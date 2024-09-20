@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
+    <link rel="stylesheet" href="./style/style-new.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <title>Noé Plain – Google</title>
+</head>
+
+<body>
+    <header style="z-index: 1;" class="main">
+        <div>
+            <a href="./"><img src="./images/illustrationen/logos/njp_logo_gross.png" alt="Logo von Noé Plain"></a>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="./" class="active">Search</a>
+                    </li>
+                    <li>
+                        <a href="./portfolio">Portfolio</a>
+                    </li>
+                    <li>
+                        <a href="./contact">Kontakt</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div style="margin-bottom: 70px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #1f0033;">
+        <a id="google" href="https://www.google.ch/">
+            <img style="z-index: 10; filter: contrast(0) brightness(100); padding: 3vh 30vh; height: 50px; margin: calc(15vh + 85px) 0 21vh 0; width: 50px; aspect-ratio: 1 / 1;" src="./images/google-logo.png" alt="Google Logo" class="body-logo googleLogo">
+        </a>
+        <input style="border-radius: 30px; width: calc(100% - 100px); max-width: 975px; padding: 20px; margin-bottom: -30px;" type="text" class="search" id="suchbegriff" placeholder="&#x1F50E; &nbsp; &nbsp; Suche">
+    </div>
+
+    <main>
+        <div class="page">
+            <h2>
+                Websites
+            </h2>
+            <div class="innernavigation">
+                <div class="card-flex">
+                    <a href="https://youtube.com/">YouTube</a>
+                    <a href="https://www.formulaweb.io/web-designer-toolkit-v2">Designer Toolkit</a>
+                    <a href="https://gemini.google.com/u/1/app">Gemini</a>
+                </div>
+
+                <h3>Design Inspiration</h3>
+                <h4>Fonts</h4>
+
+                <div class="card-flex">
+                    <a href="https://www.fontshare.com">Fontshare</a>
+                    <a href="https://fonts.google.com">Google Fonts</a>
+                    <a href="https://www.typewolf.com/">Typewolf</a>
+                    <a href="https://freefaces.gallery">Freefaces Gallery</a>
+                </div>
+
+                <h4>Colors</h4>
+
+                <div class="card-flex">
+                    <a href="https://color.adobe.com">Adobe Color</a>
+                    <a href="https://coolors.co/">Colors</a>
+                </div>
+
+                <h4>Bilder</h4>
+
+                <div class="card-flex">
+                    <a href="https://unsplash.com">Unsplash</a>
+                    <a href="https://pixabay.com">Pixabay</a>
+                    <a href="https://pexels.com">Pexels</a>
+                    <a href="https://www.wikimedia.de">Wiki Media</a>
+                    <a href="https://mockups-design.com/">Mockups Design</a>
+                    <a href="https://smartymockups.com/">Smarty Mockups</a>
+                    <a href="https://www.freepik.com/">Freepik</a>
+                </div>
+
+                <h4>Audio & Video</h4>
+
+                <div class="card-flex">
+                    <a href="https://pixabay.com/music/">Pixabay</a>
+                    <a href="https://podcast.adobe.com/">Adobe Podcast</a>
+                    <a href="https://www.musicbed.com/">Musicbed</a>
+                </div>
+
+                <h4>Icons</h4>
+                
+                <div class="card-flex">
+                    <a href="https://lucide.dev/icons">Lucide</a>
+                    <a href="https://hugeicons.com/">Hugeicons</a>
+                    <a href="https://heroicons.com/">Heroicons</a>
+                </div>
+
+                <br>
+
+            </div>
+    </main>
+
+    <footer>
+        <p>Noé Plain</p>
+    </footer>
+
+    <script>
+        // Diese Funktion wird aufgerufen, wenn die "Enter"-Taste gedrückt wird
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                sucheGoogle();
+            }
+        }
+
+        function sucheGoogle() {
+            // Den Wert des Input-Feldes abrufen
+            var suchbegriff = document.getElementById("suchbegriff").value;
+
+            // Überprüfen, ob ein Suchbegriff eingegeben wurde
+            if (suchbegriff.trim() !== "") {
+                // Google-Such-URL zusammenstellen
+                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suchbegriff);
+
+                // Die Seite im gleichen Tab öffnen
+                window.open(googleSuchURL, "_self");
+            } else {
+                alert("Bitte gib einen Suchbegriff ein.");
+            }
+        }
+
+        // Event-Listener hinzufügen, um "Enter" zu erkennen
+        document.getElementById("suchbegriff").addEventListener("keyup", handleEnter);
+    </script>
+</body>
+
+</html>
