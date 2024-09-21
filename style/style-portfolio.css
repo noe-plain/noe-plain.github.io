@@ -1,4 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=switzer@700,600,500,300,100&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=switzer@700,600,500,300,200,100&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=boska@700,600,500,300&display=swap');
 
 
@@ -267,7 +267,7 @@ main a {
     color: #131313;
     text-decoration: underline 1px;
     font-family: 'Switzer', sans-serif;
-    font-weight: 100 !important;
+    font-weight: 200 !important;
 }
 
 /****** Bilder ******/
