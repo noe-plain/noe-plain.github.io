@@ -21,7 +21,7 @@ html {
 
 main {
     display: grid;
-    min-height: calc(100vh - 192px);
+    min-height: calc(100vh - 84px - 60px);
     grid-template-columns: 40px 1fr 40px;
 }
 
@@ -285,7 +285,7 @@ form {
     padding: 10px 20px;
     margin-bottom: 17px;
     background-color: #fff;
-    border-radius: 20px;
+    border-radius: 25px;
     border: #131313 solid 1px;
 }
 
@@ -294,6 +294,7 @@ textarea {
     font-family: 'Boska', sans-serif;
     color: #1f0033;
     border: #131313 solid 1px !important;
+    font-size: large;
 }
 
 textarea {
