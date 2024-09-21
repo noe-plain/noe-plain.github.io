@@ -23,7 +23,8 @@ html {
     display: flex;
     align-items: center;
     gap: 30px;
-    height: calc(100vh - 84px - 46vh - 130px);
+    height: calc(100vh - 46vh - 190px);
+    min-height: 400px;
 }
 
 main {
@@ -32,14 +33,10 @@ main {
     overflow-x: scroll;
 }
 
-.portfolio:last-child {
-    margin: 0 50px 0 0 !important;
-}
-
 main section {
     box-shadow: #dddddd 3px 6px 15px;
     border-radius: 7px;
-    width: 100%;
+    width: 450px;
     height: 300px;
     display: grid;
     grid-template-columns: 300px 150px;
@@ -296,4 +293,67 @@ footer p {
     margin: 0;
     font-family: 'Boska';
     font-weight: 500;
+}
+
+/****** Mobile ******/
+
+@media screen and (max-width: 850px) {
+    .portfolio {
+        display: block;
+        height: 100vh;
+        padding: 0;
+    }
+    
+    main {
+        padding: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .portfolio section {
+        margin-bottom: 30px;
+    }
+
+    .portfolio section:first-child {
+        margin-top: 50px;
+    }
+
+    .portfolio section:last-child {
+        height: 20px;
+    }
+
+    #title-picture h1 {
+        left: 0;
+        top: 400px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #title-picture {
+        margin-bottom: 0 !important;
+    }
+    
+    .portfolio section {
+        display: grid;
+        width: 300px !important;
+        height: 740px;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: 410px 270px 60px !important;
+        border-radius: 13px;
+    }
+
+    section h2 {
+        padding-top: 10px;
+        grid-column-start: 1;
+        grid-row-start: 2;
+    }
+
+    section img {
+        width: 330px !important;
+        height: 410px;
+        margin-left: -30px;
+        grid-column-start: 1;
+        grid-row-start: 1;
+        border-radius: 13px 13px 0 0;
+    }
 }
