@@ -33,7 +33,7 @@
             padding: 1rem 3rem;
             background-color: white;
             border-bottom: 1px solid #ddd;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.073);
             border-radius: 30px;
             display: flex;
             justify-content: space-between;
@@ -206,6 +206,20 @@
             text-decoration: underline #fff;
         }
 
+        .verschwommen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 250px;
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(, 0, 0, 1), rgba(0, 0, 0, 0));
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+            background-color: #ffffff;
+            /* Optional: Hintergrundfarbe */
+        }
+
         @media only screen and (max-width: 600px) {
             header nav {
                 flex-direction: column;
@@ -234,6 +248,7 @@
         }
     </style>
 </head>
+<div class="verschwommen"></div>
 
 <body>
     <header>
