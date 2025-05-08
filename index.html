@@ -97,7 +97,6 @@
         .search-input {
             position: relative;
             top: calc(-60px);
-            /* Position the search bar at the bottom of the mood pic */
             left: 50%;
             transform: translateX(-50%);
             width: calc(80% - 6rem);
@@ -112,7 +111,6 @@
 
         .category {
             margin-top: 2rem;
-            /* Increased space between search bar and Category 1 */
             margin-bottom: 2rem;
         }
 
@@ -127,7 +125,6 @@
             gap: 2rem;
             overflow-y: auto;
             padding: 1rem;
-            /* Added padding to prevent shadow clipping */
             margin: 0 -1rem;
         }
 
@@ -135,13 +132,10 @@
             display: flex;
             flex-direction: column;
             flex-grow: 2;
-            /* Allow cards to grow */
             background: white;
             border-radius: 16px;
             padding: 2rem;
-            /* Increased height */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-            /* Subtle shadow */
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -155,10 +149,8 @@
         }
 
         .card:hover {
-            transform: scale(1.03);
-            /* Small grow effect */
+            transform: scale(1.07);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
-            /* Slightly stronger shadow on hover */
         }
 
         footer {
@@ -188,9 +180,7 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            /* Align elements to the right */
             gap: 0.5rem;
-            /* Add spacing between links */
         }
 
         footer a {
@@ -371,7 +361,6 @@
         </nav>
     </footer>
     <script>
-        // Diese Funktion wird aufgerufen, wenn die "Enter"-Taste gedrückt wird
         function handleEnter(event) {
             if (event.key === "Enter") {
                 sucheGoogle();
@@ -379,7 +368,6 @@
         }
 
         function sucheGoogle() {
-            // Den Wert des Input-Feldes abrufen
             var suchbegriff = document.getElementById("suchbegriff").value;
 
             // Überprüfen, ob ein Suchbegriff eingegeben wurde
