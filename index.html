@@ -279,8 +279,8 @@
         </nav>
     </header>
     <main>
-        <div id="search" class="mood-pic"></div>
-        <input id="suchbegriff" type="text" class="search-input" placeholder="Search…">
+        <div class="mood-pic"></div>
+        <input id="suche" type="text" class="search-input" placeholder="Search…">
         </div>
         <div class="category">
             <div class="card-container">
@@ -388,22 +388,22 @@
         }
 
         function sucheGoogle() {
-            var suchbegriff = document.getElementById("suchbegriff").value;
+            var suche = document.getElementById("suche").value;
 
-            // Überprüfen, ob ein Suchbegriff eingegeben wurde
-            if (suchbegriff.trim() !== "") {
+            // Überprüfen, ob ein suche eingegeben wurde
+            if (suche.trim() !== "") {
                 // Google-Such-URL zusammenstellen
-                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suchbegriff);
+                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
 
                 // Die Seite im gleichen Tab öffnen
                 window.open(googleSuchURL, "_self");
             } else {
-                alert("Bitte gib einen Suchbegriff ein.");
+                alert("Bitte gib einen suche ein.");
             }
         }
 
         // Event-Listener hinzufügen, um "Enter" zu erkennen
-        document.getElementById("suchbegriff").addEventListener("keyup", handleEnter);
+        document.getElementById("suche").addEventListener("keyup", handleEnter);
     </script>
 </body>
 
