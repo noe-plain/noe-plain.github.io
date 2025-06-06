@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>&#x1F419; – Younique CD</title>
+    <style>
+        /* ===========================================
+        Allgemeine Einstellungen
+        =========================================== */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+            transition: all 0.5s ease-in-out;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+        }
+
+        #no-hover:hover {
+            background-color: #33333300;
+        }
+
+        /* ===========================================
+        Typografie
+        ============================================ */
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 20px 0 0 0;
+        }
+
+        h3 {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        * {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        /* ===========================================
+        Material Icons
+        ============================================ */
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+        }
+
+        /* ===========================================
+        Header
+        =========================================== */
+        header {
+            position: fixed;
+            grid-column-start: 1;
+            grid-column-end: 2;
+            margin: 70px;
+            background: rgb(0 161 190);
+            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            color: #333;
+            border-radius: 40px;
+            width: 80px;
+            height: calc(100vh - 140px);
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            row-gap: 5px;
+            margin: -15px 0 0 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            font-weight: 700;
+            border-radius: 30px;
+            padding: 15px 2px 10px 2px;
+            margin: 5px 11px;
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.5s ease-in-out;
+        }
+
+        nav a:hover {
+            background: rgba(205, 205, 205, 0.3);
+        }
+
+        /* ===========================================
+        Main Content
+        =========================================== */
+        main {
+            min-height: calc(100vh - 170px);
+            grid-column-start: 2;
+            grid-column-end: 3;
+            padding: 20px;
+            padding-bottom: 0;
+            margin: 50px 50px 0px 0;
+            display: grid;
+            grid-template-rows: 600px;
+            row-gap: 70px;
+        }
+
+        main a {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.5s ease-in-out;
+            padding: 30px 70px;
+            text-align: center;
+        }
+
+        main a:hover {
+            transform: scale(1.03);
+        }
+
+        /* Content Bereich */
+        .content {
+            grid-column-start: 2;
+            grid-column-end: 4;
+        }
+
+        .card-style {
+            display: block;
+            background: #fff;
+            border-radius: 30px;
+            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            margin: 0 0 30px 0;
+        }
+
+        /* CI/CD Sammlung */
+        #ci-cd-sammlung {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            overflow-y: auto;
+            padding: 30px;
+            margin: 0 -30px;
+        }
+
+        #ci-cd-sammlung a {
+            padding: 30px 60px;
+        }
+
+        /* ===========================================
+        Younique-CD Bereich
+        ============================================ */
+        #younique-cd {
+            position: relative;
+            background-image: url('./bilder/RGB_M-Budget_Picknick_0323.jpg');
+            background-size: cover;
+            background-position: 10% 50%;
+            margin: 0 0 30px 0 !important;
+            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            border-radius: 40px;
+            padding: 20px;
+            margin-bottom: 70px;
+        }
+
+        #younique-cd h1 {
+            font-size: 7vh;
+            color: #fff;
+            text-shadow: 1px 2px 70px #333;
+            text-align: center;
+        }
+
+        #younique-cd input {
+            position: absolute;
+            left: 50%;
+            bottom: -30px;
+            transform: translateX(-50%);
+            width: calc(100% - 300px);
+            max-width: 1300px;
+            font-size: 1rem;
+            text-align: center;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3);
+            background: #fff;
+        }
+
+        #younique-logo a {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #younique-logo img {
+            max-height: 300px;
+        }
+
+        #font-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 50px;
+            overflow-y: auto;
+            padding: 30px;
+            margin: 0 -30px;
+        }
+
+        #font-samples p {
+            margin: 10px 0 0 0;
+        }
+
+        /* ===========================================
+        Footer
+        ============================================ */
+        footer {
+            background: rgb(31 67 90);
+            color: #fff;
+            align-items: center;
+            text-align: center;
+            margin: 70px 70px 70px 0px;
+            padding: 10px 30px;
+            border-radius: 40px;
+            grid-column-start: 2;
+            grid-column-end: 4;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a id="no-hover" style="display: flex; justify-content: center; margin: 20px -30px 50px -30px;"
+                        href=""><img style="filter: brightness(1000); width: 50px; height: 50px;"
+                            src="./bilder/Logo-Younique.svg" alt=""></a></li>
+                <li><a href="#logos"><span class="material-symbols-outlined">home_app_logo</span></a></li>
+                <li><a href="#younique-fonts"><span class="material-symbols-outlined">text_fields</span></a></li>
+                <li><a href="#"><span class="material-symbols-outlined">palette</span></a></li>
+                <li><a href="#"><span class="material-symbols-outlined">image</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="younique-cd">
+            <h1>&#x1F419; – Younique CD</h1>
+            <input id="suche" type="text" placeholder="&#128269; Search with Google">
+        </div>
+
+        <div id="content">
+            <!--CI/CD Sammlung-->
+            <h2 style="margin-bottom: -20px;">CI/CD Sammlung</h2>
+            <div id="ci-cd-sammlung">
+                <a class="card-style" href="https://migros.frontify.com">Migros Supermarkt AG</a>
+                <a class="card-style" href="https://branding.migros-gruppe.jobs/hub/121">Migros (EB)</a>
+                <a class="card-style" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a>
+                <a class="card-style" href="https://brandportal.migros.ch/hub/72">M-Industrie</a>
+            </div>
+
+            <hr style="margin: 30px 0 50px 0; ">
+            <!--Younique Logo-->
+            <h2 id="logos">Younique CI/CD</h2>
+
+            <div id="younique-logo" class="card-style">
+                <h3>Logos</h3>
+                <a href="download:./bilder/logo-younique.png" download>
+                    <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                </a>
+            </div>
+
+            <div id="younique-fonts">
+                <div id="font-samples">
+                    <section class="card-style">
+                        <h3>Font-Familie</h3>
+                        <p>
+                            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
+                            —
+                            …
+                        </p>
+                        <br>
+                        <p>
+                            Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
+                            Es geht darum, dass der Text
+                            nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
+                            Designer ein neues Layout
+                            gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
+                            eigentliche Text ablenkt.
+                        </p>
+                        <p>
+                            Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
+                            Lateinischen kommt. Klingt fancy, oder?
+                            Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
+                            Buchstaben und Wörter, die so
+                            zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
+                            Sinnvolles daraus ableiten.
+                        </p>
+                        <br>
+                    </section>
+                    <section class="card-style">
+                        <h3>Font-Familie 2</h3>
+                        <p>
+                            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
+                            —
+                            …
+                        </p>
+                        <br>
+                        <p>
+                            Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
+                            Es geht darum, dass der Text
+                            nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
+                            Designer ein neues Layout
+                            gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
+                            eigentliche Text ablenkt.
+                        </p>
+                        <p>
+                            Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
+                            Lateinischen kommt. Klingt fancy, oder?
+                            Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
+                            Buchstaben und Wörter, die so
+                            zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
+                            Sinnvolles daraus ableiten.
+                        </p>
+                        <br>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Younique CD. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                sucheGoogle();
+            }
+        }
+
+        function sucheGoogle() {
+            var suche = document.getElementById("suche").value;
+
+            // Überprüfen, ob ein suche eingegeben wurde
+            if (suche.trim() !== "") {
+                // Google-Such-URL zusammenstellen
+                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+
+                // Die Seite im gleichen Tab öffnen
+                window.open(googleSuchURL, "_self");
+            } else {
+                alert("Bitte gib einen suche ein.");
+            }
+        }
+
+        // Event-Listener hinzufügen, um "Enter" zu erkennen
+        document.getElementById("suche").addEventListener("keyup", handleEnter);
+    </script>
+</body>
+
+</html>
