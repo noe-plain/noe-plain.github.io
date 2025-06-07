@@ -23,7 +23,7 @@
             font-family: Arial, sans-serif;
             line-height: 1.6;
             display: grid;
-            grid-template-columns: 200px 1fr;
+            grid-template-columns: 220px 1fr;
         }
 
         #no-hover:hover {
@@ -67,7 +67,7 @@
             grid-column-end: 2;
             margin: 70px;
             background: rgb(0 161 190);
-            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
             color: #333;
             border-radius: 40px;
             width: 80px;
@@ -112,12 +112,18 @@
         Main Content
         =========================================== */
         main {
-            min-height: calc(100vh - 170px);
             grid-column-start: 2;
             grid-column-end: 3;
-            padding: 20px;
+            padding: 70px 70px 0px 0px;
+            display: flex;
+            justify-content: center;
+}
+        
+        .max-width {
+            min-height: calc(100vh - 170px);
+            max-width: 1300px;
             padding-bottom: 0;
-            margin: 50px 50px 0px 0;
+            margin: 0;
             display: grid;
             grid-template-rows: 600px;
             row-gap: 70px;
@@ -147,7 +153,7 @@
             display: block;
             background: #fff;
             border-radius: 30px;
-            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
             padding: 20px 40px;
             margin: 0 0 30px 0;
         }
@@ -155,8 +161,8 @@
         /* CI/CD Sammlung */
         #ci-cd-sammlung {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(410px, 1fr));
+            column-gap: 50px;
             overflow-y: auto;
             padding: 30px;
             margin: 0 -30px;
@@ -175,7 +181,7 @@
             background-size: cover;
             background-position: 10% 50%;
             margin: 0 0 30px 0 !important;
-            box-shadow: 1.5px 2px 13px rgba(0, 0, 0, 0.3);
+            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
             border-radius: 40px;
             padding: 20px;
             margin-bottom: 70px;
@@ -200,7 +206,7 @@
             padding: 20px 50px;
             border: none;
             border-radius: 30px;
-            box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3);
+            box-shadow: 1px 1px 13px rgba(100, 100, 100, 0.3);
             background: #fff;
         }
 
@@ -215,8 +221,8 @@
 
         #font-samples {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px 50px;
             overflow-y: auto;
             padding: 30px;
             margin: 0 -30px;
@@ -230,15 +236,27 @@
         Footer
         ============================================ */
         footer {
-            background: rgb(31 67 90);
-            color: #fff;
-            align-items: center;
-            text-align: center;
-            margin: 70px 70px 70px 0px;
-            padding: 10px 30px;
-            border-radius: 40px;
             grid-column-start: 2;
             grid-column-end: 4;
+            display: grid;
+            justify-content: center;
+        }
+
+        footer div {
+        width: 100%;
+        }
+
+        footer p {
+            background: rgb(31 67 90);
+            color: #fff;
+            align-self: center;
+            justify-self: center;
+            text-align: center;
+            width: calc(100% - 130px);
+            max-width: 1300px;
+            margin: 0px 70px 70px 0px;
+            padding: 20px 60px;
+            border-radius: 40px;
         }
     </style>
 </head>
@@ -259,86 +277,88 @@
     </header>
 
     <main>
-        <div id="younique-cd">
-            <h1>&#x1F419; – Younique CD</h1>
-            <input id="suche" type="text" placeholder="&#128269; Search with Google">
-        </div>
-
-        <div id="content">
-            <!--CI/CD Sammlung-->
-            <h2 style="margin-bottom: -20px;">CI/CD Sammlung</h2>
-            <div id="ci-cd-sammlung">
-                <a class="card-style" href="https://migros.frontify.com">Migros Supermarkt AG</a>
-                <a class="card-style" href="https://branding.migros-gruppe.jobs/hub/121">Migros (EB)</a>
-                <a class="card-style" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a>
-                <a class="card-style" href="https://brandportal.migros.ch/hub/72">M-Industrie</a>
+        <div class="max-width">
+            <div id="younique-cd">
+                <h1>&#x1F419; – Younique CD</h1>
+                <input id="suche" type="text" placeholder="&#128269; Search with Google">
             </div>
 
-            <hr style="margin: 30px 0 50px 0; ">
-            <!--Younique Logo-->
-            <h2 id="logos">Younique CI/CD</h2>
+            <div id="content">
+                <!--CI/CD Sammlung-->
+                <h2 style="margin-bottom: -20px;">CI/CD Sammlung</h2>
+                <div id="ci-cd-sammlung">
+                    <a class="card-style" href="https://migros.frontify.com">Migros Supermarkt AG</a>
+                    <a class="card-style" href="https://branding.migros-gruppe.jobs/hub/121">Migros (EB)</a>
+                    <a class="card-style" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a>
+                    <a class="card-style" href="https://brandportal.migros.ch/hub/72">M-Industrie</a>
+                </div>
 
-            <div id="younique-logo" class="card-style">
-                <h3>Logos</h3>
-                <a href="download:./bilder/logo-younique.png" download>
-                    <img src="./bilder/logo-younique.png" alt="Younique Logo">
-                </a>
-            </div>
+                <hr style="margin: 30px 0 50px 0; ">
+                <!--Younique Logo-->
+                <h2 id="logos">Younique CI/CD</h2>
 
-            <div id="younique-fonts">
-                <div id="font-samples">
-                    <section class="card-style">
-                        <h3>Font-Familie</h3>
-                        <p>
-                            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
-                            —
-                            …
-                        </p>
-                        <br>
-                        <p>
-                            Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
-                            Es geht darum, dass der Text
-                            nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
-                            Designer ein neues Layout
-                            gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
-                            eigentliche Text ablenkt.
-                        </p>
-                        <p>
-                            Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
-                            Lateinischen kommt. Klingt fancy, oder?
-                            Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
-                            Buchstaben und Wörter, die so
-                            zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
-                            Sinnvolles daraus ableiten.
-                        </p>
-                        <br>
-                    </section>
-                    <section class="card-style">
-                        <h3>Font-Familie 2</h3>
-                        <p>
-                            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
-                            —
-                            …
-                        </p>
-                        <br>
-                        <p>
-                            Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
-                            Es geht darum, dass der Text
-                            nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
-                            Designer ein neues Layout
-                            gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
-                            eigentliche Text ablenkt.
-                        </p>
-                        <p>
-                            Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
-                            Lateinischen kommt. Klingt fancy, oder?
-                            Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
-                            Buchstaben und Wörter, die so
-                            zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
-                            Sinnvolles daraus ableiten.
-                        </p>
-                        <br>
-                    </section>
+                <div id="younique-logo" class="card-style">
+                    <h3>Logos</h3>
+                    <a href="download:./bilder/logo-younique.png" download>
+                        <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                    </a>
+                </div>
+
+                <div id="younique-fonts">
+                    <div id="font-samples">
+                        <section class="card-style">
+                            <h3>Font-Familie</h3>
+                            <p>
+                                ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
+                                —
+                                …
+                            </p>
+                            <br>
+                            <p>
+                                Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
+                                Es geht darum, dass der Text
+                                nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
+                                Designer ein neues Layout
+                                gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
+                                eigentliche Text ablenkt.
+                            </p>
+                            <p>
+                                Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
+                                Lateinischen kommt. Klingt fancy, oder?
+                                Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
+                                Buchstaben und Wörter, die so
+                                zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
+                                Sinnvolles daraus ableiten.
+                            </p>
+                            <br>
+                        </section>
+                        <section class="card-style">
+                            <h3>Font-Familie 2</h3>
+                            <p>
+                                ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? + - –
+                                —
+                                …
+                            </p>
+                            <br>
+                            <p>
+                                Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute Frage!
+                                Es geht darum, dass der Text
+                                nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn ein
+                                Designer ein neues Layout
+                                gestaltet, dann möchte er sich auf die Anordnung der Elemente konzentrieren, ohne dass der
+                                eigentliche Text ablenkt.
+                            </p>
+                            <p>
+                                Früher wurde oft der Satz "Lorem ipsum dolor sit amet..." verwendet, der aus dem
+                                Lateinischen kommt. Klingt fancy, oder?
+                                Aber das Ding ist, dass dieser Text keine wirkliche Bedeutung hat. Es sind einfach nur
+                                Buchstaben und Wörter, die so
+                                zusammengewürfelt sind, dass sie wie ein normaler Text aussehen. Aber man kann nichts
+                                Sinnvolles daraus ableiten.
+                            </p>
+                            <br>
+                        </section>
+                    </div>
                 </div>
             </div>
         </div>
