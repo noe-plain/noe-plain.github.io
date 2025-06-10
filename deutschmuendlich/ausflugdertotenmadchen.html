@@ -83,6 +83,7 @@
             position: relative;
             max-width: 1200px;
             margin: 0 auto;
+            padding-top: 20px;
         }
 
         .timeline::after {
@@ -105,10 +106,12 @@
 
         .timeline-container.left {
             left: 0;
+            padding-right: 90px;
         }
 
         .timeline-container.right {
             left: 50%;
+            padding-left: 90px;
         }
 
         .timeline-container::after {
@@ -128,6 +131,30 @@
             left: -16px;
         }
 
+        .timeline-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #087E8B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            top: 8px;
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .timeline-container.left .timeline-icon {
+            right: -40px;
+        }
+
+        .timeline-container.right .timeline-icon {
+            left: -40px;
+        }
+
         .timeline-content {
             padding: 20px 30px;
             background-color: white;
@@ -136,10 +163,12 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .flow-line {
-            border-left: 2px dashed #087E8B;
-            height: 50px;
-            margin-left: 50%;
+        .flow-arrow {
+            font-size: 3rem;
+            line-height: 1;
+            display: block;
+            margin: 0 auto;
+            color: #FF5A5F;
         }
     </style>
 </head>
@@ -164,17 +193,17 @@
                 die innovativen Erzählstrategien dieses Schlüsselwerks auf.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto text-center">
-                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                <div class="bg-muted p-6 rounded-lg shadow-inner flex flex-col items-center justify-center">
                     <p class="text-6xl font-bold text-accent">1</p>
-                    <p class="text-xl text-primary font-semibold">Überlebende</p>
+                    <p class="text-xl text-primary font-semibold mt-2">Überlebende</p>
                 </div>
-                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                <div class="bg-muted p-6 rounded-lg shadow-inner flex flex-col items-center justify-center">
                     <p class="text-6xl font-bold text-primary">13</p>
-                    <p class="text-xl text-primary font-semibold">Mädchen</p>
+                    <p class="text-xl text-primary font-semibold mt-2">Mädchen</p>
                 </div>
-                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                <div class="bg-muted p-6 rounded-lg shadow-inner flex flex-col items-center justify-center">
                     <p class="text-6xl font-bold text-secondary">~30</p>
-                    <p class="text-xl text-primary font-semibold">Jahre zwischen Idylle & Katastrophe</p>
+                    <p class="text-xl text-primary font-semibold mt-2">Jahre zwischen Idylle & Katastrophe</p>
                 </div>
             </div>
         </section>
@@ -188,6 +217,7 @@
             </p>
             <div class="timeline">
                 <div class="timeline-container left">
+                    <div class="timeline-icon">📚</div>
                     <div class="timeline-content">
                         <h4 class="text-2xl font-bold text-secondary">1900-1933</h4>
                         <p class="text-gray-600">Geburt in Mainz, Studium, Eintritt in die KPD. Ihre Bücher werden bei
@@ -195,22 +225,25 @@
                     </div>
                 </div>
                 <div class="timeline-container right">
+                    <div class="timeline-icon">🏃‍♀️</div>
                     <div class="timeline-content">
                         <h4 class="text-2xl font-bold text-accent">1933</h4>
                         <p class="text-gray-600">Verhaftung durch die Gestapo und Flucht nach Paris.</p>
                     </div>
                 </div>
                 <div class="timeline-container left">
+                    <div class="timeline-icon">🌍</div>
                     <div class="timeline-content">
                         <h4 class="text-2xl font-bold text-secondary">1940-1941</h4>
                         <p class="text-gray-600">Flucht vor der deutschen Invasion über Marseille nach Mexiko-Stadt.</p>
                     </div>
                 </div>
                 <div class="timeline-container right">
+                    <div class="timeline-icon">💔</div>
                     <div class="timeline-content">
                         <h4 class="text-2xl font-bold text-accent">1942-1944</h4>
-                        <p class="text-gray-600">Erhält Nachricht vom Tod der Mutter im KZ. Schwerer Autounfall.
-                            Entstehung von "Der Ausflug der toten Mädchen".</p>
+                        <p class="text-gray-600">Nachricht vom Tod der Mutter im KZ. Schwerer Autounfall. Entstehung von
+                            "Der Ausflug der toten Mädchen".</p>
                     </div>
                 </div>
             </div>
@@ -225,37 +258,43 @@
             </p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-lg border-l-8 border-green-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Leni</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Leni <span
+                            class="ml-2 text-green-600 text-3xl">🛡️</span></h4>
                     <p class="text-gray-500 mb-2">Die treue Freundin</p>
                     <p class="text-gray-800"><b class="text-green-600">Schicksal:</b> Schloss sich dem Widerstand an,
                         wurde verraten und kam ums Leben. Ein Symbol für unerschütterliche Haltung.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg border-l-8 border-yellow-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Marianne</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Marianne <span
+                            class="ml-2 text-yellow-600 text-3xl">👥</span></h4>
                     <p class="text-gray-500 mb-2">Die enge Freundin</p>
                     <p class="text-gray-800"><b class="text-yellow-600">Schicksal:</b> Wurde zur überzeugten
                         Nationalsozialistin und Opportunistin, die alte Freundschaften verriet.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg border-l-8 border-red-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Sophie & Frl. Sichel</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Sophie & Frl. Sichel <span
+                            class="ml-2 text-red-600 text-3xl">☠️</span></h4>
                     <p class="text-gray-500 mb-2">Jüdische Mitschülerin & Lehrerin</p>
                     <p class="text-gray-800"><b class="text-red-600">Schicksal:</b> Nach Polen deportiert und im
                         Holocaust ermordet. Ihr Tod steht für die systematische Vernichtung.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg border-l-8 border-gray-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Lotte & Liese</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Lotte & Liese <span
+                            class="ml-2 text-gray-600 text-3xl">💣</span></h4>
                     <p class="text-gray-500 mb-2">Die Fromme & die Mutige</p>
                     <p class="text-gray-800"><b class="text-gray-600">Schicksal:</b> Beide starben bei Bombenangriffen,
                         als indirekte Opfer des Krieges, den sie nicht gewollt hatten.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg border-l-8 border-yellow-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Ida & Nora</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Ida & Nora <span
+                            class="ml-2 text-yellow-600 text-3xl">↔️</span></h4>
                     <p class="text-gray-500 mb-2">Die Mitläuferinnen</p>
                     <p class="text-gray-800"><b class="text-yellow-600">Schicksal:</b> Passten sich aus Opportunismus an
                         das Regime an und profitierten davon.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg border-l-8 border-blue-500 shadow-lg">
-                    <h4 class="text-2xl font-bold text-primary">Netty (Erzählerin)</h4>
+                    <h4 class="text-2xl font-bold text-primary flex items-center">Netty (Erzählerin) <span
+                            class="ml-2 text-blue-600 text-3xl">✍️</span></h4>
                     <p class="text-gray-500 mb-2">Die Beobachterin</p>
                     <p class="text-gray-800"><b class="text-blue-600">Schicksal:</b> Überlebt im Exil, wird zur Zeugin
                         und Chronistin des kollektiven Schicksals, um die Erinnerung zu bewahren.</p>
@@ -284,18 +323,17 @@
                     nicht-lineare, traumhafte Struktur ist kein bloßes Stilmittel, sondern der Ausdruck von Trauma und
                     dem Gefühl der "zerbrochenen Zugehörigkeit" im Exil.</p>
                 <div class="flex flex-col items-center justify-center h-full pt-4">
-                    <div class="text-center p-4 bg-secondary text-light rounded-lg shadow-md w-3/4">
+                    <div class="text-center p-4 bg-secondary text-light rounded-lg shadow-md w-3/4 max-w-sm">
                         <p class="text-xl font-bold">GEGENWART (ca. 1944)</p>
                         <p>Exil in Mexiko, Krankheit, Schreiben</p>
                     </div>
-                    <div class="w-full flex justify-center items-center h-24">
-                        <div class="text-accent font-bold transform -rotate-90 origin-center whitespace-nowrap">◀︎
-                            ERINNERUNG ▼</div>
-                        <div class="border-l-4 border-r-4 border-accent border-dashed h-full w-0 mx-8"></div>
-                        <div class="text-accent font-bold transform rotate-90 origin-center whitespace-nowrap">▶︎
-                            VORAUSBLICK ▲</div>
+                    <div class="w-full flex flex-col items-center py-4">
+                        <span class="flow-arrow mb-2">⬇️</span>
+                        <p class="text-lg text-accent font-semibold text-center mb-1">ERINNERUNG</p>
+                        <p class="text-lg text-accent font-semibold text-center">VORAUSBLICK</p>
+                        <span class="flow-arrow mt-2">⬆️</span>
                     </div>
-                    <div class="text-center p-4 bg-muted text-primary rounded-lg shadow-md w-3/4">
+                    <div class="text-center p-4 bg-muted text-primary rounded-lg shadow-md w-3/4 max-w-sm">
                         <p class="text-xl font-bold">VERGANGENHEIT (ca. 1912)</p>
                         <p>Schulausflug, Idylle am Rhein, Unschuld</p>
                     </div>
@@ -324,17 +362,22 @@
             const wrapLabel = (label, maxWidth) => {
                 const words = label.split(' ');
                 let lines = [];
-                let currentLine = words[0];
+                let currentLine = '';
 
-                for (let i = 1; i < words.length; i++) {
-                    if (currentLine.length + words[i].length + 1 < maxWidth) {
-                        currentLine += ' ' + words[i];
+                for (let i = 0; i < words.length; i++) {
+                    const word = words[i];
+                    if (currentLine.length + word.length + (currentLine.length > 0 ? 1 : 0) <= maxWidth) {
+                        currentLine += (currentLine.length > 0 ? ' ' : '') + word;
                     } else {
-                        lines.push(currentLine);
-                        currentLine = words[i];
+                        if (currentLine.length > 0) {
+                            lines.push(currentLine);
+                        }
+                        currentLine = word;
                     }
                 }
-                lines.push(currentLine);
+                if (currentLine.length > 0) {
+                    lines.push(currentLine);
+                }
                 return lines;
             };
 
@@ -352,7 +395,12 @@
             new Chart(societalRolesCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Passive Konformisten & Mitläufer', 'Aktive Nationalsozialisten', 'Opfer des Regimes', 'Widerstand & Nonkonformisten'],
+                    labels: [
+                        wrapLabel('Passive Konformisten & Mitläufer', 16),
+                        wrapLabel('Aktive Nationalsozialisten', 16),
+                        wrapLabel('Opfer des Regimes', 16),
+                        wrapLabel('Widerstand & Nonkonformisten', 16)
+                    ],
                     datasets: [{
                         label: 'Gesellschaftliche Rollen',
                         data: [55, 15, 25, 5],
