@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografik: Analyse von Storms Schimmelreiter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 450px;
+        }
+
+        .flowchart-box {
+            border: 2px solid #00A5E3;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .flowchart-connector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 3rem;
+        }
+
+        .flowchart-connector::after {
+            content: '↓';
+            font-size: 2rem;
+            color: #00A5E3;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Color Palette: Brilliant Blues (#00A5E3, #8DD7BF, #FF96C5, #FF5768, #FFBF65) -->
+    <!-- Narrative Plan: 1. Intro/Context, 2. Narrative Framework, 3. Character Analysis (Hauke), 4. Core Conflicts, 5. Key Symbols, 6. Character Relationships, 7. Conclusion -->
+    <!-- Visualization Plan: 
+        - Narrative Framework -> Goal: Organize -> Method: HTML/CSS Flowchart (No SVG/Mermaid)
+        - Hauke's Traits -> Goal: Compare -> Method: Chart.js Radar Chart (No SVG)
+        - Core Conflicts -> Goal: Compare -> Method: HTML/CSS Two-Column Layout (No SVG)
+        - Symbol Meanings -> Goal: Inform -> Method: HTML/CSS Cards with Icons (No SVG)
+        - Character Relationships -> Goal: Organize -> Method: HTML/CSS Styled Table (No SVG)
+        - Publication Year -> Goal: Inform -> Method: Big Number/Text (No SVG)
+    -->
+    <!-- Confirmation: No SVG graphics or Mermaid JS are used in this file. All visualizations are created using Chart.js (Canvas) or structured HTML/CSS with Tailwind. -->
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#00A5E3] mb-2">Der Schimmelreiter</h1>
+            <p class="text-xl md:text-2xl text-gray-600">Eine visuelle Analyse von Theodor Storms Meisterwerk</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <section id="kontext" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#00A5E3] mb-4 text-center">Ein Meisterwerk des Poetischen Realismus
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="text-lg text-gray-700 space-y-4">
+                        <p>Theodor Storms Novelle, posthum <span class="font-bold text-[#FF5768]">1888</span>
+                            veröffentlicht, ist ein Höhepunkt des Poetischen Realismus. Sie verwebt die tragische
+                            Lebensgeschichte des Deichgrafen Hauke Haien mit dem ewigen Kampf des Menschen gegen die
+                            Natur und dem Konflikt zwischen Fortschritt und Aberglaube.</p>
+                        <p>Die Erzählung ist tief in der nordfriesischen Landschaft verwurzelt und nutzt deren raue
+                            Schönheit als Spiegel für die inneren und äußeren Konflikte der Figuren.</p>
+                    </div>
+                    <div id="narrative-framework" class="p-4">
+                        <h3 class="text-2xl font-bold text-center mb-4">Verschachtelte Erzählstruktur</h3>
+                        <div class="flowchart-box border-[#FF96C5] bg-pink-50">
+                            <p class="font-bold">1. Äußerer Rahmen (ca. 1888)</p>
+                            <p class="text-sm">Ein Ich-Erzähler erinnert sich an eine gelesene Geschichte.</p>
+                        </div>
+                        <div class="flowchart-connector"></div>
+                        <div class="flowchart-box border-[#FFBF65] bg-yellow-50">
+                            <p class="font-bold">2. Innerer Rahmen (ca. 1820)</p>
+                            <p class="text-sm">Ein Reisender begegnet dem Geisterreiter und hört dessen Geschichte.</p>
+                        </div>
+                        <div class="flowchart-connector"></div>
+                        <div class="flowchart-box border-[#8DD7BF] bg-teal-50">
+                            <p class="font-bold">3. Binnenhandlung (18. Jh.)</p>
+                            <p class="text-sm">Der Schulmeister erzählt das Leben von Hauke Haien.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="hauke-haien" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#00A5E3] mb-4 text-center">Der Protagonist: Hauke Haien</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-3">Charakterprofil eines Visionärs</h3>
+                        <p class="text-gray-700 mb-4">Hauke Haien ist eine der komplexesten Figuren der deutschen
+                            Literatur. Er ist ein brillanter, rationaler Denker, getrieben von dem Wunsch, seine Heimat
+                            vor der Zerstörungskraft des Meeres zu schützen. Sein unbedingter Wille zum Fortschritt
+                            bringt ihn jedoch in Konflikt mit seiner Gemeinschaft und führt ihn in eine tiefe
+                            persönliche Isolation.</p>
+                        <p class="text-gray-700">Seine Hybris und seine Unfähigkeit zur Kommunikation sind, neben den
+                            Naturgewalten, die treibenden Kräfte seiner Tragödie.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="haukeChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="konflikte" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#00A5E3] mb-6 text-center">Die zentralen Konflikte</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="text-center p-6 bg-blue-50 rounded-lg">
+                        <div class="text-6xl mb-4">🧠</div>
+                        <h3 class="text-2xl font-bold text-[#00A5E3] mb-2">Rationalität & Fortschritt</h3>
+                        <p class="text-gray-700">Hauke Haien vertraut auf Wissenschaft, Mathematik und innovative
+                            Deichbau-Techniken. Er repräsentiert die aufkommende Zeit der Aufklärung.</p>
+                    </div>
+                    <div class="text-center p-6 bg-red-50 rounded-lg">
+                        <div class="text-6xl mb-4">👻</div>
+                        <h3 class="text-2xl font-bold text-[#FF5768] mb-2">Aberglaube & Tradition</h3>
+                        <p class="text-gray-700">Die Dorfgemeinschaft hält an alten Mythen und Ritualen fest. Sie
+                            fürchten das Unbekannte und sehen in Haukes Werk Teufelszeug.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="symbole" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#00A5E3] mb-6 text-center">Leitmotive und Symbole</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">🐴 Der Schimmel</h3>
+                        <p class="text-gray-700">Das vielschichtigste Symbol: Einerseits Statussymbol und Zeichen der
+                            Macht, andererseits dämonisches Geisterpferd in den Augen der Dorfbewohner. Er verkörpert
+                            Haukes Andersartigkeit und wird zum Vorboten des Unheils.</p>
+                    </div>
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">🌊 Der Deich</h3>
+                        <p class="text-gray-700">Symbol des menschlichen Fortschritts und des Versuchs, die Natur zu
+                            beherrschen. Gleichzeitig zeigt sein Brechen die Grenzen menschlicher Kontrolle und die
+                            fatalen Folgen von Hybris und Kompromissen.</p>
+                    </div>
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">🌪️ Meer & Sturmflut</h3>
+                        <p class="text-gray-700">Die unbezähmbare Urgewalt der Natur. Die Sturmflut ist der dramatische
+                            Höhepunkt, an dem sich Haukes Schicksal erfüllt und die menschliche Ohnmacht gegenüber der
+                            Natur offenbar wird.</p>
+                    </div>
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">👤 Isolation & Einsamkeit</h3>
+                        <p class="text-gray-700">Der Preis, den Hauke für sein Genie zahlt. Seine intellektuelle
+                            Überlegenheit und mangelnde Kommunikationsfähigkeit entfremden ihn von der Gemeinschaft und
+                            machen ihn zum tragischen Einzelkämpfer.</p>
+                    </div>
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">🐶 Der gelbe Hund</h3>
+                        <p class="text-gray-700">Haukes Rettung des Hundes vor dem rituellen Opfer im Deich symbolisiert
+                            den direkten Zusammenprall von wissenschaftlichem Denken und tief verwurzeltem Aberglauben.
+                        </p>
+                    </div>
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:shadow-xl transition-shadow">
+                        <h3 class="text-xl font-bold mb-2">⚪ Weiße Tiere</h3>
+                        <p class="text-gray-700">Ein wiederkehrendes Motiv des Unheils. Die Tötung des weißen Katers
+                            durch Hauke wird zum Fluch, der sein Leben überschattet und die abergläubische Weltsicht
+                            untermauert.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="beziehungen" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#00A5E3] mb-6 text-center">Figurenkonstellation</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">Haukes Isolation wird durch das Netz seiner
+                    Beziehungen deutlich. Nur wenige verstehen ihn, während die meisten ihm mit Misstrauen und
+                    Feindseligkeit begegnen. Diese Dynamik ist entscheidend für sein tragisches Scheitern.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max text-left">
+                        <thead>
+                            <tr class="border-b-2 border-[#00A5E3]">
+                                <th class="p-4 font-bold">Figur</th>
+                                <th class="p-4 font-bold">Rolle</th>
+                                <th class="p-4 font-bold">Beziehung zu Hauke Haien</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-4 font-bold text-[#FF5768]">Elke Volkerts</td>
+                                <td class="p-4">Ehefrau & Unterstützerin</td>
+                                <td class="p-4">Wichtigste Vertraute und Puffer zur Gemeinschaft, doch oft von
+                                    Entscheidungen ausgeschlossen.</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 bg-gray-50">
+                                <td class="p-4 font-bold text-[#FFBF65]">Ole Peters</td>
+                                <td class="p-4">Antagonist & Rivale</td>
+                                <td class="p-4">Verkörperung des traditionsverhafteten Widerstands, getrieben von Neid
+                                    und Misstrauen.</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-4 font-bold text-gray-600">Dorfgemeinschaft</td>
+                                <td class="p-4">Kollektiver Widerstand</td>
+                                <td class="p-4">Abergäubisch, träge und misstrauisch; lehnt Haukes fortschrittliche
+                                    Ideen als Fremdkörper ab.</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-4 font-bold text-gray-600">Tede Haien</td>
+                                <td class="p-4">Vater & Förderer</td>
+                                <td class="p-4">Erkennt Haukes Begabung, doch ihr Verhältnis ist distanziert; er
+                                    versteht die Radikalität seines Sohnes nicht.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-12 pt-8 border-t border-gray-300">
+            <p class="text-gray-500">Visuelle Analyse basierend auf Theodor Storms "Der Schimmelreiter" (1888).</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function wrapLabel(label, maxWidth) {
+            if (typeof label !== 'string' || label.length <= maxWidth) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + word).length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            });
+            lines.push(currentLine.trim());
+            return lines;
+        }
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+
+        const haukeCtx = document.getElementById('haukeChart').getContext('2d');
+        new Chart(haukeCtx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    'Intelligent & Rational',
+                    'Ehrgeizig & Visionär',
+                    'Isoliert & Einzelgängerisch',
+                    'Impulsiv & Rücksichtslos',
+                    'Pflichtbewusst',
+                    'Sozial Inkompetent'
+                ].map(label => wrapLabel(label, 16)),
+                datasets: [{
+                    label: 'Hauke Haiens Charakterzüge',
+                    data: [9, 10, 8, 6, 9, 7],
+                    backgroundColor: 'rgba(0, 165, 227, 0.2)',
+                    borderColor: '#00A5E3',
+                    pointBackgroundColor: '#00A5E3',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#00A5E3',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 12
+                            },
+                            color: '#333'
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            stepSize: 2
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

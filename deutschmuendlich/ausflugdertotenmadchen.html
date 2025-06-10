@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse: Der Ausflug der toten Mädchen von Anna Seghers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Teko:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Teko', sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .bg-primary {
+            background-color: #0B3954;
+        }
+
+        .bg-secondary {
+            background-color: #087E8B;
+        }
+
+        .bg-accent {
+            background-color: #FF5A5F;
+        }
+
+        .bg-light {
+            background-color: #FFFFFF;
+        }
+
+        .bg-muted {
+            background-color: #BFD7EA;
+        }
+
+        .text-primary {
+            color: #0B3954;
+        }
+
+        .text-secondary {
+            color: #087E8B;
+        }
+
+        .text-accent {
+            color: #FF5A5F;
+        }
+
+        .text-light {
+            color: #FFFFFF;
+        }
+
+        .border-accent {
+            border-color: #FF5A5F;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #BFD7EA;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+
+        .timeline-container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+
+        .timeline-container.left {
+            left: 0;
+        }
+
+        .timeline-container.right {
+            left: 50%;
+        }
+
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -17px;
+            background-color: white;
+            border: 4px solid #FF5A5F;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-container.right::after {
+            left: -16px;
+        }
+
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-line {
+            border-left: 2px dashed #087E8B;
+            height: 50px;
+            margin-left: 50%;
+        }
+    </style>
+</head>
+
+<body class="bg-muted">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12 py-8 bg-primary text-light rounded-lg shadow-2xl">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-wider">Der Ausflug der toten Mädchen</h1>
+            <h2 class="text-2xl md:text-4xl text-muted mt-2">Eine Analyse von Anna Seghers' Meisterwerk der
+                Exilliteratur</h2>
+        </header>
+
+        <section class="bg-light p-6 md:p-8 rounded-lg shadow-md mb-12">
+            <h3 class="text-4xl text-primary mb-4 text-center">Eine zerbrochene Erinnerung</h3>
+            <p class="text-lg text-gray-700 max-w-4xl mx-auto text-center">
+                Anna Seghers' Erzählung, verfasst im mexikanischen Exil 1943/44, ist ein tief persönliches Requiem für
+                eine verlorene Generation und eine zerstörte Heimat. Sie verwebt die unschuldige Erinnerung an einen
+                Schulausflug vor dem Ersten Weltkrieg mit den brutalen Schicksalen der Teilnehmerinnen unter dem
+                Nationalsozialismus. Diese Infografik schlüsselt die epochalen Hintergründe, die thematische Tiefe und
+                die innovativen Erzählstrategien dieses Schlüsselwerks auf.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto text-center">
+                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                    <p class="text-6xl font-bold text-accent">1</p>
+                    <p class="text-xl text-primary font-semibold">Überlebende</p>
+                </div>
+                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                    <p class="text-6xl font-bold text-primary">13</p>
+                    <p class="text-xl text-primary font-semibold">Mädchen</p>
+                </div>
+                <div class="bg-muted p-6 rounded-lg shadow-inner">
+                    <p class="text-6xl font-bold text-secondary">~30</p>
+                    <p class="text-xl text-primary font-semibold">Jahre zwischen Idylle & Katastrophe</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-light p-6 md:p-8 rounded-lg shadow-md mb-12">
+            <h3 class="text-4xl text-primary mb-6 text-center">Die Autorin im Exil: Anna Seghers' Odyssee</h3>
+            <p class="text-lg text-gray-700 max-w-4xl mx-auto text-center mb-8">
+                Die Erzählung ist untrennbar mit Seghers' Biografie verbunden. Als Jüdin, Kommunistin und
+                antifaschistische Autorin musste sie 1933 aus Deutschland fliehen. Ihre Erfahrungen von Verfolgung,
+                Flucht und dem Verlust ihrer Mutter im Holocaust prägen jede Zeile des Werks.
+            </p>
+            <div class="timeline">
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h4 class="text-2xl font-bold text-secondary">1900-1933</h4>
+                        <p class="text-gray-600">Geburt in Mainz, Studium, Eintritt in die KPD. Ihre Bücher werden bei
+                            der Bücherverbrennung vernichtet.</p>
+                    </div>
+                </div>
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h4 class="text-2xl font-bold text-accent">1933</h4>
+                        <p class="text-gray-600">Verhaftung durch die Gestapo und Flucht nach Paris.</p>
+                    </div>
+                </div>
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h4 class="text-2xl font-bold text-secondary">1940-1941</h4>
+                        <p class="text-gray-600">Flucht vor der deutschen Invasion über Marseille nach Mexiko-Stadt.</p>
+                    </div>
+                </div>
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h4 class="text-2xl font-bold text-accent">1942-1944</h4>
+                        <p class="text-gray-600">Erhält Nachricht vom Tod der Mutter im KZ. Schwerer Autounfall.
+                            Entstehung von "Der Ausflug der toten Mädchen".</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-light p-6 md:p-8 rounded-lg shadow-md mb-12">
+            <h3 class="text-4xl text-primary mb-6 text-center">Von der Idylle zum Hades: Die Schicksale der Mädchen</h3>
+            <p class="text-lg text-gray-700 max-w-4xl mx-auto text-center mb-8">
+                Das Herzstück der Erzählung ist der Kontrast zwischen der unbeschwerten Jugendfreundschaft und den
+                späteren Lebenswegen, die die gesamte Bandbreite menschlicher Reaktionen auf die Diktatur widerspiegeln:
+                Widerstand, Opportunismus, und Opfertum.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg border-l-8 border-green-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Leni</h4>
+                    <p class="text-gray-500 mb-2">Die treue Freundin</p>
+                    <p class="text-gray-800"><b class="text-green-600">Schicksal:</b> Schloss sich dem Widerstand an,
+                        wurde verraten und kam ums Leben. Ein Symbol für unerschütterliche Haltung.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border-l-8 border-yellow-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Marianne</h4>
+                    <p class="text-gray-500 mb-2">Die enge Freundin</p>
+                    <p class="text-gray-800"><b class="text-yellow-600">Schicksal:</b> Wurde zur überzeugten
+                        Nationalsozialistin und Opportunistin, die alte Freundschaften verriet.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border-l-8 border-red-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Sophie & Frl. Sichel</h4>
+                    <p class="text-gray-500 mb-2">Jüdische Mitschülerin & Lehrerin</p>
+                    <p class="text-gray-800"><b class="text-red-600">Schicksal:</b> Nach Polen deportiert und im
+                        Holocaust ermordet. Ihr Tod steht für die systematische Vernichtung.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border-l-8 border-gray-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Lotte & Liese</h4>
+                    <p class="text-gray-500 mb-2">Die Fromme & die Mutige</p>
+                    <p class="text-gray-800"><b class="text-gray-600">Schicksal:</b> Beide starben bei Bombenangriffen,
+                        als indirekte Opfer des Krieges, den sie nicht gewollt hatten.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border-l-8 border-yellow-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Ida & Nora</h4>
+                    <p class="text-gray-500 mb-2">Die Mitläuferinnen</p>
+                    <p class="text-gray-800"><b class="text-yellow-600">Schicksal:</b> Passten sich aus Opportunismus an
+                        das Regime an und profitierten davon.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border-l-8 border-blue-500 shadow-lg">
+                    <h4 class="text-2xl font-bold text-primary">Netty (Erzählerin)</h4>
+                    <p class="text-gray-500 mb-2">Die Beobachterin</p>
+                    <p class="text-gray-800"><b class="text-blue-600">Schicksal:</b> Überlebt im Exil, wird zur Zeugin
+                        und Chronistin des kollektiven Schicksals, um die Erinnerung zu bewahren.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+            <section class="bg-light p-6 md:p-8 rounded-lg shadow-md">
+                <h3 class="text-4xl text-primary mb-4 text-center">Anatomie der Katastrophe</h3>
+                <p class="text-lg text-gray-700 text-center mb-6">Seghers zeigt, dass die Katastrophe aus der Mitte der
+                    „gewöhnlichen“ Gesellschaft kam. Sie differenziert zwischen den verschiedenen Graden der
+                    Verstrickung und Verantwortung.</p>
+                <div class="chart-container">
+                    <canvas id="societalRolesChart"></canvas>
+                </div>
+                <p class="text-sm text-gray-600 text-center mt-4">Dieses Diagramm visualisiert Seghers' differenzierte
+                    Darstellung der Gesellschaft, aufgeteilt in Täter, Mitläufer, Nonkonformisten und Opfer. Es
+                    verdeutlicht, dass das NS-Regime auf einer breiten, wenn auch oft passiven, Basis in der Bevölkerung
+                    fußte.</p>
+            </section>
+
+            <section class="bg-light p-6 md:p-8 rounded-lg shadow-md">
+                <h3 class="text-4xl text-primary mb-4 text-center">Verschränkte Zeitebenen</h3>
+                <p class="text-lg text-gray-700 text-center mb-6">Die Erzählung springt zwischen den Zeitebenen. Diese
+                    nicht-lineare, traumhafte Struktur ist kein bloßes Stilmittel, sondern der Ausdruck von Trauma und
+                    dem Gefühl der "zerbrochenen Zugehörigkeit" im Exil.</p>
+                <div class="flex flex-col items-center justify-center h-full pt-4">
+                    <div class="text-center p-4 bg-secondary text-light rounded-lg shadow-md w-3/4">
+                        <p class="text-xl font-bold">GEGENWART (ca. 1944)</p>
+                        <p>Exil in Mexiko, Krankheit, Schreiben</p>
+                    </div>
+                    <div class="w-full flex justify-center items-center h-24">
+                        <div class="text-accent font-bold transform -rotate-90 origin-center whitespace-nowrap">◀︎
+                            ERINNERUNG ▼</div>
+                        <div class="border-l-4 border-r-4 border-accent border-dashed h-full w-0 mx-8"></div>
+                        <div class="text-accent font-bold transform rotate-90 origin-center whitespace-nowrap">▶︎
+                            VORAUSBLICK ▲</div>
+                    </div>
+                    <div class="text-center p-4 bg-muted text-primary rounded-lg shadow-md w-3/4">
+                        <p class="text-xl font-bold">VERGANGENHEIT (ca. 1912)</p>
+                        <p>Schulausflug, Idylle am Rhein, Unschuld</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 text-center mt-4">Dieses Flussdiagramm illustriert die narrative
+                    Kernstrategie: Das ständige Pendeln der Erzählerin zwischen der traumatischen Gegenwart im Exil und
+                    der idealisierten, verlorenen Vergangenheit. Die Zukunft der Mädchen wird aus der Vergangenheit
+                    heraus als tragische Vorahnung enthüllt.</p>
+            </section>
+        </div>
+
+        <footer class="text-center mt-12 py-8 bg-primary text-light rounded-lg shadow-2xl">
+            <h3 class="text-4xl mb-4">Ein Requiem und eine Mahnung</h3>
+            <p class="text-lg text-muted max-w-4xl mx-auto">
+                «Der Ausflug der toten Mädchen» ist mehr als nur Trauerarbeit. Es ist ein tiefgründiges Zeugnis über die
+                Zerbrechlichkeit der Zivilisation und eine zeitlose Mahnung, die Vergangenheit nicht zu vergessen. Das
+                Werk fordert uns auf, die Kontinuitäten zwischen den Generationen zu erkennen und wachsam gegenüber den
+                Kräften zu bleiben, die Menschlichkeit und Gerechtigkeit bedrohen.
+            </p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const wrapLabel = (label, maxWidth) => {
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    if (currentLine.length + words[i].length + 1 < maxWidth) {
+                        currentLine += ' ' + words[i];
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            };
+
+            const societalRolesCtx = document.getElementById('societalRolesChart').getContext('2d');
+            new Chart(societalRolesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Passive Konformisten & Mitläufer', 'Aktive Nationalsozialisten', 'Opfer des Regimes', 'Widerstand & Nonkonformisten'],
+                    datasets: [{
+                        label: 'Gesellschaftliche Rollen',
+                        data: [55, 15, 25, 5],
+                        backgroundColor: [
+                            '#BFD7EA',
+                            '#FF5A5F',
+                            '#087E8B',
+                            '#0B3954'
+                        ],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#0B3954',
+                                font: {
+                                    size: 14,
+                                    family: "'Roboto', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback
+                            },
+                            bodyFont: {
+                                size: 14,
+                                family: "'Roboto', sans-serif"
+                            },
+                            titleFont: {
+                                size: 16,
+                                family: "'Roboto', sans-serif"
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

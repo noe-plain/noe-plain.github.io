@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse: Jugend ohne Gott von Ödön von Horváth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .flow-line {
+            width: 2px;
+            background-color: #A05195;
+            flex-grow: 1;
+        }
+
+        .flow-step {
+            border-left: 4px solid #FFA600;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#003F5C] mb-2">JUGEND OHNE GOTT</h1>
+            <p class="text-xl md:text-2xl text-[#2F4B7C]">Eine Analyse von Ödön von Horváths zeitloser Warnung</p>
+            <div class="mt-6 bg-white p-6 rounded-lg shadow-lg inline-block">
+                <p class="text-lg text-[#665191]">Veröffentlicht im Exil</p>
+                <p class="text-7xl font-extrabold text-[#D45087]">1937</p>
+                <p class="text-lg text-[#665191]">Ein Jahr vor dem „Anschluss“ Österreichs</p>
+            </div>
+        </header>
+
+        <main class="space-y-12">
+
+            <section id="historischer-kontext" class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#003F5C] mb-6 text-center">Der historische Strudel: Nährboden für
+                    eine „gottlose“ Jugend</h2>
+                <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">
+                    Der Roman ist untrennbar mit dem politischen und sozialen Zerfall der 1930er Jahre verbunden. Der
+                    Aufstieg des Nationalsozialismus schuf ein Klima der Angst, der Anpassung und der moralischen
+                    Erosion, das Horváth meisterhaft seziert.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-4 text-[#2F4B7C]">Von der Demokratie zur Diktatur</h3>
+                        <div class="relative border-l-4 border-[#FFA600] pl-6 space-y-6">
+                            <div class="relative">
+                                <div class="absolute -left-[35px] top-1.5 w-4 h-4 bg-[#D45087] rounded-full"></div>
+                                <h4 class="font-semibold text-lg">1933: Machtübernahme</h4>
+                                <p class="text-sm text-gray-600">Adolf Hitler wird Reichskanzler. Demokratische
+                                    Strukturen werden systematisch zerstört.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[35px] top-1.5 w-4 h-4 bg-[#D45087] rounded-full"></div>
+                                <h4 class="font-semibold text-lg">1934: Eid auf Hitler</h4>
+                                <p class="text-sm text-gray-600">Lehrer und Beamte werden zum Eid auf Hitler gezwungen,
+                                    was den Anpassungsdruck massiv erhöht.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[35px] top-1.5 w-4 h-4 bg-[#D45087] rounded-full"></div>
+                                <h4 class="font-semibold text-lg">1937: Veröffentlichung</h4>
+                                <p class="text-sm text-gray-600">«Jugend ohne Gott» erscheint im Amsterdamer Exil und
+                                    wird zur subtilen Anklageschrift.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[35px] top-1.5 w-4 h-4 bg-[#D45087] rounded-full"></div>
+                                <h4 class="font-semibold text-lg">1938: Verbot & "Anschluss"</h4>
+                                <p class="text-sm text-gray-600">Der Roman wird auf Antrag der Gestapo verboten.
+                                    Österreich wird an Nazi-Deutschland angeschlossen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-4 text-[#2F4B7C]">Die "Totale Pädagogik" des NS-Regimes</h3>
+                        <p class="mb-4 text-gray-600">Das Bildungssystem wurde zu einem Instrument der Indoktrination,
+                            das darauf abzielte, eine gehorsame, rücksichtslose und ideologisch linientreue Generation
+                            heranzuziehen.</p>
+                        <div class="chart-container h-80 md:h-auto">
+                            <canvas id="erziehungszieleChart"></canvas>
+                        </div>
+                        <p class="text-center mt-2 text-sm text-gray-500">Gegenüberstellung der erwünschten und
+                            unterdrückten Charaktereigenschaften.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="literarische-einordnung" class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#003F5C] mb-6 text-center">Ein Roman, im Exil geschmiedet</h2>
+                <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">
+                    «Jugend ohne Gott» ist ein Paradebeispiel der Exilliteratur und trägt gleichzeitig die stilistischen
+                    Züge der Neuen Sachlichkeit in sich – eine Kombination, die dem Roman seine präzise und ungeschönte
+                    analytische Schärfe verleiht.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-4 text-[#2F4B7C]">Stilistische Wurzeln & Epoche</h3>
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-[#665191] text-white">
+                                <tr>
+                                    <th class="p-2 rounded-tl-lg">Merkmal</th>
+                                    <th class="p-2">Neue Sachlichkeit (bis 1933)</th>
+                                    <th class="p-2 rounded-tr-lg">Exilliteratur (1933-45)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-2 font-semibold">Stil</td>
+                                    <td class="p-2">Nüchtern, präzise, objektiv</td>
+                                    <td class="p-2">Realistisch, oft mit warnendem Appell</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2 font-semibold">Themen</td>
+                                    <td class="p-2">Soziale Probleme, Alltag</td>
+                                    <td class="p-2">Widerstand, Heimatverlust, NS-Kritik</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-2 font-semibold">Horváths Bezug</td>
+                                    <td class="p-2">Frühere Werke, klarer Stil</td>
+                                    <td class="p-2">Entstehung im Exil, Inhalt</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-4 text-center text-[#2F4B7C]">Themen der Exilliteratur</h3>
+                        <div class="chart-container h-80 md:h-auto">
+                            <canvas id="exilliteraturChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="thematische-analyse" class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#003F5C] mb-6 text-center">Anatomie einer „gottlosen“ Gesellschaft
+                </h2>
+                <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">
+                    Horváth diagnostiziert eine Gesellschaft, in der moralische Werte systematisch zerstört werden. Die
+                    Jugend wird zum Spiegelbild dieser Kälte, während der Einzelne vor die Wahl zwischen Anpassung und
+                    Gewissen gestellt wird.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <div
+                        class="bg-[#003F5C] text-white p-6 rounded-lg flex flex-col items-center justify-center text-center">
+                        <h3 class="font-bold text-2xl mb-2">Das Zeitalter der Fische</h3>
+                        <p class="text-5xl mb-4">🐟</p>
+                        <p class="text-gray-200">
+                            Ein zentrales Motiv, das die Gefühlskälte, den starren Blick und die moralische
+                            Teilnahmslosigkeit der indoktrinierten Jugend symbolisiert. Ihre Seelen sind ebenso kalt und
+                            unbewegt wie die Augen eines Fisches.
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-4 text-[#2F4B7C]">Der Weg des Lehrers: Vom Mitläufer zum
+                            Gewissen</h3>
+                        <p class="mb-4 text-gray-600">Die Entwicklung des Ich-Erzählers zeigt die Möglichkeit des
+                            moralischen Erwachens in einer repressiven Welt.</p>
+                        <div class="space-y-4">
+                            <div class="flow-step p-3 bg-white rounded-r-lg shadow">
+                                <h4 class="font-bold text-[#A05195]">1. Anpassung & Schweigen</h4>
+                                <p class="text-sm">Der Lehrer agiert systemkonform und ignoriert rassistische Äußerungen
+                                    seiner Schüler aus Angst um seine Existenz.</p>
+                            </div>
+                            <div class="flow-step p-3 bg-white rounded-r-lg shadow">
+                                <h4 class="font-bold text-[#D45087]">2. Innerer Konflikt & Zweifel</h4>
+                                <p class="text-sm">Die Kaltblütigkeit der Jugend und ein Mordfall erschüttern seine
+                                    Passivität und entfachen sein Gewissen.</p>
+                            </div>
+                            <div class="flow-step p-3 bg-white rounded-r-lg shadow">
+                                <h4 class="font-bold text-[#F95D6A]">3. Suche nach Wahrheit</h4>
+                                <p class="text-sm">Er beginnt, die offizielle Version der Ereignisse zu hinterfragen und
+                                    sucht nach dem wahren Täter.</p>
+                            </div>
+                            <div class="flow-step p-3 bg-white rounded-r-lg shadow">
+                                <h4 class="font-bold text-[#FF7C43]">4. Aktiver Widerstand & Verantwortung</h4>
+                                <p class="text-sm">Der Lehrer riskiert alles, um die Wahrheit aufzudecken und übernimmt
+                                    moralische Verantwortung. Er findet zu einem neuen "Gott" – dem Gewissen.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="text-center pt-8 border-t border-gray-300">
+                <h3 class="text-2xl font-bold text-[#003F5C] mb-4">Das bleibende Vermächtnis</h3>
+                <blockquote class="max-w-2xl mx-auto text-lg italic text-[#2F4B7C] mb-6">
+                    „Wenn kein Charakter mehr geduldet wird, sondern nur der Gehorsam, geht die Wahrheit, und die Lüge
+                    kommt.“
+                </blockquote>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    «Jugend ohne Gott» ist mehr als nur ein Zeitroman. Es ist eine universelle und zeitlose Mahnung, die
+                    Wachsamkeit gegenüber totalitären Ideologien, die Bedeutung kritischen Denkens und den unschätzbaren
+                    Wert des individuellen Gewissens betont. Ein Werk, das uns auch heute noch auffordert, Haltung zu
+                    zeigen.
+                </p>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        function wrapLabel(str, max_width) {
+            if (str.length <= max_width) {
+                return str;
+            }
+            const words = str.split(' ');
+            const lines = [];
+            let current_line = '';
+            for (const word of words) {
+                if ((current_line + ' ' + word).length > max_width && current_line.length > 0) {
+                    lines.push(current_line);
+                    current_line = word;
+                } else {
+                    if (current_line.length > 0) current_line += ' ';
+                    current_line += word;
+                }
+            }
+            lines.push(current_line);
+            return lines;
+        }
+
+        const defaultTooltipCallback = {
+            title: function (tooltipItems) {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            }
+        };
+
+        const brilliantBlues = ['#003F5C', '#58508D', '#BC5090', '#FF6361', '#FFA600'];
+        const palette = {
+            primary: '#003F5C',
+            secondary: '#665191',
+            accent1: '#D45087',
+            accent2: '#FF7C43',
+            accent3: '#FFA600',
+            textLight: '#FFFFFF',
+            textDark: '#333333'
+        };
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#6b7280';
+
+
+        const erziehungszieleCtx = document.getElementById('erziehungszieleChart').getContext('2d');
+        new Chart(erziehungszieleCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Gehorsam', 'Härte', 'Opferbereitschaft', 'Empathie', 'Kritisches Denken', 'Individualität'],
+                datasets: [{
+                    label: 'Erwünschte Eigenschaften (NS-Ideal)',
+                    data: [90, 80, 75, 0, 0, 0],
+                    backgroundColor: palette.primary,
+                    borderColor: palette.primary,
+                    borderWidth: 1
+                }, {
+                    label: 'Unterdrückte Eigenschaften',
+                    data: [0, 0, 0, 15, 20, 10],
+                    backgroundColor: palette.accent1,
+                    borderColor: palette.accent1,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            display: false
+                        },
+                        grid: {
+                            display: false
+                        },
+                        stacked: true
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: defaultTooltipCallback
+                    }
+                }
+            }
+        });
+
+
+        const exilliteraturCtx = document.getElementById('exilliteraturChart').getContext('2d');
+        const rawExilLabels = ['Kritik am Nationalsozialismus', 'Widerstand & Aufklärung', 'Heimatverlust & Identitätssuche', 'Moral & Humanität'];
+        new Chart(exilliteraturCtx, {
+            type: 'doughnut',
+            data: {
+                labels: rawExilLabels.map(label => wrapLabel(label, 16)),
+                datasets: [{
+                    label: 'Anteil der Themen',
+                    data: [40, 25, 20, 15],
+                    backgroundColor: [palette.primary, palette.secondary, palette.accent1, palette.accent2],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 15
+                        }
+                    },
+                    title: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: defaultTooltipCallback
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
