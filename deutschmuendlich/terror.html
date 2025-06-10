@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse von Schirachs "Terror" - Eine Infografik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .flow-box {
+            border: 2px solid #3E92CC;
+            background-color: #ffffff;
+        }
+
+        .flow-arrow::after {
+            content: '▼';
+            font-size: 1.5rem;
+            color: #0A2463;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2.5rem;
+            padding-left: 2.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #D8315B;
+            border: 4px solid #ffffff;
+            z-index: 10;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 9px;
+            top: 5px;
+            bottom: -20px;
+            width: 2px;
+            background-color: #3E92CC;
+        }
+
+        .big-number {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #0A2463;
+        }
+
+        .accent-text {
+            color: #D8315B;
+        }
+
+        .llm-button {
+            background-color: #3E92CC;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .llm-button:hover {
+            background-color: #0A2463;
+        }
+
+        .llm-output {
+            background-color: #e0f2f7;
+            border-left: 5px solid #3E92CC;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#0A2463] mb-2">TERROR</h1>
+            <h2 class="text-xl md:text-2xl font-bold text-[#3E92CC]">Eine Nation im Zeugenstand: Analyse eines
+                moralischen Dilemmas</h2>
+            <p class="max-w-3xl mx-auto mt-4 text-gray-600">
+                Ferdinand von Schirachs Theaterstück "Terror" ist mehr als nur ein Drama; es ist ein nationales
+                Experiment, das die Grundfesten von Recht, Moral und menschlicher Würde in Frage stellt. Diese
+                Infografik analysiert die zentralen Daten und Debatten, die das Stück ausgelöst hat.
+            </p>
+        </header>
+
+        <main class="space-y-16">
+
+            <section id="dilemma" class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] text-center mb-6">Das unlösbare Dilemma: Eine
+                    Entscheidung über Leben und Tod</h3>
+                <p class="max-w-3xl mx-auto text-center mb-8 text-gray-600">
+                    Der Kern des Stücks ist eine einzige, folgenschwere Entscheidung des Kampfpiloten Lars Koch. Er
+                    musste abwägen zwischen dem Leben der Passagiere in einem von Terroristen entführten Flugzeug und
+                    dem Leben tausender Menschen in einem Fußballstadion.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="flex flex-col items-center justify-center p-4 rounded-lg bg-blue-50">
+                        <div class="big-number">164</div>
+                        <div class="text-lg font-bold text-[#3E92CC] mt-2">unschuldige Leben</div>
+                        <p class="text-sm text-gray-500">an Bord des entführten Airbus A320.</p>
+                    </div>
+                    <div class="flex flex-col items-center justify-center p-4">
+                        <span class="text-6xl font-black text-gray-300">vs.</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center p-4 rounded-lg bg-red-50">
+                        <div class="big-number accent-text">70.000</div>
+                        <div class="text-lg font-bold text-[#D8315B] mt-2">potentielle Opfer</div>
+                        <p class="text-sm text-gray-500">in der voll besetzten Allianz Arena.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="verdict" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                    <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] mb-4">Das Urteil des Volkes: Ein Votum
+                        gegen das Gesetz</h3>
+                    <p class="text-gray-600 mb-6">
+                        Das Besondere an "Terror" ist die Interaktion: Das Publikum stimmt am Ende über Schuld oder
+                        Freispruch ab. Die gesammelten Ergebnisse aus hunderten Aufführungen und der TV-Ausstrahlung
+                        zeichnen ein klares Bild, das in direktem Widerspruch zur geltenden deutschen Rechtslage steht.
+                    </p>
+                    <div class="text-sm text-gray-500">
+                        <p><span class="font-bold text-[#D8315B]">Die Mehrheit der Abstimmenden (63.8%)</span> entschied
+                            sich für einen Freispruch. Dies spiegelt eine intuitive, utilitaristische Moral wider, bei
+                            der das Retten der größeren Anzahl von Menschenleben schwerer wiegt als die strikte
+                            Einhaltung des Gesetzes, welches die Tötung unschuldiger Menschen unter allen Umständen
+                            verbietet.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 flex flex-col items-center justify-center">
+                    <div class="chart-container mx-auto max-w-sm">
+                        <canvas id="verdictChart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 mt-4">Basierend auf 599.312 gesammelten Stimmen.</p>
+                </div>
+            </section>
+
+            <section id="arguments">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] text-center mb-6">Zwei Seiten der
+                    Gerechtigkeit: Die Argumente im Gerichtssaal</h3>
+                <p class="max-w-3xl mx-auto text-center mb-8 text-gray-600">
+                    Der Prozess wird durch den unversöhnlichen Gegensatz zwischen der Anklage und der Verteidigung
+                    strukturiert. Beide Seiten berufen sich auf fundamentale Prinzipien, die das Herz unserer
+                    Gesellschaftsordnung berühren.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border-t-4 border-[#0A2463]">
+                        <h4 class="text-xl font-bold text-[#0A2463] mb-4">Staatsanwaltschaft: Die Anklage</h4>
+                        <ul class="space-y-3 list-disc list-inside text-gray-700">
+                            <li><span class="font-bold">Verletzung der Menschenwürde:</span> Die Passagiere wurden zu
+                                Objekten degradiert. Ihr Tod wurde als Mittel zum Zweck benutzt.</li>
+                            <li><span class="font-bold">Rechtsbruch:</span> Koch hat bewusst gegen das Grundgesetz (Art.
+                                1) und das Urteil des Bundesverfassungsgerichts gehandelt.</li>
+                            <li><span class="font-bold">Keine Rechtfertigung:</span> Kein Gesetz erlaubt die Abwägung
+                                von Leben gegen Leben. Die Tat war Mord.</li>
+                            <li><span class="font-bold">Absolutheit des Rechts:</span> Moralische Überzeugungen eines
+                                Einzelnen dürfen niemals über der Verfassung stehen.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-xl p-6 md:p-8 border-t-4 border-[#D8315B]">
+                        <h4 class="text-xl font-bold text-[#D8315B] mb-4">Verteidigung: Das Plädoyer</h4>
+                        <ul class="space-y-3 list-disc list-inside text-gray-700">
+                            <li><span class="font-bold">Übergesetzlicher Notstand:</span> Koch befand sich in einer
+                                ausweglosen Situation, die nicht vom Gesetzgeber vorhergesehen wurde.</li>
+                            <li><span class="font-bold">Wahl des kleineren Übels:</span> Er hat sich für die Rettung der
+                                deutlich größeren Menschengruppe entschieden.</li>
+                            <li><span class="font-bold">Ethische Motivation:</span> Seine Handlung entsprang einem
+                                Verantwortungsgefühl und nicht einer kriminellen Absicht.</li>
+                            <li><span class="font-bold">Hoffnungslose Lage:</span> Die Passagiere hatten ohnehin keine
+                                Überlebenschance mehr.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="text-passage-analysis" class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] text-center mb-6">Analyse der Textstelle: Das
+                    Plädoyer des Verteidigers</h3>
+                <p class="max-w-3xl mx-auto mb-8 text-gray-600">
+                    Die gewählte Textstelle ist das eindringliche Plädoyer des Verteidigers Biegler, eine zentrale Rede,
+                    die das utilitaristische Argument des Stücks am stärksten hervorhebt. Hier werden die rechtlichen
+                    und moralischen Prinzipien des Falles aus Sicht der Verteidigung auf provokante Weise dargestellt
+                    und verhandelt.
+                </p>
+
+                <h4 class="text-xl font-bold text-[#3E92CC] mb-3">Inhaltliche Analyse (Interpretation)</h4>
+                <p class="text-gray-700 mb-4">
+                    Der Verteidiger stellt die "Prinzipien" (Verfassung, Menschenwürde) der "Rettung von Menschenleben"
+                    direkt gegenüber und argumentiert, dass letzteres Vorrang haben muss. Er attackiert die
+                    pflichtethische Position der Staatsanwältin und verweist auf Immanuel Kants Überlegungen zur Lüge,
+                    um die Absurdität einer strikten Prinzipientreue in extremen Situationen zu verdeutlichen. Er stellt
+                    klar fest, dass Lars Koch die "richtige Entscheidung" getroffen hat, da die Rettung von 70.000
+                    Menschen wichtiger sei als das Prinzip der Menschenwürde für 164 bereits dem Tod geweihte
+                    Individuen. Die historische Beispiele (Schiffbruch der William Browne, siamesische Zwillinge) dienen
+                    dazu, eine Präzedenz für das "kleinere Übel" zu schaffen und zu zeigen, dass solche Abwägungen in
+                    der Rechtsgeschichte bereits stattgefunden haben.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    Das Plädoyer gipfelt in einer emotionalen Warnung vor dem Terrorismus. Der Verteidiger argumentiert,
+                    dass ein Freispruch Kochs notwendig sei, um ein Signal an Terroristen zu senden, dass der Staat
+                    nicht kapituliert und sich wehren kann. Er formuliert den "Krieg" als eine Realität, die Opfer
+                    fordert und in der herkömmliche Prinzipien möglicherweise nicht mehr ausreichen.
+                </p>
+
+                <h4 class="text-xl font-bold text-[#3E92CC] mb-3">Sprachliche Merkmale</h4>
+                <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                    <li><span class="font-bold">Direkte Anrede und Rhetorische Fragen:</span> Der Verteidiger spricht
+                        die Richter direkt an ("Meine Damen und Herren Richter") und nutzt zahlreiche rhetorische Fragen
+                        ("Haben Sie der Staatsanwältin zugehört?", "Ist es richtig...?", "Was wäre das für ein
+                        Wahnsinn?"), um das Publikum aktiv in seine Argumentation einzubeziehen und zum Nachdenken
+                        anzuregen.</li>
+                    <li><span class="font-bold">Polemik und Konfrontation:</span> Er konfrontiert die Richter provokant
+                        mit den Konsequenzen einer Verurteilung Kochs ("Wegen eines Prinzips sollen Sie ihn
+                        lebenslänglich einsperren. Wegen eines Prinzips sollten 70 000 Menschen sterben.") und
+                        attackiert Kants Philosophie auf zugespitzte Weise.</li>
+                    <li><span class="font-bold">Einfache, prägnante Sprache:</span> Trotz des komplexen juristischen
+                        Themas bleibt die Sprache klar und verständlich. Kurze, prägnante Sätze und klare Aussagen ("Das
+                        ist alles.", "Punkt.") verstärken die Überzeugungskraft.</li>
+                    <li><span class="font-bold">Emotionale Appelle:</span> Insbesondere am Ende der Rede wird der Ton
+                        emotionaler und pathetischer ("Aber wir müssen begreifen, dass wir im Krieg sind."). Dies dient
+                        dazu, die moralische Dringlichkeit der Situation zu unterstreichen und das Publikum emotional zu
+                        packen.</li>
+                    <li><span class="font-bold">Beispiele und Analogien:</span> Die Fallbeispiele (Kant, William Browne,
+                        siamesische Zwillinge) dienen als rhetorische Beweise, um die Argumentation zu untermauern und
+                        das utilitaristische Prinzip in verschiedenen Kontexten zu veranschaulichen.</li>
+                </ul>
+
+                <h4 class="text-xl font-bold text-[#3E92CC] mb-3">Aktualitätsbezug und Dramatische Funktion</h4>
+                <p class="text-gray-700 mb-4">
+                    Die Textstelle ist hochaktuell, da sie direkt auf die globale Bedrohung durch den Terrorismus Bezug
+                    nimmt und die Notwendigkeit von Entscheidungen unter extremem Druck thematisiert, die über
+                    traditionelle Rechtsnormen hinausgehen. Die Verweise auf 9/11 und die Rede von Dick Cheney verorten
+                    das Dilemma fest in der post-9/11-Sicherheitsdebatte. Die Argumentation des Verteidigers spiegelt
+                    eine weit verbreitete gesellschaftliche Haltung wider, die in Krisensituationen pragmatische
+                    Lösungen über die strikte Einhaltung von Prinzipien stellt.
+                </p>
+                <p class="text-gray-700">
+                    Dramatisch gesehen ist dieses Plädoyer der Höhepunkt der Verteidigung. Es fasst alle Argumente
+                    zusammen, provoziert die Zuschauer und bereitet sie auf die abschließende Abstimmung vor. Die Rede
+                    ist nicht nur ein juristisches Argument, sondern ein moralischer Appell, der das Publikum dazu
+                    zwingt, seine eigenen Werte und Überzeugungen zu hinterfragen. Es verstärkt die Spannung und die
+                    Mehrdeutigkeit des Stücks, indem es eine überzeugende, wenn auch kontroverse, Perspektive auf die
+                    Schuldfrage bietet.
+                </p>
+            </section>
+
+            <section id="philosophy">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] text-center mb-6">Der philosophische
+                    Scheideweg: Pflicht oder Nutzen?</h3>
+                <p class="max-w-3xl mx-auto text-center mb-8 text-gray-600">
+                    Hinter den juristischen Argumenten stehen zwei grundverschiedene ethische Denkmodelle, die seit
+                    Jahrhunderten die Philosophie prägen. "Terror" zwingt das Publikum, zwischen diesen beiden Polen
+                    eine Position zu beziehen.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex flex-col items-center text-center p-6">
+                        <h4 class="text-xl font-bold text-[#0A2463] mb-4">Pflichtethik (Deontologie)</h4>
+                        <div class="w-full max-w-sm flex flex-col items-center">
+                            <div class="flow-box p-4 rounded-lg w-full">Die Handlung an sich ist entscheidend, nicht die
+                                Folge.</div>
+                            <div class="flow-arrow"></div>
+                            <div class="flow-box p-4 rounded-lg w-full">Gibt es eine universelle moralische Pflicht oder
+                                ein Gesetz?</div>
+                            <div class="flow-arrow"></div>
+                            <div class="flow-box p-4 rounded-lg w-full bg-red-100 border-red-500">JA: "Du sollst nicht
+                                töten." (Art. 1 GG)</div>
+                            <div class="flow-arrow"></div>
+                            <div class="p-4 rounded-lg w-full bg-[#0A2463] text-white">Handlung ist moralisch
+                                falsch.<br><span class="font-bold text-lg">URTEIL: SCHULDIG</span></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center text-center p-6">
+                        <h4 class="text-xl font-bold text-[#D8315B] mb-4">Folgenethik (Utilitarismus)</h4>
+                        <div class="w-full max-w-sm flex flex-col items-center">
+                            <div class="flow-box p-4 rounded-lg w-full">Nur das Ergebnis der Handlung zählt.</div>
+                            <div class="flow-arrow"></div>
+                            <div class="flow-box p-4 rounded-lg w-full">Welche Handlung maximiert das Glück / minimiert
+                                das Leid?</div>
+                            <div class="flow-arrow"></div>
+                            <div class="flow-box p-4 rounded-lg w-full bg-green-100 border-green-500">164 Tote &lt;
+                                70.000 Tote</div>
+                            <div class="flow-arrow"></div>
+                            <div class="p-4 rounded-lg w-full bg-[#D8315B] text-white">Handlung ist moralisch
+                                richtig.<br><span class="font-bold text-lg">URTEIL: FREISPRUCH</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interactive-case" class="bg-white rounded-lg shadow-xl p-6 md:p-8 text-center">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] mb-4">✨ Interaktive Fallstudie: Ihr moralisches
+                    Dilemma</h3>
+                <p class="max-w-3xl mx-auto mb-8 text-gray-600">
+                    Erzeugen Sie einen neuen, hypothetischen Fall, der Sie vor ähnliche ethische Entscheidungen wie im
+                    Stück "Terror" stellt. Denken Sie über die möglichen "richtigen" Antworten nach und diskutieren Sie
+                    mit Freunden.
+                </p>
+                <button id="generateCaseButton" class="llm-button">✨ Neuen Fall generieren</button>
+                <div id="caseOutput" class="llm-output p-6 mt-8 text-left rounded-lg text-gray-700 hidden">
+                    <p class="font-bold text-[#0A2463] mb-2">Ihr Fall:</p>
+                    <div id="caseContent" class="text-lg"></div>
+                </div>
+                <div id="loadingIndicator" class="hidden mt-4 text-[#3E92CC] font-bold">Lade...</div>
+            </section>
+
+            <section id="legal-context" class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                <h3 class="text-2xl md:text-3xl font-bold text-[#0A2463] text-center mb-6">Die rechtliche Realität: Eine
+                    geklärte Frage?</h3>
+                <p class="max-w-3xl mx-auto text-center mb-8 text-gray-600">
+                    Während das Publikum moralisch ringt, hat das deutsche Recht eine klare Antwort. Die Handlung von
+                    Lars Koch ist nach der aktuellen Rechtsprechung verfassungswidrig. Eine Zeitachse der entscheidenden
+                    Ereignisse.
+                </p>
+                <div class="relative">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-lg text-[#0A2463]">11. September 2001</h4>
+                        <p class="text-gray-600">Die Terroranschläge in den USA führen weltweit zu neuen
+                            Sicherheitsgesetzen und verändern die Bedrohungslage fundamental.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-lg text-[#0A2463]">2005: Luftsicherheitsgesetz</h4>
+                        <p class="text-gray-600">Deutschland verabschiedet ein Gesetz, das den Abschuss von entführten
+                            Flugzeugen als "ultima ratio" unter bestimmten Umständen erlaubt.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-lg text-[#0A2463]">2006: Urteil des Bundesverfassungsgerichts</h4>
+                        <p class="text-gray-600">Das höchste deutsche Gericht erklärt den Paragrafen zum Abschuss für
+                            <span class="font-bold accent-text">verfassungswidrig</span>. Die Begründung: Er verstößt
+                            gegen die unantastbare Menschenwürde (Art. 1 GG), da unschuldige Menschen instrumentalisiert
+                            und geopfert würden.
+                        </p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4 class="font-bold text-lg text-[#0A2463]">2015: Uraufführung "Terror"</h4>
+                        <p class="text-gray-600">Ferdinand von Schirach bringt das juristisch geklärte, aber moralisch
+                            ungelöste Dilemma auf die Bühne und löst eine breite gesellschaftliche Debatte aus.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion" class="text-center py-12">
+                <h3 class="text-3xl md:text-4xl font-black text-[#0A2463] mb-4">Ein Riss in der Gesellschaft</h3>
+                <p class="max-w-3xl mx-auto text-lg text-gray-700 mb-8">
+                    "Terror" deckt eine tiefe Kluft auf: zwischen dem absoluten Schutz der Würde jedes Einzelnen, wie
+                    ihn das Grundgesetz garantiert, und dem intuitiven Wunsch der Mehrheit, in Extremsituationen
+                    pragmatisch zu handeln, um größeres Unheil abzuwenden.
+                </p>
+                <div class="bg-white rounded-lg shadow-xl p-8 max-w-4xl mx-auto">
+                    <p class="text-2xl md:text-3xl font-bold text-[#3E92CC]">Die zentrale Frage des Stücks bleibt
+                        unbeantwortet und wird an jeden von uns weitergereicht:</p>
+                    <p class="text-3xl md:text-5xl font-black text-[#0A2463] mt-4">"In welcher Welt wollen wir leben?"
+                    </p>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-16 pt-8 border-t border-gray-300">
+            <p class="text-sm text-gray-500">Infografik basierend auf der Analyse von Ferdinand von Schirachs "Terror".
+                Visuelle Umsetzung ohne SVG oder Mermaid JS. Farbpalette: Brilliant Blues.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function wrapLabel(str, max_width) {
+            if (typeof str !== 'string' || str.length <= max_width) {
+                return str;
+            }
+            const words = str.split(' ');
+            const lines = [];
+            let current_line = '';
+            for (const word of words) {
+                if ((current_line + ' ' + word).length > max_width && current_line.length > 0) {
+                    lines.push(current_line);
+                    current_line = word;
+                } else {
+                    if (current_line.length > 0) {
+                        current_line += ' ' + word;
+                    } else {
+                        current_line = word;
+                    }
+                }
+            }
+            if (current_line.length > 0) {
+                lines.push(current_line);
+            }
+            return lines;
+        }
+
+        const verdictCtx = document.getElementById('verdictChart').getContext('2d');
+        const verdictChart = new Chart(verdictCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Freispruch', 'Schuldig'],
+                datasets: [{
+                    label: 'Urteil des Publikums',
+                    data: [63.8, 36.2],
+                    backgroundColor: [
+                        '#D8315B',
+                        '#0A2463'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: 'Inter'
+                            },
+                            color: '#1E1B18',
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function (tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                    return label.join(' ');
+                                } else {
+                                    return label;
+                                }
+                            },
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        },
+                        backgroundColor: '#1E1B18',
+                        titleFont: {
+                            size: 16,
+                            family: 'Inter',
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14,
+                            family: 'Inter'
+                        },
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                }
+            }
+        });
+
+        document.getElementById('generateCaseButton').addEventListener('click', async () => {
+            const caseOutputDiv = document.getElementById('caseOutput');
+            const caseContentDiv = document.getElementById('caseContent');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            caseOutputDiv.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+            caseContentDiv.textContent = '';
+
+            const prompt = "Generiere ein kurzes, fiktives ethisches Dilemma (maximal 150 Wörter) im Stil von 'Terror' von Ferdinand von Schirach. Es sollte einen Konflikt zwischen der Rettung einer größeren Gruppe von Menschen und dem Schutz der individuellen Rechte einer kleineren, unschuldigen Gruppe beinhalten, ohne eine einfache 'richtige' Antwort zu bieten. Formuliere es als eine hypothetische Situation, die eine klare Entscheidung erfordert.";
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    caseContentDiv.textContent = text;
+                    caseOutputDiv.classList.remove('hidden');
+                } else {
+                    caseContentDiv.textContent = 'Fehler beim Generieren des Falls: Keine gültige Antwort erhalten.';
+                    caseOutputDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Fehler bei API-Anfrage:', error);
+                caseContentDiv.textContent = 'Es gab einen Fehler beim Generieren des Falls. Bitte versuchen Sie es später erneut.';
+                caseOutputDiv.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
