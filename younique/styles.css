@@ -1,13 +1,13 @@
 @font-face {
     font-family: 'effra-rg';
-    src: url('./fonts/effra-rg') format('truetype');
+    src: url('./fonts/effra-rg.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'effra-bd';
-    src: url('./fonts/effra-bd') format('truetype');
+    src: url('./fonts/effra-bd.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -193,7 +193,7 @@ main a:hover {
     display: block;
     background: #fff;
     border-radius: 30px;
-    box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
+    box-shadow: 1.5px 2px 13px rgba(142, 142, 142, 0.3);
     padding: 20px 40px;
     margin: 0 0 30px 0;
 }
@@ -212,11 +212,13 @@ main a:hover {
     bottom: -165px;
     transform: translateX(-50%);
     width: calc(100% - 300px);
+    box-shadow: 1px 1px 13px rgba(142, 142, 142, 0.3);
 }
 
 #ci-cd-sammlung a {
     padding: 20px 30px;
     font-size: 1.2em !important;
+    border-radius: 15px;
 }
 
 /* ===========================================
@@ -370,5 +372,16 @@ footer p {
 @media screen and (max-width: 1440px) {
     #younique-logo-container {
         grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    #ci-cd-sammlung {
+        grid-template-columns: 1fr;
+        bottom: -370px;
+    }
+
+    .max-width {
+        row-gap: 400px;
     }
 }
