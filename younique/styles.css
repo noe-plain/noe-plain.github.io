@@ -221,6 +221,26 @@ main a:hover {
     border-radius: 15px;
 }
 
+#disclaimer {
+    z-index: 1;
+    position: fixed;
+    font-family: 'effra-bd', Arial, sans-serif;
+    text-align: center;
+    font-size: 2rem;
+    left: 50%;
+    top: 30%;
+    transform: translate(-50%, -30%);
+    width: calc(100vw - 40px);
+    height: 100vh;
+    background: rgb(255, 0, 0);
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 /* ===========================================
 Younique-CD Bereich
 ============================================ */
@@ -383,5 +403,11 @@ footer p {
 
     .max-width {
         row-gap: 400px;
+    }
+}
+
+@media screen and (min-width: 830px) {
+    #disclaimer {
+        display: none;
     }
 }
