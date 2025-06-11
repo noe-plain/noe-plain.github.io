@@ -232,8 +232,8 @@ main a:hover {
     transform: translate(-50%, -30%);
     width: calc(100vw - 40px);
     height: 100vh;
-    background: rgb(255, 0, 0);
     color: #fff;
+    background-color: #294754;
     padding: 20px;
     display: flex;
     align-items: center;
@@ -409,5 +409,9 @@ footer p {
 @media screen and (min-width: 830px) {
     #disclaimer {
         display: none;
+    }
+
+    html {
+        overflow: hidden;
     }
 }
