@@ -236,8 +236,18 @@ main a:hover {
     background-color: #294754;
     padding: 60px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
+}
+
+#disclaimer img {
+    max-width: 70%;
+    height: auto;
+}
+
+#disclaimer p {
+    margin-bottom: 20%;
 }
 
 
