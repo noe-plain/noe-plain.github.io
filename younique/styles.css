@@ -294,6 +294,18 @@ svg {
     margin-bottom: 20%;
 }
 
+main img {
+    background-color: #44b0ce;
+    min-height: 50px;
+    border-radius: 10px;
+    color: #fff;
+}
+
+main a img {
+    background-color: transparent;
+    min-height: 0;
+}
+
 
 /* ===========================================
 Younique-CD Bereich
@@ -399,6 +411,14 @@ Younique-CD Bereich
     border-radius: 10px;
     padding: 20px 0 0 0;
     text-align: center;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
 }
 
 .farb-karte-container-klein .farb-karte {
