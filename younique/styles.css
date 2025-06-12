@@ -367,14 +367,14 @@ Younique-CD Bereich
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 180px);
     gap: 30px;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
 }
 
 .farb-karte-container-klein {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 30px;
-    margin-bottom: 15px;
+    margin-bottom: 35px;
 }
 
 .farb-karte {
