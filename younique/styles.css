@@ -199,6 +199,10 @@ main a:hover {
     transform: scale(1.03);
 }
 
+svg {
+    filter: opacity(0.9) brightness(1.5) saturate(1.5);
+}
+
 /* Content Bereich */
 .content {
     grid-column-start: 2;
@@ -494,7 +498,7 @@ th:last-of-type {
 }
 
 input {
-    margin: 10px 0 0 0;
+    margin: 10px 0 20px -1px;
     padding: 10px 30px;
     border: 1px solid #ddd;
     text-align: center;
