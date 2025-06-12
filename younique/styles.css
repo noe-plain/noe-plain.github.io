@@ -364,7 +364,8 @@ Younique-CD Bereich
 
 .farb-karte-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 180px);
     gap: 30px;
     margin-bottom: 15px;
 }
@@ -372,16 +373,20 @@ Younique-CD Bereich
 .farb-karte-container-klein {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    grid-template-rows: repeat(auto-fit, 180px);
     gap: 30px;
     margin-bottom: 15px;
 }
 
 .farb-karte {
     color: #fff;
-    height: 150px;
     border-radius: 10px;
     padding: 20px 0 0 0;
     text-align: center;
+}
+
+.farb-karte-container-klein .farb-karte {
+    height: 170px;
 }
 
 .farb-karte h4 {
@@ -392,6 +397,11 @@ Younique-CD Bereich
 .farb-karte p {
     margin: 5px 0 0 0;
     font-size: 1em;
+}
+
+#farbe-1 {
+    grid-row-start: 1;
+    grid-row-end: 3;
 }
 
 /* ===========================================
@@ -431,6 +441,17 @@ footer p {
     }
 }
 
+@media screen and (max-width: 1300px) {
+    .farb-karte-container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(auto-fit, 180px);
+    }
+
+    .farb-karte-container .farb-karte {
+        min-height: 170px !important;
+    }
+}
+
 @media screen and (max-width: 1200px) {
     #ci-cd-sammlung {
         grid-template-columns: 1fr;
@@ -443,6 +464,14 @@ footer p {
 
     #ci-cd-sammlung {
         width: calc(100% - 200px);
+    }
+
+    .farb-karte-container {
+        grid-template-columns: 1fr;
+    }
+
+    .farb-karte-container .farb-karte {
+        grid-column-start: 1;
     }
 }
 
