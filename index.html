@@ -31,7 +31,6 @@
             width: calc(100% - 14rem);
             max-width: 600px;
             padding: 1rem 3rem;
-            background-color: white;
             border-bottom: 1px solid #ddd;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.073);
             border-radius: 30px;
@@ -40,6 +39,11 @@
             align-items: center;
             max-width: 600px;
             margin: 0 auto;
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 4px 32px 0 rgba(31, 67, 90, 0.10);
+            backdrop-filter: blur(7px) saturate(180%);
+            -webkit-backdrop-filter: blur(7px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
         header nav a {
@@ -107,6 +111,7 @@
             font-size: 1rem;
             background-color: white;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+
         }
 
         .category {
@@ -250,19 +255,22 @@
             }
         }
 
-        @media only screen and (max-width: 350px){
+        @media only screen and (max-width: 350px) {
             header nav div {
                 display: flex;
                 flex-direction: column;
                 row-gap: 10px;
                 row-gap: 0.3rem;
             }
+
             .card-container {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
+
             nav a {
                 text-align: center;
             }
+
             header nav {
                 padding: 0.5rem 0.7rem;
             }
