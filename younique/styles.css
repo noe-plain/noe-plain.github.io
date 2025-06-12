@@ -372,8 +372,7 @@ Younique-CD Bereich
 
 .farb-karte-container-klein {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-    grid-template-rows: repeat(auto-fit, 180px);
+    grid-template-columns: repeat(6, 1fr);
     gap: 30px;
     margin-bottom: 15px;
 }
@@ -469,6 +468,10 @@ footer p {
     #younique-logo-container {
         grid-template-columns: 1fr;
     }
+
+    .farb-karte-container-klein {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media screen and (max-width: 1300px) {
@@ -499,6 +502,10 @@ footer p {
     .farb-karte-container {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(4, 180px);
+    }
+
+    .farb-karte-container-klein {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .farb-karte-container .farb-karte {
