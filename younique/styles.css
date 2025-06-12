@@ -62,6 +62,14 @@ h4 {
     font-family: 'effra-rg', Helvetica, Arial, sans-serif;
 }
 
+.bold * {
+    font-family: 'effra-bd', Arial, sans-serif !important;
+}
+
+.regular * {
+    font-family: 'effra-rg', Helvetica, Arial, sans-serif !important;
+}
+
 /* ===========================================
 Material Icons
 ============================================ */
