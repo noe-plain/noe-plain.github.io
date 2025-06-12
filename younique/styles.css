@@ -526,6 +526,28 @@ input {
     border-radius: 30px;
 }
 
+.image-raster-bilder {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 15px;
+}
+
+.image-raster-bilder img {
+    width: 100%;
+}
+
+.image-raster-mockups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 15px;
+}
+
+.image-raster-mockups img {
+    width: 100%;
+}
+
 /* ===========================================
 Footer
 ============================================ */
