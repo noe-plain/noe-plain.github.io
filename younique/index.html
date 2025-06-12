@@ -196,9 +196,35 @@
                 <div id="younique-fonts" style="margin-top: 50px;">
                     <section class="card-style">
                         <h3>Younique Fonts</h3>
-                        <p>
-                            In diesem Textblock werden die angaben zur gestaltung mit den Fonts festgelegt!
-                        </p>
+                        Für diese Seite verwenden wir zwei Ausführung der Schriftart Effra, welche die Hausschrift von
+                        Younique ist:
+                        <ul>
+                            <li><strong>Effra Bold</strong> für Überschriften</li>
+                            <li><strong>Effra Regular</strong> für normalen Text</li>
+                        </ul>
+                        Die beiden passen super zusammen: modern, klar und nicht zu verspielt. So sieht die Seite
+                        aufgeräumt aus und ist beim
+                        Lesen angenehm – egal ob am Handy, Laptop oder auf Print-Layouts.
+                        <br>
+                        <br>
+
+                        <label for="baseSizeInput" style="display: flex; flex-direction: column; margin-top: 1rem;">
+                            Basisgrösse (min 16px / min 12pt):
+                            <input id="baseSizeInput" value="16" step="1">
+                        </label>
+
+                        <table class="scale-table">
+                            <thead>
+                                <tr>
+                                    <th>Typo-Stil</th>
+                                    <th>Grösse</th>
+                                    <th>Berechnung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scale-body">
+                                <!-- Dynamisch generiert -->
+                            </tbody>
+                        </table>
                     </section>
                     <div id="font-samples">
                         <section class="card-style bold">
@@ -299,6 +325,42 @@
 
         // Event-Listener hinzufügen, um "Enter" zu erkennen
         document.getElementById("suche").addEventListener("keyup", handleEnter);
+    </script>
+    <script>
+        const tbody = document.getElementById("scale-body");
+        const input = document.getElementById("baseSizeInput");
+
+        const elements = [
+            { tag: "h1", factor: 3 },
+            { tag: "h2", factor: 2 },
+            { tag: "h3", factor: 1.5 },
+            { tag: "h4", factor: 1.25 },
+            { tag: "p", factor: 1 }
+        ];
+
+        function updateTable(baseSize) {
+            tbody.innerHTML = "";
+            elements.forEach((el, index) => {
+                const size = Math.round(baseSize * el.factor);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+          <td>${el.tag}</td>
+          <td style="font-family: 'effra-bd', Arial, sans-serif;">${size}</td>
+          <td>${baseSize} × ${el.factor}</td>
+        `;
+                tbody.appendChild(row);
+            });
+        }
+
+        input.addEventListener("input", () => {
+            const baseSize = parseFloat(input.value);
+            if (!isNaN(baseSize)) {
+                updateTable(baseSize);
+            }
+        });
+
+        // Initial render
+        updateTable(parseFloat(input.value));
     </script>
 </body>
 
