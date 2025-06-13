@@ -191,6 +191,19 @@ main a {
     margin: 10px 15px 20px 0px !important;
 }
 
+.p-link {
+    color: #44b0ce;
+    text-decoration: none;
+    font-size: 1rem;
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.p-link:hover {
+    text-decoration: underline;
+}
+
 .a-button:hover {
     transform: scale(1.03);
 }
@@ -538,6 +551,8 @@ input {
 }
 
 .image-raster-bilder img {
+    background-color: transparent;
+    aspect-ratio: 3/2;
     width: 100%;
 }
 
