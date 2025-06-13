@@ -633,6 +633,10 @@ footer p {
         width: calc(100% - 200px);
     }
 
+    .image-raster-bilder {
+        grid-template-columns: 1fr;
+    }
+
     .farb-karte-container {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(4, 180px);
