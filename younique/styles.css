@@ -65,10 +65,12 @@ h4 {
 
 .bold * {
     font-family: 'effra-bd', Arial, sans-serif !important;
+    font-weight: 700;
 }
 
 .regular * {
     font-family: 'effra-rg', Helvetica, Arial, sans-serif !important;
+    font-weight: 500;
 }
 
 strong {
