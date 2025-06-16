@@ -96,7 +96,7 @@ header {
     grid-column-start: 1;
     grid-column-end: 2;
     margin: 70px;
-    background: rgb(0 161 190);
+    background: #44b0ce;
     box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
     color: #333;
     border-radius: 40px;
@@ -483,6 +483,50 @@ Younique-CD Bereich
     border-radius: 0 10px 10px 0;
 }
 
+#younique-downloads {
+    margin: 40px 0 30px 0;
+}
+
+#younique-downloads-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px 30px;
+    padding: 0;
+    list-style: none;
+    margin: 0 0 20px 0;
+    transition: 0.5s;
+
+}
+
+#younique-downloads-list img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    border-radius: 15px 15px 0 0;
+    margin-bottom: 0;
+}
+
+#younique-downloads-list p {
+    font-size: 1.1em;
+    font-family: 'effra-bd', Arial, sans-serif;
+    font-weight: 700;
+    color: #294754;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#younique-downloads-list a {
+    width: 100%;
+    padding: 0;
+    box-shadow: 1.5px 2px 13px rgba(142, 142, 142, 0.15);
+    border-radius: 15px;
+}
+
+#younique-downloads-list a:hover {
+    transform: scale(1.03);
+}
+
 /* ===========================================
 Table
 ============================================ */
@@ -556,17 +600,6 @@ input {
     width: 100%;
 }
 
-.image-raster-mockups {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    margin-bottom: 15px;
-}
-
-.image-raster-mockups img {
-    width: 100%;
-}
-
 /* ===========================================
 Footer
 ============================================ */
@@ -583,7 +616,7 @@ footer div {
 }
 
 footer p {
-    background: rgb(31 67 90);
+    background: #294754;
     color: #fff;
     align-self: center;
     justify-self: center;
