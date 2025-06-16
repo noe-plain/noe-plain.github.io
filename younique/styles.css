@@ -308,10 +308,8 @@ svg {
 }
 
 main img {
-    background-color: #44b0ce;
     min-height: 50px;
     border-radius: 10px;
-    color: #fff;
 }
 
 main a img {
