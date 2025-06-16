@@ -61,6 +61,7 @@ h4 {
 
 * {
     font-family: 'effra-rg', Helvetica, Arial, sans-serif;
+    transition-behavior: smooth;
 }
 
 .bold * {
@@ -327,7 +328,7 @@ Younique-CD Bereich
     position: relative;
     background-image: url('./bilder/RGB_M-Budget_Picknick_0323.jpg');
     background-size: cover;
-    background-position: 10% 50%;
+    background-position: 50% 65%;
     margin: 0 0 30px 0 !important;
     box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
     border-radius: 40px;
