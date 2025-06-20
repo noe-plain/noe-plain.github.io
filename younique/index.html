@@ -48,7 +48,7 @@
     <main id="younique">
         <div class="max-width">
             <div id="younique-cd">
-                <img class="younique-logo younique-logo-glass" src="./bilder/YouniqueLogos/Younique-Logo-Claim-White.webp" alt="">
+                <img class="younique-logo" src="./bilder/Logo-Younique.svg" alt="">
                 <div id="ci-cd-sammlung">
                     <a class="card-style" target="_blank" href="https://migros.frontify.com">Migros Supermarkt AG</a>
                     <a class="card-style" target="_blank" href="https://branding.migros-gruppe.jobs/hub/121">Migros
@@ -121,12 +121,12 @@
                     <h3>Farben</h3>
                     <div class="farb-karte-container">
                         <section id="farbe-1" class="farb-karte">
-                            <h3>Primär</h3>
+                            <h3>Akzent</h3>
                             <p>#44b0ce</p>
                             <p>68 10 16 0</p>
                         </section>
                         <section id="farbe-2" class="farb-karte">
-                            <h3>Text</h3>
+                            <h3>Primär</h3>
                             <p>#294754</p>
                             <p>50 0 0 80</p>
                         </section>
@@ -213,7 +213,7 @@
                             </tbody>
                         </table>
                         <label for="baseSizeInput" style="display: flex; flex-direction: column; margin-top: 1rem;">
-                            <input id="baseSizeInput" value="12" placeholder="Schriftgrösse" step="1">
+                            <input id="baseSizeInput" value="19px" placeholder="Schriftgrösse" step="1">
                             Basisgrösse (min 16px / min 12pt)
                         </label>
                     </section>
@@ -342,39 +342,14 @@
     </footer>
 
     <script>
-        function handleEnter(event) {
-            if (event.key === "Enter") {
-                sucheGoogle();
-            }
-        }
-
-        function sucheGoogle() {
-            var suche = document.getElementById("suche").value;
-
-            // Überprüfen, ob ein suche eingegeben wurde
-            if (suche.trim() !== "") {
-                // Google-Such-URL zusammenstellen
-                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
-
-                // Die Seite im gleichen Tab öffnen
-                window.open(googleSuchURL, "_self");
-            } else {
-                alert("Bitte gib einen suche ein.");
-            }
-        }
-
-        // Event-Listener hinzufügen, um "Enter" zu erkennen
-        document.getElementById("suche").addEventListener("keyup", handleEnter);
-    </script>
-    <script>
         const tbody = document.getElementById("scale-body");
         const input = document.getElementById("baseSizeInput");
 
         const elements = [
-            { tag: "h1 – Titel", factor: 3 },
-            { tag: "h2 – Überschrift 1", factor: 2 },
-            { tag: "h3 – Überschrift 2", factor: 1.5 },
-            { tag: "h4 – Überschrift 3", factor: 1.25 },
+            { tag: "h1 – Titel", factor: 4 },
+            { tag: "h2 – Überschrift 1", factor: 3 },
+            { tag: "h3 – Überschrift 2", factor: 2 },
+            { tag: "h4 – Überschrift 3", factor: 1.5 },
             { tag: "p – Text", factor: 1 }
         ];
 
