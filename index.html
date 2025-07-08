@@ -579,7 +579,7 @@
             Array.from(list.children).forEach((li, i) => {
                 if (i === idx) {
                     li.classList.add("active");
-                    li.style.background = "#f2f2f2";
+                    li.style.backdropFilter = "brightness(0.9)";
                 } else {
                     li.classList.remove("active");
                     li.style.background = "transparent";
