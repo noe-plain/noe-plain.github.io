@@ -195,6 +195,11 @@
         "category": "Audio & Video"
     },
     {
+        "name": "My Wingo",
+        "url": "https://my.wingo.ch",
+        "category": "suche"
+    },
+    {
         "name": "NotebookLM",
         "url": "https://notebooklm.google.com/",
         "category": "Ressourcen"
@@ -265,11 +270,6 @@
         "category": "suche"
     },
     {
-        "name": "My Wingo",
-        "url": "https://my.wingo.ch",
-        "category": "suche"
-    },
-    {
         "name": "Tages-Anzeiger",
         "url": "https://www.tagesanzeiger.ch",
         "category": "suche"
@@ -308,6 +308,11 @@
         "name": "Wiki Media",
         "url": "https://www.wikimedia.de",
         "category": "Bilder"
+    },
+    {
+        "name": "Wix",
+        "url": "https://wix.com",
+        "category": "suche"
     },
     {
         "name": "YouTube",
