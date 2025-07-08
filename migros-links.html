@@ -31,6 +31,7 @@
             width: calc(100% - 14rem);
             max-width: 600px;
             padding: 1rem 3rem;
+            background-color: white;
             border-bottom: 1px solid #ddd;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.073);
             border-radius: 30px;
@@ -39,11 +40,6 @@
             align-items: center;
             max-width: 600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 4px 32px 0 rgba(31, 67, 90, 0.10);
-            backdrop-filter: blur(7px) saturate(200%);
-            -webkit-backdrop-filter: blur(7px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
         header nav a {
@@ -80,128 +76,35 @@
         }
 
         .mood-pic {
-            background-image: url(./images/leuchtturm.jpg);
+            background-image: url(./images/RGB_M-Budget_Picknick_0323.jpg);
             background-size: cover;
             background-position: 35% 10%;
             height: 370px;
             background-color: #1f0033;
             display: flex;
             align-items: flex-end;
-            /* Align items to the bottom */
             justify-content: center;
             font-size: 1.5rem;
             color: #666;
             border-radius: 16px 0 16px 16px;
-            margin: 94px auto 100px auto;
+            margin: 94px auto 2rem auto;
             position: relative;
             overflow: visible;
-            /* Ensure shadows are not clipped */
-        }
-
-        .autocomplete-wrapper {
-            position: absolute;
-            width: calc(80% - 6rem);
-            max-width: 600px;
-            top: 520px;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 0;
-            z-index: 999;
-            background: rgba(255, 255, 255, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border-radius: 27px !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            display: flex;
-            flex-direction: column;
-            transition: border-radius 0.3s cubic-bezier(.4, 2, .6, 1), box-shadow 0.3s;
-        }
-
-        .autocomplete-wrapper.expanded {
-            border-radius: 30px 30px 16px 16px;
-            box-shadow: 0 8px 32px rgba(31, 67, 90, 0.13);
         }
 
         .search-input {
             position: relative;
-            z-index: 1;
-            width: 100%;
+            top: calc(-60px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(80% - 6rem);
+            max-width: 600px;
             padding: 1rem 3rem;
-            border: none;
-            outline: none;
+            border: 1px solid #ddd;
             border-radius: 30px;
             font-size: 1rem;
-            background-color: transparent;
-            box-shadow: none;
-            transition: border-radius 0.3s cubic-bezier(.4, 2, .6, 1);
-            color: #333;
-            background-color: transparent;
-
-            &::placeholder {
-                color: #fff;
-                opacity: 1;
-            }
-        }
-
-        .autocomplete-wrapper.expanded .search-input {
-            border-radius: 30px 30px 30px 30px;
-        }
-
-        #autocomplete-list {
-            position: static;
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-radius: 0 0 16px 16px;
-            box-shadow: none;
-            z-index: 2;
-            list-style: none;
-            overflow-y: auto;
-            margin: 0;
-            padding: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(.4, 2, .6, 1), max-height 0.3s cubic-bezier(.4, 2, .6, 1);
-        }
-
-
-        #autocomplete-list.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #autocomplete-list li {
-            background: transparent;
-            padding: 0.7rem 3rem 0.7rem 3rem;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s, opacity 0.3s cubic-bezier(.4, 2, .6, 1);
-            opacity: 0;
-            transform: translateY(-10px);
-            animation: fadeInListItem 0.3s forwards;
-            animation-delay: var(--delay, 0s);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            min-height: 1.2em;
-        }
-
-        #autocomplete-list li:last-of-type {
-            background: transparent;
-            margin-bottom: 16px;
-        }
-
-        @keyframes fadeInListItem {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        #autocomplete-list li:hover,
-        #autocomplete-list li.active {
-            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .category {
@@ -318,7 +221,7 @@
             }
 
             .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
 
             footer nav {
@@ -345,22 +248,16 @@
             }
         }
 
-        @media only screen and (max-width: 350px) {
+        @media only screen and (max-width: 350px){
             header nav div {
                 display: flex;
                 flex-direction: column;
                 row-gap: 10px;
                 row-gap: 0.3rem;
             }
-
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-
             nav a {
                 text-align: center;
             }
-
             header nav {
                 padding: 0.5rem 0.7rem;
             }
@@ -381,9 +278,7 @@
     </header>
     <main>
         <div id="search" class="mood-pic"></div>
-        <div class="autocomplete-wrapper" id="autocomplete-wrapper">
-            <input id="suche" type="text" class="search-input" placeholder="Search…">
-            <ul id="autocomplete-list"></ul>
+        <input id="suche" type="text" class="search-input" placeholder="Search…">
         </div>
         <div class="category">
             <div class="card-container">
@@ -401,53 +296,11 @@
             </div>
         </div>
         <div class="category">
-            <h2>Fonts</h2>
-            <div class="card-container">
-                <a class="card" href="https://www.fontshare.com">Fontshare</a>
-                <a class="card" href="https://fonts.google.com">Google Fonts</a>
-                <a class="card" href="https://www.typewolf.com/">Typewolf</a>
-                <a class="card" href="https://freefaces.gallery">Freefaces Gallery</a>
-                <a class="card" href="https://www.collletttivo.it">Collletttivo</a>
-                <a class="card" href="https://fonts.adobe.com/">Adobe Fonts</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Bilder</h2>
-            <div class="card-container">
-                <a class="card" href="https://unsplash.com">Unsplash</a>
-                <a class="card" href="https://pixabay.com">Pixabay</a>
-                <a class="card" href="https://pexels.com">Pexels</a>
-                <a class="card" href="https://www.wikimedia.de">Wiki Media</a>
-                <a class="card" href="https://mockups-design.com/">Mockups Design</a>
-                <a class="card" href="https://smartymockups.com/">Smarty Mockups</a>
-                <a class="card" href="https://www.freepik.com/">Freepik</a>
-                <a class="card" href="https://contentcredentials.org/verify">Content credentials</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Colors</h2>
-            <div class="card-container">
-                <a class="card" href="https://color.adobe.com">Adobe Color</a>
-                <a class="card" href="https://coolors.co/">Colors</a>
-            </div>
-        </div>
-        <div class="category">
             <h2>Audio &amp; Video</h2>
             <div class="card-container">
                 <a class="card" href="https://pixabay.com/music/">Pixabay</a>
                 <a class="card" href="https://podcast.adobe.com/">Adobe Podcast</a>
                 <a class="card" href="https://www.musicbed.com/">Musicbed</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Icons</h2>
-            <div class="card-container">
-                <a class="card" href="https://lucide.dev/icons">Lucide</a>
-                <a class="card" href="https://hugeicons.com/">Hugeicons</a>
-                <a class="card" href="https://heroicons.com/">Heroicons</a>
-                <a class="card" href="https://iconhub.io">Iconhub</a>
-                <a class="card" href="https://iconduck.com">Iconduck</a>
-                <a class="card" href="https://thenounproject.com">The Noun Project</a>
             </div>
         </div>
     </main>
@@ -492,156 +345,29 @@
         </nav>
     </footer>
     <script>
-        // Alle Links aus der Liste
-        const links = [
-            { name: "Noé Plain", url: "https://noeplain.ch" },
-            { name: "NotebookLM", url: "https://notebooklm.google.com/" },
-            { name: "YouTube", url: "https://youtube.com" },
-            { name: "⭐ Migros AI", url: "https://mgb-aifo-chat.service.migros.cloud/" },
-            { name: "Pinterest", url: "https://de.pinterest.com/" },
-            { name: "Behance", url: "https://www.behance.net/" },
-            { name: "Dribbble", url: "https://dribbble.com/" },
-            { name: "Fontshare", url: "https://www.fontshare.com" },
-            { name: "Google Fonts", url: "https://fonts.google.com" },
-            { name: "Typewolf", url: "https://www.typewolf.com/" },
-            { name: "Freefaces Gallery", url: "https://freefaces.gallery" },
-            { name: "Collletttivo", url: "https://www.collletttivo.it" },
-            { name: "Adobe Fonts", url: "https://fonts.adobe.com/" },
-            { name: "Unsplash", url: "https://unsplash.com" },
-            { name: "Pixabay", url: "https://pixabay.com" },
-            { name: "Pexels", url: "https://pexels.com" },
-            { name: "Wiki Media", url: "https://www.wikimedia.de" },
-            { name: "Mockups Design", url: "https://mockups-design.com/" },
-            { name: "Smarty Mockups", url: "https://smartymockups.com/" },
-            { name: "Freepik", url: "https://www.freepik.com/" },
-            { name: "Content credentials", url: "https://contentcredentials.org/verify" },
-            { name: "Adobe Color", url: "https://color.adobe.com" },
-            { name: "Colors", url: "https://coolors.co/" },
-            { name: "Pixabay (Music)", url: "https://pixabay.com/music/" },
-            { name: "Adobe Podcast", url: "https://podcast.adobe.com/" },
-            { name: "Musicbed", url: "https://www.musicbed.com/" },
-            { name: "Lucide", url: "https://lucide.dev/icons" },
-            { name: "Hugeicons", url: "https://hugeicons.com/" },
-            { name: "Heroicons", url: "https://heroicons.com/" },
-            { name: "Iconhub", url: "https://iconhub.io" },
-            { name: "Iconduck", url: "https://iconduck.com" },
-            { name: "The Noun Project", url: "https://thenounproject.com" },
-            { name: "Google", url: "https://google.com" },
-            { name: "Gemini", url: "https://gemini.google.com"}
-        ];
-
-        const input = document.getElementById("suche");
-        const list = document.getElementById("autocomplete-list");
-        const wrapper = document.getElementById("autocomplete-wrapper");
-        let selectedIndex = -1;
-        let filtered = [];
-
-        function updateAutocomplete() {
-            const val = input.value.trim().toLowerCase();
-            list.innerHTML = "";
-            selectedIndex = -1;
-            // Zeige Dropdown ab erstem Zeichen (Buchstabe oder Zahl)
-            if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
-                list.classList.remove("visible");
-                wrapper.classList.remove("expanded");
-                list.style.display = "none";
-                return;
-            }
-            filtered = links.filter(link => link.name.toLowerCase().includes(val));
-            if (filtered.length === 0) {
-                list.classList.remove("visible");
-                wrapper.classList.remove("expanded");
-                list.style.display = "none";
-                return;
-            }
-            filtered.forEach((link, idx) => {
-                const li = document.createElement("li");
-                li.textContent = link.name;
-                li.tabIndex = 0;
-                li.style.setProperty('--delay', (idx * 0.04) + 's');
-                li.onmousedown = e => {
-                    window.open(link.url, "_blank");
-                    list.classList.remove("visible");
-                    wrapper.classList.remove("expanded");
-                    list.style.display = "none";
-                };
-                li.onmouseover = () => {
-                    setActive(idx);
-                };
-                if (idx === selectedIndex) li.classList.add("active");
-                list.appendChild(li);
-            });
-            wrapper.classList.add("expanded");
-            list.classList.add("visible");
-            list.style.display = "block";
-        }
-
-        function setActive(idx) {
-            Array.from(list.children).forEach((li, i) => {
-                if (i === idx) {
-                    li.classList.add("active");
-                    li.style.backdropFilter = "brightness(0.9)";
-                } else {
-                    li.classList.remove("active");
-                    li.style.backdropFilter = "brightness(1)"
-                    li.style.background = "transparent";
-                }
-            });
-            selectedIndex = idx;
-        }
-
-        input.addEventListener("input", updateAutocomplete);
-
-        input.addEventListener("keydown", function (event) {
-            if (list.classList.contains("visible") && filtered.length > 0) {
-                if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    selectedIndex = (selectedIndex + 1) % filtered.length;
-                    setActive(selectedIndex);
-                } else if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
-                    setActive(selectedIndex);
-                } else if (event.key === "Enter") {
-                    if (selectedIndex >= 0 && filtered[selectedIndex]) {
-                        window.open(filtered[selectedIndex].url, "_blank");
-                        hideAutocomplete();
-                        event.preventDefault();
-                        return;
-                    }
-                } else if (event.key === "Escape") {
-                    hideAutocomplete();
-                }
-            }
-        });
-
-        // Wenn das Feld den Fokus verliert, Dropdown ausblenden (kurz warten für Klick)
-        input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
-
-        // Google-Suche wie gehabt, wenn kein Vorschlag ausgewählt ist
         function handleEnter(event) {
-            if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
+            if (event.key === "Enter") {
                 sucheGoogle();
             }
         }
 
         function sucheGoogle() {
             var suche = document.getElementById("suche").value;
+
+            // Überprüfen, ob ein suche eingegeben wurde
             if (suche.trim() !== "") {
+                // Google-Such-URL zusammenstellen
                 var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+
+                // Die Seite im gleichen Tab öffnen
                 window.open(googleSuchURL, "_self");
             } else {
                 alert("Bitte gib einen suche ein.");
             }
         }
 
+        // Event-Listener hinzufügen, um "Enter" zu erkennen
         document.getElementById("suche").addEventListener("keyup", handleEnter);
-
-        function hideAutocomplete() {
-            list.classList.remove("visible");
-            wrapper.classList.remove("expanded");
-            list.style.display = "none";
-        }
     </script>
 </body>
 
