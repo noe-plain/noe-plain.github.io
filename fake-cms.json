@@ -270,6 +270,11 @@
         "category": "suche"
     },
     {
+        "name": "my wingo",
+        "url": "https://my.wingo.ch",
+        "category": "suche"
+    },
+    {
         "name": "Tages-Anzeiger",
         "url": "https://www.tagesanzeiger.ch",
         "category": "suche"
