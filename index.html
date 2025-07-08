@@ -648,6 +648,11 @@
             wrapper.classList.remove("expanded");
             list.style.display = "none";
         }
+
+        // Suchfeld beim Laden der Seite automatisch fokussieren
+            window.addEventListener("DOMContentLoaded", function () {
+                input.focus();
+            });
     </script>
 </body>
 
