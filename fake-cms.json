@@ -145,18 +145,18 @@
         "category": "suche"
     },
     {
-        "name": "jobs.ch",
+        "name": "Jobs",
         "url": "https://jobs.ch",
+        "category": "suche"
+    },
+    {
+        "name": "LinkedIn",
+        "url": "https://linkedin.com",
         "category": "suche"
     },
     {
         "name": "Join",
         "url": "https://join.com/candidate",
-        "category": "suche"
-    },
-    {
-        "name": "Jira",
-        "url": "https://www.atlassian.com/software/jira",
         "category": "suche"
     },
     {
@@ -240,11 +240,6 @@
         "category": "suche"
     },
     {
-        "name": "Smashing Magazine",
-        "url": "https://www.smashingmagazine.com/",
-        "category": "suche"
-    },
-    {
         "name": "Smarty Mockups",
         "url": "https://smartymockups.com/",
         "category": "Bilder"
@@ -270,7 +265,7 @@
         "category": "suche"
     },
     {
-        "name": "my wingo",
+        "name": "My Wingo",
         "url": "https://my.wingo.ch",
         "category": "suche"
     },
