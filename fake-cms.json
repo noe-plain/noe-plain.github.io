@@ -1,0 +1,327 @@
+[
+    {
+        "name": "Noé Plain",
+        "url": "https://noeplain.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Abstract",
+        "url": "https://www.abstract.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Adobe Color",
+        "url": "https://color.adobe.com",
+        "category": "Colors"
+    },
+    {
+        "name": "Adobe Fonts",
+        "url": "https://fonts.adobe.com/",
+        "category": "Fonts"
+    },
+    {
+        "name": "Adobe Podcast",
+        "url": "https://podcast.adobe.com/",
+        "category": "Audio & Video"
+    },
+    {
+        "name": "Asana",
+        "url": "https://asana.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Awwwards",
+        "url": "https://www.awwwards.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Behance",
+        "url": "https://www.behance.net/",
+        "category": "Inspiration"
+    },
+    {
+        "name": "Blick",
+        "url": "https://www.blick.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Canva",
+        "url": "https://www.canva.com/",
+        "category": "suche"
+    },
+    {
+        "name": "CodePen",
+        "url": "https://codepen.io/",
+        "category": "suche"
+    },
+    {
+        "name": "Collletttivo",
+        "url": "https://www.collletttivo.it",
+        "category": "Fonts"
+    },
+    {
+        "name": "Colors",
+        "url": "https://coolors.co/",
+        "category": "Colors"
+    },
+    {
+        "name": "Content credentials",
+        "url": "https://contentcredentials.org/verify",
+        "category": "Bilder"
+    },
+    {
+        "name": "CSS-Tricks",
+        "url": "https://css-tricks.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Designspiration",
+        "url": "https://www.designspiration.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Digitec",
+        "url": "https://www.digitec.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Dribbble",
+        "url": "https://dribbble.com/",
+        "category": "Inspiration"
+    },
+    {
+        "name": "Figma",
+        "url": "https://www.figma.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Fontshare",
+        "url": "https://www.fontshare.com",
+        "category": "Fonts"
+    },
+    {
+        "name": "Freefaces Gallery",
+        "url": "https://freefaces.gallery",
+        "category": "Fonts"
+    },
+    {
+        "name": "Freepik",
+        "url": "https://www.freepik.com/",
+        "category": "Bilder"
+    },
+    {
+        "name": "Gemini",
+        "url": "https://gemini.google.com",
+        "category": "suche"
+    },
+    {
+        "name": "Google",
+        "url": "https://google.com",
+        "category": "suche"
+    },
+    {
+        "name": "Google Fonts",
+        "url": "https://fonts.google.com",
+        "category": "Fonts"
+    },
+    {
+        "name": "Heroicons",
+        "url": "https://heroicons.com/",
+        "category": "Icons"
+    },
+    {
+        "name": "Hugeicons",
+        "url": "https://hugeicons.com/",
+        "category": "Icons"
+    },
+    {
+        "name": "Iconduck",
+        "url": "https://iconduck.com",
+        "category": "Icons"
+    },
+    {
+        "name": "Iconhub",
+        "url": "https://iconhub.io",
+        "category": "Icons"
+    },
+    {
+        "name": "InVision",
+        "url": "https://www.invisionapp.com/",
+        "category": "suche"
+    },
+    {
+        "name": "jobs.ch",
+        "url": "https://jobs.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Join",
+        "url": "https://join.com/candidate",
+        "category": "suche"
+    },
+    {
+        "name": "Jira",
+        "url": "https://www.atlassian.com/software/jira",
+        "category": "suche"
+    },
+    {
+        "name": "Lucide",
+        "url": "https://lucide.dev/icons",
+        "category": "Icons"
+    },
+    {
+        "name": "Migros AI",
+        "url": "https://mgb-aifo-chat.service.migros.cloud/",
+        "category": "Ressourcen"
+    },
+    {
+        "name": "Migros-Gruppe Jobs",
+        "url": "https://migros-gruppe.jobs/",
+        "category": "suche"
+    },
+    {
+        "name": "Miro",
+        "url": "https://miro.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Mockups Design",
+        "url": "https://mockups-design.com/",
+        "category": "Bilder"
+    },
+    {
+        "name": "Monday.com",
+        "url": "https://monday.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Musicbed",
+        "url": "https://www.musicbed.com/",
+        "category": "Audio & Video"
+    },
+    {
+        "name": "NotebookLM",
+        "url": "https://notebooklm.google.com/",
+        "category": "Ressourcen"
+    },
+    {
+        "name": "Notion",
+        "url": "https://www.notion.so/",
+        "category": "suche"
+    },
+    {
+        "name": "NZZ",
+        "url": "https://www.nzz.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Office 365",
+        "url": "https://m365.cloud.microsoft",
+        "category": "suche"
+    },
+    {
+        "name": "Pexels",
+        "url": "https://pexels.com",
+        "category": "Bilder"
+    },
+    {
+        "name": "Pinterest",
+        "url": "https://de.pinterest.com/",
+        "category": "Inspiration"
+    },
+    {
+        "name": "Pixabay",
+        "url": "https://pixabay.com",
+        "category": "Bilder"
+    },
+    {
+        "name": "Pixabay (Music)",
+        "url": "https://pixabay.com/music/",
+        "category": "Audio & Video"
+    },
+    {
+        "name": "Slack",
+        "url": "https://slack.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Smashing Magazine",
+        "url": "https://www.smashingmagazine.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Smarty Mockups",
+        "url": "https://smartymockups.com/",
+        "category": "Bilder"
+    },
+    {
+        "name": "Sketch",
+        "url": "https://www.sketch.com/",
+        "category": "suche"
+    },
+    {
+        "name": "SRF",
+        "url": "https://www.srf.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Swiss Design Network",
+        "url": "https://www.swissdesignnetwork.org/",
+        "category": "suche"
+    },
+    {
+        "name": "Swisscom",
+        "url": "https://www.swisscom.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Tages-Anzeiger",
+        "url": "https://www.tagesanzeiger.ch",
+        "category": "suche"
+    },
+    {
+        "name": "Teams",
+        "url": "https://teams.microsoft.com/",
+        "category": "suche"
+    },
+    {
+        "name": "The Noun Project",
+        "url": "https://thenounproject.com",
+        "category": "Icons"
+    },
+    {
+        "name": "Trello",
+        "url": "https://trello.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Typewolf",
+        "url": "https://www.typewolf.com/",
+        "category": "Fonts"
+    },
+    {
+        "name": "Unsplash",
+        "url": "https://unsplash.com",
+        "category": "Bilder"
+    },
+    {
+        "name": "Webflow",
+        "url": "https://webflow.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Wiki Media",
+        "url": "https://www.wikimedia.de",
+        "category": "Bilder"
+    },
+    {
+        "name": "YouTube",
+        "url": "https://youtube.com",
+        "category": "Ressourcen"
+    },
+    {
+        "name": "Younique",
+        "url": "https://younique.migros.net",
+        "category": "suche"
+    }
+]

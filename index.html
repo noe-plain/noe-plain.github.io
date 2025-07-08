@@ -7,370 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache">
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
     <title>Suche – Noé Plain</title>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
-        }
-
-        header {
-            position: sticky;
-            top: 63px;
-            left: 50%;
-            z-index: 1000;
-        }
-
-        header nav {
-            width: calc(100% - 14rem);
-            max-width: 600px;
-            padding: 1rem 3rem;
-            border-bottom: 1px solid #ddd;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.073);
-            border-radius: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 4px 32px 0 rgba(31, 67, 90, 0.10);
-            backdrop-filter: blur(7px) saturate(200%);
-            -webkit-backdrop-filter: blur(7px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        header nav a {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.5s ease;
-        }
-
-        header nav a:hover {
-            transition: background-color 0.5s ease;
-            background-color: #dfdfdf;
-            color: #333;
-        }
-
-        .active {
-            background-color: #f2f2f2;
-        }
-
-        h1 {
-            font-weight: bold;
-            padding: 0;
-            margin: 0;
-            font-size: 1.2rem;
-            color: #333;
-        }
-
-        main {
-            padding: 4rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .mood-pic {
-            background-image: url(./images/leuchtturm.jpg);
-            background-size: cover;
-            background-position: 35% 10%;
-            height: 370px;
-            background-color: #1f0033;
-            display: flex;
-            align-items: flex-end;
-            /* Align items to the bottom */
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #666;
-            border-radius: 16px 0 16px 16px;
-            margin: 94px auto 100px auto;
-            position: relative;
-            overflow: visible;
-            /* Ensure shadows are not clipped */
-        }
-
-        .autocomplete-wrapper {
-            position: absolute;
-            width: calc(80% - 6rem);
-            max-width: 600px;
-            top: 500px;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 0;
-            padding: 0 45px;
-            z-index: 999;
-            background: rgba(255, 255, 255, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border-radius: 27px !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            display: flex;
-            flex-direction: column;
-            transition: border-radius 0.3s cubic-bezier(.4, 2, .6, 1), box-shadow 0.3s;
-        }
-
-        .autocomplete-wrapper.expanded {
-            border-radius: 30px 30px 16px 16px;
-            box-shadow: 0 8px 32px rgba(31, 67, 90, 0.13);
-        }
-
-        .search-input {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            padding: 1rem 3rem;
-            border: none;
-            outline: none;
-            border-radius: 30px;
-            font-size: 1rem;
-            background-color: transparent;
-            box-shadow: none;
-            transition: border-radius 0.3s cubic-bezier(.4, 2, .6, 1);
-            color: #333;
-            background-color: transparent;
-
-            &::placeholder {
-                color: #333;
-                opacity: 1;
-            }
-        }
-
-        .autocomplete-wrapper.expanded .search-input {
-            border-radius: 30px 30px 30px 30px;
-        }
-
-        #autocomplete-list {
-            position: static;
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-radius: 0 0 16px 16px;
-            box-shadow: none;
-            z-index: 2;
-            list-style: none;
-            overflow-y: auto;
-            margin: 0;
-            padding: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(.4, 2, .6, 1), max-height 0.3s cubic-bezier(.4, 2, .6, 1);
-        }
-
-
-        #autocomplete-list.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #autocomplete-list li {
-            background: transparent;
-            padding: 0.7rem 3rem 0.7rem 3rem;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s, opacity 0.3s cubic-bezier(.4, 2, .6, 1);
-            opacity: 0;
-            transform: translateY(-10px);
-            animation: fadeInListItem 0.3s forwards;
-            animation-delay: var(--delay, 0s);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            min-height: 1.2em;
-        }
-
-        #autocomplete-list li:last-of-type {
-            background: transparent;
-            margin-bottom: 16px;
-        }
-
-        @keyframes fadeInListItem {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        #autocomplete-list li:hover,
-        #autocomplete-list li.active {
-            border-radius: 8px;
-        }
-
-        .category {
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .category h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            overflow-y: auto;
-            padding: 1rem;
-            margin: 0 -1rem;
-        }
-
-        .card {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 2;
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        main a {
-            text-decoration: none;
-            display: block;
-            color: #333;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        footer {
-            padding: 1rem 4rem;
-            margin-top: 40px;
-            background-color: #1f0033;
-            color: #ddd;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-        }
-
-        footer nav {
-            display: flex;
-            justify-self: center;
-            width: 100%;
-            justify-content: space-between;
-            align-items: top;
-            max-width: 1200px;
-            margin-top: 30px;
-        }
-
-        footer nav div {
-            color: #ddd;
-            margin: 0 0 30px 0;
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        footer a {
-            color: #ddd;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.5s ease;
-        }
-
-        footer nav a:hover {
-            text-decoration: underline #fff;
-        }
-
-        .verschwommen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 230px;
-            backdrop-filter: blur(70px);
-            z-index: 999;
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
-            background-color: #ffffff;
-        }
-
-        @media only screen and (max-width: 600px) {
-            header nav {
-                flex-direction: column;
-                align-items: center;
-                padding: 1.3rem 1rem;
-                row-gap: 20px;
-                width: calc(100% - 10rem);
-            }
-
-            .autocomplete-wrapper {
-                padding: 0;
-            }
-
-            header h1 {
-                display: none;
-            }
-
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
-
-            footer nav {
-                flex-direction: column;
-                align-items: start;
-                row-gap: 70px;
-                text-align: left !important;
-            }
-
-            footer svg {
-                margin-left: 20px;
-            }
-
-            footer a {
-                text-align: left !important;
-            }
-
-            .mood-pic {
-                margin: 94px -2rem 2rem -2rem;
-            }
-
-            .search-input {
-                width: calc(100% - 6rem);
-            }
-        }
-
-        @media only screen and (max-width: 350px) {
-            header nav div {
-                display: flex;
-                flex-direction: column;
-                row-gap: 10px;
-                row-gap: 0.3rem;
-            }
-
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-
-            nav a {
-                text-align: center;
-            }
-
-            header nav {
-                padding: 0.5rem 0.7rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <div class="verschwommen"></div>
 
@@ -390,71 +27,7 @@
             <input id="suche" type="text" class="search-input" placeholder="Search…">
             <ul id="autocomplete-list"></ul>
         </div>
-        <div class="category">
-            <div class="card-container">
-                <a class="card" href="https://notebooklm.google.com/">NotebookLM</a>
-                <a class="card" href="https://youtube.com">YouTube</a>
-                <a class="card" href="https://mgb-aifo-chat.service.migros.cloud/">⭐ Migros AI</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Inspiration</h2>
-            <div class="card-container">
-                <a class="card" href="https://de.pinterest.com/">Pinterest</a>
-                <a class="card" href="https://www.behance.net/">Behance</a>
-                <a class="card" href="https://dribbble.com/">Dribbble</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Fonts</h2>
-            <div class="card-container">
-                <a class="card" href="https://www.fontshare.com">Fontshare</a>
-                <a class="card" href="https://fonts.google.com">Google Fonts</a>
-                <a class="card" href="https://www.typewolf.com/">Typewolf</a>
-                <a class="card" href="https://freefaces.gallery">Freefaces Gallery</a>
-                <a class="card" href="https://www.collletttivo.it">Collletttivo</a>
-                <a class="card" href="https://fonts.adobe.com/">Adobe Fonts</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Bilder</h2>
-            <div class="card-container">
-                <a class="card" href="https://unsplash.com">Unsplash</a>
-                <a class="card" href="https://pixabay.com">Pixabay</a>
-                <a class="card" href="https://pexels.com">Pexels</a>
-                <a class="card" href="https://www.wikimedia.de">Wiki Media</a>
-                <a class="card" href="https://mockups-design.com/">Mockups Design</a>
-                <a class="card" href="https://smartymockups.com/">Smarty Mockups</a>
-                <a class="card" href="https://www.freepik.com/">Freepik</a>
-                <a class="card" href="https://contentcredentials.org/verify">Content credentials</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Colors</h2>
-            <div class="card-container">
-                <a class="card" href="https://color.adobe.com">Adobe Color</a>
-                <a class="card" href="https://coolors.co/">Colors</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Audio &amp; Video</h2>
-            <div class="card-container">
-                <a class="card" href="https://pixabay.com/music/">Pixabay</a>
-                <a class="card" href="https://podcast.adobe.com/">Adobe Podcast</a>
-                <a class="card" href="https://www.musicbed.com/">Musicbed</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Icons</h2>
-            <div class="card-container">
-                <a class="card" href="https://lucide.dev/icons">Lucide</a>
-                <a class="card" href="https://hugeicons.com/">Hugeicons</a>
-                <a class="card" href="https://heroicons.com/">Heroicons</a>
-                <a class="card" href="https://iconhub.io">Iconhub</a>
-                <a class="card" href="https://iconduck.com">Iconduck</a>
-                <a class="card" href="https://thenounproject.com">The Noun Project</a>
-            </div>
-        </div>
+        <div id="categories-root"></div>
     </main>
     <footer>
         <nav>
@@ -497,82 +70,54 @@
         </nav>
     </footer>
     <script>
-        // Alle Links aus der Liste
-        const links = [
-            { name: "Noé Plain", url: "https://noeplain.ch" },
-            { name: "Abstract", url: "https://www.abstract.com/" },
-            { name: "Adobe Color", url: "https://color.adobe.com" },
-            { name: "Adobe Fonts", url: "https://fonts.adobe.com/" },
-            { name: "Adobe Podcast", url: "https://podcast.adobe.com/" },
-            { name: "Asana", url: "https://asana.com/" },
-            { name: "Awwwards", url: "https://www.awwwards.com/" },
-            { name: "Behance", url: "https://www.behance.net/" },
-            { name: "Blick", url: "https://www.blick.ch" },
-            { name: "Canva", url: "https://www.canva.com/" },
-            { name: "CodePen", url: "https://codepen.io/" },
-            { name: "Collletttivo", url: "https://www.collletttivo.it" },
-            { name: "Colors", url: "https://coolors.co/" },
-            { name: "Content credentials", url: "https://contentcredentials.org/verify" },
-            { name: "CSS-Tricks", url: "https://css-tricks.com/" },
-            { name: "Designspiration", url: "https://www.designspiration.com/" },
-            { name: "Digitec", url: "https://www.digitec.ch" },
-            { name: "Dribbble", url: "https://dribbble.com/" },
-            { name: "Figma", url: "https://www.figma.com/" },
-            { name: "Fontshare", url: "https://www.fontshare.com" },
-            { name: "Freefaces Gallery", url: "https://freefaces.gallery" },
-            { name: "Freepik", url: "https://www.freepik.com/" },
-            { name: "Gemini", url: "https://gemini.google.com" },
-            { name: "Google", url: "https://google.com" },
-            { name: "Google Fonts", url: "https://fonts.google.com" },
-            { name: "Heroicons", url: "https://heroicons.com/" },
-            { name: "Hugeicons", url: "https://hugeicons.com/" },
-            { name: "Iconduck", url: "https://iconduck.com" },
-            { name: "Iconhub", url: "https://iconhub.io" },
-            { name: "InVision", url: "https://www.invisionapp.com/" },
-            { name: "jobs.ch", url: "https://jobs.ch" },
-            { name: "Join", url: "https://join.com/candidate" },
-            { name: "Jira", url: "https://www.atlassian.com/software/jira" },
-            { name: "Lucide", url: "https://lucide.dev/icons" },
-            { name: "Migros AI", url: "https://mgb-aifo-chat.service.migros.cloud/" },
-            { name: "Migros-Gruppe Jobs", url: "https://migros-gruppe.jobs/" },
-            { name: "Miro", url: "https://miro.com/" },
-            { name: "Mockups Design", url: "https://mockups-design.com/" },
-            { name: "Monday.com", url: "https://monday.com/" },
-            { name: "Musicbed", url: "https://www.musicbed.com/" },
-            { name: "NotebookLM", url: "https://notebooklm.google.com/" },
-            { name: "Notion", url: "https://www.notion.so/" },
-            { name: "NZZ", url: "https://www.nzz.ch" },
-            { name: "Office 365", url: "https://m365.cloud.microsoft" },
-            { name: "Pexels", url: "https://pexels.com" },
-            { name: "Pinterest", url: "https://de.pinterest.com/" },
-            { name: "Pixabay", url: "https://pixabay.com" },
-            { name: "Pixabay (Music)", url: "https://pixabay.com/music/" },
-            { name: "Slack", url: "https://slack.com/" },
-            { name: "Smarty Mockups", url: "https://smartymockups.com/" },
-            { name: "Smashing Magazine", url: "https://www.smashingmagazine.com/" },
-            { name: "Sketch", url: "https://www.sketch.com/" },
-            { name: "SRF", url: "https://www.srf.ch" },
-            { name: "Swiss Design Network", url: "https://www.swissdesignnetwork.org/" },
-            { name: "Swisscom", url: "https://www.swisscom.ch" },
-            { name: "Tages-Anzeiger", url: "https://www.tagesanzeiger.ch" },
-            { name: "Teams", url: "https://teams.microsoft.com/" },
-            { name: "The Noun Project", url: "https://thenounproject.com" },
-            { name: "Trello", url: "https://trello.com/" },
-            { name: "Typewolf", url: "https://www.typewolf.com/" },
-            { name: "Unsplash", url: "https://unsplash.com" },
-            { name: "Webflow", url: "https://webflow.com/" },
-            { name: "Wiki Media", url: "https://www.wikimedia.de" },
-            { name: "Younique", url: "https://younique.migros.net" },
-            { name: "YouTube", url: "https://youtube.com" },
+        // Daten aus externer JSON laden und dann alles initialisieren
+        let links = [];
+        const categoryOrder = [
+            "Ressourcen",
+            "Inspiration",
+            "Fonts",
+            "Bilder",
+            "Colors",
+            "Audio & Video",
+            "Icons"
         ];
 
-        const input = document.getElementById("suche");
-        const list = document.getElementById("autocomplete-list");
-        const wrapper = document.getElementById("autocomplete-wrapper");
+        function renderCategories() {
+            const root = document.getElementById('categories-root');
+            root.innerHTML = '';
+            categoryOrder.forEach(category => {
+                // Ressourcen: ohne Titel, andere Kategorien mit Titel (außer "suche" wird eh nicht angezeigt)
+                const catLinks = links.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
+                if (catLinks.length === 0) return;
+                const div = document.createElement('div');
+                div.className = 'category';
+                if (category !== "Ressourcen") {
+                    const h2 = document.createElement('h2');
+                    h2.textContent = category;
+                    div.appendChild(h2);
+                }
+                const container = document.createElement('div');
+                container.className = 'card-container';
+                catLinks.forEach(link => {
+                    const a = document.createElement('a');
+                    a.className = 'card';
+                    a.href = link.url;
+                    a.textContent = link.name;
+                    container.appendChild(a);
+                });
+                div.appendChild(container);
+                root.appendChild(div);
+            });
+        }
+
+        // Autocomplete zeigt jetzt ALLE Links an, unabhängig von der Kategorie
         let selectedIndex = -1;
         let filtered = [];
 
         function updateAutocomplete() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
             const val = input.value.trim().toLowerCase();
             list.innerHTML = "";
             selectedIndex = -1;
@@ -583,7 +128,7 @@
                 list.style.display = "none";
                 return;
             }
-            filtered = links.filter(link => link.name.toLowerCase().includes(val));
+            filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
             if (filtered.length === 0) {
                 list.classList.remove("visible");
                 wrapper.classList.remove("expanded");
@@ -613,6 +158,7 @@
         }
 
         function setActive(idx) {
+            const list = document.getElementById("autocomplete-list");
             Array.from(list.children).forEach((li, i) => {
                 if (i === idx) {
                     li.classList.add("active");
@@ -626,63 +172,82 @@
             selectedIndex = idx;
         }
 
-        input.addEventListener("input", updateAutocomplete);
+        function addEventListeners() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
 
-        input.addEventListener("keydown", function (event) {
-            if (list.classList.contains("visible") && filtered.length > 0) {
-                if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    selectedIndex = (selectedIndex + 1) % filtered.length;
-                    setActive(selectedIndex);
-                } else if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
-                    setActive(selectedIndex);
-                } else if (event.key === "Enter") {
-                    if (selectedIndex >= 0 && filtered[selectedIndex]) {
-                        window.open(filtered[selectedIndex].url, "_blank");
-                        hideAutocomplete();
+            input.addEventListener("input", updateAutocomplete);
+
+            input.addEventListener("keydown", function (event) {
+                if (list.classList.contains("visible") && filtered.length > 0) {
+                    if (event.key === "ArrowDown") {
                         event.preventDefault();
-                        return;
+                        selectedIndex = (selectedIndex + 1) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "Enter") {
+                        if (selectedIndex >= 0 && filtered[selectedIndex]) {
+                            window.open(filtered[selectedIndex].url, "_blank");
+                            hideAutocomplete();
+                            event.preventDefault();
+                            return;
+                        }
+                    } else if (event.key === "Escape") {
+                        hideAutocomplete();
                     }
-                } else if (event.key === "Escape") {
-                    hideAutocomplete();
+                }
+            });
+
+            // Wenn das Feld den Fokus verliert, Dropdown ausblenden (kurz warten für Klick)
+            input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
+
+            // Google-Suche wie gehabt, wenn kein Vorschlag ausgewählt ist
+            function handleEnter(event) {
+                if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
+                    sucheGoogle();
                 }
             }
-        });
 
-        // Wenn das Feld den Fokus verliert, Dropdown ausblenden (kurz warten für Klick)
-        input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
-
-        // Google-Suche wie gehabt, wenn kein Vorschlag ausgewählt ist
-        function handleEnter(event) {
-            if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
-                sucheGoogle();
+            function sucheGoogle() {
+                var suche = document.getElementById("suche").value;
+                if (suche.trim() !== "") {
+                    var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+                    window.open(googleSuchURL, "_self");
+                } else {
+                    alert("Bitte gib einen suche ein.");
+                }
             }
-        }
 
-        function sucheGoogle() {
-            var suche = document.getElementById("suche").value;
-            if (suche.trim() !== "") {
-                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
-                window.open(googleSuchURL, "_self");
-            } else {
-                alert("Bitte gib einen suche ein.");
-            }
+            document.getElementById("suche").addEventListener("keyup", handleEnter);
         }
-
-        document.getElementById("suche").addEventListener("keyup", handleEnter);
 
         function hideAutocomplete() {
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
             list.classList.remove("visible");
             wrapper.classList.remove("expanded");
             list.style.display = "none";
         }
 
-        // Suchfeld beim Laden der Seite automatisch fokussieren
-        window.addEventListener("DOMContentLoaded", function () {
-            input.focus();
-        });
+        // Daten laden und Initialisierung starten
+        fetch('./fake-cms.json')
+            .then(response => response.json())
+            .then(data => {
+                links = data;
+                renderCategories();
+                addEventListeners();
+                // Suchfeld beim Laden der Seite automatisch fokussieren
+                window.addEventListener("DOMContentLoaded", function () {
+                    document.getElementById("suche").focus();
+                });
+            })
+            .catch(err => {
+                console.error("Fehler beim Laden von fake-cms.json:", err);
+            });
     </script>
 </body>
 
