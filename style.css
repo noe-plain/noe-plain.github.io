@@ -117,8 +117,8 @@ main {
 .search-input {
     position: relative;
     z-index: 1;
-    width: 100%;
-    padding: 1rem 3rem;
+    width: calc(100% - 30px);
+    padding: 1rem;
     border: none;
     outline: none;
     border-radius: 30px;
@@ -164,7 +164,7 @@ main {
 
 #autocomplete-list li {
     background: transparent;
-    padding: 0.7rem 3rem 0.7rem 3rem;
+    padding: 0.7rem 15px 0.7rem 15px;
     cursor: pointer;
     border: none;
     transition: background 0.2s, opacity 0.3s cubic-bezier(.4, 2, .6, 1);
