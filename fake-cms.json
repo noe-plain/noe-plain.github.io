@@ -65,6 +65,11 @@
         "category": "Bilder"
     },
     {
+        "name": "Coop Jobs",
+        "url": "https://jobs.coopjobs.ch",
+        "category": "suche"
+    },
+    {
         "name": "CSS-Tricks",
         "url": "https://css-tricks.com/",
         "category": "suche"
@@ -322,6 +327,11 @@
     {
         "name": "Younique",
         "url": "https://younique.migros.net",
+        "category": "suche"
+    },
+    {
+        "name": "Younique CD",
+        "url": "https://noe-plain.github.io/younique/",
         "category": "suche"
     }
 ]
