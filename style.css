@@ -285,7 +285,8 @@ footer nav a:hover {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    display: block;
+    overflow: hidden;
     height: 230px;
     backdrop-filter: blur(70px);
     z-index: 999;
