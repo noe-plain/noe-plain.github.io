@@ -1,5 +1,7 @@
 html {
     scroll-behavior: smooth;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
@@ -118,6 +120,7 @@ main {
     position: relative;
     z-index: 1;
     width: calc(100vw - 18rem);
+    max-width: calc(600px - 40px);
     padding: 1rem;
     border: none;
     outline: none;
@@ -283,17 +286,21 @@ footer nav a:hover {
 
 .verschwommen {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0px;
+    left: 0px;
     display: block;
     overflow: none;
     height: 230px;
-    width: 100vw !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
     z-index: 999;
     -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
     background-color: #ffffff;
     backdrop-filter: blur(70px);
+    -webkit-backdrop-filter: blur(70px);
 }
 
 @media only screen and (max-width: 600px) {
