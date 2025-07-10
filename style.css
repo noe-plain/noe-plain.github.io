@@ -1,6 +1,6 @@
 html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: unset;
 }
 
 body {
@@ -98,7 +98,7 @@ main {
     transform: translateX(-50%);
     margin-bottom: 0;
     padding: 0 45px;
-    z-index: 999;
+    z-index: 900;
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(12px) saturate(180%);
@@ -289,11 +289,12 @@ footer nav a:hover {
     display: block;
     overflow: hidden;
     height: 230px;
-    backdrop-filter: blur(70px);
+    width: 100vw !important;
     z-index: 999;
     -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
     background-color: #ffffff;
+    backdrop-filter: blur(70px);
 }
 
 @media only screen and (max-width: 600px) {
