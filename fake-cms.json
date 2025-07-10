@@ -100,11 +100,6 @@
         "category": "Fonts"
     },
     {
-        "name": "Google Fotos",
-        "url": "https://photos.google.com",
-        "category": "suche"
-    },
-    {
         "name": "Freefaces Gallery",
         "url": "https://freefaces.gallery",
         "category": "Fonts"
@@ -128,6 +123,11 @@
         "name": "Google Fonts",
         "url": "https://fonts.google.com",
         "category": "Fonts"
+    },
+    {
+        "name": "Google Fotos",
+        "url": "https://photos.google.com",
+        "category": "suche"
     },
     {
         "name": "Heroicons",
