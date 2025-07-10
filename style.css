@@ -18,7 +18,7 @@ header {
 }
 
 header nav {
-    width: calc(100% - 14rem);
+    width: calc(100vw - 14rem);
     max-width: 600px;
     padding: 1rem 3rem;
     border-bottom: 1px solid #ddd;
@@ -117,7 +117,7 @@ main {
 .search-input {
     position: relative;
     z-index: 1;
-    width: calc(100% - 30px);
+    width: calc(100vw - 18rem);
     padding: 1rem;
     border: none;
     outline: none;
@@ -303,8 +303,14 @@ footer nav a:hover {
         width: calc(100% - 10rem);
     }
 
+    .search-input {
+        width: 100%;
+        margin: 0;
+        padding: 15px 0;
+    }
+
     .autocomplete-wrapper {
-        padding: 0;
+        width: calc(100vw - 15rem);
     }
 
     header h1 {
@@ -332,10 +338,6 @@ footer nav a:hover {
 
     .mood-pic {
         margin: 94px -2rem 2rem -2rem;
-    }
-
-    .search-input {
-        width: calc(100% - 6rem);
     }
 }
 

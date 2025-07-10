@@ -100,6 +100,11 @@
         "category": "Fonts"
     },
     {
+        "name": "Google Fotos",
+        "url": "https://photos.google.com",
+        "category": "suche"
+    },
+    {
         "name": "Freefaces Gallery",
         "url": "https://freefaces.gallery",
         "category": "Fonts"
