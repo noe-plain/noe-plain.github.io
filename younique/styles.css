@@ -97,7 +97,7 @@ header {
     grid-column-start: 1;
     grid-column-end: 2;
     margin: 70px;
-    background: #44b0ce;
+    background: #294754;
     box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
     color: #333;
     border-radius: 40px;
@@ -575,7 +575,7 @@ th:last-of-type {
 }
 
 .scale-table thead {
-    background-color: #44b0ce !important;
+    background-color: #294754 !important;
     color: #fff;
     border-radius: 20px 20px 0 0;
 }
@@ -618,20 +618,40 @@ footer {
 }
 
 footer div {
-    width: 100%;
-}
-
-footer p {
-    background: #294754;
+    background: #44b0ce;
     color: #fff;
     align-self: center;
     justify-self: center;
     text-align: center;
     width: 100%;
-    max-width: calc(1500px - 108px);
+    max-width: calc(1500px - 120px);
     margin: 20px 70px 70px 0px;
-    padding: 20px 60px;
+    padding: 50px 60px;
     border-radius: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: Start;
+}
+
+footer img {
+    max-width: 130px;
+    height: auto;
+}
+
+footer li {
+    text-decoration: none;
+    list-style: none;
+    text-align: right;
+    margin: 0 10px;
+    color: #fff;
+
+}
+
+footer li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 5px;
 }
 
 /* ===========================================
