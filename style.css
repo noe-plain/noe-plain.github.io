@@ -70,7 +70,7 @@ main {
 }
 
 .mood-pic {
-    background-image: url(./images/leuchtturm.jpg);
+    background-image: url(./leuchtturm.jpg);
     background-size: cover;
     background-position: 35% 10%;
     height: 370px;
