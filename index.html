@@ -173,17 +173,30 @@
                     return;
                 }
                 // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
+                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
                 filtered = suggestions.map(s => ({ suggestion: s }));
                 filteredType = "google";
                 list.innerHTML = "";
                 suggestions.forEach((suggestion, idx) => {
                     const li = document.createElement("li");
-                    li.textContent = "(G)    " + suggestion;
+
+                    // Erstelle ein kleines Google-Logo
+                    const img = document.createElement("img");
+                    img.src = "https://www.google.com/favicon.ico"; // URL zum Google-Logo
+                    img.alt = "Google Logo";
+                    img.style.width = "13px";
+                    img.style.height = "13px";
+                    img.style.marginRight = "10px"; // Abstand zwischen Logo und Text
+
+                    // Füge das Logo und den Text hinzu
+                    li.appendChild(img);
+                    li.appendChild(document.createTextNode(suggestion));
+
                     li.tabIndex = 0;
                     li.style.setProperty('--delay', (idx * 0.04) + 's');
                     li.onmousedown = e => {
                         const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suggestion);
-                        window.open(googleSuchURL, "_blank");
+                        window.open(googleSuchURL, "_self");
                         list.classList.remove("visible");
                         wrapper.classList.remove("expanded");
                         list.style.display = "none";
