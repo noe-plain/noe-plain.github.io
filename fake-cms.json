@@ -5,11 +5,6 @@
         "category": "suche"
     },
     {
-        "name": "Abstract",
-        "url": "https://www.abstract.com/",
-        "category": "suche"
-    },
-    {
         "name": "Adobe Color",
         "url": "https://color.adobe.com",
         "category": "Colors"
@@ -25,16 +20,6 @@
         "category": "Audio & Video"
     },
     {
-        "name": "Asana",
-        "url": "https://asana.com/",
-        "category": "suche"
-    },
-    {
-        "name": "Awwwards",
-        "url": "https://www.awwwards.com/",
-        "category": "suche"
-    },
-    {
         "name": "Behance",
         "url": "https://www.behance.net/",
         "category": "Inspiration"
@@ -43,16 +28,6 @@
         "name": "Canva",
         "url": "https://www.canva.com/",
         "category": "suche"
-    },
-    {
-        "name": "CodePen",
-        "url": "https://codepen.io/",
-        "category": "suche"
-    },
-    {
-        "name": "Collletttivo",
-        "url": "https://www.collletttivo.it",
-        "category": "Fonts"
     },
     {
         "name": "Colors",
@@ -135,11 +110,6 @@
         "category": "suche"
     },
     {
-        "name": "Google Chat",
-        "url": "https://chat.google.com",
-        "category": "suche"
-    },
-    {
         "name": "Google Contacts",
         "url": "https://contacts.google.com",
         "category": "suche"
@@ -147,11 +117,6 @@
     {
         "name": "Google Fotos",
         "url": "https://photos.google.com",
-        "category": "suche"
-    },
-    {
-        "name": "Google Keep",
-        "url": "https://keep.google.com",
         "category": "suche"
     },
     {
@@ -175,11 +140,6 @@
         "category": "suche"
     },
     {
-        "name": "Gmail",
-        "url": "https://mail.google.com",
-        "category": "suche"
-    },
-    {
         "name": "Heroicons",
         "url": "https://heroicons.com/",
         "category": "Icons"
@@ -198,11 +158,6 @@
         "name": "Iconhub",
         "url": "https://iconhub.io",
         "category": "Icons"
-    },
-    {
-        "name": "InVision",
-        "url": "https://www.invisionapp.com/",
-        "category": "suche"
     },
     {
         "name": "Jobs",
@@ -232,11 +187,6 @@
     {
         "name": "Migros-Gruppe Jobs",
         "url": "https://migros-gruppe.jobs/",
-        "category": "suche"
-    },
-    {
-        "name": "Miro",
-        "url": "https://miro.com/",
         "category": "suche"
     },
     {
@@ -275,11 +225,6 @@
         "category": "suche"
     },
     {
-        "name": "Office 365",
-        "url": "https://m365.cloud.microsoft",
-        "category": "suche"
-    },
-    {
         "name": "Pexels",
         "url": "https://pexels.com",
         "category": "Bilder"
@@ -310,11 +255,6 @@
         "category": "Bilder"
     },
     {
-        "name": "Sketch",
-        "url": "https://www.sketch.com/",
-        "category": "suche"
-    },
-    {
         "name": "SRF",
         "url": "https://www.srf.ch",
         "category": "suche"
@@ -330,24 +270,9 @@
         "category": "suche"
     },
     {
-        "name": "Tages-Anzeiger",
-        "url": "https://www.tagesanzeiger.ch",
-        "category": "suche"
-    },
-    {
-        "name": "Teams",
-        "url": "https://teams.microsoft.com/",
-        "category": "suche"
-    },
-    {
         "name": "The Noun Project",
         "url": "https://thenounproject.com",
         "category": "Icons"
-    },
-    {
-        "name": "Trello",
-        "url": "https://trello.com/",
-        "category": "suche"
     },
     {
         "name": "Typewolf",
@@ -378,15 +303,5 @@
         "name": "YouTube",
         "url": "https://youtube.com",
         "category": "Ressourcen"
-    },
-    {
-        "name": "Younique",
-        "url": "https://younique.migros.net",
-        "category": "suche"
-    },
-    {
-        "name": "Younique CD",
-        "url": "https://noe-plain.github.io/younique/",
-        "category": "suche"
     }
 ]
