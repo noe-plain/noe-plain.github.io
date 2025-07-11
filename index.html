@@ -129,11 +129,11 @@
             }
             filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
             if (filtered.length === 0) {
-                list.classList.remove("visible");
-                wrapper.classList.remove("expanded");
-                list.style.display = "none";
+                // Google Suggest API verwenden, wenn keine lokalen Treffer
+                fetchGoogleSuggestions(val, list, wrapper);
                 return;
             }
+            filteredType = "local";
             filtered.forEach((link, idx) => {
                 const li = document.createElement("li");
                 li.textContent = link.name;
@@ -155,6 +155,55 @@
             list.classList.add("visible");
             list.style.display = "block";
         }
+
+        // Google Suggest API Integration
+        function fetchGoogleSuggestions(query, list, wrapper) {
+            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                // data[1] enthält die Vorschläge
+                const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
+                if (suggestions.length === 0) {
+                    list.classList.remove("visible");
+                    wrapper.classList.remove("expanded");
+                    list.style.display = "none";
+                    filtered = [];
+                    filteredType = "none";
+                    return;
+                }
+                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
+                filtered = suggestions.map(s => ({ suggestion: s }));
+                filteredType = "google";
+                list.innerHTML = "";
+                suggestions.forEach((suggestion, idx) => {
+                    const li = document.createElement("li");
+                    li.textContent = suggestion;
+                    li.tabIndex = 0;
+                    li.style.setProperty('--delay', (idx * 0.04) + 's');
+                    li.onmousedown = e => {
+                        const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suggestion);
+                        window.open(googleSuchURL, "_blank");
+                        list.classList.remove("visible");
+                        wrapper.classList.remove("expanded");
+                        list.style.display = "none";
+                    };
+                    li.onmouseover = () => {
+                        setActive(idx);
+                    };
+                    if (idx === selectedIndex) li.classList.add("active");
+                    list.appendChild(li);
+                });
+                wrapper.classList.add("expanded");
+                list.classList.add("visible");
+                list.style.display = "block";
+            };
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        let filteredType = "local"; // "local", "google", "none"
 
         function setActive(idx) {
             const list = document.getElementById("autocomplete-list");
@@ -190,7 +239,12 @@
                         setActive(selectedIndex);
                     } else if (event.key === "Enter") {
                         if (selectedIndex >= 0 && filtered[selectedIndex]) {
-                            window.open(filtered[selectedIndex].url, "_blank");
+                            if (filteredType === "local" && filtered[selectedIndex].url) {
+                                window.open(filtered[selectedIndex].url, "_blank");
+                            } else if (filteredType === "google" && filtered[selectedIndex].suggestion) {
+                                const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(filtered[selectedIndex].suggestion);
+                                window.open(googleSuchURL, "_blank");
+                            }
                             hideAutocomplete();
                             event.preventDefault();
                             return;
