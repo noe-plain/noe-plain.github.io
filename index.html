@@ -178,7 +178,7 @@
                 list.innerHTML = "";
                 suggestions.forEach((suggestion, idx) => {
                     const li = document.createElement("li");
-                    li.textContent = " 🔍    " + suggestion;
+                    li.textContent = "•    " + suggestion;
                     li.tabIndex = 0;
                     li.style.setProperty('--delay', (idx * 0.04) + 's');
                     li.onmousedown = e => {
