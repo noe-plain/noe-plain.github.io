@@ -142,7 +142,7 @@
                 li.tabIndex = 0;
                 li.style.setProperty('--delay', (idx * 0.04) + 's');
                 li.onmousedown = e => {
-                    window.open(link.url, "_blank");
+                    window.open(link.url, "_self");
                     list.classList.remove("visible");
                     wrapper.classList.remove("expanded");
                     list.style.display = "none";
@@ -255,10 +255,10 @@
                     } else if (event.key === "Enter") {
                         if (selectedIndex >= 0 && filtered[selectedIndex]) {
                             if (filteredType === "local" && filtered[selectedIndex].url) {
-                                window.open(filtered[selectedIndex].url, "_blank");
+                                window.open(filtered[selectedIndex].url, "_self");
                             } else if (filteredType === "google" && filtered[selectedIndex].suggestion) {
                                 const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(filtered[selectedIndex].suggestion);
-                                window.open(googleSuchURL, "_blank");
+                                window.open(googleSuchURL, "_self");
                             }
                             hideAutocomplete();
                             event.preventDefault();
