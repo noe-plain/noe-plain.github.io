@@ -7,7 +7,8 @@
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
     <title>Suche – Noé Plain</title>
     <link rel="stylesheet" href="style.css">
-    <meta name="description" content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
+    <meta name="description"
+        content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
 <div class="verschwommen"></div>
@@ -124,9 +125,7 @@
             selectedIndex = -1;
             // Zeige Dropdown ab erstem Zeichen (Buchstabe oder Zahl)
             if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
-                list.classList.remove("visible");
-                wrapper.classList.remove("expanded");
-                list.style.display = "none";
+                animateAutocomplete(false);
                 return;
             }
             filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
@@ -153,9 +152,7 @@
                 if (idx === selectedIndex) li.classList.add("active");
                 list.appendChild(li);
             });
-            wrapper.classList.add("expanded");
-            list.classList.add("visible");
-            list.style.display = "block";
+            animateAutocomplete(true);
         }
 
         // Google Suggest API Integration
@@ -167,11 +164,7 @@
                 // data[1] enthält die Vorschläge
                 const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
                 if (suggestions.length === 0) {
-                    list.classList.remove("visible");
-                    wrapper.classList.remove("expanded");
-                    list.style.display = "none";
-                    filtered = [];
-                    filteredType = "none";
+                    animateAutocomplete(false);
                     return;
                 }
                 // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
@@ -209,9 +202,7 @@
                     if (idx === selectedIndex) li.classList.add("active");
                     list.appendChild(li);
                 });
-                wrapper.classList.add("expanded");
-                list.classList.add("visible");
-                list.style.display = "block";
+                animateAutocomplete(true);
             };
             const script = document.createElement('script');
             script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
@@ -293,12 +284,43 @@
             document.getElementById("suche").addEventListener("keyup", handleEnter);
         }
 
-        function hideAutocomplete() {
-            const list = document.getElementById("autocomplete-list");
+        function animateAutocomplete(expand) {
             const wrapper = document.getElementById("autocomplete-wrapper");
-            list.classList.remove("visible");
-            wrapper.classList.remove("expanded");
-            list.style.display = "none";
+            const list = document.getElementById("autocomplete-list");
+            // Zielhöhe berechnen
+            const startHeight = wrapper.offsetHeight;
+            let endHeight;
+            if (expand) {
+                wrapper.classList.add("expanded");
+                list.classList.add("visible");
+                list.style.display = "block";
+                // Temporär Höhe auf auto setzen, um scrollHeight zu bekommen
+                wrapper.style.height = "auto";
+                endHeight = wrapper.scrollHeight;
+                wrapper.style.height = startHeight + "px";
+                // Animation starten
+                requestAnimationFrame(() => {
+                    wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                    wrapper.style.height = endHeight + "px";
+                });
+            } else {
+                endHeight = 49;
+                wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                wrapper.style.height = startHeight + "px";
+                requestAnimationFrame(() => {
+                    wrapper.style.height = endHeight + "px";
+                });
+                setTimeout(() => {
+                    wrapper.classList.remove("expanded");
+                    list.classList.remove("visible");
+                    list.style.display = "none";
+                    wrapper.style.transition = "";
+                }, 300);
+            }
+        }
+
+        function hideAutocomplete() {
+            animateAutocomplete(false);
         }
 
         // Daten laden und Initialisierung starten
