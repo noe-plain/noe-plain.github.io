@@ -39,6 +39,7 @@
                 <li><a href="#younique-farben"><span class="material-symbols-outlined">palette</span></a></li>
                 <li><a href="#younique-fonts"><span class="material-symbols-outlined">text_fields</span></a></li>
                 <li><a href="#younique-bilder"><span class="material-symbols-outlined">image</span></a></li>
+                <li><a href="#younique-gestaltungselemente"><span class="material-symbols-outlined">design_services</span></a></li>
                 <li><a href="#younique-mockups"><span class="material-symbols-outlined">contract</span></a></li>
                 <li><a href="#younique-downloads"><span class="material-symbols-outlined">download</span></a></li>
             </ul>
@@ -110,9 +111,9 @@
                     <div id="logo-donts" class="card-style">
                         <h3>Logo Don'ts</h3>
                         <div class="image-raster">
-                            <img src="./bilder/logo-dont-1.png" alt="Logo Don't 1">
-                            <img src="./bilder/logo-dont-2.png" alt="Logo Don't 2">
-                            <img src="./bilder/logo-dont-3.png" alt="Logo Don't 3">
+                            <img src="" alt="Logo Don't 1">
+                            <img src="" alt="Logo Don't 2">
+                            <img src="" alt="Logo Don't 3">
                         </div>
                     </div>
                 </div>
@@ -302,18 +303,18 @@
                     </div>
                 </div>
 
-                <div id="younique-gestaltungs-elemente" class="card-style" style="margin-top: 50px !important;">
-                    <h3>Gestaltungselement</h3>
+                <div id="younique-gestaltungselemente" class="card-style" style="margin-top: 50px !important;">
+                    <h3>Gestaltungselemente</h3>
                     <p>Die Gestaltungselemente sollen klar und einheitlich sein, um die Markenidentität zu stärken.</p>
                 </div>
 
                 <div id="younique-mockups" class="card-style" style="margin-top: 50px;">
                     <h3>Mockups</h3>
                     <div class="image-raster-bilder">
-                        <img src="./bilder/mockup-1.png" alt="Mockup 1">
-                        <img src="./bilder/mockup-2.png" alt="Mockup 2">
-                        <img src="./bilder/mockup-3.png" alt="Mockup 3">
-                        <img src="./bilder/mockup-4.png" alt="Mockup 4">
+                        <img src="" alt="Mockup 1">
+                        <img src="" alt="Mockup 2">
+                        <img src="" alt="Mockup 3">
+                        <img src="" alt="Mockup 4">
                     </div>
                 </div>
 
@@ -337,7 +338,7 @@
                             <p>Farben</p>
                         </a>
                         <a href="./bilder/gestalltungselemente.indd" download>
-                            <img src="./bilder/gestalltungselemente.png" alt="">
+                            <img src="" alt="">
                             <p>Elemente</p>
                         </a>
                     </div>
@@ -390,6 +391,13 @@
 
         // Initial render
         updateTable(parseFloat(input.value));
+
+        // Füge Platzhalterbild für fehlende Bilder ein
+        document.querySelectorAll('img').forEach(img => {
+            if (!img.hasAttribute('src') || img.getAttribute('src').trim() === '') {
+                img.setAttribute('src', './bilder/bild-fuer-wenn-kein-bild-16-9.png');
+            }
+        });
     </script>
 </body>
 

@@ -612,6 +612,7 @@ input {
 .image-raster-bilder img {
     background-color: transparent;
     aspect-ratio: 3/2;
+    object-fit: cover;
     width: 100%;
 }
 
