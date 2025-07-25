@@ -616,6 +616,10 @@ input {
     width: 100%;
 }
 
+#annotationContainer {
+    background-color: #294754 !important;
+}
+
 /* ===========================================
 Footer
 ============================================ */
