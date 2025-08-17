@@ -109,7 +109,7 @@ main {
     transition: border-radius 0.s cubic-bezier(.4, 2, .6, 1), box-shadow 0.3s;
     min-height: 49px;
     height: 49px;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 .autocomplete-wrapper.expanded {
