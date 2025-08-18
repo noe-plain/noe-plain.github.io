@@ -85,7 +85,10 @@ main {
     margin: 94px auto 100px auto;
     position: relative;
     overflow: visible;
-    /* Ensure shadows are not clipped */
+}
+
+.autocomplete-wrapper * {
+    overflow: hidden !important;
 }
 
 .autocomplete-wrapper {
@@ -109,7 +112,6 @@ main {
     transition: border-radius 0.s cubic-bezier(.4, 2, .6, 1), box-shadow 0.3s;
     min-height: 49px;
     height: 49px;
-    overflow: hidden !important;
 }
 
 .autocomplete-wrapper.expanded {
