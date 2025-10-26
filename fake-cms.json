@@ -87,7 +87,7 @@
     {
         "name": "Gemini",
         "url": "https://gemini.google.com",
-        "category": "suche"
+        "category": "Ressourcen"
     },
     {
         "name": "Google",
@@ -207,7 +207,7 @@
     {
         "name": "NotebookLM",
         "url": "https://notebooklm.google.com/",
-        "category": "Ressourcen"
+        "category": "suche"
     },
     {
         "name": "Notion",
