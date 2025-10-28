@@ -2,359 +2,47 @@
 <html lang="en">
 
 <head>
+    <title>Younique CD</title>
+    <link rel="icon" type="image/png" href="./bilder/favicon.ico">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Younique CD - A unique collection of creative designs and resources." />
+    <meta name="keywords" content="Younique, CD, creative, designs, resources" />
+    <meta name="author" content="Noé Plain und Flavia Strebel" />
+
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <title>&#x1F419; – Younique CD</title>
-    <style>
-        /* ===========================================
-        Allgemeine Einstellungen
-        =========================================== */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-            transition: all 0.5s ease-in-out;
-        }
 
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            display: grid;
-            grid-template-columns: 220px 1fr;
-        }
-
-        #no-hover:hover {
-            background-color: #33333300;
-        }
-
-        /* ===========================================
-        Typografie
-        ============================================ */
-        h2 {
-            font-size: 3rem;
-            margin-bottom: 20px 0 0 0;
-        }
-
-        h3 {
-            font-size: 2rem;
-            margin: 10px 0;
-        }
-
-        * {
-            font-family: Helvetica, Arial, sans-serif;
-        }
-
-        /* ===========================================
-        Material Icons
-        ============================================ */
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 24;
-        }
-
-        /* ===========================================
-        Header
-        =========================================== */
-        header {
-            position: fixed;
-            grid-column-start: 1;
-            grid-column-end: 2;
-            margin: 70px;
-            background: rgb(0 161 190);
-            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
-            color: #333;
-            border-radius: 40px;
-            width: 80px;
-            height: calc(100vh - 140px);
-        }
-
-        /* Navigation */
-        nav {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            row-gap: 5px;
-            margin: -15px 0 0 0;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-            text-align: center;
-        }
-
-        nav ul li {
-            display: inline;
-        }
-
-        nav ul li a {
-            font-weight: 700;
-            border-radius: 30px;
-            padding: 15px 2px 10px 2px;
-            margin: 5px 11px;
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            transition: all 0.5s ease-in-out;
-        }
-
-        nav a:hover {
-            background: rgba(205, 205, 205, 0.3);
-        }
-
-        /* ===========================================
-        Main Content
-        =========================================== */
-        main {
-            grid-column-start: 2;
-            grid-column-end: 3;
-            padding: 70px 70px 0px 0px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .max-width {
-            min-height: calc(100vh - 170px);
-            max-width: 1500px;
-            padding-bottom: 0;
-            margin: 0;
-            display: grid;
-            grid-template-rows: 600px;
-            row-gap: 100px;
-        }
-
-        main a {
-            color: #333;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.5s ease-in-out;
-            padding: 30px 70px;
-            text-align: center;
-        }
-
-        .image-raster {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px 50px;
-            margin-bottom: 20px;
-        }
-
-        .image-raster img {
-            width: 100%;
-            border-radius: 10px;
-            border: 1px solid #dbdbdb;
-        }
-
-        .a-button {
-            display: block;
-            width: fit-content;
-            box-shadow: 1px 1px 13px #dbdbdb;
-            font-weight: 500;
-            font-size: 1rem;
-            border-radius: 10px;
-            padding: 15px 30px !important;
-            margin: 10px 15px 20px 0px !important;
-        }
-
-        .a-button:hover {
-            transform: scale(1.03);
-        }
-
-        main a:hover {
-            transform: scale(1.03);
-        }
-
-        /* Content Bereich */
-        .content {
-            grid-column-start: 2;
-            grid-column-end: 4;
-        }
-
-        .card-style {
-            display: block;
-            background: #fff;
-            border-radius: 30px;
-            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
-            padding: 20px 40px;
-            margin: 0 0 30px 0;
-        }
-
-        /* CI/CD Sammlung */
-        #ci-cd-sammlung {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            column-gap: 30px;
-            overflow-y: auto;
-            padding: 30px;
-            position: absolute;
-            left: 50%;
-            bottom: -95px;
-            transform: translateX(-50%);
-            width: calc(100% - 300px);
-        }
-
-        #ci-cd-sammlung a {
-            padding: 20px 30px;
-            font-size: 1.2em !important;
-        }
-
-        /* ===========================================
-        Younique-CD Bereich
-        ============================================ */
-        #younique-cd {
-            position: relative;
-            background-image: url('./bilder/RGB_M-Budget_Picknick_0323.jpg');
-            background-size: cover;
-            background-position: 10% 50%;
-            margin: 0 0 30px 0 !important;
-            box-shadow: 1.5px 2px 13px rgba(100, 100, 100, 0.3);
-            border-radius: 40px;
-            padding: 20px;
-
-        }
-
-        #younique-cd h1 {
-            font-size: 7vh;
-            color: #fff;
-            text-shadow: 1px 2px 70px #333;
-            text-align: center;
-        }
-
-        #younique-cd input {
-            position: absolute;
-            left: 50%;
-            bottom: -30px;
-            transform: translateX(-50%);
-            width: calc(100% - 300px);
-            max-width: 1300px;
-            font-size: 1rem;
-            text-align: center;
-            padding: 20px 50px;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 1px 1px 13px rgba(100, 100, 100, 0.3);
-            background: #fff;
-        }
-
-        #younique-logo-container {
-            display: grid;
-            grid-template-columns: 2fr 450px;
-            gap: 30px 50px;
-        }
-
-        #younique-logo a {
-            margin: 0;
-            padding: 0;
-        }
-
-        #younique-logo img {
-            border: 1px solid #dbdbdb;
-            border-radius: 10px;
-            margin: 7px 0;
-        }
-
-        .dreier-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 0px 30px;
-            height: fit-content;
-
-        }
-
-        .dreier-grid img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
-        #font-samples {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 30px 50px;
-            overflow-y: auto;
-            padding: 30px;
-            margin: 0 -30px;
-        }
-
-        #font-samples p {
-            margin: 10px 0 0 0;
-        }
-
-        #younique-farben {
-            margin-top: 30px;
-        }
-
-        .farb-karte-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 15px;
-        }
-
-        .farb-karte {
-            color: #fff;
-            height: 150px;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        /* ===========================================
-        Footer
-        ============================================ */
-        footer {
-            grid-column-start: 2;
-            grid-column-end: 3;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        footer div {
-            width: 100%;
-        }
-
-        footer p {
-            background: rgb(31 67 90);
-            color: #fff;
-            align-self: center;
-            justify-self: center;
-            text-align: center;
-            width: 100%;
-            max-width: calc(1500px - 108px);
-            margin: 20px 70px 70px 0px;
-            padding: 20px 60px;
-            border-radius: 40px;
-        }
-
-        /* ===========================================
-        @ Media Screen
-        ============================================ */
-        @media screen and (max-width: 1440px) {
-            #younique-logo-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <meta name="theme-color" content="rgb(41 71 84)">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="slackbot" content="index, follow">
 </head>
+<div id="disclaimer">
+    <img src="./bilder/Logo-Younique.svg" alt="Younique Logo">
+    <p>Your device is too small!</p>
+</div>
 
 <body>
     <header>
         <nav>
             <ul>
                 <li><a id="no-hover" style="display: flex; justify-content: center; margin: 20px -30px 50px -30px;"
-                        href="#younique-cd"><img style="filter: brightness(1000); width: 50px; height: 50px;"
+                        href="#younique"><img style="filter: brightness(1000); width: 50px; height: 50px;"
                             src="./bilder/Logo-Younique.svg" alt=""></a></li>
-                <li><a href="#logos"><span class="material-symbols-outlined">home_app_logo</span></a></li>
-                <li><a href="#younique-fonts"><span class="material-symbols-outlined">text_fields</span></a></li>
+                <li><a href="#younique-logo-container"><span class="material-symbols-outlined">home_app_logo</span></a>
+                </li>
                 <li><a href="#younique-farben"><span class="material-symbols-outlined">palette</span></a></li>
+                <li><a href="#younique-fonts"><span class="material-symbols-outlined">text_fields</span></a></li>
                 <li><a href="#younique-bilder"><span class="material-symbols-outlined">image</span></a></li>
+                <li><a href="#younique-gestaltungselemente"><span
+                            class="material-symbols-outlined">design_services</span></a></li>
+                <li><a href="#younique-mockups"><span class="material-symbols-outlined">contract</span></a></li>
+                <li><a href="#younique-downloads"><span class="material-symbols-outlined">download</span></a></li>
             </ul>
         </nav>
     </header>
@@ -362,12 +50,13 @@
     <main id="younique">
         <div class="max-width">
             <div id="younique-cd">
-                <h1>Younique CD</h1>
+                <img class="younique-logo" src="./bilder/Logo-Younique.svg" style="height: 350px;" alt="">
                 <div id="ci-cd-sammlung">
-                    <a class="card-style" href="https://migros.frontify.com">Migros Supermarkt AG</a>
-                    <a class="card-style" href="https://branding.migros-gruppe.jobs/hub/121">Migros (EB)</a>
-                    <a class="card-style" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a>
-                    <a class="card-style" href="https://brandportal.migros.ch/hub/72">M-Industrie</a>
+                    <a class="card-style" target="_blank" href="https://migros.frontify.com">Migros Supermarkt AG</a>
+                    <a class="card-style" target="_blank" href="https://branding.migros-gruppe.jobs/hub/121">Migros
+                        (EB)</a>
+                    <a class="card-style" target="_blank" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a>
+                    <a class="card-style" target="_blank" href="https://brandportal.migros.ch/hub/72">M-Industrie</a>
                 </div>
             </div>
 
@@ -377,69 +66,165 @@
                     <div id="younique-logo" class="card-style">
                         <h3>Logos</h3>
                         <div class="dreier-grid">
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrUn-claim_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrUn-claim_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrUn_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrUn_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrOb-claim_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrOb-claim_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrLi-claim_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrLi-claim_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrLi_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrLi_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-Ma-Schr-claim_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-Ma-Schr-claim_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-Ma-Schr-claim_1_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-Ma-Schr-claim_1_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
-                            <a href="./bilder/logo-younique.png" download>
-                                <img src="./bilder/logo-younique.png" alt="Younique Logo">
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-BiMa-SchrUn-claim-v_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-BiMa-SchrUn-claim-v_1x.jpg"
+                                    alt="Younique Logo">
+                            </a>
+                            <a href="./bilder/YouniqueLogos/PNG/younique-logo-varianten_4x.png" download>
+                                <img src="./bilder/YouniqueLogos/JPG/younique-logo-varianten_1x.jpg"
+                                    alt="Younique Logo">
                             </a>
                         </div>
 
-                        <a class="a-button"
-                            href="https://migros.sharepoint.com/:f:/s/MGB_PRO-DY-Mediamatik/Ei-JbWmGsiFDvuL0CFuv21QBySZi9xghXuzoOnu3q8pueg?e=RZxqwz">Zu
+                        <a class="a-button" target="_blank"
+                            href="https://migros.sharepoint.com/:f:/s/MGB_PRO-DY-Mediamatik/EpyD_-htw8dLqZG3_y16Gy0BcQc8OmpwPVMfmgFkZ9UBLQ?e=FgDlbK">Zu
                             den Logos</a>
                     </div>
 
                     <div id="logo-donts" class="card-style">
                         <h3>Logo Don'ts</h3>
                         <div class="image-raster">
-                            <img src="./bilder/logo-dont-1.png" alt="Logo Don't 1">
-                            <img src="./bilder/logo-dont-2.png" alt="Logo Don't 2">
-                            <img src="./bilder/logo-dont-3.png" alt="Logo Don't 3">
+                            <img src="" alt="Verzertes Logo"
+                                title="Das Logo darf nicht verzerrt werden. Halte die Originalproportionen ein.">
+                            <img src="" alt="Logo Don't 2"
+                                title="Der Kontrast des Logos muss immer hoch genug sein, damit es gut lesbar ist.">
+                            <img src="" alt="Logo Don't 3"
+                                title="Das Logo darf nicht in der Farbe verändert werden. Verwende immer die Originalfarben. Ausnahmen sind Positive und negative Variationen">
                         </div>
                     </div>
                 </div>
 
                 <div id="younique-farben" class="card-style">
-                    <h3>Younique Farben</h3>
+                    <h3>Farben</h3>
                     <div class="farb-karte-container">
-                        <section class="farb-karte" style="background-color: rgb(0 161 190) !important;">
-                            <h3>Primärfarbe</h3>
-                            <p>#FFB6C1</p>
+                        <section id="farbe-1" class="farb-karte">
+                            <h3>Akzent</h3>
+                            <p>#44b0ce</p>
+                            <p>68 10 16 0</p>
                         </section>
-                        <section class="farb-karte" style="background-color: rgb(255, 105, 180) !important;">
+                        <section id="farbe-2" class="farb-karte">
+                            <h3>Primär</h3>
+                            <p>#294754</p>
+                            <p>50 0 0 80</p>
+                        </section>
+                        <section id="farbe-3" class="farb-karte">
                             <h3>Sekundärfarbe</h3>
-                            <p>#FF69B4</p>
+                            <p>#7a3f91</p>
+                            <p>64 85 0 0</p>
                         </section>
-                        <section class="farb-karte" style="background-color: rgb(255, 20, 147) !important;">
-                            <h3>Tertiärfarbe</h3>
-                            <p>#FF1493</p>
+                        <div class="farb-karte" style="padding: 0; height: 100%; display: flex;">
+                            <div id="farbe-4">
+                                <h4 style="color: #000;">White</h4>
+                            </div>
+                            <div id="farbe-5">
+                                <h4>Black</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>Farbpalette</h4>
+                    <div class="farb-karte-container-klein">
+                        <section class="farb-karte" style="background-color: #b34b96 !important;">
+                            <h4>Lila</h4>
+                            <p>#b34b96</p>
+                            <p>43 81 0 0</p>
+                        </section>
+                        <section class="farb-karte" style="background-color: #d94f8e !important;">
+                            <h4>Pink</h4>
+                            <p>#d94f8e</p>
+                            <p>7 80 6 4</p>
+                        </section>
+                        <section class="farb-karte" style="background-color: #e5823e !important;">
+                            <h4>Orange</h4>
+                            <p>#e5823e</p>
+                            <p>4 57 79 3</p>
+                        </section>
+                        <section class="farb-karte" style="background-color: #e3c742 !important;">
+                            <h4>Gelb</h4>
+                            <p>#e3c742</p>
+                            <p>7 13 80 9</p>
+                        </section>
+                        <section class="farb-karte" style="background-color: #bed139 !important;">
+                            <h4>Lemon Grass</h4>
+                            <p>#bed139</p>
+                            <p>34 0 88 0</p>
+                        </section>
+                        <section class="farb-karte" style="background-color: #4db05b !important;">
+                            <h4>Grün</h4>
+                            <p>#4db05b</p>
+                            <p>70 0 80 0</p>
                         </section>
                     </div>
+                    <a class="a-button" href="./farben/Younique-Farben.ase" download>Farbpalette (für InDesign)</a>
                 </div>
 
-                <div id="younique-fonts">
+                <div id="younique-fonts" style="margin-top: 50px;">
+                    <section class="card-style">
+                        <h3>Fonts</h3>
+                        <p>
+                            Für diese Seite verwenden wir zwei Ausführung der Schriftart Effra, welche die Hausschrift
+                            von
+                            Younique ist:
+                        </p>
+                        <ul>
+                            <li><strong>Effra Bold</strong> für Überschriften</li>
+                            <li><strong>Effra Regular</strong> für normalen Text</li>
+                        </ul>
+                        <p>
+                            Die beiden passen super zusammen: modern, klar und nicht zu verspielt. So sieht die Seite
+                            aufgeräumt aus und ist beim
+                            Lesen angenehm – egal ob am Handy, Laptop oder auf Print-Layouts. <br> Fliesstexte die in
+                            InDesign erstellt werden, sollten bei einem Blocksatz optisch korrigiert werden:
+                        </p>
+
+                        <table class="scale-table">
+                            <thead>
+                                <tr>
+                                    <th>Typo-Stil</th>
+                                    <th>Grösse</th>
+                                    <th>Berechnung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scale-body">
+                                <!-- Dynamisch generiert -->
+                            </tbody>
+                        </table>
+                        <label for="baseSizeInput" style="display: flex; flex-direction: column; margin-top: 1rem;">
+                            <input id="baseSizeInput" value="19px" placeholder="Schriftgrösse" step="1">
+                            Basisgrösse (min 16px / min 12pt)
+                        </label>
+                    </section>
                     <div id="font-samples">
-                        <section class="card-style">
-                            <h3>Font-Familie</h3>
+                        <section class="card-style bold">
+                            <h3>Effra Bold (Titel)</h3>
                             <p>
                                 ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? +
                                 - –
@@ -447,8 +232,10 @@
                                 …
                             </p>
                             <br>
+                            <h4>Titel: Bold</h4>
                             <p>
-                                Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute
+                                Fliesstext: Regular <br>Du fragst dich vielleicht, warum man dafür extra einen
+                                speziellen Text braucht. Gute
                                 Frage!
                                 Es geht darum, dass der Text
                                 nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn
@@ -458,12 +245,14 @@
                                 der
                                 eigentliche Text ablenkt.
                             </p>
-
                             <br>
-                            <a class="a-button" href="">Link zur Font</a>
+                            <a class="a-button" href="./fonts/effra-bd.ttf" download="">
+                                <img style="margin: 0px 10px -5px 10px; width: 30px; height: 30px;"
+                                    src="./bilder/download.svg" alt="download icon">
+                            </a>
                         </section>
-                        <section class="card-style">
-                            <h3>Font-Familie 2</h3>
+                        <section class="card-style regular">
+                            <h3>Effra Regular (Text)</h3>
                             <p>
                                 ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890<br>. : , ; ! ? +
                                 - –
@@ -471,8 +260,10 @@
                                 …
                             </p>
                             <br>
+                            <h4>Titel: Bold</h4>
                             <p>
-                                Du fragst dich vielleicht, warum man dafür extra einen speziellen Text braucht. Gute
+                                Fliesstext: Regular <br>Du fragst dich vielleicht, warum man dafür extra einen
+                                speziellen Text braucht. Gute
                                 Frage!
                                 Es geht darum, dass der Text
                                 nicht vom Inhalt ablenken soll, sondern nur als Platzhalter dient. Zum Beispiel, wenn
@@ -483,22 +274,82 @@
                                 eigentliche Text ablenkt.
                             </p>
                             <br>
-                            <a class="a-button" href="">Link zur Font</a>
+                            <a class="a-button material-symbols-outlined" href="./fonts/effra-rg.ttf" download>
+                                <img style="margin: 0px 10px -5px 10px; width: 30px; height: 30px;"
+                                    src="./bilder/download.svg" alt="download icon">
+                            </a>
                         </section>
                     </div>
                 </div>
 
-                <div class="card-style">
-                    <h3>Younique Bilder</h3>
+                <div id="younique-bilder" class="card-style">
+                    <h3>Bildwelt</h3>
                     <p>Bilder sollen im Style von der Migros gehalten werden!</p>
-                    <div class="image-raster-special">
-                        <img src="./bilder/logo-dont-1.png" alt="Logo Don't 1">
-                        <img src="./bilder/logo-dont-2.png" alt="Logo Don't 2">
-                        <img src="./bilder/logo-dont-3.png" alt="Logo Don't 3">
-                        <img src="./bilder/logo-dont-4.png" alt="Logo Don't 4">
-                        <img src="./bilder/logo-dont-5.png" alt="Logo Don't 5">
-                        <img src="./bilder/logo-dont-6.png" alt="Logo Don't 6">
-                        <img src="./bilder/logo-dont-7.png" alt="Logo Don't 7">
+                    <h4>Licht</h4>
+                    <p>Die Lichtstimmung soll natürlich und warm sein. Auf übertriebene Kontraste wird verzichtet. Harte
+                        Schlagschatten sind zu
+                        vermeiden.</p>
+                    <h4>Farbakzent</h4>
+                    <p>Ein zusätzliches Gestaltungselement der Bildsprache kann ein Farbakzent in der jeweiligen
+                        Primärfarbe des Unternehmens
+                        sein. Er wird dezent, nicht überinszeniert, aber trotzdem immer gut sichtbar eingesetzt. Im
+                        Gesamtbild kann der
+                        Farbakzent eine formale Bildklammer mit einer eindeutigen Verbindung zur Marke erzeugen.</p>
+                    <h4>Illustrations Stiel</h4>
+                    <p>Illustrationen sollen von <a class="p-link" target="_blank"
+                            href="https://storyset.com/rafiki">Storyset (Style:
+                            Rafiki)</a> sein oder im gleichen Stil gehalten werden.</p>
+                    <div class="image-raster-bilder">
+                        <img src="./bilder/younique-beispielbild-1.jpg" alt="Foto1">
+                        <img src="./bilder/younique-beispielbild-2.jpg" alt="Foto2">
+                        <img style="border: #000 1px solid;" src="./bilder/contact-us-rafiki.svg" alt="Illu1">
+                        <img style="border: #000 1px solid;" src="./bilder/conference-rafiki.svg" alt="Illu2">
+                    </div>
+                </div>
+
+                <div id="younique-gestaltungselemente" class="card-style" style="margin-top: 50px !important;">
+                    <h3>Gestaltungselemente</h3>
+                    <p>Die Gestaltungselemente sollen klar und einheitlich sein, um die Markenidentität zu stärken.</p>
+                    <object
+                        style="width:100%; height: calc(100vh - 300px); border-radius: 10px !important; background-color: #294754 !important;"
+                        data="./bilder/gestaltungselemente.pdf" type="application/pdf">
+                        <p>Ihr Browser unterstützt keine PDF-Vorschau. Bitte laden Sie die Datei herunter.</p>
+                    </object>
+                    <a class="a-button" href="./bilder/gestaltungselemente.indd" download><span
+                            class="material-symbols-outlined">Download</span></a>
+                </div>
+
+                <div id="younique-mockups" class="card-style" style="margin-top: 50px;">
+                    <h3>Mockups</h3>
+                    <div class="image-raster-bilder">
+                        <img src="./bilder/MacBook_Mockup_3.jpg" alt="Mockup 1">
+                        <img src="" alt="Mockup 2">
+                    </div>
+                </div>
+
+                <div id="younique-downloads" class="card-style">
+                    <h3>Downloads</h3>
+                    <div id="younique-downloads-list">
+                        <a href="./fonts/effra-bd.ttf" download>
+                            <img src="./bilder/effra-bold.png" alt="">
+                            <p>Effra Bold</p>
+                        </a>
+                        <a href="./fonts/effra-rg.ttf" download>
+                            <img src="./bilder/effra-regular.png" alt="">
+                            <p>Effra Regular</p>
+                        </a>
+                        <a href="https://younique.migros.net">
+                            <img src="./bilder/MacBook_Mockup_3.jpg" alt="">
+                            <p>Younique Website</p>
+                        </a>
+                        <a href="./farben/Younique-Farben.ase" download>
+                            <img src="./bilder/farbpalette.png" alt="">
+                            <p>Farben</p>
+                        </a>
+                        <a href="./bilder/gestalltungselemente.indd" download>
+                            <img src="" alt="">
+                            <p>Elemente</p>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -506,33 +357,61 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Younique CD. All rights reserved.</p>
+        <div>
+            <img src="./younique-logo.svg" alt="younique logo">
+            <ul>
+                <li><a href="https://younique.migros.net">Younique Website</a></li>
+                <li><a target="_blank" href="https://migros.frontify.com">Migros Supermarkt AG</a></li>
+                <li><a target="_blank" href="https://migros.frontify.com/hub/177">Migros-Gruppe</a></li>
+                <li><a target="_blank" href="https://brandportal.migros.ch/hub/72">M-Industrie</a></li>
+                <li><a target="_blank" href="https://branding.migros-gruppe.jobs/hub/121">Migros
+                        (EB)</a></li>
+            </ul>
+        </div>
     </footer>
 
     <script>
-        function handleEnter(event) {
-            if (event.key === "Enter") {
-                sucheGoogle();
-            }
+        const tbody = document.getElementById("scale-body");
+        const input = document.getElementById("baseSizeInput");
+
+        const elements = [
+            { tag: "h1 – Titel", factor: 4 },
+            { tag: "h2 – Überschrift 1", factor: 3 },
+            { tag: "h3 – Überschrift 2", factor: 2 },
+            { tag: "h4 – Überschrift 3", factor: 1.5 },
+            { tag: "p – Text", factor: 1 }
+        ];
+
+        function updateTable(baseSize) {
+            tbody.innerHTML = "";
+            elements.forEach((el, index) => {
+                const size = Math.round(baseSize * el.factor);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+          <td>${el.tag}</td>
+          <td style="font-family: 'effra-bd', Arial, sans-serif;">${size}</td>
+          <td>${baseSize} × ${el.factor}</td>
+        `;
+                tbody.appendChild(row);
+            });
         }
 
-        function sucheGoogle() {
-            var suche = document.getElementById("suche").value;
-
-            // Überprüfen, ob ein suche eingegeben wurde
-            if (suche.trim() !== "") {
-                // Google-Such-URL zusammenstellen
-                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
-
-                // Die Seite im gleichen Tab öffnen
-                window.open(googleSuchURL, "_self");
-            } else {
-                alert("Bitte gib einen suche ein.");
+        input.addEventListener("input", () => {
+            const baseSize = parseFloat(input.value);
+            if (!isNaN(baseSize)) {
+                updateTable(baseSize);
             }
-        }
+        });
 
-        // Event-Listener hinzufügen, um "Enter" zu erkennen
-        document.getElementById("suche").addEventListener("keyup", handleEnter);
+        // Initial render
+        updateTable(parseFloat(input.value));
+
+        // Füge Platzhalterbild für fehlende Bilder ein
+        document.querySelectorAll('img').forEach(img => {
+            if (!img.hasAttribute('src') || img.getAttribute('src').trim() === '') {
+                img.setAttribute('src', './bilder/bild-fuer-wenn-kein-bild-16-9.png');
+            }
+        });
     </script>
 </body>
 

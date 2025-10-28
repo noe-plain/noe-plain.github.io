@@ -1,0 +1,303 @@
+/* ================================
+Basis-Layout
+================================ */
+* {
+    margin: 0;
+    padding: 0;
+    background: none;
+    transition: all 0.3s;
+    font-style: normal;
+}
+
+.max-width-1450 {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 0 100px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.button {
+    display: inline-block;
+    font-family: 'effra-bold';
+    padding: 15px 50px;
+    margin: 12px auto 0 auto;
+    box-shadow: 3px 6px 13px 0 rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: #222;
+    text-decoration: none;
+    border-radius: 30px;
+}
+
+.button:hover {
+    transform: scale(1.03);
+    text-decoration: none;
+}
+
+/* ================================
+Abschnittstitel-Stile
+================================ */
+/* Navigation */
+nav {
+    position: sticky;
+    bottom: 20px;
+    color: #222;
+    max-width: 1450px;
+    margin: 0 auto;
+    z-index: 100;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul {
+    width: calc(100vw - 160px);
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 1em 0;
+    margin: 0;
+    border-radius: 50px !important;
+    background: #fff;
+    box-shadow: 3px 6px 20px #00000020;
+}
+
+nav a {
+    color: #222;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Header Image */
+header {
+    margin: 10px;
+    padding: 0;
+    border-radius: 40px;
+    width: calc(100% - 20px);
+    height: calc(100vh - 20px);
+    background-image: url('../bilder/RGB_M-Budget_Picknick_0323.jpg');
+}
+
+.center-header {
+    position: absolute;
+    top: 60vh;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.younique-header-image {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    object-fit: cover;
+    margin: 20px;
+    border-radius: 40px;
+}
+
+.younique-logo {
+    width: 200px;
+    position: absolute;
+    top: 30vh;
+    left: 50%;
+    transform: translateX(-50%);
+    height: auto;
+    margin: 20px;
+}
+
+.header-buttons-container {
+    position: absolute;
+    top: 0px;
+    width: calc(100vw - 160px);
+    max-width: 1450px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    margin: 20px 0;
+    background: transparent;
+}
+
+.header-buttons {
+    display: inline-block;
+    font-family: 'effra-bold';
+    width: 100%;
+    padding: 35px 40px;
+    margin: 12px 0;
+    box-shadow: 3px 6px 13px 0 rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: #222;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 20px;
+    backdrop-filter: blur(40px) saturate(180%) brightness(1.5);
+    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(1.5);
+    border: 1px solid rgba(139, 139, 139, 0.121);
+}
+
+.header-buttons:hover {
+    transform: scale(1.03);
+    text-decoration: none;
+}
+
+/* ================================
+Fonts 
+================================ */
+@font-face {
+    font-family: 'Effra';
+    src: url('../fonts/effra-rg.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Effra';
+    src: url('../fonts/effra-bd.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* ================================
+Typografie
+================================ */
+* {
+    font-family: 'Effra', Arial, sans-serif;
+    color: #fff;
+    font-size: 19px;
+    line-height: 1.3;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Effra', Arial, sans-serif;
+    font-weight: bold;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 76px;
+    line-height: 1;
+}
+
+h2 {
+    font-size: 57px;
+    line-height: 1;
+}
+
+h3 {
+    font-size: 38px;
+    line-height: 1;
+}
+
+h4 {
+    font-size: 29px;
+    line-height: 1;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.lead-p {
+    font-size: 38px;
+    line-height: 1.3;
+    font-family: 'effra-regular';
+}
+
+ul,
+ol {
+    margin: 0 0 1em 2em;
+    padding: 0;
+}
+
+/* ================================
+Links & Buttons
+================================ */
+a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus {
+    text-decoration: underline;
+}
+
+/* ================================
+Formularelemente
+================================ */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 1em;
+}
+
+/* ================================
+About Younique
+================================ */
+
+#about-younique {
+    background-color: #294754;
+    margin: 100px 0 300px 0;
+    border-radius: 40px;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 150px; /* Platz für die halb überlappende Stats-Box + Abstand zum lead-p */
+}
+
+#about-younique video {
+    width: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+}
+
+#about-younique .lead-p {
+    padding: 50px 100px;
+    margin-bottom: 100px;
+}
+
+.about-younique-stats {
+    background-color: #fff;
+    box-shadow: 3px 6px 13px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 40px;
+    margin: 0 100px;
+    padding: 50px 100px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.about-younique-stats p {
+    text-align: center;
+    color: #222 !important;
+}
+
+.dreier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 50px;
+    column-gap: 20px;
+}
+
+.vorteile {
+    font-size: 38px;
+    font-family: 'effra-regular';
+}

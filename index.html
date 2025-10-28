@@ -4,270 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache">
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
     <title>Suche – Noé Plain</title>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
-        }
-
-        header {
-            position: sticky;
-            top: 63px;
-            left: 50%;
-            z-index: 1000;
-        }
-
-        header nav {
-            width: calc(100% - 14rem);
-            max-width: 600px;
-            padding: 1rem 3rem;
-            background-color: white;
-            border-bottom: 1px solid #ddd;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.073);
-            border-radius: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        header nav a {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.5s ease;
-        }
-
-        header nav a:hover {
-            transition: background-color 0.5s ease;
-            background-color: #dfdfdf;
-            color: #333;
-        }
-
-        .active {
-            background-color: #f2f2f2;
-        }
-
-        h1 {
-            font-weight: bold;
-            padding: 0;
-            margin: 0;
-            font-size: 1.2rem;
-            color: #333;
-        }
-
-        main {
-            padding: 4rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .mood-pic {
-            background-image: url(./images/leuchtturm.jpg);
-            background-size: cover;
-            background-position: 35% 10%;
-            height: 370px;
-            background-color: #1f0033;
-            display: flex;
-            align-items: flex-end;
-            /* Align items to the bottom */
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #666;
-            border-radius: 16px 0 16px 16px;
-            margin: 94px auto 2rem auto;
-            position: relative;
-            overflow: visible;
-            /* Ensure shadows are not clipped */
-        }
-
-        .search-input {
-            position: relative;
-            top: calc(-60px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(80% - 6rem);
-            max-width: 600px;
-            padding: 1rem 3rem;
-            border: 1px solid #ddd;
-            border-radius: 30px;
-            font-size: 1rem;
-            background-color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        }
-
-        .category {
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .category h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            overflow-y: auto;
-            padding: 1rem;
-            margin: 0 -1rem;
-        }
-
-        .card {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 2;
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        main a {
-            text-decoration: none;
-            display: block;
-            color: #333;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        footer {
-            padding: 1rem 4rem;
-            margin-top: 40px;
-            background-color: #1f0033;
-            color: #ddd;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-        }
-
-        footer nav {
-            display: flex;
-            justify-self: center;
-            width: 100%;
-            justify-content: space-between;
-            align-items: top;
-            max-width: 1200px;
-            margin-top: 30px;
-        }
-
-        footer nav div {
-            color: #ddd;
-            margin: 0 0 30px 0;
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        footer a {
-            color: #ddd;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.5s ease;
-        }
-
-        footer nav a:hover {
-            text-decoration: underline #fff;
-        }
-
-        .verschwommen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 230px;
-            backdrop-filter: blur(70px);
-            z-index: 999;
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
-            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
-            background-color: #ffffff;
-        }
-
-        @media only screen and (max-width: 600px) {
-            header nav {
-                flex-direction: column;
-                align-items: center;
-                padding: 1.3rem 1rem;
-                row-gap: 20px;
-                width: calc(100% - 10rem);
-            }
-
-            header h1 {
-                display: none;
-            }
-
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
-
-            footer nav {
-                flex-direction: column;
-                align-items: start;
-                row-gap: 70px;
-                text-align: left !important;
-            }
-
-            footer svg {
-                margin-left: 20px;
-            }
-
-            footer a {
-                text-align: left !important;
-            }
-
-            .mood-pic {
-                margin: 94px -2rem 2rem -2rem;
-            }
-
-            .search-input {
-                width: calc(100% - 6rem);
-            }
-        }
-
-        @media only screen and (max-width: 350px){
-            header nav div {
-                display: flex;
-                flex-direction: column;
-                row-gap: 10px;
-                row-gap: 0.3rem;
-            }
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-            nav a {
-                text-align: center;
-            }
-            header nav {
-                padding: 0.5rem 0.7rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description"
+        content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
+    <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
 <div class="verschwommen"></div>
 
@@ -283,73 +25,11 @@
     </header>
     <main>
         <div id="search" class="mood-pic"></div>
-        <input id="suche" type="text" class="search-input" placeholder="Search…">
+        <div class="autocomplete-wrapper" id="autocomplete-wrapper">
+            <input id="suche" type="text" class="search-input" placeholder="Durchsuche das Internet">
+            <ul id="autocomplete-list"></ul>
         </div>
-        <div class="category">
-            <div class="card-container">
-                <a class="card" href="https://notebooklm.google.com/">NotebookLM</a>
-                <a class="card" href="https://youtube.com">YouTube</a>
-                <a class="card" href="https://mgb-aifo-chat.service.migros.cloud/">⭐ Migros AI</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Inspiration</h2>
-            <div class="card-container">
-                <a class="card" href="https://de.pinterest.com/">Pinterest</a>
-                <a class="card" href="https://www.behance.net/">Behance</a>
-                <a class="card" href="https://dribbble.com/">Dribbble</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Fonts</h2>
-            <div class="card-container">
-                <a class="card" href="https://www.fontshare.com">Fontshare</a>
-                <a class="card" href="https://fonts.google.com">Google Fonts</a>
-                <a class="card" href="https://www.typewolf.com/">Typewolf</a>
-                <a class="card" href="https://freefaces.gallery">Freefaces Gallery</a>
-                <a class="card" href="https://www.collletttivo.it">Collletttivo</a>
-                <a class="card" href="https://fonts.adobe.com/">Adobe Fonts</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Bilder</h2>
-            <div class="card-container">
-                <a class="card" href="https://unsplash.com">Unsplash</a>
-                <a class="card" href="https://pixabay.com">Pixabay</a>
-                <a class="card" href="https://pexels.com">Pexels</a>
-                <a class="card" href="https://www.wikimedia.de">Wiki Media</a>
-                <a class="card" href="https://mockups-design.com/">Mockups Design</a>
-                <a class="card" href="https://smartymockups.com/">Smarty Mockups</a>
-                <a class="card" href="https://www.freepik.com/">Freepik</a>
-                <a class="card" href="https://contentcredentials.org/verify">Content credentials</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Colors</h2>
-            <div class="card-container">
-                <a class="card" href="https://color.adobe.com">Adobe Color</a>
-                <a class="card" href="https://coolors.co/">Colors</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Audio &amp; Video</h2>
-            <div class="card-container">
-                <a class="card" href="https://pixabay.com/music/">Pixabay</a>
-                <a class="card" href="https://podcast.adobe.com/">Adobe Podcast</a>
-                <a class="card" href="https://www.musicbed.com/">Musicbed</a>
-            </div>
-        </div>
-        <div class="category">
-            <h2>Icons</h2>
-            <div class="card-container">
-                <a class="card" href="https://lucide.dev/icons">Lucide</a>
-                <a class="card" href="https://hugeicons.com/">Hugeicons</a>
-                <a class="card" href="https://heroicons.com/">Heroicons</a>
-                <a class="card" href="https://iconhub.io">Iconhub</a>
-                <a class="card" href="https://iconduck.com">Iconduck</a>
-                <a class="card" href="https://thenounproject.com">The Noun Project</a>
-            </div>
-        </div>
+        <div id="categories-root"></div>
     </main>
     <footer>
         <nav>
@@ -392,29 +72,276 @@
         </nav>
     </footer>
     <script>
-        function handleEnter(event) {
-            if (event.key === "Enter") {
-                sucheGoogle();
-            }
+        // Daten aus externer JSON laden und dann alles initialisieren
+        let links = [];
+        const categoryOrder = [
+            "Ressourcen",
+            "Inspiration",
+            "Fonts",
+            "Bilder",
+            "Colors",
+            "Audio & Video",
+            "Icons"
+        ];
+
+        function renderCategories() {
+            const root = document.getElementById('categories-root');
+            root.innerHTML = '';
+            categoryOrder.forEach(category => {
+                // Ressourcen: ohne Titel, andere Kategorien mit Titel (außer "suche" wird eh nicht angezeigt)
+                const catLinks = links.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
+                if (catLinks.length === 0) return;
+                const div = document.createElement('div');
+                div.className = 'category';
+                if (category !== "Ressourcen") {
+                    const h2 = document.createElement('h2');
+                    h2.textContent = category;
+                    div.appendChild(h2);
+                }
+                const container = document.createElement('div');
+                container.className = 'card-container';
+                catLinks.forEach(link => {
+                    const a = document.createElement('a');
+                    a.className = 'card';
+                    a.href = link.url;
+                    a.textContent = link.name;
+                    container.appendChild(a);
+                });
+                div.appendChild(container);
+                root.appendChild(div);
+            });
         }
 
-        function sucheGoogle() {
-            var suche = document.getElementById("suche").value;
+        // Autocomplete zeigt jetzt ALLE Links an, unabhängig von der Kategorie
+        let selectedIndex = -1;
+        let filtered = [];
 
-            // Überprüfen, ob ein suche eingegeben wurde
-            if (suche.trim() !== "") {
-                // Google-Such-URL zusammenstellen
-                var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+        function updateAutocomplete() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
+            const val = input.value.trim().toLowerCase();
+            list.innerHTML = "";
+            selectedIndex = -1;
+            // Zeige Dropdown ab erstem Zeichen (Buchstabe oder Zahl)
+            if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
+                animateAutocomplete(false);
+                return;
+            }
+            filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
+            if (filtered.length === 0) {
+                // Google Suggest API verwenden, wenn keine lokalen Treffer
+                fetchGoogleSuggestions(val, list, wrapper);
+                return;
+            }
+            filteredType = "local";
+            filtered.forEach((link, idx) => {
+                const li = document.createElement("li");
+                li.textContent = link.name;
+                li.tabIndex = 0;
+                li.style.setProperty('--delay', (idx * 0.04) + 's');
+                li.onmousedown = e => {
+                    window.open(link.url, "_self");
+                    list.classList.remove("visible");
+                    wrapper.classList.remove("expanded");
+                    list.style.display = "none";
+                };
+                li.onmouseover = () => {
+                    setActive(idx);
+                };
+                if (idx === selectedIndex) li.classList.add("active");
+                list.appendChild(li);
+            });
+            animateAutocomplete(true);
+        }
 
-                // Die Seite im gleichen Tab öffnen
-                window.open(googleSuchURL, "_self");
+        // Google Suggest API Integration
+        function fetchGoogleSuggestions(query, list, wrapper) {
+            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                // data[1] enthält die Vorschläge
+                const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
+                if (suggestions.length === 0) {
+                    animateAutocomplete(false);
+                    return;
+                }
+                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
+                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
+                filtered = suggestions.map(s => ({ suggestion: s }));
+                filteredType = "google";
+                list.innerHTML = "";
+                suggestions.forEach((suggestion, idx) => {
+                    const li = document.createElement("li");
+
+                    // Erstelle ein kleines Google-Logo
+                    const img = document.createElement("img");
+                    img.src = "https://www.google.com/favicon.ico"; // URL zum Google-Logo
+                    img.alt = "Google Logo";
+                    img.style.width = "13px";
+                    img.style.height = "13px";
+                    img.style.marginRight = "10px"; // Abstand zwischen Logo und Text
+
+                    // Füge das Logo und den Text hinzu
+                    li.appendChild(img);
+                    li.appendChild(document.createTextNode(suggestion));
+
+                    li.tabIndex = 0;
+                    li.style.setProperty('--delay', (idx * 0.04) + 's');
+                    li.onmousedown = e => {
+                        const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suggestion);
+                        window.open(googleSuchURL, "_self");
+                        list.classList.remove("visible");
+                        wrapper.classList.remove("expanded");
+                        list.style.display = "none";
+                    };
+                    li.onmouseover = () => {
+                        setActive(idx);
+                    };
+                    if (idx === selectedIndex) li.classList.add("active");
+                    list.appendChild(li);
+                });
+                animateAutocomplete(true);
+            };
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        let filteredType = "local"; // "local", "google", "none"
+
+        function setActive(idx) {
+            const list = document.getElementById("autocomplete-list");
+            Array.from(list.children).forEach((li, i) => {
+                if (i === idx) {
+                    li.classList.add("active");
+                    li.style.backdropFilter = "brightness(0.9)";
+                } else {
+                    li.classList.remove("active");
+                    li.style.backdropFilter = "none"
+                    li.style.background = "transparent";
+                }
+            });
+            selectedIndex = idx;
+        }
+
+        function addEventListeners() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
+
+            input.addEventListener("input", updateAutocomplete);
+
+            input.addEventListener("keydown", function (event) {
+                if (list.classList.contains("visible") && filtered.length > 0) {
+                    if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        selectedIndex = (selectedIndex + 1) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "Enter") {
+                        if (selectedIndex >= 0 && filtered[selectedIndex]) {
+                            if (filteredType === "local" && filtered[selectedIndex].url) {
+                                window.open(filtered[selectedIndex].url, "_self");
+                            } else if (filteredType === "google" && filtered[selectedIndex].suggestion) {
+                                const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(filtered[selectedIndex].suggestion);
+                                window.open(googleSuchURL, "_self");
+                            }
+                            hideAutocomplete();
+                            event.preventDefault();
+                            return;
+                        }
+                    } else if (event.key === "Escape") {
+                        hideAutocomplete();
+                    }
+                }
+            });
+
+            // Wenn das Feld den Fokus verliert, Dropdown ausblenden (kurz warten für Klick)
+            input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
+
+            // Google-Suche wie gehabt, wenn kein Vorschlag ausgewählt ist
+            function handleEnter(event) {
+                if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
+                    sucheGoogle();
+                }
+            }
+
+            function sucheGoogle() {
+                var suche = document.getElementById("suche").value;
+                if (suche.trim() !== "") {
+                    var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+                    window.open(googleSuchURL, "_self");
+                } else {
+                    alert("Bitte gib einen suche ein.");
+                }
+            }
+
+            document.getElementById("suche").addEventListener("keyup", handleEnter);
+        }
+
+        function animateAutocomplete(expand) {
+            const wrapper = document.getElementById("autocomplete-wrapper");
+            const list = document.getElementById("autocomplete-list");
+            // Zielhöhe berechnen
+            const startHeight = wrapper.offsetHeight;
+            let endHeight;
+            if (expand) {
+                wrapper.classList.add("expanded");
+                list.classList.add("visible");
+                list.style.display = "block";
+                // Temporär Höhe auf auto setzen, um scrollHeight zu bekommen
+                wrapper.style.height = "auto";
+                endHeight = wrapper.scrollHeight;
+                wrapper.style.height = startHeight + "px";
+                // Animation starten
+                requestAnimationFrame(() => {
+                    wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                    wrapper.style.height = endHeight + "px";
+                });
             } else {
-                alert("Bitte gib einen suche ein.");
+                endHeight = 49;
+                wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                wrapper.style.height = startHeight + "px";
+                requestAnimationFrame(() => {
+                    wrapper.style.height = endHeight + "px";
+                });
+                setTimeout(() => {
+                    wrapper.classList.remove("expanded");
+                    list.classList.remove("visible");
+                    list.style.display = "none";
+                    wrapper.style.transition = "";
+                }, 300);
             }
         }
 
-        // Event-Listener hinzufügen, um "Enter" zu erkennen
-        document.getElementById("suche").addEventListener("keyup", handleEnter);
+        function hideAutocomplete() {
+            animateAutocomplete(false);
+        }
+
+        // Daten laden und Initialisierung starten
+        fetch('./fake-cms.json')
+            .then(response => response.json())
+            .then(data => {
+                links = data;
+                renderCategories();
+                addEventListeners();
+                // Suchfeld beim Laden der Seite automatisch fokussieren
+                window.addEventListener("DOMContentLoaded", function () {
+                    document.getElementById("suche").focus();
+                });
+            })
+            .catch(err => {
+                console.error("Fehler beim Laden von fake-cms.json:", err);
+            });
+        // Suchfeld beim Laden der Seite automatisch fokussieren
+        window.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("suche").focus();
+        });
     </script>
 </body>
 
