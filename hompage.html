@@ -14,65 +14,51 @@
 
 <body>
     <header>
-        <nav>
-            <h1><span>Noé</span> Plain</h1>
-            <div>
-                <a class="active" href="#search">Suche</a>
-                <a href="https://www.noeplain.ch">Portfolio</a>
+        <nav class="header-nav">
+            <a class="logo-a" href="https://noe-plain.github.io"><span>Noé</span> Plain</a>
+            <div class="header-nav-links">
+                <a class="header-nav-link" href="./index.html">Browser</a>
+                <a class="header-nav-link active" href="./hompage.html#portfolio">Portfolio</a>
             </div>
         </nav>
     </header>
 
-    <img style="position: absolute; top: 15px; left: 15px; background-position: center; object-fit: cover; width: calc(100vw - 30px); height: calc(100vh - 30px); border-radius: 30px  0 30px 30px; z-index: 2;"
-        src="./images/BB-Bildwelt-10.jpg" alt="bild">
-    <h1
-        style="position: absolute; left: 50%; top: 210px; transform: translate(-50%); z-index: 99; font-size: 150px; font-family: 'Boska'; color: #fff; text-align: center; line-height: 150px; width: calc(100vw - 120px);">
-        Noé Plain</h1>
-    <h2 style="position: absolute; z-index: 99; text-align: center; top: 300px; color: #fff;">Mediamatiker EFZ mit BM
-    </h2>
+    <img class="hero-image" src="./images/noe-plain-bench.jpg" alt="bild">
+    <h1 class="hero-h1"><span>Noé</span> Plain</h1>
+    <h2 class="hero-h2 h-klein">Mediamatiker EFZ mit BM</h2>
 
-    <main style="margin-top: calc(100vh - 70px); ">
-        <div>
-            <div class="portfolio-overview-grid max-width"
-                style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                <Section
-                    style="background-image: url(./images/kategorien/noe-background.jpg); color: #fff; background-size: cover; border-radius: 20px 0 20px 20px; padding: 0 30px; grid-row-start: 1; grid-row-end: 3; grid-column-start: 1; grid-column-end: 3; display: flex; flex-direction: column; justify-content: center;">
+    <main class="main-homepage">
+        <div id="portfolio">
+            <div class="portfolio-grid max-width">
+                <section class="portfolio-card-large bg-img-noe">
                     <h2>Portfolio</h2>
                     <p>Hier findest du eine Auswahl meiner Projekte, die meine Leidenschaft für Fotografie, Videografie,
                         Illustration und Design widerspiegeln.</p>
-                </Section>
-                <a href="./fotografie"
-                    style="background-image: url(./images/kategorien/fotografie.jpg); background-size: cover; border-radius: 20px 0 20px 20px; padding: 0; aspect-ratio: 6 / 5; display: grid; align-items: end; text-decoration: none; color: black;">
-                    <h3
-                        style="background-color: #fff; position: relative; margin-bottom: 10px; left: 10px; padding: 10px 15px; border-radius: 10px; width: calc(100% - 50px);">
+                </section>
+                <a href="./fotografie" class="portfolio-card-small bg-img-foto">
+                    <h3 class="portfolio-card-title">
                         Fotografie
                     </h3>
                 </a>
-                <a href="./videografie"
-                    style="background-image: url(./images/kategorien/videografie.jpg); background-size: cover; border-radius: 20px 0 20px 20px; padding: 0; aspect-ratio: 6 / 5; display: grid; align-items: end; text-decoration: none; color: black;">
-                    <h3
-                        style="background-color: #fff; position: relative; margin-bottom: 10px; left: 10px; padding: 10px 15px; border-radius: 10px; width: calc(100% - 50px);">
+                <a href="./videografie" class="portfolio-card-small bg-img-video">
+                    <h3 class="portfolio-card-title">
                         Videografie
                     </h3>
                 </a>
-                <a href="./illustration"
-                    style="background-image: url(./images/kategorien/illustration.jpg); background-size: cover; border-radius: 20px 0 20px 20px; padding: 0; aspect-ratio: 6 / 5; display: grid; align-items: end; text-decoration: none; color: black;">
-                    <h3
-                        style="background-color: #fff; position: relative; margin-bottom: 10px; left: 10px; padding: 10px 15px; border-radius: 10px; width: calc(100% - 50px);">
+                <a href="./illustration" class="portfolio-card-small bg-img-illust">
+                    <h3 class="portfolio-card-title">
                         Illustration
                     </h3>
                 </a>
-                <a href="./Design"
-                    style="background-image: url(./images/kategorien/design.jpg); background-size: cover; border-radius: 20px 0 20px 20px; padding: 0; aspect-ratio: 6 / 5; display: grid; align-items: end; text-decoration: none; color: black;">
-                    <h3
-                        style="background-color: #fff; position: relative; margin-bottom: 10px; left: 10px; padding: 10px 15px; border-radius: 10px; width: calc(100% - 50px);">
+                <a href="./Design" class="portfolio-card-small bg-img-design">
+                    <h3 class="portfolio-card-title">
                         Design
                     </h3>
                 </a>
             </div>
         </div>
 
-        <div style="background-color: rgb(31, 1, 51); color: #fff;">
+        <div class="about-section">
             <div class="max-width">
                 <h2>
                     Das bin ich
@@ -101,19 +87,55 @@
                 </p>
             </div>
         </div>
-        <div class="max-width">
-            <h2 style="text-align: center;">Kund:innen und Arbeitgebende</h2>
-            <div
-                style="display: grid; grid-template-columns: repeat(4, 1fr); justify-content: center; align-items: center;">
-                <a href="https://migros.ch"><img src="https://migros.ch/assets/images/menu/M100_DE.svg" alt=""></a>
-                <a href="https://sportx.ch"><img src="" alt="SportX Logo"></a>
+        <div class="bg-dark-violet clients-section">
+            <div class="max-width">
+                <h2>Kund:innen und Arbeitgebende</h2>
+                <div class="clients-grid">
+                    <a href="https://migros.ch"><img src="https://migros.ch/assets/images/menu/M100_DE.svg" alt=""></a>
+                    <a href="https://sportx.ch"><img src="" alt="SportX Logo"></a>
+                </div>
             </div>
+        </div>
+
+        <div class="form-section max-width" id="search">
+            <h2>Contact</h2>
+
+            <form onsubmit="sendMail(); return false;">
+                <input class="block" id="name" name="name" type="text" placeholder="Name" required>
+                <input class="block" id="email" name="email" type="email" placeholder="Mail" required>
+                <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
+                <textarea id="nachricht" name="message" placeholder="Dein Anliegen" class="block" rows="10"
+                    required></textarea>
+                <input id="submit" class="submit" type="submit" value="Senden">
+            </form>
+
+            <script>
+                function sendMail() {
+                    // Lese die Eingabefelder aus dem Formular aus
+                    var name = document.getElementById("name").value;
+                    var email = document.getElementById("email").value;
+                    var betreff = document.getElementById("betreff").value;
+                    var nachricht = document.getElementById("nachricht").value;
+
+                    // Erstelle die E-Mail-Adresse und den Betreff
+                    var mailtoLink = "mailto:noeplain@gmail.com" +
+                        "?subject=" + encodeURIComponent(betreff) +
+                        "&body=" + encodeURIComponent(nachricht + "\n\n" + name + "\n" + email);
+
+                    // Ersetze alle Zeilenumbrüche durch %0D%0A (RFC 2368)
+                    mailtoLink = mailtoLink.replace(/(\r\n|\r|\n)/g, "%0D%0A");
+
+                    // Öffne das E-Mail-Programm des Benutzers mit dem Mailto-Link
+                    window.location.href = mailtoLink;
+                }
+            </script>
+
         </div>
     </main>
 
     <footer>
-        <nav>
-            <svg style="height: 70px;" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
+        <nav class="footer-nav">
+            <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
                 viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
                 role="presentation" aria-hidden="true" aria-label="">
                 <g>
@@ -143,11 +165,12 @@
                         fill="#ddcfe6" data-color="1"></path>
                 </g>
             </svg>
-            <div>
-                <a href="https://www.noeplain.ch">Portfolio</a>
-                <a href="https://www.instagram.com/medie.vom.noe/">Instagram (medie.vom.noe)</a>
-                <a href="https://www.instagram.com/noe.plain.life/">Instagram (noe.plain.life)</a>
-                <a href="https://linkedin.com/in/noe-plain">LinkedIn</a>
+            <div class="footer-nav-links">
+                <a class="footer-nav-link" href="https://www.noeplain.ch">Portfolio</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/medie.vom.noe/">Instagram (medie.vom.noe)</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/noe.plain.life/">Instagram
+                    (noe.plain.life)</a>
+                <a class="footer-nav-link" href="https://linkedin.com/in/noe-plain">LinkedIn</a>
             </div>
         </nav>
     </footer>
