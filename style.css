@@ -1,5 +1,43 @@
-@import url('https://api.fontshare.com/v2/css?f[]=boska:600&f[]=switzer:300,500&f[]=melodrama:500&display=swap');
+@font-face {
+    font-family: 'boska';
+    src: url('https://api.fontshare.com/v2/css?f[]=boska:600&display=swap') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'boska';
+    src: url('https://api.fontshare.com/v2/css?f[]=boska:600&display=swap') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'switzer';
+    src: url('https://api.fontshare.com/v2/css?f[]=switzer:300&display=swap') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
 
+@font-face {
+    font-family: 'switzer';
+    src: url('https://api.fontshare.com/v2/css?f[]=switzer:400&display=swap') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'switzer';
+    src: url('https://api.fontshare.com/v2/css?f[]=switzer:500&display=swap') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'melodrama';
+    src: url('https://api.fontshare.com/v2/css?f[]=melodrama:500&display=swap') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
 
 /* ======================================== */
 /* 1. Globale Stile & Resets                */
