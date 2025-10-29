@@ -842,6 +842,16 @@ footer {
     .hero-h2 {
         top: 490px;
     }
+
+    .header-nav {
+        margin: 0 25px;
+        padding: 15px 20px;
+        width: calc(100vw - 90px);
+    }
+
+    .hamburger-nav-overlay {
+        width: 200px;
+    }
 }
 
 @media only screen and (max-width: 350px) {
@@ -859,9 +869,4 @@ footer {
     .header-nav-link {
         text-align: center;
     }
-
-    .header-nav {
-        padding: 0.5rem 0.7rem;
-    }
-
 }
