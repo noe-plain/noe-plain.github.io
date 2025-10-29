@@ -15,10 +15,22 @@
 <body>
     <header>
         <nav class="header-nav">
-            <a class="logo-a" href="https://noe-plain.github.io"><span>Noé</span> Plain</a>
-            <div class="header-nav-links">
-                <a class="header-nav-link" href="./index.html">Browser</a>
-                <a class="header-nav-link active" href="./hompage.html#portfolio">Portfolio</a>
+            <a class="logo-a" href="https://noe-plain.github.io/hompage"><span>Noé</span> Plain</a>
+            <!-- Hamburger Button -->
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+        <!-- Hamburger Overlay -->
+        <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
+        <nav class="hamburger-nav-overlay" id="hamburgerNav">
+            <div class="hamburger-nav-links">
+                <a class="hamburger-nav-link" href="./index.html">Browser</a>
+                <a class="hamburger-nav-link" href="./hompage.html#portfolio">Portfolio</a>
+                <a class="hamburger-nav-link" href="./hompage.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="./hompage.html#contact">Kontakt</a>
             </div>
         </nav>
     </header>
@@ -58,7 +70,7 @@
             </div>
         </div>
 
-        <div class="about-section">
+        <div class="about-section" id="about">
             <div class="max-width">
                 <h2>
                     Das bin ich
@@ -97,7 +109,7 @@
             </div>
         </div>
 
-        <div class="form-section max-width" id="search">
+        <div class="form-section max-width" id="contact">
             <h2>Contact</h2>
 
             <form onsubmit="sendMail(); return false;">
@@ -174,6 +186,17 @@
             </div>
         </nav>
     </footer>
+    <script>
+        // Hamburger Menü Logik
+        document.getElementById('hamburgerBtn').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.add('open');
+            document.getElementById('hamburgerNavBg').classList.add('open');
+        });
+        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.remove('open');
+            document.getElementById('hamburgerNavBg').classList.remove('open');
+        });
+    </script>
 </body>
 
 </html>

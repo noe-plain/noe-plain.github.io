@@ -3,6 +3,93 @@
 
 /* ======================================== */
 /* 1. Globale Stile & Resets                */
+/* Hamburger Button */
+.hamburger-btn {
+    right: 25px;
+    width: 30px;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    border: none;
+    z-index: 1201;
+    cursor: pointer;
+    padding: 0;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 20px;
+    height: 3px;
+    margin: 2.5px 0;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Hamburger Nav Overlay */
+.hamburger-nav-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 16px rgba(0, 0, 0, 0.08);
+    z-index: 1200;
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(.4, 1, .6, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 30px 30px 30px;
+}
+
+.hamburger-nav-overlay.open {
+    transform: translateX(0);
+}
+
+.hamburger-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 60px;
+}
+
+.hamburger-nav-link {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.hamburger-nav-link:hover {
+    background: #f7f7f7;
+}
+
+/* Overlay Hintergrund für Klick außerhalb */
+.hamburger-nav-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.hamburger-nav-bg.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* ======================================== */
 html {
     scroll-behavior: smooth;
@@ -299,7 +386,7 @@ footer {
 .hero-h2 {
     z-index: 99;
     position: absolute;
-    top: 350px;
+    top: 360px;
     width: 100%;
     text-align: center;
     font-weight: 300;
@@ -689,13 +776,7 @@ footer {
         font-size: 30px;
     }
 
-    .header-nav {
-        flex-direction: column;
-        align-items: center;
-        padding: 1.3rem 1rem;
-        row-gap: 20px;
-        width: calc(100% - 10rem);
-    }
+
 
     .search-input {
         width: 100%;
