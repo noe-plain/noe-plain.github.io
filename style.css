@@ -96,7 +96,7 @@ html {
 }
 
 body {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f7f7f7;
@@ -107,7 +107,7 @@ h1,
 h2,
 h3,
 h4 {
-    font-family: 'Melodrama', serif;
+    font-family: 'melodrama', melodrama, serif;
     font-weight: 500;
     line-height: 1.2;
     margin-bottom: 1rem;
@@ -142,13 +142,13 @@ h4 {
 }
 
 .h-klein {
-    font-family: 'switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-size: 24px;
     color: #333;
 }
 
 p {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-weight: 300;
     font-size: 20px;
     line-height: 1.35;
@@ -200,7 +200,7 @@ header {
 }
 
 .logo-a {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-size: 20px;
     font-weight: 300;
     color: #333;
@@ -210,7 +210,7 @@ header {
 }
 
 .logo-a span {
-    font-family: 'Boska', serif;
+    font-family: 'boska', serif;
     font-weight: 600;
 }
 
@@ -253,7 +253,7 @@ form {
 
 input,
 textarea {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     width: calc(100% - 2rem);
     margin: 1rem auto;
     padding: 1rem;
@@ -267,7 +267,7 @@ textarea {
 }
 
 form select {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     width: 100%;
     margin: 1rem auto;
     padding: 1rem;
@@ -304,7 +304,7 @@ textarea {
 }
 
 input.submit[type="submit"] {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-size: 1rem;
     font-weight: 500;
     color: #fff;
@@ -395,7 +395,7 @@ footer {
     transform: translate(-50%);
     z-index: 99;
     font-size: 150px;
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-weight: 300;
     color: #fff;
     text-align: center;
@@ -404,7 +404,7 @@ footer {
 }
 
 .hero-h1 span {
-    font-family: 'Boska', serif;
+    font-family: 'boska', serif;
     font-weight: 600;
 }
 
@@ -616,7 +616,7 @@ footer {
 }
 
 .search-input {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-weight: 500;
     position: relative;
     margin: 0;
@@ -688,7 +688,7 @@ footer {
     display: flex;
     align-items: center;
     min-height: 1.2em;
-    font-family: 'switzer', sans-serif;
+    font-family: 'switzer', switzer, sans-serif;
     font-weight: 300;
 }
 
