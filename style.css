@@ -266,6 +266,31 @@ textarea {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+form select {
+    font-family: 'Switzer', sans-serif;
+    width: 100%;
+    margin: 1rem auto;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%2210%22 height%3D%225%22 viewBox%3D%220 0 10 5%22%3E%3Cpath fill%3D%22%23333%22 d%3D%22M0 0l5 5 5-5z%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 10px 5px;
+}
+
+form select:focus {
+    border-color: #1f0033;
+    box-shadow: 0 0 8px rgba(31, 0, 51, 0.2);
+    outline: none;
+}
+
 input:focus,
 textarea:focus {
     border-color: #1f0033;

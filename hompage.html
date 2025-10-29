@@ -116,6 +116,11 @@
             <form onsubmit="sendMail(); return false;">
                 <input class="block" id="name" name="name" type="text" placeholder="Name" required>
                 <input class="block" id="email" name="email" type="email" placeholder="Mail" required>
+                <select class="block" id="grund" name="grund" required style="margin-bottom:1rem;">
+                    <option value="Frage">Frage</option>
+                    <option value="Anfrage">Anfrage</option>
+                    <option value="Anderer Grund">Anderer Grund</option>
+                </select>
                 <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
                 <textarea id="nachricht" name="message" placeholder="Dein Anliegen" class="block" rows="10"
                     required></textarea>
@@ -129,10 +134,14 @@
                     var email = document.getElementById("email").value;
                     var betreff = document.getElementById("betreff").value;
                     var nachricht = document.getElementById("nachricht").value;
+                    var grund = document.getElementById("grund").value;
+
+                    // Betreff zusammensetzen: Dropdown-Antwort – Betreff
+                    var finalBetreff = grund + " – " + betreff;
 
                     // Erstelle die E-Mail-Adresse und den Betreff
                     var mailtoLink = "mailto:noeplain@gmail.com" +
-                        "?subject=" + encodeURIComponent(betreff) +
+                        "?subject=" + encodeURIComponent(finalBetreff) +
                         "&body=" + encodeURIComponent(nachricht + "\n\n" + name + "\n" + email);
 
                     // Ersetze alle Zeilenumbrüche durch %0D%0A (RFC 2368)
