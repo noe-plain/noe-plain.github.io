@@ -573,7 +573,7 @@ footer {
 }
 
 .search-input {
-    font-family: 'Switzer', serif;
+    font-family: 'Switzer', sans-serif;
     font-weight: 500;
     position: relative;
     margin: 0;
@@ -718,7 +718,7 @@ footer {
     }
 
     .portfolio-card-large {
-        aspect-ratio: 6 / 5 !important;
+        min-height: 400px;
         grid-column-start: 1;
         grid-column-end: 3;
         grid-row-start: 1;
@@ -733,7 +733,7 @@ footer {
     }
 }
 
-@media only screen and (max-width: 750px) {
+@media only screen and (max-width: 1140px) {
     .hero-h1 {
         font-size: 90px;
         line-height: 90px;
@@ -741,6 +741,12 @@ footer {
 
     .hero-h2 {
         top: 300px;
+    }
+}
+
+@media only screen and (max-width: 725px) {
+    .hero-h2 {
+        top: 390px;
     }
 }
 
@@ -776,7 +782,9 @@ footer {
         font-size: 30px;
     }
 
-
+    .max-width {
+        padding: 70px 40px;
+    }
 
     .search-input {
         width: 100%;
@@ -793,7 +801,7 @@ footer {
     }
 
     .card-container {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .clients-grid {
@@ -830,6 +838,12 @@ footer {
     }
 }
 
+@media only screen and (max-width: 450px) {
+    .hero-h2 {
+        top: 490px;
+    }
+}
+
 @media only screen and (max-width: 350px) {
     .header-nav-links {
         display: flex;
@@ -839,7 +853,7 @@ footer {
     }
 
     .card-container {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .header-nav-link {
