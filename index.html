@@ -17,9 +17,19 @@
     <header>
         <nav class="header-nav">
             <a class="logo-a" href="https://noe-plain.github.io"><span>Noé</span> Plain</a>
-            <div class="header-nav-links">
-                <a class="header-nav-link active" href="./index.html">Browser</a>
-                <a class="header-nav-link" href="./hompage.html#portfolio">Portfolio</a>
+            <!-- Hamburger Button -->
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+        <!-- Hamburger Overlay -->
+        <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
+        <nav class="hamburger-nav-overlay" id="hamburgerNav">
+            <div class="hamburger-nav-links">
+                <a class="hamburger-nav-link active" href="./index.html">Browser</a>
+                <a class="hamburger-nav-link" href="./hompage.html#portfolio">Portfolio</a>
             </div>
         </nav>
     </header>
@@ -74,7 +84,17 @@
     </footer>
 
     <script>
-        // Daten aus externer JSON laden und dann alles initialisieren
+        // Hamburger Menü Logik
+        document.getElementById('hamburgerBtn').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.add('open');
+            document.getElementById('hamburgerNavBg').classList.add('open');
+        });
+        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.remove('open');
+            document.getElementById('hamburgerNavBg').classList.remove('open');
+        });
+
+        // Restliche JS wie gehabt
         let links = [];
         const categoryOrder = [
             "Ressourcen",
@@ -90,7 +110,6 @@
             const root = document.getElementById('categories-root');
             root.innerHTML = '';
             categoryOrder.forEach(category => {
-                // Ressourcen: ohne Titel, andere Kategorien mit Titel (außer "suche" wird eh nicht angezeigt)
                 const catLinks = links.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
                 if (catLinks.length === 0) return;
                 const div = document.createElement('div');
@@ -114,7 +133,6 @@
             });
         }
 
-        // Autocomplete zeigt jetzt ALLE Links an, unabhängig von der Kategorie
         let selectedIndex = -1;
         let filtered = [];
 
@@ -125,14 +143,12 @@
             const val = input.value.trim().toLowerCase();
             list.innerHTML = "";
             selectedIndex = -1;
-            // Zeige Dropdown ab erstem Zeichen (Buchstabe oder Zahl)
             if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
                 animateAutocomplete(false);
                 return;
             }
             filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
             if (filtered.length === 0) {
-                // Google Suggest API verwenden, wenn keine lokalen Treffer
                 fetchGoogleSuggestions(val, list, wrapper);
                 return;
             }
@@ -157,38 +173,29 @@
             animateAutocomplete(true);
         }
 
-        // Google Suggest API Integration
         function fetchGoogleSuggestions(query, list, wrapper) {
             const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
             window[callbackName] = function (data) {
                 delete window[callbackName];
                 document.body.removeChild(script);
-                // data[1] enthält die Vorschläge
                 const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
                 if (suggestions.length === 0) {
                     animateAutocomplete(false);
                     return;
                 }
-                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
-                // filtered mit Google-Suggestions befüllen, damit Tastatur-Navigation funktioniert
                 filtered = suggestions.map(s => ({ suggestion: s }));
                 filteredType = "google";
                 list.innerHTML = "";
                 suggestions.forEach((suggestion, idx) => {
                     const li = document.createElement("li");
-
-                    // Erstelle ein kleines Google-Logo
                     const img = document.createElement("img");
-                    img.src = "https://www.google.com/favicon.ico"; // URL zum Google-Logo
+                    img.src = "https://www.google.com/favicon.ico";
                     img.alt = "Google Logo";
                     img.style.width = "13px";
                     img.style.height = "13px";
-                    img.style.marginRight = "10px"; // Abstand zwischen Logo und Text
-
-                    // Füge das Logo und den Text hinzu
+                    img.style.marginRight = "10px";
                     li.appendChild(img);
                     li.appendChild(document.createTextNode(suggestion));
-
                     li.tabIndex = 0;
                     li.style.setProperty('--delay', (idx * 0.04) + 's');
                     li.onmousedown = e => {
@@ -211,7 +218,7 @@
             document.body.appendChild(script);
         }
 
-        let filteredType = "local"; // "local", "google", "none"
+        let filteredType = "local";
 
         function setActive(idx) {
             const list = document.getElementById("autocomplete-list");
@@ -263,10 +270,8 @@
                 }
             });
 
-            // Wenn das Feld den Fokus verliert, Dropdown ausblenden (kurz warten für Klick)
             input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
 
-            // Google-Suche wie gehabt, wenn kein Vorschlag ausgewählt ist
             function handleEnter(event) {
                 if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
                     sucheGoogle();
@@ -289,18 +294,15 @@
         function animateAutocomplete(expand) {
             const wrapper = document.getElementById("autocomplete-wrapper");
             const list = document.getElementById("autocomplete-list");
-            // Zielhöhe berechnen
             const startHeight = wrapper.offsetHeight;
             let endHeight;
             if (expand) {
                 wrapper.classList.add("expanded");
                 list.classList.add("visible");
                 list.style.display = "block";
-                // Temporär Höhe auf auto setzen, um scrollHeight zu bekommen
                 wrapper.style.height = "auto";
                 endHeight = wrapper.scrollHeight;
                 wrapper.style.height = startHeight + "px";
-                // Animation starten
                 requestAnimationFrame(() => {
                     wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
                     wrapper.style.height = endHeight + "px";
@@ -325,14 +327,12 @@
             animateAutocomplete(false);
         }
 
-        // Daten laden und Initialisierung starten
         fetch('./fake-cms.json')
             .then(response => response.json())
             .then(data => {
                 links = data;
                 renderCategories();
                 addEventListeners();
-                // Suchfeld beim Laden der Seite automatisch fokussieren
                 window.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("suche").focus();
                 });
@@ -340,7 +340,6 @@
             .catch(err => {
                 console.error("Fehler beim Laden von fake-cms.json:", err);
             });
-        // Suchfeld beim Laden der Seite automatisch fokussieren
         window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("suche").focus();
         });
