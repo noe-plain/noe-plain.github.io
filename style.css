@@ -4,13 +4,7 @@
     font-weight: 600;
     font-style: normal;
 }
-@font-face {
-    font-family: 'boska';
-    src: url('https://api.fontshare.com/v2/css?f[]=boska:600&display=swap') format('truetype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
+
 @font-face {
     font-family: 'switzer';
     src: url('https://api.fontshare.com/v2/css?f[]=switzer:300&display=swap') format('truetype');
