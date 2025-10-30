@@ -819,7 +819,7 @@ footer {
     }
 }
 
-@media only screen and (max-width: 725px) {
+@media only screen and (max-width: 705px) {
     .hero-h2 {
         top: 390px;
     }
@@ -859,6 +859,16 @@ footer {
 
     h3 {
         font-size: 30px;
+    }
+
+    .hero-h1 {
+        font-size: 50px;
+        line-height: 50px;
+    }
+
+    .hero-h2 {
+        font-size: 20px;
+        top: 280px;
     }
 
     .max-width {
@@ -903,20 +913,7 @@ footer {
     }
 }
 
-@media only screen and (max-width: 473px) {
-    .hero-h2 {
-        top: 400px;
-    }
-
-    .clients-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 @media only screen and (max-width: 450px) {
-    .hero-h2 {
-        top: 490px;
-    }
 
     .header-nav {
         margin: 0 25px;
@@ -926,6 +923,20 @@ footer {
 
     .hamburger-nav-overlay {
         width: 200px;
+    }
+
+    .portfolio-card-large {
+        padding: 20px 35px;
+    }
+}
+
+@media only screen and (max-width: 438px) {
+    .hero-h2 {
+        top: 320px;
+    }
+
+    .clients-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -943,5 +954,9 @@ footer {
 
     .header-nav-link {
         text-align: center;
+    }
+
+    h2 {
+        font-size: 35px;
     }
 }
