@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
+    <title>Search – Medie vom Noé</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description"
+        content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
+    <meta http-equiv="cache-control" content="max-age=604800" />
+</head>
+<div class="verschwommen"></div>
+
+<body>
+    <header>
+        <nav class="header-nav">
+            <a class="logo-a" href="https://noe-plain.github.io">Mediä vom <span>Noé</span></a>
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+
+        <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
+        <nav class="hamburger-nav-overlay" id="hamburgerNav">
+            <div class="hamburger-nav-links">
+                <a class="hamburger-nav-link" href="#">Search</a>
+                <a class="hamburger-nav-link" href="./index.html">Mediä vom Noé</a>
+                <a class="hamburger-nav-link" href="./index.html#portfolio">Portfolio</a>
+                <a class="hamburger-nav-link" href="./index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="./index.html#contact">Kontakt</a>
+            </div>
+        </nav>
+    </header>
+    <main class="max-width">
+        <div id="search" class="mood-pic"></div>
+        <div class="autocomplete-wrapper" id="autocomplete-wrapper">
+            <input id="suche" type="text" class="search-input" placeholder="Durchsuche das Internet">
+            <ul id="autocomplete-list" class="autocomplete-list"></ul>
+        </div>
+        <div id="categories-root"></div>
+    </main>
+    <footer>
+        <nav class="footer-nav">
+            <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
+                viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
+                role="presentation" aria-hidden="true" aria-label="">
+                <g>
+                    <path
+                        d="M1769.49 865.92h16.55v235.35h-16.55zm16.54 92.64h-8.94q2.235-30 14.34-51.9c8.02-14.62 18.71-25.8 31.97-33.56 13.27-7.76 28.12-11.65 44.52-11.65s30.74 3.29 42.05 9.85c11.36 6.58 20 15.88 25.95 27.96 5.97 12.09 8.94 26.79 8.94 44.08v157.94h-17.01V947.39c0-13.73-2.21-25.97-6.68-36.7-4.47-10.75-11.41-19.15-20.82-25.27-9.42-6.12-21.7-9.18-36.92-9.18-12.23 0-23.13 2.47-32.63 7.38-9.56 4.91-17.69 11.49-24.42 19.68-6.68 8.2-11.77 17.15-15.21 26.84-3.45 9.71-5.15 19.17-5.15 28.42"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path d="M1602.26 1101.29h16.56V865.93h-16.56zm0-272.93h16.56v-49.23h-16.56z" fill="#ddcfe6"
+                        data-color="1"></path>
+                    <path
+                        d="M1437.61 964.36v12.99c-31.91 0-58.08 1.49-78.5 4.46-20.46 2.99-36.24 7.18-47.44 12.53-11.16 5.36-18.93 11.87-23.24 19.48-4.37 7.6-6.53 16.04-6.53 25.27 0 16.11 5.61 28.78 16.82 38.04 11.15 9.25 26.62 13.88 46.31 13.88 16.4 0 31.31-4.27 44.72-12.77 13.42-8.48 24.16-19.67 32.23-33.55 8.02-13.88 12.09-28.7 12.09-44.51h9.81c-1.18 18.5-5.09 34.36-11.61 47.64-6.58 13.27-14.86 24.16-24.83 32.67-10.03 8.49-20.62 14.76-31.77 18.79-11.21 4.01-21.85 6.04-32.03 6.04-16.4 0-30.38-2.53-42.05-7.6-11.61-5.07-20.66-12.54-27.04-22.38-6.42-9.85-9.61-21.62-9.61-35.34 0-16.12 4.16-29.15 12.48-39.15 8.38-10 20.77-17.53 37.17-22.6 16.71-5.68 34.6-9.41 53.67-11.17 19.07-1.8 42.2-2.7 69.34-2.7m-148.08-21.94h-16.97c2.67-16.99 7.71-31.53 15.16-43.62 7.46-12.08 17.84-21.32 31.1-27.72 13.32-6.43 29.36-9.64 48.11-9.64s34.85 3.67 47.19 10.97c12.39 7.3 21.6 17.66 27.55 31.1 5.96 13.42 8.94 29.38 8.94 47.85v96.64c0 12.23.82 22.62 2.47 31.1 1.59 8.51 4.21 15.88 7.81 22.15h-18.35c-3.59-5.96-5.9-13.34-6.93-22.15-1.04-8.8-1.54-17.22-1.54-25.27V953.61c0-24.76-5.45-43.86-16.36-57.27-10.89-13.42-28.42-20.12-52.59-20.12s-40.55 5.96-52.79 17.89c-12.23 11.92-19.85 28.04-22.82 48.32"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path fill="#ddcfe6" d="M1125.34 779.13v322.16h-16.56V779.13z" data-color="1"></path>
+                    <path
+                        d="M776.15 797.05h17.43v304.24h-17.43zm93.03 183.87h-81.89V966.6h81.42c26.83 0 48.27-6.94 64.2-20.8 15.99-13.88 23.96-32.74 23.96-56.6s-7.98-43.18-23.96-57.06c-15.93-13.88-37.22-20.8-63.74-20.8h-81.89v-14.31h81.89c21.18 0 39.69 3.73 55.47 11.17 15.83 7.46 28.06 18.05 36.7 31.77 8.63 13.72 12.95 29.98 12.95 48.76 0 28.94-9.51 51.54-28.64 67.8-19.07 16.24-44.56 24.37-76.49 24.37"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M1519.92 419.64c-15.52 0-25.81 7.99-30.84 23.95-5.09 15.96-7.92 38.09-8.53 66.44h47.44c9.56 0 15.78-3.06 18.77-9.17 2.97-6.12 4.47-14.4 4.47-24.84s-.68-19.92-2.01-28.42c-1.34-8.48-4.21-15.26-8.69-20.36-4.47-5.07-11.37-7.6-20.62-7.6m-102.45 109.62c0-38.76 9-67.34 27.09-85.67 18.05-18.35 43.18-27.53 75.36-27.53 28.64 0 48.99 5.97 61.07 17.9 12.08 11.94 18.15 27.16 18.15 45.65 0 5.68-.68 11.56-2.01 17.67-1.34 6.12-3.4 11.55-6.07 16.32h-110.51v15.66c0 21.79 1.59 40.35 4.72 55.72 3.14 15.34 8.94 27.14 17.43 35.34 8.48 8.2 21.13 12.31 37.84 12.31 10.12 0 19.07-2.39 26.83-7.16 7.76-4.79 13.77-10.98 18.09-18.56 4.31-7.6 6.52-15.29 6.52-23.06h4.01c0 8.67-2.61 17.46-7.82 26.41-5.24 8.94-13.36 16.47-24.41 22.59s-25.49 9.18-43.38 9.18c-32.79 0-58.2-8.79-76.08-26.39-17.89-17.61-26.83-46.37-26.83-86.36m96.18-143.65-3.13-2.67c10.43-11.93 18.5-24.91 24.15-38.94 5.71-14 9.56-27.73 11.67-41.14l40.71 13.84c-7.45 13.44-17.63 26.19-30.43 38.28-12.85 12.08-27.14 22.3-42.98 30.63"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M1245.88 528.35c0-26.83-1.28-48.17-3.81-63.97-2.57-15.8-6.78-27.22-12.74-34.23-5.97-6.98-14.19-10.51-24.63-10.51s-18.19 3.53-24.16 10.51c-5.96 7.02-10.29 18.43-12.95 34.23-2.73 15.8-4.06 37.14-4.06 63.97s1.33 48.71 4.06 64.67c2.67 15.95 7 27.5 12.95 34.66 5.97 7.18 14.04 10.75 24.16 10.75s18.66-3.57 24.63-10.75c5.96-7.16 10.17-18.71 12.74-34.66 2.52-15.96 3.81-37.5 3.81-64.67m63.07 0c0 75.77-34.75 113.65-104.25 113.65s-104.25-37.88-104.25-113.65 34.74-112.29 104.25-112.29 104.25 37.45 104.25 112.29"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M976.67 352.09v285.45h-8.94L789.2 333.74V599.5c0 11.65 2.83 20.31 8.48 25.97 5.66 5.68 15.99 8.51 30.9 8.51v3.57H752.5v-3.57c12.85 0 21.38-2.83 25.75-8.51 4.31-5.66 6.48-14.32 6.48-25.97V321.23h-28.64v-3.6h95.3l120.81 210.3V352.1c0-11.93-3.81-20.07-11.41-24.39-7.6-4.33-17.99-6.48-31.1-6.48v-3.6h79.22v3.6c-12.54 0-21.08 2.59-25.55 7.81-4.47 5.23-6.68 12.91-6.68 23.06"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M144.11 581.3v-62.12c48.55 44.49 113.21 71.58 184.02 71.58s135.55-27.19 184.09-71.68v409.17c0 6.52-.79 12.85-2.17 18.98L144.11 581.29Zm284.07 430.99H144.11V707.07l303.05 303.04c-6.13 1.39-12.46 2.17-18.98 2.17M328.13 133.67c101.44 0 184 82.56 184 184s-82.56 184.11-184 184.11-184.02-82.66-184.02-184.11 82.56-184 184.02-184m272.88 179.45q.1-.1 0-.19C598.54 164.51 477.12 44.69 328.12 44.69S55.13 167.09 55.13 317.67v739.12c0 24.52 19.87 44.49 44.5 44.49h328.56c31.63 0 61.2-8.49 86.71-23.42 26.11-15.03 47.87-36.79 62.88-62.89 14.94-25.5 23.44-55.06 23.44-86.71V317.67c0-1.49-.1-3.06-.2-4.55"
+                        fill="#ddcfe6" data-color="1"></path>
+                </g>
+            </svg>
+            <div class="footer-nav-links">
+                <a class="footer-nav-link" href="https://www.noeplain.ch">Portfolio</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/medie.vom.noe/">Instagram (medie.vom.noe)</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/noe.plain.life/">Instagram
+                    (noe.plain.life)</a>
+                <a class="footer-nav-link" href="https://linkedin.com/in/noe-plain">LinkedIn</a>
+            </div>
+        </nav>
+    </footer>
+
+    <script>
+        // Hamburger Menü Logik
+        document.getElementById('hamburgerBtn').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.add('open');
+            document.getElementById('hamburgerNavBg').classList.add('open');
+        });
+        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
+            document.getElementById('hamburgerNav').classList.remove('open');
+            document.getElementById('hamburgerNavBg').classList.remove('open');
+        });
+
+        // Restliche JS wie gehabt
+        let links = [];
+        const categoryOrder = [
+            "Ressourcen",
+            "Inspiration",
+            "Fonts",
+            "Bilder",
+            "Colors",
+            "Audio & Video",
+            "Icons"
+        ];
+
+        function renderCategories() {
+            const root = document.getElementById('categories-root');
+            root.innerHTML = '';
+            categoryOrder.forEach(category => {
+                const catLinks = links.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
+                if (catLinks.length === 0) return;
+                const div = document.createElement('div');
+                div.className = 'category';
+                if (category !== "Ressourcen") {
+                    const h2 = document.createElement('h2');
+                    h2.textContent = category;
+                    div.appendChild(h2);
+                }
+                const container = document.createElement('div');
+                container.className = 'card-container';
+                catLinks.forEach(link => {
+                    const a = document.createElement('a');
+                    a.className = 'card';
+                    a.href = link.url;
+                    a.textContent = link.name;
+                    container.appendChild(a);
+                });
+                div.appendChild(container);
+                root.appendChild(div);
+            });
+        }
+
+        let selectedIndex = -1;
+        let filtered = [];
+
+        function updateAutocomplete() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
+            const val = input.value.trim().toLowerCase();
+            list.innerHTML = "";
+            selectedIndex = -1;
+            if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
+                animateAutocomplete(false);
+                return;
+            }
+            filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
+            if (filtered.length === 0) {
+                fetchGoogleSuggestions(val, list, wrapper);
+                return;
+            }
+            filteredType = "local";
+            filtered.forEach((link, idx) => {
+                const li = document.createElement("li");
+                li.textContent = link.name;
+                li.tabIndex = 0;
+                li.style.setProperty('--delay', (idx * 0.04) + 's');
+                li.onmousedown = e => {
+                    window.open(link.url, "_self");
+                    list.classList.remove("visible");
+                    wrapper.classList.remove("expanded");
+                    list.style.display = "none";
+                };
+                li.onmouseover = () => {
+                    setActive(idx);
+                };
+                if (idx === selectedIndex) li.classList.add("active");
+                list.appendChild(li);
+            });
+            animateAutocomplete(true);
+        }
+
+        function fetchGoogleSuggestions(query, list, wrapper) {
+            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
+            window[callbackName] = function (data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
+                if (suggestions.length === 0) {
+                    animateAutocomplete(false);
+                    return;
+                }
+                filtered = suggestions.map(s => ({ suggestion: s }));
+                filteredType = "google";
+                list.innerHTML = "";
+                suggestions.forEach((suggestion, idx) => {
+                    const li = document.createElement("li");
+                    const img = document.createElement("img");
+                    img.src = "https://www.google.com/favicon.ico";
+                    img.alt = "Google Logo";
+                    img.style.width = "13px";
+                    img.style.height = "13px";
+                    img.style.marginRight = "10px";
+                    li.appendChild(img);
+                    li.appendChild(document.createTextNode(suggestion));
+                    li.tabIndex = 0;
+                    li.style.setProperty('--delay', (idx * 0.04) + 's');
+                    li.onmousedown = e => {
+                        const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suggestion);
+                        window.open(googleSuchURL, "_self");
+                        list.classList.remove("visible");
+                        wrapper.classList.remove("expanded");
+                        list.style.display = "none";
+                    };
+                    li.onmouseover = () => {
+                        setActive(idx);
+                    };
+                    if (idx === selectedIndex) li.classList.add("active");
+                    list.appendChild(li);
+                });
+                animateAutocomplete(true);
+            };
+            const script = document.createElement('script');
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        let filteredType = "local";
+
+        function setActive(idx) {
+            const list = document.getElementById("autocomplete-list");
+            Array.from(list.children).forEach((li, i) => {
+                if (i === idx) {
+                    li.classList.add("active");
+                    li.style.backdropFilter = "brightness(0.9)";
+                } else {
+                    li.classList.remove("active");
+                    li.style.backdropFilter = "none"
+                    li.style.background = "transparent";
+                }
+            });
+            selectedIndex = idx;
+        }
+
+        function addEventListeners() {
+            const input = document.getElementById("suche");
+            const list = document.getElementById("autocomplete-list");
+            const wrapper = document.getElementById("autocomplete-wrapper");
+
+            input.addEventListener("input", updateAutocomplete);
+
+            input.addEventListener("keydown", function (event) {
+                if (list.classList.contains("visible") && filtered.length > 0) {
+                    if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        selectedIndex = (selectedIndex + 1) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+                        setActive(selectedIndex);
+                    } else if (event.key === "Enter") {
+                        if (selectedIndex >= 0 && filtered[selectedIndex]) {
+                            if (filteredType === "local" && filtered[selectedIndex].url) {
+                                window.open(filtered[selectedIndex].url, "_self");
+                            } else if (filteredType === "google" && filtered[selectedIndex].suggestion) {
+                                const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(filtered[selectedIndex].suggestion);
+                                window.open(googleSuchURL, "_self");
+                            }
+                            hideAutocomplete();
+                            event.preventDefault();
+                            return;
+                        }
+                    } else if (event.key === "Escape") {
+                        hideAutocomplete();
+                    }
+                }
+            });
+
+            input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
+
+            function handleEnter(event) {
+                if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
+                    sucheGoogle();
+                }
+            }
+
+            function sucheGoogle() {
+                var suche = document.getElementById("suche").value;
+                if (suche.trim() !== "") {
+                    var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
+                    window.open(googleSuchURL, "_self");
+                } else {
+                    alert("Bitte gib einen suche ein.");
+                }
+            }
+
+            document.getElementById("suche").addEventListener("keyup", handleEnter);
+        }
+
+        function animateAutocomplete(expand) {
+            const wrapper = document.getElementById("autocomplete-wrapper");
+            const list = document.getElementById("autocomplete-list");
+            const startHeight = wrapper.offsetHeight;
+            let endHeight;
+            if (expand) {
+                wrapper.classList.add("expanded");
+                list.classList.add("visible");
+                list.style.display = "block";
+                wrapper.style.height = "auto";
+                endHeight = wrapper.scrollHeight;
+                wrapper.style.height = startHeight + "px";
+                requestAnimationFrame(() => {
+                    wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                    wrapper.style.height = endHeight + "px";
+                });
+            } else {
+                endHeight = 49;
+                wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
+                wrapper.style.height = startHeight + "px";
+                requestAnimationFrame(() => {
+                    wrapper.style.height = endHeight + "px";
+                });
+                setTimeout(() => {
+                    wrapper.classList.remove("expanded");
+                    list.classList.remove("visible");
+                    list.style.display = "none";
+                    wrapper.style.transition = "";
+                }, 300);
+            }
+        }
+
+        function hideAutocomplete() {
+            animateAutocomplete(false);
+        }
+
+        fetch('./fake-cms.json')
+            .then(response => response.json())
+            .then(data => {
+                links = data;
+                renderCategories();
+                addEventListeners();
+                window.addEventListener("DOMContentLoaded", function () {
+                    document.getElementById("suche").focus();
+                });
+            })
+            .catch(err => {
+                console.error("Fehler beim Laden von fake-cms.json:", err);
+            });
+        window.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("suche").focus();
+        });
+    </script>
+</body>
+
+</html>

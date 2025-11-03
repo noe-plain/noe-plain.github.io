@@ -430,6 +430,7 @@ footer {
     font-family: 'switzer', switzer, sans-serif;
     font-weight: 300;
     color: #fff;
+    text-shadow: #333 2px 2px 30px;
     text-align: center;
     line-height: 150px;
     width: calc(100vw - 120px);
@@ -448,6 +449,7 @@ footer {
     text-align: center;
     font-weight: 300;
     color: #fff;
+    text-shadow: #000000 2px 2px 20px;
 }
 
 .main-homepage {
@@ -613,6 +615,15 @@ footer {
     position: relative;
     overflow: visible;
 }
+
+.kategorien-bg {
+    width: 100vw;
+    height: 100vh;
+    margin-top: -62px;
+    background-color: #925c5c;
+    z-index: -1;
+}
+
 
 .autocomplete-wrapper * {
     overflow: hidden !important;
@@ -783,7 +794,154 @@ footer {
 
 
 /* ======================================== */
-/* 6. Media Queries                         */
+/* 6. Komponenten (Projekte-Seite)         */
+/* ======================================== */
+
+.projekte-hero {
+    background-size: cover;
+    background-position: 35% 10%;
+    height: 370px;
+    border-radius: 30px 0 30px 30px;
+    margin: 94px auto 4rem auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    padding: 2rem;
+    background-color: #1f0033;
+}
+
+.projekte-hero .hero-h1 {
+    position: static;
+    transform: none;
+    text-align: center;
+    width: auto;
+    font-size: 120px;
+    line-height: 1;
+}
+
+.project-gallery {
+    column-width: 340px; 
+    column-gap: 30px;
+    margin-bottom: 4rem;
+}
+
+.projekt-karte {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 30px; 
+    break-inside: avoid;
+    background: #fff;
+    border-radius: 30px 0 30px 30px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    color: #333;
+    box-sizing: border-box; 
+}
+
+.projekt-karte:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.projekt-karte .projekt-bild {
+    width: 100%;
+    height: auto; 
+    border-radius: 16px 0 16px 16px;
+    margin-bottom: 1.5rem;
+    object-fit: cover;
+}
+
+.projekt-karte h3 {
+    font-size: 2rem;
+    font-family: 'melodrama', melodrama, serif;
+    margin-bottom: 1rem;
+    color: #1f0033;
+}
+
+.projekt-karte p {
+    font-family: 'switzer', switzer, sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+.projekt-kurzinfo {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    margin-top: 1rem;
+}
+
+.projekt-kurzinfo ul {
+    font-family: 'switzer', switzer, sans-serif;
+    font-size: 0.9rem;
+    padding-left: 0; 
+    list-style: none; 
+    margin: 0;
+}
+
+.projekt-kurzinfo li {
+    margin-bottom: 0.5rem;
+}
+
+.projekt-kurzinfo li:last-child {
+    margin-bottom: 0;
+}
+
+
+@media (max-width: 768px) {
+    .project-gallery {
+        column-width: 90%;
+    }
+
+    .projekte-hero .hero-h1 {
+        font-size: 80px;
+    }
+}
+
+.button-design {
+    background-color: #1f0033;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-family: 'switzer', switzer, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}  
+.button-design:hover {
+    background-color: #3a0055;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Aufräumen der Media Queries (optional, aber empfohlen) */
+@media (max-width: 768px) {
+    /* Auf Mobilgeräten wollen wir oft nur eine Spalte. 
+      Wir setzen die Spaltenbreite fast auf 100%, 
+      sodass nur eine Spalte Platz hat.
+    */
+    .project-gallery {
+        column-width: 90%;
+    }
+
+    .projekte-hero .hero-h1 {
+        font-size: 80px;
+    }
+}
+
+/* ======================================== */
+/* 8. Media Queries                         */
 /* ======================================== */
 
 @media only screen and (max-width: 1100px) {
