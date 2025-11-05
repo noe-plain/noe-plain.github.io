@@ -802,7 +802,7 @@ footer {
     background-position: 35% 10%;
     height: 370px;
     border-radius: 30px 0 30px 30px;
-    margin: 94px auto 4rem auto;
+    margin: 120px auto 4rem auto;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -824,7 +824,7 @@ footer {
 }
 
 .project-gallery {
-    column-width: 340px; 
+    column-width: 400px;
     column-gap: 30px;
     margin-bottom: 4rem;
 }
@@ -833,7 +833,7 @@ footer {
     display: inline-block;
     vertical-align: top;
     width: 100%;
-    margin-bottom: 30px; 
+    margin-bottom: 30px;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
     background: #fff;
@@ -843,12 +843,12 @@ footer {
     -webkit-transition: -webkit-transform 0.3s ease;
     text-decoration: none;
     color: #333;
-    box-sizing: border-box; 
-    
+    box-sizing: border-box;
+
     /* Erzwingt GPU-Rendering für flüssige Animation */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    
+
     /* Behebt den Safari-Bug "Verschwinden bei transform" */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -862,7 +862,7 @@ footer {
 
 .projekt-karte .projekt-bild {
     width: 100%;
-    height: auto; 
+    height: auto;
     border-radius: 16px 0 16px 16px;
     margin-bottom: 1.5rem;
     object-fit: cover;
@@ -893,8 +893,8 @@ footer {
 .projekt-kurzinfo ul {
     font-family: 'switzer', switzer, sans-serif;
     font-size: 0.9rem;
-    padding-left: 0; 
-    list-style: none; 
+    padding-left: 0;
+    list-style: none;
     margin: 0;
 }
 
@@ -931,14 +931,168 @@ footer {
     -webkit-transition: background-color 0.3s ease, box-shadow 0.3s ease;
     text-decoration: none;
     display: inline-block;
-}  
+}
+
 .button-design:hover {
     background-color: #3a0055;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* ======================================== */
-/* 8. Media Queries                         */
+/* 8. Komponenten (Projekt-Detailseite)    */
+/* ======================================== */
+
+/* Hero-Bereich (Jetzt angepasst an die Übersichtsseite) */
+.detail-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 450px;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+
+    border-radius: 30px 0 30px 30px;
+    margin: 4rem 0;
+    overflow: hidden;
+}
+
+.detail-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    /* Anpassung an Ihre Markenfarbe */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.detail-hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 4rem;
+}
+
+.detail-hero h1,
+.detail-hero h2,
+.detail-hero p {
+    color: #fff;
+}
+
+.detail-hero h1 {
+    font-size: 100px;
+}
+
+.detail-hero .h-klein {
+    font-weight: 300;
+}
+
+.detail-hero-beschreibung {
+    font-size: 1.25rem;
+    font-weight: 300;
+    max-width: 800px;
+    line-height: 1.5;
+}
+
+.detail-hero .projekt-kurzinfo {
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Hellere, lesbarere Anpassung */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 2rem;
+}
+
+/* Hauptinhalts-Container braucht kein oberes Padding mehr,
+   da .detail-hero seinen eigenen Margin hat 
+*/
+main.max-width {
+    padding-bottom: 4rem;
+}
+
+.text-content {
+    /* max-width: 800px;  <-- Diese Zeile wird entfernt, um die volle Breite zu nutzen */
+    margin: 0 0 4rem 0;
+    /* <-- Geändert von '0 auto 4rem auto' */
+}
+
+.text-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.text-content h3 {
+    margin-top: 3rem;
+    color: #1f0033;
+}
+
+
+.gallery-item {
+    display: block;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: 30px;
+    border-radius: 30px 0 30px 30px;
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+}
+
+/* KORREKTUR: Fehlenden Alpha-Wert hinzugefügt */
+.lg-backdrop {
+    background-color: rgb(255, 255, 255) !important;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+.pdf-embed-wrapper {
+    border-radius: 30px 0 30px 30px;
+    overflow: hidden;
+    margin: 2rem 0 1rem 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+    height: 800px;
+}
+
+.pdf-embed-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.pdf-download-btn {
+    display: block;
+    width: fit-content;
+    margin: 1rem auto 4rem auto;
+}
+
+.video-responsive-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 30px 0 30px 30px;
+    margin: 2rem 0 4rem 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.video-responsive-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ======================================== */
+/* 9. Media Queries                         */
 /* ======================================== */
 
 @media only screen and (max-width: 1100px) {

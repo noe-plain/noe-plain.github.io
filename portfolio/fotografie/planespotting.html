@@ -4,106 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
-    <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../style.css">
-    <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
-    <meta http-equiv="cache-control" content="max-age=604800" />
+    <link rel="icon" type="image/x-icon" href="../../images/illustrationen/logos/favicon.png">
+    <title>Projekt: Plainspotting – Medien vom Noé</title>
+
+    <link rel="stylesheet" href="../../style.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-zoom.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-thumbnail.min.css">
+
+    <meta name="description" content="Case Study: Neugestaltung der Werbemittel für den Migros-Tech-Day.">
 </head>
 
 <body>
     <header>
         <nav class="header-nav">
-            <a class="logo-a" href="../index.html">Medien von <span>Noé</span></a>
+            <a class="logo-a" href="../../index.html">Medien von <span>Noé</span></a>
             <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </nav>
-
         <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
         <nav class="hamburger-nav-overlay" id="hamburgerNav">
             <div class="hamburger-nav-links">
-                <a class="hamburger-nav-link" href="../search.html">Search</a>
-                <a class="hamburger-nav-link" href="../index.html">Medien von Noé</a>
-                <a class="hamburger-nav-link" href="../index.html#portfolio">Projekte</a>
-                <a class="hamburger-nav-link" href="../index.html#about">Das bin ich</a>
-                <a class="hamburger-nav-link" href="../index.html#contact">Kontakt</a>
+                <a class="hamburger-nav-link" href="../../search.html">Search</a>
+                <a class="hamburger-nav-link" href="../../index.html">Medien von Noé</a>
+                <a class="hamburger-nav-link" href="../../projekte.html">Projekte</a>
+                <a class="hamburger-nav-link" href="../../index.html#portfolio">Portfolio-Kategorien</a>
+                <a class="hamburger-nav-link" href="../../index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="../../index.html#contact">Kontakt</a>
             </div>
         </nav>
     </header>
 
     <main class="max-width">
-
-        <div class="projekte-hero"
-            style="background-image: url(../images/kategorien/fotografie.jpg); background-position: 80% 40%;">
-            <h1 class="hero-h1"><span>Fotografie</span></h1>
-            <h2 class="hero-h2 h-klein" style="color: #fff; position: static; margin-top: 1rem;">
-                Eine kuratierte Sammlung meiner Arbeiten.
-            </h2>
+        <div class="detail-hero max" style="background-image: url(../../images/kategorien/fotografie.jpg);">
+            <div class="detail-hero-overlay"></div>
+            <div class="detail-hero-content max-width">
+                <h1>Plainspotting</h1>
+                <h2 class="h-klein">Neugestaltung aller Werbemittel (Digital & Print)</h2>
+                <p class="detail-hero-beschreibung">
+                    Komplette Neugestaltung aller Werbemittel für den internen Migros-Tech-Day 2024. Ziel war es, ein
+                    frisches, modernes und tech-affines Branding zu entwickeln.
+                </p>
+                <div class="projekt-kurzinfo">
+                    <ul>
+                        <li><strong>Rolle:</strong> Lead Design, Konzeption</li>
+                        <li><strong>Tools:</strong> Adobe Illustrator, Photoshop, InDesign</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <div class="project-gallery">
+        <div class="text-content">
+            <h3>Das Projekt-Briefing</h3>
+            <p>Das ursprüngliche Branding des Tech-Days war in die Jahre gekommen und sprach die Zielgruppe – interne
+                Entwickler, Ingenieure und IT-Spezialisten – nicht mehr optimal an. Die Herausforderung bestand darin,
+                eine visuelle Identität zu schaffen, die sowohl innovativ als auch klar erkennbar innerhalb des
+                Migros-Corporate-Designs funktioniert.</p>
+            <p>Wir entschieden uns für einen "Dark Mode"-Ansatz mit leuchtenden Akzentfarben, um Modernität zu
+                signalisieren. Typografisch setzten wir auf eine Kombination aus einer serifenlosen Schrift für die
+                Technik und einer Serifenschrift (Ihrer 'Melodrama') für die menschliche Komponente.</p>
+        </div>
 
-            <a href="./fotografie/planespotting.html" class="projekt-karte">
-                <img src="../images/kategorien/design.jpg" alt="Design-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 5/7;">
-                <h3>Migros-Tech-Day Neugestaltung</h3>
-                <p>Komplette Neugestaltung aller Werbemittel (digital und print) für den internen Migros-Tech-Day 2024.
-                    Ziel war es, ein frisches, modernes und tech-affines Branding zu entwickeln.</p>
-                <ul>
-                    <li><strong>Rolle:</strong> Lead Design & Konzeption</li>
-                    <li><strong>Tools:</strong> Adobe Illustrator, Photoshop, InDesign</li>
-                </ul>
+        <h2>Bildergalerie</h2>
+        <p>Eine Auswahl der erstellten Werbemittel, von digitalen Bannern bis zu physischen Rollups.</p>
+
+        <div id="lightgallery-masonry" class="project-gallery">
+            <a class="gallery-item" href="../../images/kategorien/illustration.jpg">
+                <img src="../../images/kategorien/noe-background.jpg" alt="Digitales Banner">
             </a>
-
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/fotografie.jpg" alt="Fotografie-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 4/5;">
-                <h3>Fotografie-Serie: "Alpen-Stille"</h3>
-                <p>Eine persönliche Fotografie-Serie, die die Stille und Majestät der Schweizer Alpen in den frühen
-                    Morgenstunden einfängt.</p>
+            <a class="gallery-item" href="../../images/kategorien/illustration.jpg">
+                <img src="../../images/kategorien/illustration.jpg" alt="Icon-Set">
             </a>
-
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/illustration.jpg" alt="Illustrations-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 1/1;">
-                <h3>Digitale Illustrationen</h3>
-                <p>Eine Sammlung von Vektor-Illustrationen, die für verschiedene Kundenprojekte, von
-                    Website-Hintergründen bis hin zu Erklärvideos, erstellt wurden.</p>
+            <a class="gallery-item" href="../../images/kategorien/fotografie.jpg">
+                <img src="../../images/kategorien/fotografie.jpg" alt="Event-Fotografie Mockup">
             </a>
-
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 6/7;">
-                <h3>Imagefilm "La Pataconera"</h3>
-                <p>Konzeption, Dreh und Postproduktion eines kurzen, dynamischen Imagefilms für das Food-Startup "La
-                    Pataconera".</p>
-                <ul>
-                    <li><strong>Rolle:</strong> Kamera, Schnitt, Color Grading</li>
-                    <li><strong>Tools:</strong> DaVinci Resolve, Adobe Premiere Pro</li>
-                </ul>
+            <a class="gallery-item" href="../../images/kategorien/videografie.jpg" style="aspect-ratio: 16/9;">
+                <img src="../../images/kategorien/videografie.jpg" alt="Video-Teaser-Bild">
             </a>
+        </div>
 
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/design.jpg" alt="Design-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 1/1;">
-                <h3>SportX "Run"-Kampagne</h3>
-                <p>Mitarbeit bei der visuellen Gestaltung der Frühjahrs-Laufkampagne für SportX.</p>
-            </a>
 
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/fotografie.jpg" alt="Fotografie-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 5/7;">
-                <h3>Video-Tutorials (ZLI)</h3>
-                <p>Produktion einer internen Tutorial-Serie für ZLI zur Einarbeitung neuer Lernender in die Adobe
-                    Creative Suite.</p>
-            </a>
+        <h2>Projektdokumentation (PDF)</h2>
+        <p>Das vollständige Branding-Manual, das als PDF für alle Projektbeteiligten verteilt wurde.</p>
 
+        <div class="pdf-embed-wrapper">
+            <iframe href="../../pfad/zu/deinem/dokument.pdf" title="PDF-Ansicht: Branding Manual"></iframe>
+        </div>
+        <a href="../../pfad/zu/deinem/dokument.pdf" class="button-design pdf-download-btn" download>
+            Branding Manual herunterladen
+        </a>
+
+
+        <h2>Event-Teaser (Video)</h2>
+        <p>Ein kurzer Teaser-Clip, der für die interne Kommunikation produziert wurde.</p>
+
+        <div class="video-responsive-wrapper">
+            <iframe src="https://www.youtube.com/embed/0uJ5SiewG6Q?si=krHXLJl1w8XXVsh-" title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
         </div>
 
     </main>
+
 
     <footer>
         <nav class="footer-nav">
@@ -157,6 +164,21 @@
             document.getElementById('hamburgerNavBg').classList.remove('open');
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
+
+    <script type="text/javascript">
+        lightGallery(document.getElementById('lightgallery-masonry'), {
+            plugins: [lgZoom, lgThumbnail],
+            selector: '.gallery-item', // Sagt lightGallery, welche Elemente Klicks auslösen
+            speed: 500,
+            download: true, // Deaktiviert den Download-Button im Slider
+            thumbnail: false // Zeigt thumbnails unten im Slider an
+        });
+    </script>
+
 </body>
 
 </html>
