@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simples Mock-up v4 (Maximale Breite)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Eigene Stile */
+
+        /* Hero-Bild mit Person auf der rechten Seite */
+        .hero-image {
+            /* Foto von Joel Mott auf Unsplash */
+            background-image: url('./Assets/hero.jpg');
+            background-size: cover;
+            /* Mobile-first: Gesicht ist leicht rechts von der Mitte */
+            background-position: 65% 50%;
+        }
+
+        @media (min-width: 768px) {
+
+            /* Desktop: Gesicht weiter nach rechts rücken */
+            .hero-image {
+                background-position: 80% 50%;
+            }
+        }
+
+        .h2,
+        .h3,
+        .h4,
+        .h5,
+        .h6 {
+            hyphenate-limit-chars: auto 5;
+            hyphenate-limit-lines: 2;
+
+        }
+
+        /* Stile für das FAQ-Akkordeon */
+        .faq-item .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-item.faq-open .faq-answer {
+            max-height: 300px;
+            /* Ausreichend Höhe für den Inhalt */
+        }
+
+        /* +/- Ikon-Wechsel */
+        .faq-item.faq-open .icon-plus {
+            display: none;
+        }
+
+        .faq-item:not(.faq-open) .icon-minus {
+            display: none;
+        }
+
+        /* --- NEUE STILE FÜR DAS SLIDE-IN MENÜ --- */
+
+        /* Verstecke das mobile Menü (slide-in) standardmäßig */
+        #side-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            /* Breite: 350px (mobil), 450px (desktop) */
+            width: 350px;
+        }
+
+        @media (min-width: 768px) {
+            #side-menu {
+                width: 450px;
+            }
+        }
+
+        /* Zeige das Menü an, wenn 'open' Klasse gesetzt ist */
+        #side-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Backdrop (Overlay) */
+        #menu-backdrop {
+            display: none;
+            /* Standardmäßig versteckt */
+        }
+
+        #menu-backdrop.open {
+            display: block;
+            /* Zeigen, wenn Menü offen ist */
+        }
+
+        /* --- ENDE NEUE STILE --- */
+    </style>
+
+    <script>
+        // Tailwind-Konfiguration für Akzentfarbe, eckige Ränder und Schriftart
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: '#9D5073',
+                        footer: '#49484A',
+                    },
+                    fontFamily: {
+                        // Setze Roboto als Standard-Sans-Serif-Schriftart
+                        sans: ['Roboto', 'sans-serif'],
+                    },
+                },
+                // Alle Ecken standardmäßig auf "eckig" (0px) setzen
+                borderRadius: {
+                    'none': '0',
+                    'sm': '0',
+                    '': '0',
+                    'md': '0',
+                    'lg': '0',
+                    'xl': '0',
+                    '2xl': '0',
+                    '3xl': '0',
+                    'full': 'full', // 'full' (für runde Bilder) beibehalten
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-white text-gray-800 font-sans leading-relaxed">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <nav class="max-w-6xl mx-auto px-8 md:px-12 h-20 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2 flex-shrink-0">
+                <img src="./Assets/OMS_Logo_schwarz.svg" alt="Logo" class="h-12">
+            </a>
+
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-accent font-medium">Sales</a>
+                    <a href="#" class="text-gray-700 hover:text-accent font-medium">Leader</a>
+                    <a href="#" class="text-gray-700 hover:text-accent font-medium">Mentoring+</a>
+                </div>
+
+                <button id="hamburger-btn" class="p-2 z-[60]"> <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+
+    <section class="hero-image h-[400px] md:h-[500px] relative flex items-end pb-12">
+        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+
+        <div class="relative z-10 max-w-6xl mx-auto px-8 md:px-12 w-full">
+            <h1 class="text-white text-4xl md:text-6xl font-bold max-w-xl md:max-w-2xl">
+                Sind Sie bereit für den nächsten Schritt?
+            </h1>
+        </div>
+    </section>
+
+    <section>
+        <div class="max-w-6xl mx-auto px-8 md:px-12 pt-12 pb-16">
+            <h2 class="text-3xl md:text-4xl font-medium">
+                Warum ist echtes Umdenken so entscheidend?
+            </h2>
+        </div>
+    </section>
+
+    <section class="pb-16">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <p class="text-lg text-gray-700 mb-6 font-normal">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus
+                ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent
+                mauris. Fusce nec tellus sed augue semper porta.
+            </p>
+            <p class="text-lg text-gray-700 font-normal">
+                Morbi in sem quis dui placerat ornare. Pellentesque odio nisi, Egestas id, Egestas
+                elementum, imperdiet sed, nisi. Nunc rhoncus rutrum eros. Integer
+                lacinia. Nulla ac non, arcu.
+            </p>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 py-20 border-t border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <div class="text-center">
+                <blockquote class="text-2xl md:text-3xl font-light italic mt-6 mb-6">
+                    "Die größte Hürde ist nicht der Markt, sondern die eigene Denkweise. Haben Sie den Mut, diese zu
+                    hinterfragen?"
+                </blockquote>
+                <img src="./Assets/zitat-image.jpg" alt="Platzhalter"
+                    class="w-24 h-24 mx-auto mt-12 mb-6 bg-gray-300 object-cover" style="border-radius: 100%;">
+                <cite class="not-italic font-semibold text-lg">Roger Schenk</cite>
+                <p class="text-gray-600">Gründer & Mentor</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <h3 class="text-2xl font-medium mb-4">Ein weiterer wichtiger Gedanke</h3>
+            <p class="text-lg text-gray-700 mb-6 font-normal">
+                Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh.
+                Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula
+                vel nunc Egestas porttitor.
+            </p>
+            <p class="text-lg text-gray-700 font-normal">
+                Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac turpis quis ligula lacinia
+                aliquet. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, Egestas in, nibh.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-16">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <h2 class="text-3xl font-medium mb-12">Lösungen</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <a href="#" class="block border border-gray-200 group">
+                    <img src="./Assets/selbststaendige.jpg" alt="Platzhalter" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-medium mb-3">Für Selbstständig&shy;erwerbende</h3>
+                        <p class="text-gray-700 mb-4 font-normal">Donec nec justo eget felis facilisis fermentum.
+                            Aliquam porttitor mauris sit amet orci.</p>
+                        <span class="font-semibold text-accent group-hover:underline">
+                            Mehr erfahren &rarr;
+                        </span>
+                    </div>
+                </a>
+
+                <a href="#" class="block border border-gray-200 group">
+                    <img src="./Assets/vertriebsmitarbeitende.jpg" alt="Platzhalter" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-medium mb-3">Für Vertriebs&shy;mitarbeitende</h3>
+                        <p class="text-gray-700 mb-4 font-normal">Aenean dignissim pellentesque felis. Morbi in sem quis
+                            dui placerat ornare.</p>
+                        <span class="font-semibold text-accent group-hover:underline">
+                            Mehr erfahren &rarr;
+                        </span>
+                    </div>
+                </a>
+
+                <a href="#" class="block border border-gray-200 group">
+                    <img src="./Assets/unternehmen-mit-vertrieb.jpg" alt="Platzhalter" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-medium mb-3">Für Unter&shy;nehmen mit Vertrieb</h3>
+                        <p class="text-gray-700 mb-4 font-normal">Pellentesque odio nisi, Egestas id, Egestas elementum,
+                            imperdiet sed, nisi.</p>
+                        <span class="font-semibold text-accent group-hover:underline">
+                            Mehr erfahren &rarr;
+                        </span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 py-20 border-gray-200 ">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <div class=" pb-16">
+                <h2 class="text-3xl font-medium mb-6">Starten Sie Ihre Transformation</h2>
+                <p class="text-lg text-gray-700 mb-8 font-normal">
+                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse
+                    sollicitudin velit sed leo. Ut pharetra augue nec augue. Nam elit agna, endrerit sit amet, tincidunt
+                    ac, viverra sed, nulla.
+                </p>
+                <a href="#"
+                    class="inline-block bg-accent text-white px-10 py-3 text-lg font-semibold hover:bg-opacity-80 transition-colors">
+                    Jetzt Kurse entdecken
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-medium border-b-2 border-gray-200 pb-3">Sales</h3>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg font-medium">Kurs: Sales Essentials</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Die Grundlagen des modernen Verkaufs.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Einsteiger & Junior Sales</p>
+                        <p class="font-bold text-lg">CHF 490.-</p>
+                    </div>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg font-medium">Kurs: Advanced Closing</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Abschlusssicherheit in komplexen Deals.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Erfahrene Vertriebler</p>
+                        <p class="font-bold text-lg">CHF 890.-</p>
+                    </div>
+                    <div class="border border-accent border-2 p-6 bg-white">
+                        <h4 class="text-lg font-medium text-accent">Paket: Sales Master</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Beinhaltet beide Sales-Kurse & 1:1 Coaching.
+                        </p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Ambitionierte Aufsteiger</p>
+                        <p class="font-bold text-lg">CHF 1.200.-</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-medium border-b-2 border-gray-200 pb-3">Leader</h3>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg font-medium">Kurs: Führen 1.0</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Vom Mitarbeiter zur Führungskraft.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Neue Teamleiter</p>
+                        <p class="font-bold text-lg">CHF 550.-</p>
+                    </div>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg  font-medium">Kurs: Strategische Führung</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Teams durch Wandel führen.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> C-Level & Senior Manager</p>
+                        <p class="font-bold text-lg">CHF 990.-</p>
+                    </div>
+                    <div class="border border-accent border-2 p-6 bg-white">
+                        <h4 class="text-lg font-medium text-accent">Paket: Leadership Circle</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Beide Kurse plus Peer-Group-Mastermind.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Zukünftige Geschäftsleitung</p>
+                        <p class="font-bold text-lg">CHF 1.400.-</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-medium border-b-2 border-gray-200 pb-3">Mentoring+</h3>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg font-medium">Kurs: Mentor-Mindset</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Wissen effektiv weitergeben.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Interne Mentoren & HR</p>
+                        <p class="font-bold text-lg">CHF 450.-</p>
+                    </div>
+                    <div class="border border-gray-200 p-6">
+                        <h4 class="text-lg font-medium">Kurs: Sparring Partner</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Coaching auf Augenhöhe.</p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Selbstständige & CEOs</p>
+                        <p class="font-bold text-lg">CHF 1.100.-</p>
+                    </div>
+                    <div class="border border-accent border-2 p-6 bg-white">
+                        <h4 class="text-lg font-medium text-accent">Paket: Full Access Mentoring</h4>
+                        <p class="text-gray-600 text-sm my-2 font-normal">Alle Kurse & unlimitierter Sparring-Zugang.
+                        </p>
+                        <p class="text-sm mb-3 font-normal"><strong>Für:</strong> Unternehmer & Gründer</p>
+                        <p class="font-bold text-lg">Auf Anfrage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <h2 class="text-3xl font-medium mb-16">Der OpenMind Zyklus</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+                <div class="flex items-center justify-center">
+                    <svg class="w-full max-w-sm" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"
+                                fill="#9D5073">
+                                <polygon points="0 0, 10 3.5, 0 7" />
+                            </marker>
+                        </defs>
+
+                        <path d="M 100 20 A 80 80 0 0 1 180 100" stroke="#9D5073" stroke-width="4" fill="none"
+                            marker-end="url(#arrowhead)" />
+                        <text x="150" y="45" font-family="Roboto, sans-serif" font-size="10" fill="#333">Persönliche
+                            E.</text>
+
+                        <path d="M 180 100 A 80 80 0 0 1 60 171.8" stroke="#9D5073" stroke-width="4" fill="none"
+                            marker-end="url(#arrowhead)" />
+                        <text x="105" y="185" font-family="Roboto, sans-serif" font-size="10"
+                            fill="#333">Mitarbeiterentw.</text>
+
+                        <path d="M 60 171.8 A 80 80 0 0 1 100 20" stroke="#9D5073" stroke-width="4" fill="none"
+                            marker-end="url(#arrowhead)" />
+                        <text x="20" y="110" font-family="Roboto, sans-serif" font-size="10" fill="#333">Strukturen
+                            g.</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-medium">OpenMind Sales von Roger Schenk schafft Bewusstsein auf allen Ebenen
+                    </h3>
+
+                    <ul class="mt-6 space-y-3 text-gray-700">
+                        <li>
+                            <strong class="font-semibold text-gray-900">Persönliche Entwicklung</strong>
+                            <ul class="list-none pl-6 mt-2 space-y-1 font-normal">
+                                <li>- Academy & 1:1 Mentoring</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong class="font-semibold text-gray-900">Mitarbeiterentwicklung</strong>
+                            <ul class="list-none pl-6 mt-2 space-y-1 font-normal">
+                                <li>- Individuelle Sales- & Leadership-Kurse</li>
+                                <li>- Sparring bei Rekrutierungen & Personalentscheiden</li>
+                                <li>- Zugang zu geprüften Talenten</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong class="font-semibold text-gray-900">Strukturen gestalten</strong>
+                            <ul class="list-none pl-6 mt-2 space-y-1 font-normal">
+                                <li>- Consulting & Business Development</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <div class="">
+                <h2 class="text-3xl font-medium mb-12">Häufig gestellte Fragen (FAQ)</h2>
+
+                <div class="space-y-4">
+                    <div class="faq-item border border-gray-200">
+                        <button
+                            class="faq-toggle w-full flex justify-between items-center text-left p-6 bg-gray-50 hover:bg-gray-100">
+                            <span class="text-lg font-medium">Für wen sind diese Kurse geeignet?</span>
+                            <span class="text-2xl font-light">
+                                <span class="icon-plus">+</span>
+                                <span class="icon-minus">-</span>
+                            </span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="p-6 pt-6">
+                                <p class="text-gray-700 font-normal">
+                                    Unsere Kurse richten sich an Selbstständige, Vertriebsmitarbeitende und Unternehmen,
+                                    die ihre Denkweise und Strukturen im Sales- und Leadership-Bereich fundamental
+                                    verbessern möchten. Wir haben spezielle Angebote für Einsteiger bis hin zu
+                                    C-Level-Führungskräften.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item border border-gray-200">
+                        <button
+                            class="faq-toggle w-full flex justify-between items-center text-left p-6 bg-gray-50 hover:bg-gray-100">
+                            <span class="text-lg font-medium">Finden die Kurse online oder vor Ort statt?</span>
+                            <span class="text-2xl font-light">
+                                <span class="icon-plus">+</span>
+                                <span class="icon-minus">-</span>
+                            </span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="p-6 pt-6">
+                                <p class="text-gray-700 font-normal">
+                                    Wir bieten eine flexible Mischung. Die meisten unserer Kurse sind als
+                                    On-Demand-Videokurse verfügbar, ergänzt durch Live-Online-Q&A-Sessions. Die Pakete
+                                    (Sales Master, Leadership Circle) beinhalten zusätzlich exklusive 1:1-Mentorings
+                                    oder Peer-Group-Treffen, die je nach Absprache auch vor Ort stattfinden können.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item border border-gray-200">
+                        <button
+                            class="faq-toggle w-full flex justify-between items-center text-left p-6 bg-gray-50 hover:bg-gray-100">
+                            <span class="text-lg font-medium">Was bedeutet "OpenMind Sales"?</span>
+                            <span class="text-2xl font-light">
+                                <span class="icon-plus">+</span>
+                                <span class="icon-minus">-</span>
+                            </span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="p-6 pt-6">
+                                <p class="text-gray-700 font-normal">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent
+                                    libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum
+                                    imperdiet. Duis sagittis ipsum. Praesent mauris.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>
+
+
+    <section class="py-20 bg-gray-50 border-t border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+                <div>
+                    <h2 class="text-3xl font-medium mb-6">Nehmen Sie Kontakt auf</h2>
+                    <p class="text-lg text-gray-700 mb-8 font-normal">
+                        Wir freuen uns auf Ihre Anfrage. Füllen Sie das Formular aus, oder erreichen Sie uns direkt über
+                        die untenstehenden Angaben.
+                    </p>
+
+                    <h3 class="text-xl font-medium mb-4">Direktkontakt</h3>
+                    <address class="not-italic space-y-2 text-gray-700">
+                        <p class="font-medium">OpenMind Sales GmbH</p>
+                        <p>Musterstrasse 123</p>
+                        <p>8000 Zürich, Schweiz</p>
+                        <p class="pt-2">
+                            <a href="mailto:info@openmind.ch" class="text-accent hover:underline">info@openmind.ch</a>
+                        </p>
+                    </address>
+                </div>
+
+                <div>
+                    <form action="#" method="POST" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="first-name"
+                                    class="block text-base font-medium text-gray-700 mb-2">Vorname</label>
+                                <input type="text" name="first-name" id="first-name"
+                                    class="w-full p-3 bg-white border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                    required>
+                            </div>
+                            <div>
+                                <label for="last-name"
+                                    class="block text-base font-medium text-gray-700 mb-2">Nachname</label>
+                                <input type="text" name="last-name" id="last-name"
+                                    class="w-full p-3 bg-white border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="email"
+                                class="block text-base font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
+                            <input type="email" name="email" id="email"
+                                class="w-full p-3 bg-white border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                required>
+                        </div>
+
+                        <div>
+                            <label for="inquiry-type" class="block text-base font-medium text-gray-700 mb-2">Bezug Ihrer
+                                Anfrage</label>
+                            <div class="relative">
+                                <select id="inquiry-type" name="inquiry-type"
+                                    class="w-full p-3 bg-white border border-gray-300 appearance-none pr-10 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                    required>
+                                    <option>Allgemeine Anfrage</option>
+                                    <option>Selbstständigerwerbend</option>
+                                    <option>Vertriebsmitarbeitende</option>
+                                    <option>Unternehmen mit Vertrieb</option>
+                                </select>
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-base font-medium text-gray-700 mb-2">Ihre
+                                Nachricht</label>
+                            <textarea name="message" id="message" rows="5"
+                                class="w-full p-3 bg-white border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                                required></textarea>
+                        </div>
+
+                        <div>
+                            <button type="submit"
+                                class="w-full md:w-auto inline-block bg-accent text-white px-10 py-3 text-lg font-semibold hover:bg-opacity-80 transition-colors">
+                                Nachricht senden
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-footer text-gray-300 py-16 px-8">
+        <div class="max-w-6xl mx-auto px-8 md:px-12">
+            <img src="./Assets/OMS_Logo_weiss.svg" class="h-20" alt="">
+            <div class="grid grid-cols-1 md:grid-cols-4 mt-6 gap-8">
+                <div>
+                    <h5 class="text-lg font-medium text-white mb-4">Navigation</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#">Startseite</a></li>
+                        <li><a href="#">Sales</a></li>
+                        <li><a href="#">Leader</a></li>
+                        <li><a href="#">Über Uns</a></li>
+                        <li><a href="#">Kontakt</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="text-lg font-medium text-white mb-4">Kontakt</h5>
+                    <address class="not-italic space-y-2">
+                        <p>OpenMind Sales GmbH</p>
+                        <p>Musterstrasse 123</p>
+                        <p>8000 Zürich, Schweiz</p>
+                        <p>info@openmind.ch</p>
+                    </address>
+                </div>
+
+                <div>
+                    <h5 class="text-lg font-medium text-white mb-4">Social Media</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="text-lg font-medium text-white mb-4">Rechtliches</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#">Impressum</a></li>
+                        <li><a href="#">Datenschutz</a></li>
+                    </ul>
+                    <p class="pt-6">
+                        Bewusstsein auf allen Ebenen schaffen.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="menu-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <div id="side-menu" class="fixed top-0 right-0 h-full bg-white z-50 p-8 overflow-y-auto shadow-lg">
+        <div class="flex justify-end mb-8">
+            <button id="close-menu-btn" class="p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="space-y-6">
+            <div class="md:hidden space-y-4">
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent font-medium">Sales</a>
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent font-medium">Leader</a>
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent font-medium">Mentoring+</a>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6 space-y-4">
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent">Über Uns</a>
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent">Blog</a>
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent">FAQ</a>
+                <a href="#" class="block text-xl text-gray-700 hover:text-accent">Kontakt</a>
+            </div>
+        </nav>
+    </div>
+    <script>
+        // Warten, bis das DOM geladen ist
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Logik für das FAQ-Akkordeon ---
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const item = toggle.closest('.faq-item');
+                    item.classList.toggle('faq-open');
+                });
+            });
+
+            // --- NEUE Logik für das Hamburger-Slide-Menü ---
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            const sideMenu = document.getElementById('side-menu');
+            const menuBackdrop = document.getElementById('menu-backdrop');
+
+            // Funktion zum Öffnen des Menüs
+            const openMenu = () => {
+                sideMenu.classList.add('open');
+                menuBackdrop.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Scrollen des Hintergrunds verhindern
+            };
+
+            // Funktion zum Schließen des Menüs
+            const closeMenu = () => {
+                sideMenu.classList.remove('open');
+                menuBackdrop.classList.remove('open');
+                document.body.style.overflow = ''; // Scrollen wieder erlauben
+            };
+
+            // Event Listeners
+            if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMenu);
+            if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeMenu);
+            if (menuBackdrop) menuBackdrop.addEventListener('click', closeMenu);
+
+        });
+    </script>
+
+</body>
+
+</html>
