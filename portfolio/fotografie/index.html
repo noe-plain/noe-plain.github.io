@@ -14,6 +14,127 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-thumbnail.min.css">
 
     <meta name="description" content="Case Study: Neugestaltung der Werbemittel für den Migros-Tech-Day.">
+
+    <style>
+        /* Container-Verhalten für Tabs */
+        .gallery-section {
+            display: none;
+            /* Verstecke alle Sektionen standardmäßig */
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .gallery-section.active {
+            display: block;
+            /* Zeige nur die aktive Sektion */
+        }
+
+        /* Page-Nav Styling als Reiter */
+        #page-nav {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            min-width: 0;
+            white-space: nowrap;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: -1px;
+        }
+
+        #page-nav::-webkit-scrollbar {
+            display: none;
+            height: 0;
+        }
+
+        #page-nav a.tab-btn {
+            flex: 0 0 auto;
+        }
+
+        @media (max-width: 800px) {
+            #page-nav {
+                min-width: 0 !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            #page-nav::-webkit-scrollbar {
+                display: none;
+                height: 0;
+            }
+        }
+
+        #page-nav a.tab-btn {
+            background-color: transparent;
+            color: #333;
+            box-shadow: none;
+            border: 1px solid transparent;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+            margin-bottom: -1px;
+        }
+
+        #page-nav a.tab-btn:first-of-type {
+            margin-left: 0 !important;
+        }
+
+        #page-nav a.tab-btn.active {
+            background-color: #1f0033;
+            color: #fff;
+            border-color: #1f0033;
+        }
+
+        #page-nav a.tab-btn:hover:not(.active) {
+            background-color: #f0f0f0;
+            border-color: #ddd;
+        }
+
+        /* Animation für den Tab-Wechsel */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Masonry Fallback für dynamische Inhalte */
+        .project-gallery {
+            column-count: 3;
+            /* Erzwingt Spalten-Layout */
+            column-gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .project-gallery {
+                column-count: 2;
+            }
+
+            #page-nav {
+                min-width: min-content;
+                overflow: scroll;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .project-gallery {
+                column-count: 1;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -40,7 +161,7 @@
     </header>
 
     <main class="max-width">
-        <div class="detail-hero max" style="background-image: url(../../images/portfolio/photography/hero-image.jpeg);">
+                <div class="detail-hero max" style="background-image: url(../../images/portfolio/photography/hero-image.jpeg);">
             <div class="detail-hero-overlay"></div>
             <div class="detail-hero-content max-width">
                 <h1>Photo&shy;graphy</h1>
@@ -60,194 +181,36 @@
         </div>
 
         <div id="page-nav">
-            <a href="#streetphotography">Street Photography</a>
-            <a href="#aviation">Aviation</a>
-            <a href="#portaet">Porträt</a>
-            <a href="#hochzeit">Hochzeit</a>
+            <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portaet')">Porträt</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('hochzeit')">Hochzeit</a>
         </div>
 
-        <h2 id="streetphotography">Street Photography</h2>
+        <div id="gallery-container">
+            <div id="section-street" class="gallery-section active">
+                <h2>Street Photography</h2>
+                <div id="lightgallery-street" class="project-gallery"></div>
+            </div>
 
-        <div id="lightgallery-masonry-street" class="project-gallery">
-            <a class="gallery-item" href="../../images/portfolio/photography/street-01.jpeg">
-                <img src="../../images/portfolio/photography/street-01.jpeg"
-                    alt="Mann auf dem Gehsteig vor einem modernen Gebäude in Edinburgh">
-            </a>
+            <div id="section-aviation" class="gallery-section">
+                <h2>Aviation</h2>
+                <div id="lightgallery-aviation" class="project-gallery"></div>
+            </div>
 
-            <a class="gallery-item" href="../../images/portfolio/photography/street-03.jpeg">
-                <img src="../../images/portfolio/photography/street-03.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-04.jpeg">
-                <img src="../../images/portfolio/photography/street-04.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-05.jpeg">
-                <img src="../../images/portfolio/photography/street-05.jpeg"
-                    alt="Mann mit Hut und Mantel der eine Strasse in Edinburgh entlang läuft">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-06.jpeg">
-                <img src="../../images/portfolio/photography/street-06.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-08.jpeg">
-                <img src="../../images/portfolio/photography/street-08.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-09.jpeg">
-                <img src="../../images/portfolio/photography/street-09.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-10.jpeg">
-                <img src="../../images/portfolio/photography/street-10.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-11.jpeg">
-                <img src="../../images/portfolio/photography/street-11.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-12.jpeg">
-                <img src="../../images/portfolio/photography/street-12.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-13.jpeg">
-                <img src="../../images/portfolio/photography/street-13.jpeg"
-                    alt="Frau mit rotem Regenschirm in einer Strasse in Edinburgh">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-15.jpeg">
-                <img src="../../images/portfolio/photography/street-15.jpeg" alt="Mann mit Gitarre auf dem Bürgersteig">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-16.jpeg">
-                <img src="../../images/portfolio/photography/street-16.jpeg"
-                    alt="Blick entlang einer belebten Einkaufsstraße">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-19.jpeg">
-                <img src="../../images/portfolio/photography/street-19.jpeg" alt="Schaufenster mit Vintage-Objekten">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-20.jpeg">
-                <img src="../../images/portfolio/photography/street-20.jpeg"
-                    alt="Nahaufnahme von Pflastersteinen und Schatten">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-22.jpeg">
-                <img src="../../images/portfolio/photography/street-22.jpeg" alt="Stadtgarten mit Laternen und Bäumen">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-23.jpeg">
-                <img src="../../images/portfolio/photography/street-23.jpeg" alt="Taxi fährt durch eine neblige Straße">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-24.jpeg">
-                <img src="../../images/portfolio/photography/street-24.jpeg"
-                    alt="Zug am Bahnhof mit wartenden Passagieren">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-25.jpeg">
-                <img src="../../images/portfolio/photography/street-25.jpeg"
-                    alt="Sonnenuntergang über den Dächern der Stadt">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-27.jpeg">
-                <img src="../../images/portfolio/photography/street-27.jpeg"
-                    alt="Mann liest Zeitung an einem Café-Tisch">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-28.jpeg">
-                <img src="../../images/portfolio/photography/street-28.jpeg"
-                    alt="Kinderwagen auf einer gepflasterten Straße">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/street-29.jpeg">
-                <img src="../../images/portfolio/photography/street-29.jpeg"
-                    alt="Street Art an einer bunten Graffiti-Mauer">
-            </a>
+            <div id="section-portaet" class="gallery-section">
+                <h2>Porträt</h2>
+                <div id="lightgallery-portaet" class="project-gallery"></div>
+            </div>
 
+            <div id="section-hochzeit" class="gallery-section">
+                <h2>Hochzeit</h2>
+                <div id="lightgallery-hochzeit" class="project-gallery"></div>
+            </div>
         </div>
-
-        <h2 id="aviation">Aviation</h2>
-
-        <div id="lightgallery-masonry-aviation" class="project-gallery">
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-02.jpeg">
-                <img src="../../images/portfolio/photography/aviation-02.jpeg"
-                    alt="Flugzeug beim Start über der Landebahn">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-03.jpeg">
-                <img src="../../images/portfolio/photography/aviation-03.jpeg"
-                    alt="Nahaufnahme eines Tragflügels über den Wolken">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-04.jpeg">
-                <img src="../../images/portfolio/photography/aviation-04.jpeg" alt="Cockpit-Instrumente im Morgenlicht">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-05.jpeg">
-                <img src="../../images/portfolio/photography/aviation-05.jpeg"
-                    alt="Fahrwerk eines Verkehrsflugzeugs beim Rollen">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-06.jpeg">
-                <img src="../../images/portfolio/photography/aviation-06.jpeg"
-                    alt="Kontrollturm mit Terminal im Hintergrund">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-07.jpeg">
-                <img src="../../images/portfolio/photography/aviation-07.jpeg"
-                    alt="Detailaufnahme eines Triebwerks und Turbinenblatt">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-08.jpeg">
-                <img src="../../images/portfolio/photography/aviation-08.jpeg"
-                    alt="Mehrere Kleinflugzeuge in Formationsflug">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-09.jpeg">
-                <img src="../../images/portfolio/photography/aviation-09.jpeg" alt="Vintage-Biplan auf einer Grasbahn">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-10.jpeg">
-                <img src="../../images/portfolio/photography/aviation-10.jpeg"
-                    alt="Hangar-Innenansicht mit wartenden Flugzeugen">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/aviation-11.jpeg">
-                <img src="../../images/portfolio/photography/aviation-11.jpeg"
-                    alt="Luftaufnahme der Küstenlinie aus dem Fenster eines Flugzeugs">
-            </a>
-        </div>
-
-        <h2 id="portaet">Porträt</h2>
-
-        <div id="lightgallery-masonry-portaet" class="project-gallery">
-            <a class="gallery-item" href="../../images/portfolio/photography/portraet-01.jpeg">
-                <img src="../../images/portfolio/photography/portraet-01.jpeg"
-                    alt="Porträt einer Frau mit Sombrero-Hut vor einer Wand mit Graffiti">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/portraet-02.jpeg">
-                <img src="../../images/portfolio/photography/portraet-02.jpeg"
-                    alt="Schwarz-Weiß-Porträt eines Mannes mit Bart und Brille">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/portraet-03.jpeg">
-                <img src="../../images/portfolio/photography/portraet-03.jpeg"
-                    alt="Porträt einer Frau mit Kopftuch und intensiven Augen">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/portraet-04.jpeg">
-                <img src="../../images/portfolio/photography/portraet-04.jpeg"
-                    alt="Porträt eines Mannes mit Hut und Mantel vor einer Backsteinwand">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/portraet-05.jpeg">
-                <img src="../../images/portfolio/photography/portraet-05.jpeg"
-                    alt="Porträt einer Frau mit rotem Lippenstift und lockigem Haar">
-            </a>
-        </div>
-
-        <h2 id="hochzeit">Hochzeit</h2>
-
-        <div id="lightgallery-masonry-hochzeit" class="project-gallery">
-            <a class="gallery-item" href="../../images/portfolio/photography/hochzeit-01.jpeg">
-                <img src="../../images/portfolio/photography/hochzeit-01.jpeg"
-                    alt="Brautpaar beim ersten Tanz auf der Hochzeit">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/hochzeit-02.jpeg">
-                <img src="../../images/portfolio/photography/hochzeit-02.jpeg"
-                    alt="Braut mit Blumenstrauß und Schleier im Wind">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/hochzeit-03.jpeg">
-                <img src="../../images/portfolio/photography/hochzeit-03.jpeg"
-                    alt="Bräutigam mit Anzug und Fliege lächelnd">
-            </a>
-            <a class="gallery-item" href="../../images/portfolio/photography/hochzeit-04.jpeg">
-                <img src="../../images/portfolio/photography/hochzeit-04.jpeg"
-                    alt="Brautjungfern mit passenden Kleidern und Blumensträußen">
-            </a>
     </main>
 
-
-    <footer>
+        <footer>
         <nav class="footer-nav">
             <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
                 viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
@@ -304,96 +267,88 @@
     <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
 
-    <script type="text/javascript">
-        if (typeof lightGallery === 'function') {
-            const plugins = (typeof lgZoom !== 'undefined' && typeof lgThumbnail !== 'undefined') ? [lgZoom, lgThumbnail] : [];
-            const el1 = document.getElementById('lightgallery-masonry-street');
-            if (el1) {
-                lightGallery(el1, {
-                    plugins: plugins,
-                    selector: '.gallery-item',
-                    speed: 500,
-                    download: true,
-                    thumbnail: true,
-                    toggleThumb: true,
-                    zoom: true,
-                    counter: true,
-                    zoomFromOrigin: true,
-                    getCaptionFromTitleOrAlt: false
-                });
-            }
-        } else {
-            console.warn('lightGallery is not loaded.');
-        }
-    </script>
+    <script>
+        /**
+         * Konfiguration der Kategorien und Dateipfade
+         */
+        const categories = {
+            street: { prefix: 'street-', container: 'lightgallery-street', path: '../../images/portfolio/photography/' },
+            aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../../images/portfolio/photography/' },
+            portaet: { prefix: 'portraet-', container: 'lightgallery-portaet', path: '../../images/portfolio/photography/' },
+            hochzeit: { prefix: 'hochzeit-', container: 'lightgallery-hochzeit', path: '../../images/portfolio/photography/' }
+        };
 
-    <script type="text/javascript">
-        if (typeof lightGallery === 'function') {
-            const plugins = (typeof lgZoom !== 'undefined' && typeof lgThumbnail !== 'undefined') ? [lgZoom, lgThumbnail] : [];
-            const el1 = document.getElementById('lightgallery-masonry-aviation');
-            if (el1) {
-                lightGallery(el1, {
-                    plugins: plugins,
-                    selector: '.gallery-item',
-                    speed: 500,
-                    download: true,
-                    thumbnail: true,
-                    toggleThumb: true,
-                    zoom: true,
-                    counter: true,
-                    zoomFromOrigin: true,
-                    getCaptionFromTitleOrAlt: false
-                });
-            }
-        } else {
-            console.warn('lightGallery is not loaded.');
-        }
-    </script>
+        /**
+         * Lädt Bilder dynamisch in den Container
+         */
+        function loadImages(categoryId) {
+            const cat = categories[categoryId];
+            const container = document.getElementById(cat.container);
+            if (!container || container.dataset.loaded === "true") return;
 
-    <script type="text/javascript">
-        if (typeof lightGallery === 'function') {
-            const plugins = (typeof lgZoom !== 'undefined' && typeof lgThumbnail !== 'undefined') ? [lgZoom, lgThumbnail] : [];
-            const el1 = document.getElementById('lightgallery-masonry-portaet');
-            if (el1) {
-                lightGallery(el1, {
-                    plugins: plugins,
-                    selector: '.gallery-item',
-                    speed: 500,
-                    download: true,
-                    thumbnail: true,
-                    toggleThumb: true,
-                    zoom: true,
-                    counter: true,
-                    zoomFromOrigin: true,
-                    getCaptionFromTitleOrAlt: false
-                });
-            }
-        } else {
-            console.warn('lightGallery is not loaded.');
-        }
-    </script>
+            let index = 1;
 
-    <script type="text/javascript">
-        if (typeof lightGallery === 'function') {
-            const plugins = (typeof lgZoom !== 'undefined' && typeof lgThumbnail !== 'undefined') ? [lgZoom, lgThumbnail] : [];
-            const el1 = document.getElementById('lightgallery-masonry-hochzeit');
-            if (el1) {
-                lightGallery(el1, {
-                    plugins: plugins,
-                    selector: '.gallery-item',
-                    speed: 500,
-                    download: true,
-                    thumbnail: true,
-                    toggleThumb: true,
-                    zoom: true,
-                    counter: true,
-                    zoomFromOrigin: true,
-                    getCaptionFromTitleOrAlt: false
-                });
+            function tryLoadNext() {
+                const imgNum = index < 10 ? `0${index}` : index; // Formatiert 1 zu 01
+                const fileName = `${cat.prefix}${imgNum}.jpeg`;
+                const fullPath = cat.path + fileName;
+
+                const img = new Image();
+                img.onload = function () {
+                    // Bild existiert -> HTML Element erstellen
+                    const anchor = document.createElement('a');
+                    anchor.className = 'gallery-item';
+                    anchor.href = fullPath;
+                    anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} ${index}">`;
+                    container.appendChild(anchor);
+
+                    index++;
+                    tryLoadNext(); // Rekursion für das nächste Bild
+                };
+
+                img.onerror = function () {
+                    // Kein Bild mehr gefunden -> LightGallery für diesen Container initialisieren
+                    container.dataset.loaded = "true";
+                    initLightGallery(cat.container);
+                };
+
+                img.src = fullPath;
             }
-        } else {
-            console.warn('lightGallery is not loaded.');
+
+            tryLoadNext();
         }
+
+        /**
+         * Tab-Wechsel Logik
+         */
+        function showGallery(id) {
+            // Alle Sektionen verstecken
+            document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
+            // Alle Buttons deaktivieren
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Ziel-Sektion und Button aktivieren
+            document.getElementById('section-' + id).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Bilder laden (falls noch nicht geschehen)
+            loadImages(id);
+        }
+
+        function initLightGallery(id) {
+            const el = document.getElementById(id);
+            lightGallery(el, {
+                plugins: [lgZoom, lgThumbnail],
+                selector: '.gallery-item',
+                speed: 500,
+                licenseKey: '0000-0000-000-0000' // Falls du einen Key hast, sonst leer lassen
+            });
+        }
+
+        // Initial beim Laden die erste Kategorie laden
+        window.addEventListener('DOMContentLoaded', () => {
+            loadImages('street');
+        });
     </script>
 
 </body>
