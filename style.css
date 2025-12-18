@@ -1162,7 +1162,7 @@ main.max-width {
     }
 }
 
-@media only screen and (max-width: 1140px) {
+@media only screen and (max-width: 1200px) {
     .hero-h1 {
         font-size: 90px;
         line-height: 90px;
@@ -1173,7 +1173,7 @@ main.max-width {
     }
 }
 
-@media only screen and (max-width: 705px) {
+@media only screen and (max-width: 744px) {
     .hero-h2 {
         top: 390px;
     }
@@ -1289,7 +1289,7 @@ main.max-width {
 
 }
 
-@media only screen and (max-width: 438px) {
+@media only screen and (max-width: 466px) {
     .hero-h2 {
         top: 320px;
     }
