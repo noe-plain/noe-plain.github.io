@@ -679,7 +679,7 @@ footer {
     z-index: 1;
     width: calc(100vw - 18rem);
     max-width: calc(600px - 40px);
-    padding: 1rem;
+    padding: 14px;
     border: none;
     outline: none;
     border-radius: 30px;
@@ -750,7 +750,7 @@ footer {
 
 .autocomplete-list li:last-of-type {
     background: transparent;
-    margin-bottom: 16px;
+    margin-bottom: 15px;
 }
 
 @keyframes fadeInListItem {
@@ -1236,7 +1236,7 @@ main.max-width {
     .search-input {
         width: 100%;
         margin: 0;
-        padding: 15px 0;
+        padding: 13px 0 !important;
     }
 
     .autocomplete-wrapper {
