@@ -1184,6 +1184,10 @@ main.max-width {
 }
 
 @media only screen and (max-width: 600px) {
+    .detail-hero {
+        margin-top: 60px;
+    }
+
     .portfolio-grid {
         grid-template-columns: 1fr;
     }
@@ -1225,7 +1229,7 @@ main.max-width {
         top: 280px;
     }
 
-        .detail-hero-content h1 {
+    .detail-hero-content h1 {
         font-size: 50px !important;
     }
 
