@@ -4,11 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
-    <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../style.css">
-    <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
-    <meta http-equiv="cache-control" content="max-age=604800" />
+    <link rel="icon" type="image/x-icon" href="../../images/illustrationen/logos/favicon.png">
+    <title>Fotografie – Medien vom Noé</title>
+
+    <link rel="stylesheet" href="../../style.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-zoom.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-thumbnail.min.css">
+
+    <meta name="description" content="Case Study: Neugestaltung der Werbemittel für den Migros-Tech-Day.">
+
+    <style>
+        /* Container-Verhalten für Tabs */
+        .gallery-section {
+            display: none;
+            /* Verstecke alle Sektionen standardmäßig */
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .gallery-section.active {
+            display: block;
+            /* Zeige nur die aktive Sektion */
+        }
+
+        /* Page-Nav Styling als Reiter */
+        #page-nav {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            min-width: 0;
+            white-space: nowrap;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: -1px;
+        }
+
+        #page-nav::-webkit-scrollbar {
+            display: none;
+            height: 0;
+        }
+
+        #page-nav a.tab-btn {
+            flex: 0 0 auto;
+        }
+
+        @media (max-width: 800px) {
+            #page-nav {
+                min-width: 0 !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+            }
+
+            #page-nav::-webkit-scrollbar {
+                display: none;
+                height: 0;
+            }
+        }
+
+        #page-nav a.tab-btn {
+            background-color: transparent;
+            color: #333;
+            box-shadow: none;
+            border: 1px solid transparent;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+            margin-bottom: -1px;
+        }
+
+        #page-nav a.tab-btn:first-of-type {
+            margin-left: 0 !important;
+        }
+
+        #page-nav a.tab-btn.active {
+            background-color: #1f0033;
+            color: #fff;
+            border-color: #1f0033;
+        }
+
+        #page-nav a.tab-btn:hover:not(.active) {
+            background-color: #f0f0f0;
+            border-color: #ddd;
+        }
+
+        /* Animation für den Tab-Wechsel */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Masonry Fallback für dynamische Inhalte */
+        .project-gallery {
+            column-count: 3;
+            /* Erzwingt Spalten-Layout */
+            column-gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .project-gallery {
+                column-count: 2;
+            }
+
+            #page-nav {
+                min-width: min-content;
+                overflow: scroll;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .project-gallery {
+                column-count: 1;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -18,16 +144,16 @@
             <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
                 <span></span>
                 <span></span>
-                <span></span>
+                <span id="small-bar"></span>
             </button>
         </nav>
-
         <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
         <nav class="hamburger-nav-overlay" id="hamburgerNav">
             <div class="hamburger-nav-links">
-                <a class="hamburger-nav-link" href="../search.html">Search</a>
+                <a class="hamburger-nav-link" href="../search.html">Search &#8197; &#128270;</a>
+                <hr>
                 <a class="hamburger-nav-link" href="../index.html">Medien von Noé</a>
-                <a class="hamburger-nav-link" href="../index.html#portfolio">Projekte</a>
+                <a class="hamburger-nav-link" href="../index.html#portfolio">Portfolio</a>
                 <a class="hamburger-nav-link" href="../index.html#about">Das bin ich</a>
                 <a class="hamburger-nav-link" href="../index.html#contact">Kontakt</a>
             </div>
@@ -35,42 +161,62 @@
     </header>
 
     <main class="max-width">
-
-        <div class="projekte-hero"
-            style="background-image: url(../images/kategorien/fotografie.jpg); background-position: 80% 40%;">
-            <h1 class="hero-h1"><span>Fotografie</span></h1>
-            <h2 class="hero-h2 h-klein" style="color: #fff; position: static; margin-top: 1rem;">
-                Eine kuratierte Sammlung meiner Arbeiten.
-            </h2>
+                <div class="detail-hero max" style="background-image: url(../images/portfolio/photography/hero-image.jpeg);">
+            <div class="detail-hero-overlay"></div>
+            <div class="detail-hero-content max-width">
+                <h1>Photo&shy;graphy</h1>
+                <p class="detail-hero-beschreibung">
+                    Die Fotografie iste eine meiner Grossen Leidenschaften. Ob Street Photography, Luftfahrt, Porträts
+                    oder Events wie Hochzeiten – ich liebe es, Momente einzufangen und Geschichten durch Bilder zu
+                    erzählen.
+                </p>
+                <div class="projekt-kurzinfo">
+                    <ul>
+                        <li><strong>Rolle:</strong> Fotograf</li>
+                        <li><strong>Equipment:</strong> Sony A7C II & Canon R6 MII</li>
+                        <li><strong>Tools:</strong> Lightroom, Photoshop</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <div class="project-gallery">
-
-            <a href="./fotografie/street.html" class="projekt-karte">
-                <img src="../images/portfolio/street-photography/hero-image.jpeg" alt="Design-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 5/7;">
-                <h3>Migros-Tech-Day Neugestaltung</h3>
-                <p>Komplette Neugestaltung aller Werbemittel (digital und print) für den internen Migros-Tech-Day 2024.
-                    Ziel war es, ein frisches, modernes und tech-affines Branding zu entwickeln.</p>
-                <ul>
-                    <li><strong>Rolle:</strong> Lead Design & Konzeption</li>
-                    <li><strong>Tools:</strong> Adobe Illustrator, Photoshop, InDesign</li>
-                </ul>
-            </a>
-
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/fotografie.jpg" alt="Fotografie-Beispiel" class="projekt-bild"
-                    style="aspect-ratio: 7/5;">
-                <h3>Fotografie-Serie: "Alpen-Stille"</h3>
-                <p>Eine persönliche Fotografie-Serie, die die Stille und Majestät der Schweizer Alpen in den frühen
-                    Morgenstunden einfängt.</p>
-            </a>
-
+        <div id="page-nav">
+            <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portaet')">Porträt</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('bts')">BTS</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('event')">Event</a>
         </div>
 
+        <div id="gallery-container">
+            <div id="section-street" class="gallery-section active">
+                <h2>Street Photography</h2>
+                <div id="lightgallery-street" class="project-gallery"></div>
+            </div>
+
+            <div id="section-aviation" class="gallery-section">
+                <h2>Aviation</h2>
+                <div id="lightgallery-aviation" class="project-gallery"></div>
+            </div>
+
+            <div id="section-portaet" class="gallery-section">
+                <h2>Porträt</h2>
+                <div id="lightgallery-portaet" class="project-gallery"></div>
+            </div>
+
+            <div id="section-bts" class="gallery-section">
+                <h2>BTS</h2>
+                <div id="lightgallery-bts" class="project-gallery"></div>
+            </div>
+
+            <div id="section-event" class="gallery-section">
+                <h2>Event</h2>
+                <div id="lightgallery-event" class="project-gallery"></div>
+            </div>
+        </div>
     </main>
 
-    <footer>
+        <footer>
         <nav class="footer-nav">
             <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
                 viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
@@ -122,6 +268,95 @@
             document.getElementById('hamburgerNavBg').classList.remove('open');
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
+
+    <script>
+        /**
+         * Konfiguration der Kategorien und Dateipfade
+         */
+        const categories = {
+            street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
+            aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
+            portaet: { prefix: 'portraet-', container: 'lightgallery-portaet', path: '../images/portfolio/photography/' },
+            bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
+            event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
+        };
+
+        /**
+         * Lädt Bilder dynamisch in den Container
+         */
+        function loadImages(categoryId) {
+            const cat = categories[categoryId];
+            const container = document.getElementById(cat.container);
+            if (!container || container.dataset.loaded === "true") return;
+
+            let index = 1;
+
+            function tryLoadNext() {
+                const imgNum = index < 10 ? `0${index}` : index; // Formatiert 1 zu 01
+                const fileName = `${cat.prefix}${imgNum}.jpeg`;
+                const fullPath = cat.path + fileName;
+
+                const img = new Image();
+                img.onload = function () {
+                    // Bild existiert -> HTML Element erstellen
+                    const anchor = document.createElement('a');
+                    anchor.className = 'gallery-item';
+                    anchor.href = fullPath;
+                    anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} ${index}">`;
+                    container.appendChild(anchor);
+
+                    index++;
+                    tryLoadNext(); // Rekursion für das nächste Bild
+                };
+
+                img.onerror = function () {
+                    // Kein Bild mehr gefunden -> LightGallery für diesen Container initialisieren
+                    container.dataset.loaded = "true";
+                    initLightGallery(cat.container);
+                };
+
+                img.src = fullPath;
+            }
+
+            tryLoadNext();
+        }
+
+        /**
+         * Tab-Wechsel Logik
+         */
+        function showGallery(id) {
+            // Alle Sektionen verstecken
+            document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
+            // Alle Buttons deaktivieren
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Ziel-Sektion und Button aktivieren
+            document.getElementById('section-' + id).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Bilder laden (falls noch nicht geschehen)
+            loadImages(id);
+        }
+
+        function initLightGallery(id) {
+            const el = document.getElementById(id);
+            lightGallery(el, {
+                plugins: [lgZoom, lgThumbnail],
+                selector: '.gallery-item',
+                speed: 500,
+            });
+        }
+
+        // Initial beim Laden die erste Kategorie laden
+        window.addEventListener('DOMContentLoaded', () => {
+            loadImages('street');
+        });
+    </script>
+
 </body>
 
 </html>
