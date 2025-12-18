@@ -37,13 +37,13 @@
             overflow-y: hidden;
             flex-wrap: nowrap;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; 
+            scrollbar-width: none;
             -ms-overflow-style: none;
             min-width: 0;
             white-space: nowrap;
             display: flex;
             gap: 10px;
-            margin-bottom: 3rem;
+            marfixedin-bottom: 3rem;
             border-bottom: 1px solid #ddd;
             padding-bottom: -1px;
         }
@@ -63,6 +63,7 @@
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
                 scrollbar-width: none !important;
+                -webkit-overflow-scrolling: none !important;
                 -ms-overflow-style: none !important;
             }
 
@@ -93,9 +94,92 @@
             border-color: #1f0033;
         }
 
+        /* Linker Gradient-Overlay für die Seiten-Navigation */
+        #page-nav-left-gradient {
+            position: fixed;
+            z-index: 61;
+            width: 48px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            line-height: 1;
+            color: #1f0033;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            pointer-events: auto;
+            background: linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, #f7f7f7aa 50%, #f7f7f7 95%);
+            transition: opacity .18s ease, transform .18s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #page-nav-left-gradient {
+                color: #fff;
+                background: linear-gradient(270deg, rgba(31, 0, 51, 0) 0%, #1f0033 100%);
+            }
+        }
+
+        /* verstecken, wenn am Anfang */
+        #page-nav-left-gradient.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-6px);
+        }
+
+        @media (max-width: 420px) {
+            #page-nav-left-gradient {
+                width: 40px;
+                font-size: 20px;
+            }
+        }
+
         #page-nav a.tab-btn:hover:not(.active) {
-            background-color: #f0f0f0;
+            background-color: #f7f7f7;
             border-color: #ddd;
+        }
+
+        #page-nav-scroll-btn {
+            position: fixed;
+            z-index: 60;
+            width: 48px;
+            height: 43px;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            line-height: 1;
+            color: #1f0033;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: none;
+            transition: opacity .18s ease, transform .18s ease;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #f7f7f7aa 50%, #f7f7f7 95%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #page-nav-scroll-btn {
+                color: #fff;
+                background: linear-gradient(90deg, rgba(31, 0, 51, 0) 0%, #1f0033 100%);
+            }
+        }
+
+        /* versteckt, wenn nicht gebraucht */
+        #page-nav-scroll-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(6px);
+        }
+
+        /* kleineres Icon auf sehr kleinen Bildschirmen */
+        @media (max-width: 420px) {
+            #page-nav-scroll-btn {
+                width: 40px;
+                font-size: 20px;
+            }
         }
 
         /* Animation für den Tab-Wechsel */
@@ -134,6 +218,7 @@
                 column-count: 1;
             }
         }
+
         /* Loader-Styling */
         #loader {
             position: fixed;
@@ -144,7 +229,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.8);
             z-index: 9999;
         }
 
@@ -161,10 +246,10 @@
         .spinner {
             width: 48px;
             height: 48px;
-            border: 5px solid rgba(31,0,51,0.12);
+            border: 5px solid rgba(31, 0, 51, 0.12);
             border-top-color: #1f0033;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1.7s linear infinite;
             margin: 0 auto 10px auto;
         }
 
@@ -174,7 +259,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -203,12 +290,12 @@
     </header>
 
     <main class="max-width">
-                <div class="detail-hero max" style="background-image: url(../images/portfolio/photography/hero-image.jpeg);">
+        <div class="detail-hero max" style="background-image: url(../images/portfolio/photography/hero-image.jpeg);">
             <div class="detail-hero-overlay"></div>
             <div class="detail-hero-content max-width">
                 <h1>Photo&shy;graphy</h1>
                 <p class="detail-hero-beschreibung">
-                    Die Fotografie iste eine meiner Grossen Leidenschaften. Ob Street Photography, Luftfahrt, Porträts
+                    Die Fotografie ist eine meiner Grossen Leidenschaften. Ob Street Photography, Luftfahrt, Porträts
                     oder Events wie Hochzeiten – ich liebe es, Momente einzufangen und Geschichten durch Bilder zu
                     erzählen.
                 </p>
@@ -222,6 +309,10 @@
             </div>
         </div>
 
+        <div id="page-nav-left-gradient" class="hidden" aria-hidden="true" title="Zurück" role="button" tabindex="0">
+            &lt;</div>
+        <button id="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr">&gt;</button>
+
         <div id="page-nav">
             <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
             <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portaet')">Porträt</a>
@@ -231,25 +322,26 @@
         </div>
 
         <div id="gallery-container">
-            <!-- Loader: sichtbar während Bilder geladen werden -->
+
             <div id="loader" aria-hidden="true">
                 <div class="loader-inner">
                     <div class="spinner" aria-hidden="true"></div>
                     <div class="loader-text">Bilder werden geladen…</div>
                 </div>
             </div>
+
             <div id="section-street" class="gallery-section active">
-                <h2>Street Photography</h2>
+                <h2>Street Photo&shy;graphy</h2>
                 <div id="lightgallery-street" class="project-gallery"></div>
             </div>
 
             <div id="section-aviation" class="gallery-section">
-                <h2>Aviation</h2>
+                <h2>Aviation Photo&shy;graphy</h2>
                 <div id="lightgallery-aviation" class="project-gallery"></div>
             </div>
 
             <div id="section-portaet" class="gallery-section">
-                <h2>Porträt</h2>
+                <h2>Porträt Foto&shy;grafie</h2>
                 <div id="lightgallery-portaet" class="project-gallery"></div>
             </div>
 
@@ -259,13 +351,13 @@
             </div>
 
             <div id="section-event" class="gallery-section">
-                <h2>Event</h2>
+                <h2>Event Photo&shy;graphy</h2>
                 <div id="lightgallery-event" class="project-gallery"></div>
             </div>
         </div>
     </main>
 
-        <footer>
+    <footer>
         <nav class="footer-nav">
             <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
                 viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
@@ -402,6 +494,12 @@
                 plugins: [lgZoom, lgThumbnail],
                 selector: '.gallery-item',
                 speed: 500,
+                download: true,
+                zoom: true,
+                thumbnail: true,
+                actualSize: true,
+                altText: false,
+                closeOnTap: true,
             });
             // sicherstellen, dass Loader verborgen ist
             hideLoader();
@@ -422,6 +520,97 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadImages('street');
         });
+    </script>
+
+    <script>
+        (function () {
+            const nav = document.getElementById('page-nav');
+            const btn = document.getElementById('page-nav-scroll-btn');
+            if (!nav || !btn) return;
+
+            // Positioniert Button an der rechten Kante von #page-nav und passt Höhe an
+            function updateBtn() {
+                const rect = nav.getBoundingClientRect();
+                // vertikal zentrieren und Höhe an die Nav-Höhe anpassen
+                btn.style.top = (rect.top + (rect.height / 2) - (btn.offsetHeight / 2)) + 'px';
+                btn.style.left = (rect.right - btn.offsetWidth) + 'px';
+                btn.style.height = Math.max(40, rect.height) + 'px';
+
+                const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
+                // Button nur zeigen, wenn noch gescrollt werden kann
+                if (maxScrollLeft > 5 && nav.scrollLeft < maxScrollLeft - 5) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+
+            // Klick scrollt die Nav um einen großen Schritt nach rechts
+            function scrollNav() {
+                const amount = Math.max(200, nav.clientWidth * 0.6);
+                nav.scrollBy({ left: amount, behavior: 'smooth' });
+                // nach dem Scroll kurz aktualisieren
+                setTimeout(updateBtn, 420);
+            }
+
+            // Events
+            btn.addEventListener('click', scrollNav);
+            nav.addEventListener('scroll', updateBtn);
+            window.addEventListener('resize', updateBtn);
+            window.addEventListener('scroll', updateBtn);
+            window.addEventListener('orientationchange', updateBtn);
+            // ResizeObserver, damit sich Button an Änderungen der Nav-Grösse anpasst
+            if (window.ResizeObserver) {
+                new ResizeObserver(updateBtn).observe(nav);
+            }
+
+            // initial
+            window.requestAnimationFrame(updateBtn);
+            window.addEventListener('load', updateBtn);
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const nav = document.getElementById('page-nav');
+            const leftGrad = document.getElementById('page-nav-left-gradient');
+            if (!nav || !leftGrad) return;
+
+            function updateLeftGradient() {
+                const rect = nav.getBoundingClientRect();
+                leftGrad.style.top = (rect.top + (rect.height / 2) - (leftGrad.offsetHeight / 2)) + 'px';
+                leftGrad.style.left = (rect.left) + 'px';
+                leftGrad.style.height = Math.max(40, rect.height) + 'px';
+
+                if (nav.scrollLeft > 5) {
+                    leftGrad.classList.remove('hidden');
+                } else {
+                    leftGrad.classList.add('hidden');
+                }
+            }
+
+            leftGrad.addEventListener('click', () => {
+                const amount = Math.max(200, nav.clientWidth * 0.6);
+                nav.scrollBy({ left: -amount, behavior: 'smooth' });
+                setTimeout(updateLeftGradient, 420);
+            });
+
+            leftGrad.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    leftGrad.click();
+                }
+            });
+
+            nav.addEventListener('scroll', updateLeftGradient);
+            window.addEventListener('resize', updateLeftGradient);
+            window.addEventListener('scroll', updateLeftGradient);
+            window.addEventListener('orientationchange', updateLeftGradient);
+            if (window.ResizeObserver) new ResizeObserver(updateLeftGradient).observe(nav);
+
+            window.requestAnimationFrame(updateLeftGradient);
+            window.addEventListener('load', updateLeftGradient);
+        })();
     </script>
 
 </body>
