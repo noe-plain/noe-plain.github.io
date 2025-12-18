@@ -182,9 +182,10 @@
 
         <div id="page-nav">
             <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
             <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portaet')">Porträt</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('hochzeit')">Hochzeit</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('bts')">BTS</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('event')">Event</a>
         </div>
 
         <div id="gallery-container">
@@ -203,9 +204,14 @@
                 <div id="lightgallery-portaet" class="project-gallery"></div>
             </div>
 
-            <div id="section-hochzeit" class="gallery-section">
-                <h2>Hochzeit</h2>
-                <div id="lightgallery-hochzeit" class="project-gallery"></div>
+            <div id="section-bts" class="gallery-section">
+                <h2>BTS</h2>
+                <div id="lightgallery-bts" class="project-gallery"></div>
+            </div>
+
+            <div id="section-event" class="gallery-section">
+                <h2>Event</h2>
+                <div id="lightgallery-event" class="project-gallery"></div>
             </div>
         </div>
     </main>
@@ -275,7 +281,8 @@
             street: { prefix: 'street-', container: 'lightgallery-street', path: '../../images/portfolio/photography/' },
             aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../../images/portfolio/photography/' },
             portaet: { prefix: 'portraet-', container: 'lightgallery-portaet', path: '../../images/portfolio/photography/' },
-            hochzeit: { prefix: 'hochzeit-', container: 'lightgallery-hochzeit', path: '../../images/portfolio/photography/' }
+            bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../../images/portfolio/photography/' },
+            event: { prefix: 'event-', container: 'lightgallery-event', path: '../../images/portfolio/photography/' },
         };
 
         /**
@@ -341,7 +348,6 @@
                 plugins: [lgZoom, lgThumbnail],
                 selector: '.gallery-item',
                 speed: 500,
-                licenseKey: '0000-0000-000-0000' // Falls du einen Key hast, sonst leer lassen
             });
         }
 
