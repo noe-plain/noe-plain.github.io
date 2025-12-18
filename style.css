@@ -33,6 +33,7 @@
     font-style: normal;
 }
 
+
 /* ======================================== */
 /* 1. Globale Stile & Resets                */
 /* Hamburger Button */
@@ -54,12 +55,18 @@
 .hamburger-btn span {
     display: block;
     width: 20px;
-    height: 3px;
+    height: 3.5px;
     margin: 2.5px 0;
     background: #333;
     border-radius: 2px;
     transition: 0.3s;
 }
+
+.hamburger-btn #small-bar {
+    width: 13px !important;
+    margin-left: 7px !important;
+}
+
 
 /* Hamburger Nav Overlay */
 .hamburger-nav-overlay {
@@ -229,6 +236,12 @@ header {
     backdrop-filter: blur(7px) saturate(200%) brightness(110%);
     -webkit-backdrop-filter: blur(7px) saturate(180%) brightness(110%);
     border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+nav hr {
+    margin: -7px 15px;
+    border-left: 1px solid #ddd;
+    width: 30px;
 }
 
 .logo-a {
@@ -824,9 +837,33 @@ footer {
 }
 
 .project-gallery {
+    margin: 20px 0 0 0;
     column-width: 400px;
     column-gap: 30px;
     margin-bottom: 4rem;
+}
+
+.project-gallery img {
+    transform: scale(1);
+    transition: transform 0.3s ease;
+    -webkit-transition: transform 0.3s ease;
+    border-radius: 30px 0 30px 30px !important;
+}
+
+.project-gallery img:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    -webkit-transition: transform 0.3s ease;
+}
+
+.project-gallery a {
+    text-decoration: none;
+    border-radius: 30px 0 30px 30px !important;
+}
+
+.project-gallery a:hover {
+    text-decoration: none;
+    border-radius: 30px 0 30px 30px !important;
 }
 
 .projekt-karte {
@@ -938,6 +975,27 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+#page-nav {
+    margin: 20px 0 40px 0;
+}
+
+#page-nav a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    background-color: #3a0055;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: #e4e4e4 0px 2px 7px;
+    border-radius: 8px;
+    font-family: 'switzer', switzer, sans-serif;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+#page-nav a:hover {
+    background-color: #1f0033;
+}
+
 /* ======================================== */
 /* 8. Komponenten (Projekt-Detailseite)    */
 /* ======================================== */
@@ -952,8 +1010,10 @@ footer {
     background-position: center;
     color: #fff;
 
+    text-shadow: #00000050 15px;
+
     border-radius: 30px 0 30px 30px;
-    margin: 4rem 0;
+    margin: 120px 0 4rem 0;
     overflow: hidden;
 }
 
@@ -963,10 +1023,9 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.65);
-    /* Anpassung an Ihre Markenfarbe */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
 }
 
 .detail-hero-content {
@@ -998,22 +1057,21 @@ footer {
 
 .detail-hero .projekt-kurzinfo {
     background-color: rgba(255, 255, 255, 0.1);
-    /* Hellere, lesbarere Anpassung */
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(100, 100, 100, 0.2);
     margin-top: 2rem;
 }
 
-/* Hauptinhalts-Container braucht kein oberes Padding mehr,
-   da .detail-hero seinen eigenen Margin hat 
-*/
+.projekt-kurzinfo {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
 main.max-width {
     padding-bottom: 4rem;
 }
 
 .text-content {
-    /* max-width: 800px;  <-- Diese Zeile wird entfernt, um die volle Breite zu nutzen */
     margin: 0 0 4rem 0;
-    /* <-- Geändert von '0 auto 4rem auto' */
 }
 
 .text-content p {
@@ -1180,6 +1238,10 @@ main.max-width {
         top: 280px;
     }
 
+        .detail-hero-content h1 {
+        font-size: 50px !important;
+    }
+
     .max-width {
         padding: 70px 40px;
     }
@@ -1237,6 +1299,7 @@ main.max-width {
     .portfolio-card-large {
         padding: 20px 35px;
     }
+
 }
 
 @media only screen and (max-width: 438px) {
