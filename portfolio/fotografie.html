@@ -323,7 +323,7 @@
 
         <div id="page-nav">
             <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portaet')">Porträt</a>
+            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portraet')">Porträt</a>
             <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
             <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('bts')">BTS</a>
             <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('event')">Event</a>
@@ -348,9 +348,9 @@
                 <div id="lightgallery-aviation" class="project-gallery"></div>
             </div>
 
-            <div id="section-portaet" class="gallery-section">
+            <div id="section-portraet" class="gallery-section">
                 <h2>Porträt Foto&shy;grafie</h2>
-                <div id="lightgallery-portaet" class="project-gallery"></div>
+                <div id="lightgallery-portraet" class="project-gallery"></div>
             </div>
 
             <div id="section-bts" class="gallery-section">
@@ -429,7 +429,7 @@
         const categories = {
             street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
             aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
-            portaet: { prefix: 'portraet-', container: 'lightgallery-portaet', path: '../images/portfolio/photography/' },
+            portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
             bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
             event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
         };
@@ -524,7 +524,57 @@
             if (l) l.classList.remove('visible');
         }
 
-        // Initial beim Laden die erste Kategorie laden
+        // Initial beim Laden die erste Kategorie laden (jetzt basierend auf URL)
+        function initCategoryFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            let desired = '';
+
+            // Unterstütze sowohl ?tab=value als auch ?value (key-only)
+            if (params.has('tab')) {
+                desired = params.get('tab') || '';
+            } else {
+                // erster Key (bei ?value ist 'value' der Key mit leerem Wert)
+                const firstKey = Array.from(params.keys())[0];
+                if (firstKey) {
+                    desired = firstKey;
+                } else {
+                    // Fallback: rohe Suche verarbeiten (z.B. ?value ohne Key=Value)
+                    const raw = (window.location.search || '').replace(/^\?/, '');
+                    if (raw) desired = decodeURIComponent(raw.split('&')[0].split('=')[0] || '');
+                }
+            }
+
+            if (!desired && window.location.hash) {
+                desired = window.location.hash.replace('#', '');
+            }
+
+            desired = (desired || '').trim().toLowerCase();
+
+            // Fallback auf 'street' wenn nichts oder ungültig
+            if (!Object.keys(categories).includes(desired)) {
+                desired = 'street';
+            }
+
+            // Tab-Button mit passendem onclick finden und echten Klick simulieren,
+            // damit showGallery event.currentTarget korrekt hat
+            const btn = document.querySelector(`a.tab-btn[onclick="showGallery('${desired}')"]`);
+            if (btn) {
+                btn.click();
+            } else {
+                // Fallback: nur Bilder laden und Sektion/Buttons manuell setzen
+                loadImages(desired);
+                document.querySelectorAll('.gallery-section').forEach(s => s.classList.remove('active'));
+                const sec = document.getElementById('section-' + desired);
+                if (sec) sec.classList.add('active');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                const fallbackBtn = document.querySelector(`a.tab-btn[onclick="showGallery('${desired}')"]`) ||
+                                    document.querySelector(`a.tab-btn[onclick="showGallery('street')"]`);
+                if (fallbackBtn) fallbackBtn.classList.add('active');
+            }
+        }
+
+        // beim Laden ausführen
+        window.addEventListener('DOMContentLoaded', initCategoryFromUrl);
         window.addEventListener('DOMContentLoaded', () => {
             loadImages('street');
         });
