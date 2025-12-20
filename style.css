@@ -838,9 +838,11 @@ footer {
 
 .project-gallery {
     margin: 20px 0 0 0;
-    column-width: 400px;
-    column-gap: 30px;
-    margin-bottom: 4rem;
+    /* Grid-fallback: zwei Spalten, konsistenter gap */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;               /* engerer Abstand (früher 20/30) */
+    grid-auto-rows: 8px;     /* Basishöhe für row-spans */
 }
 
 .project-gallery a {

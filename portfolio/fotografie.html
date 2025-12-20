@@ -158,16 +158,21 @@
             }
         }
 
-        /* Masonry Fallback für dynamische Inhalte */
+        /* Masonry: Grid-basiertes, deterministisches Layout (1.,2. Bild: Reihe 1 Spalten 1/2; 3.,4. Bild: Reihe 2 Spalten 1/2 usw.) */
         .project-gallery {
-            column-count: 3;
-            /* Erzwingt Spalten-Layout */
-            column-gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            align-items: start;
+            /* Basis-Rasterhöhe für row-spans (kleine Einheit für präzise Spans) */
+            grid-auto-rows: 8px;
+            /* Reihenweises Füllen behält die Reihenfolge 1→2 per row */
+            grid-auto-flow: row;
         }
 
         @media (max-width: 800px) {
             .project-gallery {
-                column-count: 2;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             #page-nav {
@@ -178,7 +183,7 @@
 
         @media (max-width: 600px) {
             .project-gallery {
-                column-count: 1;
+                grid-template-columns: 1fr;
             }
         }
 
@@ -392,31 +397,78 @@
         };
 
         /**
-         * Lädt Bilder dynamisch in den Container
+         * Hilfsfunktionen für Masonry
+         */
+        function getColumnCount(container) {
+            const cols = getComputedStyle(container).gridTemplateColumns;
+            return cols ? cols.split(' ').length : 2;
+        }
+
+        function computeSpan(img, itemWidth, rowHeight, gap) {
+            // Bildhöhe berechnen (falls noch nicht gerendert)
+            const imgNaturalW = img.naturalWidth || img.width;
+            const imgNaturalH = img.naturalHeight || img.height;
+            const displayHeight = img.getBoundingClientRect().height || (imgNaturalH * (itemWidth / imgNaturalW));
+            const span = Math.max(1, Math.ceil((displayHeight + gap) / (rowHeight + gap)));
+            return span;
+        }
+
+        /**
+         * Relayout: weist jedem Item span und Spalte zu (kürzere Spalte bekommt das nächste Item)
+         */
+        function relayoutGrid(container) {
+            if (!container) return;
+            const rowHeight = parseFloat(getComputedStyle(container).getPropertyValue('grid-auto-rows')) || 8;
+            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 16;
+            const cols = getColumnCount(container);
+            const colHeights = new Array(cols).fill(0);
+
+            // Elemente in DOM-Reihenfolge durchgehen und Spalte/span setzen
+            container.querySelectorAll('.gallery-item').forEach(item => {
+                const img = item.querySelector('img');
+                if (!img) return;
+
+                // Breite des Items (eine Spalte)
+                const itemWidth = Math.floor(container.clientWidth / cols) - ( (cols - 1) * gap / cols );
+                const span = computeSpan(img, itemWidth, rowHeight, gap);
+
+                // Zielspalte: die momentan kürzeste Spalte
+                let targetCol = 0;
+                for (let c = 1; c < colHeights.length; c++) {
+                    if (colHeights[c] < colHeights[targetCol]) targetCol = c;
+                }
+
+                // Setze CSS-Grid-Positionen
+                item.style.gridColumnStart = String(targetCol + 1);
+                item.style.gridRowEnd = 'span ' + span;
+
+                // Erhöhe die Spaltenhöhe (in Einheiten px)
+                colHeights[targetCol] += (span * (rowHeight + gap));
+            });
+        }
+
+        /**
+         * Lädt Bilder dynamisch in den Container (setzt Item und ruft relayout auf)
          */
         function loadImages(categoryId) {
             const cat = categories[categoryId];
             const container = document.getElementById(cat.container);
             if (!container) return;
 
-            // Bereits abgeschlossen oder aktuell in Arbeit -> nichts tun
             if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
 
-            // Loader anzeigen und Ladesperre setzen
             container.dataset.loading = "true";
             showLoader();
 
             let index = 1;
 
             function tryLoadNext() {
-                const imgNum = index < 10 ? `0${index}` : index; // Formatiert 1 zu 01
+                const imgNum = index < 10 ? `0${index}` : index;
                 const fileName = `${cat.prefix}${imgNum}.jpeg`;
                 const fullPath = cat.path + fileName;
 
-                // Schutz: falls dieses Bild bereits vorhanden ist, überspringen
                 if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
                     index++;
-                    // kleiner Schutz gegen endlose Rekursion
                     if (index > 999) {
                         container.dataset.loaded = "true";
                         container.dataset.loading = "false";
@@ -430,23 +482,28 @@
 
                 const img = new Image();
                 img.onload = function () {
-                    // Bild existiert -> HTML Element erstellen
                     const anchor = document.createElement('a');
                     anchor.className = 'gallery-item';
                     anchor.href = fullPath;
                     anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} ${index}">`;
+
                     container.appendChild(anchor);
 
+                    // Warten bis Bild im Layout ist, dann relayout
+                    requestAnimationFrame(() => {
+                        // Falls Bild noch nicht gerendert, ein weiteres frame
+                        requestAnimationFrame(() => relayoutGrid(container));
+                    });
+
                     index++;
-                    tryLoadNext(); // Rekursion für das nächste Bild
+                    tryLoadNext();
                 };
 
                 img.onerror = function () {
-                    // Kein Bild mehr gefunden -> LightGallery für diesen Container initialisieren
                     container.dataset.loaded = "true";
                     container.dataset.loading = "false";
-                    // Loader ausblenden und LightGallery initialisieren
                     hideLoader();
+                    relayoutGrid(container);
                     initLightGallery(cat.container);
                 };
 
@@ -549,6 +606,20 @@
                 if (fallbackBtn) fallbackBtn.classList.add('active');
             }
         }
+
+        // Debounced Resize / Orientation: relayout für alle Container
+        (function () {
+            let resizeTimer;
+            function onResize() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+                }, 120);
+            }
+            window.addEventListener('resize', onResize);
+            window.addEventListener('orientationchange', onResize);
+            window.addEventListener('load', () => document.querySelectorAll('.project-gallery').forEach(relayoutGrid));
+        })();
 
         // beim Laden ausführen
         window.addEventListener('DOMContentLoaded', initCategoryFromUrl);
