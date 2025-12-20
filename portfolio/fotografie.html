@@ -501,59 +501,84 @@
                 // fallback: ignore init errors
                 console.warn('lightGallery init failed', e);
             }
-            hideLoader();
+            // loader wird per loadImages/hideLoader(containerId) beendet — nicht hier
         }
 
-        function showLoader() { document.getElementById('loader')?.classList.add('visible'); }
-        function hideLoader() { document.getElementById('loader')?.classList.remove('visible'); }
+        // Tracke mehrere gleichzeitige Gallery-Loads; erst ausblenden, wenn alle fertig sind
+        function showLoader(id) {
+            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+            const key = id || '__global';
+            window.__activeGalleryLoads.add(key);
+            document.getElementById('loader')?.classList.add('visible');
+        }
+
+        function hideLoader(id) {
+            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+            const key = id || '__global';
+            window.__activeGalleryLoads.delete(key);
+            if (window.__activeGalleryLoads.size === 0) {
+                document.getElementById('loader')?.classList.remove('visible');
+            }
+        }
 
         function loadImages(categoryId) {
             const cat = categories[categoryId];
             const container = document.getElementById(cat.container);
             if (!container) return;
             if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+
             container.dataset.loading = "true";
-            showLoader();
+            showLoader(cat.container);
+
             let index = 1;
+
             function tryLoadNext() {
                 const imgNum = index < 10 ? `0${index}` : index;
                 const fileName = `${cat.prefix}${imgNum}.jpeg`;
                 const fullPath = cat.path + fileName;
+
                 if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
                     index++;
                     if (index > 999) {
                         container.dataset.loaded = "true";
                         container.dataset.loading = "false";
-                        hideLoader();
+                        hideLoader(cat.container);
                         initLightGallery(cat.container);
                         return;
                     }
                     tryLoadNext();
                     return;
                 }
+
                 const img = new Image();
                 img.onload = function () {
                     const anchor = document.createElement('a');
                     anchor.className = 'gallery-item';
                     anchor.href = fullPath;
                     anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} ${index}">`;
+
                     container.appendChild(anchor);
-                    // small delay to ensure browser computed sizes
+
+                    // sicherstellen, dass Bild gerendert ist, dann relayout
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => relayoutGrid(container));
                     });
+
                     index++;
                     tryLoadNext();
                 };
+
                 img.onerror = function () {
                     container.dataset.loaded = "true";
                     container.dataset.loading = "false";
-                    hideLoader();
+                    hideLoader(cat.container);
                     relayoutGrid(container);
                     initLightGallery(cat.container);
                 };
+
                 img.src = fullPath;
             }
+
             tryLoadNext();
         }
 
