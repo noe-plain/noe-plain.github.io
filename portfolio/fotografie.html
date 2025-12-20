@@ -162,7 +162,7 @@
         .project-gallery {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 10px;
             align-items: start;
             /* Basis-Rasterhöhe für row-spans (kleine Einheit für präzise Spans) */
             grid-auto-rows: 8px;
@@ -419,7 +419,7 @@
         function relayoutGrid(container) {
             if (!container) return;
             const rowHeight = parseFloat(getComputedStyle(container).getPropertyValue('grid-auto-rows')) || 8;
-            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 16;
+            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
             const cols = getColumnCount(container);
             const colHeights = new Array(cols).fill(0);
 
@@ -429,7 +429,7 @@
                 if (!img) return;
 
                 // Breite des Items (eine Spalte)
-                const itemWidth = Math.floor(container.clientWidth / cols) - ( (cols - 1) * gap / cols );
+                const itemWidth = Math.floor(container.clientWidth / cols) - ((cols - 1) * gap / cols);
                 const span = computeSpan(img, itemWidth, rowHeight, gap);
 
                 // Zielspalte: die momentan kürzeste Spalte

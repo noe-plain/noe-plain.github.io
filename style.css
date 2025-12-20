@@ -477,7 +477,7 @@ footer {
 .portfolio-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr;
-    gap: 30px;
+    gap: 10px;
 }
 
 .portfolio-card-large {
@@ -841,8 +841,9 @@ footer {
     /* Grid-fallback: zwei Spalten, konsistenter gap */
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;               /* engerer Abstand (früher 20/30) */
-    grid-auto-rows: 8px;     /* Basishöhe für row-spans */
+    gap: 10px;
+    grid-auto-rows: 8px;
+    /* Basishöhe für row-spans */
 }
 
 .project-gallery a {
