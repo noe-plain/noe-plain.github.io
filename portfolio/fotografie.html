@@ -93,58 +93,6 @@
             border-color: #1f0033;
         }
 
-        /* ersetze die bisherigen separaten Regeln für #page-nav-left-gradient und #page-nav-scroll-btn
-           durch eine gemeinsame, einheitliche Klasse, die den Hintergrund von der Seite erbt.
-           Dadurch stimmen die Buttons immer mit dem Seiten-Hintergrund überein und kein violett mehr. */
-        .page-nav-scroll-btn {
-            position: fixed;
-            z-index: 60;
-            width: 48px;
-            height: 43px;
-            margin-bottom: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            line-height: 1;
-            color: #1f0033;
-            /* Icon/Text-Farbe */
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            box-shadow: none;
-            transition: opacity .18s ease, transform .18s ease;
-            isolation: isolate;
-            /* rechter Verlauf: transparent -> #f7f7f7 */
-            background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 0.67) 50%, #f7f7f7 100%);
-        }
-
-        /* linker Button: invertierter Verlauf (270deg) + höherer z-index */
-        #page-nav-left-gradient {
-            z-index: 61;
-            background: linear-gradient(270deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 0.67) 50%, #f7f7f7 100%);
-        }
-
-        /* versteckt / nicht verfügbar */
-        .page-nav-scroll-btn.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: translateX(6px);
-        }
-
-        /* kleineres Icon auf sehr kleinen Bildschirmen */
-        @media (max-width: 420px) {
-            .page-nav-scroll-btn {
-                width: 40px;
-                font-size: 20px;
-            }
-        }
-
-        #page-nav a.tab-btn:hover:not(.active) {
-            background-color: #f7f7f7;
-            border-color: #ddd;
-        }
-
         /* Animation für den Tab-Wechsel */
         @keyframes fadeIn {
             from {
@@ -170,20 +118,41 @@
             grid-auto-flow: row;
         }
 
-        @media (max-width: 800px) {
-            .project-gallery {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            #page-nav {
-                min-width: min-content;
-                overflow: scroll;
-            }
+        /* Page-Nav scroll buttons (wieder eingefügt) */
+        .page-nav-scroll-btn {
+            position: fixed;
+            z-index: 60;
+            width: 48px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #1f0033;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: none;
+            transition: opacity .18s ease, transform .18s ease;
+            isolation: isolate;
+            background: linear-gradient(90deg, rgba(247,247,247,0) 0%, rgba(247,247,247,0.67) 50%, #f7f7f7 100%);
         }
 
-        @media (max-width: 600px) {
-            .project-gallery {
-                grid-template-columns: 1fr;
+        #page-nav-left-gradient {
+            z-index: 61;
+            background: linear-gradient(270deg, rgba(247,247,247,0) 0%, rgba(247,247,247,0.67) 50%, #f7f7f7 100%);
+        }
+
+        .page-nav-scroll-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(6px);
+        }
+
+        @media (max-width: 420px) {
+            .page-nav-scroll-btn {
+                width: 40px;
+                font-size: 20px;
             }
         }
 
@@ -277,18 +246,18 @@
             </div>
         </div>
 
-        <!-- linke Steuerung jetzt als Button -->
+        <!-- linke/rechte Steuer-Buttons wieder eingefügt -->
         <button id="page-nav-left-gradient" class="page-nav-scroll-btn hidden" aria-hidden="true" title="Zurück"
             tabindex="0" type="button">&lt;</button>
         <button id="page-nav-scroll-btn" class="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr"
             type="button">&gt;</button>
 
         <div id="page-nav">
-            <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('portraet')">Porträt</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('aviation')">Aviation</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('bts')">BTS</a>
-            <a href="javascript:void(0)" class="tab-btn" onclick="showGallery('event')">Event</a>
+            <a href="?street" class="tab-btn">Street</a>
+            <a href="?portraet" class="tab-btn">Porträt</a>
+            <a href="?aviation" class="tab-btn">Aviation</a>
+            <a href="?bts" class="tab-btn">BTS</a>
+            <a href="?event" class="tab-btn">Event</a>
         </div>
 
         <div id="gallery-container">
@@ -378,6 +347,83 @@
             document.getElementById('hamburgerNav').classList.remove('open');
             document.getElementById('hamburgerNavBg').classList.remove('open');
         });
+    </script>
+
+    <!-- Page-Nav Scroll-Buttons: Positionierung + Verhalten -->
+    <script>
+        (function () {
+            const nav = document.getElementById('page-nav');
+            const btn = document.getElementById('page-nav-scroll-btn');
+            const leftGrad = document.getElementById('page-nav-left-gradient');
+            if (!nav || !btn || !leftGrad) return;
+
+            function updateBtn() {
+                const rect = nav.getBoundingClientRect();
+                // positioniere Buttons vertikal zentriert zur Nav
+                btn.style.top = (rect.top + (rect.height / 2) - (btn.offsetHeight / 2)) + 'px';
+                btn.style.left = (rect.right - btn.offsetWidth) + 'px';
+                leftGrad.style.top = (rect.top + (rect.height / 2) - (leftGrad.offsetHeight / 2)) + 'px';
+                leftGrad.style.left = (rect.left) + 'px';
+                btn.style.height = Math.max(40, rect.height) + 'px';
+                leftGrad.style.height = Math.max(40, rect.height) + 'px';
+
+                const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
+                if (maxScrollLeft > 5 && nav.scrollLeft < maxScrollLeft - 5) btn.classList.remove('hidden');
+                else btn.classList.add('hidden');
+                if (nav.scrollLeft > 5) leftGrad.classList.remove('hidden');
+                else leftGrad.classList.add('hidden');
+            }
+
+            function scrollNav(amount) {
+                nav.scrollBy({ left: amount, behavior: 'smooth' });
+                setTimeout(updateBtn, 420);
+            }
+
+            btn.addEventListener('click', () => scrollNav(Math.max(200, nav.clientWidth * 0.6)));
+            leftGrad.addEventListener('click', () => scrollNav(-Math.max(200, nav.clientWidth * 0.6)));
+
+            nav.addEventListener('scroll', updateBtn);
+            window.addEventListener('resize', updateBtn);
+            window.addEventListener('scroll', updateBtn);
+            window.addEventListener('orientationchange', updateBtn);
+            if (window.ResizeObserver) new ResizeObserver(updateBtn).observe(nav);
+            window.requestAnimationFrame(updateBtn);
+            window.addEventListener('load', updateBtn);
+        })();
+    </script>
+
+    <!-- Relaunch Masonry on visibility/focus and ensure relayout after showing a gallery -->
+    <script>
+        // ensure relayout when returning to the tab / focusing window
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                document.querySelectorAll('.project-gallery').forEach(c => relayoutGrid(c));
+            }
+        });
+        window.addEventListener('focus', () => {
+            document.querySelectorAll('.project-gallery').forEach(c => relayoutGrid(c));
+        });
+
+        // erweitere showGallery: nach Aktivierung relayout mehrfach (für Fälle, in denen Bilder noch messen)
+        const _oldShowGallery = typeof showGallery === 'function' ? showGallery : null;
+        if (_oldShowGallery) {
+            window.showGallery = function (id, sourceLink = null, push = true) {
+                _oldShowGallery(id, sourceLink, push);
+                const cat = categories[id];
+                if (!cat) return;
+                const container = document.getElementById(cat.container);
+                if (!container) return;
+                // mehrere Versuche spaced out, falls Bilder noch laden / rendering delayed
+                setTimeout(() => relayoutGrid(container), 60);
+                setTimeout(() => relayoutGrid(container), 300);
+                setTimeout(() => relayoutGrid(container), 800);
+            };
+        }
+    </script>
+
+    <!-- Init on DOM ready -->
+    <script>
+        window.addEventListener('DOMContentLoaded', setupPageNav);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.umd.min.js"></script>
@@ -543,38 +589,51 @@
         })();
 
         /**
-         * Tab-Wechsel Logik
+         * Tab-Wechsel Logik (vereinheitlicht): ruft loadImages auf und markiert das aktive Tab
          */
-        function showGallery(id) {
-            // Alle Sektionen verstecken
+        function showGallery(id, sourceLink = null, push = true) {
             document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
-            // Alle Buttons deaktivieren
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-            // Ziel-Sektion und Button aktivieren
-            document.getElementById('section-' + id).classList.add('active');
-            event.currentTarget.classList.add('active');
-
-            // Bilder laden (falls noch nicht geschehen)
+            const sec = document.getElementById('section-' + id);
+            if (sec) sec.classList.add('active');
+            if (sourceLink) sourceLink.classList.add('active');
+            if (push) history.replaceState({}, '', '?' + id);
             loadImages(id);
         }
 
-        function initLightGallery(id) {
-            const el = document.getElementById(id);
-            lightGallery(el, {
-                plugins: [lgZoom, lgThumbnail],
-                selector: '.gallery-item',
-                speed: 500,
-                download: true,
-                zoom: true,
-                thumbnail: true,
-                actualSize: true,
-                altText: false,
-                closeOnTap: true,
+        /**
+         * Setup Page Nav: aktives Tab aus URL lesen, Klicks behandeln
+         */
+        function setupPageNav() {
+            const params = new URLSearchParams(window.location.search);
+            let desired = '';
+            if (params.has('tab')) desired = params.get('tab') || '';
+            else {
+                const firstKey = Array.from(params.keys())[0];
+                if (firstKey) desired = firstKey;
+                else desired = (window.location.hash || '').replace('#', '') || '';
+            }
+            desired = (desired || '').trim().toLowerCase();
+            if (!Object.keys(categories).includes(desired)) desired = 'street';
+
+            document.querySelectorAll('#page-nav a.tab-btn').forEach(a => {
+                // prevent default navigation and handle via JS
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const href = (a.getAttribute('href') || '').replace(/^\?/, '').toLowerCase();
+                    const id = href || desired;
+                    showGallery(id, a, true);
+                });
             });
-            // sicherstellen, dass Loader verborgen ist
-            hideLoader();
+
+            // Set initial active
+            const initialLink = document.querySelector(`#page-nav a.tab-btn[href="?${desired}"]`) ||
+                document.querySelector('#page-nav a.tab-btn[href="?street"]');
+            showGallery(desired, initialLink, false);
         }
+
+        // Init on DOM ready
+        window.addEventListener('DOMContentLoaded', setupPageNav);
 
         // Loader-Hilfsfunktionen
         function showLoader() {
@@ -657,96 +716,7 @@
         });
     </script>
 
-    <script>
-        (function () {
-            const nav = document.getElementById('page-nav');
-            const btn = document.getElementById('page-nav-scroll-btn');
-            if (!nav || !btn) return;
-
-            // Positioniert Button an der rechten Kante von #page-nav und passt Höhe an
-            function updateBtn() {
-                const rect = nav.getBoundingClientRect();
-                // vertikal zentrieren und Höhe an die Nav-Höhe anpassen
-                btn.style.top = (rect.top + (rect.height / 2) - (btn.offsetHeight / 2)) + 'px';
-                btn.style.left = (rect.right - btn.offsetWidth) + 'px';
-                btn.style.height = Math.max(40, rect.height) + 'px';
-
-                const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
-                // Button nur zeigen, wenn noch gescrollt werden kann
-                if (maxScrollLeft > 5 && nav.scrollLeft < maxScrollLeft - 5) {
-                    btn.classList.remove('hidden');
-                } else {
-                    btn.classList.add('hidden');
-                }
-            }
-
-            // Klick scrollt die Nav um einen großen Schritt nach rechts
-            function scrollNav() {
-                const amount = Math.max(200, nav.clientWidth * 0.6);
-                nav.scrollBy({ left: amount, behavior: 'smooth' });
-                // nach dem Scroll kurz aktualisieren
-                setTimeout(updateBtn, 420);
-            }
-
-            // Events
-            btn.addEventListener('click', scrollNav);
-            nav.addEventListener('scroll', updateBtn);
-            window.addEventListener('resize', updateBtn);
-            window.addEventListener('scroll', updateBtn);
-            window.addEventListener('orientationchange', updateBtn);
-            // ResizeObserver, damit sich Button an Änderungen der Nav-Grösse anpasst
-            if (window.ResizeObserver) {
-                new ResizeObserver(updateBtn).observe(nav);
-            }
-
-            // initial
-            window.requestAnimationFrame(updateBtn);
-            window.addEventListener('load', updateBtn);
-        })();
-    </script>
-
-    <script>
-        (function () {
-            const nav = document.getElementById('page-nav');
-            const leftGrad = document.getElementById('page-nav-left-gradient');
-            if (!nav || !leftGrad) return;
-
-            function updateLeftGradient() {
-                const rect = nav.getBoundingClientRect();
-                leftGrad.style.top = (rect.top + (rect.height / 2) - (leftGrad.offsetHeight / 2)) + 'px';
-                leftGrad.style.left = (rect.left) + 'px';
-                leftGrad.style.height = Math.max(40, rect.height) + 'px';
-
-                if (nav.scrollLeft > 5) {
-                    leftGrad.classList.remove('hidden');
-                } else {
-                    leftGrad.classList.add('hidden');
-                }
-            }
-
-            leftGrad.addEventListener('click', () => {
-                const amount = Math.max(200, nav.clientWidth * 0.6);
-                nav.scrollBy({ left: -amount, behavior: 'smooth' });
-                setTimeout(updateLeftGradient, 420);
-            });
-
-            leftGrad.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    leftGrad.click();
-                }
-            });
-
-            nav.addEventListener('scroll', updateLeftGradient);
-            window.addEventListener('resize', updateLeftGradient);
-            window.addEventListener('scroll', updateLeftGradient);
-            window.addEventListener('orientationchange', updateLeftGradient);
-            if (window.ResizeObserver) new ResizeObserver(updateLeftGradient).observe(nav);
-
-            window.requestAnimationFrame(updateLeftGradient);
-            window.addEventListener('load', updateLeftGradient);
-        })();
-    </script>
+    <!-- entfernte die separaten page-nav scroll/gradient script-blöcke (aufgeräumt) -->
 
 </body>
 
