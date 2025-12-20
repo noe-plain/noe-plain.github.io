@@ -93,57 +93,10 @@
             border-color: #1f0033;
         }
 
-        /* Linker Gradient-Overlay für die Seiten-Navigation */
-        #page-nav-left-gradient {
-            position: fixed;
-            z-index: 61;
-            width: 48px;
-            height: 43px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            line-height: 1;
-            color: #1f0033;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            pointer-events: auto;
-            background-color: #f7f7f7aa;
-            background: linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, #f7f7f7aa 50%, #f7f7f7 95%);
-            background-image: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
-            background-image: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
-            background-image: linear-gradient(270deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
-            isolation: isolate;
-            transition: opacity .18s ease;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            #page-nav-left-gradient {
-                color: #fff;
-                background: linear-gradient(270deg, rgba(31, 0, 51, 0) 0%, #1f0033 100%);
-            }
-        }
-
-        /* verstecken, wenn am Anfang */
-        #page-nav-left-gradient.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @media (max-width: 420px) {
-            #page-nav-left-gradient {
-                width: 40px;
-                font-size: 20px;
-            }
-        }
-
-        #page-nav a.tab-btn:hover:not(.active) {
-            background-color: #f7f7f7;
-            border-color: #ddd;
-        }
-
-        #page-nav-scroll-btn {
+        /* ersetze die bisherigen separaten Regeln für #page-nav-left-gradient und #page-nav-scroll-btn
+           durch eine gemeinsame, einheitliche Klasse, die den Hintergrund von der Seite erbt.
+           Dadurch stimmen die Buttons immer mit dem Seiten-Hintergrund überein und kein violett mehr. */
+        .page-nav-scroll-btn {
             position: fixed;
             z-index: 60;
             width: 48px;
@@ -155,28 +108,25 @@
             font-size: 22px;
             line-height: 1;
             color: #1f0033;
+            /* Icon/Text-Farbe */
             border: none;
             cursor: pointer;
             padding: 0;
             box-shadow: none;
-            transition: opacity .18s ease;
-            background-color: #f7f7f7aa;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #f7f7f7aa 50%, #f7f7f7 95%);
-            background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
-            background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
-            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 5%, rgba(247, 247, 247, 0.67) 50%, rgba(247, 247, 247, 1) 95%);
+            transition: opacity .18s ease, transform .18s ease;
             isolation: isolate;
+            /* rechter Verlauf: transparent -> #f7f7f7 */
+            background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 0.67) 50%, #f7f7f7 100%);
         }
 
-        @media (prefers-color-scheme: dark) {
-            #page-nav-scroll-btn {
-                color: #fff;
-                background: linear-gradient(90deg, rgba(31, 0, 51, 0) 0%, #1f0033 100%);
-            }
+        /* linker Button: invertierter Verlauf (270deg) + höherer z-index */
+        #page-nav-left-gradient {
+            z-index: 61;
+            background: linear-gradient(270deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 0.67) 50%, #f7f7f7 100%);
         }
 
-        /* versteckt, wenn nicht gebraucht */
-        #page-nav-scroll-btn.hidden {
+        /* versteckt / nicht verfügbar */
+        .page-nav-scroll-btn.hidden {
             opacity: 0;
             pointer-events: none;
             transform: translateX(6px);
@@ -184,10 +134,15 @@
 
         /* kleineres Icon auf sehr kleinen Bildschirmen */
         @media (max-width: 420px) {
-            #page-nav-scroll-btn {
+            .page-nav-scroll-btn {
                 width: 40px;
                 font-size: 20px;
             }
+        }
+
+        #page-nav a.tab-btn:hover:not(.active) {
+            background-color: #f7f7f7;
+            border-color: #ddd;
         }
 
         /* Animation für den Tab-Wechsel */
@@ -317,9 +272,11 @@
             </div>
         </div>
 
-        <div id="page-nav-left-gradient" class="hidden" aria-hidden="true" title="Zurück" role="button" tabindex="0">
-            &lt;</div>
-        <button id="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr">&gt;</button>
+        <!-- linke Steuerung jetzt als Button -->
+        <button id="page-nav-left-gradient" class="page-nav-scroll-btn hidden" aria-hidden="true" title="Zurück"
+            tabindex="0" type="button">&lt;</button>
+        <button id="page-nav-scroll-btn" class="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr"
+            type="button">&gt;</button>
 
         <div id="page-nav">
             <a href="javascript:void(0)" class="tab-btn active" onclick="showGallery('street')">Street</a>
