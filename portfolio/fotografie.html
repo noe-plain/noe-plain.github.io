@@ -445,7 +445,7 @@
             const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
             const width = container.clientWidth;
             const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
-            return Math.min(maxCols, cols);
+            return Math.min(3, cols); /* max 3 columns */
         }
 
         function computeSpan(img, itemWidth, rowHeight, gap) {
@@ -459,7 +459,7 @@
             if (!container) return;
             const rowHeight = parseFloat(getComputedStyle(container).getPropertyValue('grid-auto-rows')) || 8;
             const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
-            const cols = getColumnCount(container, 280, 6);
+            const cols = getColumnCount(container, 280, 3);
             container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             const colHeights = new Array(cols).fill(0);
             const totalGap = (cols - 1) * gap;
@@ -571,7 +571,7 @@
             const container = document.getElementById(cat.container);
             if (!container) return;
             // multiple relayout attempts to cover late image rendering / reflow
-            [60, 300, 800, 1500].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
+            [60, 300, 800, 1500, 3000].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
             // init lightgallery after short delay as well
             setTimeout(() => initLightGallery(cat.container), 600);
         }
