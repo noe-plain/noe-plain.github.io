@@ -440,9 +440,13 @@
         function loadImages(categoryId) {
             const cat = categories[categoryId];
             const container = document.getElementById(cat.container);
-            if (!container || container.dataset.loaded === "true") return;
+            if (!container) return;
 
-            // Loader anzeigen
+            // Bereits abgeschlossen oder aktuell in Arbeit -> nichts tun
+            if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+
+            // Loader anzeigen und Ladesperre setzen
+            container.dataset.loading = "true";
             showLoader();
 
             let index = 1;
@@ -451,6 +455,21 @@
                 const imgNum = index < 10 ? `0${index}` : index; // Formatiert 1 zu 01
                 const fileName = `${cat.prefix}${imgNum}.jpeg`;
                 const fullPath = cat.path + fileName;
+
+                // Schutz: falls dieses Bild bereits vorhanden ist, überspringen
+                if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
+                    index++;
+                    // kleiner Schutz gegen endlose Rekursion
+                    if (index > 999) {
+                        container.dataset.loaded = "true";
+                        container.dataset.loading = "false";
+                        hideLoader();
+                        initLightGallery(cat.container);
+                        return;
+                    }
+                    tryLoadNext();
+                    return;
+                }
 
                 const img = new Image();
                 img.onload = function () {
@@ -468,6 +487,7 @@
                 img.onerror = function () {
                     // Kein Bild mehr gefunden -> LightGallery für diesen Container initialisieren
                     container.dataset.loaded = "true";
+                    container.dataset.loading = "false";
                     // Loader ausblenden und LightGallery initialisieren
                     hideLoader();
                     initLightGallery(cat.container);
@@ -568,7 +588,7 @@
                 if (sec) sec.classList.add('active');
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 const fallbackBtn = document.querySelector(`a.tab-btn[onclick="showGallery('${desired}')"]`) ||
-                                    document.querySelector(`a.tab-btn[onclick="showGallery('street')"]`);
+                    document.querySelector(`a.tab-btn[onclick="showGallery('street')"]`);
                 if (fallbackBtn) fallbackBtn.classList.add('active');
             }
         }
