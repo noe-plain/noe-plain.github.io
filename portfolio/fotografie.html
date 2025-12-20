@@ -158,16 +158,15 @@
             }
         }
 
-        /* Masonry: Grid-basiertes, deterministisches Layout (1.,2. Bild: Reihe 1 Spalten 1/2; 3.,4. Bild: Reihe 2 Spalten 1/2 usw.) */
+        /* Masonry: responsive Grid — Anzahl der Spalten wird per JS berechnet (wie Unsplash) */
         .project-gallery {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            /* Fallback, JS überschreibt später die exakte Spaltenanzahl */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 10px;
-            column-gap: 15px;
+            column-gap: 14px;
             align-items: start;
-            /* Basis-Rasterhöhe für row-spans (kleine Einheit für präzise Spans) */
             grid-auto-rows: 8px;
-            /* Reihenweises Füllen behält die Reihenfolge 1→2 per row */
             grid-auto-flow: row;
         }
 
@@ -400,51 +399,61 @@
         /**
          * Hilfsfunktionen für Masonry
          */
-        function getColumnCount(container) {
-            const cols = getComputedStyle(container).gridTemplateColumns;
-            return cols ? cols.split(' ').length : 2;
+        function getColumnCount(container, minColWidth = 280, maxCols = 6) {
+            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
+            const width = container.clientWidth;
+            // Anzahl Spalten, inkl. Gaps berücksichtigt
+            const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
+            return Math.min(maxCols, cols);
         }
 
         function computeSpan(img, itemWidth, rowHeight, gap) {
-            // Bildhöhe berechnen (falls noch nicht gerendert)
-            const imgNaturalW = img.naturalWidth || img.width;
-            const imgNaturalH = img.naturalHeight || img.height;
-            const displayHeight = img.getBoundingClientRect().height || (imgNaturalH * (itemWidth / imgNaturalW));
-            const span = Math.max(1, Math.ceil((displayHeight + gap) / (rowHeight + gap)));
-            return span;
+            const w = img.naturalWidth || img.width;
+            const h = img.naturalHeight || img.height;
+            const displayHeight = img.getBoundingClientRect().height || (h * (itemWidth / w));
+            return Math.max(1, Math.ceil((displayHeight + gap) / (rowHeight + gap)));
         }
 
         /**
-         * Relayout: weist jedem Item span und Spalte zu (kürzere Spalte bekommt das nächste Item)
+         * Relayout: berechnet Spaltenzahl, setzt grid-template-columns und verteilt Items
+         * in die jeweils aktuell kürzeste Spalte (balanced masonry wie Unsplash).
          */
         function relayoutGrid(container) {
             if (!container) return;
             const rowHeight = parseFloat(getComputedStyle(container).getPropertyValue('grid-auto-rows')) || 8;
             const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
-            const cols = getColumnCount(container);
+
+            // berechne Spalten wie Unsplash (minColWidth kann angepasst werden)
+            const cols = getColumnCount(container, 280, 6);
+
+            // Setze explizit die Spaltenzahl im Grid — wichtig für responsive Verhalten
+            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            // leere Höhen-Tracker pro Spalte
             const colHeights = new Array(cols).fill(0);
 
-            // Elemente in DOM-Reihenfolge durchgehen und Spalte/span setzen
+            // Breite einer Spalte (inkl. Gaps korrekt berechnet)
+            const totalGap = (cols - 1) * gap;
+            const colWidth = (container.clientWidth - totalGap) / cols;
+
+            // Items in DOM-Reihenfolge durchgehen und jeweils in die kürzeste Spalte legen
             container.querySelectorAll('.gallery-item').forEach(item => {
                 const img = item.querySelector('img');
                 if (!img) return;
 
-                // Breite des Items (eine Spalte)
-                const itemWidth = Math.floor(container.clientWidth / cols) - ((cols - 1) * gap / cols);
-                const span = computeSpan(img, itemWidth, rowHeight, gap);
+                const span = computeSpan(img, colWidth, rowHeight, gap);
 
-                // Zielspalte: die momentan kürzeste Spalte
-                let targetCol = 0;
-                for (let c = 1; c < colHeights.length; c++) {
-                    if (colHeights[c] < colHeights[targetCol]) targetCol = c;
+                // finde kürzeste Spalte
+                let target = 0;
+                for (let i = 1; i < colHeights.length; i++) {
+                    if (colHeights[i] < colHeights[target]) target = i;
                 }
 
-                // Setze CSS-Grid-Positionen
-                item.style.gridColumnStart = String(targetCol + 1);
+                item.style.gridColumnStart = String(target + 1);
                 item.style.gridRowEnd = 'span ' + span;
 
-                // Erhöhe die Spaltenhöhe (in Einheiten px)
-                colHeights[targetCol] += (span * (rowHeight + gap));
+                // erhöhe Höhe der Zielspalte
+                colHeights[target] += span * (rowHeight + gap);
             });
         }
 
@@ -490,9 +499,8 @@
 
                     container.appendChild(anchor);
 
-                    // Warten bis Bild im Layout ist, dann relayout
+                    // sicherstellen, dass Bild gerendert ist, dann relayout
                     requestAnimationFrame(() => {
-                        // Falls Bild noch nicht gerendert, ein weiteres frame
                         requestAnimationFrame(() => relayoutGrid(container));
                     });
 
@@ -513,6 +521,26 @@
 
             tryLoadNext();
         }
+
+        // Resize: Debounced relayout, wichtig für responsive Spaltenanzahl
+        (function () {
+            let t;
+            window.addEventListener('resize', () => {
+                clearTimeout(t);
+                t = setTimeout(() => {
+                    document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+                }, 120);
+            });
+            window.addEventListener('orientationchange', () => {
+                clearTimeout(t);
+                t = setTimeout(() => {
+                    document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+                }, 150);
+            });
+            window.addEventListener('load', () => {
+                document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+            });
+        })();
 
         /**
          * Tab-Wechsel Logik
