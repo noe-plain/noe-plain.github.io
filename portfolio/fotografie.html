@@ -149,6 +149,52 @@
             transform: translateX(6px);
         }
 
+        /* --- In style.css --- */
+
+        .project-gallery {
+            margin: 20px 0 0 0;
+            display: grid;
+            /* Wir setzen den Gap strikt auf 15px wie gewünscht */
+            gap: 15px;
+            column-gap: 15px;
+            grid-auto-rows: 8px;
+            /* Feinraster für Masonry */
+        }
+
+        /* Der Container für das Bild */
+        .gallery-item {
+            display: block;
+            border-radius: 15px 0 15px 15px !important;
+
+            /* WICHTIG für den Zoom-Effekt ohne den Container zu vergrössern: */
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+            /* Füllt die vom JS berechnete Grid-Höhe komplett aus */
+
+            /* Optional: Hardware-Beschleunigung für flüssigere Animation */
+            transform: translateZ(0);
+        }
+
+        /* Das Bild selbst */
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+
+            /* WICHTIG: Das Bild wird beschnitten, um den Container zu füllen */
+            object-fit: cover;
+
+            /* Die Animation */
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: center center;
+        }
+
+        /* Hover Effekt: Zoom */
+        .gallery-item:hover img {
+            transform: scale(1.05);
+            /* Zoom auf 105% */
+        }
+
         @media (max-width: 420px) {
             .page-nav-scroll-btn {
                 width: 40px;
@@ -431,247 +477,306 @@
     <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
 
     <script>
-        // Konsolidiertes, korrekt geordnetes Skript für Kategorien, Masonry, Nav und Init
+    // Konfiguration der Kategorien
+    const categories = {
+        street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
+        aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
+        portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
+        bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
+        event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
+    };
 
-        const categories = {
-            street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
-            aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
-            portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
-            bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
-            event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
-        };
+    /**
+     * Berechnet die Anzahl der Spalten basierend auf der Container-Breite.
+     */
+    function getColumnCount(container, minColWidth = 280) {
+        const gap = parseFloat(getComputedStyle(container).gap) || 15;
+        const width = container.clientWidth;
+        // Mindestens 1 Spalte, maximal 3 (oder mehr, wenn gewünscht)
+        const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
+        return Math.min(3, cols); 
+    }
 
-        function getColumnCount(container, minColWidth = 280, maxCols = 6) {
-            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
-            const width = container.clientWidth;
-            const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
-            return Math.min(3, cols); /* max 3 columns */
+    /**
+     * NEUE LOGIK:
+     * Berechnet die Höhe (row spans) strikt nach dem Raster:
+     * - Landscape (Querformat): Verhältnis 3:2
+     * - Portrait (Hochformat): Höhe von 2 Landscapes + Gap
+     */
+    function computeSpan(img, itemWidth, rowHeight, gap) {
+        // 1. Basis-Höhe für ein Querformat-Bild (3:2 Ratio -> Breite / 1.5)
+        const baseLandscapeHeight = itemWidth / 1.5;
+
+        // 2. Prüfen, ob das geladene Bild Hoch- oder Querformat ist
+        const naturalRatio = (img.naturalWidth / img.naturalHeight);
+        const isPortrait = naturalRatio < 1.0; 
+
+        let targetHeight;
+
+        if (isPortrait) {
+            // Hochformat: Exakt so hoch wie zwei Querformate übereinander + der Zwischenraum
+            targetHeight = (baseLandscapeHeight * 2) + gap;
+        } else {
+            // Querformat: Standard 3:2 Höhe
+            targetHeight = baseLandscapeHeight;
         }
 
-        function computeSpan(img, itemWidth, rowHeight, gap) {
-            const w = img.naturalWidth || img.width;
-            const h = img.naturalHeight || img.height;
-            const displayHeight = img.getBoundingClientRect().height || (h * (itemWidth / w));
-            return Math.max(1, Math.ceil((displayHeight + gap) / (rowHeight + gap)));
-        }
+        // 3. Umrechnung in Grid-Zeilen (Spans)
+        // (Zielhöhe + Gap) / (Zeilenhöhe + Gap) -> aufgerundet
+        const span = Math.ceil((targetHeight + gap) / (rowHeight + gap));
 
-        function relayoutGrid(container) {
-            if (!container) return;
-            const rowHeight = parseFloat(getComputedStyle(container).getPropertyValue('grid-auto-rows')) || 8;
-            const gap = parseFloat(getComputedStyle(container).getPropertyValue('gap')) || 10;
-            const cols = getColumnCount(container, 280, 3);
-            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            const colHeights = new Array(cols).fill(0);
-            const totalGap = (cols - 1) * gap;
-            const colWidth = (container.clientWidth - totalGap) / cols;
+        return Math.max(1, span);
+    }
 
-            container.querySelectorAll('.gallery-item').forEach(item => {
-                const img = item.querySelector('img');
-                if (!img) return;
-                const span = computeSpan(img, colWidth, rowHeight, gap);
-                let target = 0;
-                for (let i = 1; i < colHeights.length; i++) if (colHeights[i] < colHeights[target]) target = i;
-                item.style.gridColumnStart = String(target + 1);
-                item.style.gridRowEnd = 'span ' + span;
-                colHeights[target] += span * (rowHeight + gap);
-            });
-        }
+    /**
+     * Layoutet das Grid neu. Wird bei Resize, Tab-Wechsel und Bild-Load aufgerufen.
+     */
+    function relayoutGrid(container) {
+        if (!container) return;
+        
+        // CSS-Werte auslesen
+        const compStyle = getComputedStyle(container);
+        const rowHeight = parseFloat(compStyle.gridAutoRows) || 1; // Fallback auf 1px wenn CSS fehlt
+        const gap = parseFloat(compStyle.gap) || 15;
+        
+        // Spalten berechnen
+        const cols = getColumnCount(container, 280);
+        container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-        function initLightGallery(containerId) {
-            const el = document.getElementById(containerId);
-            if (!el) return;
-            // destroy previous instance if any (lightGallery v2 returns instance on init)
-            if (el.lgInstance && typeof el.lgInstance.destroy === 'function') {
-                try { el.lgInstance.destroy(); } catch (_) { }
-            }
-            try {
-                const instance = lightGallery(el, {
-                    plugins: [lgZoom, lgThumbnail],
-                    selector: '.gallery-item',
-                    speed: 500,
-                    download: true,
-                    zoom: true,
-                    thumbnail: true,
-                    actualSize: true,
-                    altText: false,
-                    closeOnTap: true,
-                });
-                el.lgInstance = instance;
-            } catch (e) {
-                // fallback: ignore init errors
-                console.warn('lightGallery init failed', e);
-            }
-            // loader wird per loadImages/hideLoader(containerId) beendet — nicht hier
-        }
+        // Spalten-Breite berechnen (Container minus Gaps geteilt durch Anzahl Spalten)
+        const totalGap = (cols - 1) * gap;
+        const colWidth = (container.clientWidth - totalGap) / cols;
 
-        // Tracke mehrere gleichzeitige Gallery-Loads; erst ausblenden, wenn alle fertig sind
-        function showLoader(id) {
-            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
-            const key = id || '__global';
-            window.__activeGalleryLoads.add(key);
-            document.getElementById('loader')?.classList.add('visible');
-        }
+        // Masonry Algorithmus: Fülle immer die kürzeste Spalte auf
+        const colHeights = new Array(cols).fill(0);
 
-        function hideLoader(id) {
-            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
-            const key = id || '__global';
-            window.__activeGalleryLoads.delete(key);
-            if (window.__activeGalleryLoads.size === 0) {
-                document.getElementById('loader')?.classList.remove('visible');
-            }
-        }
+        container.querySelectorAll('.gallery-item').forEach(item => {
+            const img = item.querySelector('img');
+            if (!img) return;
 
-        function loadImages(categoryId) {
-            const cat = categories[categoryId];
-            const container = document.getElementById(cat.container);
-            if (!container) return;
-            if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
-
-            container.dataset.loading = "true";
-            showLoader(cat.container);
-
-            let index = 1;
-
-            function tryLoadNext() {
-                const imgNum = index < 10 ? `0${index}` : index;
-                const fileName = `${cat.prefix}${imgNum}.jpeg`;
-                const fullPath = cat.path + fileName;
-
-                if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
-                    index++;
-                    if (index > 999) {
-                        container.dataset.loaded = "true";
-                        container.dataset.loading = "false";
-                        hideLoader(cat.container);
-                        initLightGallery(cat.container);
-                        return;
-                    }
-                    tryLoadNext();
-                    return;
+            // Span berechnen mit neuer Logik
+            const span = computeSpan(img, colWidth, rowHeight, gap);
+            
+            // Finde die Spalte mit der geringsten aktuellen Höhe
+            let targetCol = 0;
+            for (let i = 1; i < colHeights.length; i++) {
+                if (colHeights[i] < colHeights[targetCol]) {
+                    targetCol = i;
                 }
-
-                const img = new Image();
-                img.onload = function () {
-                    const anchor = document.createElement('a');
-                    anchor.className = 'gallery-item';
-                    anchor.href = fullPath;
-                    anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} ${index}">`;
-
-                    container.appendChild(anchor);
-
-                    // sicherstellen, dass Bild gerendert ist, dann relayout
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => relayoutGrid(container));
-                    });
-
-                    index++;
-                    tryLoadNext();
-                };
-
-                img.onerror = function () {
-                    container.dataset.loaded = "true";
-                    container.dataset.loading = "false";
-                    hideLoader(cat.container);
-                    relayoutGrid(container);
-                    initLightGallery(cat.container);
-                };
-
-                img.src = fullPath;
             }
 
-            tryLoadNext();
-        }
+            // Item platzieren
+            item.style.gridColumnStart = String(targetCol + 1);
+            item.style.gridRowEnd = `span ${span}`;
 
-        // unified showGallery with retry-relayouts
-        function showGallery(id, sourceLink = null, push = true) {
-            document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const sec = document.getElementById('section-' + id);
-            if (sec) sec.classList.add('active');
-            if (sourceLink) sourceLink.classList.add('active');
-            if (push) history.replaceState({}, '', '?' + id);
-            loadImages(id);
-            const cat = categories[id];
-            if (!cat) return;
-            const container = document.getElementById(cat.container);
-            if (!container) return;
-            // multiple relayout attempts to cover late image rendering / reflow
-            [60, 300, 800, 1500, 3000].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
-            // init lightgallery after short delay as well
-            setTimeout(() => initLightGallery(cat.container), 600);
-        }
-
-        // Page Nav setup + click handling
-        function setupPageNav() {
-            const params = new URLSearchParams(window.location.search);
-            let desired = '';
-            if (params.has('tab')) desired = params.get('tab') || '';
-            else {
-                const firstKey = Array.from(params.keys())[0];
-                if (firstKey) desired = firstKey;
-                else desired = (window.location.hash || '').replace('#', '') || '';
-            }
-            desired = (desired || '').trim().toLowerCase();
-            if (!Object.keys(categories).includes(desired)) desired = 'street';
-            document.querySelectorAll('#page-nav a.tab-btn').forEach(a => {
-                a.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const href = (a.getAttribute('href') || '').replace(/^\?/, '').toLowerCase();
-                    const id = href || desired;
-                    showGallery(id, a, true);
-                });
-            });
-            const initialLink = document.querySelector(`#page-nav a.tab-btn[href="?${desired}"]`) ||
-                document.querySelector('#page-nav a.tab-btn[href="?street"]');
-            showGallery(desired, initialLink, false);
-        }
-
-        // Page-nav scroll buttons behavior (re-used)
-        (function () {
-            const nav = document.getElementById('page-nav');
-            const btn = document.getElementById('page-nav-scroll-btn');
-            const leftGrad = document.getElementById('page-nav-left-gradient');
-            if (!nav || !btn || !leftGrad) return;
-            function updateBtn() {
-                const rect = nav.getBoundingClientRect();
-                btn.style.top = (rect.top + (rect.height / 2) - (btn.offsetHeight / 2)) + 'px';
-                btn.style.left = (rect.right - btn.offsetWidth) + 'px';
-                leftGrad.style.top = (rect.top + (rect.height / 2) - (leftGrad.offsetHeight / 2)) + 'px';
-                leftGrad.style.left = (rect.left) + 'px';
-                btn.style.height = Math.max(40, rect.height) + 'px';
-                leftGrad.style.height = Math.max(40, rect.height) + 'px';
-                const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
-                if (maxScrollLeft > 5 && nav.scrollLeft < maxScrollLeft - 5) btn.classList.remove('hidden'); else btn.classList.add('hidden');
-                if (nav.scrollLeft > 5) leftGrad.classList.remove('hidden'); else leftGrad.classList.add('hidden');
-            }
-            function scrollNav(amount) { nav.scrollBy({ left: amount, behavior: 'smooth' }); setTimeout(updateBtn, 420); }
-            btn.addEventListener('click', () => scrollNav(Math.max(200, nav.clientWidth * 0.6)));
-            leftGrad.addEventListener('click', () => scrollNav(-Math.max(200, nav.clientWidth * 0.6)));
-            nav.addEventListener('scroll', updateBtn);
-            window.addEventListener('resize', updateBtn);
-            window.addEventListener('scroll', updateBtn);
-            window.addEventListener('orientationchange', updateBtn);
-            if (window.ResizeObserver) new ResizeObserver(updateBtn).observe(nav);
-            window.requestAnimationFrame(updateBtn);
-            window.addEventListener('load', updateBtn);
-        })();
-
-        // ensure relayout when tab/window regains focus
-        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') document.querySelectorAll('.project-gallery').forEach(relayoutGrid); });
-        window.addEventListener('focus', () => document.querySelectorAll('.project-gallery').forEach(relayoutGrid));
-
-        // Debounced resize relayout
-        (function () {
-            let t;
-            window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => document.querySelectorAll('.project-gallery').forEach(relayoutGrid), 120); });
-            window.addEventListener('orientationchange', () => { clearTimeout(t); t = setTimeout(() => document.querySelectorAll('.project-gallery').forEach(relayoutGrid), 150); });
-        })();
-
-        // Dom ready init
-        window.addEventListener('DOMContentLoaded', () => {
-            setupPageNav();
+            // Neue Höhe der Spalte speichern
+            colHeights[targetCol] += span * (rowHeight + gap);
         });
-    </script>
+    }
+
+    /**
+     * LightGallery Initialisierung
+     */
+    function initLightGallery(containerId) {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        
+        // Alte Instanz zerstören, falls vorhanden
+        if (el.lgInstance) {
+            try { el.lgInstance.destroy(); } catch (_) { }
+        }
+        
+        try {
+            el.lgInstance = lightGallery(el, {
+                plugins: [lgZoom, lgThumbnail],
+                selector: '.gallery-item',
+                speed: 500,
+                download: true,
+                zoom: true,
+                thumbnail: true,
+                actualSize: true,
+                mobileSettings: { controls: false, showCloseIcon: true, download: false },
+                closeOnTap: true
+            });
+        } catch (e) {
+            console.warn('lightGallery init failed', e);
+        }
+    }
+
+    /* --- Loader Logik --- */
+    function showLoader(id) {
+        if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+        window.__activeGalleryLoads.add(id || '__global');
+        document.getElementById('loader')?.classList.add('visible');
+    }
+
+    function hideLoader(id) {
+        if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+        window.__activeGalleryLoads.delete(id || '__global');
+        if (window.__activeGalleryLoads.size === 0) {
+            document.getElementById('loader')?.classList.remove('visible');
+        }
+    }
+
+    /**
+     * Bilder laden (Sequential Check Pattern)
+     */
+    function loadImages(categoryId) {
+        const cat = categories[categoryId];
+        const container = document.getElementById(cat.container);
+        if (!container) return;
+        
+        // Verhindern, dass wir laden, wenn schon geladen ist oder gerade geladen wird
+        if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+
+        container.dataset.loading = "true";
+        showLoader(cat.container);
+
+        let index = 1;
+
+        function tryLoadNext() {
+            // Formatierung: 01, 02, ... 10, 11
+            const imgNum = index < 10 ? `0${index}` : index;
+            const fileName = `${cat.prefix}${imgNum}.jpeg`;
+            const fullPath = cat.path + fileName;
+
+            // Check ob Bild schon im DOM ist (Duplicate check)
+            if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
+                index++;
+                // Safety break bei 999 Bildern
+                if (index > 999) finishLoading();
+                else tryLoadNext();
+                return;
+            }
+
+            const img = new Image();
+            img.onload = function () {
+                const anchor = document.createElement('a');
+                anchor.className = 'gallery-item';
+                anchor.href = fullPath;
+                // Alt-Text generieren
+                anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} photography ${index}">`;
+
+                container.appendChild(anchor);
+
+                // Nach jedem Bild kurz layouten, damit es nicht "springt"
+                // requestAnimationFrame sorgt für flüssigen Ablauf
+                requestAnimationFrame(() => relayoutGrid(container));
+
+                index++;
+                tryLoadNext();
+            };
+
+            img.onerror = function () {
+                // Wenn ein Bild nicht gefunden wird (404), gehen wir davon aus, dass die Serie zu Ende ist
+                finishLoading();
+            };
+
+            img.src = fullPath;
+        }
+
+        function finishLoading() {
+            container.dataset.loaded = "true";
+            container.dataset.loading = "false";
+            hideLoader(cat.container);
+            // Finales Layout und Init
+            relayoutGrid(container);
+            initLightGallery(cat.container);
+        }
+
+        tryLoadNext();
+    }
+
+    /**
+     * Hauptfunktion zum Anzeigen einer Galerie (Tab-Wechsel)
+     */
+    function showGallery(id, sourceLink = null, push = true) {
+        // UI Updates
+        document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        const sec = document.getElementById('section-' + id);
+        if (sec) sec.classList.add('active');
+        if (sourceLink) sourceLink.classList.add('active');
+        
+        // URL Update
+        if (push) history.replaceState({}, '', '?' + id);
+
+        // Bilder laden
+        loadImages(id);
+
+        const cat = categories[id];
+        if (!cat) return;
+        const container = document.getElementById(cat.container);
+        
+        // Mehrfaches Relayout, um Layout-Shifts durch nachladende Fonts/Styles abzufangen
+        if (container) {
+            [50, 200, 500].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
+        }
+    }
+
+    /**
+     * Setup der Page Navigation (Tabs)
+     */
+    function setupPageNav() {
+        const params = new URLSearchParams(window.location.search);
+        let desired = '';
+        
+        // Prüfen auf ?tab=street oder einfach ?street
+        if (params.has('tab')) desired = params.get('tab') || '';
+        else {
+            const firstKey = Array.from(params.keys())[0];
+            desired = firstKey || (window.location.hash || '').replace('#', '');
+        }
+        
+        desired = (desired || '').trim().toLowerCase();
+        
+        // Fallback auf 'street' wenn nichts oder ungültiges gefunden
+        if (!Object.keys(categories).includes(desired)) desired = 'street';
+
+        // Event Listener für Buttons
+        document.querySelectorAll('#page-nav a.tab-btn').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = (a.getAttribute('href') || '').replace(/^\?/, '').toLowerCase();
+                const id = href || desired;
+                showGallery(id, a, true);
+            });
+        });
+
+        // Initiale Galerie laden
+        const initialLink = document.querySelector(`#page-nav a.tab-btn[href="?${desired}"]`) ||
+                            document.querySelector('#page-nav a.tab-btn[href="?street"]');
+        
+        showGallery(desired, initialLink, false);
+    }
+
+    /* --- Event Listeners Global --- */
+
+    // Relayout bei Fenster-Fokus oder Sichtbarkeit (behebt Glitches beim Tab-Wechsel)
+    document.addEventListener('visibilitychange', () => { 
+        if (document.visibilityState === 'visible') {
+            document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+        }
+    });
+    window.addEventListener('focus', () => {
+        document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+    });
+
+    // Resize Handler (Debounced)
+    let resizeTimer;
+    window.addEventListener('resize', () => { 
+        clearTimeout(resizeTimer); 
+        resizeTimer = setTimeout(() => {
+            document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
+        }, 100); 
+    });
+
+    // Start
+    window.addEventListener('DOMContentLoaded', setupPageNav);
+
+</script>
+    
 
 </body>
 

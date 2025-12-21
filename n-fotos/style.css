@@ -171,12 +171,18 @@ header {
     font-size: 0.9rem;
 }
 
+#empty-state {
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
 /* --- NEU: SCROLL TABS (ALBEN) --- */
 .scroll-tabs-wrapper {
     padding: 15px 0;
-    /* Sticky position damit sie beim scrollen oben bleiben? Optional */
-    position: sticky;
-    top: 70px;
     /* unter search bar */
     z-index: 40;
     background: var(--bg-app);
