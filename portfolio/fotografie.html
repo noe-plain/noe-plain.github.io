@@ -326,7 +326,7 @@
             </div>
 
             <div id="section-favorite" class="gallery-section">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <div class="favorites-header">
                     <h2 style="margin:0;">Favoriten</h2>
                     <button class="icon-btn" onclick="downloadFavoritesZip()" id="download-all-favs"
                         style="display:none; width:auto; padding:0 20px; border-radius:12px; font-size:1rem; gap:8px;">
@@ -492,9 +492,9 @@
                 </div>
 
                 <div class="zoom-controls">
-                    <i class="fas fa-search-minus small-icon"></i>
+                    <i class="fas fa-search-minus small-icon" id="zoom-out-btn" style="cursor: pointer;"></i>
                     <input type="range" id="zoom-slider" min="1" max="4" step="0.1" value="1">
-                    <i class="fas fa-search-plus small-icon"></i>
+                    <i class="fas fa-search-plus small-icon" id="zoom-in-btn" style="cursor: pointer;"></i>
                 </div>
 
                 <button class="icon-btn detail-nav-button left" id="detail-prev-btn"><i
@@ -528,14 +528,8 @@
                     </p>
                 </div>
 
-                <div class="specs-row">
-                    <!-- Mock Specs -->
-                    <span class="spec-badge"><i class="fas fa-camera"></i> <span id="detail-camera">Sony A7C
-                            II</span></span>
-                    <span class="spec-badge"><i class="fas fa-bullseye"></i> <span
-                            id="detail-aperture">f/1.8</span></span>
-                    <!-- <span class="spec-badge"><i class="fas fa-star"></i> <span id="detail-rating">5.0</span></span> -->
-                </div>
+                <div class="specs-row" id="specs-equipment"></div>
+                <div class="specs-row" id="specs-technical" style="margin-top: 5px;"></div>
 
                 <div class="description">
                     <p id="detail-desc"></p>
@@ -615,10 +609,47 @@
             setupPageNav();
             // setupDetailInteractions(); // Removed obsolete function
             setupZoomPan();
+            setupSwipe();
             setupEventListeners();
         });
 
         // --- LOGIC ---
+
+        function setupSwipe() {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            const threshold = 50;
+
+            const target = document.querySelector('.detail-image-wrapper');
+            if (!target) return;
+
+            target.addEventListener('touchstart', (e) => {
+                // Don't swipe if zoomed
+                if (currentScale > 1) return;
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            target.addEventListener('touchend', (e) => {
+                if (currentScale > 1) return;
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+
+                // Horizontal swipe (dominant X axis)
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                    if (diffX > 0) {
+                        // Swipe Right -> Prev
+                        navigatePhoto(-1);
+                    } else {
+                        // Swipe Left -> Next
+                        navigatePhoto(1);
+                    }
+                }
+            }, { passive: true });
+        }
 
         function setupEventListeners() {
             safeAddClick('back-btn', closeDetail);
@@ -758,36 +789,43 @@
             document.getElementById('detail-desc').innerText = "Ein Foto aus der Kategorie " + (catDisplay || "Portfolio") + ".";
 
             // EXIF Data Reading
-            const specsRow = document.querySelector('.specs-row');
-            if (specsRow) {
-                specsRow.innerHTML = ""; // Clear existing
+            const equipmentRow = document.getElementById('specs-equipment');
+            const technicalRow = document.getElementById('specs-technical');
+
+            if (equipmentRow && technicalRow) {
+                equipmentRow.innerHTML = "";
+                technicalRow.innerHTML = "";
 
                 // Add Loading State
                 const loadingSpan = document.createElement('span');
                 loadingSpan.className = 'spec-badge loading-badge';
-                loadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Lade Metadaten...`;
-                specsRow.appendChild(loadingSpan);
+                loadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Lade...`;
+                equipmentRow.appendChild(loadingSpan);
 
                 exifr.parse(photo.imageUrl).then(exif => {
                     // Clear loading
-                    if (specsRow.contains(loadingSpan)) specsRow.removeChild(loadingSpan);
+                    if (equipmentRow.contains(loadingSpan)) equipmentRow.removeChild(loadingSpan);
 
                     // Define helpers
-                    function addSpec(icon, text) {
+                    function addSpec(container, icon, text) {
                         const span = document.createElement('span');
                         span.className = 'spec-badge';
                         span.innerHTML = `<i class="${icon}"></i> ${text}`;
-                        specsRow.appendChild(span);
+                        container.appendChild(span);
                     }
 
                     if (exif) {
+                        // --- ROW 1: Equipment ---
                         // Camera Model
-                        if (exif.Model) addSpec('fas fa-camera', exif.Model);
+                        if (exif.Model) addSpec(equipmentRow, 'fas fa-camera', exif.Model);
+                        // Lens Model
+                        if (exif.LensModel) addSpec(equipmentRow, 'fas fa-circle-notch', exif.LensModel);
+
+                        // --- ROW 2: Technical ---
                         // Aperture (F-Stop)
-                        if (exif.FNumber) addSpec('fas fa-bullseye', `f/${exif.FNumber}`);
+                        if (exif.FNumber) addSpec(technicalRow, 'fas fa-bullseye', `f/${exif.FNumber}`);
                         // Shutter Speed (ExposureTime)
                         if (exif.ExposureTime) {
-                            // Convert decimal to fraction if needed, or simple display
                             const val = exif.ExposureTime;
                             let text = val;
                             if (val < 1) {
@@ -795,22 +833,22 @@
                             } else {
                                 text = `${val}s`;
                             }
-                            addSpec('fas fa-stopwatch', text);
+                            addSpec(technicalRow, 'fas fa-stopwatch', text);
                         }
                         // ISO
-                        if (exif.ISO) addSpec('fas fa-lightbulb', `ISO ${exif.ISO}`);
+                        if (exif.ISO) addSpec(technicalRow, 'fas fa-lightbulb', `ISO ${exif.ISO}`);
                     } else {
                         // Fallback if no EXIF found
-                        addSpec('fas fa-camera', 'Unbekannte Kamera');
+                        addSpec(equipmentRow, 'fas fa-camera', 'Unbekannte Kamera');
                     }
                 }).catch(e => {
                     // Clear loading
-                    if (specsRow.contains(loadingSpan)) specsRow.removeChild(loadingSpan);
+                    if (equipmentRow.contains(loadingSpan)) equipmentRow.removeChild(loadingSpan);
 
                     const span = document.createElement('span');
                     span.className = 'spec-badge';
                     span.innerHTML = `<i class="fas fa-info-circle"></i> Keine Metadaten`;
-                    specsRow.appendChild(span);
+                    equipmentRow.appendChild(span);
                 });
             }
 
@@ -880,6 +918,30 @@
                 currentScale = parseFloat(e.target.value);
                 updateTransform();
             });
+
+            // Clickable Icons
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    let newVal = parseFloat(zoomSlider.value) + 0.5;
+                    if (newVal > 4) newVal = 4;
+                    zoomSlider.value = newVal;
+                    currentScale = newVal;
+                    updateTransform();
+                });
+            }
+
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    let newVal = parseFloat(zoomSlider.value) - 0.5;
+                    if (newVal < 1) newVal = 1;
+                    zoomSlider.value = newVal;
+                    currentScale = newVal;
+                    updateTransform();
+                });
+            }
 
             let isDragging = false;
             let startX = 0;
