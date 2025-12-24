@@ -9,9 +9,9 @@
 
     <link rel="stylesheet" href="../../style.css">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-zoom.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lg-thumbnail.min.css">
+    <link rel="stylesheet" href="gallery-overlay.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
 
     <meta name="description" content="Showcase der Fotografien von Noé.">
 
@@ -91,6 +91,10 @@
             background-color: #1f0033;
             color: #fff;
             border-color: #1f0033;
+        }
+
+        #page-nav a.tab-btn:hover {
+            border-color: #ddd;
         }
 
         /* Animation für den Tab-Wechsel */
@@ -299,6 +303,7 @@
             type="button">&gt;</button>
 
         <div id="page-nav">
+            <a href="?favorite" class="tab-btn"><i class="fa-solid fa-heart"></i></a>
             <a href="?street" class="tab-btn">Street</a>
             <a href="?portraet" class="tab-btn">Porträt</a>
             <a href="?aviation" class="tab-btn">Aviation</a>
@@ -318,6 +323,17 @@
             <div id="section-street" class="gallery-section active">
                 <h2>Street Photo&shy;graphy</h2>
                 <div id="lightgallery-street" class="project-gallery"></div>
+            </div>
+
+            <div id="section-favorite" class="gallery-section">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <h2 style="margin:0;">Favoriten</h2>
+                    <button class="icon-btn" onclick="downloadFavoritesZip()" id="download-all-favs"
+                        style="display:none; width:auto; padding:0 20px; border-radius:12px; font-size:1rem; gap:8px;">
+                        <i class="fas fa-file-archive"></i> Alle als ZIP laden
+                    </button>
+                </div>
+                <div id="lightgallery-favorite" class="project-gallery"></div>
             </div>
 
             <div id="section-aviation" class="gallery-section">
@@ -467,317 +483,895 @@
         }
     </script>
 
-    <!-- Init on DOM ready -->
+
+    <section id="detail-screen" class="screen hidden">
+        <div class="detail-container">
+            <div class="detail-image-wrapper">
+                <div class="zoom-container">
+                    <div class="zoom-target" id="zoom-target"></div>
+                </div>
+
+                <div class="zoom-controls">
+                    <i class="fas fa-search-minus small-icon"></i>
+                    <input type="range" id="zoom-slider" min="1" max="4" step="0.1" value="1">
+                    <i class="fas fa-search-plus small-icon"></i>
+                </div>
+
+                <button class="icon-btn detail-nav-button left" id="detail-prev-btn"><i
+                        class="fas fa-chevron-left"></i></button>
+                <button class="icon-btn detail-nav-button right" id="detail-next-btn"><i
+                        class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="detail-header-overlay">
+                <button class="icon-btn" id="back-btn"><i class="fas fa-chevron-left"></i></button>
+                <div class="right-actions">
+                    <button class="icon-btn bookmark-btn" id="detail-fav-btn"><i class="far fa-heart"></i></button>
+                    <!-- Info Button replaces Add to Album -->
+                    <button class="icon-btn" id="info-toggle-btn"><i class="fas fa-info"></i></button>
+                    <button class="icon-btn" id="download-btn"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+
+            <div class="detail-content" id="detail-content-sheet">
+                <button class="sheet-close-btn" id="sheet-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <!-- Mock Price or remove -->
+                <!-- <div class="price-tag" id="detail-price"></div> -->
+
+                <div class="detail-info-header">
+                    <h2 id="detail-title"></h2>
+                    <p class="photographer"><i class="fas fa-user-circle"></i> <span id="detail-photographer">Noé
+                            Plain</span>
+                    </p>
+                </div>
+
+                <div class="specs-row">
+                    <!-- Mock Specs -->
+                    <span class="spec-badge"><i class="fas fa-camera"></i> <span id="detail-camera">Sony A7C
+                            II</span></span>
+                    <span class="spec-badge"><i class="fas fa-bullseye"></i> <span
+                            id="detail-aperture">f/1.8</span></span>
+                    <!-- <span class="spec-badge"><i class="fas fa-star"></i> <span id="detail-rating">5.0</span></span> -->
+                </div>
+
+                <div class="description">
+                    <p id="detail-desc"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <div id="modal-add-to-album" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Zu Album hinzufügen</h3>
+            <div id="album-selection-list" class="selection-list"></div>
+            <div class="modal-buttons">
+                <button class="btn-cancel">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <script>
-        window.addEventListener('DOMContentLoaded', setupPageNav);
-    </script>
+        // --- STATE MANAGEMENT ---
+        let galleryData = []; // Stores objects { id, imageUrl, title, category, ... }
+        let activePhotoId = null;
+        let favoriteIds = [];
+        let albums = [];
 
-    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/zoom/lg-zoom.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
+        // Zoom Variables
+        let currentScale = 1;
+        let pannedX = 0;
+        let pannedY = 0;
 
-    <script>
-    // Konfiguration der Kategorien
-    const categories = {
-        street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
-        aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
-        portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
-        bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
-        event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
-    };
+        // --- DOM ELEMENTE ---
+        const detailScreen = document.getElementById('detail-screen');
+        const zoomTarget = document.getElementById('zoom-target');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const detailContent = document.getElementById('detail-content-sheet');
+        // sheetToggleBtn removed
+        const mainHeader = document.querySelector('header'); // Main site header
 
-    /**
-     * Berechnet die Anzahl der Spalten basierend auf der Container-Breite.
-     */
-    function getColumnCount(container, minColWidth = 280) {
-        const gap = parseFloat(getComputedStyle(container).gap) || 15;
-        const width = container.clientWidth;
-        // Mindestens 1 Spalte, maximal 3 (oder mehr, wenn gewünscht)
-        const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
-        return Math.min(3, cols); 
-    }
+        // --- COOKIE HELPER ---
+        const CookieManager = {
+            set: (name, value, days = 365) => {
+                const d = new Date();
+                d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+                let expires = "expires=" + d.toUTCString();
+                document.cookie = name + "=" + JSON.stringify(value) + ";" + expires + ";path=/;SameSite=Strict";
+            },
+            get: (name) => {
+                let nameEQ = name + "=";
+                let ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i].trim();
+                    if (c.indexOf(nameEQ) == 0) {
+                        try { return JSON.parse(c.substring(nameEQ.length, c.length)); } catch (e) { return null; }
+                    }
+                }
+                return null;
+            }
+        };
 
-    /**
-     * NEUE LOGIK:
-     * Berechnet die Höhe (row spans) strikt nach dem Raster:
-     * - Landscape (Querformat): Verhältnis 3:2
-     * - Portrait (Hochformat): Höhe von 2 Landscapes + Gap
-     */
-    function computeSpan(img, itemWidth, rowHeight, gap) {
-        // 1. Basis-Höhe für ein Querformat-Bild (3:2 Ratio -> Breite / 1.5)
-        const baseLandscapeHeight = itemWidth / 1.5;
+        // --- INIT ---
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load Data First
+            const savedFavs = CookieManager.get('pl_favs');
+            if (savedFavs) favoriteIds = savedFavs;
 
-        // 2. Prüfen, ob das geladene Bild Hoch- oder Querformat ist
-        const naturalRatio = (img.naturalWidth / img.naturalHeight);
-        const isPortrait = naturalRatio < 1.0; 
+            const savedAlbums = CookieManager.get('pl_albums');
+            if (savedAlbums) albums = savedAlbums;
 
-        let targetHeight;
+            // Then Setup UI
+            setupPageNav();
+            // setupDetailInteractions(); // Removed obsolete function
+            setupZoomPan();
+            setupEventListeners();
+        });
 
-        if (isPortrait) {
-            // Hochformat: Exakt so hoch wie zwei Querformate übereinander + der Zwischenraum
-            targetHeight = (baseLandscapeHeight * 2) + gap;
-        } else {
-            // Querformat: Standard 3:2 Höhe
-            targetHeight = baseLandscapeHeight;
+        // --- LOGIC ---
+
+        function setupEventListeners() {
+            safeAddClick('back-btn', closeDetail);
+            safeAddClick('detail-fav-btn', () => toggleFavorite(activePhotoId));
+            safeAddClick('detail-prev-btn', () => navigatePhoto(-1));
+            safeAddClick('detail-next-btn', () => navigatePhoto(1));
+
+            // Album Features
+            // Info Toggle (replaces Add to Album)
+            safeAddClick('info-toggle-btn', () => {
+                const sheet = document.getElementById('detail-content-sheet');
+                if (sheet) {
+                    sheet.classList.toggle('minimized');
+                    // We don't toggle icon anymore as requested
+                }
+            });
+            // Close Sheet Button
+            safeAddClick('sheet-close-btn', () => {
+                const sheet = document.getElementById('detail-content-sheet');
+                if (sheet) sheet.classList.add('minimized');
+            });
+
+            document.querySelectorAll('.btn-cancel').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modal = btn.closest('.modal-overlay');
+                    if (modal) modal.classList.add('hidden');
+                });
+            });
+
+            safeAddClick('download-btn', () => {
+                const photo = galleryData.find(p => p.id === activePhotoId);
+                if (photo) {
+                    const link = document.createElement('a');
+                    link.href = photo.imageUrl;
+                    link.download = `NoeMedia_${photo.title || 'photo'}.jpg`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast("Download gestartet");
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (!detailScreen.classList.contains('active')) return;
+                if (e.key === 'ArrowRight') navigatePhoto(1);
+                if (e.key === 'ArrowLeft') navigatePhoto(-1);
+                if (e.key === 'Escape') closeDetail();
+            });
         }
 
-        // 3. Umrechnung in Grid-Zeilen (Spans)
-        // (Zielhöhe + Gap) / (Zeilenhöhe + Gap) -> aufgerundet
-        const span = Math.ceil((targetHeight + gap) / (rowHeight + gap));
+        function safeAddClick(id, func) {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', func);
+        }
 
-        return Math.max(1, span);
-    }
+        function toggleFavorite(id) {
+            if (!id) return;
+            if (favoriteIds.includes(id)) {
+                favoriteIds = favoriteIds.filter(fid => fid !== id);
+                showToast("Entfernt");
+            } else {
+                favoriteIds.push(id);
+                showToast("Favorisiert");
+            }
+            CookieManager.set('pl_favs', favoriteIds);
+            updateDetailFavBtn();
+            // Update Tab Visibility in Realtime
+            const favTab = document.querySelector('a.tab-btn[href="?favorite"]');
+            if (favTab) {
+                favTab.style.display = favoriteIds.length > 0 ? 'inline-block' : 'none';
+            }
+        }
 
-    /**
-     * Layoutet das Grid neu. Wird bei Resize, Tab-Wechsel und Bild-Load aufgerufen.
-     */
-    function relayoutGrid(container) {
-        if (!container) return;
-        
-        // CSS-Werte auslesen
-        const compStyle = getComputedStyle(container);
-        const rowHeight = parseFloat(compStyle.gridAutoRows) || 1; // Fallback auf 1px wenn CSS fehlt
-        const gap = parseFloat(compStyle.gap) || 15;
-        
-        // Spalten berechnen
-        const cols = getColumnCount(container, 280);
-        container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        function updateDetailFavBtn() {
+            const btn = document.getElementById('detail-fav-btn');
+            if (!btn) return;
+            const icon = btn.querySelector('i');
+            if (favoriteIds.includes(activePhotoId)) {
+                btn.classList.add('active');
+                icon.classList.replace('far', 'fas');
+            } else {
+                btn.classList.remove('active');
+                icon.classList.replace('fas', 'far');
+            }
+        }
 
-        // Spalten-Breite berechnen (Container minus Gaps geteilt durch Anzahl Spalten)
-        const totalGap = (cols - 1) * gap;
-        const colWidth = (container.clientWidth - totalGap) / cols;
+        /* --- ALBUM FUNCTIONS --- */
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.innerText = msg;
+            t.classList.add('active');
+            setTimeout(() => { t.classList.remove('active'); }, 2000);
+        }
 
-        // Masonry Algorithmus: Fülle immer die kürzeste Spalte auf
-        const colHeights = new Array(cols).fill(0);
+        // --- DETAIL VIEW ---
 
-        container.querySelectorAll('.gallery-item').forEach(item => {
-            const img = item.querySelector('img');
-            if (!img) return;
+        function openDetail(id) {
+            activePhotoId = id;
+            const photo = galleryData.find(p => p.id === id);
+            if (!photo) return;
 
-            // Span berechnen mit neuer Logik
-            const span = computeSpan(img, colWidth, rowHeight, gap);
-            
-            // Finde die Spalte mit der geringsten aktuellen Höhe
-            let targetCol = 0;
-            for (let i = 1; i < colHeights.length; i++) {
-                if (colHeights[i] < colHeights[targetCol]) {
-                    targetCol = i;
+            currentScale = 1;
+            pannedX = 0;
+            pannedY = 0;
+            if (zoomSlider) zoomSlider.value = 1;
+            updateTransform();
+
+            // Check minimized state
+            detailContent.classList.add('minimized');
+
+            updateDetailContent(photo);
+
+            if (mainHeader) mainHeader.style.display = 'none'; // Hide header
+
+            if (detailScreen) {
+                detailScreen.classList.remove('hidden'); // make display block
+                setTimeout(() => detailScreen.classList.add('active'), 10);
+            }
+        }
+
+        function updateDetailContent(photo) {
+            if (zoomTarget) {
+                zoomTarget.style.backgroundImage = `url(${photo.imageUrl})`;
+            }
+
+            // Title Format: Bild [Nummer] – [Kategorie]
+            // We can parse the number from the photo ID or index
+            // photo.id e.g. "street-01" -> extract 01
+            const numMatch = photo.id.match(/\d+$/);
+            const num = numMatch ? numMatch[0] : "00";
+            // Capitalize category
+            const catDisplay = photo.category.charAt(0).toUpperCase() + photo.category.slice(1);
+
+            document.getElementById('detail-title').innerText = `Bild ${num} – ${catDisplay}`;
+            document.getElementById('detail-photographer').innerText = photo.photographer || "Noé Plain";
+            document.getElementById('detail-desc').innerText = "Ein Foto aus der Kategorie " + (catDisplay || "Portfolio") + ".";
+
+            // EXIF Data Reading
+            const specsRow = document.querySelector('.specs-row');
+            if (specsRow) {
+                specsRow.innerHTML = ""; // Clear existing
+
+                // Add Loading State
+                const loadingSpan = document.createElement('span');
+                loadingSpan.className = 'spec-badge loading-badge';
+                loadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Lade Metadaten...`;
+                specsRow.appendChild(loadingSpan);
+
+                exifr.parse(photo.imageUrl).then(exif => {
+                    // Clear loading
+                    if (specsRow.contains(loadingSpan)) specsRow.removeChild(loadingSpan);
+
+                    // Define helpers
+                    function addSpec(icon, text) {
+                        const span = document.createElement('span');
+                        span.className = 'spec-badge';
+                        span.innerHTML = `<i class="${icon}"></i> ${text}`;
+                        specsRow.appendChild(span);
+                    }
+
+                    if (exif) {
+                        // Camera Model
+                        if (exif.Model) addSpec('fas fa-camera', exif.Model);
+                        // Aperture (F-Stop)
+                        if (exif.FNumber) addSpec('fas fa-bullseye', `f/${exif.FNumber}`);
+                        // Shutter Speed (ExposureTime)
+                        if (exif.ExposureTime) {
+                            // Convert decimal to fraction if needed, or simple display
+                            const val = exif.ExposureTime;
+                            let text = val;
+                            if (val < 1) {
+                                text = `1/${Math.round(1 / val)}`;
+                            } else {
+                                text = `${val}s`;
+                            }
+                            addSpec('fas fa-stopwatch', text);
+                        }
+                        // ISO
+                        if (exif.ISO) addSpec('fas fa-lightbulb', `ISO ${exif.ISO}`);
+                    } else {
+                        // Fallback if no EXIF found
+                        addSpec('fas fa-camera', 'Unbekannte Kamera');
+                    }
+                }).catch(e => {
+                    // Clear loading
+                    if (specsRow.contains(loadingSpan)) specsRow.removeChild(loadingSpan);
+
+                    const span = document.createElement('span');
+                    span.className = 'spec-badge';
+                    span.innerHTML = `<i class="fas fa-info-circle"></i> Keine Metadaten`;
+                    specsRow.appendChild(span);
+                });
+            }
+
+            updateDetailFavBtn();
+        }
+
+        function closeDetail() {
+            if (detailScreen) {
+                detailScreen.classList.remove('active');
+                setTimeout(() => {
+                    if (mainHeader) mainHeader.style.display = '';
+                }, 100);
+                setTimeout(() => {
+                    detailScreen.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function navigatePhoto(direction) {
+            // Filter based on currently visible tab content? 
+            // For simplicity, navigate all loaded photos of CURRENT CATEGORY if possible.
+            // We can check query param to filter galleryData.
+
+            const params = new URLSearchParams(window.location.search);
+            let currentCat = 'street';
+            if (params.has('tab')) currentCat = params.get('tab');
+            else {
+                const keys = Object.keys(categories);
+                for (let k of keys) {
+                    if (params.has(k)) { currentCat = k; break; }
                 }
             }
 
-            // Item platzieren
-            item.style.gridColumnStart = String(targetCol + 1);
-            item.style.gridRowEnd = `span ${span}`;
+            const currentList = galleryData.filter(p => p.category === currentCat);
+            if (currentList.length === 0) return;
 
-            // Neue Höhe der Spalte speichern
-            colHeights[targetCol] += span * (rowHeight + gap);
-        });
-    }
+            const currentIndex = currentList.findIndex(p => p.id === activePhotoId);
+            if (currentIndex === -1) return;
 
-    /**
-     * LightGallery Initialisierung
-     */
-    function initLightGallery(containerId) {
-        const el = document.getElementById(containerId);
-        if (!el) return;
-        
-        // Alte Instanz zerstören, falls vorhanden
-        if (el.lgInstance) {
-            try { el.lgInstance.destroy(); } catch (_) { }
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = currentList.length - 1;
+            if (newIndex >= currentList.length) newIndex = 0;
+
+            activePhotoId = currentList[newIndex].id;
+
+            const wrapper = document.querySelector('.detail-image-wrapper');
+            wrapper.style.opacity = 0;
+            setTimeout(() => {
+                currentScale = 1;
+                pannedX = 0; pannedY = 0;
+                if (zoomSlider) zoomSlider.value = 1;
+                updateTransform();
+
+                updateDetailContent(currentList[newIndex]);
+                wrapper.style.opacity = 1;
+            }, 200);
         }
-        
-        try {
-            el.lgInstance = lightGallery(el, {
-                plugins: [lgZoom, lgThumbnail],
-                selector: '.gallery-item',
-                speed: 500,
-                download: true,
-                zoom: true,
-                thumbnail: true,
-                actualSize: true,
-                mobileSettings: { controls: false, showCloseIcon: true, download: false },
-                closeOnTap: true
+
+        function setupDetailInteractions() {
+            // Functionality moved to info-toggle-btn/sheet-close-btn
+        }
+
+        function setupZoomPan() {
+            if (!zoomSlider || !zoomTarget) return;
+
+            zoomSlider.addEventListener('input', (e) => {
+                currentScale = parseFloat(e.target.value);
+                updateTransform();
             });
-        } catch (e) {
-            console.warn('lightGallery init failed', e);
+
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+
+            const startDrag = (e) => {
+                if (currentScale <= 1) return;
+                isDragging = true;
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                startY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+                zoomTarget.style.cursor = 'grabbing';
+            };
+
+            const stopDrag = () => {
+                isDragging = false;
+                zoomTarget.style.cursor = currentScale > 1 ? 'grab' : 'default';
+            };
+
+            const moveDrag = (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const currentY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+
+                const diffX = currentX - startX;
+                const diffY = currentY - startY;
+
+                pannedX += diffX / currentScale;
+                pannedY += diffY / currentScale;
+
+                startX = currentX;
+                startY = currentY;
+
+                updateTransform();
+            };
+
+            zoomTarget.addEventListener('mousedown', startDrag);
+            zoomTarget.addEventListener('touchstart', startDrag, { passive: false });
+
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchend', stopDrag);
+
+            window.addEventListener('mousemove', moveDrag);
+            window.addEventListener('touchmove', moveDrag, { passive: false });
         }
-    }
 
-    /* --- Loader Logik --- */
-    function showLoader(id) {
-        if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
-        window.__activeGalleryLoads.add(id || '__global');
-        document.getElementById('loader')?.classList.add('visible');
-    }
+        function updateTransform() {
+            if (currentScale == 1) {
+                pannedX = 0;
+                pannedY = 0;
+                if (zoomTarget) zoomTarget.style.cursor = 'default';
+            } else {
+                if (zoomTarget) zoomTarget.style.cursor = 'grab';
+            }
 
-    function hideLoader(id) {
-        if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
-        window.__activeGalleryLoads.delete(id || '__global');
-        if (window.__activeGalleryLoads.size === 0) {
-            document.getElementById('loader')?.classList.remove('visible');
+            if (zoomTarget) {
+                zoomTarget.style.transform = `scale(${currentScale}) translate(${pannedX}px, ${pannedY}px)`;
+            }
         }
-    }
 
-    /**
-     * Bilder laden (Sequential Check Pattern)
-     */
-    function loadImages(categoryId) {
-        const cat = categories[categoryId];
-        const container = document.getElementById(cat.container);
-        if (!container) return;
-        
-        // Verhindern, dass wir laden, wenn schon geladen ist oder gerade geladen wird
-        if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
 
-        container.dataset.loading = "true";
-        showLoader(cat.container);
+        /* --- EXISTING LOGIC MODIFIED --- */
 
-        let index = 1;
+        // Konfiguration der Kategorien
+        const categories = {
+            street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
+            aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
+            portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
+            bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
+            event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
+        };
 
-        function tryLoadNext() {
-            // Formatierung: 01, 02, ... 10, 11
-            const imgNum = index < 10 ? `0${index}` : index;
-            const fileName = `${cat.prefix}${imgNum}.jpeg`;
-            const fullPath = cat.path + fileName;
+        /**
+         * Berechnet die Anzahl der Spalten basierend auf der Container-Breite.
+         */
+        function getColumnCount(container, minColWidth = 280) {
+            const gap = parseFloat(getComputedStyle(container).gap) || 15;
+            const width = container.clientWidth;
+            // Mindestens 1 Spalte, maximal 3 (oder mehr, wenn gewünscht)
+            const cols = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
+            return Math.min(3, cols);
+        }
 
-            // Check ob Bild schon im DOM ist (Duplicate check)
-            if (container.querySelector(`a.gallery-item[href="${fullPath}"]`)) {
-                index++;
-                // Safety break bei 999 Bildern
-                if (index > 999) finishLoading();
-                else tryLoadNext();
+        /**
+         * NEUE LOGIK:
+         * Berechnet die Höhe (row spans) basierend auf der dynamischen Zeilenhöhe (1 Landscape-Höhe).
+         */
+        function computeSpan(img, itemWidth, rowHeight, gap) {
+            // Target Height Portrait (2:3) -> Breite * 1.5
+            // Target Height Landscape (3:2) -> Breite / 1.5 ( = rowHeight)
+
+            // Wenn wir strict rowHeight = LandscapeHeight nutzen:
+            // Landscape Span = 1
+            // Portrait Span = wie viele Landscape-Zeilen passen in ein Portrait?
+            // Portrait Height = 1.5 * Width
+            // Row Height = 0.666 * Width
+            // Span = (TargetH + G) / (RowH + G)
+
+            const naturalRatio = (img.naturalWidth / img.naturalHeight);
+            const isPortrait = naturalRatio < 1.0;
+
+            if (!isPortrait) return 1;
+
+            // Für Portrait: Zielhöhe berechnen
+            const targetHeight = itemWidth * 1.5;
+            // Berechnen des idealen Spans
+            const span = Math.round((targetHeight + gap) / (rowHeight + gap));
+
+            // Mindestens 1, meistens wird es 2 sein (da 2*0.66 = 1.33, etwas crop, aber clean grid)
+            return Math.max(1, span);
+        }
+
+        /**
+         * Layoutet das Grid neu. Wird bei Resize, Tab-Wechsel und Bild-Load aufgerufen.
+         */
+        function relayoutGrid(container) {
+            if (!container) return;
+
+            // Spalten berechnen
+            const cols = getColumnCount(container, 280);
+            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            // Spalten-Breite berechnen (Container minus Gaps geteilt durch Anzahl Spalten)
+            // Um präzise CSS Grid Berechnung zu simulieren
+            const gap = parseFloat(getComputedStyle(container).gap) || 15;
+            const totalGap = (cols - 1) * gap;
+            const colWidth = (container.clientWidth - totalGap) / cols;
+
+            // DYNAMISCHE ZEILENHÖHE:
+            // Wir setzen die grid-auto-rows exakt auf die Höhe eines Landscape-Bildes (3:2)
+            const rowHeight = colWidth / 1.5;
+            container.style.gridAutoRows = `${rowHeight}px`;
+
+            // Masonry Algorithmus: Fülle immer die kürzeste Spalte auf
+            const colHeights = new Array(cols).fill(0);
+
+            container.querySelectorAll('.gallery-item').forEach(item => {
+                const img = item.querySelector('img');
+                if (!img) return;
+
+                // Span berechnen mit neuer Logik
+                const span = computeSpan(img, colWidth, rowHeight, gap);
+
+                // Finde die Spalte mit der geringsten aktuellen Höhe
+                let targetCol = 0;
+                for (let i = 1; i < colHeights.length; i++) {
+                    if (colHeights[i] < colHeights[targetCol]) {
+                        targetCol = i;
+                    }
+                }
+
+                // Item platzieren
+                item.style.gridColumnStart = String(targetCol + 1);
+                item.style.gridRowEnd = `span ${span}`;
+
+                // Neue Höhe der Spalte speichern
+                colHeights[targetCol] += span * (rowHeight + gap);
+            });
+        }
+
+        /* --- Loader Logik --- */
+        function showLoader(id) {
+            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+            window.__activeGalleryLoads.add(id || '__global');
+            document.getElementById('loader')?.classList.add('visible');
+        }
+
+        function hideLoader(id) {
+            if (!window.__activeGalleryLoads) window.__activeGalleryLoads = new Set();
+            window.__activeGalleryLoads.delete(id || '__global');
+            if (window.__activeGalleryLoads.size === 0) {
+                document.getElementById('loader')?.classList.remove('visible');
+            }
+        }
+
+        /**
+         * Bilder laden (Sequential Check Pattern)
+         */
+        function loadImages(categoryId) {
+            const cat = categories[categoryId];
+            const container = document.getElementById(cat.container);
+            if (!container) return;
+
+            // Verhindern, dass wir laden, wenn schon geladen ist oder gerade geladen wird
+            if (container.dataset.loaded === "true" || container.dataset.loading === "true") return;
+
+            container.dataset.loading = "true";
+            showLoader(cat.container);
+
+            let index = 1;
+
+            function tryLoadNext() {
+                // Formatierung: 01, 02, ... 10, 11
+                const imgNum = index < 10 ? `0${index}` : index;
+                const fileName = `${cat.prefix}${imgNum}.jpeg`;
+                const fullPath = cat.path + fileName;
+
+                // Unique ID for internal data
+                const photoId = `${cat.prefix}${imgNum}`;
+
+                // Check ob Bild schon im DOM ist (Duplicate check)
+                if (container.querySelector(`a.gallery-item[href="${fullPath}"], div.gallery-item[data-id="${photoId}"]`)) {
+                    index++;
+                    // Safety break bei 999 Bildern
+                    if (index > 999) finishLoading();
+                    else tryLoadNext();
+                    return;
+                }
+
+                const img = new Image();
+                img.onload = function () {
+                    // Modified: Create Div instead of A anchor for custom click handling
+                    // Or keep A for accessibility but preventDefault
+                    const anchor = document.createElement('a');
+                    anchor.className = 'gallery-item';
+                    anchor.href = "#";
+                    anchor.dataset.id = photoId;
+
+                    // Add to Global Data
+                    const photoObj = {
+                        id: photoId,
+                        imageUrl: fullPath,
+                        title: `${categoryId.charAt(0).toUpperCase() + categoryId.slice(1)} #${index}`,
+                        category: categoryId,
+                        photographer: "Noé Plain",
+                    };
+                    // avoid duplicates in data
+                    if (!galleryData.find(p => p.id === photoId)) {
+                        galleryData.push(photoObj);
+                    }
+
+                    anchor.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openDetail(photoId);
+                    });
+
+                    // Alt-Text generieren
+                    anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} photography ${index}">`;
+
+                    container.appendChild(anchor);
+
+                    // Nach jedem Bild kurz layouten, damit es nicht "springt"
+                    // requestAnimationFrame sorgt für flüssigen Ablauf
+                    requestAnimationFrame(() => relayoutGrid(container));
+
+                    index++;
+                    tryLoadNext();
+                };
+
+                img.onerror = function () {
+                    // Wenn ein Bild nicht gefunden wird (404), gehen wir davon aus, dass die Serie zu Ende ist
+                    finishLoading();
+                };
+
+                img.src = fullPath;
+            }
+
+            function finishLoading() {
+                container.dataset.loaded = "true";
+                container.dataset.loading = "false";
+                hideLoader(cat.container);
+                // Finales Layout und Init
+                relayoutGrid(container);
+            }
+
+            tryLoadNext();
+        }
+
+        /**
+         * Hauptfunktion zum Anzeigen einer Galerie (Tab-Wechsel)
+         */
+        function showGallery(id, sourceLink = null, push = true) {
+            // UI Updates
+            document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const sec = document.getElementById('section-' + id);
+            if (sec) sec.classList.add('active');
+            if (sourceLink) sourceLink.classList.add('active');
+
+            // URL Update
+            if (push) history.replaceState({}, '', '?' + id);
+
+            if (id === 'favorite') {
+                loadFavorites();
+            } else {
+                // Bilder laden
+                loadImages(id);
+            }
+
+            const cat = categories[id];
+            const containerName = cat ? cat.container : (id === 'favorite' ? 'lightgallery-favorite' : null);
+
+            if (!containerName) return;
+            const container = document.getElementById(containerName);
+
+            // Mehrfaches Relayout, um Layout-Shifts durch nachladende Fonts/Styles abzufangen
+            if (container) {
+                [50, 200, 500].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
+            }
+        }
+
+        // --- FAVORITES LOGIC ---
+        function loadFavorites() {
+            const container = document.getElementById('lightgallery-favorite');
+            const dlBtn = document.getElementById('download-all-favs');
+
+            if (!container) return;
+            container.innerHTML = ""; // Always rebuild to reflect removals
+
+            if (favoriteIds.length === 0) {
+                const msg = document.createElement('p');
+                msg.innerText = "Noch keine Favoriten markiert.";
+                msg.style.color = "#666";
+                msg.style.padding = "20px";
+                container.appendChild(msg);
+
+                if (dlBtn) dlBtn.style.display = 'none';
                 return;
             }
 
-            const img = new Image();
-            img.onload = function () {
+            if (dlBtn) dlBtn.style.display = 'flex';
+
+            favoriteIds.forEach(id => {
+                // Parse ID "category-number" e.g. "street-05"
+                // Find matching category prefix
+                const catKey = Object.keys(categories).find(key => id.startsWith(categories[key].prefix));
+                if (!catKey) return;
+
+                const cat = categories[catKey];
+                const num = id.replace(cat.prefix, '');
+                const fullPath = cat.path + cat.prefix + num + '.jpeg';
+
+                // Construct Element (Div + Image) similar to loadImages
                 const anchor = document.createElement('a');
                 anchor.className = 'gallery-item';
-                anchor.href = fullPath;
-                // Alt-Text generieren
-                anchor.innerHTML = `<img src="${fullPath}" alt="${categoryId} photography ${index}">`;
+                anchor.href = "#";
+                anchor.dataset.id = id;
 
+                // Add to Global Data if not exists (Favorites might be loaded first)
+                const photoObj = {
+                    id: id,
+                    imageUrl: fullPath,
+                    title: `${catKey.charAt(0).toUpperCase() + catKey.slice(1)} #${num}`,
+                    category: catKey,
+                    photographer: "Noé Plain",
+                };
+                if (!galleryData.find(p => p.id === id)) {
+                    galleryData.push(photoObj);
+                }
+
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openDetail(id);
+                });
+
+                anchor.innerHTML = `<img src="${fullPath}" alt="Favorite ${id}">`;
                 container.appendChild(anchor);
-
-                // Nach jedem Bild kurz layouten, damit es nicht "springt"
-                // requestAnimationFrame sorgt für flüssigen Ablauf
-                requestAnimationFrame(() => relayoutGrid(container));
-
-                index++;
-                tryLoadNext();
-            };
-
-            img.onerror = function () {
-                // Wenn ein Bild nicht gefunden wird (404), gehen wir davon aus, dass die Serie zu Ende ist
-                finishLoading();
-            };
-
-            img.src = fullPath;
-        }
-
-        function finishLoading() {
-            container.dataset.loaded = "true";
-            container.dataset.loading = "false";
-            hideLoader(cat.container);
-            // Finales Layout und Init
-            relayoutGrid(container);
-            initLightGallery(cat.container);
-        }
-
-        tryLoadNext();
-    }
-
-    /**
-     * Hauptfunktion zum Anzeigen einer Galerie (Tab-Wechsel)
-     */
-    function showGallery(id, sourceLink = null, push = true) {
-        // UI Updates
-        document.querySelectorAll('.gallery-section').forEach(sec => sec.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        
-        const sec = document.getElementById('section-' + id);
-        if (sec) sec.classList.add('active');
-        if (sourceLink) sourceLink.classList.add('active');
-        
-        // URL Update
-        if (push) history.replaceState({}, '', '?' + id);
-
-        // Bilder laden
-        loadImages(id);
-
-        const cat = categories[id];
-        if (!cat) return;
-        const container = document.getElementById(cat.container);
-        
-        // Mehrfaches Relayout, um Layout-Shifts durch nachladende Fonts/Styles abzufangen
-        if (container) {
-            [50, 200, 500].forEach(ms => setTimeout(() => relayoutGrid(container), ms));
-        }
-    }
-
-    /**
-     * Setup der Page Navigation (Tabs)
-     */
-    function setupPageNav() {
-        const params = new URLSearchParams(window.location.search);
-        let desired = '';
-        
-        // Prüfen auf ?tab=street oder einfach ?street
-        if (params.has('tab')) desired = params.get('tab') || '';
-        else {
-            const firstKey = Array.from(params.keys())[0];
-            desired = firstKey || (window.location.hash || '').replace('#', '');
-        }
-        
-        desired = (desired || '').trim().toLowerCase();
-        
-        // Fallback auf 'street' wenn nichts oder ungültiges gefunden
-        if (!Object.keys(categories).includes(desired)) desired = 'street';
-
-        // Event Listener für Buttons
-        document.querySelectorAll('#page-nav a.tab-btn').forEach(a => {
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                const href = (a.getAttribute('href') || '').replace(/^\?/, '').toLowerCase();
-                const id = href || desired;
-                showGallery(id, a, true);
             });
+
+            relayoutGrid(container);
+        }
+
+        function downloadFavoritesZip() {
+            if (favoriteIds.length === 0) {
+                showToast("Keine Favoriten zum Downloaden");
+                return;
+            }
+            showToast("ZIP wird erstellt...");
+
+            const zip = new JSZip();
+            const folder = zip.folder("NoeMedia_Favorites");
+            const promises = [];
+
+            favoriteIds.forEach(id => {
+                const photo = galleryData.find(p => p.id === id);
+                // Fallback parsing if galleryData is incomplete
+                let url = photo ? photo.imageUrl : null;
+                if (!url) {
+                    const catKey = Object.keys(categories).find(key => id.startsWith(categories[key].prefix));
+                    if (catKey) {
+                        const cat = categories[catKey];
+                        const num = id.replace(cat.prefix, '');
+                        url = cat.path + cat.prefix + num + '.jpeg';
+                    }
+                }
+
+                if (url) {
+                    const filename = id + ".jpg";
+                    promises.push(
+                        fetch(url)
+                            .then(res => {
+                                if (!res.ok) throw new Error("Fetch fail " + url);
+                                return res.blob();
+                            })
+                            .then(blob => {
+                                folder.file(filename, blob);
+                            })
+                            .catch(err => console.warn("Failed to load for zip:", url))
+                    );
+                }
+            });
+
+            Promise.all(promises).then(() => {
+                zip.generateAsync({ type: "blob" }).then(function (content) {
+                    // Trigger download
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(content);
+                    link.download = "NoePlain_Favorites.zip";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast("Download gestartet");
+                });
+            });
+        }
+
+        /**
+         * Setup der Page Navigation (Tabs)
+         */
+        function setupPageNav() {
+            // -- FAVORITES TAB VISIBILITY --
+            const favTab = document.querySelector('a.tab-btn[href="?favorite"]');
+            if (favTab) {
+                if (favoriteIds.length > 0) {
+                    favTab.style.display = 'inline-block';
+                } else {
+                    favTab.style.display = 'none';
+                }
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            let desired = '';
+
+            // Prüfen auf ?tab=street oder einfach ?street
+            if (params.has('tab')) desired = params.get('tab') || '';
+            else {
+                const firstKey = Array.from(params.keys())[0];
+                desired = firstKey || (window.location.hash || '').replace('#', '');
+            }
+
+            desired = (desired || '').trim().toLowerCase();
+
+            // Fallback auf 'street' wenn nichts oder ungültiges gefunden, 
+            // ABER 'favorite' ist auch gültig wenn vorhanden
+            const validKeys = [...Object.keys(categories), 'favorite'];
+            if (!validKeys.includes(desired)) desired = 'street';
+
+            // Wenn 'favorite' gewünscht ist, aber leer, fallback auf street
+            if (desired === 'favorite' && favoriteIds.length === 0) desired = 'street';
+
+            // Event Listener für Buttons
+            document.querySelectorAll('#page-nav a.tab-btn').forEach(a => {
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const href = (a.getAttribute('href') || '').replace(/^\?/, '').toLowerCase();
+                    const id = href || desired;
+                    showGallery(id, a, true);
+                });
+            });
+
+            // Initiale Galerie laden
+            const initialLink = document.querySelector(`#page-nav a.tab-btn[href="?${desired}"]`) ||
+                document.querySelector('#page-nav a.tab-btn[href="?street"]');
+
+            showGallery(desired, initialLink, false);
+        }
+
+        /* --- Event Listeners Global --- */
+
+        // Relayout bei Fenster-Fokus oder Sichtbarkeit (behebt Glitches beim Tab-Wechsel)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                document.querySelectorAll('.project-gallery').forEach(c => relayoutGrid(c));
+            }
+        });
+        window.addEventListener('focus', () => {
+            document.querySelectorAll('.project-gallery').forEach(c => relayoutGrid(c));
         });
 
-        // Initiale Galerie laden
-        const initialLink = document.querySelector(`#page-nav a.tab-btn[href="?${desired}"]`) ||
-                            document.querySelector('#page-nav a.tab-btn[href="?street"]');
-        
-        showGallery(desired, initialLink, false);
-    }
+        // Resize Handler (Debounced)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                document.querySelectorAll('.project-gallery').forEach(c => relayoutGrid(c));
+            }, 100);
+        });
 
-    /* --- Event Listeners Global --- */
-
-    // Relayout bei Fenster-Fokus oder Sichtbarkeit (behebt Glitches beim Tab-Wechsel)
-    document.addEventListener('visibilitychange', () => { 
-        if (document.visibilityState === 'visible') {
-            document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
-        }
-    });
-    window.addEventListener('focus', () => {
-        document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
-    });
-
-    // Resize Handler (Debounced)
-    let resizeTimer;
-    window.addEventListener('resize', () => { 
-        clearTimeout(resizeTimer); 
-        resizeTimer = setTimeout(() => {
-            document.querySelectorAll('.project-gallery').forEach(relayoutGrid);
-        }, 100); 
-    });
-
-    // Start
-    window.addEventListener('DOMContentLoaded', setupPageNav);
-
-</script>
-    
-
+        // We start setupPageNav in DOMContentLoaded (already in Init block)
+    </script>
 </body>
 
 </html>
