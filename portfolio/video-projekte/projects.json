@@ -1,0 +1,112 @@
+[
+    {
+        "id": "murten-classics",
+        "title": "Murten Classics",
+        "tabTitle": "Murten Classics",
+        "description": "Eine Dokumentation der Taschensymphoniker am Murten Classics Festival.",
+        "heroImage": "../images/portfolio/videografie/murten-classics.jpeg",
+        "heroMeta": [
+            "<strong>Rolle:</strong> Videograf",
+            "<strong>Equipment:</strong> Sony A7C II & MacBook Air M2",
+            "<strong>Tools:</strong> Final Cut Pro"
+        ],
+        "videos": [
+            {
+                "title": "Murten Classics – Tag 1",
+                "youtubeId": "C19KNuotklo",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Color Grading"
+                ]
+            },
+            {
+                "title": "Murten Classics – Tag 2",
+                "youtubeId": "WNkwhKSsKgg",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Color Grading"
+                ]
+            },
+            {
+                "title": "Murten Classics – Tag 3 & 4",
+                "youtubeId": "SFc1Hv8SvcM",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Color Grading"
+                ]
+            },
+            {
+                "title": "Murten Classics – Tag 5 & 6",
+                "youtubeId": "RfoGJ-dDRlw",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Color Grading"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "linkedin-quiz",
+        "title": "Migros – LinkedIn Quiz",
+        "tabTitle": "Migros – LinkedIn Quiz",
+        "description": "Für das Employer Branding der Migros durfte ich eine Quiz-Show konzipieren und produzieren.",
+        "heroImage": "../images/portfolio/videografie/linkedin-quiz.jpeg",
+        "heroMeta": [
+            "<strong>Rolle:</strong> Videograf",
+            "<strong>Equipment:</strong> Sony A7 IV",
+            "<strong>Tools:</strong> DaVinci Resolve"
+        ],
+        "videos": [
+            {
+                "title": "Migros – LinkedIn Quiz mit Faruk und Emilia",
+                "youtubeId": "1_61GPk-6u8",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Audio"
+                ]
+            },
+            {
+                "title": "Migros – LinkedIn Quiz mit Lina und Selina",
+                "youtubeId": "bvS75f_QAkY",
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Audio"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "la-pataconera",
+        "title": "La Pata&shy;conera",
+        "tabTitle": "La Pataconera",
+        "description": "Eine kurze Beschreibung des Beispielprojekts.",
+        "heroImage": "../images/portfolio/videografie/la-pataconera.jpeg",
+        "heroMeta": [
+            "<strong>Rolle:</strong> Videograf",
+            "<strong>Equipment:</strong> Sony A7 IV",
+            "<strong>Tools:</strong> DaVinci Resolve"
+        ],
+        "videos": [
+            {
+                "title": "Beispiel Projekt – Tag 1",
+                "youtubeId": "PT3iey_RAfM",
+                "tags": [
+                    "Kamera"
+                ]
+            },
+            {
+                "title": "Beispiel Projekt – Tag 2",
+                "youtubeId": "iPqxR3NpklI",
+                "tags": [
+                    "Kamera"
+                ]
+            }
+        ]
+    }
+]

@@ -45,64 +45,8 @@
             </h2>
         </div>
 
-        <div class="project-gallery video-grid">
-
-            <!-- Platzhalter Projekt 1 -->
-            <a href="./video-projekte/murten-classics.html" class="projekt-karte">
-                <img src="https://murten.unsereregion.ch/assets/images/6/Murten%20_Classics_Brand-5c74a1a5.jpg" alt="Video Projekt 1" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Murten Classics</h3>
-                    <p>Ein Dokumentation der Taschensymphoniker am Murten Classics Festival.</p>
-                </div>
-            </a>
-
-            <!-- Platzhalter Projekt 2 -->
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video Projekt 2" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Musikvideo "Neon Nights"</h3>
-                    <p>Atmosphärisches Musikvideo für eine lokale Synth-Pop Band. Gedreht bei Nacht mit Available Light.
-                    </p>
-                </div>
-            </a>
-
-            <!-- Platzhalter Projekt 3 -->
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video Projekt 3" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Event-Recap: Tech Summit</h3>
-                    <p>Kurzer, energiegeladener Recap-Clip des diesjährigen Tech Summits in Zürich.</p>
-                </div>
-            </a>
-
-            <!-- Platzhalter Projekt 4 -->
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video Projekt 4" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Produktvideo "SmartWatch X"</h3>
-                    <p>Werbespot für eine neue Smartwatch. Fokus auf Makro-Aufnahmen und texturiertes Licht.</p>
-                </div>
-            </a>
-
-            <!-- Platzhalter Projekt 5 -->
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video Projekt 5" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Dokumentation: "Handwerk"</h3>
-                    <p>Ein Porträt über traditionelles Handwerk in der modernen Zeit. Ruhige Bilder, tiefe Interviews.
-                    </p>
-                </div>
-            </a>
-
-            <!-- Platzhalter Projekt 6 -->
-            <a href="#" class="projekt-karte">
-                <img src="../images/kategorien/videografie.jpg" alt="Video Projekt 6" class="card-bg-img">
-                <div class="card-content-overlay">
-                    <h3>Social Media Kampagne "Fresh"</h3>
-                    <p>Serie von 9:16 Short-Clips für Instagram und TikTok für eine Getränkemarke.</p>
-                </div>
-            </a>
-
+        <div class="project-gallery video-grid" id="video-grid">
+            <!-- Dynamic Content -->
         </div>
 
     </main>
@@ -150,13 +94,42 @@
     </footer>
 
     <script>
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.add('open');
-            document.getElementById('hamburgerNavBg').classList.add('open');
-        });
-        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.remove('open');
-            document.getElementById('hamburgerNavBg').classList.remove('open');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('hamburgerBtn').addEventListener('click', function () {
+                document.getElementById('hamburgerNav').classList.add('open');
+                document.getElementById('hamburgerNavBg').classList.add('open');
+            });
+            document.getElementById('hamburgerNavBg').addEventListener('click', function () {
+                document.getElementById('hamburgerNav').classList.remove('open');
+                document.getElementById('hamburgerNavBg').classList.remove('open');
+            });
+
+            // Fetch and render projects
+            fetch('video-projekte/projects.json')
+                .then(res => res.json())
+                .then(projects => {
+                    const grid = document.getElementById('video-grid');
+                    grid.innerHTML = '';
+
+                    projects.forEach(p => {
+                        const card = document.createElement('a');
+                        card.href = `./video-projekte/video-projekte.html?project=${p.id}`;
+                        card.className = 'projekt-karte';
+
+                        // We use heroImage directly (assuming relative path '../images/...' works from this location too)
+                        // videografie.html is in `portfolio/`. '../images' refers to `ROOT/images`.
+
+                        card.innerHTML = `
+                            <img src="${p.heroImage}" alt="${p.title}" class="card-bg-img">
+                            <div class="card-content-overlay">
+                                <h3>${p.title}</h3>
+                                <p>${p.description}</p>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(err => console.error('Error loading projects:', err));
         });
     </script>
 </body>

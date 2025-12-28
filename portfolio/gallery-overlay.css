@@ -120,12 +120,12 @@
     z-index: 20;
     width: 280px;
     /* Wider control area */
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.7);
     /* More opaque */
-    padding: 10px 25px;
+    padding: 0px 25px;
     border-radius: 50px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--detail-shadow-hard);
     transition: bottom 0.3s ease;
 }
@@ -232,7 +232,7 @@
 }
 
 .icon-btn {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.8);
     border: none;
     width: 50px;
     /* Larger hit target */
@@ -255,7 +255,7 @@
 .icon-btn:hover {
     background: rgba(255, 255, 255, 1);
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
 }
 
 .icon-btn:active {
