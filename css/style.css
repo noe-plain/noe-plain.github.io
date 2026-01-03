@@ -180,25 +180,8 @@
     object-fit: contain
 }
 
-.verschwommen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: block;
-    overflow: none;
-    height: 230px;
-    width: 100vw;
-    z-index: 999;
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0px, rgba(0, 0, 0, 0));
-    mask-image: linear-gradient(to bottom, #000, #0000);
-    background-color: #fff;
-    backdrop-filter: blur(70px)
-}
-
 .mood-pic {
-    background-image: url(../images/leuchtturm.jpg);
     background-size: cover;
-    background-position: 35% 10%;
     height: 370px;
     background-color: #1f0033;
     display: flex;
