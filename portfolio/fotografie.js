@@ -171,12 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
         CookieManager.set('noe_favs', favoriteIds);
         updateAllFavButtons(); // Updates all grid buttons
         updateFloatingDownloadBar();
-        showToast("Auswahl aufgehoben");
 
-        // If we are on favorites tab, reload it
-        if (new URLSearchParams(window.location.search).has('favorite')) {
-            loadFavorites();
-        }
+        const previewPanel = document.getElementById('floating-preview-panel');
+        if (previewPanel) previewPanel.classList.add('hidden');
+
+        showToast("Auswahl aufgehoben");
     });
 });
 
@@ -213,6 +212,12 @@ function toggleFavorite(id) {
     updateDetailFavBtn();
     updateGridFavBtn(id); // Update specific grid button
     updateFloatingDownloadBar();
+
+    // If preview is open, refresh it
+    const previewPanel = document.getElementById('floating-preview-panel');
+    if (previewPanel && !previewPanel.classList.contains('hidden')) {
+        renderFloatingPreview();
+    }
 
     if (new URLSearchParams(window.location.search).has('favorite')) {
         loadFavorites(); // Reload fav list if active
@@ -740,15 +745,11 @@ function showGallery(category, tabElement = null, pushState = true) {
     }
 
     // Load content
-    if (category === 'favorite') {
-        loadFavorites();
-    } else {
-        loadImages(category);
-    }
+    loadImages(category);
 
     // Relayout
     const catConfig = categories[category];
-    const containerId = catConfig ? catConfig.container : (category === 'favorite' ? 'lightgallery-favorite' : null);
+    const containerId = catConfig ? catConfig.container : null;
     if (!containerId) return;
 
     const container = document.getElementById(containerId);
@@ -758,109 +759,40 @@ function showGallery(category, tabElement = null, pushState = true) {
 }
 
 
-function loadFavorites() {
-    const container = document.getElementById('lightgallery-favorite');
-    const dlAllBtn = document.getElementById('download-all-favs'); // Legacy btn (optional to keep or hide)
+/* -- Floating Preview Logic -- */
 
-    if (!container) return;
-    container.innerHTML = '';
+function toggleFloatingPreview() {
+    const panels = document.getElementById('floating-preview-panel');
+    if (!panels) return;
 
-    if (favoriteIds.length === 0) {
-        const msg = document.createElement('p');
-        msg.innerText = "Noch keine Favoriten markiert.";
-        msg.style.color = "#666";
-        msg.style.padding = "20px";
-        container.appendChild(msg);
-        if (dlAllBtn) dlAllBtn.style.display = 'none';
-        return;
+    if (panels.classList.contains('hidden')) {
+        renderFloatingPreview();
+        panels.classList.remove('hidden');
+    } else {
+        panels.classList.add('hidden');
     }
-
-    if (dlAllBtn) dlAllBtn.style.display = 'flex';
-
-    favoriteIds.forEach(id => {
-        // Recover Data
-        // Try to find in galleryData first, or reconstruct
-        let data = galleryData.find(g => g.id === id);
-
-        let url = data ? data.imageUrl : null;
-        let cat = data ? data.category : null;
-        let idx = null;
-
-        if (!url) {
-            // Reconstruct from ID
-            // id = category-index e.g. street-01
-            // Find category prefix match
-            const catKey = Object.keys(categories).find(k => id.startsWith(categories[k].prefix));
-            if (catKey) {
-                const conf = categories[catKey];
-                const parts = id.replace(conf.prefix, ''); // "01"
-                url = conf.path + conf.prefix + parts + ".jpeg";
-                cat = catKey;
-                idx = parts;
-            }
-        }
-
-        if (!url) return; // Skip invalid
-
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'gallery-item';
-        itemDiv.dataset.id = id;
-        itemDiv.style.position = 'relative';
-
-        const thumb = document.createElement('img');
-        thumb.src = url;
-        thumb.alt = `Favorite ${id}`;
-        thumb.addEventListener('click', () => openDetail(id));
-        thumb.style.cursor = 'pointer';
-
-        const favBtn = document.createElement('button');
-        favBtn.className = 'grid-fav-btn active'; // Always active in fav view
-        favBtn.dataset.id = id;
-        favBtn.innerHTML = '<i class="fas fa-heart"></i>'; // Solid heart
-        favBtn.title = "Aus Favoriten entfernen";
-        favBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleFavorite(id);
-        });
-
-        itemDiv.appendChild(thumb);
-        itemDiv.appendChild(favBtn);
-        container.appendChild(itemDiv);
-
-        // Ensure data exists for detail view
-        const dataObj = {
-            id: id,
-            imageUrl: url,
-            title: `${cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : 'Foto'} #${idx || ''}`,
-            category: cat || 'favorite',
-            photographer: 'Noé Plain'
-        };
-        if (!galleryData.find(p => p.id === id)) galleryData.push(dataObj);
-    });
-
-    relayoutGrid(container);
 }
 
+function renderFloatingPreview() {
+    const panels = document.getElementById('floating-preview-panel');
+    if (!panels) return;
+    panels.innerHTML = '';
 
-function downloadFavoritesZip() {
     if (favoriteIds.length === 0) {
-        showToast("Keine Favoriten zum Downloaden");
+        panels.classList.add('hidden'); // Should not happen if button disabled, but safe check
         return;
     }
 
-    showToast("ZIP wird erstellt (kann einen Moment dauern)...");
-
-    const zip = new JSZip();
-    const folder = zip.folder("NoeMedia_Favorites");
-    const promises = [];
+    const container = document.createElement('div');
+    container.className = 'preview-list';
 
     favoriteIds.forEach(id => {
-        let url = null;
-        const item = galleryData.find(l => l.id === id);
-        if (item) {
-            url = item.imageUrl;
-        } else {
-            // reconstruct
+        // Reconstruct or find data
+        let data = galleryData.find(g => g.id === id);
+        let url = data ? data.imageUrl : null;
+
+        if (!url) {
+            // Try reconstruct from ID (same logic as before)
             const catKey = Object.keys(categories).find(k => id.startsWith(categories[k].prefix));
             if (catKey) {
                 const conf = categories[catKey];
@@ -870,70 +802,49 @@ function downloadFavoritesZip() {
         }
 
         if (url) {
-            const filename = id + ".jpg"; // Normalized name
-            // Fetch blob
-            const p = fetch(url)
-                .then(r => {
-                    if (!r.ok) throw new Error("Fetch fail " + url);
-                    return r.blob();
-                })
-                .then(blob => {
-                    folder.file(filename, blob);
-                })
-                .catch(err => {
-                    console.warn("Failed to load for zip:", url);
-                });
-            promises.push(p);
+            const item = document.createElement('div');
+            item.className = 'preview-item';
+
+            const img = document.createElement('img');
+            img.src = url;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'preview-remove-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(id); // Will toggle off
+                // renderFloatingPreview(); // Called by toggleFavorite logic
+            };
+
+            item.appendChild(img);
+            item.appendChild(removeBtn);
+            container.appendChild(item);
         }
     });
 
-    Promise.all(promises).then(() => {
-        zip.generateAsync({ type: "blob" }).then(function (content) {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = "NoePlain_Favorites.zip";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Download gestartet!");
-        });
-    });
+    panels.appendChild(container);
 }
 
+// Expose for HTML inline calls
+window.downloadFavoritesZip = downloadFavoritesZip;
+window.showGallery = showGallery;
+window.toggleFloatingPreview = toggleFloatingPreview;
 
 function setupPageNav() {
-    // Show favorite tab if we have favs (initially)
-    // Actually, user wants to see it always? No, hidden if empty maybe.
-    // Logic existing:
-    const favTab = document.querySelector('a.tab-btn[href="?favorite"]');
-    if (favTab) {
-        // favTab.style.display = favoriteIds.length > 0 ? 'inline-block' : 'none';
-        // Let's keep it visible if user used it, or maybe just always visible?
-        // Original logic hid it. Let's keep it visible so they can review easily?
-        // Actually, if they clear selection, it might hide?
-        // Let's force it visible for now if selection > 0
-        if (favoriteIds.length > 0) favTab.style.display = 'inline-block';
-        else favTab.style.display = 'none'; // Only show if items exist
-    }
-
     const urlParams = new URLSearchParams(window.location.search);
     let activeTab = '';
 
     if (urlParams.has('tab')) activeTab = urlParams.get('tab') || '';
     else {
-        // e.g. ?street
         activeTab = Array.from(urlParams.keys())[0] || (window.location.hash || '').replace('#', '');
     }
 
     activeTab = (activeTab || '').trim().toLowerCase();
 
     // Validate
-    const allKeys = [...Object.keys(categories), 'favorite'];
+    const allKeys = Object.keys(categories);
     if (!allKeys.includes(activeTab)) activeTab = 'street';
-
-    if (activeTab === 'favorite' && favoriteIds.length === 0) {
-        activeTab = 'street'; // Fallback if trying to access empty favs
-    }
 
     // Bind checks
     document.querySelectorAll('#page-nav a.tab-btn').forEach(btn => {
@@ -941,15 +852,9 @@ function setupPageNav() {
             e.preventDefault();
             const href = btn.getAttribute('href') || '';
             const target = href.replace(/^\?/, '').toLowerCase() || activeTab;
-            if (activeTab === 'favorite' && favoriteIds.length === 0 && target === 'favorite') return;
             showGallery(target, btn, true);
         });
     });
 
     showGallery(activeTab, null, false);
 }
-
-
-// Expose for HTML inline calls
-window.downloadFavoritesZip = downloadFavoritesZip;
-window.showGallery = showGallery;

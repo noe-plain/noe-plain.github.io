@@ -79,7 +79,6 @@
             type="button">&gt;</button>
 
         <div id="page-nav">
-            <a href="?favorite" class="tab-btn"><i class="fa-solid fa-heart"></i></a>
             <a href="?street" class="tab-btn">Street</a>
             <a href="?portraet" class="tab-btn">Porträt</a>
             <a href="?aviation" class="tab-btn">Aviation</a>
@@ -99,17 +98,6 @@
             <div id="section-street" class="gallery-section active">
                 <h2>Street Photo&shy;graphy</h2>
                 <div id="lightgallery-street" class="project-gallery"></div>
-            </div>
-
-            <div id="section-favorite" class="gallery-section">
-                <div class="favorites-header">
-                    <h2 style="margin:0;">Favoriten</h2>
-                    <button class="icon-btn" onclick="downloadFavoritesZip()" id="download-all-favs"
-                        style="display:none; width:auto; padding:0 20px; border-radius:12px; font-size:1rem; gap:8px;">
-                        <i class="fas fa-file-archive"></i> Alle als ZIP laden
-                    </button>
-                </div>
-                <div id="lightgallery-favorite" class="project-gallery"></div>
             </div>
 
             <div id="section-aviation" class="gallery-section">
@@ -241,10 +229,11 @@
     </div>
 
     <div id="floating-download-bar" class="floating-bar hidden">
+        <div id="floating-preview-panel" class="hidden"></div>
         <div class="floating-bar-content">
             <span id="selected-count">0 Bilder ausgewählt</span>
             <div class="floating-actions">
-                <button id="floating-review-btn" onclick="showGallery('favorite')" title="Auswahl prüfen">
+                <button id="floating-review-btn" onclick="toggleFloatingPreview()" title="Auswahl prüfen/bearbeiten">
                     <i class="fas fa-list-check"></i> Prüfen
                 </button>
                 <button id="floating-download-btn" onclick="downloadFavoritesZip()">
