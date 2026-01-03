@@ -1,0 +1,193 @@
+/* Image Radius Refinement */
+.gallery-item {
+    border-radius: 30px 0 30px 30px !important;
+    overflow: hidden;
+}
+
+.gallery-item img {
+    border-radius: 30px 0 30px 30px !important;
+}
+
+/* Grid Favorite Button */
+.gallery-item {
+    position: relative;
+    /* Ensure gallery items can position the absolute button */
+}
+
+.grid-fav-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+    z-index: 5;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.grid-fav-btn:hover {
+    background: rgba(255, 255, 255, 0.45);
+    transform: scale(1.1);
+}
+
+.grid-fav-btn.active {
+    background: rgba(255, 255, 255, 0.9);
+    color: #e31b23;
+}
+
+.grid-fav-btn.active:hover {
+    transform: scale(0.95);
+}
+
+@media (hover: hover) {
+    .grid-fav-btn {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    .gallery-item:hover .grid-fav-btn,
+    .grid-fav-btn.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* On touch devices, always show the button or at least if active */
+@media (hover: none) {
+    .grid-fav-btn {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .grid-fav-btn.active {
+        background: rgba(255, 255, 255, 0.9);
+    }
+}
+
+
+/* Floating Download Bar */
+.floating-bar {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 1000;
+    width: 90%;
+    max-width: 600px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.floating-bar.hidden {
+    transform: translateX(-50%) translateY(150%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.floating-bar-content {
+    background: rgba(31, 0, 51, 0.85);
+    /* Matches theme primary color with opacity */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    color: white;
+}
+
+#selected-count {
+    font-family: 'Switzer-Regular', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.floating-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.floating-actions button {
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-family: 'Switzer-Regular', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#floating-download-btn {
+    background: white;
+    color: var(--detail-primary);
+}
+
+#floating-download-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+#floating-review-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+#floating-review-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+#clear-selection-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+}
+
+#clear-selection-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 500px) {
+    .floating-bar {
+        width: 94%;
+        bottom: 20px;
+    }
+
+    .floating-bar-content {
+        padding: 12px 15px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .floating-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #selected-count {
+        align-self: flex-start;
+        font-size: 0.9rem;
+    }
+}

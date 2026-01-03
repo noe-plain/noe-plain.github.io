@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../../images/illustrationen/logos/favicon.png">
     <title>Murten Classics – Medien vom Noé</title>
-    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="../../common.js" defer></script>
     <meta name="description"
         content="Murten Classics – Ein Dokumentation der Taschensymphoniker am Murten Classics Festival.">
     <style>
@@ -546,15 +548,7 @@
                 loadProject(newId);
             });
 
-            // Hamburger Menu
-            document.getElementById('hamburgerBtn').addEventListener('click', function () {
-                document.getElementById('hamburgerNav').classList.add('open');
-                document.getElementById('hamburgerNavBg').classList.add('open');
-            });
-            document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-                document.getElementById('hamburgerNav').classList.remove('open');
-                document.getElementById('hamburgerNavBg').classList.remove('open');
-            });
+
         });
 
     </script>

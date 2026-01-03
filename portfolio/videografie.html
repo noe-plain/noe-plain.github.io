@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
     <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="projektübersicht.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../common.js" defer></script>
+    <link rel="stylesheet" href="../css/projektübersicht.css">
     <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
@@ -95,14 +97,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('hamburgerBtn').addEventListener('click', function () {
-                document.getElementById('hamburgerNav').classList.add('open');
-                document.getElementById('hamburgerNavBg').classList.add('open');
-            });
-            document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-                document.getElementById('hamburgerNav').classList.remove('open');
-                document.getElementById('hamburgerNavBg').classList.remove('open');
-            });
 
             // Fetch and render projects
             fetch('video-projekte/projects.json')

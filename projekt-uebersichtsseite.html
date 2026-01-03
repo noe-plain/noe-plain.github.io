@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
     <title>Portfolio – Medie vom Noé</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/style.css">
     <meta name="description"
         content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
     <meta http-equiv="cache-control" content="max-age=604800" />
@@ -80,17 +81,7 @@
             </div>
         </nav>
     </footer>
-    <script>
-        // Hamburger Menü Logik
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.add('open');
-            document.getElementById('hamburgerNavBg').classList.add('open');
-        });
-        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.remove('open');
-            document.getElementById('hamburgerNavBg').classList.remove('open');
-        });
-    </script>
+    <script src="common.js" defer></script>
 </body>
 
 </html>

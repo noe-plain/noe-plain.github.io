@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{const t=document.getElementById("hamburgerBtn"),n=document.getElementById("hamburgerNav"),e=document.getElementById("hamburgerNavBg");t&&n&&e&&(t.addEventListener("click",function(){n.classList.add("open"),e.classList.add("open")}),e.addEventListener("click",function(){n.classList.remove("open"),e.classList.remove("open")}))});

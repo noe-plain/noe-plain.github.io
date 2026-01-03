@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
     <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../common.js" defer></script>
     <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
@@ -36,7 +38,8 @@
 
     <main class="max-width">
 
-        <div class="projekte-hero" style="background-image: url(../images/kategorien/design.jpg); background-position: 80% 24%;">
+        <div class="projekte-hero"
+            style="background-image: url(../images/kategorien/design.jpg); background-position: 80% 24%;">
             <h1 class="hero-h1"><span>Design</span></h1>
             <h2 class="hero-h2 h-klein" style="color: #fff; position: static; margin-top: 1rem;">
                 Eine kuratierte Sammlung meiner Arbeiten.
@@ -146,16 +149,7 @@
         </nav>
     </footer>
 
-    <script>
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.add('open');
-            document.getElementById('hamburgerNavBg').classList.add('open');
-        });
-        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.remove('open');
-            document.getElementById('hamburgerNavBg').classList.remove('open');
-        });
-    </script>
+
 </body>
 
 </html>

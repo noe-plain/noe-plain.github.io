@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
     <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="projektübersicht.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../common.js" defer></script>
+    <link rel="stylesheet" href="../css/projektübersicht.css">
     <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
@@ -49,7 +51,8 @@
 
             <!-- Platzhalter Projekt 1 -->
             <a href="./video-projekte/murten-classics.html" class="projekt-karte">
-                <img src="https://murten.unsereregion.ch/assets/images/6/Murten%20_Classics_Brand-5c74a1a5.jpg" alt="Video Projekt 1" class="card-bg-img">
+                <img src="https://murten.unsereregion.ch/assets/images/6/Murten%20_Classics_Brand-5c74a1a5.jpg"
+                    alt="Video Projekt 1" class="card-bg-img">
                 <div class="card-content-overlay">
                     <h3>Murten Classics</h3>
                     <p>Ein Dokumentation der Taschensymphoniker am Murten Classics Festival.</p>
@@ -149,16 +152,7 @@
         </nav>
     </footer>
 
-    <script>
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.add('open');
-            document.getElementById('hamburgerNavBg').classList.add('open');
-        });
-        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.remove('open');
-            document.getElementById('hamburgerNavBg').classList.remove('open');
-        });
-    </script>
+
 </body>
 
 </html>

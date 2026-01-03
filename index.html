@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
     <title>Portfolio – Medie vom Noé</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/style.css">
     <meta name="description"
         content="Diese Seite dient dazu effizienter arbeiten zu können mittels einer Suche die auf Google zugreifen kann und einer Linksammlung für alle Designer und Designerinnen.">
     <meta http-equiv="cache-control" content="max-age=604800" />
@@ -35,7 +36,9 @@
         </nav>
     </header>
 
-    <div class="hero-image" style="background-image: url(./images/noe-plain-bench.jpg); background-position: 35% 0%; background-size: cover;"></div>
+    <div class="hero-image"
+        style="background-image: url(./images/noe-plain-bench.jpg); background-position: 35% 0%; background-size: cover;">
+    </div>
 
     <h1 class="hero-h1">Medien von <span>Noé</span></h1>
     <h2 class="hero-h2 h-klein">Mediamatiker EFZ mit BM</h2>
@@ -115,7 +118,8 @@
                             alt="SportX Logo"></a>
                     <a href="https://migros.ch"><img src="./images/logos/logos-firmen/cd_migr_logo_l03761_rb_so_n.jpg"
                             alt="Migros Logo"></a>
-                    <a href=""><img src="./images/logos/logos-firmen/la-pataconera_rgb.svg" alt="La Pataconera Logo"></a>
+                    <a href=""><img src="./images/logos/logos-firmen/la-pataconera_rgb.svg"
+                            alt="La Pataconera Logo"></a>
                 </div>
             </div>
         </div>
@@ -126,12 +130,14 @@
             <form onsubmit="sendMail(); return false;">
                 <input class="block" id="name" name="name" type="text" placeholder="Name" required>
                 <input class="block" id="email" name="email" type="email" placeholder="Mail" required>
-                <select class="block" id="grund" name="grund" required style="margin-bottom:1rem;">
-                    <option value="Frage">Frage</option>
-                    <option value="Anfrage">Anfrage</option>
-                    <option value="Anderer Grund">Anderer Grund</option>
-                </select>
-                <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
+                <div class="form-row">
+                    <select class="block" id="grund" name="grund" required>
+                        <option value="Frage">Frage</option>
+                        <option value="Anfrage">Anfrage</option>
+                        <option value="Anderer Grund">Anderer Grund</option>
+                    </select>
+                    <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
+                </div>
                 <textarea id="nachricht" name="message" placeholder="Dein Anliegen" class="block" rows="10"
                     required></textarea>
                 <input id="submit" class="submit" type="submit" value="Senden">
@@ -210,17 +216,7 @@
             </div>
         </nav>
     </footer>
-    <script>
-        // Hamburger Menü Logik
-        document.getElementById('hamburgerBtn').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.add('open');
-            document.getElementById('hamburgerNavBg').classList.add('open');
-        });
-        document.getElementById('hamburgerNavBg').addEventListener('click', function () {
-            document.getElementById('hamburgerNav').classList.remove('open');
-            document.getElementById('hamburgerNavBg').classList.remove('open');
-        });
-    </script>
+    <script src="common.js" defer></script>
 </body>
 
 </html>
