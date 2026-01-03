@@ -78,7 +78,8 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: column;
-    justify-content: center
+    justify-content: center;
+    box-shadow: 0 4px 15px #00000008;
 }
 
 .portfolio-card-small {
@@ -91,7 +92,8 @@
     text-decoration: none;
     color: #000;
     font-weight: 700;
-    font-size: 1.1rem
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px #00000008;
 }
 
 .portfolio-card-small h3 {
