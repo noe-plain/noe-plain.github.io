@@ -3,7 +3,7 @@
         "id": "murten-classics",
         "title": "Murten Classics",
         "tabTitle": "Murten Classics",
-        "description": "Eine Dokumentation der Taschensymphoniker am Murten Classics Festival.",
+        "description": "Als Familienband durften wir diesen Sommer an den Murten Classics auftreten. Ich habe die Konzerttage mit einer kleinen Videoserie für Social-Media dokumentiert.",
         "heroImage": "../images/portfolio/videografie/murten-classics.jpeg",
         "heroMeta": [
             "<strong>Rolle:</strong> Videograf",
@@ -53,12 +53,12 @@
         "id": "linkedin-quiz",
         "title": "Migros – LinkedIn Quiz",
         "tabTitle": "Migros – LinkedIn Quiz",
-        "description": "Für das Employer Branding der Migros durfte ich eine Quiz-Show konzipieren und produzieren.",
+        "description": "Zusammen mit Mara Blum (KV-Lernende) habe ich für den Migros-Genossenschafts-Bund (MGB) einen Fragenkatalog und ein entsprechendes Konzept entwickelt. Anschliessend erhielt ich die Möglichkeit, dieses zu produzieren. Es handelt sich um eine Videoserie, die einen Unterhaltungswert haben soll und unaufdringlich über die Fringe-Benefits des MGB informiert.",
         "heroImage": "../images/portfolio/videografie/linkedin-quiz.jpeg",
         "heroMeta": [
-            "<strong>Rolle:</strong> Videograf",
-            "<strong>Equipment:</strong> Sony A7 IV",
-            "<strong>Tools:</strong> DaVinci Resolve"
+            "<strong>Rolle:</strong> Planung und Videograf",
+            "<strong>Equipment:</strong> Canon R6 mit dem 28 – 70mm f/2.0",
+            "<strong>Tools:</strong> Premiere Pro"
         ],
         "videos": [
             {
@@ -85,7 +85,7 @@
         "id": "la-pataconera",
         "title": "La Pata&shy;conera",
         "tabTitle": "La Pataconera",
-        "description": "Eine kurze Beschreibung des Beispielprojekts.",
+        "description": "La Pataconera ist eine kleine Videoagentur aus der Schweiz. Wir filmen verschiedene Projekte. Die meisten haben mit Moderner Musik zutun. Für die Videos reise ich viel in der Schweiz umher und werde dann vorort gebrieft. Um Davinci kennenzulernen habe ich auch immer wieder das Material davon genutzt",
         "heroImage": "../images/portfolio/videografie/la-pataconera.jpeg",
         "heroMeta": [
             "<strong>Rolle:</strong> Videograf",
@@ -94,14 +94,14 @@
         ],
         "videos": [
             {
-                "title": "Beispiel Projekt – Tag 1",
+                "title": "Marimba Konzert",
                 "youtubeId": "PT3iey_RAfM",
                 "tags": [
                     "Kamera"
                 ]
             },
             {
-                "title": "Beispiel Projekt – Tag 2",
+                "title": "Taubstumme Tanzgruppe aus Frankreich",
                 "youtubeId": "iPqxR3NpklI",
                 "tags": [
                     "Kamera"
