@@ -54,7 +54,7 @@
         </nav>
     </header>
 
-    <div class="hero-image"
+    <div class="hero-image z-index-hero-image"
         style="background-image: url(./images/noe-plain-bench.jpg); background-position: 35% 0%; background-size: cover;">
     </div>
 
@@ -62,6 +62,36 @@
     <h2 class="hero-h2 h-klein">Mediamatiker EFZ mit BM</h2>
 
     <main class="main-homepage">
+        <div class="about-section max-width" id="about">
+            <div class="signature-form">
+                <h2>
+                    Das bin ich
+                </h2>
+                <p>
+                    Hallo, ich bin Mediamatiker EFZ mit Berufsmatura – und das ist mehr als nur ein Titel. Es ist die
+                    Möglichkeit, meine Kreativität und mein technisches Wissen zu verbinden. Meine Ausbildung habe ich
+                    im
+                    Sommer 2025 erfolgreich abgeschlossen.
+                </p>
+                <p>
+                    In den letzten Jahren habe ich bei verschiedenen Projekten mitgewirkt. Besonders stolz bin ich auf
+                    meine
+                    Arbeit am Migros-Tech-Day, wo ich die Werbemittel neu gestaltet habe. Solche Projekte zeigen, wie
+                    gerne
+                    ich Ästhetik und Funktionalität zusammenbringe.
+                </p>
+                <p>
+                    Ob Fotografie, Illustration, Layout-Design oder Filmgestaltung – die Vielseitigkeit ist es, die mich
+                    an
+                    meinem Beruf begeistert. Ich liebe es, Momente einzufangen, Geschichten zu erzählen und kreative
+                    Ideen
+                    in die Realität umzusetzen. Mein Anspruch ist es immer, präzise zu arbeiten, um ein professionelles
+                    und
+                    überzeugendes Ergebnis zu erzielen.
+                </p>
+            </div>
+        </div>
+
         <div id="portfolio">
             <div class="portfolio-grid max-width">
                 <section class="portfolio-card-large bg-img-noe">
@@ -96,70 +126,26 @@
             </div>
         </div>
 
-        <div class="about-section" id="about">
-            <div class="max-width">
-                <h2>
-                    Das bin ich
-                </h2>
-                <p>
-                    Hallo, ich bin Mediamatiker EFZ mit Berufsmatura – und das ist mehr als nur ein Titel. Es ist die
-                    Möglichkeit, meine Kreativität und mein technisches Wissen zu verbinden. Meine Ausbildung habe ich
-                    im
-                    Sommer 2025 erfolgreich abgeschlossen.
-                </p>
-                <p>
-                    In den letzten Jahren habe ich bei verschiedenen Projekten mitgewirkt. Besonders stolz bin ich auf
-                    meine
-                    Arbeit am Migros-Tech-Day, wo ich die Werbemittel neu gestaltet habe. Solche Projekte zeigen, wie
-                    gerne
-                    ich Ästhetik und Funktionalität zusammenbringe.
-                </p>
-                <p>
-                    Ob Fotografie, Illustration, Layout-Design oder Filmgestaltung – die Vielseitigkeit ist es, die mich
-                    an
-                    meinem Beruf begeistert. Ich liebe es, Momente einzufangen, Geschichten zu erzählen und kreative
-                    Ideen
-                    in die Realität umzusetzen. Mein Anspruch ist es immer, präzise zu arbeiten, um ein professionelles
-                    und
-                    überzeugendes Ergebnis zu erzielen.
-                </p>
-            </div>
-        </div>
-        <div class="bg-dark-violet clients-section">
-            <div class="max-width">
-                <h2>Arbeitgebende</h2>
-                <div class="clients-grid">
-                    <a href="https://zli.ch"><img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnuaJHAXilx2C80HxHd3sjyxqW350MytI_fg&s"
-                            alt="ZLI Logo"></a>
-                    <a href="https://sportx.ch"><img src="./images/logos/logos-firmen/SportX_Master Wordmark_rgb.png"
-                            alt="SportX Logo"></a>
-                    <a href="https://migros.ch"><img src="./images/logos/logos-firmen/cd_migr_logo_l03761_rb_so_n.jpg"
-                            alt="Migros Logo"></a>
-                    <a href=""><img src="./images/logos/logos-firmen/la-pataconera_rgb.svg"
-                            alt="La Pataconera Logo"></a>
-                </div>
-            </div>
-        </div>
-
         <div class="form-section max-width" id="contact">
-            <h2>Contact</h2>
+            <div class="signature-form">
+                <h2>Contact</h2>
 
-            <form onsubmit="sendMail(); return false;">
-                <input class="block" id="name" name="name" type="text" placeholder="Name" required>
-                <input class="block" id="email" name="email" type="email" placeholder="Mail" required>
-                <div class="form-row">
-                    <select class="block" id="grund" name="grund" required>
-                        <option value="Frage">Frage</option>
-                        <option value="Anfrage">Anfrage</option>
-                        <option value="Anderer Grund">Anderer Grund</option>
-                    </select>
-                    <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
-                </div>
-                <textarea id="nachricht" name="message" placeholder="Dein Anliegen" class="block" rows="10"
-                    required></textarea>
-                <input id="submit" class="submit" type="submit" value="Senden">
-            </form>
+                <form onsubmit="sendMail(); return false;">
+                    <input class="block" id="name" name="name" type="text" placeholder="Name" required>
+                    <input class="block" id="email" name="email" type="email" placeholder="Mail" required>
+                    <div class="form-row">
+                        <select class="block" id="grund" name="grund" required>
+                            <option value="Frage">Frage</option>
+                            <option value="Anfrage">Anfrage</option>
+                            <option value="Anderer Grund">Anderer Grund</option>
+                        </select>
+                        <input class="block" id="betreff" name="betreff" type="text" placeholder="Betreff" required>
+                    </div>
+                    <textarea id="nachricht" name="message" placeholder="Dein Anliegen" class="block" rows="10"
+                        required></textarea>
+                    <input id="submit" class="submit" type="submit" value="Senden">
+                </form>
+            </div>
 
             <script>
                 function sendMail() {

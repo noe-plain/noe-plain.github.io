@@ -21,11 +21,5 @@ document.addEventListener("DOMContentLoaded", () => {
             sublinks.classList.toggle('collapsed');
             toggle.classList.toggle('rotate');
         });
-
-        // Also allow clicking the "Portfolio" text to toggle if on mobile? 
-        // Currently the request was "Hover over Portfolio OR expand icon". 
-        // Desktop hover is CSS. Mobile is icon click.
-        // Let's keep it consistent: Icon click toggles. 
-        // If "Portfolio" link is clicked, it goes to anchor #portfolio.
     }
 });

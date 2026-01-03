@@ -51,10 +51,20 @@
     color: #fff
 }
 
+.signature-form {
+    background: #FFF;
+    background: linear-gradient(140deg, rgba(255, 255, 255, 1) 7%, rgba(239, 220, 245, 1) 50%, rgba(255, 255, 255, 1) 93%);
+    box-shadow: 0 4px 15px #00000008;
+    color: #333;
+    padding: 50px;
+    border-radius: 30px 0 30px 30px;
+}
+
 .portfolio-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr;
-    gap: 10px
+    gap: 15px;
+    padding: 0 4rem !important;
 }
 
 .portfolio-card-large {
@@ -136,18 +146,7 @@
     background-image: url(../images/kategorien/noe-background.jpg)
 }
 
-.about-section {
-    background-color: #1f0033;
-    color: #fff
-}
-
-.about-section h2,
-.about-section p {
-    color: #fff
-}
-
 .clients-section {
-    margin-top: -70px;
     padding-bottom: 100px
 }
 
@@ -783,7 +782,7 @@ main.max-width {
     }
 
     .max-width {
-        padding: 70px 40px
+        padding: 30px 40px !important;
     }
 
     .search-input {
@@ -874,7 +873,6 @@ main.max-width {
 .form-section h2 {
     text-align: center;
     margin-bottom: 3rem;
-    color: #1f0033;
     font-family: melodrama, serif;
     font-size: 3rem
 }
@@ -890,7 +888,8 @@ form {
     padding: 1.2rem 1.5rem;
     border: 1px solid rgba(0, 0, 0, .1);
     border-radius: 16px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
     font-family: switzer, sans-serif;
     font-size: 1.1rem;
     color: #333;

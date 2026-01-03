@@ -136,18 +136,9 @@
     background-image: url(./images/kategorien/noe-background.jpg)
 }
 
-.about-section {
-    background-color: #1f0033;
-    color: #fff
-}
 
-.about-section h2,
-.about-section p {
-    color: #fff
-}
 
 .clients-section {
-    margin-top: -70px;
     padding-bottom: 100px
 }
 
