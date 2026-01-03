@@ -823,6 +823,32 @@ main.max-width {
     .mood-pic {
         margin: 94px -2rem 2rem
     }
+
+    /* Mobile Hero Text Positioning */
+    .hero-text {
+        position: absolute;
+        bottom: 80px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 100;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .hero-text .hero-h1,
+    .hero-text .hero-h2 {
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        margin: 0;
+    }
+
+    .hero-text .hero-h2 {
+        margin-top: 10px;
+    }
 }
 
 @media only screen and (max-width:450px) {
