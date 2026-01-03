@@ -307,3 +307,71 @@ footer {
 .footer-nav-link:hover {
     text-decoration: underline #fff
 }
+
+/* Hamburger Sub-navigation */
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    /* Removed gap: 10px to prevent extra spacing when collapsed */
+    gap: 0;
+}
+
+.nav-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.submenu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #333;
+    padding: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.submenu-toggle.rotate {
+    transform: rotate(180deg);
+}
+
+.hamburger-nav-sublinks {
+    list-style: none;
+    padding: 0 0 0 20px;
+    /* Indent */
+    margin: 10px 0 0 0;
+    /* Add margin when expanded */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: hidden;
+    max-height: 500px;
+    /* Arbitrary large height for transition */
+    transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+    opacity: 1;
+}
+
+.hamburger-nav-sublinks.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    /* Remove margin when collapsed */
+    pointer-events: none;
+}
+
+.hamburger-nav-link.sub-link {
+    font-size: 1.1rem;
+    /* Slightly smaller */
+    padding: 5px 10px;
+    display: block;
+}
+
+/* Hover logic for desktop */
+.nav-group:hover .hamburger-nav-sublinks {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 10px;
+    /* Consistently apply margin */
+    pointer-events: auto;
+}
