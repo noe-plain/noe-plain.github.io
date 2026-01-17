@@ -763,13 +763,16 @@ function showGallery(category, tabElement = null, pushState = true) {
 
 function toggleFloatingPreview() {
     const panels = document.getElementById('floating-preview-panel');
+    const btn = document.getElementById('floating-review-btn');
     if (!panels) return;
 
     if (panels.classList.contains('hidden')) {
         renderFloatingPreview();
         panels.classList.remove('hidden');
+        if (btn) btn.innerHTML = '<i class="fas fa-times"></i> Schliessen';
     } else {
         panels.classList.add('hidden');
+        if (btn) btn.innerHTML = '<i class="fas fa-list-check"></i> Prüfen';
     }
 }
 
@@ -813,8 +816,7 @@ function renderFloatingPreview() {
             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
             removeBtn.onclick = (e) => {
                 e.stopPropagation();
-                toggleFavorite(id); // Will toggle off
-                // renderFloatingPreview(); // Called by toggleFavorite logic
+                toggleFavorite(id);
             };
 
             item.appendChild(img);
@@ -823,7 +825,79 @@ function renderFloatingPreview() {
         }
     });
 
+    // Add close button inside the panel
+    const closePanelBtn = document.createElement('button');
+    closePanelBtn.className = 'preview-panel-close-btn';
+    closePanelBtn.innerHTML = '<i class="fas fa-times"></i>';
+    closePanelBtn.title = 'Schliessen';
+    closePanelBtn.onclick = toggleFloatingPreview;
+
     panels.appendChild(container);
+    panels.appendChild(closePanelBtn);
+}
+
+
+/* -- ZIP Download Logic -- */
+
+async function downloadFavoritesZip() {
+    if (favoriteIds.length === 0) return;
+
+    const btn = document.getElementById('floating-download-btn');
+    const originalText = btn.innerHTML;
+
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Laden...';
+
+        const zip = new JSZip();
+        const folder = zip.folder("medien-von-noe");
+
+        const fetchPromises = favoriteIds.map(async (id) => {
+            // Reconstruct URL if needed
+            let data = galleryData.find(g => g.id === id);
+            let url = data ? data.imageUrl : null;
+
+            if (!url) {
+                const catKey = Object.keys(categories).find(k => id.startsWith(categories[k].prefix));
+                if (catKey) {
+                    const conf = categories[catKey];
+                    const parts = id.replace(conf.prefix, '');
+                    url = conf.path + conf.prefix + parts + ".jpeg";
+                }
+            }
+
+            if (!url) return null;
+
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const filename = url.split('/').pop();
+                folder.file(filename, blob);
+            } catch (err) {
+                console.error("Failed to load image", url, err);
+            }
+        });
+
+        await Promise.all(fetchPromises);
+
+        const content = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = "medien-von-noe-auswahl.zip";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+        showToast("Download gestartet");
+
+    } catch (e) {
+        console.error("ZIP Error", e);
+        showToast("Fehler beim Erstellen des Downloads");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
 }
 
 // Expose for HTML inline calls

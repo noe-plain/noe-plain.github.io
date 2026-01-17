@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helvetic Airways Assessment Companion - Professional Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(237, 28, 36, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .helvetic-red-bg {
+            background-color: #ED1C24;
+        }
+
+        .helvetic-red-text {
+            color: #ED1C24;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.02),
+                0 10px 15px -3px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 15px -3px rgba(0, 0, 0, 0.04),
+                0 20px 25px -5px rgba(0, 0, 0, 0.03);
+            border-color: rgba(237, 28, 36, 0.1);
+        }
+
+        /* Segmented Control Nav */
+        .nav-segment {
+            position: relative;
+            color: #64748b;
+            /* slate-500 */
+        }
+
+        .nav-segment.active {
+            background-color: white;
+            color: #0f172a;
+            /* slate-900 */
+            box-shadow:
+                0 1px 3px 0 rgba(0, 0, 0, 0.1),
+                0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Elegant Fade In */
+        .fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Custom Scrollbar for hidden nav */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-slate-800 pb-24 selection:bg-red-100 selection:text-red-900">
+
+    <!-- Hero / Header - New Segmented Design -->
+    <header class="sticky top-2 z-50 transition-all duration-300 pointer-events-none">
+        <!-- Top Gap for status bar esthetics on mobile -->
+        <div class="h-0 sm:h-2"></div>
+
+        <!-- Floating Glass Container -->
+        <div class="pointer-events-auto max-w-5xl mx-auto sm:px-4">
+            <div
+                class="glass-panel border-b sm:border border-white/50 shadow-lg sm:rounded-2xl overflow-hidden bg-white/95 supports-[backdrop-filter]:bg-white/80 backdrop-blur-xl">
+
+                <!-- Top Bar: Brand & Info -->
+                <div class="px-4 py-3 flex justify-between items-center border-b border-slate-100/50">
+                    <div class="flex items-center gap-3">
+                        <!-- Logo Mark -->
+                        <div
+                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white shadow-red-500/20 shadow-lg">
+                            <i data-lucide="plane" class="w-5 h-5 stroke-[2.5]"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="font-bold text-slate-900 text-sm tracking-tight">Helvetic Assessment</h1>
+                            <p class="text-[10px] font-medium text-slate-500 flex items-center gap-1">
+                                <span>07.01.26</span>
+                                <span class="w-0.5 h-0.5 rounded-full bg-slate-300"></span>
+                                <span>Kloten HQ</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation: Segmented Control -->
+                <nav class="p-2 bg-slate-50/50">
+                    <div class="flex p-1 bg-slate-100/80 rounded-xl overflow-x-auto hide-scrollbar sm:overflow-visible">
+                        <button onclick="showSection('schedule')" id="tab-schedule"
+                            class="nav-segment active flex-1 min-w-[90px] px-3 py-2 text-xs font-bold rounded-lg transition-all duration-200 text-center whitespace-nowrap outline-none focus:ring-2 focus:ring-red-100">
+                            Zeitplan
+                        </button>
+                        <button onclick="showSection('facts')" id="tab-facts"
+                            class="nav-segment flex-1 min-w-[90px] px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 rounded-lg transition-all duration-200 text-center whitespace-nowrap outline-none focus:ring-2 focus:ring-red-100">
+                            Wissen
+                        </button>
+                        <button onclick="showSection('prep')" id="tab-prep"
+                            class="nav-segment flex-1 min-w-[90px] px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 rounded-lg transition-all duration-200 text-center whitespace-nowrap outline-none focus:ring-2 focus:ring-red-100">
+                            Coaching
+                        </button>
+                        <button onclick="showSection('checklist')" id="tab-checklist"
+                            class="nav-segment flex-1 min-w-[90px] px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 rounded-lg transition-all duration-200 text-center whitespace-nowrap outline-none focus:ring-2 focus:ring-red-100">
+                            Checkliste
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+        <!-- SECTION: SCHEDULE -->
+        <section id="section-schedule" class="space-y-8 fade-in-up">
+
+            <!-- Logistics Card -->
+            <div class="glass-panel p-5 rounded-2xl border-l-4 border-blue-500 bg-blue-50/30 mb-8">
+                <div class="flex flex-col sm:flex-row gap-4 sm:items-start text-sm">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2 text-blue-800 font-bold">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span>Helvetic Airways AG (HQ)</span>
+                        </div>
+                        <p class="text-slate-600 ml-6">Steinackerstrasse 56, 8302 Kloten</p>
+                        <p class="text-slate-600 ml-6 mt-1 text-xs sm:text-sm">Aufenthaltsraum: Eingang links hinten, 1.
+                            Stock.</p>
+                    </div>
+                    <div class="flex-1 border-t sm:border-t-0 sm:border-l border-blue-200 pt-3 sm:pt-0 sm:pl-4">
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="bus" class="w-4 h-4 text-blue-600 mt-0.5"></i>
+                                <div>
+                                    <span class="font-semibold text-slate-800">Bus 765</span> (ab ZRH) / <span
+                                        class="font-semibold text-slate-800">766</span> (ab Bassersdorf)<br>
+                                    <span class="text-xs text-slate-500">Haltestelle "Grubenstrasse" (gegenüber)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="car" class="w-4 h-4 text-blue-600 mt-0.5"></i>
+                                <div>
+                                    <span class="font-semibold text-slate-800">Parken</span><br>
+                                    <span class="text-xs text-slate-500">Innenhof (Eberhard Tor, gelb-grün).</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Tagesablauf</h2>
+                <span
+                    class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-md border border-slate-200">Start
+                    07:30</span>
+            </div>
+
+            <div
+                class="relative pl-8 sm:pl-10 space-y-12 before:absolute before:inset-y-2 before:left-3 sm:before:left-4 before:w-[2px] before:bg-gradient-to-b before:from-red-500 before:via-red-200 before:to-transparent">
+
+                <!-- Timeline Item 1 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-red-600 border-[3px] border-white shadow-[0_0_0_2px_rgba(237,28,36,0.3)] group-hover:scale-110 transition-transform duration-300 z-10">
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 relative group-hover:border-red-100 transition-colors">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">Infoevent</h3>
+                            <span
+                                class="text-sm font-bold helvetic-red-text font-mono bg-red-50 px-2 py-0.5 rounded">07:30
+                                – 08:15</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">Begrüssung & Präsentation. Achte auf Keywords
+                            wie "Qualität" und "Partnerschaft". Zeige aktives Interesse.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-white border-[3px] border-red-400 shadow-sm z-10">
+                    </div>
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">Gruppenarbeit</h3>
+                            <span
+                                class="text-sm font-bold helvetic-red-text font-mono bg-red-50 px-2 py-0.5 rounded">08:15
+                                – 09:00</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">Fokus auf Team-Dynamik. Nimm eine
+                            unterstützende Rolle ein.</p>
+                        <div
+                            class="mt-3 flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">
+                            <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+                            <span>Nicht dominieren, sondern moderieren.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-white border-[3px] border-red-400 shadow-sm z-10">
+                    </div>
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">Englisch & Wissenstest</h3>
+                            <span
+                                class="text-sm font-bold helvetic-red-text font-mono bg-red-50 px-2 py-0.5 rounded">09:00
+                                – 10:00</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-3">Abfragen von Englischkenntnissen und
+                            Allgemeinwissen/Geografie.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">IATA
+                                Codes</span>
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Capitals</span>
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Aircrafts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 4 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-blue-100 border-[3px] border-blue-500 shadow-sm z-10">
+                    </div>
+                    <div
+                        class="glass-card rounded-2xl p-6 bg-gradient-to-br from-blue-50/50 to-white/50 border-blue-100">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-blue-900">Pause</h3>
+                            <span class="text-sm font-bold text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded">10:00
+                                – 10:30</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed font-semibold">Selbstverpflegung! <span
+                                class="font-normal">Nutze die Zeit für Networking, aber iss auch etwas (mitgebrachte
+                                Snacks).</span></p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 5 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-white border-[3px] border-red-400 shadow-sm z-10">
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 border-l-4 border-l-red-500">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">Persönliches Interview</h3>
+                            <span
+                                class="text-sm font-bold helvetic-red-text font-mono bg-red-50 px-2 py-0.5 rounded">10:30
+                                – 12:00</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">Dauer ca. 15min pro Person. Nutze die
+                            STAR-Methode.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 6 -->
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[29px] sm:-left-[33px] top-1.5 w-4 h-4 rounded-full bg-slate-800 border-[3px] border-slate-600 shadow-sm z-10">
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 bg-slate-50">
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-2">
+                            <h3 class="text-lg font-bold text-slate-900">Decision Board</h3>
+                            <span
+                                class="text-sm font-bold text-slate-600 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">12:00
+                                – 13:30</span>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed">Dauer ca. 10min. Wartezeit bis zum Schluss
+                            bewahren.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION: FACTS -->
+        <section id="section-facts" class="hidden space-y-8 fade-in-up">
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-6">Unternehmensfakten</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Fact 1 -->
+                <div
+                    class="glass-card p-6 rounded-2xl border-t-4 border-t-red-500 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Management &
+                            Historie</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">100% Schweiz</h3>
+                    <p class="text-sm text-slate-600 mt-2">Gegründet <span
+                            class="font-semibold text-slate-800">2003</span>. Im Privatbesitz von <span
+                            class="font-semibold text-slate-800">Martin Ebner</span>. CEO ist <span
+                            class="font-semibold text-slate-800">Tobias Pogorevc</span>. Diese finanzielle Stabilität
+                        ist in der Branche einzigartig.</p>
+                </div>
+
+                <!-- Fact 2 -->
+                <div
+                    class="glass-card p-6 rounded-2xl border-t-4 border-t-red-500 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                            <i data-lucide="plane" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Flotte</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">22 Embraer Aircraft</h3>
+                    <p class="text-sm text-slate-600 mt-2">Flaggschiffe: <span class="font-semibold">Embraer E190-E2 &
+                            E195-E2</span> ("Whisperjet"). Zudem 14x E190-E1 im Einsatz für <span
+                            class="font-semibold text-slate-800">SWISS</span> (Wet-Lease). Modernste Regio-Flotte
+                        Europas.</p>
+                </div>
+
+                <!-- Fact 3 -->
+                <div
+                    class="glass-card p-6 rounded-2xl border-t-4 border-t-red-500 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                            <i data-lucide="mountain" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Expertise</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Steep Approach</h3>
+                    <p class="text-sm text-slate-600 mt-2">Spezialzertifizierung für <span
+                            class="font-semibold text-slate-800">London City (LCY)</span>. 5.5° Anflugwinkel statt 3°.
+                        Erfordert höchste Präzision und Training.</p>
+                </div>
+
+                <!-- Fact 4 -->
+                <div
+                    class="glass-card p-6 rounded-2xl border-t-4 border-t-red-500 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-red-50 text-red-600 rounded-lg">
+                            <i data-lucide="leaf" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Zukunft</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Nachhaltigkeit</h3>
+                    <p class="text-sm text-slate-600 mt-2">Die E2-Jets verbrauchen bis zu 25% weniger Kerosin und sind
+                        50% leiser. Einsatz von SAF (Sustainable Aviation Fuel) ist Teil der Strategie.</p>
+                </div>
+            </div>
+
+            <!-- Destinations Map/List -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white shadow-sm mt-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-slate-900 text-white rounded-lg">
+                        <i data-lucide="map" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Strategisches Netzwerk</h3>
+                </div>
+
+                <p class="text-sm text-slate-600 mb-6 font-medium">Alle Basen und Destinationen (Stand
+                    2025/Sommerflugplan).</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Basen -->
+                    <div>
+                        <span
+                            class="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-4 block">Operationelle
+                            Basen</span>
+                        <ul class="space-y-3">
+                            <li
+                                class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 transition-colors">
+                                <span class="text-sm font-semibold text-slate-700">Zürich (Home Base)</span>
+                                <span
+                                    class="text-xs font-mono font-bold text-red-600 bg-red-50 px-2 py-1 rounded">ZRH</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-semibold text-slate-700">Bern-Belp (Sommer)</span>
+                                    <span class="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded font-bold"
+                                        title="Bundesstadt">CAPITAL</span>
+                                </div>
+                                <span
+                                    class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">BRN</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:border-red-200 transition-colors">
+                                <span class="text-sm font-semibold text-slate-700">Basel-Mülhausen</span>
+                                <span
+                                    class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">BSL</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Destinationen -->
+                    <div>
+                        <span
+                            class="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-4 block">Destinationen
+                            (Scheduled & Charter)</span>
+                        <ul class="space-y-2.5 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-slate-600 font-medium">London City</span>
+                                    <span class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold"
+                                        title="Hauptstadt UK">CAPITAL</span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-400">LCY</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-slate-600 font-medium">Prag</span>
+                                    <span class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold"
+                                        title="Hauptstadt Tschechien">CAPITAL</span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-400">PRG</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-slate-600 font-medium">Luxemburg</span>
+                                    <span class="text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold"
+                                        title="Hauptstadt Luxemburg">CAPITAL</span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-400">LUX</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Palma de Mallorca</span>
+                                <span class="text-xs font-mono text-slate-400">PMI</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Larnaca (Zypern)</span>
+                                <span class="text-xs font-mono text-slate-400">LCA</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Heraklion (Kreta)</span>
+                                <span class="text-xs font-mono text-slate-400">HER</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Rhodos</span>
+                                <span class="text-xs font-mono text-slate-400">RHO</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Kos</span>
+                                <span class="text-xs font-mono text-slate-400">KGS</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Djerba (Tunesien)</span>
+                                <span class="text-xs font-mono text-slate-400">DJE</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Monastir (Tunesien)</span>
+                                <span class="text-xs font-mono text-slate-400">MIR</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Antalya</span>
+                                <span class="text-xs font-mono text-slate-400">AYT</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Jerez de la Frontera</span>
+                                <span class="text-xs font-mono text-slate-400">XRY</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Kittilä (Finnland)</span>
+                                <span class="text-xs font-mono text-slate-400">KTT</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Harstad/Narvik</span>
+                                <span class="text-xs font-mono text-slate-400">EVE</span>
+                            </li>
+                            <li
+                                class="flex items-center justify-between p-2.5 rounded-lg bg-white/50 border border-slate-100 hover:bg-white transition-colors">
+                                <span class="text-sm text-slate-600">Tromsø</span>
+                                <span class="text-xs font-mono text-slate-400">TOS</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: PREP -->
+        <section id="section-prep" class="hidden space-y-8 fade-in-up">
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-6">Interview Coaching</h2>
+
+            <!-- STAR Method Card -->
+            <div class="glass-card rounded-2xl overflow-hidden border-none shadow-xl">
+                <div class="bg-slate-900 p-6 text-white relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-slate-800 opacity-20">
+                        <i data-lucide="star" class="w-40 h-40"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Essentiell</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1">Die S.T.A.R. Methode</h3>
+                        <p class="text-sm text-slate-300">Der Industriestandard für kompetenzbasierte Interviews.</p>
+                    </div>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                        <span class="block text-2xl font-black text-red-200 mb-1">S</span>
+                        <h4 class="font-bold text-slate-900 text-sm">Situation</h4>
+                        <p class="text-xs text-slate-600 mt-1">Was war die Ausgangslage? Kontext kurz erklären.</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-2xl font-black text-slate-200 mb-1">T</span>
+                        <h4 class="font-bold text-slate-900 text-sm">Task</h4>
+                        <p class="text-xs text-slate-600 mt-1">Was war deine spezifische Aufgabe/Herausforderung?</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-2xl font-black text-slate-200 mb-1">A</span>
+                        <h4 class="font-bold text-slate-900 text-sm">Action</h4>
+                        <p class="text-xs text-slate-600 mt-1">Was hast <span class="font-bold text-red-600">DU</span>
+                            konkret getan? (Wichtigster Teil!)</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                        <span class="block text-2xl font-black text-green-200 mb-1">R</span>
+                        <h4 class="font-bold text-slate-900 text-sm">Result</h4>
+                        <p class="text-xs text-slate-600 mt-1">Was war das Ergebnis? Zahlen/Fakten nennen.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Values & Stress Questions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Values -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-red-100 text-red-600 rounded-full">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-900">Training & Werte</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <span class="block text-sm font-bold text-slate-800">Horizon Swiss Flight Academy</span>
+                                <span class="text-xs text-slate-500">Partner für das Training. Erwähne, dass du dich auf
+                                    die Ausbildung dort freust.</span>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <span class="block text-sm font-bold text-slate-800">Präzision & Pünktlichkeit</span>
+                                <span class="text-xs text-slate-500">Schweizer Tupfen. 5 Minuten zu früh ist
+                                    pünktlich.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Stress Questions -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-slate-100 text-slate-600 rounded-full">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-slate-900">Heikle Fragen</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                            <p class="text-xs font-bold text-slate-800">"Warum Helvetic und nicht SWISS?"</p>
+                            <p class="text-[10px] text-slate-500 mt-1 italic">Antwort: "Hier habe ich beides: Die
+                                familiäre Atmosphäre und Flexibilität, aber durch die SWISS-Partnerschaft auch das
+                                internationale Netzwerk."</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                            <p class="text-xs font-bold text-slate-800">"Passagier verweigert Gurte..."</p>
+                            <p class="text-[10px] text-slate-500 mt-1 italic">Antwort-Fokus: Sicherheit ist nicht
+                                verhandelbar, aber Ton bleibt freundlich.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: CHECKLIST -->
+        <section id="section-checklist" class="hidden space-y-8 fade-in-up">
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-6">Final Pre-Flight Checklist</h2>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                <div class="bg-slate-900 p-6 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-bold text-lg">Ausrüstungs-Check</h3>
+                        <p class="text-slate-400 text-xs">Alles muss am Assessment-Tag dabei sein.</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-green-400">
+                        <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4" id="checklist-container">
+
+                    <!-- Item 1 -->
+                    <label
+                        class="group flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:bg-red-50/30 transition-all cursor-pointer">
+                        <div class="relative flex items-center mt-1">
+                            <input type="checkbox"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-red-600 checked:border-red-600 transition-colors">
+                            <i data-lucide="check"
+                                class="absolute w-3.5 h-3.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span
+                                class="block font-bold text-slate-800 group-hover:text-red-700 transition-colors text-sm">Dokumente
+                                (Vollständig!)</span>
+                            <span class="text-xs text-slate-500 mt-0.5 block">Original Pass/ID, 2x CV, <span
+                                    class="font-bold text-red-600">Arbeitszeugnisse</span>, Einladung.</span>
+                        </div>
+                    </label>
+
+                    <!-- Item 2 -->
+                    <label
+                        class="group flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:bg-red-50/30 transition-all cursor-pointer">
+                        <div class="relative flex items-center mt-1">
+                            <input type="checkbox"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-red-600 checked:border-red-600 transition-colors">
+                            <i data-lucide="check"
+                                class="absolute w-3.5 h-3.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span
+                                class="block font-bold text-slate-800 group-hover:text-red-700 transition-colors text-sm">Outfit:
+                                Business Casual</span>
+                            <span class="text-xs text-slate-500 mt-0.5 block">Gemäss E-Mail. Trotzdem: Lieber etwas "zu
+                                schick" als zu leger.</span>
+                        </div>
+                    </label>
+
+                    <!-- Item 3 -->
+                    <label
+                        class="group flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:bg-red-50/30 transition-all cursor-pointer">
+                        <div class="relative flex items-center mt-1">
+                            <input type="checkbox"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-red-600 checked:border-red-600 transition-colors">
+                            <i data-lucide="check"
+                                class="absolute w-3.5 h-3.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span
+                                class="block font-bold text-slate-800 group-hover:text-red-700 transition-colors text-sm">Verpflegung
+                                (Wichtig!)</span>
+                            <span class="text-xs text-slate-500 mt-0.5 block">Wasserflasche & Snacks/Lunch. Keine
+                                Kantine vor Ort!</span>
+                        </div>
+                    </label>
+
+                    <!-- Item 4 -->
+                    <label
+                        class="group flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:bg-red-50/30 transition-all cursor-pointer">
+                        <div class="relative flex items-center mt-1">
+                            <input type="checkbox"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-red-600 checked:border-red-600 transition-colors">
+                            <i data-lucide="check"
+                                class="absolute w-3.5 h-3.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span
+                                class="block font-bold text-slate-800 group-hover:text-red-700 transition-colors text-sm">Analoge
+                                Armbanduhr</span>
+                            <span class="text-xs text-slate-500 mt-0.5 block">Pflicht in der Luftfahrt. Zeigt
+                                Zuverlässigkeit.</span>
+                        </div>
+                    </label>
+
+                    <!-- Item 5 -->
+                    <label
+                        class="group flex items-start gap-4 p-4 rounded-xl border border-slate-100 hover:border-red-200 hover:bg-red-50/30 transition-all cursor-pointer">
+                        <div class="relative flex items-center mt-1">
+                            <input type="checkbox"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-red-600 checked:border-red-600 transition-colors">
+                            <i data-lucide="check"
+                                class="absolute w-3.5 h-3.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></i>
+                        </div>
+                        <div class="flex-1">
+                            <span
+                                class="block font-bold text-slate-800 group-hover:text-red-700 transition-colors text-sm">Schreibzeug</span>
+                            <span class="text-xs text-slate-500 mt-0.5 block">Eigener Kugelschreiber & kleiner
+                                Notizblock.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="bg-gray-50 p-4 border-t border-gray-100 text-center">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Ready for Takeoff</p>
+                </div>
+            </div>
+
+            <!-- Pro Tip -->
+            <div class="glass-panel p-5 rounded-2xl border-l-4 border-yellow-400 bg-yellow-50/50">
+                <div class="flex gap-4">
+                    <i data-lucide="lightbulb" class="w-6 h-6 text-yellow-600 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-bold text-sm text-yellow-800 mb-1">Insider Tipp: Lächeln!</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Deine Ausstrahlung wird ab dem Moment bewertet, in dem du das Gebäude betrittst. Auch wenn
+                            du gerade nicht sprichst: Schaue interessiert, lächle und sei präsent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Success Toast -->
+    <div id="toast"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-2xl opacity-0 translate-y-10 transition-all duration-500 pointer-events-none z-50 flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+        <span>Ready for Boarding! Viel Erfolg!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(s => {
+                s.classList.add('hidden');
+                s.classList.remove('fade-in-up'); // Reset animation
+            });
+
+            // Show target section & trigger animation
+            const target = document.getElementById('section-' + sectionId);
+            target.classList.remove('hidden');
+            // Little hack to re-trigger css animation
+            void target.offsetWidth;
+            target.classList.add('fade-in-up');
+
+            // Handle Tabs
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('active', 'text-slate-900', 'bg-white', 'shadow-sm');
+                b.classList.add('text-slate-500');
+            });
+
+            const activeTab = document.getElementById('tab-' + sectionId);
+            activeTab.classList.add('active', 'text-slate-900');
+            activeTab.classList.remove('text-slate-500');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Re-render icons
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 10);
+        }
+
+        // Checklist Logic
+        const checkboxes = document.querySelectorAll('#checklist-container input');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checked = Array.from(checkboxes).filter(c => c.checked).length;
+                if (checked === checkboxes.length) {
+                    showToast();
+                }
+            });
+        });
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'translate-y-10');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-10');
+            }, 4000);
+        }
+    </script>
+</body>
+
+</html>
