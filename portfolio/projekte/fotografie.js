@@ -526,11 +526,11 @@ function updateTransform() {
 /* -- Grid / Gallery Logic -- */
 
 const categories = {
-    street: { prefix: 'street-', container: 'lightgallery-street', path: '../images/portfolio/photography/' },
-    aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../images/portfolio/photography/' },
-    portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../images/portfolio/photography/' },
-    bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../images/portfolio/photography/' },
-    event: { prefix: 'event-', container: 'lightgallery-event', path: '../images/portfolio/photography/' },
+    street: { prefix: 'street-', container: 'lightgallery-street', path: '../../images/portfolio/photography/' },
+    aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../../images/portfolio/photography/' },
+    portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../../images/portfolio/photography/' },
+    bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../../images/portfolio/photography/' },
+    event: { prefix: 'event-', container: 'lightgallery-event', path: '../../images/portfolio/photography/' },
 };
 
 

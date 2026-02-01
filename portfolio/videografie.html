@@ -57,7 +57,7 @@
             style="background-image: url(../images/kategorien/videografie.jpg); background-position: 80% 50%;">
             <h1 class="hero-h1"><span>Video&shy;grafie</span></h1>
             <h2 class="hero-h2 h-klein" style="color: #fff; position: static; margin-top: 1rem;">
-                Eine kuratierte Sammlung meiner Arbeiten.
+                Bewegte Bilder, die Geschichten erzählen.
             </h2>
         </div>
 
@@ -113,7 +113,7 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // Fetch and render projects
-            fetch('video-projekte/projects.json')
+            fetch('projekte/video-projects.json')
                 .then(res => res.json())
                 .then(projects => {
                     const grid = document.getElementById('video-grid');
@@ -121,7 +121,7 @@
 
                     projects.forEach(p => {
                         const card = document.createElement('a');
-                        card.href = `./video-projekte/video-projekte.html?project=${p.id}`;
+                        card.href = `./projekte/video.html?project=${p.id}`;
                         card.className = 'projekt-karte';
 
                         // We use heroImage directly (assuming relative path '../images/...' works from this location too)
