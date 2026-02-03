@@ -1,0 +1,139 @@
+[
+    {
+        "id": "lamaLami",
+        "title": "Lama Lami",
+        "description": "Für die Geschichte Lama Lami an den Olympischen Musikspielen, habe ich die Geschichte mit Illustrationen versehen. Die Illustrierten Tiere sind in Fotografien platziert.",
+        "images": [
+            {
+                "id": "illu-003a",
+                "imageUrl": "../../images/portfolio/illustration/01_LamaLami-AmSchlafen.jpg",
+                "title": "Lama Lami am Schlafen",
+                "description": "Das Lama Lami schläft bei sich zuhause. Illustration für die Geschichte Lama Lami."
+            },
+            {
+                "id": "illu-003b",
+                "imageUrl": "../../images/portfolio/illustration/02_LamaLami-Bluemewise.jpg",
+                "title": "Lama Lami am Schlafen",
+                "description": "Das Lama Lami schläft bei sich zuhause. Illustration für die Geschichte Lama Lami."
+            },
+            {
+                "id": "illu-003c",
+                "imageUrl": "../../images/portfolio/illustration/02.5_LamaLami-BänkliImPark.jpg",
+                "title": "Lama Lami im Park mit dem Schneck Pete",
+                "description": "Das Lama Lami schläft bei sich zuhause. Illustration für die Geschichte Lama Lami."
+            },
+            {
+                "id": "illu-003d",
+                "imageUrl": "../../images/portfolio/illustration/03_LamaLami-Bühne.jpg",
+                "title": "Lama Lami bei seinem Durchlauf",
+                "description": "Das Lama Lami schläft bei sich zuhause. Illustration für die Geschichte Lama Lami."
+            },
+            {
+                "id": "illu-003e",
+                "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg.jpg",
+                "title": "Lama Lami hat eine Idee",
+                "description": "Das Lama Lami ist traurig und geht zusammen mit Pete auf den Heimweg."
+            },
+            {
+                "id": "illu-003f",
+                "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg-idee.jpg",
+                "title": "Lama Lami hat eine Idee",
+                "description": "Das Lama Lami eine Idee. Es geht alle Tiere besuchen und fragt sie, was ihr geheimrezept ist für das schnelle Spielen."
+            },
+            {
+                "id": "illu-003g",
+                "imageUrl": "../../images/portfolio/illustration/05_LamaLami-LeuHarryAnDerHarfe.jpg",
+                "title": "Lama Lami besucht Harry den Löwen",
+                "description": "Das Lama Lami besucht Harry den Löwen, welcher die Harfe spielt."
+            },
+            {
+                "id": "illu-003h",
+                "imageUrl": "../../images/portfolio/illustration/06_LamaLami-CrockiAmSaxophon.jpg",
+                "title": "Lama Lami besucht Crocki den Krokodil",
+                "description": "Das Lama Lami besucht Crocki das Krokodil, welches Saxophon spielt."
+            },
+            {
+                "id": "illu-003i",
+                "imageUrl": "../../images/portfolio/illustration/06.5_LamaLami-LamaLamiSchlaeft.jpg",
+                "title": "Lama Lami schläft",
+                "description": "Das Lama Lami schläft und träumt von einer Siegreichen Teilnahme an den Olympischen Musikspielen."
+            },
+            {
+                "id": "illu-003j",
+                "imageUrl": "../../images/portfolio/illustration/07_LamaLami-CrockieLamiPeteRennbahn.jpg",
+                "title": "Lama Lami, Crocki und Pete auf dem Weg zu den Olympischen Musikspielen",
+                "description": "Das Lama Lami, Crocki und Pete eilen zum Konzertsaal, wo die Olympischen Musikspiele stattfinden."
+            },
+            {
+                "id": "illu-003k",
+                "imageUrl": "../../images/portfolio/illustration/XX_LamaLami-Spotlight.jpg",
+                "title": "Lama Lami im Rampenlicht",
+                "description": "Das Lama Lami im Rampenlicht. Es geniesst die Musik anstatt einfach nur die schnellste zu sein."
+            }
+        ]
+    },
+    {
+        "id": "migros-gruppe",
+        "title": "Migros Universum",
+        "description": "Verschiedene Illustrationen von Firmen der Migros-Gruppe.",
+        "hero-image": "../../images/portfolio/illustration/migrosUniversHero.svg",
+        "images": [
+            {
+                "id": "illu-002",
+                "imageUrl": "../../images/portfolio/illustration/migrosWagen.svg",
+                "title": "Migros Universum",
+                "description": "Vektor-Illustration der Migros Firmenwelt."
+            },
+            {
+                "id": "illu-002a",
+                "imageUrl": "../../images/portfolio/illustration/migrosFilliale.svg",
+                "title": "Migros Filiale",
+                "description": "Illustration für ein Migros Projekt."
+            },
+            {
+                "id": "illu-002b",
+                "imageUrl": "../../images/portfolio/illustration/migrosBank.svg",
+                "title": "Migros Bank",
+                "description": "Illustration für ein Migros Projekt."
+            },
+            {
+                "id": "illu-002c",
+                "imageUrl": "../../images/portfolio/illustration/medBase.svg",
+                "title": "MedBase",
+                "description": "Illustration für ein Migros Projekt."
+            }
+        ]
+    },{
+        "id": "fspm-logo",
+        "title": "FSPM Logo",
+        "description": "Logo für das Team Finance, Sourcing und Performance Management.",
+        "hero-image": "../../images/portfolio/illustration/hero-fspm.jpg",
+        "images": [
+            {
+                "id": "illu-001",
+                "imageUrl": "../../images/portfolio/illustration/fspm-logo.jpg",
+                "title": "FSPM Logo Final",
+                "description": "Finale Version des Logos."
+            },
+            {
+                "id": "illu-001b",
+                "imageUrl": "../../images/portfolio/illustration/fspmLogoFinaleRunde.jpg",
+                "title": "FSPM Logo Variante",
+                "description": "Entwurfsvariante."
+            }
+        ]
+    },
+    {
+        "id": "tasse",
+        "title": "Geburtstags Tasse",
+        "description": "Design für eine Geburtstagstasse.",
+        "images": [
+            {
+                "id": "illu-004",
+                "imageUrl": "../../images/noe-plain-bench.jpg",
+                "title": "Tasse Entwurf",
+                "description": "Mockup der Tasse."
+            }
+        ]
+    }
+]

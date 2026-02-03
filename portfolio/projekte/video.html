@@ -347,8 +347,7 @@
                         </button>
                     </div>
                     <ul class="hamburger-nav-sublinks collapsed" id="portfolio-sublinks">
-                        <li><a class="hamburger-nav-link sub-link"
-                                href="../../portfolio/fotografie.html">Fotografie</a>
+                        <li><a class="hamburger-nav-link sub-link" href="../../portfolio/fotografie.html">Fotografie</a>
                         </li>
                         <li><a class="hamburger-nav-link sub-link"
                                 href="../../portfolio/videografie.html">Videografie</a>
@@ -496,6 +495,40 @@
             // Render Videos
             const container = document.getElementById('project-container');
             container.innerHTML = '';
+
+            // Render PDF if exists
+            if (project.pdf) {
+                const pdfCard = document.createElement('div');
+                pdfCard.className = 'videokarte';
+                // Add some padding/style for PDF container if needed, using inline for simplicity or relying on existing class
+                pdfCard.style.padding = "0";
+
+                const pdfHeader = document.createElement('div');
+                pdfHeader.className = 'project-details';
+                pdfHeader.style.marginTop = "0";
+                pdfHeader.innerHTML = `<h2>${project.pdf.title || "Dokumentation"}</h2>`;
+
+                const pdfContainer = document.createElement('div');
+                pdfContainer.style.width = "100%";
+                pdfContainer.style.height = "600px";
+
+                // Using object or embed
+                pdfContainer.innerHTML = `
+                    <object data="${project.pdf.link}" type="application/pdf" width="100%" height="100%">
+                        <div style="padding: 2rem; text-align: center;">
+                            <p>Ihr Browser kann dieses PDF nicht direkt anzeigen.</p>
+                            <a href="${project.pdf.link}" class="back-link" style="color: #333; pointer: cursor;" target="_blank">
+                                <i class="fas fa-file-pdf"></i> PDF herunterladen / öffnen
+                            </a>
+                        </div>
+                    </object>
+                `;
+
+                pdfCard.appendChild(pdfContainer);
+                pdfCard.appendChild(pdfHeader);
+
+                container.appendChild(pdfCard);
+            }
 
             if (project.videos) {
                 project.videos.forEach(video => {

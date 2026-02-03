@@ -4,15 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="../images/illustrationen/logos/favicon.png">
-    <title>Projekte – Medie vom Noé</title>
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/x-icon" href="../../images/illustrationen/logos/favicon.png">
+    <title>Illustration – Medien vom Noé</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/gallery-overlay.css">
+    <link rel="stylesheet" href="../../css/fotografie.css">
+    <link rel="stylesheet" href="../../css/fotografie-additions.css">
+
+    <!-- Styles for Illustration Specifics if any (reusing photography styles for now) -->
+
+    <!-- Scripts -->
+    <script src="../../common.js" defer></script>
+    <script src="illustration.js" defer></script>
+
+    <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../common.js" defer></script>
-    <link rel="stylesheet" href="../css/projektübersicht.css">
-    <meta name="description" content="Eine Übersicht über ausgewählte Projekte von Noé Plain, Mediamatiker EFZ.">
-    <meta http-equiv="cache-control" content="max-age=604800" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <meta name="description" content="Eine Sammlung von Illustrationen und grafischen Arbeiten von Noé Plain.">
+    <!-- Preload Fonts -->
+    <link rel="preload" href="../../fonts/Boska-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../../fonts/Switzer-Regular.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 
 <body>
@@ -28,152 +43,69 @@
         <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
         <nav class="hamburger-nav-overlay" id="hamburgerNav">
             <div class="hamburger-nav-links">
-                <a class="hamburger-nav-link" href="../search.html">Search &#8197; &#128270;</a>
+                <a class="hamburger-nav-link" href="../../search.html">Search &#8197; &#128270;</a>
                 <hr>
-                <a class="hamburger-nav-link" href="../index.html">Medien von Noé</a>
+                <a class="hamburger-nav-link" href="../../index.html">Medien von Noé</a>
                 <div class="nav-group">
                     <div class="nav-item-row">
-                        <a class="hamburger-nav-link" href="../index.html#portfolio">Portfolio</a>
+                        <a class="hamburger-nav-link" href="../../index.html#portfolio">Portfolio</a>
                         <button class="submenu-toggle" id="portfolio-toggle" aria-label="Portfolio Menü öffnen">
                             <i class="fas fa-chevron-down"></i>
                         </button>
                     </div>
                     <ul class="hamburger-nav-sublinks collapsed" id="portfolio-sublinks">
-                        <li><a class="hamburger-nav-link sub-link" href="fotografie.html">Fotografie</a></li>
-                        <li><a class="hamburger-nav-link sub-link" href="videografie.html">Videografie</a></li>
-                        <li><a class="hamburger-nav-link sub-link" href="illustration.html">Illustration</a></li>
-                        <li><a class="hamburger-nav-link sub-link" href="design.html">Design</a></li>
+                        <li><a class="hamburger-nav-link sub-link" href="../../portfolio/fotografie.html">Fotografie</a>
+                        </li>
+                        <li><a class="hamburger-nav-link sub-link"
+                                href="../../portfolio/videografie.html">Videografie</a>
+                        </li>
+                        <li><a class="hamburger-nav-link sub-link"
+                                href="../../portfolio/illustration.html">Illustration</a></li>
+                        <li><a class="hamburger-nav-link sub-link" href="../../portfolio/design.html">Design</a></li>
                     </ul>
                 </div>
-                <a class="hamburger-nav-link" href="../index.html#about">Das bin ich</a>
-                <a class="hamburger-nav-link" href="../index.html#contact">Kontakt</a>
+                <a class="hamburger-nav-link" href="../../index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="../../index.html#contact">Kontakt</a>
             </div>
         </nav>
     </header>
 
     <main class="max-width">
-        <div class="projekte-hero"
-            style="background-image: url(../images/kategorien/illustration.jpg); background-position: 80% 50%;">
-            <h1 class="hero-h1"><span>Illu&shy;strat&shy;ion</span></h1>
-            <h2 class="hero-h2 h-klein" style="color: #fff; position: static; margin-top: 1rem;">
-                Eine kuratierte Sammlung meiner Arbeiten.
-            </h2>
+        <div class="detail-hero max" style="background-image: url(../../images/kategorien/illustration.jpg);">
+            <div class="detail-hero-overlay"></div>
+            <div class="detail-hero-content max-width">
+                <h1>Illu&shy;stra&shy;tion</h1>
+                <p class="detail-hero-beschreibung">
+                    Kreative Illustrationen und grafische Kunstwerke.
+                </p>
+            </div>
         </div>
 
-        <style>
-            .category-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                padding: 20px 0;
-            }
+        <button id="page-nav-left-gradient" class="page-nav-scroll-btn hidden" aria-hidden="true" title="Zurück"
+            tabindex="0" type="button">&lt;</button>
+        <button id="page-nav-scroll-btn" class="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr"
+            type="button">&gt;</button>
 
-            @media (max-width: 768px) {
-                .category-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-
-            .category-card {
-                position: relative;
-                display: block;
-                border-radius: 12px;
-                overflow: hidden;
-                aspect-ratio: 3/2;
-                text-decoration: none;
-                color: #fff;
-                transition: transform 0.3s ease;
-            }
-
-            .category-card:hover {
-                transform: translateY(-5px);
-            }
-
-            .category-bg-img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: transform 0.5s ease;
-            }
-
-            .category-card:hover .category-bg-img {
-                transform: scale(1.05);
-            }
-
-            .category-overlay {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-                padding: 20px;
-                box-sizing: border-box;
-            }
-
-            .category-overlay h3 {
-                margin: 0;
-                font-size: 1.5rem;
-                font-weight: 600;
-            }
-
-            .category-overlay p {
-                margin: 5px 0 0;
-                font-size: 0.95rem;
-                opacity: 0.9;
-            }
-        </style>
-
-        <div class="category-grid" id="overview-category-grid">
-            <!-- Dynamically loaded categories -->
-            <div style="grid-column: 1/-1; text-align: center; color: #999;">Lade Kategorien...</div>
+        <!-- Category Tabs (filled by JS) -->
+        <div id="page-nav">
+            <a href="?fspm-logo" class="tab-btn">FSPM Logo</a>
+            <a href="?migros-gruppe" class="tab-btn">Migros Universum</a>
+            <a href="?tasse" class="tab-btn">Geburtstags Tasse</a>
         </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const grid = document.getElementById('overview-category-grid');
+        <div id="gallery-container">
 
-                // Optional: Map for manual overrides of titles/descriptions if "Auto" isn't enough
-                const categoryMeta = {
-                    'fspmLogo': { title: 'FSPM Logo', desc: 'Logo für das Team Finance, Sourcing und Performance Management.' },
-                    'migros-gruppe': { title: 'Migros-Gruppe', desc: 'Verschiedene Illustrationen von Firmen der Migros-Gruppe.' },
-                    'design': { title: 'Design', desc: 'Entwürfe und Konzepte.' }
-                };
+            <div id="loader" aria-hidden="true">
+                <div class="loader-inner">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <div class="loader-text">Bilder werden geladen…</div>
+                </div>
+            </div>
 
-                fetch('projekte/illustrations.json')
-                    .then(r => r.json())
-                    .then(data => {
-                        if (!data) return;
-                        grid.innerHTML = ''; // Clear loader
-
-                        data.forEach(project => {
-                            const card = document.createElement('a');
-                            card.href = `projekte/illustration.html?${project.id}`;
-                            card.className = 'category-card';
-
-                            let imgPath = '';
-                            if (project.images && project.images.length > 0) {
-                                imgPath = project.images[0].imageUrl.replace('../../images/', '../images/');
-                            } else {
-                                imgPath = '../images/kategorien/illustration.jpg';
-                            }
-
-                            card.innerHTML = `
-                                <img src="${imgPath}" alt="${project.title}" class="category-bg-img">
-                                <div class="category-overlay">
-                                    <h3>${project.title}</h3>
-                                    <p>${project.description || ''}</p>
-                                </div>
-                           `;
-                            grid.appendChild(card);
-                        });
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        grid.innerHTML = '<p style="text-align:center;">Kategorien konnten nicht geladen werden.</p>';
-                    });
-            });
-        </script>
-
+            <div id="section-illustration" class="gallery-section active">
+                <div id="lightgallery-illustration" class="project-gallery"></div>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -218,6 +150,87 @@
         </nav>
     </footer>
 
+    <section id="detail-screen" class="screen hidden">
+        <div class="detail-container">
+            <div class="detail-image-wrapper">
+                <div class="zoom-container">
+                    <div class="zoom-target" id="zoom-target"></div>
+                </div>
+
+                <div class="zoom-controls">
+                    <i class="fas fa-search-minus small-icon" id="zoom-out-btn" style="cursor: pointer;"></i>
+                    <input type="range" id="zoom-slider" min="1" max="4" step="0.1" value="1">
+                    <i class="fas fa-search-plus small-icon" id="zoom-in-btn" style="cursor: pointer;"></i>
+                </div>
+
+                <button class="icon-btn detail-nav-button left" id="detail-prev-btn"><i
+                        class="fas fa-chevron-left"></i></button>
+                <button class="icon-btn detail-nav-button right" id="detail-next-btn"><i
+                        class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="detail-header-overlay">
+                <button class="icon-btn" id="back-btn"><i class="fas fa-chevron-left"></i></button>
+                <div class="right-actions">
+                    <button class="icon-btn bookmark-btn" id="detail-fav-btn"><i class="far fa-heart"></i></button>
+                    <!-- Info Button replaces Add to Album -->
+                    <button class="icon-btn" id="info-toggle-btn"><i class="fas fa-info"></i></button>
+                    <button class="icon-btn" id="download-btn"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+
+            <div class="detail-content" id="detail-content-sheet">
+                <button class="sheet-close-btn" id="sheet-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <!-- Mock Price or remove -->
+                <!-- <div class="price-tag" id="detail-price"></div> -->
+
+                <div class="detail-info-header">
+                    <h2 id="detail-title"></h2>
+                    <p class="photographer"><i class="fas fa-user-circle"></i> <span id="detail-photographer">Noé
+                            Plain</span>
+                    </p>
+                </div>
+
+                <div class="specs-row" id="specs-equipment"></div>
+                <div class="specs-row" id="specs-technical" style="margin-top: 5px;"></div>
+
+                <div class="description">
+                    <p id="detail-desc"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-add-to-album" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Zu Album hinzufügen</h3>
+            <div id="album-selection-list" class="selection-list"></div>
+            <div class="modal-buttons">
+                <button class="btn-cancel">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="floating-download-bar" class="floating-bar hidden">
+        <div id="floating-preview-panel" class="hidden"></div>
+        <div class="floating-bar-content">
+            <span id="selected-count">0 Bilder ausgewählt</span>
+            <div class="floating-actions">
+                <button id="floating-review-btn" onclick="toggleFloatingPreview()" title="Auswahl prüfen/bearbeiten">
+                    <i class="fas fa-list-check"></i> Prüfen
+                </button>
+                <button id="floating-download-btn" onclick="downloadFavoritesZip()">
+                    <i class="fas fa-file-archive"></i> Download
+                </button>
+                <button id="clear-selection-btn" title="Alle abwählen"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
 
 </body>
 
