@@ -676,19 +676,25 @@ function renderFloatingPreview() {
         let data = findImageById(id);
         let url = data ? data.imageUrl : null;
 
-        const row = document.createElement('div');
-        row.className = 'preview-row';
-        row.innerHTML = `
-            <img src="${url || ''}" class="preview-thumb">
-            <span class="preview-name">${data ? data.title : id}</span>
-            <button class="remove-fav-small" title="Entfernen"><i class="fas fa-trash"></i></button>
-        `;
+        if (url) {
+            const item = document.createElement('div');
+            item.className = 'preview-item';
 
-        row.querySelector('.remove-fav-small').addEventListener('click', () => {
-            toggleFavorite(id);
-        });
+            const img = document.createElement('img');
+            img.src = url;
 
-        container.appendChild(row);
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'preview-remove-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(id);
+            };
+
+            item.appendChild(img);
+            item.appendChild(removeBtn);
+            container.appendChild(item);
+        }
     });
 
     panels.appendChild(container);
