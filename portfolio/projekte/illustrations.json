@@ -1,5 +1,37 @@
 [
     {
+        "id": "migros-gruppe",
+        "title": "Migros Universum",
+        "description": "Verschiedene Illustrationen von Firmen der Migros-Gruppe.",
+        "hero-image": "../../images/portfolio/illustration/migrosUniversHero.svg",
+        "images": [
+            {
+                "id": "illu-002",
+                "imageUrl": "../../images/portfolio/illustration/migrosWagen.svg",
+                "title": "Migros Universum",
+                "description": "Vektor-Illustration der Migros Firmenwelt."
+            },
+            {
+                "id": "illu-002a",
+                "imageUrl": "../../images/portfolio/illustration/migrosFilliale.svg",
+                "title": "Migros Filiale",
+                "description": "Illustration für ein Migros Projekt."
+            },
+            {
+                "id": "illu-002b",
+                "imageUrl": "../../images/portfolio/illustration/migrosBank.svg",
+                "title": "Migros Bank",
+                "description": "Illustration für ein Migros Projekt."
+            },
+            {
+                "id": "illu-002c",
+                "imageUrl": "../../images/portfolio/illustration/medBase.svg",
+                "title": "MedBase",
+                "description": "Illustration für ein Migros Projekt."
+            }
+        ]
+    },
+    {
         "id": "lamaLami",
         "title": "Lama Lami",
         "description": "Für die Geschichte Lama Lami an den Olympischen Musikspielen, habe ich die Geschichte mit Illustrationen versehen. Die Illustrierten Tiere sind in Fotografien platziert.",
@@ -73,37 +105,6 @@
         ]
     },
     {
-        "id": "migros-gruppe",
-        "title": "Migros Universum",
-        "description": "Verschiedene Illustrationen von Firmen der Migros-Gruppe.",
-        "hero-image": "../../images/portfolio/illustration/migrosUniversHero.svg",
-        "images": [
-            {
-                "id": "illu-002",
-                "imageUrl": "../../images/portfolio/illustration/migrosWagen.svg",
-                "title": "Migros Universum",
-                "description": "Vektor-Illustration der Migros Firmenwelt."
-            },
-            {
-                "id": "illu-002a",
-                "imageUrl": "../../images/portfolio/illustration/migrosFilliale.svg",
-                "title": "Migros Filiale",
-                "description": "Illustration für ein Migros Projekt."
-            },
-            {
-                "id": "illu-002b",
-                "imageUrl": "../../images/portfolio/illustration/migrosBank.svg",
-                "title": "Migros Bank",
-                "description": "Illustration für ein Migros Projekt."
-            },
-            {
-                "id": "illu-002c",
-                "imageUrl": "../../images/portfolio/illustration/medBase.svg",
-                "title": "MedBase",
-                "description": "Illustration für ein Migros Projekt."
-            }
-        ]
-    },{
         "id": "fspm-logo",
         "title": "FSPM Logo",
         "description": "Logo für das Team Finance, Sourcing und Performance Management.",
