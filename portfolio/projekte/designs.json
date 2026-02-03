@@ -1,0 +1,58 @@
+[
+    {
+        "id": "ipa-techday",
+        "title": "IPA – Migros Techday",
+        "description": "Verschiedene Layout-Arbeiten und Print-Produkte.",
+        "hero-image": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
+        "images": [
+            {
+                "id": "design-001",
+                "type": "pdf",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
+                "pdfUrl": "../../images/portfolio/design/migrosTechdayCdManualV2.8.pdf",
+                "title": "Migros Techday CD",
+                "description": "Die Grundlagen für das neue Design des Migros Techdays."
+            },
+            {
+                "id": "design-002",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg",
+                "title": "Broschüre",
+                "description": "Ein Mögliches Layout einer Broschüre für den Tagesablauf."
+            },
+            {
+                "id": "design-003",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-3.jpg",
+                "title": "Broschüre",
+                "description": "Ein Mögliches Layout einer Broschüre für den Tagesablauf."
+            },
+            {
+                "id": "design-004",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-2.jpg",
+                "title": "Migros Techday CD",
+                "description": "Die Grundlagen für das neue Design des Migros Techdays."
+            },
+            {
+                "id": "design-005",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-1.jpg",
+                "title": "Migros Techday Plakat",
+                "description": "Entwurf für ein Veranstaltungsposter."
+            }
+        ]
+    },
+    {
+        "id": "iwish",
+        "title": "Iwish_",
+        "description": "Für ein Modul in der Schule sollten wir CI/CDs erweitern mit neuen Produkten. Vorallem ging es um das erstellen von Druckdaten.",
+        "hero-image": "../../images/portfolio/design/tassen_design.jpg",
+        "images": [
+            {
+                "id": "design-006",
+                "type": "pdf",
+                "imageUrl": "../../images/portfolio/design/tassen_design.jpg",
+                "pdfUrl": "../../images/portfolio/design/IWISH_CD_Erweiterung_Praesentation.pdf",
+                "title": "Iwish",
+                "description": ""
+            }
+        ]
+    }
+]

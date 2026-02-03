@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="../../images/illustrationen/logos/favicon.png">
+    <title>Design – Medien vom Noé</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/gallery-overlay.css">
+    <link rel="stylesheet" href="../../css/fotografie.css">
+    <link rel="stylesheet" href="../../css/fotografie-additions.css">
+
+    <!-- Styles for Illustration Specifics if any (reusing photography styles for now) -->
+    <style>
+        /* PDF specific style */
+        .pdf-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff3e3e;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        /* Detail PDF container */
+        .pdf-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #eee;
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="../../common.js" defer></script>
+    <script src="design.js" defer></script>
+
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <meta name="description" content="Design Projekte von Noé Plain.">
+    <!-- Preload Fonts -->
+    <link rel="preload" href="../../fonts/Boska-Bold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../../fonts/Switzer-Regular.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+
+<body>
+    <header>
+        <nav class="header-nav">
+            <a class="logo-a" href="../../index.html">Medien von <span>Noé</span></a>
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span id="small-bar"></span>
+            </button>
+        </nav>
+        <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
+        <nav class="hamburger-nav-overlay" id="hamburgerNav">
+            <div class="hamburger-nav-links">
+                <a class="hamburger-nav-link" href="../../search.html">Search &#8197; &#128270;</a>
+                <hr>
+                <a class="hamburger-nav-link" href="../../index.html">Medien von Noé</a>
+                <div class="nav-group">
+                    <div class="nav-item-row">
+                        <a class="hamburger-nav-link" href="../../index.html#portfolio">Portfolio</a>
+                        <button class="submenu-toggle" id="portfolio-toggle" aria-label="Portfolio Menü öffnen">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <ul class="hamburger-nav-sublinks collapsed" id="portfolio-sublinks">
+                        <li><a class="hamburger-nav-link sub-link" href="../../portfolio/fotografie.html">Fotografie</a>
+                        </li>
+                        <li><a class="hamburger-nav-link sub-link"
+                                href="../../portfolio/videografie.html">Videografie</a>
+                        </li>
+                        <li><a class="hamburger-nav-link sub-link"
+                                href="../../portfolio/illustration.html">Illustration</a></li>
+                        <li><a class="hamburger-nav-link sub-link" href="../../portfolio/design.html">Design</a></li>
+                    </ul>
+                </div>
+                <a class="hamburger-nav-link" href="../../index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="../../index.html#contact">Kontakt</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-width">
+        <div class="detail-hero max" style="background-image: url(../../images/kategorien/design.jpg);">
+            <div class="detail-hero-overlay"></div>
+            <div class="detail-hero-content max-width">
+                <h1>Design</h1>
+                <p class="detail-hero-beschreibung">
+                    Kreative Grafiken und Konzepte.
+                </p>
+            </div>
+        </div>
+
+        <button id="page-nav-left-gradient" class="page-nav-scroll-btn hidden" aria-hidden="true" title="Zurück"
+            tabindex="0" type="button">&lt;</button>
+        <button id="page-nav-scroll-btn" class="page-nav-scroll-btn" aria-label="Weiter scrollen" title="Mehr"
+            type="button">&gt;</button>
+
+        <!-- Category Tabs (filled by JS) -->
+        <div id="page-nav"></div>
+
+        <div id="gallery-container">
+
+            <div id="loader" aria-hidden="true">
+                <div class="loader-inner">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <div class="loader-text">Bilder werden geladen…</div>
+                </div>
+            </div>
+
+            <div id="section-design" class="gallery-section active">
+                <div id="lightgallery-design" class="project-gallery"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <nav class="footer-nav">
+            <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"
+                viewBox="55.13 44.69 1889.73 1060.63" xmlns="http://www.w3.org/2000/svg" data-type="color"
+                role="presentation" aria-hidden="true" aria-label="">
+                <g>
+                    <path
+                        d="M1769.49 865.92h16.55v235.35h-16.55zm16.54 92.64h-8.94q2.235-30 14.34-51.9c8.02-14.62 18.71-25.8 31.97-33.56 13.27-7.76 28.12-11.65 44.52-11.65s30.74 3.29 42.05 9.85c11.36 6.58 20 15.88 25.95 27.96 5.97 12.09 8.94 26.79 8.94 44.08v157.94h-17.01V947.39c0-13.73-2.21-25.97-6.68-36.7-4.47-10.75-11.41-19.15-20.82-25.27-9.42-6.12-21.7-9.18-36.92-9.18-12.23 0-23.13 2.47-32.63 7.38-9.56 4.91-17.69 11.49-24.42 19.68-6.68 8.2-11.77 17.15-15.21 26.84-3.45 9.71-5.15 19.17-5.15 28.42"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path d="M1602.26 1101.29h16.56V865.93h-16.56zm0-272.93h16.56v-49.23h-16.56z" fill="#ddcfe6"
+                        data-color="1"></path>
+                    <path
+                        d="M1437.61 964.36v12.99c-31.91 0-58.08 1.49-78.5 4.46-20.46 2.99-36.24 7.18-47.44 12.53-11.16 5.36-18.93 11.87-23.24 19.48-4.37 7.6-6.53 16.04-6.53 25.27 0 16.11 5.61 28.78 16.82 38.04 11.15 9.25 26.62 13.88 46.31 13.88 16.4 0 31.31-4.27 44.72-12.77 13.42-8.48 24.16-19.67 32.23-33.55 8.02-13.88 12.09-28.7 12.09-44.51h9.81c-1.18 18.5-5.09 34.36-11.61 47.64-6.58 13.27-14.86 24.16-24.83 32.67-10.03 8.49-20.62 14.76-31.77 18.79-11.21 4.01-21.85 6.04-32.03 6.04-16.4 0-30.38-2.53-42.05-7.6-11.61-5.07-20.66-12.54-27.04-22.38-6.42-9.85-9.61-21.62-9.61-35.34 0-16.12 4.16-29.15 12.48-39.15 8.38-10 20.77-17.53 37.17-22.6 16.71-5.68 34.6-9.41 53.67-11.17 19.07-1.8 42.2-2.7 69.34-2.7m-148.08-21.94h-16.97c2.67-16.99 7.71-31.53 15.16-43.62 7.46-12.08 17.84-21.32 31.1-27.72 13.32-6.43 29.36-9.64 48.11-9.64s34.85 3.67 47.19 10.97c12.39 7.3 21.6 17.66 27.55 31.1 5.96 13.42 8.94 29.38 8.94 47.85v96.64c0 12.23.82 22.62 2.47 31.1 1.59 8.51 4.21 15.88 7.81 22.15h-18.35c-3.59-5.96-5.9-13.34-6.93-22.15-1.04-8.8-1.54-17.22-1.54-25.27V953.61c0-24.76-5.45-43.86-16.36-57.27-10.89-13.42-28.42-20.12-52.59-20.12s-40.55 5.96-52.79 17.89c-12.23 11.92-19.85 28.04-22.82 48.32"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path fill="#ddcfe6" d="M1125.34 779.13v322.16h-16.56V779.13z" data-color="1"></path>
+                    <path
+                        d="M776.15 797.05h17.43v304.24h-17.43zm93.03 183.87h-81.89V966.6h81.42c26.83 0 48.27-6.94 64.2-20.8 15.99-13.88 23.96-32.74 23.96-56.6s-7.98-43.18-23.96-57.06c-15.93-13.88-37.22-20.8-63.74-20.8h-81.89v-14.31h81.89c21.18 0 39.69 3.73 55.47 11.17 15.83 7.46 28.06 18.05 36.7 31.77 8.63 13.72 12.95 29.98 12.95 48.76 0 28.94-9.51 51.54-28.64 67.8-19.07 16.24-44.56 24.37-76.49 24.37"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M1519.92 419.64c-15.52 0-25.81 7.99-30.84 23.95-5.09 15.96-7.92 38.09-8.53 66.44h47.44c9.56 0 15.78-3.06 18.77-9.17 2.97-6.12 4.47-14.4 4.47-24.84s-.68-19.92-2.01-28.42c-1.34-8.48-4.21-15.26-8.69-20.36-4.47-5.07-11.37-7.6-20.62-7.6m-102.45 109.62c0-38.76 9-67.34 27.09-85.67 18.05-18.35 43.18-27.53 75.36-27.53 28.64 0 48.99 5.97 61.07 17.9 12.08 11.94 18.15 27.16 18.15 45.65 0 5.68-.68 11.56-2.01 17.67-1.34 6.12-3.4 11.55-6.07 16.32h-110.51v15.66c0 21.79 1.59 40.35 4.72 55.72 3.14 15.34 8.94 27.14 17.43 35.34 8.48 8.2 21.13 12.31 37.84 12.31 10.12 0 19.07-2.39 26.83-7.16 7.76-4.79 13.77-10.98 18.09-18.56 4.31-7.6 6.52-15.29 6.52-23.06h4.01c0 8.67-2.61 17.46-7.82 26.41-5.24 8.94-13.36 16.47-24.41 22.59s-25.49 9.18-43.38 9.18c-32.79 0-58.2-8.79-76.08-26.39-17.89-17.61-26.83-46.37-26.83-86.36m96.18-143.65-3.13-2.67c10.43-11.93 18.5-24.91 24.15-38.94 5.71-14 9.56-27.73 11.67-41.14l40.71 13.84c-7.45 13.44-17.63 26.19-30.43 38.28-12.85 12.08-27.14 22.3-42.98 30.63"
+                        fill="#ddcfe6" data-color="1"></path>
+                    <path
+                        d="M1245.88 528.35c0-26.83-1.28-48.17-3.81-63.97-2.57-15.8-6.78-27.22-12.74-34.23-5.97-6.98-14.19-10.51-24.63-10.51s-18.19 3.53-24.16 10.51c-5.96 7.02-10.29 18.43-12.95 34.23-2.73 15.8-4.06 37.14-4.06 63.97s1.33 48.71 4.06 64.67c2.67 15.95 7 27.5 12.95 34.66 5.97 7.18 14.04 10.75 24.16 10.75s18.66-3.57 24.63-10.75c5.96-7.16 10.17-18.71 12.74-34.66 2.52-15.96 3.81-37.5 3.81-64.67m63.07 0c0 75.77-34.75 113.65-104.25 113.65s-104.25-37.88-104.25-113.65 34.74-112.29 104.25-112.29 104.25 37.45 104.25 112.29"
+                        fill="#ddcfe6" data-color="1"></path>
+                </g>
+            </svg>
+            <div class="footer-nav-links">
+                <a class="footer-nav-link" href="https://www.noeplain.ch">Portfolio</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/medie.vom.noe/">Instagram (medie.vom.noe)</a>
+                <a class="footer-nav-link" href="https://www.instagram.com/noe.plain.life/">Instagram
+                    (noe.plain.life)</a>
+                <a class="footer-nav-link" href="https://linkedin.com/in/noe-plain">LinkedIn</a>
+            </div>
+        </nav>
+    </footer>
+
+    <section id="detail-screen" class="screen hidden">
+        <div class="detail-container">
+            <div class="detail-image-wrapper">
+                <div class="zoom-container">
+                    <div class="zoom-target" id="zoom-target"></div>
+                </div>
+
+                <div class="zoom-controls">
+                    <i class="fas fa-search-minus small-icon" id="zoom-out-btn" style="cursor: pointer;"></i>
+                    <input type="range" id="zoom-slider" min="1" max="4" step="0.1" value="1">
+                    <i class="fas fa-search-plus small-icon" id="zoom-in-btn" style="cursor: pointer;"></i>
+                </div>
+
+                <button class="icon-btn detail-nav-button left" id="detail-prev-btn"><i
+                        class="fas fa-chevron-left"></i></button>
+                <button class="icon-btn detail-nav-button right" id="detail-next-btn"><i
+                        class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="detail-header-overlay">
+                <button class="icon-btn" id="back-btn"><i class="fas fa-chevron-left"></i></button>
+                <div class="right-actions">
+                    <button class="icon-btn bookmark-btn" id="detail-fav-btn"><i class="far fa-heart"></i></button>
+                    <!-- Info Button replaces Add to Album -->
+                    <button class="icon-btn" id="info-toggle-btn"><i class="fas fa-info"></i></button>
+                    <button class="icon-btn" id="download-btn"><i class="fas fa-download"></i></button>
+                </div>
+            </div>
+
+            <div class="detail-content" id="detail-content-sheet">
+                <button class="sheet-close-btn" id="sheet-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div class="detail-info-header">
+                    <h2 id="detail-title"></h2>
+                    <p class="photographer"><i class="fas fa-user-circle"></i> <span id="detail-photographer">Noé
+                            Plain</span>
+                    </p>
+                </div>
+
+                <div class="specs-row" id="specs-equipment"></div>
+                <div class="specs-row" id="specs-technical" style="margin-top: 5px;"></div>
+
+                <div class="description">
+                    <p id="detail-desc"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Download Bar and Toast -->
+    <div id="floating-download-bar" class="floating-bar hidden">
+        <div id="floating-preview-panel" class="hidden"></div>
+        <div class="floating-bar-content">
+            <span id="selected-count">0 Bilder ausgewählt</span>
+            <div class="floating-actions">
+                <button id="floating-review-btn" onclick="toggleFloatingPreview()" title="Auswahl prüfen/bearbeiten">
+                    <i class="fas fa-list-check"></i> Prüfen
+                </button>
+                <button id="floating-download-btn" onclick="downloadFavoritesZip()">
+                    <i class="fas fa-file-archive"></i> Download
+                </button>
+                <button id="clear-selection-btn" title="Alle abwählen"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+</body>
+
+</html>
