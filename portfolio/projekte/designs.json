@@ -2,7 +2,7 @@
     {
         "id": "ipa-techday",
         "title": "IPA – Migros Techday",
-        "description": "Verschiedene Layout-Arbeiten und Print-Produkte.",
+        "description": "Für meine IPA gestaltete ich das Redesign des Migros Techday 2025. Das Projekt umfasste eine konsistente Designsprache für Print- und Digitalmedien, die zum 5. Jubiläum Innovation mit bestehendem Wiedererkennungswert verbindet.",
         "hero-image": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
         "images": [
             {
@@ -35,9 +35,24 @@
         ]
     },
     {
+        "id": "fotografie-kurs",
+        "title": "Fotografie Kurs",
+        "description": "Für das Employer Branding Team der Migros-Gruppe durfte ich einen Kurs vorbereiten und durchführen. Es ging darum, den Mitarbeitenden die Grundlagen der Fotografie und Videografie näherzubringen, da dieses Team zu diesem Zeitpunkt eine neue Kamera und ein iPhone für Social Media Content anschaffte.",
+        "hero-image": "../../images/portfolio/design/NP_08299.jpeg",
+        "images": [
+            {
+                "id": "illu-002",
+                "type": "pdf",
+                "pdfUrl": "../../images/portfolio/design/eb-foto_videografie-101-small-komprimiert.pdf",
+                "imageUrl": "../../images/kategorien/fotografie.jpg",
+                "title": "Migros Universum"
+            }
+        ]
+    },
+    {
         "id": "iwish",
         "title": "Iwish_",
-        "description": "Für ein Modul in der Schule sollten wir CI/CDs erweitern mit neuen Produkten. Vorallem ging es um das erstellen von Druckdaten.",
+        "description": "Als Aufgabe in einem Modul für Druckdatenerstellung in der Schule durfte ich das Corporate Design der Videoagentur IWISH_ erweitern. Mein Ziel war es, ein neues Werbemittel zu schaffen, das Ästhetik mit Nutzen verbindet und die Markenidentität im Büroalltag präsent hält.",
         "hero-image": "../../images/portfolio/design/tassen_design.jpg",
         "images": [
             {
