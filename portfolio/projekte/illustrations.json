@@ -106,17 +106,5 @@
                 "title": "FSPM Logo Varianten"
             }
         ]
-    },
-    {
-        "id": "tasse",
-        "title": "Geburtstags Tasse",
-        "description": "Design für eine Geburtstagstasse.",
-        "images": [
-            {
-                "id": "illu-004",
-                "imageUrl": "../../images/noe-plain-bench.jpg",
-                "title": "Tasse Entwurf"
-            }
-        ]
     }
 ]
