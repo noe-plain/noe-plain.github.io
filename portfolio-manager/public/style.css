@@ -1,0 +1,638 @@
+/* Fonts */
+@font-face {
+    font-family: 'boska';
+    src: url('/fonts/Boska-Bold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'switzer';
+    src: url('/fonts/Switzer-Regular.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'switzer';
+    src: url('/fonts/Switzer-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'melodrama';
+    src: url('/fonts/Melodrama-Semibold.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+
+:root {
+    --primary: #1f0033;
+    --primary-light: #3a0055;
+    --accent-gradient: linear-gradient(140deg, rgba(255, 255, 255, 1) 7%, rgba(239, 220, 245, 1) 50%, rgba(255, 255, 255, 1) 93%);
+    --text-main: #333;
+    --text-light: #fff;
+    --border-radius-sig: 30px 0 30px 30px;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    margin: 0;
+    font-family: 'switzer', sans-serif;
+    color: var(--text-main);
+    background-color: #f7f7f7;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background-color: var(--primary);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 30px;
+    /* No border radius on left side to sit flush */
+    border-radius: 0 30px 30px 0;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    position: relative;
+}
+
+.logo {
+    margin-bottom: 60px;
+}
+
+.logo h2 {
+    font-family: 'switzer', sans-serif;
+    /* Matching main site logo font base */
+    font-weight: 300;
+    font-size: 1.5rem;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.logo h2 span.brand-name {
+    font-family: 'boska', serif;
+    font-weight: 600;
+}
+
+.logo .badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-family: 'switzer', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+nav button {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'switzer', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+nav button i {
+    width: 24px;
+    text-align: center;
+}
+
+nav button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    transform: translateX(5px);
+}
+
+nav button.active {
+    background: var(--text-light);
+    color: var(--primary);
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.modal-actions button {
+    padding: 8px 16px;
+    border-radius: 8px 0 8px 8px;
+    border: none;
+    font-family: 'switzer', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
+}
+
+.modal-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(31, 0, 51, 0.3);
+}
+
+/* Main Content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 60px;
+    background: #fff;
+    /* Plain white or gradient? */
+    /* Let's use the subtle gradient on the main bg or specific sections. */
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+header h1 {
+    font-family: 'melodrama', serif;
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin: 0;
+    line-height: 1;
+}
+
+/* Action Bar inside Header */
+.actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.primary-btn {
+    background-color: var(--primary);
+    color: var(--text-light);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'switzer', sans-serif;
+    font-size: 1rem;
+    border-radius: 30px;
+    /* Rounded pill style or signature? */
+    /* Signature radius for buttons might look odd, standard pill is usually safer, 
+       but let's try signature to be "100% meaningful" */
+    border-radius: 12px 0 12px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(31, 0, 51, 0.3);
+}
+
+/* Grid Layouts */
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.project-card {
+    background: #fff;
+    border-radius: var(--border-radius-sig);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-img {
+    height: 240px;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    /* Image sits at top, follows radius */
+}
+
+.card-body {
+    padding: 25px 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body h3 {
+    font-family: 'melodrama', serif;
+    font-size: 1.8rem;
+    margin: 0 0 10px 0;
+    color: var(--primary);
+}
+
+.card-body p {
+    font-family: 'switzer', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 20px;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    border-radius: 8px 0 8px 8px;
+    border: none;
+    font-family: 'switzer', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-edit {
+    background: #f0f0f5;
+    color: #333;
+}
+
+.btn-edit:hover {
+    background: #e0e0ea;
+}
+
+.btn-delete {
+    background: #fff0f0;
+    color: #d63031;
+}
+
+.btn-delete:hover {
+    background: #ffe0e0;
+}
+
+.gallery-list-container input {
+    border-radius: var(--border-radius-sig);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'switzer', sans-serif;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
+}
+
+/* The missing brace was here, closing the .gallery-list-container input rule.
+   The original document had an extra opening brace for .photo-grid,
+   which made the subsequent rules nested incorrectly.
+   The instruction implies closing the previous block before starting .photo-grid.
+   However, the original code already had a closing brace for .gallery-list-container input.
+   The actual issue is that the .photo-grid rule was malformed,
+   with nested rules using SCSS-like syntax within a CSS file.
+   The instruction "Add missing brace" and the provided `Code Edit`
+   suggest that the `.photo-grid` rule itself needs to be properly defined
+   as a top-level rule, and the nested rules should be extracted.
+   The original `.photo-grid` had an extra `{` after `display: grid;`
+   which was then closed by the `}` at the end of the block/* Photography Grid */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.photo-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    cursor: grab;
+}
+
+.photo-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--primary);
+}
+
+.photo-item.drag-over {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(31, 0, 51, 0.3);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.photo-item:hover img {
+    transform: scale(1.05);
+}
+
+.photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(31, 0, 51, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    color: white;
+}
+
+.photo-item:hover .photo-overlay {
+    opacity: 1;
+}
+
+.photo-overlay span {
+    font-family: 'switzer', sans-serif;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.photo-overlay .btn-delete {
+    align-self: flex-start;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.photo-category-select {
+    border-radius: var(--border-radius-sig);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'switzer', sans-serif;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
+}
+
+
+/* Modal Overhaul */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+    font-family: 'melodrama', serif;
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: var(--primary);
+}
+
+.close-modal {
+    top: 30px;
+    right: 40px;
+    font-size: 2rem;
+    color: var(--primary);
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.close-modal:hover {
+    opacity: 1;
+}
+
+.form-group label {
+    font-family: 'switzer', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--primary);
+}
+
+/* Inputs styling to match simplified logic */
+.form-group input,
+.form-group textarea,
+.form-group select {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-family: 'switzer', sans-serif;
+    font-size: 0.95rem;
+    color: #333;
+    transition: all 0.2s;
+    box-shadow: none;
+    width: 100%;
+    /* Ensure full width */
+    box-sizing: border-box;
+    /* prevent overflow */
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    background: #fff;
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(31, 0, 51, 0.1);
+}
+
+.image-input-row {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(31, 0, 51, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 0, 51, 0.4);
+}
+
+/* --- New Form Styles regarding the refactor --- */
+
+.type-specific-fields {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.type-specific-fields h3 {
+    font-family: 'melodrama', serif;
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+/* Video List Styling */
+.video-item-row,
+.gallery-item-row {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--primary);
+}
+
+.secondary-btn {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'switzer', sans-serif;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.secondary-btn:hover {
+    background: rgba(31, 0, 51, 0.05);
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-btn input {
+    flex: 1;
+}
+
+.input-with-btn button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 50px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.input-with-btn button:hover {
+    background: var(--primary-light);
+}
+
+/* Delete button for rows */
+.btn-row-delete {
+    background: transparent;
+    color: #d63031;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+}

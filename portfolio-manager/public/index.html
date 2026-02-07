@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Manager - Noé Plain</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Medien von <span class="brand-name">Noé</span></h2>
+                <span class="badge">Manager</span>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-tab="design">
+                    <i class="fas fa-pen-nib"></i> Design
+                </button>
+                <button class="nav-btn" data-tab="illustration">
+                    <i class="fas fa-paint-brush"></i> Illustration
+                </button>
+                <button class="nav-btn" data-tab="video">
+                    <i class="fas fa-video"></i> Video
+                </button>
+                <button class="nav-btn" data-tab="photography">
+                    <i class="fas fa-camera"></i> Fotografie
+                </button>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <!-- Project Tabs -->
+            <section id="tab-design" class="tab-content active">
+                <header>
+                    <h1>Design Projekte</h1>
+                    <button class="primary-btn" onclick="openProjectModal('design')">
+                        <i class="fas fa-plus"></i> Neues Projekt
+                    </button>
+                </header>
+                <div class="project-list" id="list-design">
+                    <!-- Loaded dynamically -->
+                </div>
+            </section>
+
+            <section id="tab-illustration" class="tab-content">
+                <header>
+                    <h1>Illustration Projekte</h1>
+                    <button class="primary-btn" onclick="openProjectModal('illustration')">
+                        <i class="fas fa-plus"></i> Neues Projekt
+                    </button>
+                </header>
+                <div class="project-list" id="list-illustration"></div>
+            </section>
+
+            <section id="tab-video" class="tab-content">
+                <header>
+                    <h1>Video Projekte</h1>
+                    <button class="primary-btn" onclick="openProjectModal('video')">
+                        <i class="fas fa-plus"></i> Neues Projekt
+                    </button>
+                </header>
+                <div class="project-list" id="list-video"></div>
+            </section>
+
+            <!-- Photography Tab -->
+            <section id="tab-photography" class="tab-content">
+                <header>
+                    <h1>Fotografie Manager</h1>
+                    <div class="actions">
+                        <select id="photo-category-select">
+                            <option value="street">Street</option>
+                            <option value="aviation">Aviation</option>
+                            <option value="portraet">Porträt</option>
+                            <option value="bts">BTS</option>
+                            <option value="event">Event</option>
+                        </select>
+                        <button class="primary-btn" onclick="triggerPhotoUpload()">
+                            <i class="fas fa-upload"></i> Foto hochladen
+                        </button>
+                        <input type="file" id="photo-upload-input" hidden accept="image/*">
+                    </div>
+                </header>
+                <div class="photo-grid" id="photo-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Unified Modal -->
+    <div id="project-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Projekt bearbeiten</h2>
+
+            <form id="project-form">
+                <input type="hidden" id="p-type" name="type">
+                <input type="hidden" id="p-id" name="id">
+
+                <!-- Common Fields -->
+                <div class="form-group">
+                    <label>Titel</label>
+                    <input type="text" id="p-title" required>
+                </div>
+
+                <div class="form-group" id="group-tabTitle">
+                    <label>Tab Titel (Optional)</label>
+                    <input type="text" id="p-tabTitle">
+                </div>
+
+                <div class="form-group">
+                    <label>Beschreibung</label>
+                    <textarea id="p-desc" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Hero Bild</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="p-hero" placeholder="../../images/..." required>
+                        <button type="button" onclick="triggerUpload('p-hero')"><i class="fas fa-upload"></i></button>
+                    </div>
+                </div>
+
+                <!-- Video Specific Fields -->
+                <div id="fields-video" class="type-specific-fields hidden">
+                    <h3>Video Details</h3>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Rolle</label>
+                            <input type="text" id="p-role" placeholder="z.B. Videograf">
+                        </div>
+                        <div class="form-group half">
+                            <label>Equipment</label>
+                            <input type="text" id="p-equipment" placeholder="z.B. Sony A7 IV">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tools</label>
+                        <input type="text" id="p-tools" placeholder="z.B. Premiere Pro, After Effects">
+                    </div>
+
+                    <h3>Videos</h3>
+                    <div id="video-list-container"></div>
+                    <button type="button" class="secondary-btn" onclick="addVideoInput()">
+                        <i class="fas fa-plus"></i> Video hinzufügen
+                    </button>
+                </div>
+
+                <!-- Design/Illustration Specific Fields -->
+                <div id="fields-gallery" class="type-specific-fields hidden">
+                    <h3>Galerie & Assets</h3>
+
+                    <!-- PDF Upload (Design Only via JS toggle) -->
+                    <div id="pdf-section" class="form-group hidden">
+                        <label>Projekt Dokumentation (PDF)</label>
+                        <div class="input-with-btn">
+                            <input type="text" id="p-pdf" placeholder="URL zum PDF">
+                            <button type="button" onclick="triggerUpload('p-pdf')"><i
+                                    class="fas fa-upload"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="gallery-list-container"></div>
+                    <button type="button" class="secondary-btn" onclick="addGalleryImageInput()">
+                        <i class="fas fa-plus"></i> Bild hinzufügen
+                    </button>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Abbrechen</button>
+                    <button type="submit" class="primary-btn">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden file input for generic uploads -->
+    <input type="file" id="generic-upload-input" hidden>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
