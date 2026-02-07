@@ -40,3 +40,6 @@ fi
 
 log "Server stopped or crashed."
 read -p "Press any key to exit..."
+```bash
+open -a "GitHub Desktop"
+```
