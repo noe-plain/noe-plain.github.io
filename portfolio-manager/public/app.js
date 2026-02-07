@@ -126,9 +126,7 @@ function openProjectModal(type, project = null) {
     } else {
         document.getElementById('fields-gallery').classList.remove('hidden');
         if (type === 'design') {
-            document.getElementById('pdf-section').classList.remove('hidden');
-        } else {
-            document.getElementById('pdf-section').classList.add('hidden');
+            // No specific show/hide for design vs illustration anymore, they share the gallery list
         }
     }
 
@@ -165,11 +163,10 @@ function openProjectModal(type, project = null) {
 
             // Let's filter out PDF from images for display in gallery list
             // populate PDF input if found
+            // Verify if project.images exists
             if (project.images) {
-                const pdfItem = project.images.find(i => i.type === 'pdf');
-                if (pdfItem) document.getElementById('p-pdf').value = pdfItem.pdfUrl;
-
-                project.images.filter(i => i.type !== 'pdf').forEach(img => addGalleryImageInput(img));
+                // Load ALL items, including PDFs, into the list
+                project.images.forEach(img => addGalleryImageInput(img));
             }
 
             // Check video-projects.json specific pdf structure just in case? 
@@ -250,28 +247,35 @@ async function handleSave(e) {
         newProject["hero-image"] = hero;
         newProject.images = [];
 
-        // PDF (Design only)
-        const pdfUrl = document.getElementById('p-pdf').value;
-        if (currentType === 'design' && pdfUrl) {
-            newProject.images.push({
-                id: `${id}-pdf`,
-                type: 'pdf',
-                pdfUrl: pdfUrl,
-                imageUrl: hero, // often same as hero or generic
-                title: title
-            });
-        }
 
-        // Gallery
+
+        // Gallery & PDFs
         const galleryRows = document.querySelectorAll('.gallery-item-row');
         galleryRows.forEach((row, idx) => {
-            const url = row.querySelector('.img-url').value;
-            if (url) {
-                newProject.images.push({
-                    id: `${id}-img-${idx}`,
-                    imageUrl: url,
-                    title: row.querySelector('.img-title').value || title
-                });
+            const isPdf = row.querySelector('.is-pdf-cb').checked;
+            const titleVal = row.querySelector('.img-title').value;
+
+            if (isPdf) {
+                const pdfUrl = row.querySelector('.pdf-url').value;
+                const coverUrl = row.querySelector('.pdf-cover-url').value;
+                if (pdfUrl) {
+                    newProject.images.push({
+                        id: `${id}-pdf-${idx}`,
+                        type: 'pdf',
+                        pdfUrl: pdfUrl,
+                        imageUrl: coverUrl || hero, // Fallback to hero if no cover
+                        title: titleVal || title
+                    });
+                }
+            } else {
+                const url = row.querySelector('.img-url').value;
+                if (url) {
+                    newProject.images.push({
+                        id: `${id}-img-${idx}`,
+                        imageUrl: url,
+                        title: titleVal || title
+                    });
+                }
             }
         });
     }
@@ -337,22 +341,61 @@ window.addGalleryImageInput = function (data = null) {
     const container = document.getElementById('gallery-list-container');
     const div = document.createElement('div');
     div.className = 'gallery-item-row';
+    const isPdf = data && data.type === 'pdf';
+
     div.innerHTML = `
         <div class="row-header">
-            <span>Bild</span>
+            <span>${isPdf ? 'PDF Dokument' : 'Bild'}</span>
             <div class="row-controls">
+                <label style="margin-right: 10px; font-size: 0.9em;">
+                    <input type="checkbox" class="is-pdf-cb" onchange="togglePdfInputs(this)" ${isPdf ? 'checked' : ''}> PDF?
+                </label>
                 <button type="button" class="btn-move" onclick="moveRow(this, -1)" title="Nach oben"><i class="fas fa-chevron-up"></i></button>
                 <button type="button" class="btn-move" onclick="moveRow(this, 1)" title="Nach unten"><i class="fas fa-chevron-down"></i></button>
                 <button type="button" class="btn-row-delete" onclick="this.parentElement.parentElement.parentElement.remove()" title="Löschen"><i class="fas fa-trash"></i></button>
             </div>
         </div>
-        <div class="input-with-btn">
-            <input type="text" class="img-url" placeholder="Bild URL" value="${data ? data.imageUrl : ''}">
+        
+        <!-- Image Input -->
+        <div class="input-with-btn image-input-group ${isPdf ? 'hidden' : ''}">
+            <input type="text" class="img-url" placeholder="Bild URL" value="${!isPdf && data ? data.imageUrl : ''}">
             <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-upload"></i></button>
         </div>
-        <input type="text" class="img-title" placeholder="Bild Titel / Caption" value="${data ? data.title : ''}">
+
+        <!-- PDF Inputs -->
+        <div class="pdf-input-group ${isPdf ? '' : 'hidden'}">
+            <div class="input-with-btn">
+                <input type="text" class="pdf-url" placeholder="PDF Datei URL" value="${isPdf && data ? data.pdfUrl : ''}">
+                <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-file-pdf"></i></button>
+            </div>
+            <div class="input-with-btn" style="margin-top: 5px;">
+                <input type="text" class="pdf-cover-url" placeholder="PDF Titelbild URL" value="${isPdf && data ? data.imageUrl : ''}">
+                <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-image"></i></button>
+            </div>
+        </div>
+
+        <input type="text" class="img-title" placeholder="Titel / Caption" value="${data ? data.title : ''}" style="margin-top: 5px;">
     `;
     container.appendChild(div);
+}
+
+window.togglePdfInputs = function (cb) {
+    const row = cb.closest('.gallery-item-row');
+    const isPdf = cb.checked;
+
+    const imgGroup = row.querySelector('.image-input-group');
+    const pdfGroup = row.querySelector('.pdf-input-group');
+    const labelSpan = row.querySelector('.row-header span');
+
+    if (isPdf) {
+        imgGroup.classList.add('hidden');
+        pdfGroup.classList.remove('hidden');
+        labelSpan.innerText = 'PDF Dokument';
+    } else {
+        imgGroup.classList.remove('hidden');
+        pdfGroup.classList.add('hidden');
+        labelSpan.innerText = 'Bild';
+    }
 }
 
 window.moveRow = function (btn, direction) {
