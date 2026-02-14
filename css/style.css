@@ -1,11 +1,15 @@
+html {
+    scroll-behavior: smooth;
+}
+
 .hero-image {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 20px;
+    left: 20px;
     background-position: center;
     object-fit: cover;
-    width: calc(100vw - 30px);
-    height: calc(100vh - 30px);
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
     border-radius: 30px 0 30px 30px;
     z-index: 2
 }
@@ -52,10 +56,8 @@
 }
 
 .signature-form {
-    background: #FFF;
-    background: linear-gradient(140deg, rgba(255, 255, 255, 1) 7%, rgba(239, 220, 245, 1) 50%, rgba(255, 255, 255, 1) 93%);
-    box-shadow: 0 4px 15px #00000008;
-    color: #333;
+    border: 1.5px solid #fff;
+    color: #fff;
     padding: 50px;
     border-radius: 30px 0 30px 30px;
 }
@@ -142,10 +144,6 @@
 .portfolio-card-title {
     position: absolute;
     z-index: 10
-}
-
-.bg-img-noe {
-    background-image: url(../images/kategorien/noe-background.jpg)
 }
 
 .clients-section {
@@ -441,7 +439,8 @@
 
 .projekt-karte h3 {
     font-size: 2rem;
-    font-family: melodrama, melodrama, serif;
+    font-family: "Bodoni Moda", serif;
+    font-weight: 400;
     margin-bottom: 1rem;
     color: #1f0033
 }
@@ -884,7 +883,8 @@ main.max-width {
 .form-section h2 {
     text-align: center;
     margin-bottom: 3rem;
-    font-family: melodrama, serif;
+    font-family: "Bodoni Moda", serif;
+    font-weight: 500;
     font-size: 3rem
 }
 
@@ -894,19 +894,24 @@ form {
     gap: 1.5rem
 }
 
+::placeholder {
+    color: #d0d0d0;
+    opacity: 1;
+}
+
+
 .block {
-    width: 100%;
-    padding: 1.2rem 1.5rem;
-    border: 1px solid rgba(0, 0, 0, .1);
-    border-radius: 16px;
-    background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    font-family: switzer, sans-serif;
-    font-size: 1.1rem;
-    color: #333;
-    transition: all .3s ease;
-    box-sizing: border-box;
-    box-shadow: 0 4px 6px #00000005
+width: 100%;
+background-color: rgba(255, 255, 255, 0.2)  !important;
+backdrop-filter: blur(5px);
+box-sizing: border-box;
+border: 1px solid rgba(221, 221, 221, 0.08) !important;
+font-family: switzer, sans-serif;
+font-size: 1rem;
+color: rgb(255, 255, 255) !important;
+transition: 0.3s;
+border-radius: 50px !important;
+padding: 1.2rem 2rem !important;
 }
 
 .block:focus {
