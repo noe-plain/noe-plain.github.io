@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,10 +55,29 @@
         }
 
         /* Active States with NO white text */
-        .btn-gl.active { background-color: #fef3c7; border-color: #8b4513; color: #8b4513; }
-        .btn-l.active { background-color: #fefce8; border-color: #b08d57; color: #b08d57; }
-        .btn-s.active { background-color: #eff6ff; border-color: #2563eb; color: #1e40af; }
-        .btn-sl.active { background-color: #f1f5f9; border-color: #475569; color: #1e293b; }
+        .btn-gl.active {
+            background-color: #fef3c7;
+            border-color: #8b4513;
+            color: #8b4513;
+        }
+
+        .btn-l.active {
+            background-color: #fefce8;
+            border-color: #b08d57;
+            color: #b08d57;
+        }
+
+        .btn-s.active {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #1e40af;
+        }
+
+        .btn-sl.active {
+            background-color: #f1f5f9;
+            border-color: #475569;
+            color: #1e293b;
+        }
 
         .modal-overlay {
             background: rgba(0, 0, 0, 0.4);
@@ -72,11 +92,19 @@
         }
 
         /* No white text override for all interactive elements */
-        button, a, span, p, h1, h2, h3, h4 {
+        button,
+        a,
+        span,
+        p,
+        h1,
+        h2,
+        h3,
+        h4 {
             color: inherit;
         }
     </style>
 </head>
+
 <body class="antialiased">
 
     <!-- Application Structure Plan:
@@ -89,54 +117,78 @@
 
     <!-- Chosen Palette: Ivory & Slate (Creme-Hintergrund, Obsidian-Text, gedeckte Metall-Akzente) -->
 
-    <nav class="p-8 flex justify-between items-center fixed w-full top-0 z-40 bg-white/60 backdrop-blur-md border-b border-black/5">
+    <nav
+        class="p-8 flex justify-between items-center fixed w-full top-0 z-40 bg-white/60 backdrop-blur-md border-b border-black/5">
         <div class="heading-font font-bold text-lg">Thomann<span class="text-amber-800">//</span>Alto</div>
-        <div class="text-[10px] uppercase tracking-widest font-bold opacity-60 hidden md:block">Analytischer Vergleich für Profis</div>
+        <div class="text-[10px] uppercase tracking-widest font-bold opacity-60 hidden md:block">Analytischer Vergleich
+            für Profis</div>
     </nav>
 
     <main class="max-w-6xl mx-auto px-6 pt-32 pb-20">
-        
+
         <!-- Hero -->
-        <section class="mb-32">
-            <h1 class="heading-font text-4xl md:text-6xl font-bold mb-8 leading-tight">
-                Die Suche nach der <br><span class="text-amber-800 italic">Symphonischen Altposaune.</span>
-            </h1>
-            <p class="text-xl max-w-2xl opacity-80">
-                Als Spieler eines <strong>S.E. Shires David Rejano Models</strong> sind Sie Präzision und klangliche Tiefe gewohnt. Wir vergleichen die Thomann-Serie auf Augenhöhe mit Ihren professionellen Ansprüchen.
-            </p>
+        <section class="mb-10 min-h-[70vh] flex items-center relative py-20 lg:py-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+                <div class="z-10 relative">
+                    <h1 class="heading-font text-4xl md:text-6xl font-bold mb-8 leading-tight">
+                        Die Suche nach der <br><span class="text-amber-800 italic">Symphonischen Altposaune.</span>
+                    </h1>
+                    <p class="text-xl max-w-2xl opacity-80">
+                        Als Spieler eines <strong>S.E. Shires David Rejano Models</strong> sind Sie Präzision und
+                        klangliche
+                        Tiefe gewohnt. Wir vergleichen die Thomann-Serie auf Augenhöhe mit Ihren professionellen
+                        Ansprüchen.
+                    </p>
+                </div>
+                <div
+                    class="lg:absolute lg:right-[-5%] lg:top-1/2 lg:-translate-y-1/2 lg:w-2/3 z-20 pointer-events-none">
+                    <img src="./altposaune.webp" alt="Posaune"
+                        class="w-full transform rotate-12 transition duration-1000 mix-blend-multiply drop-shadow-2xl">
+                </div>
+            </div>
         </section>
 
         <!-- Product Grid -->
         <section id="matrix" class="mb-32">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- SL-35 -->
-                <div onclick="openModal('sl35')" class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
-                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/255316.jpg" alt="SL-35" class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
+                <div onclick="openModal('sl35')"
+                    class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
+                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/255316.jpg" alt="SL-35"
+                        class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
                     <h3 class="heading-font text-xs font-bold mb-2">SL-35</h3>
                     <p class="text-[10px] uppercase tracking-widest opacity-50 mb-4">Einsteiger / Gelbmessing</p>
                     <div class="text-lg font-bold">221 CHF</div>
                 </div>
 
                 <!-- TEB480 GL -->
-                <div onclick="openModal('teb480gl')" class="bg-white p-8 rounded-card border-2 border-amber-800/20 hover:border-amber-800 transition-all cursor-pointer group shadow-md relative">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-800 text-[8px] font-bold text-amber-100 px-3 py-1 rounded-full uppercase tracking-widest">Empfehlung</div>
-                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288865.jpg" alt="TEB480 GL" class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
+                <div onclick="openModal('teb480gl')"
+                    class="bg-white p-8 rounded-card border-2 border-amber-800/20 hover:border-amber-800 transition-all cursor-pointer group shadow-md relative">
+                    <div
+                        class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-800 text-[8px] font-bold text-amber-100 px-3 py-1 rounded-full uppercase tracking-widest">
+                        Empfehlung</div>
+                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288865.jpg" alt="TEB480 GL"
+                        class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
                     <h3 class="heading-font text-xs font-bold mb-2">TEB480 GL</h3>
                     <p class="text-[10px] uppercase tracking-widest opacity-50 mb-4">Classic / Goldmessing</p>
                     <div class="text-lg font-bold">273 CHF</div>
                 </div>
 
                 <!-- TEB480 L -->
-                <div onclick="openModal('teb480l')" class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
-                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288863.jpg" alt="TEB480 L" class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
+                <div onclick="openModal('teb480l')"
+                    class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
+                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288863.jpg" alt="TEB480 L"
+                        class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
                     <h3 class="heading-font text-xs font-bold mb-2">TEB480 L</h3>
                     <p class="text-[10px] uppercase tracking-widest opacity-50 mb-4">Classic / Lackiert</p>
                     <div class="text-lg font-bold">228 CHF</div>
                 </div>
 
                 <!-- TEB480 S -->
-                <div onclick="openModal('teb480s')" class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
-                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288864.jpg" alt="TEB480 S" class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
+                <div onclick="openModal('teb480s')"
+                    class="bg-white p-8 rounded-card border border-black/5 hover:border-amber-800/30 transition-all cursor-pointer group shadow-sm">
+                    <img src="https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288864.jpg" alt="TEB480 S"
+                        class="h-48 mx-auto mb-6 object-contain mix-blend-multiply group-hover:scale-105 transition-transform">
                     <h3 class="heading-font text-xs font-bold mb-2">TEB480 S</h3>
                     <p class="text-[10px] uppercase tracking-widest opacity-50 mb-4">Classic / Versilbert</p>
                     <div class="text-lg font-bold">273 CHF</div>
@@ -150,10 +202,12 @@
                 <div>
                     <h2 class="heading-font text-2xl font-bold mb-6">Klang-Labor</h2>
                     <p class="opacity-70 mb-10">
-                        Überlagern Sie die klanglichen DNA-Profile. Für einen symphonischen Einsatz ist die Balance zwischen <strong>Wärme</strong> und <strong>Slotting</strong> entscheidend.
+                        Überlagern Sie die klanglichen DNA-Profile. Für einen symphonischen Einsatz ist die Balance
+                        zwischen <strong>Wärme</strong> und <strong>Slotting</strong> entscheidend.
                     </p>
                     <div class="flex flex-wrap gap-4 mb-8">
-                        <button id="toggle-gl" onclick="toggleDataset('gl')" class="btn-toggle btn-gl active">TEB480 GL</button>
+                        <button id="toggle-gl" onclick="toggleDataset('gl')" class="btn-toggle btn-gl active">TEB480
+                            GL</button>
                         <button id="toggle-l" onclick="toggleDataset('l')" class="btn-toggle btn-l">TEB480 L</button>
                         <button id="toggle-s" onclick="toggleDataset('s')" class="btn-toggle btn-s">TEB480 S</button>
                         <button id="toggle-sl" onclick="toggleDataset('sl')" class="btn-toggle btn-sl">SL-35</button>
@@ -161,7 +215,8 @@
                     <div class="p-6 bg-slate-50 rounded-3xl border border-black/5">
                         <h4 class="heading-font text-[10px] font-bold mb-2">Analyse-Insight</h4>
                         <p id="lab-insight" class="text-sm opacity-60 italic">
-                            Das Goldmessing-Modell (GL) zeigt die stabilste klangliche Sättigung für den Orchestergraben.
+                            Das Goldmessing-Modell (GL) zeigt die stabilste klangliche Sättigung für den
+                            Orchestergraben.
                         </p>
                     </div>
                 </div>
@@ -179,13 +234,20 @@
                     <div>
                         <h4 class="font-bold text-lg mb-4">1. Material & Masse</h4>
                         <p class="opacity-70">
-                            Als Shires-Spieler sind Sie eine hohe Materialgüte gewohnt. Die <strong>SL-35</strong> ist extrem leicht gebaut, was zu einer schnellen Ansprache führt, aber im Fortissimo klanglich "ausbricht" und dünn wird. Die <strong>TEB480 GL</strong> bietet durch das Goldmessing-Blech eine höhere akustische Dichte. Dies führt zu einem "runderen" Klang, der sich besser in den Posaunensatz eines Symphonieorchesters einfügt.
+                            Als Shires-Spieler sind Sie eine hohe Materialgüte gewohnt. Die <strong>SL-35</strong> ist
+                            extrem leicht gebaut, was zu einer schnellen Ansprache führt, aber im Fortissimo klanglich
+                            "ausbricht" und dünn wird. Die <strong>TEB480 GL</strong> bietet durch das Goldmessing-Blech
+                            eine höhere akustische Dichte. Dies führt zu einem "runderen" Klang, der sich besser in den
+                            Posaunensatz eines Symphonieorchesters einfügt.
                         </p>
                     </div>
                     <div>
                         <h4 class="font-bold text-lg mb-4">2. Slotting & Intonation</h4>
                         <p class="opacity-70">
-                            Die 480er Serie basiert auf einer bewährten Mensur (Kruspe-Stil). Während die versilberte Version (S) sehr zentriert und brillant klingt, bietet die GL-Variante das harmonischste Slotting – die Töne "rasten" natürlicher ein, was bei der Altposaune aufgrund der kürzeren Züge kritisch ist.
+                            Die 480er Serie basiert auf einer bewährten Mensur (Kruspe-Stil). Während die versilberte
+                            Version (S) sehr zentriert und brillant klingt, bietet die GL-Variante das harmonischste
+                            Slotting – die Töne "rasten" natürlicher ein, was bei der Altposaune aufgrund der kürzeren
+                            Züge kritisch ist.
                         </p>
                     </div>
                 </div>
@@ -194,14 +256,18 @@
                 <div class="absolute top-0 right-0 w-32 h-32 bg-amber-800/20 blur-3xl"></div>
                 <h3 class="heading-font text-lg font-bold mb-8 text-amber-200">Experten-Fazit</h3>
                 <p class="text-amber-50/80 mb-8 text-lg font-light italic leading-relaxed">
-                    "Die <strong>TEB480 GL</strong> ist die einzige Altposaune in diesem Preissegment, die klanglich nicht nach 'Schülerinstrument' klingt. Für einen Profi, der eigentlich Shires gewohnt ist, bietet sie das authentischste symphonische Spielgefühl und den wärmsten Blend."
+                    "Die <strong>TEB480 GL</strong> ist die einzige Altposaune in diesem Preissegment, die klanglich
+                    nicht nach 'Schülerinstrument' klingt. Für einen Profi, der eigentlich Shires gewohnt ist, bietet
+                    sie das authentischste symphonische Spielgefühl und den wärmsten Blend."
                 </p>
                 <div class="space-y-4">
-                    <div class="flex justify-between border-b border-white/10 pb-2 text-[10px] uppercase tracking-widest font-bold text-amber-200/60">
+                    <div
+                        class="flex justify-between border-b border-white/10 pb-2 text-[10px] uppercase tracking-widest font-bold text-amber-200/60">
                         <span>Orchester-Eignung</span>
                         <span class="text-amber-200">96%</span>
                     </div>
-                    <div class="flex justify-between border-b border-white/10 pb-2 text-[10px] uppercase tracking-widest font-bold text-amber-200/60">
+                    <div
+                        class="flex justify-between border-b border-white/10 pb-2 text-[10px] uppercase tracking-widest font-bold text-amber-200/60">
                         <span>Klangfarben-Tiefe</span>
                         <span class="text-amber-200">92%</span>
                     </div>
@@ -220,21 +286,24 @@
                     <h4 class="heading-font text-[10px] font-bold mb-4 opacity-50">Denis Wick</h4>
                     <p class="text-xl font-bold mb-2">7CS Heritage</p>
                     <p class="text-sm opacity-60">
-                        Das logische Pendant zu Ihrem 5BL. Die Heritage-Bauweise erhält das gewohnte Randgefühl, während der Kessel die Brillanz der Altlage unterstützt.
+                        Das logische Pendant zu Ihrem 5BL. Die Heritage-Bauweise erhält das gewohnte Randgefühl, während
+                        der Kessel die Brillanz der Altlage unterstützt.
                     </p>
                 </div>
                 <div class="bg-white p-10 rounded-card border border-black/5 shadow-sm">
                     <h4 class="heading-font text-[10px] font-bold mb-4 opacity-50">Laskey</h4>
                     <p class="text-xl font-bold mb-2">50S / 55S</p>
                     <p class="text-sm opacity-60">
-                        Bietet ein extrem präzises Slotting, das dem Gefühl Ihrer Shires 4-1/2MD am nächsten kommt. Ideal für orchestrale Klarheit.
+                        Bietet ein extrem präzises Slotting, das dem Gefühl Ihrer Shires 4-1/2MD am nächsten kommt.
+                        Ideal für orchestrale Klarheit.
                     </p>
                 </div>
                 <div class="bg-white p-10 rounded-card border border-black/5 shadow-sm">
                     <h4 class="heading-font text-[10px] font-bold mb-4 opacity-50">Yamaha</h4>
                     <p class="text-xl font-bold mb-2">47 (Gold Rim)</p>
                     <p class="text-sm opacity-60">
-                        Ein verlässlicher Standard. Der Goldrand sorgt für ein weicheres Ansprechverhalten, was den Wechsel zwischen Tenor und Alt erleichtert.
+                        Ein verlässlicher Standard. Der Goldrand sorgt für ein weicheres Ansprechverhalten, was den
+                        Wechsel zwischen Tenor und Alt erleichtert.
                     </p>
                 </div>
             </div>
@@ -246,9 +315,11 @@
     </footer>
 
     <!-- Modal Overlay -->
-    <div id="modal-overlay" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center p-4 invisible opacity-0">
+    <div id="modal-overlay"
+        class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center p-4 invisible opacity-0">
         <div class="modal-content w-full max-w-4xl p-10 relative">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-3xl opacity-20 hover:opacity-100">&times;</button>
+            <button onclick="closeModal()"
+                class="absolute top-8 right-8 text-3xl opacity-20 hover:opacity-100">&times;</button>
             <div id="modal-body" class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <!-- Content injected via JS -->
             </div>
@@ -265,7 +336,8 @@
                 image: "https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/255316.jpg",
                 desc: "Hervorragend für agile, solistische Passagen. Im symphonischen Einsatz fehlt ihr jedoch die klangliche Substanz, um einen großen Posaunensatz zu stützen.",
                 specs: ["Bohrung: 12,2 mm", "Becher: 181 mm", "Material: Gelbmessing"],
-                radar: [35, 90, 45, 45, 95]
+                radar: [35, 90, 45, 45, 95],
+                url: "https://www.thomannmusic.ch/thomann_sl_35_alt_posaune.htm"
             },
             teb480gl: {
                 title: "Classic TEB480 GL",
@@ -274,7 +346,8 @@
                 image: "https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288865.jpg",
                 desc: "Goldmessing sorgt für eine harmonische Sättigung. Für einen Shires-Spieler das klanglich authentischste Modell im Budget-Bereich.",
                 specs: ["Bohrung: 12,2 - 12,4 mm", "Becher: 181 mm", "Material: Goldmessing"],
-                radar: [95, 65, 85, 92, 75]
+                radar: [95, 65, 85, 92, 75],
+                url: "https://www.thomannmusic.ch/thomann_teb480_gl_alto_trombone.htm"
             },
             teb480l: {
                 title: "Classic TEB480 L",
@@ -283,7 +356,8 @@
                 image: "https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288863.jpg",
                 desc: "Bietet dieselbe Mechanik wie die GL, klingt aber heller und obertonreicher. Gut für Brass-Ensembles.",
                 specs: ["Bohrung: 12,2 - 12,4 mm", "Becher: 181 mm", "Material: Messing"],
-                radar: [65, 80, 75, 75, 85]
+                radar: [65, 80, 75, 75, 85],
+                url: "https://www.thomannmusic.ch/thomann_teb480_l_alto_trombone.htm"
             },
             teb480s: {
                 title: "Classic TEB480 S",
@@ -292,7 +366,8 @@
                 image: "https://thumbs.static-thomann.de/thumb/bdbmagic/pics/prod/288864.jpg",
                 desc: "Extrem zentrierter Ton durch Versilberung. Hervorragende Projektion, im klassischen Blend jedoch oft etwas zu präsent.",
                 specs: ["Bohrung: 12,2 - 12,4 mm", "Finish: Versilbert", "Material: Messing"],
-                radar: [60, 95, 75, 65, 88]
+                radar: [60, 95, 75, 65, 88],
+                url: "https://www.thomannmusic.ch/thomann_teb_480_s_alto_trombone.htm"
             }
         };
 
@@ -314,8 +389,9 @@
                     <div class="space-y-4 mb-10 text-sm">
                         ${data.specs.map(s => `<div class="flex justify-between border-b border-black/5 pb-2"><span>${s.split(':')[0]}</span><span class="font-bold">${s.split(':')[1]}</span></div>`).join('')}
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mt-auto">
                         <span class="text-3xl font-bold">${data.price}</span>
+                        <a href="${data.url}" target="_blank" class="bg-amber-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-amber-900 transition-colors">Zu Thomann</a>
                     </div>
                 </div>
             `;
@@ -330,7 +406,7 @@
         function toggleDataset(key) {
             activeDatasets[key] = !activeDatasets[key];
             const btn = document.getElementById(`toggle-${key}`);
-            if(activeDatasets[key]) btn.classList.add('active');
+            if (activeDatasets[key]) btn.classList.add('active');
             else btn.classList.remove('active');
             updateChart();
         }
@@ -345,7 +421,7 @@
             };
 
             Object.keys(activeDatasets).forEach(key => {
-                if(activeDatasets[key]) {
+                if (activeDatasets[key]) {
                     const dataKey = key === 'gl' ? 'teb480gl' : key === 'l' ? 'teb480l' : key === 's' ? 'teb480s' : 'sl35';
                     datasets.push({
                         label: instrumentData[dataKey].title,
@@ -364,9 +440,9 @@
 
             // Insight logic
             const insight = document.getElementById('lab-insight');
-            if(datasets.length > 1) {
+            if (datasets.length > 1) {
                 insight.textContent = "Der Vergleich macht die Unterschiede in Projektion (S/SL) und klanglicher Wärme (GL) deutlich sichtbar.";
-            } else if(activeDatasets.gl) {
+            } else if (activeDatasets.gl) {
                 insight.textContent = "Das Goldmessing-Modell (GL) zeigt die stabilste klangliche Sättigung für den Orchestergraben.";
             } else {
                 insight.textContent = "Wählen Sie Modelle aus, um klangliche Profile simultan zu überlagern.";
@@ -405,7 +481,7 @@
         }
 
         // Close modal on outside click
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('modal-overlay');
             if (event.target == modal) closeModal();
         }
@@ -413,4 +489,5 @@
         window.onload = initRadar;
     </script>
 </body>
+
 </html>
