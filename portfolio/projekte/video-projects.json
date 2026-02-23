@@ -118,7 +118,7 @@
         "title": "Employer-Branding-Video-Konzept",
         "description": "",
         "tabTitle": "EB-Konzept",
-        "heroImage": "../../images/portfolio/videografie/file-1771863655992-386600092.jpg",
+        "heroImage": "../../images/portfolio/uploads/file-1771863655992-386600092.jpg",
         "heroMeta": [
             "<strong>Rolle:</strong> Videograf",
             "<strong>Equipment:</strong> Sony FX3 und MacBook Pro",
@@ -128,7 +128,11 @@
             {
                 "title": "Werde Content Creator*in bei vonMedia",
                 "youtubeId": "-4ZJB3pq_ik",
-                "tags": []
+                "tags": [
+                    "Kamera",
+                    "Schnitt",
+                    "Audio"
+                ]
             }
         ]
     }
