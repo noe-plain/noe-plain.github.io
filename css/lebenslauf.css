@@ -2,7 +2,7 @@
 .timeline-container {
     position: relative;
     max-width: 1000px;
-    margin: 40px auto;
+    margin: 40px auto 20px auto;
     padding: 20px 0;
 }
 
@@ -61,7 +61,7 @@
     z-index: 2;
     /* Borrow from existing signature-form but adjust for cards */
     padding: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid #fff;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.3s ease;
 }
 
@@ -127,7 +127,7 @@
 /* Responsive Design - Mobile */
 @media screen and (max-width: 900px) {
     .timeline-container {
-        padding: 10px 0;
+        padding: 10px 0 0 0;
     }
 
     .timeline-line {
