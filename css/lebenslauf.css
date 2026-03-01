@@ -1,0 +1,175 @@
+/* Timeline Container */
+.timeline-container {
+    position: relative;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px 0;
+}
+
+/* Central Line */
+.timeline-line {
+    position: absolute;
+    width: 2px;
+    background-color: #ffffff40;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.timeline-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to bottom, transparent, #fff);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    z-index: 2;
+}
+
+/* Timeline Item (Card Wrapper) */
+.timeline-item {
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+    box-sizing: border-box;
+    opacity: 0;
+    /* Hidden initially for animation */
+    transition: all 0.6s ease-out;
+}
+
+/* Left side cards */
+.timeline-item.left {
+    left: 0;
+    transform: translateX(-50px);
+    /* Start slightly off-screen */
+}
+
+/* Right side cards */
+.timeline-item.right {
+    left: 50%;
+    transform: translateX(50px);
+    /* Start slightly off-screen */
+}
+
+/* The actual card content */
+.timeline-content {
+    position: relative;
+    z-index: 2;
+    /* Borrow from existing signature-form but adjust for cards */
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+.timeline-content h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-family: "Bodoni Moda", serif;
+    font-size: 1.5rem;
+    /* Dark violet for better contrast */
+}
+
+.timeline-content h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-family: switzer, sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    opacity: 0.8;
+    /* Dark gray for subtitle */
+}
+
+.timeline-content p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    /* Dark gray for description */
+}
+
+/* Animation Classes applied by JS */
+.timeline-item.in-view {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Dots on the line */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    right: -11px;
+    background-color: #1f0033;
+    /* Dark violet from existing theme */
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    top: 30px;
+    border-radius: 50%;
+    z-index: 3;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-item.in-view::after {
+    background-color: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.4);
+    transform: scale(1.2);
+}
+
+.timeline-item.right::after {
+    left: -11px;
+}
+
+
+/* Responsive Design - Mobile */
+@media screen and (max-width: 900px) {
+    .timeline-container {
+        padding: 10px 0;
+    }
+
+    .timeline-line {
+        left: 0px;
+        transform: none;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 35px;
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
+
+    .timeline-item.left,
+    .timeline-item.right {
+        left: 0;
+        transform: translateX(1px);
+        /* Animate coming from right/center instead of flying across */
+    }
+
+    /* Adjust dots for mobile */
+    .timeline-item::after,
+    .timeline-item.right::after {
+        left: -11px;
+        right: auto;
+    }
+
+    .timeline-content {
+        padding: 20px;
+    }
+
+    .timeline-content h3 {
+        font-size: 1.25rem;
+    }
+
+    .timeline-content h4 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .timeline-content p {
+        font-size: 0.85rem;
+    }
+}

@@ -792,6 +792,10 @@ main.max-width {
         display: none
     }
 
+    .signature-form {
+        padding: 40px 25px;
+    }
+
     .card-container {
         grid-template-columns: 1fr
     }
