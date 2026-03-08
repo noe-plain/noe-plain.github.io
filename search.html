@@ -55,10 +55,20 @@
     </header>
 
     <main class="max-width">
-        <div id="search" class="mood-pic" style="background-image: url(../images/NP_06864.jpeg); background-position: 50% 50%;"></div>
-        <div class="autocomplete-wrapper" id="autocomplete-wrapper">
-            <input id="suche" type="text" class="search-input" placeholder="Durchsuche das Internet">
-            <ul id="autocomplete-list" class="autocomplete-list"></ul>
+        <div id="search" class="mood-pic"
+            style="background-image: url(../images/NP_06864.jpeg); background-position: 50% 50%;"></div>
+        <div id="search-overlay" class="search-overlay">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input id="suche" type="text" class="search-input" placeholder="Suchen" autocomplete="off">
+                    <button id="cancel-search-btn" class="cancel-search-btn" aria-label="Abbrechen"><i
+                            class="fas fa-times"></i></button>
+                </div>
+                <div class="autocomplete-dropdown" id="autocomplete-dropdown">
+                    <ul id="autocomplete-list" class="autocomplete-list"></ul>
+                </div>
+            </div>
         </div>
         <div id="categories-root"></div>
     </main>
@@ -105,23 +115,193 @@
     </footer>
 
     <script>
-        // Restliche JS wie gehabt
-        let links = [];
-        const categoryOrder = [
-            "Ressourcen",
-            "Inspiration",
-            "Fonts",
-            "Bilder",
-            "Colors",
-            "Audio & Video",
-            "Icons"
-        ];
+        let localData = [];
+        let state = {
+            query: "",
+            rawQuery: "",
+            results: [],
+            selectedIndex: -1,
+            isMobileActive: false
+        };
 
+        const inputEl = document.getElementById("suche");
+        const listEl = document.getElementById("autocomplete-list");
+        const dropdownEl = document.getElementById("autocomplete-dropdown");
+        const overlayEl = document.getElementById("search-overlay");
+        const cancelBtn = document.getElementById("cancel-search-btn");
+
+        // UI Helpers
+        function setVisibility(isOpen) {
+            if (isOpen && state.results.length > 0) {
+                dropdownEl.classList.add("open");
+            } else {
+                dropdownEl.classList.remove("open");
+            }
+        }
+
+        function setMobileMode(isActive) {
+            state.isMobileActive = isActive;
+            if (isActive) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                overlayEl.classList.add("mobile-active");
+                document.body.classList.add("search-active");
+            } else {
+                overlayEl.classList.remove("mobile-active");
+                document.body.classList.remove("search-active");
+                inputEl.blur();
+
+                // Allow CSS transition of search-overlay to finish before resetting content
+                setTimeout(() => {
+                    if (!state.isMobileActive) {
+                        inputEl.value = "";
+                        state.query = "";
+                        state.results = [];
+                        renderResults();
+                    }
+                }, 300);
+            }
+        }
+
+        function isUrlSegment(str) {
+            return /^(https?:\/\/)?([\w\-]+\.)+[a-z]{2,}(\/[\w\-.\/?%&=]*)?$/i.test(str);
+        }
+
+        // Logic
+        function renderResults() {
+            listEl.innerHTML = "";
+            if (state.results.length === 0) {
+                setVisibility(false);
+                return;
+            }
+
+            state.results.forEach((item, idx) => {
+                const li = document.createElement("li");
+
+                let iconClass = "fas fa-bookmark";
+                if (item.type === "url") iconClass = "fas fa-link";
+                if (item.type === "google") iconClass = "fab fa-google";
+
+                li.innerHTML = `
+                    <div class="result-content">
+                        <i class="${iconClass}"></i>
+                        <span>${item.name}</span>
+                    </div>
+                `;
+
+                if (idx === state.selectedIndex) li.classList.add("active");
+
+                li.addEventListener("mousedown", (e) => {
+                    e.preventDefault(); // Prevent blur
+                    executeSearch(item);
+                });
+                li.addEventListener("mouseenter", () => {
+                    state.selectedIndex = idx;
+                    renderResults();
+                });
+
+                listEl.appendChild(li);
+            });
+            setVisibility(true);
+        }
+
+        function executeSearch(item) {
+            if (!item && state.results[state.selectedIndex]) {
+                item = state.results[state.selectedIndex];
+            }
+            if (!item && state.rawQuery) {
+                item = isUrlSegment(state.rawQuery)
+                    ? { type: 'url', url: (/^https?:\/\//i.test(state.rawQuery) ? "" : "https://") + state.rawQuery }
+                    : { type: 'google', name: state.rawQuery };
+            }
+
+            if (!item) return;
+
+            setMobileMode(false);
+            setVisibility(false);
+
+            if (item.type === "url" || item.type === "local") {
+                window.open(item.url || item.name, "_self");
+            } else {
+                window.open("https://www.google.com/search?q=" + encodeURIComponent(item.name), "_self");
+            }
+        }
+
+        function updateSearch() {
+            state.rawQuery = inputEl.value.trim();
+            state.query = state.rawQuery.toLowerCase();
+            state.selectedIndex = -1;
+
+            if (!state.query || !/[\p{L}\p{N}]/u.test(state.query.charAt(0))) {
+                state.results = [];
+                renderResults();
+                return;
+            }
+
+            let results = [];
+            const isUrl = isUrlSegment(state.rawQuery);
+
+            if (isUrl) {
+                let formattedUrl = state.rawQuery;
+                if (!/^https?:\/\//i.test(formattedUrl)) formattedUrl = "https://" + formattedUrl;
+                results.push({ type: 'url', url: formattedUrl, name: `Öffne: ${state.rawQuery}` });
+            }
+
+            // Local matches
+            const localMatches = localData.filter(link =>
+                (link.name && link.name.toLowerCase().includes(state.query)) ||
+                (link.url && link.url.toLowerCase().includes(state.query))
+            ).slice(0, 5);
+
+            localMatches.forEach(m => results.push({ type: 'local', url: m.url, name: m.name }));
+
+            const neededFromGoogle = 8 - results.length;
+            if (neededFromGoogle > 0) {
+                fetchGoogle(state.query, neededFromGoogle, results);
+            } else {
+                state.results = results;
+                renderResults();
+            }
+        }
+
+        let debounceGoogleTimer = null;
+        function fetchGoogle(query, count, currentResults) {
+            clearTimeout(debounceGoogleTimer);
+            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
+
+            debounceGoogleTimer = setTimeout(() => {
+                state.results = currentResults; // Fallback update if API is too slow
+                renderResults();
+            }, 300);
+
+            window[callbackName] = function (data) {
+                clearTimeout(debounceGoogleTimer);
+                const scriptToRemove = document.getElementById(callbackName);
+                if (scriptToRemove) document.body.removeChild(scriptToRemove);
+                delete window[callbackName];
+
+                const suggestions = (data && data[1]) ? data[1].slice(0, count) : [];
+                let newResults = [...currentResults];
+                suggestions.forEach(s => newResults.push({ type: 'google', name: s }));
+
+                // Only update if query hasn't fundamentally changed during network
+                if (query === state.query) {
+                    state.results = newResults;
+                    renderResults();
+                }
+            };
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        // Render Categories completely separately so search is isolated
+        const categoryOrder = ["Ressourcen", "Inspiration", "Fonts", "Bilder", "Colors", "Audio & Video", "Icons"];
         function renderCategories() {
             const root = document.getElementById('categories-root');
             root.innerHTML = '';
             categoryOrder.forEach(category => {
-                const catLinks = links.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
+                const catLinks = localData.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
                 if (catLinks.length === 0) return;
                 const div = document.createElement('div');
                 div.className = 'category';
@@ -144,215 +324,53 @@
             });
         }
 
-        let selectedIndex = -1;
-        let filtered = [];
+        // Event Setup
+        inputEl.addEventListener("input", updateSearch);
 
-        function updateAutocomplete() {
-            const input = document.getElementById("suche");
-            const list = document.getElementById("autocomplete-list");
-            const wrapper = document.getElementById("autocomplete-wrapper");
-            const val = input.value.trim().toLowerCase();
-            list.innerHTML = "";
-            selectedIndex = -1;
-            if (!/[\p{L}\p{N}]/u.test(val.charAt(0))) {
-                animateAutocomplete(false);
-                return;
+        inputEl.addEventListener("focus", () => {
+            if (window.innerWidth <= 600) setMobileMode(true);
+            if (state.results.length > 0) setVisibility(true);
+        });
+
+        inputEl.addEventListener("blur", () => {
+            if (!state.isMobileActive) {
+                setTimeout(() => setVisibility(false), 150);
             }
-            filtered = links.filter(link => link.name.toLowerCase().includes(val)).slice(0, 10);
-            if (filtered.length === 0) {
-                fetchGoogleSuggestions(val, list, wrapper);
-                return;
+        });
+
+        cancelBtn.addEventListener("click", () => setMobileMode(false));
+
+        inputEl.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                executeSearch();
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (state.results.length > 0) {
+                    state.selectedIndex = (state.selectedIndex + 1) % state.results.length;
+                    renderResults();
+                }
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                if (state.results.length > 0) {
+                    state.selectedIndex = (state.selectedIndex - 1 + state.results.length) % state.results.length;
+                    renderResults();
+                }
+            } else if (e.key === "Escape") {
+                setVisibility(false);
             }
-            filteredType = "local";
-            filtered.forEach((link, idx) => {
-                const li = document.createElement("li");
-                li.textContent = link.name;
-                li.tabIndex = 0;
-                li.style.setProperty('--delay', (idx * 0.04) + 's');
-                li.onmousedown = e => {
-                    window.open(link.url, "_self");
-                    list.classList.remove("visible");
-                    wrapper.classList.remove("expanded");
-                    list.style.display = "none";
-                };
-                li.onmouseover = () => {
-                    setActive(idx);
-                };
-                if (idx === selectedIndex) li.classList.add("active");
-                list.appendChild(li);
-            });
-            animateAutocomplete(true);
-        }
-
-        function fetchGoogleSuggestions(query, list, wrapper) {
-            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
-            window[callbackName] = function (data) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                const suggestions = (data && data[1]) ? data[1].slice(0, 5) : [];
-                if (suggestions.length === 0) {
-                    animateAutocomplete(false);
-                    return;
-                }
-                filtered = suggestions.map(s => ({ suggestion: s }));
-                filteredType = "google";
-                list.innerHTML = "";
-                suggestions.forEach((suggestion, idx) => {
-                    const li = document.createElement("li");
-                    const img = document.createElement("img");
-                    img.src = "https://www.google.com/favicon.ico";
-                    img.alt = "Google Logo";
-                    img.style.width = "13px";
-                    img.style.height = "13px";
-                    img.style.marginRight = "10px";
-                    li.appendChild(img);
-                    li.appendChild(document.createTextNode(suggestion));
-                    li.tabIndex = 0;
-                    li.style.setProperty('--delay', (idx * 0.04) + 's');
-                    li.onmousedown = e => {
-                        const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suggestion);
-                        window.open(googleSuchURL, "_self");
-                        list.classList.remove("visible");
-                        wrapper.classList.remove("expanded");
-                        list.style.display = "none";
-                    };
-                    li.onmouseover = () => {
-                        setActive(idx);
-                    };
-                    if (idx === selectedIndex) li.classList.add("active");
-                    list.appendChild(li);
-                });
-                animateAutocomplete(true);
-            };
-            const script = document.createElement('script');
-            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
-            document.body.appendChild(script);
-        }
-
-        let filteredType = "local";
-
-        function setActive(idx) {
-            const list = document.getElementById("autocomplete-list");
-            Array.from(list.children).forEach((li, i) => {
-                if (i === idx) {
-                    li.classList.add("active");
-                    li.style.backdropFilter = "brightness(0.9)";
-                } else {
-                    li.classList.remove("active");
-                    li.style.backdropFilter = "none"
-                    li.style.background = "transparent";
-                }
-            });
-            selectedIndex = idx;
-        }
-
-        function addEventListeners() {
-            const input = document.getElementById("suche");
-            const list = document.getElementById("autocomplete-list");
-            const wrapper = document.getElementById("autocomplete-wrapper");
-
-            input.addEventListener("input", updateAutocomplete);
-
-            input.addEventListener("keydown", function (event) {
-                if (list.classList.contains("visible") && filtered.length > 0) {
-                    if (event.key === "ArrowDown") {
-                        event.preventDefault();
-                        selectedIndex = (selectedIndex + 1) % filtered.length;
-                        setActive(selectedIndex);
-                    } else if (event.key === "ArrowUp") {
-                        event.preventDefault();
-                        selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
-                        setActive(selectedIndex);
-                    } else if (event.key === "Enter") {
-                        if (selectedIndex >= 0 && filtered[selectedIndex]) {
-                            if (filteredType === "local" && filtered[selectedIndex].url) {
-                                window.open(filtered[selectedIndex].url, "_self");
-                            } else if (filteredType === "google" && filtered[selectedIndex].suggestion) {
-                                const googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(filtered[selectedIndex].suggestion);
-                                window.open(googleSuchURL, "_self");
-                            }
-                            hideAutocomplete();
-                            event.preventDefault();
-                            return;
-                        }
-                    } else if (event.key === "Escape") {
-                        hideAutocomplete();
-                    }
-                }
-            });
-
-            input.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
-
-            function handleEnter(event) {
-                if (event.key === "Enter" && !(list.classList.contains("visible") && selectedIndex >= 0)) {
-                    sucheGoogle();
-                }
-            }
-
-            function sucheGoogle() {
-                var suche = document.getElementById("suche").value;
-                if (suche.trim() !== "") {
-                    var googleSuchURL = "https://www.google.com/search?q=" + encodeURIComponent(suche);
-                    window.open(googleSuchURL, "_self");
-                } else {
-                    alert("Bitte gib einen suche ein.");
-                }
-            }
-
-            document.getElementById("suche").addEventListener("keyup", handleEnter);
-        }
-
-        function animateAutocomplete(expand) {
-            const wrapper = document.getElementById("autocomplete-wrapper");
-            const list = document.getElementById("autocomplete-list");
-            const startHeight = wrapper.offsetHeight;
-            let endHeight;
-            if (expand) {
-                wrapper.classList.add("expanded");
-                list.classList.add("visible");
-                list.style.display = "block";
-                wrapper.style.height = "auto";
-                endHeight = wrapper.scrollHeight;
-                wrapper.style.height = startHeight + "px";
-                requestAnimationFrame(() => {
-                    wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
-                    wrapper.style.height = endHeight + "px";
-                });
-            } else {
-                endHeight = 49;
-                wrapper.style.transition = "height 0.3s cubic-bezier(.4,2,.6,1)";
-                wrapper.style.height = startHeight + "px";
-                requestAnimationFrame(() => {
-                    wrapper.style.height = endHeight + "px";
-                });
-                setTimeout(() => {
-                    wrapper.classList.remove("expanded");
-                    list.classList.remove("visible");
-                    list.style.display = "none";
-                    wrapper.style.transition = "";
-                }, 300);
-            }
-        }
-
-        function hideAutocomplete() {
-            animateAutocomplete(false);
-        }
+        });
 
         fetch('./fake-cms.json')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                links = data;
+                localData = data;
                 renderCategories();
-                addEventListeners();
-                window.addEventListener("DOMContentLoaded", function () {
-                    document.getElementById("suche").focus();
-                });
             })
-            .catch(err => {
-                console.error("Fehler beim Laden von fake-cms.json:", err);
-            });
-        window.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("suche").focus();
+            .catch(err => console.error(err));
+
+        window.addEventListener("DOMContentLoaded", () => {
+            if (window.innerWidth > 600) inputEl.focus();
         });
     </script>
 </body>
