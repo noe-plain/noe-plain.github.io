@@ -214,13 +214,26 @@
                 }, { passive: false });
 
                 li.addEventListener("mouseenter", () => {
-                    state.selectedIndex = idx;
-                    renderResults();
+                    if (state.selectedIndex !== idx) {
+                        state.selectedIndex = idx;
+                        updateActiveSelection();
+                    }
                 });
 
                 listEl.appendChild(li);
             });
             setVisibility(true);
+        }
+
+        function updateActiveSelection() {
+            const items = listEl.querySelectorAll("li");
+            items.forEach((item, index) => {
+                if (index === state.selectedIndex) {
+                    item.classList.add("active");
+                } else {
+                    item.classList.remove("active");
+                }
+            });
         }
 
         function executeSearch(item) {
@@ -372,13 +385,13 @@
                 e.preventDefault();
                 if (state.results.length > 0) {
                     state.selectedIndex = (state.selectedIndex + 1) % state.results.length;
-                    renderResults();
+                    updateActiveSelection();
                 }
             } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 if (state.results.length > 0) {
                     state.selectedIndex = (state.selectedIndex - 1 + state.results.length) % state.results.length;
-                    renderResults();
+                    updateActiveSelection();
                 }
             } else if (e.key === "Escape") {
                 setVisibility(false);
