@@ -162,6 +162,8 @@
             }
         }
 
+        let blurTimeout = null;
+
         function isUrlSegment(str) {
             return /^(https?:\/\/)?([\w\-]+\.)+[a-z]{2,}(\/[\w\-.\/?%&=]*)?$/i.test(str);
         }
@@ -191,9 +193,26 @@
                 if (idx === state.selectedIndex) li.classList.add("active");
 
                 li.addEventListener("mousedown", (e) => {
-                    e.preventDefault(); // Prevent blur
+                    // Only prevent default on desktop to keep input focus.
+                    if (!state.isMobileActive) {
+                        e.preventDefault();
+                    }
+                });
+
+                // Standard tap/click
+                li.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    clearTimeout(blurTimeout);
                     executeSearch(item);
                 });
+
+                // Redundant safety net for extremely stubborn mobile browsers
+                li.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    clearTimeout(blurTimeout);
+                    executeSearch(item);
+                }, { passive: false });
+
                 li.addEventListener("mouseenter", () => {
                     state.selectedIndex = idx;
                     renderResults();
@@ -219,11 +238,14 @@
             setMobileMode(false);
             setVisibility(false);
 
+            let targetUrl = "";
             if (item.type === "url" || item.type === "local") {
-                window.open(item.url || item.name, "_self");
+                targetUrl = item.url || item.name;
             } else {
-                window.open("https://www.google.com/search?q=" + encodeURIComponent(item.name), "_self");
+                targetUrl = "https://www.google.com/search?q=" + encodeURIComponent(item.name);
             }
+
+            window.location.href = targetUrl;
         }
 
         function updateSearch() {
@@ -328,13 +350,15 @@
         inputEl.addEventListener("input", updateSearch);
 
         inputEl.addEventListener("focus", () => {
+            clearTimeout(blurTimeout);
             if (window.innerWidth <= 600) setMobileMode(true);
             if (state.results.length > 0) setVisibility(true);
         });
 
         inputEl.addEventListener("blur", () => {
             if (!state.isMobileActive) {
-                setTimeout(() => setVisibility(false), 150);
+                // Increased timeout to ensure mobile clicks register before the element hides
+                blurTimeout = setTimeout(() => setVisibility(false), 400);
             }
         });
 
