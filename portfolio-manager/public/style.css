@@ -635,3 +635,165 @@ header h1 {
     font-size: 1rem;
     padding: 5px;
 }
+
+/* --- Links UI Manager Redesign --- */
+
+.link-group {
+    margin-bottom: 50px;
+    background: #fff;
+    padding: 30px;
+    border-radius: var(--border-radius-sig);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease;
+}
+
+.link-group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.link-group h3 {
+    font-family: "Bodoni Moda", serif;
+    font-size: 2rem;
+    color: var(--primary);
+    margin: 0 0 25px 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.link-group h3::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 2px;
+    background: var(--primary);
+}
+
+.link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.link-list li {
+    background: linear-gradient(145deg, #ffffff, #fafafa);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.link-list li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s ease;
+}
+
+.link-list li:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(31, 0, 51, 0.08);
+    border-color: rgba(31, 0, 51, 0.1);
+}
+
+.link-list li:hover::before {
+    transform: scaleY(1);
+}
+
+.link-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+}
+
+.link-info strong {
+    font-family: 'switzer', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.link-info a {
+    font-family: 'switzer', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+    word-break: break-all;
+}
+
+.link-info a i {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.link-info a:hover {
+    color: var(--primary);
+}
+
+.link-actions {
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.link-actions button {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'switzer', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.link-actions .btn-edit {
+    background: rgba(31, 0, 51, 0.05);
+    color: var(--primary);
+}
+
+.link-actions .btn-edit:hover {
+    background: rgba(31, 0, 51, 0.1);
+    transform: translateY(-1px);
+}
+
+.link-actions .btn-delete {
+    background: #fff0f0;
+    color: #d63031;
+}
+
+.link-actions .btn-delete:hover {
+    background: #ffe0e0;
+    transform: translateY(-1px);
+}

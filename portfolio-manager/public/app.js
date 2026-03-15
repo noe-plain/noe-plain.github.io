@@ -1,11 +1,13 @@
 // State
 let currentType = 'design';
 let projectsData = [];
+let linksData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupModal();
     setupPhotography();
+    setupLinkModal();
 
     // Load initial data
     loadProjects('design');
@@ -36,6 +38,8 @@ function setupTabs() {
             currentType = type;
             if (type === 'photography') {
                 loadPhotography();
+            } else if (type === 'links') {
+                loadLinks();
             } else {
                 loadProjects(type);
             }
@@ -584,4 +588,162 @@ async function uploadFile(file, type, targetInputId) {
             if (input) input.value = json.url;
         }
     } catch (e) { alert('Upload Error'); }
+}
+
+/* --- Links Logic --- */
+
+async function loadLinks() {
+    try {
+        const res = await fetch('/api/links');
+        if (!res.ok) throw new Error('Failed to load links');
+        linksData = await res.json();
+        renderLinks();
+    } catch (e) {
+        console.error(e);
+        alert('Fehler beim Laden der Links');
+    }
+}
+
+function renderLinks() {
+    const container = document.getElementById('list-links');
+    container.innerHTML = '';
+
+    // Extract unique categories for the datalist
+    const categories = [...new Set(linksData.map(l => l.category))].filter(Boolean);
+    const dataList = document.getElementById('category-list');
+    dataList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
+
+    // Group by category to display nicely
+    const grouped = {};
+    linksData.forEach(link => {
+        const cat = link.category || 'Uncategorized';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(link);
+    });
+
+    for (let cat of Object.keys(grouped).sort()) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'link-group';
+        groupDiv.innerHTML = `<h3>${cat}</h3>`;
+
+        const ul = document.createElement('ul');
+        ul.className = 'link-list';
+
+        grouped[cat].forEach(link => {
+            const li = document.createElement('li');
+            const urlShort = link.url.replace(/^https?:\/\//i, '').substring(0, 30);
+            const safeName = link.name.replace(/'/g, "\\'");
+            li.innerHTML = '<div class="link-info">' +
+                '<strong>' + link.name + '</strong>' +
+                '<a href="' + link.url + '" target="_blank" title="' + link.url + '">' + urlShort + '...</a>' +
+                '</div>' +
+                '<div class="link-actions">' +
+                '<button class="btn-small btn-edit" onclick="editLink(\'' + safeName + '\')">Bearbeiten</button>' +
+                '<button class="btn-small btn-delete" onclick="deleteLink(\'' + safeName + '\')">Löschen</button>' +
+                '</div>';
+            ul.appendChild(li);
+        });
+
+        groupDiv.appendChild(ul);
+        container.appendChild(groupDiv);
+    }
+}
+
+/* --- Link Modal Logic --- */
+
+const linkModal = document.getElementById('link-modal');
+const linkForm = document.getElementById('link-form');
+
+function setupLinkModal() {
+    linkForm.addEventListener('submit', handleSaveLink);
+}
+
+window.openLinkModal = function (linkName = null) {
+    linkForm.reset();
+
+    if (linkName) {
+        // Edit mode
+        const link = linksData.find(l => l.name === linkName);
+        if (link) {
+            document.getElementById('link-modal-title').innerText = 'Link bearbeiten';
+            document.getElementById('l-original-name').value = link.name;
+            document.getElementById('l-name').value = link.name;
+            document.getElementById('l-url').value = link.url;
+            document.getElementById('l-category').value = link.category || '';
+        }
+    } else {
+        // New mode
+        document.getElementById('link-modal-title').innerText = 'Neuer Link';
+        document.getElementById('l-original-name').value = '';
+    }
+
+    linkModal.classList.remove('hidden');
+}
+
+window.closeLinkModal = function () {
+    linkModal.classList.add('hidden');
+}
+
+window.editLink = function (name) {
+    openLinkModal(name);
+}
+
+window.deleteLink = async function (name) {
+    if (!confirm("Link '" + name + "' wirklich löschen?")) return;
+
+    linksData = linksData.filter(l => l.name !== name);
+    await saveAllLinks();
+}
+
+async function handleSaveLink(e) {
+    e.preventDefault();
+
+    const originalName = document.getElementById('l-original-name').value;
+    const name = document.getElementById('l-name').value.trim();
+    const url = document.getElementById('l-url').value.trim();
+    const category = document.getElementById('l-category').value.trim();
+
+    const newLink = { name, url, category };
+
+    if (originalName) {
+        // Edit existing
+        const idx = linksData.findIndex(l => l.name === originalName);
+        if (idx > -1) {
+            linksData[idx] = newLink;
+        } else {
+            // Shouldn't happen unless name bug
+            linksData.push(newLink);
+        }
+    } else {
+        // Check if name already exists
+        if (linksData.some(l => l.name === name)) {
+            alert('Ein Link mit diesem Namen existiert bereits!');
+            return;
+        }
+        // Add new
+        linksData.push(newLink);
+    }
+
+    await saveAllLinks();
+    closeLinkModal();
+}
+
+async function saveAllLinks() {
+    try {
+        const res = await fetch('/api/links', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(linksData)
+        });
+
+        if (res.ok) {
+            // Reload and re-render
+            loadLinks();
+        } else {
+            alert('Fehler beim Speichern der Links');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Netzwerkfehler beim Speichern der Links');
+    }
 }

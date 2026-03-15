@@ -21,7 +21,8 @@ const IMAGES_DIR = path.join(PROJECT_ROOT, 'images/portfolio');
 const DATA_FILES = {
     design: path.join(PORTFOLIO_DATA_DIR, 'designs.json'),
     illustration: path.join(PORTFOLIO_DATA_DIR, 'illustrations.json'),
-    video: path.join(PORTFOLIO_DATA_DIR, 'video-projects.json')
+    video: path.join(PORTFOLIO_DATA_DIR, 'video-projects.json'),
+    links: path.join(PROJECT_ROOT, 'fake-cms.json')
 };
 
 // Ensure directories exist
@@ -103,6 +104,49 @@ app.post('/api/projects/:type', (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error writing data file' });
+    }
+});
+
+// --- Links (Fake CMS) ---
+
+// Get Links Fake-CMS Data
+app.get('/api/links', (req, res) => {
+    const filePath = DATA_FILES['links'];
+    if (!filePath || !fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'Links data file not found' });
+    }
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (err) {
+        res.status(500).json({ error: 'Error reading links data file' });
+    }
+});
+
+// Save Links Fake-CMS Data
+app.post('/api/links', (req, res) => {
+    const filePath = DATA_FILES['links'];
+    let newData = req.body;
+
+    if (!Array.isArray(newData)) {
+        return res.status(400).json({ error: 'Invalid links data format' });
+    }
+
+    // Sort alphabetically by name
+    newData.sort((a, b) => {
+        const nameA = (a.name || '').toLowerCase();
+        const nameB = (b.name || '').toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(newData, null, 4), 'utf8');
+        res.json({ success: true, message: 'Links saved successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error writing links data file' });
     }
 });
 

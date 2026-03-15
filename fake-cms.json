@@ -1,7 +1,7 @@
 [
     {
-        "name": "Noé Plain",
-        "url": "https://noeplain.ch",
+        "name": "Adobe Acrobat – PDF komprimieren",
+        "url": "https://www.adobe.com/ch_de/acrobat/online/compress-pdf.html",
         "category": "suche"
     },
     {
@@ -13,11 +13,6 @@
         "name": "Adobe Fonts",
         "url": "https://fonts.adobe.com/",
         "category": "Fonts"
-    },
-    {
-        "name": "Adobe Acrobat – PDF komprimieren",
-        "url": "https://www.adobe.com/ch_de/acrobat/online/compress-pdf.html",
-        "category": "suche"
     },
     {
         "name": "Adobe Podcast",
@@ -100,6 +95,16 @@
         "category": "suche"
     },
     {
+        "name": "Google Calendar",
+        "url": "https://calendar.google.com",
+        "category": "suche"
+    },
+    {
+        "name": "Google Contacts",
+        "url": "https://contacts.google.com",
+        "category": "suche"
+    },
+    {
         "name": "Google Docs",
         "url": "https://docs.google.com",
         "category": "suche"
@@ -110,14 +115,9 @@
         "category": "suche"
     },
     {
-        "name": "Google Calendar",
-        "url": "https://calendar.google.com",
-        "category": "suche"
-    },
-    {
-        "name": "Google Contacts",
-        "url": "https://contacts.google.com",
-        "category": "suche"
+        "name": "Google Fonts",
+        "url": "https://fonts.google.com",
+        "category": "Fonts"
     },
     {
         "name": "Google Fotos",
@@ -130,11 +130,6 @@
         "category": "suche"
     },
     {
-        "name": "Google Tasks",
-        "url": "https://tasks.google.com",
-        "category": "suche"
-    },
-    {
         "name": "Google Sheets",
         "url": "https://sheets.google.com",
         "category": "suche"
@@ -142,6 +137,11 @@
     {
         "name": "Google Slides",
         "url": "https://slides.google.com",
+        "category": "suche"
+    },
+    {
+        "name": "Google Tasks",
+        "url": "https://tasks.google.com",
         "category": "suche"
     },
     {
@@ -170,13 +170,13 @@
         "category": "suche"
     },
     {
-        "name": "LinkedIn",
-        "url": "https://linkedin.com",
+        "name": "Join",
+        "url": "https://join.com/candidate",
         "category": "suche"
     },
     {
-        "name": "Join",
-        "url": "https://join.com/candidate",
+        "name": "LinkedIn",
+        "url": "https://linkedin.com",
         "category": "suche"
     },
     {
@@ -217,6 +217,11 @@
     {
         "name": "Notion",
         "url": "https://www.notion.so/",
+        "category": "suche"
+    },
+    {
+        "name": "Noé Plain",
+        "url": "https://noeplain.ch",
         "category": "suche"
     },
     {

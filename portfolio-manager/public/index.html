@@ -29,6 +29,9 @@
                 <button class="nav-btn" data-tab="photography">
                     <i class="fas fa-camera"></i> Fotografie
                 </button>
+                <button class="nav-btn" data-tab="links">
+                    <i class="fas fa-link"></i> Links
+                </button>
             </nav>
         </aside>
 
@@ -85,6 +88,19 @@
                     </div>
                 </header>
                 <div class="photo-grid" id="photo-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </section>
+
+            <!-- Links Tab -->
+            <section id="tab-links" class="tab-content">
+                <header>
+                    <h1>Links (Suche & Ressourcen)</h1>
+                    <button class="primary-btn" onclick="openLinkModal()">
+                        <i class="fas fa-plus"></i> Neuer Link
+                    </button>
+                </header>
+                <div class="project-list" id="list-links">
                     <!-- Loaded dynamically -->
                 </div>
             </section>
@@ -164,6 +180,42 @@
 
                 <div class="modal-actions">
                     <button type="button" class="cancel-btn" onclick="closeModal()">Abbrechen</button>
+                    <button type="submit" class="primary-btn">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Link Modal -->
+    <div id="link-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-modal" onclick="closeLinkModal()">&times;</span>
+            <h2 id="link-modal-title">Link bearbeiten</h2>
+
+            <form id="link-form">
+                <input type="hidden" id="l-original-name">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="l-name" required placeholder="z.B. Adobe Color">
+                </div>
+
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="l-url" required placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>Kategorie</label>
+                    <input type="text" id="l-category" list="category-list" required
+                        placeholder="suche, Colors, Inspiration...">
+                    <datalist id="category-list">
+                        <!-- Loaded dynamically -->
+                    </datalist>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeLinkModal()">Abbrechen</button>
                     <button type="submit" class="primary-btn">Speichern</button>
                 </div>
             </form>
