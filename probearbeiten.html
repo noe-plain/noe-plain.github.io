@@ -78,6 +78,7 @@
             width: fit-content;
             background: #222;
             color: #fff;
+            text-decoration: underline 3px #00008b;
             padding: 13px 24px;
             font-weight: bold;
             font-family: Arial, sans-serif;
@@ -86,12 +87,6 @@
             border: none;
             margin-bottom: 15px;
             cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s ease;
-        }
-
-        .newsletter-btn:hover {
-            background: #FF4A7A;
         }
 
         /* --- Portfolio Project style (Task 2) --- */
@@ -147,7 +142,7 @@
             color: #000;
             font-weight: 800;
             font-family: Arial, sans-serif;
-            font-size: 9px;
+            font-size: 3px;
             margin-right: 12px;
         }
 
@@ -161,6 +156,65 @@
             aspect-ratio: 9/16;
             object-fit: cover;
             object-position: 50% 20%;
+            display: block;
+        }
+
+        .mockup-media-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .center-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            padding-left: 4px;
+            /* Optischer Ausgleich für das Icon */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        .reel-audio-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
+        .reel-volume-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            pointer-events: none;
         }
 
         .mockup-actions {
@@ -276,18 +330,27 @@
                     <p class="newsletter-salutation">Liebes Publikum</p>
 
                     <div class="newsletter-body">
-                        <p>ein Aufbruch kann viele Formen annehmen. Für <strong>Wolfgang Amadeus Mozart</strong>
-                            bedeutete er 1782 einen radikalen Neuanfang: Frisch vermählt und nach seinem Umzug nach Wien
-                            schuf er in kurzer Zeit drei wegweisende Klavierkonzerte, um sich als unabhängiger Pianist
-                            und Veranstalter zu etablieren. <strong>Robert Schumann</strong> hingegen vollzog einen ganz
-                            anderen Aufbruch: In einem rauschhaften Herbst dachte er das Klavierquintett völlig neu und
-                            beschritt damit visionäre musikalische Pfade.</p>
+                        <p>Ein Aufbruch kann viele Formen annehmen: Für <strong>Wolfgang Amadeus Mozart</strong>
+                            bedeutete das Jahr 1782
+                            gleichzeitig Aufbruch und radikaler Neuanfang. Frisch verheiratet und soeben nach Wien
+                            umgezogen, schuf er in kurzer Zeit drei wegweisende <strong>Klavierkonzerte</strong> mit der
+                            Absicht, sich
+                            als unabhängiger Pianist und Veranstalter zu etablieren. <strong>Robert Schumann</strong>
+                            hingegen vollzog
+                            einen ganz anderen Aufbruch: In einem rauschhaften Herbst erfand er das
+                            <strong>Klavierquintett</strong>
+                            völlig neu und beschritt damit visionäre musikalische Pfade.
+                        </p>
 
                         <p>Heute bricht die legendäre Pianistin <strong>Elisabeth Leonskaja</strong> auf, um diese
                             Meilensteine gemeinsam mit dem <strong>Musikkollegium Winterthur</strong> und dem
                             <strong>Winterthurer Streichquartett</strong> im Stadthaus zum Klingen zu bringen. Begleiten
-                            Sie uns und erleben Sie Mozarts meisterhaften Wiener Neuanfang sowie die visionäre Kraft
-                            Schumanns in einem einzigartigen Konzertmoment. Wir freuen uns auf Sie!
+                            Sie uns und erleben Sie den meisterhaften Neuanfang Mozarts in Wien mit dem
+                            <strong>Klavierkonzert in
+                                A-Dur, KV 414</strong> am <strong>27. und 28. Mai</strong>, sowie die visionäre Kraft
+                            Schumanns mit seinem <strong>Klavierquintett in Es-Dur, Opus 44</strong> am <strong>31.
+                                Mai</strong> in einem einzigartigen
+                            Konzertmoment. Wir freuen uns auf Sie!
                         </p>
 
                         <p style="margin-top: 25px; margin-bottom: 30px;"> Herzliche Grüsse<br>Ihr Musikkollegium
@@ -303,49 +366,146 @@
 
             <!-- ===================== TASK 2: PORTFOLIO DESIGN mit MOCKUP ===================== -->
             <section class="task2-portfolio max-width">
-                <div style="margin-bottom: 20px;">
-                    <h2 style="margin-bottom: 10px; text-align: center;">Aufgabe 2: <br> Social Media Beitrag</h2>
-
+                <div style="margin-bottom: 30px;">
+                    <h2 style="margin-bottom: 10px; text-align: center;">Aufgabe 2: <br> Social Media Konzept</h2>
                 </div>
 
                 <div class="task2-grid">
 
-                    <!-- Linke Spalte: Ausführungen -->
                     <div class="ausfuehrung-block">
-                        <h3 style="margin-bottom: 25px;">Konzeptausarbeitung</h3>
-
-                        <h4>Empfehlung zum Format:</h4>
-                        <p>Ich empfehle ein kurzes <strong>Video (Reel) im 9:16 Format</strong>. Dieser Content-Typ wird
-                            von den Social-Media-Algorithmen (insbesondere auf Instagram und Facebook) bevorzugt
-                            ausgespielt. Dadurch lässt sich nicht nur das Stammpublikum erreichen, sondern auch eine
-                            organische Reichweite bei potenziellen neuen Konzertbesucher:innen erzielen.</p>
-
-                        <h4>Bild-/Videokonzept:</h4>
-                        <p>
-                            <strong>Einstieg (Sek. 0-3):</strong> Eine emotionale Nahaufnahme von Konzertmeister Bogdan
-                            Božović in seinem musikalischen "Zuhause", während er leidenschaftlich spielt.<br><br>
-                            <strong>Hauptteil (Sek. 3-10):</strong> Ein sanfter, harmonischer Überblendungs-Effekt (z.B.
-                            durch Licht oder Bewegung) zur "Grande Dame" Elisabeth Leonskaja am Flügel. Die
-                            Hintergrundmusik schwillt leicht an – ein packender Mozart-Ausschnitt, der das
-                            Orchesterkonzert charakterisiert.<br><br>
-                            <strong>Informationsebene & Outro (Sek. 10-20):</strong> Ästhetische Texteinblendungen für
-                            die Konzertdaten (27./28. Mai Orchesterkonzert, 31. Mai Kammermusik) mit kurzen, dynamischen
-                            Rhythmus-Schnitten des Zusammenspiels. Abschliessend das Logo des Musikkollegiums mit der
-                            Handlungsaufforderung (Call-to-Action), sich Tickets zu sichern.
+                        <h3 style="margin-bottom: 20px;">Shot-List</h3>
+                        <p style="margin-bottom: 20px;">Kurze, unterhaltsame Videos sind das ideale Medium für die
+                            Bewerbung des Konzerts. Durch den ursprünglich englisch&shy;sprachigen TikTok-Trend «Three
+                            things I’m good at» lässt sich die Begeisterung für die Musik des MKW auf humorvolle Weise
+                            direkt mit dem alltäglichen Leben der Besucher:innen verknüpfen und schafft so eine
+                            persönliche Verbindung.<br>
+                            Hauptperson im Video könnte sowohl jemand aus dem Publikum als auch ein
+                            Team-Mitglied des MKW sein.
                         </p>
+
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; line-height: 1.4;">
+                            <thead>
+                                <tr style="background-color: #f4f4f4; text-align: left;">
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Part</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Dauer</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Kamera & Bildausschnitt</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Untertitel (Deutsch für den
+                                        Algorithmus) & Audio (Schweizerdeutsch)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>01</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 3-4 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Person setzt sich hin, schaut
+                                        direkt in die Kamera (Doku-Stil).</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Voice-Over:<br>Drei Dinge die ich
+                                        besonders gut kann:</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>02</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 2 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Halbnahe, 45° Winkel. Person
+                                        spricht seitlich zur Kamera.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">1. Online shoppen.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>03</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 3 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Frontalaufnahme. Person spricht
+                                        direkt in die Frontkamera.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">2. Den wunderbaren Klängen des
+                                        MKW zuhören.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>04</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 6 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>B-Roll:</strong>
+                                        Ästhetische Aufnahmen von der Probe im Stadthaus.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><em>(Musik schwillt kurz an –
+                                            Schumann-Thema)</em></td>
+                                </tr>
+                                <tr style="background-color: #f9f9f9;">
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>05</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 5 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Naheinstellung. Person dreht sich
+                                        mit einem Schmunzeln zur Kamera.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">3. Online Tickets für Konzerte
+                                        des MKW & Elisabeth Leonskaja shoppen.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>06</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">ca. 3-4 Sek.</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Outro-Grafik:</strong>
+                                        Bild von Elisabeth Leonskaja am Flügel und MKW-Logo</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Call-to-Action: Buchen Sie jetzt
+                                        Ihr nächstes Erlebnis!, Link</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                            <thead>
+                                <tr style="background-color: #f4f4f4; text-align: left;">
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Nr.</th>
+                                    <th style="padding: 10px; border: 1px solid #ddd;">Weitere Content-Ideen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">01</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">A day in the Life of an orchestra
+                                        member</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">02</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Geschichte des Stücks erklärt von
+                                        einem Musiker oder einer Musikerin</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">03</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Ausschnitte des Programms auf
+                                        Gemüse spielen</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">04</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Werk erraten ab den ersten drei
+                                        Akkorden aus einem Stück oder einem rückwärts abgespielten Werk</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">05</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">Bezug auf Welt- oder Feiertage
+                                        z.B. Tag der Musik</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <!-- Rechte Spalte: Mockup Einbettung -->
                     <div>
+                        <h3 style="margin-bottom: 20px; text-align: center;">Instagram-Reel-Mockup</h3>
+                        <p style="margin-bottom: 20px; text-align: center;">Hier ist ein Mockup, wie die Caption auf
+                            Instagram aussehen könnte:</p>
                         <div class="social-mockup">
                             <div class="mockup-header">
-                                <div class="mockup-avatar">MKW</div>
+                                <div class="mockup-avatar">MUSIKKOLLEGIUM<br>WINTERTHUR</div>
                                 <span class="mockup-username">musikkollegiumwinterthur</span>
                                 <i class="fas fa-ellipsis-h" style="margin-left:auto;"></i>
                             </div>
-                            <!-- Bild des Reels (Thumbnail Simulation) -->
-                            <img src="./images/portfolio/photography/bts-01.jpeg" alt="Reel Thumbnail"
-                                class="mockup-media">
+
+                            <div class="mockup-media-container">
+                                <img style="object-position: 60% 50%;"
+                                    src="https://berliner-zeitung.imgix.net/2024/02/29/c9608928-b1d2-458f-98e6-10fc558d101c.jpeg?auto=format&fit=max&w=1880&auto=compress"
+                                    alt="Reel Thumbnail" class="mockup-media">
+                                <div class="center-play">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="reel-audio-badge">
+                                    <i class="fas fa-music"></i>
+                                    <span>Original Audio • MKW</span>
+                                </div>
+                                <div class="reel-volume-badge">
+                                    <i class="fas fa-volume-mute"></i>
+                                </div>
+                            </div>
 
                             <div class="mockup-actions">
                                 <i class="far fa-heart"></i>
@@ -355,22 +515,31 @@
                             </div>
 
                             <div class="mockup-likes">
-                                Gefällt <strong>bogdan.bozovic</strong> und <strong>182 weiteren Personen</strong>
+                                Gefällt <strong>elisabeth.leonskaja</strong> und <strong>245 weiteren Personen</strong>
                             </div>
 
                             <div class="mockup-caption">
-                                <strong>musikkollegiumwinterthur</strong> Zwei Konzerte, eine Legende, unzählige
-                                Emotionen. ✨<br><br>
-                                Nächste Woche beehrt uns die unvergleichliche Pianistin Elisabeth Leonskaja! Freuen Sie
-                                sich auf gleich zwei Highlights, bei denen die «Grande Dame» des Klaviers ihre tiefe
-                                Verbundenheit zur Musik – ihrem Zuhause – mit uns teilt. 🎻🎹<br><br>
-                                🌟 <strong>Mi/Do, 27./28. Mai:</strong> Orchesterkonzert – Mozart in seiner schönsten
-                                Form.<br>
-                                🌟 <strong>So, 31. Mai:</strong> Kammermusik – Intimes Zusammenspiel mit Bogdan
-                                Božović.<br><br>
-                                Sichern Sie sich Tickets über den Link in unserer Bio. Wir freuen uns! 🎫🤍<br><br>
-                                <span style="color: #a8c7fa; font-size: 0.9em;">#Musikkollegium #ElisabethLeonskaja
-                                    #Mozart #Kammermusik #WinterthurErleben</span>
+                                <strong>musikkollegiumwinterthur</strong> Manche Investitionen zahlen sich sofort aus,
+                                besonders wenn Mozart und Schumann im Aufbruch sind 😉 <br><br>
+
+                                Erleben Sie zwei wegweisende musikalische Meilensteine mit der legendären Pianistin
+                                <strong style="color: #a8c7fa;">@elisabeth.leonskaja</strong>, dem Musikkollegium
+                                Winterthur und dem Winterthurer Streichquartett. <br><br>
+
+                                &#x1F3B9; Elisabeth Leonskaja spielt Mozart - Klavierkonzert KV 414 am <strong>27.
+                                    und 28. Mai</strong>.<br>
+                                &#x1F3B9; Kammermusik mit Elisabeth Leonskaja – Schumanns Klavierquintett Op. 44 am
+                                <strong>31.
+                                    Mai</strong>.<br><br>
+
+                                Wir freuen uns auf Sie!<br><br>
+
+                                Buchen Sie jetzt Ihre Tickets auf unserer Website!<br> (Link in
+                                Bio)<br><br>
+
+                                <span style="color: #a8c7fa; font-size: 0.9em;">#MusikkollegiumWinterthur
+                                    #StadthausWinterthur #ElisabethLeonskaja #3ThingsImGoodAt #WinterthurEvents
+                                    #Schumann #Mozart</span>
                             </div>
                         </div>
                     </div>
