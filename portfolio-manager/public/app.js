@@ -14,6 +14,68 @@ document.addEventListener('DOMContentLoaded', () => {
     startClock();
 });
 
+// --- Publish repository (trigger server-side git push) ---
+window.publishRepo = async function () {
+    const btn = document.getElementById('publish-btn');
+    if (!btn) return;
+    // Ask for commit message
+    const defaultMsg = `Publish via portfolio-manager: ${new Date().toISOString()}`;
+    const userMsg = prompt('Commit-Nachricht für den Commit eingeben (Abbrechen bricht ab):', defaultMsg);
+    if (userMsg === null) return; // user cancelled
+
+    btn.disabled = true;
+    const origText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Veröffentliche...';
+
+    try {
+        // Ensure we call the backend server (use absolute URL if page not served over http(s))
+        const apiBase = (location.protocol === 'http:' || location.protocol === 'https:') ? `${location.protocol}//${location.host}` : 'http://localhost:3000';
+        const res = await fetch(`${apiBase}/api/publish`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMsg })
+        });
+
+        // Handle JSON and non-JSON responses robustly
+        const ct = res.headers.get('content-type') || '';
+        let payload;
+        if (ct.includes('application/json')) {
+            try {
+                payload = await res.json();
+            } catch (parseErr) {
+                const txt = await res.text();
+                throw new Error('Invalid JSON response: ' + txt);
+            }
+        } else {
+            const txt = await res.text();
+            // Try to interpret as JSON anyway
+            try {
+                payload = JSON.parse(txt);
+            } catch (_) {
+                // Non-JSON: show raw text as error or message depending on status
+                if (res.ok) alert('Veröffentlicht:\n' + txt);
+                else throw new Error(txt || 'Non-JSON response from server');
+                payload = null;
+            }
+        }
+
+        if (payload) {
+            if (res.ok && payload.success) {
+                alert('Veröffentlicht:\n' + (payload.message || 'Erfolgreich gepusht.'));
+            } else {
+                console.error(payload);
+                alert('Fehler beim Veröffentlichen:\n' + (payload.error || JSON.stringify(payload)));
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Netzwerkfehler beim Veröffentlichen. Siehe Konsole.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+    }
+}
+
 function setupTabs() {
     const tabs = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.tab-content');
@@ -59,30 +121,30 @@ function setupTabs() {
 function startClock() {
     const clockEl = document.getElementById('dashboard-clock');
     if (!clockEl) return;
-    
+
     function updateClock() {
         const now = new Date();
         const timeStr = now.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         clockEl.innerText = timeStr;
-        
+
         let greeting = 'Herzlich willkommen!';
         const hour = now.getHours();
         if (hour >= 5 && hour < 12) greeting = 'Guten Morgen!';
         else if (hour >= 12 && hour < 18) greeting = 'Guten Tag!';
         else if (hour >= 18 && hour < 22) greeting = 'Guten Abend!';
         else greeting = 'Gute Nacht!';
-        
+
         const greetingEl = document.querySelector('.dashboard-greeting');
         if (greetingEl) greetingEl.innerText = greeting;
     }
-    
+
     updateClock();
     setInterval(updateClock, 1000);
 }
 
 async function loadDashboard() {
     if (currentType !== 'dashboard') return;
-    
+
     try {
         const [designRes, illusRes, videoRes, linksRes] = await Promise.all([
             fetch('/api/projects/design').catch(() => null),
@@ -90,18 +152,18 @@ async function loadDashboard() {
             fetch('/api/projects/video').catch(() => null),
             fetch('/api/links').catch(() => null)
         ]);
-        
-        let dCount = 0, iCount =0, vCount = 0, lCount = 0;
+
+        let dCount = 0, iCount = 0, vCount = 0, lCount = 0;
         let recentProjects = [];
         let recentLinks = [];
         let assetsCount = 0;
-        
+
         if (designRes && designRes.ok) {
             const data = await designRes.json();
             dCount = data.length;
             document.getElementById('dash-stat-design').innerText = dCount;
             data.forEach(p => {
-                recentProjects.push({...p, _type: 'design'});
+                recentProjects.push({ ...p, _type: 'design' });
                 if (p.images) assetsCount += p.images.length;
                 if (p['hero-image'] || p.heroImage) assetsCount += 1;
             });
@@ -111,7 +173,7 @@ async function loadDashboard() {
             iCount = data.length;
             document.getElementById('dash-stat-illustration').innerText = iCount;
             data.forEach(p => {
-                recentProjects.push({...p, _type: 'illustration'});
+                recentProjects.push({ ...p, _type: 'illustration' });
                 if (p.images) assetsCount += p.images.length;
                 if (p.heroImage || p['hero-image']) assetsCount += 1;
             });
@@ -121,7 +183,7 @@ async function loadDashboard() {
             vCount = data.length;
             document.getElementById('dash-stat-video').innerText = vCount;
             data.forEach(p => {
-                recentProjects.push({...p, _type: 'video'});
+                recentProjects.push({ ...p, _type: 'video' });
                 if (p.videos) assetsCount += p.videos.length;
                 if (p.heroImage || p['hero-image']) assetsCount += 1;
             });
@@ -133,21 +195,21 @@ async function loadDashboard() {
             const linkInsight = document.getElementById('insight-links-total');
             if (linkInsight) linkInsight.innerText = lCount;
         }
-        
+
         const assetsInsight = document.getElementById('insight-assets-total');
         if (assetsInsight) assetsInsight.innerText = assetsCount;
-        
+
         const pCount = await fetchPhotosTotalForDash();
         fetchIndividualPhotosCount();
-        
+
         // --- Populate Chart ---
         const totalProjects = dCount + iCount + vCount + pCount;
-        if(totalProjects > 0) {
+        if (totalProjects > 0) {
             const dPct = (dCount / totalProjects) * 100;
             const iPct = (iCount / totalProjects) * 100;
             const vPct = (vCount / totalProjects) * 100;
             const pPct = (pCount / totalProjects) * 100;
-            
+
             document.getElementById('bar-design').style.height = `${dPct}%`;
             document.getElementById('bar-illustration').style.height = `${iPct}%`;
             document.getElementById('bar-video').style.height = `${vPct}%`;
@@ -159,10 +221,10 @@ async function loadDashboard() {
         const latestProjects = [];
         const designs = recentProjects.filter(p => p._type === 'design');
         latestProjects.push(...designs.slice(-3).reverse());
-        
+
         const illus = recentProjects.filter(p => p._type === 'illustration');
         latestProjects.push(...illus.slice(-3).reverse());
-        
+
         const vids = recentProjects.filter(p => p._type === 'video');
         latestProjects.push(...vids.slice(-3).reverse());
 
@@ -178,32 +240,32 @@ async function loadDashboard() {
                         // Always use the first image of the category
                         latestProjects.push({
                             _type: 'photography',
-                            heroImage: `/images/portfolio/photography/${pData[0]}`, 
+                            heroImage: `/images/portfolio/photography/${pData[0]}`,
                             title: 'Album: ' + pc.charAt(0).toUpperCase() + pc.slice(1),
                             id: null
                         });
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
         }
 
         const grid = document.getElementById('recent-projects-grid');
         grid.innerHTML = '';
         latestProjects.forEach(p => {
             let imgUrl = p['hero-image'] || p.heroImage || '';
-            if(!imgUrl && p.images && p.images.length > 0) imgUrl = p.images[0].imageUrl || '';
-            
+            if (!imgUrl && p.images && p.images.length > 0) imgUrl = p.images[0].imageUrl || '';
+
             const displayImg = imgUrl ? imgUrl.replace('../../', '/') : '';
-            
+
             let bgCol = '';
             let textCol = '';
             let typeLabel = '';
-            
+
             if (p._type === 'design') { typeLabel = 'Design'; bgCol = '#e8def8'; textCol = '#6d28d9'; }
             else if (p._type === 'illustration') { typeLabel = 'Illu'; bgCol = '#fce7f3'; textCol = '#be185d'; }
             else if (p._type === 'video') { typeLabel = 'Video'; bgCol = '#e0f2fe'; textCol = '#0369a1'; }
             else if (p._type === 'photography') { typeLabel = 'Foto'; bgCol = '#dcfce7'; textCol = '#15803d'; }
-            
+
             const card = document.createElement('div');
             card.className = 'recent-card';
             card.onclick = () => {
@@ -240,7 +302,7 @@ async function loadDashboard() {
             `;
             linksList.appendChild(item);
         });
-        
+
     } catch (e) {
         console.error('Error loading dashboard stats:', e);
     }
@@ -250,10 +312,10 @@ async function fetchPhotosTotalForDash() {
     // Only count the 5 main categories as "Projects" instead of individual photos
     const categories = ['street', 'aviation', 'portraet', 'bts', 'event'];
     const total = categories.length;
-    
+
     const statEl = document.getElementById('dash-stat-photography');
     if (statEl) statEl.innerText = total;
-    
+
     return total;
 }
 
@@ -348,7 +410,7 @@ function closeCategorySelectModal() {
 
 function selectCategoryForNewProject(type) {
     closeCategorySelectModal();
-    
+
     // Switch to the respective tab implicitly before opening modal
     if (type === 'photography') {
         document.querySelector('.nav-btn[data-tab="photography"]').click();

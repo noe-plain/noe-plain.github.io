@@ -333,6 +333,56 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     });
 });
 
+// --- Publish: run git add/commit/push in project root ---
+const util = require('util');
+const child_process = require('child_process');
+const exec = util.promisify(child_process.exec);
+
+app.post('/api/publish', async (req, res) => {
+    try {
+        // Check for changes
+        const { stdout: statusOut } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
+        if (!statusOut || statusOut.trim() === '') {
+            return res.json({ success: true, message: 'Keine Änderungen zum Veröffentlichen.' });
+        }
+
+        // Ensure a committer identity exists (local repo may be missing config)
+        try {
+            await exec('git config user.name "Portfolio Manager"', { cwd: PROJECT_ROOT });
+            await exec('git config user.email "portfolio@local"', { cwd: PROJECT_ROOT });
+        } catch (e) {
+            // Non-fatal
+        }
+
+        // Stage, commit and push
+        await exec('git add -A', { cwd: PROJECT_ROOT });
+
+        // Use commit message provided by client if available
+        const userMsg = req.body && req.body.message ? String(req.body.message) : null;
+        const commitMsg = userMsg || `Publish via portfolio-manager: ${new Date().toISOString()}`;
+        try {
+            const safeMsg = commitMsg.replace(/"/g, '\\"');
+            await exec(`git commit -m "${safeMsg}"`, { cwd: PROJECT_ROOT });
+        } catch (commitErr) {
+            // git commit may fail if no changes after add or other reasons
+            const { stdout: afterStatus } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
+            if (!afterStatus || afterStatus.trim() === '') {
+                return res.json({ success: true, message: 'Keine Änderungen zum Veröffentlichen nach Staging.' });
+            }
+            throw commitErr;
+        }
+
+        // Push
+        const { stdout: pushOut, stderr: pushErr } = await exec('git push', { cwd: PROJECT_ROOT });
+
+        res.json({ success: true, message: pushOut || 'Pushed.', debug: pushErr });
+    } catch (e) {
+        console.error('Publish error:', e);
+        const errMsg = (e && e.message) ? e.message : String(e);
+        res.status(500).json({ success: false, error: 'Fehler beim Veröffentlichen: ' + errMsg });
+    }
+});
+
 // Start Server
 app.listen(port, () => {
     console.log(`Portfolio Manager running at http://localhost:${port}`);
