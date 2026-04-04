@@ -1,5 +1,5 @@
 // State
-let currentType = 'design';
+let currentType = 'dashboard';
 let projectsData = [];
 let linksData = [];
 
@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLinkModal();
 
     // Load initial data
-    loadProjects('design');
+    loadDashboard();
+    startClock();
 });
 
 function setupTabs() {
@@ -36,7 +37,9 @@ function setupTabs() {
 
             // Logic Switch
             currentType = type;
-            if (type === 'photography') {
+            if (type === 'dashboard') {
+                loadDashboard();
+            } else if (type === 'photography') {
                 loadPhotography();
             } else if (type === 'links') {
                 loadLinks();
@@ -48,7 +51,228 @@ function setupTabs() {
 
     // Initialize first tab
     sections.forEach(s => s.style.display = 'none');
-    document.getElementById('tab-design').style.display = 'block';
+    document.getElementById('tab-dashboard').style.display = 'block';
+}
+
+/* --- Dashboard Logic --- */
+
+function startClock() {
+    const clockEl = document.getElementById('dashboard-clock');
+    if (!clockEl) return;
+    
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        clockEl.innerText = timeStr;
+        
+        let greeting = 'Herzlich willkommen!';
+        const hour = now.getHours();
+        if (hour >= 5 && hour < 12) greeting = 'Guten Morgen!';
+        else if (hour >= 12 && hour < 18) greeting = 'Guten Tag!';
+        else if (hour >= 18 && hour < 22) greeting = 'Guten Abend!';
+        else greeting = 'Gute Nacht!';
+        
+        const greetingEl = document.querySelector('.dashboard-greeting');
+        if (greetingEl) greetingEl.innerText = greeting;
+    }
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+async function loadDashboard() {
+    if (currentType !== 'dashboard') return;
+    
+    try {
+        const [designRes, illusRes, videoRes, linksRes] = await Promise.all([
+            fetch('/api/projects/design').catch(() => null),
+            fetch('/api/projects/illustration').catch(() => null),
+            fetch('/api/projects/video').catch(() => null),
+            fetch('/api/links').catch(() => null)
+        ]);
+        
+        let dCount = 0, iCount =0, vCount = 0, lCount = 0;
+        let recentProjects = [];
+        let recentLinks = [];
+        let assetsCount = 0;
+        
+        if (designRes && designRes.ok) {
+            const data = await designRes.json();
+            dCount = data.length;
+            document.getElementById('dash-stat-design').innerText = dCount;
+            data.forEach(p => {
+                recentProjects.push({...p, _type: 'design'});
+                if (p.images) assetsCount += p.images.length;
+                if (p['hero-image'] || p.heroImage) assetsCount += 1;
+            });
+        }
+        if (illusRes && illusRes.ok) {
+            const data = await illusRes.json();
+            iCount = data.length;
+            document.getElementById('dash-stat-illustration').innerText = iCount;
+            data.forEach(p => {
+                recentProjects.push({...p, _type: 'illustration'});
+                if (p.images) assetsCount += p.images.length;
+                if (p.heroImage || p['hero-image']) assetsCount += 1;
+            });
+        }
+        if (videoRes && videoRes.ok) {
+            const data = await videoRes.json();
+            vCount = data.length;
+            document.getElementById('dash-stat-video').innerText = vCount;
+            data.forEach(p => {
+                recentProjects.push({...p, _type: 'video'});
+                if (p.videos) assetsCount += p.videos.length;
+                if (p.heroImage || p['hero-image']) assetsCount += 1;
+            });
+        }
+        if (linksRes && linksRes.ok) {
+            const data = await linksRes.json();
+            lCount = data.length;
+            recentLinks = data;
+            const linkInsight = document.getElementById('insight-links-total');
+            if (linkInsight) linkInsight.innerText = lCount;
+        }
+        
+        const assetsInsight = document.getElementById('insight-assets-total');
+        if (assetsInsight) assetsInsight.innerText = assetsCount;
+        
+        const pCount = await fetchPhotosTotalForDash();
+        fetchIndividualPhotosCount();
+        
+        // --- Populate Chart ---
+        const totalProjects = dCount + iCount + vCount + pCount;
+        if(totalProjects > 0) {
+            const dPct = (dCount / totalProjects) * 100;
+            const iPct = (iCount / totalProjects) * 100;
+            const vPct = (vCount / totalProjects) * 100;
+            const pPct = (pCount / totalProjects) * 100;
+            
+            document.getElementById('bar-design').style.height = `${dPct}%`;
+            document.getElementById('bar-illustration').style.height = `${iPct}%`;
+            document.getElementById('bar-video').style.height = `${vPct}%`;
+            document.getElementById('bar-photo').style.height = `${pPct}%`;
+        }
+
+        // --- Populate Recent Projects ---
+        // Ensure every category is present
+        const latestProjects = [];
+        const designs = recentProjects.filter(p => p._type === 'design');
+        latestProjects.push(...designs.slice(-3).reverse());
+        
+        const illus = recentProjects.filter(p => p._type === 'illustration');
+        latestProjects.push(...illus.slice(-3).reverse());
+        
+        const vids = recentProjects.filter(p => p._type === 'video');
+        latestProjects.push(...vids.slice(-3).reverse());
+
+        // Add Photography to complete the 4 categories
+        const photoCats = ['street', 'aviation', 'portraet'];
+        for (const pc of photoCats) {
+            try {
+                const pRes = await fetch(`/api/photography/${pc}`);
+                if (pRes.ok) {
+                    const pData = await pRes.json();
+                    if (pData.length > 0) {
+                        // pData is an array of filenames like "street-01.jpeg"
+                        // Always use the first image of the category
+                        latestProjects.push({
+                            _type: 'photography',
+                            heroImage: `/images/portfolio/photography/${pData[0]}`, 
+                            title: 'Album: ' + pc.charAt(0).toUpperCase() + pc.slice(1),
+                            id: null
+                        });
+                    }
+                }
+            } catch(e) {}
+        }
+
+        const grid = document.getElementById('recent-projects-grid');
+        grid.innerHTML = '';
+        latestProjects.forEach(p => {
+            let imgUrl = p['hero-image'] || p.heroImage || '';
+            if(!imgUrl && p.images && p.images.length > 0) imgUrl = p.images[0].imageUrl || '';
+            
+            const displayImg = imgUrl ? imgUrl.replace('../../', '/') : '';
+            
+            let bgCol = '';
+            let textCol = '';
+            let typeLabel = '';
+            
+            if (p._type === 'design') { typeLabel = 'Design'; bgCol = '#e8def8'; textCol = '#6d28d9'; }
+            else if (p._type === 'illustration') { typeLabel = 'Illu'; bgCol = '#fce7f3'; textCol = '#be185d'; }
+            else if (p._type === 'video') { typeLabel = 'Video'; bgCol = '#e0f2fe'; textCol = '#0369a1'; }
+            else if (p._type === 'photography') { typeLabel = 'Foto'; bgCol = '#dcfce7'; textCol = '#15803d'; }
+            
+            const card = document.createElement('div');
+            card.className = 'recent-card';
+            card.onclick = () => {
+                if (p._type === 'photography') {
+                    document.querySelector('.nav-btn[data-tab="photography"]').click();
+                } else {
+                    document.querySelector(`.nav-btn[data-tab="${p._type}"]`).click();
+                    setTimeout(() => editProject(p.id), 100);
+                }
+            };
+            card.innerHTML = `
+                <div class="recent-img" style="background-image: url('${displayImg}')"></div>
+                <div class="recent-info">
+                    <span style="background: ${bgCol}; color: ${textCol};">${typeLabel}</span>
+                    <h4>${p.title}</h4>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // --- Populate Sidebar Links ---
+        // the links are sorted alphabetically in backend, reverse to get some variety or keep as is
+        const linksList = document.getElementById('sidebar-latest-links');
+        linksList.innerHTML = '';
+        recentLinks.slice(0, 5).forEach(l => {
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = `
+                <div class="list-item-content">
+                    <strong>${l.name}</strong>
+                    <span>${l.category || ''}</span>
+                </div>
+                <a href="${l.url}" target="_blank" class="list-item-action"><i class="fas fa-external-link-alt"></i></a>
+            `;
+            linksList.appendChild(item);
+        });
+        
+    } catch (e) {
+        console.error('Error loading dashboard stats:', e);
+    }
+}
+
+async function fetchPhotosTotalForDash() {
+    // Only count the 5 main categories as "Projects" instead of individual photos
+    const categories = ['street', 'aviation', 'portraet', 'bts', 'event'];
+    const total = categories.length;
+    
+    const statEl = document.getElementById('dash-stat-photography');
+    if (statEl) statEl.innerText = total;
+    
+    return total;
+}
+
+async function fetchIndividualPhotosCount() {
+    const categories = ['street', 'aviation', 'portraet', 'bts', 'event'];
+    let total = 0;
+    try {
+        for (const cat of categories) {
+            const res = await fetch(`/api/photography/${cat}`);
+            if (res.ok) {
+                const data = await res.json();
+                total += data.length;
+            }
+        }
+        const statEl = document.getElementById('insight-photos-total');
+        if (statEl) statEl.innerText = total;
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 /* --- Projects Logic --- */
@@ -111,6 +335,31 @@ function setupModal() {
         await uploadFile(file, currentType, targetId);
         genericInput.value = '';
     });
+}
+
+/* --- Category Selection Modal --- */
+function openCategorySelectModal() {
+    document.getElementById('category-select-modal').classList.remove('hidden');
+}
+
+function closeCategorySelectModal() {
+    document.getElementById('category-select-modal').classList.add('hidden');
+}
+
+function selectCategoryForNewProject(type) {
+    closeCategorySelectModal();
+    
+    // Switch to the respective tab implicitly before opening modal
+    if (type === 'photography') {
+        document.querySelector('.nav-btn[data-tab="photography"]').click();
+        setTimeout(triggerPhotoUpload, 300);
+    } else if (type === 'links') {
+        document.querySelector('.nav-btn[data-tab="links"]').click();
+        setTimeout(() => openLinkModal(null), 100);
+    } else {
+        document.querySelector(`.nav-btn[data-tab="${type}"]`).click();
+        setTimeout(() => openProjectModal(type), 100);
+    }
 }
 
 function openProjectModal(type, project = null) {
