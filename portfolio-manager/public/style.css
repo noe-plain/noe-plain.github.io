@@ -603,6 +603,39 @@ header h1 {
     background: rgba(31, 0, 51, 0.05);
 }
 
+/* Stil für den Veröffentlichen-Button (sichtbar in Hero) */
+#publish-btn {
+    background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);
+    color: var(--text-light);
+    border: none;
+    padding: 12px 28px; /* match .primary-btn */
+    border-radius: 12px 0 12px 12px; /* match .primary-btn */
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.18);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#publish-btn i { font-size: 0.95rem; }
+
+#publish-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(99, 102, 241, 0.25);
+}
+
+#publish-btn:active { transform: translateY(-1px); }
+
+#publish-btn[disabled] {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .input-with-btn {
     display: flex;
     gap: 10px;
@@ -853,11 +886,13 @@ header h1 {
 }
 
 .hero-btn {
-    border-radius: 30px;
-    padding: 12px 24px;
+    /* Provide consistent sizing for hero buttons; visual style comes from .primary-btn or #publish-btn */
+    border-radius: 12px 0 12px 12px;
+    padding: 12px 28px;
     display: inline-flex;
     gap: 10px;
-    background: var(--primary);
+    align-items: center;
+    font-size: 1rem;
 }
 
 /* Stats Row */
