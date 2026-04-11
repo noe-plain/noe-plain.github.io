@@ -916,48 +916,77 @@ async function loadLinks() {
 }
 
 function renderLinks() {
-    const container = document.getElementById('list-links');
-    container.innerHTML = '';
+    const filterContainer = document.getElementById('links-filter-bar');
+    const linksContainer = document.getElementById('list-links');
+    
+    if (!filterContainer || !linksContainer) return;
 
-    // Extract unique categories for the datalist
+    filterContainer.innerHTML = '';
+    linksContainer.innerHTML = '';
+
+    // Extract unique categories for the datalist & filters
     const categories = [...new Set(linksData.map(l => l.category))].filter(Boolean);
     const dataList = document.getElementById('category-list');
-    dataList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
+    if (dataList) {
+        dataList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
+    }
 
-    // Group by category to display nicely
-    const grouped = {};
-    linksData.forEach(link => {
-        const cat = link.category || 'Uncategorized';
-        if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(link);
+    // Render Filter Pills
+    const allPill = document.createElement('button');
+    allPill.className = 'filter-pill active';
+    allPill.innerText = 'Alle';
+    allPill.onclick = () => filterLinksByCategory('all', allPill);
+    filterContainer.appendChild(allPill);
+
+    categories.sort().forEach(cat => {
+        const pill = document.createElement('button');
+        pill.className = 'filter-pill';
+        pill.innerText = cat;
+        pill.onclick = () => filterLinksByCategory(cat, pill);
+        filterContainer.appendChild(pill);
     });
 
-    for (let cat of Object.keys(grouped).sort()) {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'link-group';
-        groupDiv.innerHTML = `<h3>${cat}</h3>`;
+    // Render all links as cards
+    linksData.forEach(link => {
+        const card = document.createElement('div');
+        card.className = 'link-card';
+        card.dataset.category = link.category || 'Uncategorized';
 
-        const ul = document.createElement('ul');
-        ul.className = 'link-list';
+        const urlShort = link.url.replace(/^https?:\/\//i, '').substring(0, 35);
+        const safeName = link.name.replace(/'/g, "\\'");
 
-        grouped[cat].forEach(link => {
-            const li = document.createElement('li');
-            const urlShort = link.url.replace(/^https?:\/\//i, '').substring(0, 30);
-            const safeName = link.name.replace(/'/g, "\\'");
-            li.innerHTML = '<div class="link-info">' +
-                '<strong>' + link.name + '</strong>' +
-                '<a href="' + link.url + '" target="_blank" title="' + link.url + '">' + urlShort + '...</a>' +
-                '</div>' +
-                '<div class="link-actions">' +
-                '<button class="btn-small btn-edit" onclick="editLink(\'' + safeName + '\')">Bearbeiten</button>' +
-                '<button class="btn-small btn-delete" onclick="deleteLink(\'' + safeName + '\')">Löschen</button>' +
-                '</div>';
-            ul.appendChild(li);
-        });
+        card.innerHTML = `
+            <div class="link-card-header">
+                <div class="link-card-icon"><i class="fas fa-link"></i></div>
+                <span class="link-card-badge">${link.category || 'Uncategorized'}</span>
+            </div>
+            <div class="link-card-body">
+                <h3>${link.name}</h3>
+                <a href="${link.url}" target="_blank" title="${link.url}">${urlShort}...</a>
+            </div>
+            <div class="link-card-actions">
+                <button class="btn-small btn-edit" onclick="editLink('${safeName}')"><i class="fas fa-pen"></i></button>
+                <button class="btn-small btn-delete" onclick="deleteLink('${safeName}')"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        linksContainer.appendChild(card);
+    });
+}
 
-        groupDiv.appendChild(ul);
-        container.appendChild(groupDiv);
-    }
+window.filterLinksByCategory = function(category, pillElement) {
+    // Update active state on pills
+    document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
+    pillElement.classList.add('active');
+
+    // Filter cards
+    const cards = document.querySelectorAll('.link-card');
+    cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 /* --- Link Modal Logic --- */
