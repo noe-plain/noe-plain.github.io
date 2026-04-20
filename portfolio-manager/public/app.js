@@ -548,6 +548,8 @@ async function handleSave(e) {
                 b.pdfUrl = el.querySelector('.b-pdf-url').value;
                 b.imageUrl = el.querySelector('.b-pdf-thumb').value;
             } else if (type === 'youtube') {
+                b.title = el.querySelector('.b-yt-title').value;
+                b.tags = el.querySelector('.b-yt-tags').value;
                 b.videoId = el.querySelector('.b-yt-id').value;
             } else if (type === 'gallery' || type === 'media') {
                 const urls = el.querySelector('.b-gal-urls').value.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -620,7 +622,7 @@ async function handleSave(e) {
     if (existingIdx > -1) {
         projectsData[existingIdx] = newProject;
     } else {
-        projectsData.push(newProject);
+        projectsData.unshift(newProject);
     }
 
     await saveAllProjects();
@@ -1180,7 +1182,11 @@ window.renderBlockToCanvas = function(b) {
         `;
     } else if (b.type === 'youtube') {
         title = 'YouTube'; icon = 'fa-youtube';
-        innerHTML = `<input type="text" class="b-yt-id" placeholder="YouTube Video ID (z.B. dQw4w9WgXcQ)" value="${b.videoId || ''}">`;
+        innerHTML = `
+            <input type="text" class="b-yt-title" placeholder="Video Titel" value="${b.title || ''}" style="margin-bottom:5px;">
+            <input type="text" class="b-yt-tags" placeholder="Tags (Komma-separiert, z.B. Schnitt, Kamera)" value="${b.tags || ''}" style="margin-bottom:5px;">
+            <input type="text" class="b-yt-id" placeholder="YouTube Video ID (z.B. dQw4w9WgXcQ)" value="${b.videoId || ''}">
+        `;
     } else if (b.type === 'gallery' || b.type === 'media') {
         title = 'Fotogalerie / Media'; icon = 'fa-images';
         const urls = b.items ? b.items.map(i => i.imageUrl).join('\n') : '';

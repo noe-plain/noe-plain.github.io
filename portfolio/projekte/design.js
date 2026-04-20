@@ -314,33 +314,73 @@ function renderBlocksFromData(blocks, containerId) {
                 div.innerHTML = b.html || '';
                 break;
             case 'pdf':
+                div.className = 'videokarte';
+                div.style.padding = "0";
                 div.innerHTML = `
-                    <a href="${b.pdfUrl}" target="_blank" class="g-block-pdf">
-                        <div style="display:flex; align-items:center;">
-                            <i class="fas fa-file-pdf"></i>
-                            <strong>${b.title || 'PDF Dokumentation'}</strong>
-                        </div>
-                        <i class="fas fa-download" style="color:#aaa; font-size:1rem;"></i>
-                    </a>
+                    <div style="width:100%; height:600px;">
+                        <object data="${b.pdfUrl}" type="application/pdf" width="100%" height="100%">
+                            <div style="padding: 2rem; text-align: center;">
+                                <p>Ihr Browser kann dieses PDF nicht direkt anzeigen.</p>
+                                <a href="${b.pdfUrl}" class="back-link" style="color: #333;" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> PDF herunterladen / öffnen
+                                </a>
+                            </div>
+                        </object>
+                    </div>
+                    ${b.title ? `<div class="project-details" style="margin-top:0;"><h2>${b.title}</h2></div>` : ''}
                 `;
                 break;
             case 'youtube':
-                div.className = 'g-block-youtube';
-                if (b.videoId) {
-                    div.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${b.videoId}" allowfullscreen></iframe>`;
-                }
+                div.className = 'videokarte';
+                const tagsArray = b.tags ? b.tags.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                const tagsHtml = tagsArray.map(tag => {
+                    let icon = 'fa-video';
+                    if (tag.includes('Schnitt')) icon = 'fa-cut';
+                    if (tag.includes('Color')) icon = 'fa-palette';
+                    if (tag.includes('Kamera')) icon = 'fa-video';
+                    if (tag.includes('Audio')) icon = 'fa-headphones';
+                    if (tag.includes('Editing')) icon = 'fa-edit';
+                    if (tag.includes('Postproduktion')) icon = 'fa-timeline';
+                    return `<li><i class="fas ${icon}"></i> ${tag}</li>`;
+                }).join('');
+
+                div.innerHTML = `
+                    <div class="video-container">
+                        <iframe style="aspect-ratio: 16 / 9 !important;" src="https://www.youtube-nocookie.com/embed/${b.videoId}" 
+                            allowfullscreen></iframe>
+                    </div>
+                    ${(b.title || tagsHtml) ? `
+                    <div class="project-details">
+                        ${b.title ? `<h2>${b.title}</h2>` : ''}
+                        ${tagsHtml ? `<ul class="roles-list">${tagsHtml}</ul>` : ''}
+                    </div>` : ''}
+                `;
+                if (!b.videoId) div.innerHTML = ''; // Hide if empty
                 break;
             case 'gallery':
             case 'media':
-                div.className = 'g-block-gallery';
+                div.className = 'project-gallery'; // Native masonry look
                 if (b.items) {
-                    // Quick lightbox-like integration via openDetail if items added to global or just open in new tab
-                    // For now, simpler viewing
-                    b.items.forEach(img => {
-                        const imgEl = document.createElement('img');
-                        imgEl.src = img.imageUrl;
-                        imgEl.onclick = () => window.open(img.imageUrl, '_blank');
-                        div.appendChild(imgEl);
+                    b.items.forEach((item, idx) => {
+                        const cell = document.createElement('div');
+                        cell.className = 'gallery-item';
+                        cell.dataset.index = idx;
+                        
+                        const img = document.createElement('img');
+                        img.onload = () => { img.style.opacity = 1; };
+                        img.src = item.imageUrl;
+                        img.alt = b.title || "Gallery Image";
+                        
+                        cell.appendChild(img);
+                        cell.innerHTML += `<i class="fas fa-search-plus zoom-icon"></i>`;
+                        
+                        cell.addEventListener('click', () => {
+                            if (typeof openLightbox === 'function') {
+                                openLightbox(idx, b.items.map(i => ({imageUrl: i.imageUrl, title: b.title})));
+                            }
+                        });
+                        
+                        div.appendChild(cell);
                     });
                 }
                 break;

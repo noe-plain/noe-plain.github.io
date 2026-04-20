@@ -146,11 +146,15 @@
             {
                 "id": "block-1776681073046",
                 "type": "youtube",
+                "title": "Titel",
+                "tags": "Schnitt",
                 "videoId": "1_61GPk-6u8"
             },
             {
                 "id": "block-1776681076477",
                 "type": "youtube",
+                "title": "Titel 2",
+                "tags": "Kamera",
                 "videoId": "bvS75f_QAkY"
             },
             {
