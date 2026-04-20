@@ -10,42 +10,34 @@
             "<strong>Equipment:</strong> Sony A7C II & MacBook Air M2",
             "<strong>Tools:</strong> Final Cut Pro"
         ],
-        "videos": [
+        "blocks": [
             {
+                "id": "ew70l47iv",
+                "type": "youtube",
                 "title": "Murten Classics – Tag 1",
-                "youtubeId": "C19KNuotklo",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Color Grading"
-                ]
+                "videoId": "C19KNuotklo",
+                "tags": "Kamera, Schnitt, Color Grading"
             },
             {
+                "id": "b3etxts7n",
+                "type": "youtube",
                 "title": "Murten Classics – Tag 2",
-                "youtubeId": "WNkwhKSsKgg",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Color Grading"
-                ]
+                "videoId": "WNkwhKSsKgg",
+                "tags": "Kamera, Schnitt, Color Grading"
             },
             {
+                "id": "i2cvnkzau",
+                "type": "youtube",
                 "title": "Murten Classics – Tag 3 & 4",
-                "youtubeId": "SFc1Hv8SvcM",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Color Grading"
-                ]
+                "videoId": "SFc1Hv8SvcM",
+                "tags": "Kamera, Schnitt, Color Grading"
             },
             {
+                "id": "xuqds5y6l",
+                "type": "youtube",
                 "title": "Murten Classics – Tag 5 & 6",
-                "youtubeId": "RfoGJ-dDRlw",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Color Grading"
-                ]
+                "videoId": "RfoGJ-dDRlw",
+                "tags": "Kamera, Schnitt, Color Grading"
             }
         ]
     },
@@ -60,28 +52,27 @@
             "<strong>Equipment:</strong> Canon R6 mit dem 28 – 70mm f/2.0",
             "<strong>Tools:</strong> Premiere Pro"
         ],
-        "pdf": {
-            "title": "Konzept & Präsentation",
-            "link": "../../images/portfolio/videografie/LinkedIn_Quiz-Serie_Konzept_Praesentation.pdf"
-        },
-        "videos": [
+        "blocks": [
             {
-                "title": "Migros – LinkedIn Quiz mit Faruk und Emilia",
-                "youtubeId": "1_61GPk-6u8",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Audio"
-                ]
+                "id": "2aiu3srih",
+                "type": "pdf",
+                "title": "Konzept & Präsentation",
+                "pdfUrl": "../../images/portfolio/videografie/LinkedIn_Quiz-Serie_Konzept_Praesentation.pdf",
+                "imageUrl": ""
             },
             {
+                "id": "o992lfahi",
+                "type": "youtube",
+                "title": "Migros – LinkedIn Quiz mit Faruk und Emilia",
+                "videoId": "1_61GPk-6u8",
+                "tags": "Kamera, Schnitt, Audio"
+            },
+            {
+                "id": "d4e9klmii",
+                "type": "youtube",
                 "title": "Migros – LinkedIn Quiz mit Lina und Selina",
-                "youtubeId": "bvS75f_QAkY",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Audio"
-                ]
+                "videoId": "bvS75f_QAkY",
+                "tags": "Kamera, Schnitt, Audio"
             }
         ]
     },
@@ -96,20 +87,20 @@
             "<strong>Equipment:</strong> Sony A7 IV",
             "<strong>Tools:</strong> DaVinci Resolve"
         ],
-        "videos": [
+        "blocks": [
             {
+                "id": "k65itnfdi",
+                "type": "youtube",
                 "title": "Marimba Konzert",
-                "youtubeId": "PT3iey_RAfM",
-                "tags": [
-                    "Kamera"
-                ]
+                "videoId": "PT3iey_RAfM",
+                "tags": "Kamera"
             },
             {
+                "id": "uuq1t7vqh",
+                "type": "youtube",
                 "title": "Taubstumme Tanzgruppe aus Frankreich",
-                "youtubeId": "iPqxR3NpklI",
-                "tags": [
-                    "Kamera"
-                ]
+                "videoId": "iPqxR3NpklI",
+                "tags": "Kamera"
             }
         ]
     },
@@ -124,15 +115,13 @@
             "<strong>Equipment:</strong> Sony FX3 und MacBook Pro",
             "<strong>Tools:</strong> Premiere Pro"
         ],
-        "videos": [
+        "blocks": [
             {
+                "id": "x91zbb3ah",
+                "type": "youtube",
                 "title": "Werde Content Creator*in bei vonMedia",
-                "youtubeId": "-4ZJB3pq_ik",
-                "tags": [
-                    "Kamera",
-                    "Schnitt",
-                    "Audio"
-                ]
+                "videoId": "-4ZJB3pq_ik",
+                "tags": "Kamera, Schnitt, Audio"
             }
         ]
     }
