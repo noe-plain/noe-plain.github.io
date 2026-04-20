@@ -34,55 +34,45 @@
         "id": "lamaLami",
         "title": "Lama Lami",
         "description": "Für die Geschichte Lama Lami an den Olympischen Musikspielen, habe ich die Geschichte mit Illustrationen versehen. Die Illustrierten Tiere sind in Fotografien platziert.",
+        "tabTitle": "Lama Lami",
+        "hero-image": "../../images/portfolio/illustration/06_LamaLami-CrockiAmSaxophon.jpg",
         "blocks": [
             {
                 "id": "550kppvhp",
                 "type": "gallery",
-                "title": "Galerie",
                 "items": [
                     {
-                        "imageUrl": "../../images/portfolio/illustration/01_LamaLami-AmSchlafen.jpg",
-                        "title": "Lama Lami am Schlafen"
+                        "imageUrl": "../../images/portfolio/illustration/01_LamaLami-AmSchlafen.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/02_LamaLami-Bluemewise.jpg",
-                        "title": "Lama Lami auf dem Weg zu den Olympischen Musikspielen"
+                        "imageUrl": "../../images/portfolio/illustration/02_LamaLami-Bluemewise.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/02.5_LamaLami-BänkliImPark.jpg",
-                        "title": "Lama Lami im Park mit dem Schneck Pete"
+                        "imageUrl": "../../images/portfolio/illustration/02.5_LamaLami-BänkliImPark.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/03_LamaLami-Bühne.jpg",
-                        "title": "Lama Lami bei seinem Durchlauf"
+                        "imageUrl": "../../images/portfolio/illustration/03_LamaLami-Bühne.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg.jpg",
-                        "title": "Lama Lami auf dem Heimweg"
+                        "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg-idee.jpg",
-                        "title": "Lama Lami hat eine Idee"
+                        "imageUrl": "../../images/portfolio/illustration/04_LamaLami-IdeeAufHeimweg-idee.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/05_LamaLami-LeuHarryAnDerHarfe.jpg",
-                        "title": "Lama Lami besucht Harry den Löwen"
+                        "imageUrl": "../../images/portfolio/illustration/05_LamaLami-LeuHarryAnDerHarfe.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/06_LamaLami-CrockiAmSaxophon.jpg",
-                        "title": "Lama Lami besucht Crocki den Krokodil"
+                        "imageUrl": "../../images/portfolio/illustration/06_LamaLami-CrockiAmSaxophon.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/06.5_LamaLami-LamaLamiSchlaeft.jpg",
-                        "title": "Lama Lami schläft"
+                        "imageUrl": "../../images/portfolio/illustration/06.5_LamaLami-LamaLamiSchlaeft.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/07_LamaLami-CrockieLamiPeteRennbahn.jpg",
-                        "title": "Lama Lami, Crocki und Pete auf dem Weg zu den Olympischen Musikspielen"
+                        "imageUrl": "../../images/portfolio/illustration/07_LamaLami-CrockieLamiPeteRennbahn.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/XX_LamaLami-Spotlight.jpg",
-                        "title": "Lama Lami im Rampenlicht"
+                        "imageUrl": "../../images/portfolio/illustration/XX_LamaLami-Spotlight.jpg"
                     }
                 ]
             }
