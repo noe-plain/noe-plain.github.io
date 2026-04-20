@@ -85,6 +85,11 @@
         "category": "Bilder"
     },
     {
+        "name": "Galaxus",
+        "url": "https://www.galaxus.ch",
+        "category": "suche"
+    },
+    {
         "name": "Gemini",
         "url": "https://gemini.google.com",
         "category": "Ressourcen"
