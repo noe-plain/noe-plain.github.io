@@ -238,8 +238,116 @@ function loadProject(id) {
 
     renderPageNav(id);
 
-    // Render Images
-    loadImagesFromData(project.images || [], 'lightgallery-design');
+    // Render Content
+    const containerId = 'lightgallery-design';
+    const container = document.getElementById(containerId);
+    
+    // Clear and optionally remove masonry grid from container if it's block-based
+    if (project.blocks) {
+        container.classList.remove('project-gallery');
+        container.classList.add('gutenberg-article-container');
+        renderBlocksFromData(project.blocks, containerId);
+    } else {
+        container.classList.add('project-gallery');
+        container.classList.remove('gutenberg-article-container');
+        loadImagesFromData(project.images || [], containerId);
+    }
+}
+
+// ---------------------------------------------
+// Block Renderer
+// ---------------------------------------------
+function renderBlocksFromData(blocks, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // Load specific CSS safely once
+    if (!document.getElementById('gutenberg-frontend-css')) {
+        const style = document.createElement('style');
+        style.id = 'gutenberg-frontend-css';
+        style.innerHTML = `
+            .gutenberg-article-container { max-width: 800px; margin: 40px auto; display: flex; flex-direction: column; gap: 30px; font-family: 'switzer', sans-serif; padding: 0 15px; }
+            .g-block-hero { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+            .g-block-hero img { width: 100%; border-radius: 15px; object-fit: cover; max-height: 60vh; }
+            .g-block-hero p { font-size: 0.95rem; color: #555; text-align: center; margin: 0; font-style: italic; }
+            .g-block-heading h1 { font-size: 2.5rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
+            .g-block-heading h2 { font-size: 2rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
+            .g-block-heading h3 { font-size: 1.5rem; color: #222; margin: 0; }
+            .g-block-heading h4 { font-size: 1.25rem; color: #333; margin: 0; }
+            .g-block-text { font-size: 1.1rem; line-height: 1.6; color: #444; }
+            .g-block-youtube { width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            .g-block-youtube iframe { width: 100%; height: 100%; border: none; }
+            .g-block-pdf { background: #f9f9f9; padding: 15px 25px; border-radius: 10px; border-left: 4px solid var(--primary); display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #333; transition: background 0.2s; }
+            .g-block-pdf:hover { background: #f0f0f0; }
+            .g-block-pdf i { font-size: 1.5rem; color: var(--primary); margin-right: 15px; }
+            .g-block-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+            .g-block-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; cursor: pointer; transition: transform 0.2s; }
+            .g-block-gallery img:hover { transform: scale(1.03); }
+        `;
+        document.head.appendChild(style);
+    }
+
+    if (!blocks || blocks.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">Keine Inhalte verfügbar.</p>';
+        return;
+    }
+
+    blocks.forEach(b => {
+        const div = document.createElement('div');
+        
+        switch (b.type) {
+            case 'hero':
+                div.className = 'g-block-hero';
+                div.innerHTML = `
+                    ${b.imageUrl ? `<img src="${b.imageUrl}" alt="Hero">` : ''}
+                    ${b.text ? `<p>${b.text}</p>` : ''}
+                `;
+                break;
+            case 'heading':
+                div.className = 'g-block-heading';
+                const lvl = b.level || 'h2';
+                div.innerHTML = `<${lvl}>${b.text || ''}</${lvl}>`;
+                break;
+            case 'text':
+                div.className = 'g-block-text';
+                div.innerHTML = b.html || '';
+                break;
+            case 'pdf':
+                div.innerHTML = `
+                    <a href="${b.pdfUrl}" target="_blank" class="g-block-pdf">
+                        <div style="display:flex; align-items:center;">
+                            <i class="fas fa-file-pdf"></i>
+                            <strong>${b.title || 'PDF Dokumentation'}</strong>
+                        </div>
+                        <i class="fas fa-download" style="color:#aaa; font-size:1rem;"></i>
+                    </a>
+                `;
+                break;
+            case 'youtube':
+                div.className = 'g-block-youtube';
+                if (b.videoId) {
+                    div.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${b.videoId}" allowfullscreen></iframe>`;
+                }
+                break;
+            case 'gallery':
+            case 'media':
+                div.className = 'g-block-gallery';
+                if (b.items) {
+                    // Quick lightbox-like integration via openDetail if items added to global or just open in new tab
+                    // For now, simpler viewing
+                    b.items.forEach(img => {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = img.imageUrl;
+                        imgEl.onclick = () => window.open(img.imageUrl, '_blank');
+                        div.appendChild(imgEl);
+                    });
+                }
+                break;
+        }
+        
+        container.appendChild(div);
+    });
 }
 
 function renderPageNav(activeId) {

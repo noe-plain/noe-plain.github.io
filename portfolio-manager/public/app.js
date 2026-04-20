@@ -435,15 +435,8 @@ function openProjectModal(type, project = null) {
 
     // Toggle Visibility
     document.querySelectorAll('.type-specific-fields').forEach(el => el.classList.add('hidden'));
-
-    if (type === 'video') {
-        document.getElementById('fields-video').classList.remove('hidden');
-    } else {
-        document.getElementById('fields-gallery').classList.remove('hidden');
-        if (type === 'design') {
-            // No specific show/hide for design vs illustration anymore, they share the gallery list
-        }
-    }
+    document.getElementById('fields-blocks').classList.add('hidden');
+    document.getElementById('block-canvas').innerHTML = ''; // clear blocks
 
     if (project) {
         document.getElementById('modal-title').innerText = 'Projekt bearbeiten';
@@ -453,45 +446,40 @@ function openProjectModal(type, project = null) {
         document.getElementById('p-tabTitle').value = project.tabTitle || '';
         document.getElementById('p-hero').value = project['hero-image'] || project.heroImage || '';
 
-        // Load Specifics
-        if (type === 'video') {
-            // Load Hero Meta
-            // meta is array of strings: "<strong>Key:</strong> Value"
-            if (project.heroMeta) {
-                project.heroMeta.forEach(m => {
-                    if (m.includes('Rolle')) document.getElementById('p-role').value = stripHtml(m).replace('Rolle:', '').trim();
-                    if (m.includes('Equipment')) document.getElementById('p-equipment').value = stripHtml(m).replace('Equipment:', '').trim();
-                    if (m.includes('Tools')) document.getElementById('p-tools').value = stripHtml(m).replace('Tools:', '').trim();
-                });
-            }
-            // Load Videos
-            if (project.videos) {
-                project.videos.forEach(v => addVideoInput(v));
-            }
+        if (project.blocks) {
+            // Gutenberg Project
+            document.getElementById('fields-blocks').classList.remove('hidden');
+            project.blocks.forEach(b => renderBlockToCanvas(b));
+            initSortable();
         } else {
-            // Design/Illustration
-            // Load PDF
-            // Design projects sometimes have PDF in images array with type='pdf', OR in specific cases maybe separate?
-            // The JSON shows PDFs in 'images' array with type: 'pdf'.
-            // AND the video project has a 'pdf' object. (Wait, video has pdf too?)
-            // Checking designs.json: it has "images": [ { "type": "pdf", ... } ]
-
-            // Let's filter out PDF from images for display in gallery list
-            // populate PDF input if found
-            // Verify if project.images exists
-            if (project.images) {
-                // Load ALL items, including PDFs, into the list
-                project.images.forEach(img => addGalleryImageInput(img));
+            // Legacy Project
+            if (type === 'video') {
+                document.getElementById('fields-video').classList.remove('hidden');
+                if (project.heroMeta) {
+                    project.heroMeta.forEach(m => {
+                        if (m.includes('Rolle')) document.getElementById('p-role').value = stripHtml(m).replace('Rolle:', '').trim();
+                        if (m.includes('Equipment')) document.getElementById('p-equipment').value = stripHtml(m).replace('Equipment:', '').trim();
+                        if (m.includes('Tools')) document.getElementById('p-tools').value = stripHtml(m).replace('Tools:', '').trim();
+                    });
+                }
+                if (project.videos) {
+                    project.videos.forEach(v => addVideoInput(v));
+                }
+            } else {
+                document.getElementById('fields-gallery').classList.remove('hidden');
+                if (project.images) {
+                    project.images.forEach(img => addGalleryImageInput(img));
+                }
             }
-
-            // Check video-projects.json specific pdf structure just in case? 
-            // Video JSON has "pdf": { "link": "..." }
-            // But we are in 'design'/'illustration' block here.
         }
 
     } else {
         document.getElementById('modal-title').innerText = 'Neues Projekt';
         document.getElementById('p-id').value = '';
+        
+        // NEW PROJECTS ALWAYS USE BLOCKS
+        document.getElementById('fields-blocks').classList.remove('hidden');
+        initSortable();
     }
 
     modal.classList.remove('hidden');
@@ -533,66 +521,98 @@ async function handleSave(e) {
         tabTitle: tabTitle || title // default to title if empty
     };
 
-    if (currentType === 'video') {
-        newProject.heroImage = hero;
-
-        // Construct Meta
-        const role = document.getElementById('p-role').value;
-        const equip = document.getElementById('p-equipment').value;
-        const tools = document.getElementById('p-tools').value;
-
-        newProject.heroMeta = [];
-        if (role) newProject.heroMeta.push(`<strong>Rolle:</strong> ${role}`);
-        if (equip) newProject.heroMeta.push(`<strong>Equipment:</strong> ${equip}`);
-        if (tools) newProject.heroMeta.push(`<strong>Tools:</strong> ${tools}`);
-
-        // Construct Videos
-        newProject.videos = [];
-        const videoRows = document.querySelectorAll('.video-item-row');
-        videoRows.forEach(row => {
-            newProject.videos.push({
-                title: row.querySelector('.vid-title').value,
-                youtubeId: row.querySelector('.vid-id').value,
-                tags: row.querySelector('.vid-tags').value.split(',').map(s => s.trim()).filter(s => s)
-            });
-        });
-
+    if (currentType !== 'video') {
+        newProject['hero-image'] = hero;
     } else {
-        // Design & Illustration
-        newProject["hero-image"] = hero;
-        newProject.images = [];
+        newProject.heroImage = hero;
+    }
 
-
-
-        // Gallery & PDFs
-        const galleryRows = document.querySelectorAll('.gallery-item-row');
-        galleryRows.forEach((row, idx) => {
-            const isPdf = row.querySelector('.is-pdf-cb').checked;
-            const titleVal = row.querySelector('.img-title').value;
-
-            if (isPdf) {
-                const pdfUrl = row.querySelector('.pdf-url').value;
-                const coverUrl = row.querySelector('.pdf-cover-url').value;
-                if (pdfUrl) {
-                    newProject.images.push({
-                        id: `${id}-pdf-${idx}`,
-                        type: 'pdf',
-                        pdfUrl: pdfUrl,
-                        imageUrl: coverUrl || hero, // Fallback to hero if no cover
-                        title: titleVal || title
-                    });
-                }
-            } else {
-                const url = row.querySelector('.img-url').value;
-                if (url) {
-                    newProject.images.push({
-                        id: `${id}-img-${idx}`,
-                        imageUrl: url,
-                        title: titleVal || title
-                    });
-                }
+    if (!document.getElementById('fields-blocks').classList.contains('hidden')) {
+        // --- Gutenberg Save Logic ---
+        newProject.blocks = [];
+        const blocksCanvas = document.getElementById('block-canvas');
+        blocksCanvas.querySelectorAll('.editor-block').forEach(el => {
+            const type = el.dataset.type;
+            const b = { id: el.dataset.id, type: type };
+            
+            if (type === 'hero') {
+                b.imageUrl = el.querySelector('.b-hero-img').value;
+                b.text = el.querySelector('.b-hero-text').value;
+            } else if (type === 'heading') {
+                b.level = el.querySelector('.b-head-level').value;
+                b.text = el.querySelector('.b-head-text').value;
+            } else if (type === 'text') {
+                b.html = el.querySelector('.b-text-content').value;
+            } else if (type === 'pdf') {
+                b.title = el.querySelector('.b-pdf-title').value;
+                b.pdfUrl = el.querySelector('.b-pdf-url').value;
+                b.imageUrl = el.querySelector('.b-pdf-thumb').value;
+            } else if (type === 'youtube') {
+                b.videoId = el.querySelector('.b-yt-id').value;
+            } else if (type === 'gallery' || type === 'media') {
+                const urls = el.querySelector('.b-gal-urls').value.split('\n').map(s=>s.trim()).filter(Boolean);
+                b.items = urls.map(u => ({ imageUrl: u }));
             }
+            newProject.blocks.push(b);
         });
+    } else {
+        // --- Legacy Save Logic ---
+        if (currentType === 'video') {
+            // Construct Meta
+            const role = document.getElementById('p-role').value;
+            const equip = document.getElementById('p-equipment').value;
+            const tools = document.getElementById('p-tools').value;
+
+            newProject.heroMeta = [];
+            if (role) newProject.heroMeta.push(`<strong>Rolle:</strong> ${role}`);
+            if (equip) newProject.heroMeta.push(`<strong>Equipment:</strong> ${equip}`);
+            if (tools) newProject.heroMeta.push(`<strong>Tools:</strong> ${tools}`);
+
+            // Construct Videos
+            newProject.videos = [];
+            const videoRows = document.querySelectorAll('.video-item-row');
+            videoRows.forEach(row => {
+                newProject.videos.push({
+                    title: row.querySelector('.vid-title').value,
+                    youtubeId: row.querySelector('.vid-id').value,
+                    tags: row.querySelector('.vid-tags').value.split(',').map(s => s.trim()).filter(s => s)
+                });
+            });
+
+        } else {
+            // Design & Illustration
+            newProject.images = [];
+
+            // Gallery & PDFs
+            const galleryRows = document.querySelectorAll('.gallery-item-row');
+            galleryRows.forEach((row, idx) => {
+                const isPdf = row.querySelector('.is-pdf-cb').checked;
+                const titleVal = row.querySelector('.img-title').value;
+
+                if (isPdf) {
+                    const pdfUrl = row.querySelector('.pdf-url').value;
+                    const coverUrl = row.querySelector('.pdf-cover-url').value;
+                    if (pdfUrl) {
+                        newProject.images.push({
+                            id: `${id}-pdf-${idx}`,
+                            type: 'pdf',
+                            pdfUrl: pdfUrl,
+                            imageUrl: coverUrl || hero, // Fallback to hero if no cover
+                            title: titleVal || title
+                        });
+                    }
+                } else {
+                    const url = row.querySelector('.img-url').value;
+                    if (url) {
+                        newProject.images.push({
+                            id: `${id}-img-${idx}`,
+                            imageUrl: url,
+                            title: titleVal || title
+                        });
+                    }
+                }
+            });
+        }
     }
 
     // Update data array
@@ -1087,3 +1107,99 @@ async function saveAllLinks() {
         alert('Netzwerkfehler beim Speichern der Links');
     }
 }
+
+/* --- Gutenberg Block Editor Logistics --- */
+
+let sortableInstance = null;
+
+window.initSortable = function() {
+    const canvas = document.getElementById('block-canvas');
+    if (sortableInstance) sortableInstance.destroy();
+    
+    if (typeof Sortable !== 'undefined') {
+        sortableInstance = new Sortable(canvas, {
+            handle: '.block-drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost'
+        });
+    } else {
+        console.warn("SortableJS not loaded.");
+    }
+}
+
+window.addBlock = function(type) {
+    const block = { id: 'block-' + Date.now(), type: type };
+    renderBlockToCanvas(block);
+};
+
+window.removeBlock = function(btn) {
+    btn.closest('.editor-block').remove();
+};
+
+window.renderBlockToCanvas = function(b) {
+    const canvas = document.getElementById('block-canvas');
+    const div = document.createElement('div');
+    div.className = 'editor-block';
+    div.dataset.id = b.id;
+    div.dataset.type = b.type;
+
+    let innerHTML = '';
+    let title = '';
+    let icon = '';
+
+    if (b.type === 'hero') {
+        title = 'Hero Bild'; icon = 'fa-image';
+        innerHTML = `
+            <input type="text" class="b-hero-img" placeholder="Bild URL" value="${b.imageUrl || ''}">
+            <input type="text" class="b-hero-text" placeholder="Optionaler Text" value="${b.text || ''}">
+        `;
+    } else if (b.type === 'heading') {
+        title = 'Titel'; icon = 'fa-heading';
+        innerHTML = `
+            <div style="display:flex; gap:10px;">
+                <select class="b-head-level" style="width: 80px;">
+                    <option value="h1" ${b.level==='h1'?'selected':''}>H1</option>
+                    <option value="h2" ${b.level==='h2'?'selected':''}>H2</option>
+                    <option value="h3" ${b.level==='h3'?'selected':''}>H3</option>
+                    <option value="h4" ${b.level==='h4'?'selected':''}>H4</option>
+                    <option value="h5" ${b.level==='h5'?'selected':''}>H5</option>
+                    <option value="h6" ${b.level==='h6'?'selected':''}>H6</option>
+                </select>
+                <input type="text" class="b-head-text" placeholder="Titel Text" value="${b.text || ''}" style="flex:1;">
+            </div>
+        `;
+    } else if (b.type === 'text') {
+        title = 'Text'; icon = 'fa-align-left';
+        innerHTML = `<textarea class="b-text-content" rows="4" placeholder="Textinhalt (HTML möglich) ...">${b.html || ''}</textarea>`;
+    } else if (b.type === 'pdf') {
+        title = 'PDF'; icon = 'fa-file-pdf';
+        innerHTML = `
+            <input type="text" class="b-pdf-title" placeholder="PDF Titel" value="${b.title || ''}">
+            <input type="text" class="b-pdf-url" placeholder="PDF Datei URL" value="${b.pdfUrl || ''}">
+            <input type="text" class="b-pdf-thumb" placeholder="Vorschaubild URL" value="${b.imageUrl || ''}">
+        `;
+    } else if (b.type === 'youtube') {
+        title = 'YouTube'; icon = 'fa-youtube';
+        innerHTML = `<input type="text" class="b-yt-id" placeholder="YouTube Video ID (z.B. dQw4w9WgXcQ)" value="${b.videoId || ''}">`;
+    } else if (b.type === 'gallery' || b.type === 'media') {
+        title = 'Fotogalerie / Media'; icon = 'fa-images';
+        const urls = b.items ? b.items.map(i => i.imageUrl).join('\n') : '';
+        innerHTML = `
+            <p style="font-size:0.8rem;color:#888;margin:0;">Fügen Sie pro Zeile eine gültige Bild-URL ein:</p>
+            <textarea class="b-gal-urls" rows="4" placeholder="../../images/bild1.jpg\n../../images/bild2.jpg">${urls}</textarea>
+        `;
+    }
+
+    div.innerHTML = `
+        <div class="block-drag-handle"><i class="fas fa-grip-vertical"></i></div>
+        <div class="block-content">
+            <div class="block-header">
+                <span><i class="fas ${icon} block-icon"></i> ${title}</span>
+                <button type="button" class="block-delete-btn" onclick="removeBlock(this)"><i class="fas fa-trash"></i></button>
+            </div>
+            ${innerHTML}
+        </div>
+    `;
+    canvas.appendChild(div);
+}
+

@@ -1281,6 +1281,161 @@ header h1 {
     font-size: 0.95rem;
 }
 
+/* --- Gutenberg Block Editor --- */
+.block-editor-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+}
+
+.hint-text {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.block-canvas {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.editor-block {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 12px;
+    display: flex;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.editor-block:hover {
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+}
+
+.block-drag-handle {
+    width: 40px;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-right: 1px solid rgba(0,0,0,0.05);
+    cursor: grab;
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+.block-drag-handle:active {
+    cursor: grabbing;
+}
+
+.block-icon {
+    font-size: 1rem;
+    color: var(--primary);
+    background: var(--accent-gradient);
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.block-content {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.block-delete-btn {
+    background: none;
+    border: none;
+    color: #d63031;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.block-delete-btn:hover {
+    opacity: 1;
+}
+
+.block-add-menu {
+    border: 2px dashed rgba(31,0,51,0.1);
+    background: rgba(31,0,51,0.02);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.block-add-menu span {
+    font-family: 'switzer', sans-serif;
+    font-weight: 500;
+    color: #666;
+}
+
+.block-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.block-add-btn {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'switzer', sans-serif;
+    transition: all 0.2s;
+}
+
+.block-add-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.block-add-btn i {
+    opacity: 0.7;
+}
+
+.block-content input[type="text"], .block-content textarea, .block-content select {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+}
+
+.block-gallery-items {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 /* --- Responsive Design --- */
 @media (max-width: 1300px) {
     .dash-layout {
