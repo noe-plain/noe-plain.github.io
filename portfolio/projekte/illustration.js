@@ -356,24 +356,47 @@ function renderBlocksFromData(blocks, containerId) {
                     b.items.forEach((item, idx) => {
                         const cell = document.createElement('div');
                         cell.className = 'gallery-item';
-                        cell.dataset.index = idx;
+                        cell.style.position = 'relative';
+                        
+                        // Generate a stable ID based on image URL since block images don't have intrinsic IDs
+                        const imgId = item.id || 'img-' + item.imageUrl.replace(/[^a-zA-Z0-9]/g, '').slice(-20);
+                        cell.dataset.id = imgId;
+                        item.id = imgId; // inject into memory so findImageById can find it later!
                         
                         const img = document.createElement('img');
                         img.onload = () => { img.style.opacity = 1; };
                         img.src = item.imageUrl;
                         img.alt = b.title || "Gallery Image";
+                        img.style.cursor = 'pointer';
                         
                         cell.appendChild(img);
-                        cell.innerHTML += `<i class="fas fa-search-plus zoom-icon"></i>`;
                         
+                        // Add Favorite Button
+                        const favBtn = document.createElement('button');
+                        favBtn.className = 'grid-fav-btn';
+                        favBtn.dataset.id = imgId;
+                        if (typeof favoriteIds !== 'undefined' && favoriteIds.includes(imgId)) {
+                             favBtn.classList.add('active');
+                        }
+                        favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                        favBtn.title = "Zu Favoriten hinzufügen";
+                        favBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (typeof toggleFavorite === 'function') toggleFavorite(imgId);
+                        });
+                        cell.appendChild(favBtn);
+
                         cell.addEventListener('click', () => {
-                            if (typeof openLightbox === 'function') {
+                            if (typeof openDetail === 'function') {
+                                openDetail(imgId);
+                            } else if (typeof openLightbox === 'function') {
                                 openLightbox(idx, b.items.map(i => ({imageUrl: i.imageUrl, title: b.title})));
                             }
                         });
                         
                         div.appendChild(cell);
                     });
+                    setTimeout(() => { if (typeof relayoutGrid === 'function') relayoutGrid(div); }, 150);
                 }
                 break;
 
@@ -407,6 +430,23 @@ function findImageById(id) {
         if (p.images) {
             const found = p.images.find(img => img.id === id);
             if (found) return found;
+        }
+        if (p.blocks) {
+            for (const b of p.blocks) {
+                if (b.type === 'pdf' && b.id === id) return b;
+                if ((b.type === 'gallery' || b.type === 'media') && b.items) {
+                    const found = b.items.find(img => img.id === id);
+                    if (found) {
+                        return {
+                            id: found.id,
+                            imageUrl: found.imageUrl,
+                            type: 'image',
+                            title: found.title || b.title || p.title,
+                            description: p.description || ''
+                        };
+                    }
+                }
+            }
         }
     }
     return null;
@@ -571,9 +611,31 @@ function closeDetail() {
     }
 }
 
+function getProjectImages() {
+    if (!currentProject) return [];
+    if (currentProject.images) return currentProject.images;
+    
+    let allImgs = [];
+    if (currentProject.blocks) {
+        currentProject.blocks.forEach(b => {
+             if (b.type === 'pdf') allImgs.push(b);
+             if ((b.type === 'gallery' || b.type === 'media') && b.items) {
+                 b.items.forEach(img => {
+                     allImgs.push({
+                         id: img.id,
+                         imageUrl: img.imageUrl,
+                         title: img.title || b.title,
+                         type: 'image'
+                     });
+                 });
+             }
+        });
+    }
+    return allImgs;
+}
+
 function navigatePhoto(dir) {
-    if (!currentProject || !currentProject.images) return;
-    const images = currentProject.images;
+    const images = getProjectImages();
     if (images.length === 0) return;
 
     const currIdx = images.findIndex(i => i.id === activePhotoId);
