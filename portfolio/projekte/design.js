@@ -267,11 +267,25 @@ function renderBlocksFromData(blocks, containerId) {
         const style = document.createElement('style');
         style.id = 'gutenberg-frontend-css';
         style.innerHTML = `
-            .gutenberg-article-container { width: 100%; margin: 40px auto; display: flex; flex-direction: column; gap: 30px; font-family: 'switzer', sans-serif; padding: 0 15px; }
-            .g-block-heading, .g-block-text { max-width: 800px; margin: 0 auto; width: 100%; }
+            .gutenberg-article-container { width: 100%; margin: 40px auto; display: flex; flex-direction: column; gap: 30px; font-family: 'switzer', sans-serif; padding: 0; }
+            .g-block-heading, .g-block-text { max-width: 800px; margin: 0 auto; width: 100%; padding: 0 15px; }
             .g-block-hero { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
             .g-block-hero img { width: 100%; border-radius: 15px; object-fit: cover; max-height: 60vh; }
             .g-block-hero p { font-size: 0.95rem; color: #555; text-align: center; margin: 0; font-style: italic; }
+            .g-block-heading h1 { font-size: 2.5rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
+            .g-block-heading h2 { font-size: 2rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
+            .g-block-heading h3 { font-size: 1.5rem; color: #222; margin: 0; }
+            .g-block-heading h4 { font-size: 1.25rem; color: #333; margin: 0; }
+            .g-block-text { font-size: 1.1rem; line-height: 1.6; color: #444; }
+            
+            .videokarte h2 { font-size: 2rem; }
+            .videokarte .project-details {
+                background: white;
+                padding: 2rem;
+                margin-top: -2rem;
+                position: relative;
+                z-index: 10;
+            }
             .g-block-heading h1 { font-size: 2.5rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
             .g-block-heading h2 { font-size: 2rem; font-family: 'Bodoni Moda', serif; color: var(--primary); margin: 0; }
             .g-block-heading h3 { font-size: 1.5rem; color: #222; margin: 0; }
