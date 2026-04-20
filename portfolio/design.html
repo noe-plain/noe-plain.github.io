@@ -150,9 +150,21 @@
 
                             let imgPath = '';
                             if (project['hero-image']) {
-                                imgPath = project['hero-image'].replace('../../images/', '../images/');
-                            } else if (project.images && project.images.length > 0) {
-                                imgPath = project.images[0].imageUrl.replace('../../images/', '../images/');
+                                imgPath = project['hero-image'].replace('../../', '../');
+                            } else if (project.blocks) {
+                                let firstImg = null;
+                                for (let b of project.blocks) {
+                                    if ((b.type === 'gallery' || b.type === 'media') && b.items && b.items.length > 0) {
+                                        firstImg = b.items[0].imageUrl; break;
+                                    } else if (b.type === 'hero' && b.imageUrl) {
+                                        firstImg = b.imageUrl; break;
+                                    }
+                                }
+                                if (firstImg) {
+                                    imgPath = firstImg.replace('../../', '../');
+                                } else {
+                                    imgPath = '../images/kategorien/design.jpg';
+                                }
                             } else {
                                 imgPath = '../images/kategorien/design.jpg';
                             }
