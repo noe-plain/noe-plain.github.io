@@ -3,35 +3,31 @@
         "id": "ipa-techday",
         "title": "IPA – Migros Techday",
         "description": "Für meine IPA gestaltete ich das Redesign des Migros Techday 2025. Das Projekt umfasste eine konsistente Designsprache für Print- und Digitalmedien, die zum 5. Jubiläum Innovation mit bestehendem Wiedererkennungswert verbindet.",
+        "tabTitle": "Lehrabschlussarbeit (IPA)",
         "hero-image": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
         "blocks": [
             {
                 "id": "design-001",
                 "type": "pdf",
                 "title": "Migros Techday CD",
-                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
-                "pdfUrl": "../../images/portfolio/design/migrosTechdayCdManualV2.8.pdf"
+                "pdfUrl": "../../images/portfolio/design/migrosTechdayCdManualV2.8.pdf",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg"
             },
             {
                 "id": "v582mua8l",
                 "type": "gallery",
-                "title": "Galerie",
                 "items": [
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg",
-                        "title": "Broschüre"
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-3.jpg",
-                        "title": "Broschüre"
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-3.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-2.jpg",
-                        "title": "Migros Techday CD"
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-2.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-1.jpg",
-                        "title": "Migros Techday Plakat"
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-1.jpg"
                     }
                 ]
             }
@@ -41,14 +37,15 @@
         "id": "fotografie-kurs",
         "title": "Fotografie Kurs",
         "description": "Für das Employer Branding Team der Migros-Gruppe durfte ich einen Kurs vorbereiten und durchführen. Es ging darum, den Mitarbeitenden die Grundlagen der Fotografie und Videografie näherzubringen, da dieses Team zu diesem Zeitpunkt eine neue Kamera und ein iPhone für Social Media Content anschaffte.",
+        "tabTitle": "Fotografie Kurs",
         "hero-image": "../../images/portfolio/design/NP_08299.jpeg",
         "blocks": [
             {
                 "id": "illu-002",
                 "type": "pdf",
                 "title": "Migros Universum",
-                "imageUrl": "../../images/kategorien/fotografie.jpg",
-                "pdfUrl": "../../images/portfolio/design/eb-foto_videografie-101-small-komprimiert.pdf"
+                "pdfUrl": "../../images/portfolio/design/eb-foto_videografie-101-small-komprimiert.pdf",
+                "imageUrl": "../../images/kategorien/fotografie.jpg"
             }
         ]
     },
@@ -56,14 +53,15 @@
         "id": "iwish",
         "title": "Iwish_",
         "description": "Als Aufgabe in einem Modul für Druckdatenerstellung in der Schule durfte ich das Corporate Design der Videoagentur IWISH_ erweitern. Mein Ziel war es, ein neues Werbemittel zu schaffen, das Ästhetik mit Nutzen verbindet und die Markenidentität im Büroalltag präsent hält.",
+        "tabTitle": "Iwish_ CD-Ergäntzung",
         "hero-image": "../../images/portfolio/design/tassen_design.jpg",
         "blocks": [
             {
                 "id": "design-006",
                 "type": "pdf",
                 "title": "Iwish",
-                "imageUrl": "../../images/portfolio/design/tassen_design.jpg",
-                "pdfUrl": "../../images/portfolio/design/IWISH_CD_Erweiterung_Praesentation.pdf"
+                "pdfUrl": "../../images/portfolio/design/IWISH_CD_Erweiterung_Praesentation.pdf",
+                "imageUrl": "../../images/portfolio/design/tassen_design.jpg"
             }
         ]
     }

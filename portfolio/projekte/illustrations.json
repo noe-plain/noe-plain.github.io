@@ -3,28 +3,24 @@
         "id": "migros-gruppe",
         "title": "Migros Universum",
         "description": "Verschiedene Illustrationen von Firmen der Migros-Gruppe.",
+        "tabTitle": "Migros Universum",
         "hero-image": "../../images/portfolio/illustration/migrosUniversHero.svg",
         "blocks": [
             {
                 "id": "f3iqi5ga2",
                 "type": "gallery",
-                "title": "Galerie",
                 "items": [
                     {
-                        "imageUrl": "../../images/portfolio/illustration/migrosWagen.svg",
-                        "title": "Migros Universum"
+                        "imageUrl": "../../images/portfolio/illustration/migrosWagen.svg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/migrosFilliale.svg",
-                        "title": "Migros Filiale"
+                        "imageUrl": "../../images/portfolio/illustration/migrosFilliale.svg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/migrosBank.svg",
-                        "title": "Migros Bank"
+                        "imageUrl": "../../images/portfolio/illustration/migrosBank.svg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/medBase.svg",
-                        "title": "MedBase"
+                        "imageUrl": "../../images/portfolio/illustration/medBase.svg"
                     }
                 ]
             }
@@ -82,20 +78,18 @@
         "id": "fspm-logo",
         "title": "FSPM Logo",
         "description": "Logo für das Team Finance, Sourcing und Performance Management.",
+        "tabTitle": "FSPM Logo",
         "hero-image": "../../images/portfolio/illustration/hero-fspm.jpg",
         "blocks": [
             {
                 "id": "ynlrhghst",
                 "type": "gallery",
-                "title": "Galerie",
                 "items": [
                     {
-                        "imageUrl": "../../images/portfolio/illustration/fspm-logo.jpg",
-                        "title": "FSPM Logo Final"
+                        "imageUrl": "../../images/portfolio/illustration/fspm-logo.jpg"
                     },
                     {
-                        "imageUrl": "../../images/portfolio/illustration/fspmLogoFinaleRunde.jpg",
-                        "title": "FSPM Logo Varianten"
+                        "imageUrl": "../../images/portfolio/illustration/fspmLogoFinaleRunde.jpg"
                     }
                 ]
             }
