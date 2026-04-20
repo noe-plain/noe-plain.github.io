@@ -135,37 +135,5 @@
                 ]
             }
         ]
-    },
-    {
-        "id": "migros---linkedin-quiz-2",
-        "title": "Migros – LinkedIn Quiz 2",
-        "description": "Zusammen mit Mara Blum (KV-Lernende) habe ich für den Migros-Genossenschafts-Bund (MGB) einen Fragenkatalog und ein entsprechendes Konzept entwickelt. Anschliessend erhielt ich die Möglichkeit, dieses zu produzieren. Es handelt sich um eine Videoserie, die einen Unterhaltungswert haben soll und unaufdringlich über die Fringe-Benefits des MGB informiert.",
-        "tabTitle": "Migros – LinkedIn Quiz 2",
-        "heroImage": "../../images/portfolio/videografie/linkedin-quiz.jpeg",
-        "blocks": [
-            {
-                "id": "block-1776681073046",
-                "type": "youtube",
-                "title": "Titel",
-                "tags": "Schnitt",
-                "videoId": "1_61GPk-6u8"
-            },
-            {
-                "id": "block-1776681076477",
-                "type": "youtube",
-                "title": "Titel 2",
-                "tags": "Kamera",
-                "videoId": "bvS75f_QAkY"
-            },
-            {
-                "id": "block-1776681090242",
-                "type": "media",
-                "items": [
-                    {
-                        "imageUrl": "../../images/portfolio/videografie/LinkedIn_Quiz-Serie_Konzept_Praesentation.pdf"
-                    }
-                ]
-            }
-        ]
     }
 ]
