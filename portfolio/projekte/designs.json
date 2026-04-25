@@ -7,11 +7,11 @@
         "hero-image": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg",
         "blocks": [
             {
-                "id": "design-001",
+                "id": "block-1777129114834",
                 "type": "pdf",
-                "title": "Migros Techday CD Manual",
-                "pdfUrl": "../../images/portfolio/design/migrosTechdayCdManualV2.8.pdf",
-                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg"
+                "title": "Dokumentation der Erstellung",
+                "pdfUrl": "../../images/portfolio/design/td-2025-IPA-Dokumentation-Noe-Plain-vf.pdf",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg"
             },
             {
                 "id": "v582mua8l",
@@ -40,11 +40,11 @@
                 ]
             },
             {
-                "id": "block-1777129114834",
+                "id": "design-001",
                 "type": "pdf",
-                "title": "Dokumentation der Erstellung",
-                "pdfUrl": "../../images/portfolio/design/td-2025-IPA-Dokumentation-Noe-Plain-vf.pdf",
-                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg"
+                "title": "Migros Techday CD Manual",
+                "pdfUrl": "../../images/portfolio/design/migrosTechdayCdManualV2.8.pdf",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-5.jpg"
             }
         ]
     },
