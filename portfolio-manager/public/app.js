@@ -476,7 +476,7 @@ function openProjectModal(type, project = null) {
     } else {
         document.getElementById('modal-title').innerText = 'Neues Projekt';
         document.getElementById('p-id').value = '';
-        
+
         // NEW PROJECTS ALWAYS USE BLOCKS
         document.getElementById('fields-blocks').classList.remove('hidden');
         initSortable();
@@ -534,7 +534,7 @@ async function handleSave(e) {
         blocksCanvas.querySelectorAll('.editor-block').forEach(el => {
             const type = el.dataset.type;
             const b = { id: el.dataset.id, type: type };
-            
+
             if (type === 'hero') {
                 b.imageUrl = el.querySelector('.b-hero-img').value;
                 b.text = el.querySelector('.b-hero-text').value;
@@ -552,8 +552,28 @@ async function handleSave(e) {
                 b.tags = el.querySelector('.b-yt-tags').value;
                 b.videoId = el.querySelector('.b-yt-id').value;
             } else if (type === 'gallery' || type === 'media') {
-                const urls = el.querySelector('.b-gal-urls').value.split('\n').map(s=>s.trim()).filter(Boolean);
-                b.items = urls.map(u => ({ imageUrl: u }));
+                // Support structured gallery items (image or pdf with thumb + title)
+                const itemsContainer = el.querySelector('.b-gal-items');
+                if (itemsContainer) {
+                    const rows = itemsContainer.querySelectorAll('.b-gal-item-row');
+                    b.items = [];
+                    rows.forEach(r => {
+                        const kind = r.querySelector('.b-gal-kind') ? r.querySelector('.b-gal-kind').value : 'image';
+                        const title = r.querySelector('.b-gal-item-title') ? r.querySelector('.b-gal-item-title').value : '';
+                        if (kind === 'pdf') {
+                            const pdfUrl = r.querySelector('.b-gal-pdf-url').value.trim();
+                            const thumb = r.querySelector('.b-gal-pdf-thumb').value.trim();
+                            if (pdfUrl) b.items.push({ type: 'pdf', pdfUrl: pdfUrl, imageUrl: thumb || '', title: title || '' });
+                        } else {
+                            const img = r.querySelector('.b-gal-img-url').value.trim();
+                            if (img) b.items.push({ type: 'image', imageUrl: img, title: title || '' });
+                        }
+                    });
+                } else {
+                    // Backwards-compatible: plain textarea with URLs
+                    const urls = (el.querySelector('.b-gal-urls') || { value: '' }).value.split('\n').map(s => s.trim()).filter(Boolean);
+                    b.items = urls.map(u => ({ type: 'image', imageUrl: u }));
+                }
             }
             newProject.blocks.push(b);
         });
@@ -900,11 +920,35 @@ async function uploadPhoto(e) {
 /* --- Generic Upload --- */
 window.triggerUpload = function (targetInputOrId) {
     const genericInput = document.getElementById('generic-upload-input');
-    if (typeof targetInputOrId === 'string') genericInput.dataset.targetInput = targetInputOrId;
-    else {
+    // Determine and remember the target input element id
+    let targetEl = null;
+    if (typeof targetInputOrId === 'string') {
+        genericInput.dataset.targetInput = targetInputOrId;
+        targetEl = document.getElementById(targetInputOrId);
+    } else {
         if (!targetInputOrId.id) targetInputOrId.id = 'temp-' + Date.now();
         genericInput.dataset.targetInput = targetInputOrId.id;
+        targetEl = targetInputOrId;
     }
+
+    // Set accept attribute based on target (image vs pdf)
+    try {
+        if (targetEl) {
+            const cls = Array.from(targetEl.classList || []);
+            if (cls.includes('b-pdf-url') || cls.includes('pdf-url') || cls.includes('b-gal-pdf-url')) {
+                genericInput.accept = 'application/pdf';
+            } else if (cls.includes('b-pdf-thumb') || cls.includes('b-gal-img-url') || cls.includes('img-url') || targetEl.id === 'p-hero') {
+                genericInput.accept = 'image/*';
+            } else {
+                genericInput.accept = 'image/*,application/pdf';
+            }
+        } else {
+            genericInput.accept = 'image/*,application/pdf';
+        }
+    } catch (e) {
+        genericInput.accept = 'image/*,application/pdf';
+    }
+
     genericInput.click();
 }
 
@@ -940,7 +984,7 @@ async function loadLinks() {
 function renderLinks() {
     const filterContainer = document.getElementById('links-filter-bar');
     const linksContainer = document.getElementById('list-links');
-    
+
     if (!filterContainer || !linksContainer) return;
 
     filterContainer.innerHTML = '';
@@ -995,7 +1039,7 @@ function renderLinks() {
     });
 }
 
-window.filterLinksByCategory = function(category, pillElement) {
+window.filterLinksByCategory = function (category, pillElement) {
     // Update active state on pills
     document.querySelectorAll('.filter-pill').forEach(el => el.classList.remove('active'));
     pillElement.classList.add('active');
@@ -1114,10 +1158,10 @@ async function saveAllLinks() {
 
 let sortableInstance = null;
 
-window.initSortable = function() {
+window.initSortable = function () {
     const canvas = document.getElementById('block-canvas');
     if (sortableInstance) sortableInstance.destroy();
-    
+
     if (typeof Sortable !== 'undefined') {
         sortableInstance = new Sortable(canvas, {
             handle: '.block-drag-handle',
@@ -1129,16 +1173,33 @@ window.initSortable = function() {
     }
 }
 
-window.addBlock = function(type) {
+window.addBlock = function (type) {
     const block = { id: 'block-' + Date.now(), type: type };
     renderBlockToCanvas(block);
 };
 
-window.removeBlock = function(btn) {
+window.removeBlock = function (btn) {
     btn.closest('.editor-block').remove();
 };
 
-window.renderBlockToCanvas = function(b) {
+window.toggleBlock = function (el) {
+    // el may be the button or an element inside the header
+    const block = el.closest('.editor-block');
+    if (!block) return;
+    block.classList.toggle('collapsed');
+    const chevron = block.querySelector('.block-toggle-btn i');
+    if (chevron) {
+        if (block.classList.contains('collapsed')) {
+            chevron.classList.remove('fa-chevron-up');
+            chevron.classList.add('fa-chevron-down');
+        } else {
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+    }
+};
+
+window.renderBlockToCanvas = function (b) {
     const canvas = document.getElementById('block-canvas');
     const div = document.createElement('div');
     div.className = 'editor-block';
@@ -1160,12 +1221,12 @@ window.renderBlockToCanvas = function(b) {
         innerHTML = `
             <div style="display:flex; gap:10px;">
                 <select class="b-head-level" style="width: 80px;">
-                    <option value="h1" ${b.level==='h1'?'selected':''}>H1</option>
-                    <option value="h2" ${b.level==='h2'?'selected':''}>H2</option>
-                    <option value="h3" ${b.level==='h3'?'selected':''}>H3</option>
-                    <option value="h4" ${b.level==='h4'?'selected':''}>H4</option>
-                    <option value="h5" ${b.level==='h5'?'selected':''}>H5</option>
-                    <option value="h6" ${b.level==='h6'?'selected':''}>H6</option>
+                    <option value="h1" ${b.level === 'h1' ? 'selected' : ''}>H1</option>
+                    <option value="h2" ${b.level === 'h2' ? 'selected' : ''}>H2</option>
+                    <option value="h3" ${b.level === 'h3' ? 'selected' : ''}>H3</option>
+                    <option value="h4" ${b.level === 'h4' ? 'selected' : ''}>H4</option>
+                    <option value="h5" ${b.level === 'h5' ? 'selected' : ''}>H5</option>
+                    <option value="h6" ${b.level === 'h6' ? 'selected' : ''}>H6</option>
                 </select>
                 <input type="text" class="b-head-text" placeholder="Titel Text" value="${b.text || ''}" style="flex:1;">
             </div>
@@ -1189,10 +1250,14 @@ window.renderBlockToCanvas = function(b) {
         `;
     } else if (b.type === 'gallery' || b.type === 'media') {
         title = 'Fotogalerie / Media'; icon = 'fa-images';
-        const urls = b.items ? b.items.map(i => i.imageUrl).join('\n') : '';
         innerHTML = `
-            <p style="font-size:0.8rem;color:#888;margin:0;">Fügen Sie pro Zeile eine gültige Bild-URL ein:</p>
-            <textarea class="b-gal-urls" rows="4" placeholder="../../images/bild1.jpg\n../../images/bild2.jpg">${urls}</textarea>
+            <div class="b-gal-items" style="display:flex;flex-direction:column;gap:8px;">
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px;">
+                <button type="button" class="secondary-btn" onclick="appendGalItemToBlock(this.closest('.editor-block'),'image')">Bild hinzufügen</button>
+                <button type="button" class="secondary-btn" onclick="appendGalItemToBlock(this.closest('.editor-block'),'pdf')">PDF hinzufügen</button>
+            </div>
+            <p style="font-size:0.8rem;color:#888;margin:6px 0 0 0;">Jedes Element kann ein Bild oder ein PDF mit Vorschaubild und Titel sein.</p>
         `;
     }
 
@@ -1200,12 +1265,69 @@ window.renderBlockToCanvas = function(b) {
         <div class="block-drag-handle"><i class="fas fa-grip-vertical"></i></div>
         <div class="block-content">
             <div class="block-header">
-                <span><i class="fas ${icon} block-icon"></i> ${title}</span>
-                <button type="button" class="block-delete-btn" onclick="removeBlock(this)"><i class="fas fa-trash"></i></button>
+                <div class="block-title" onclick="toggleBlock(this)"><i class="fas ${icon} block-icon"></i> <span class="block-title-text">${title}</span></div>
+                <div class="block-actions">
+                    <button type="button" class="block-toggle-btn" onclick="toggleBlock(this)"><i class="fas fa-chevron-up"></i></button>
+                    <button type="button" class="block-delete-btn" onclick="removeBlock(this)"><i class="fas fa-trash"></i></button>
+                </div>
             </div>
             ${innerHTML}
         </div>
     `;
     canvas.appendChild(div);
+    // animate on insert
+    div.classList.add('new-block');
+    setTimeout(() => div.classList.remove('new-block'), 400);
+
+    // Populate gallery items if provided (for gallery/media blocks)
+    if ((b.type === 'gallery' || b.type === 'media') && Array.isArray(b.items) && b.items.length) {
+        b.items.forEach(it => appendGalItemToBlock(div, it.type || (it.pdfUrl ? 'pdf' : 'image'), it));
+    }
 }
+
+// Helpers for gallery items inside blocks
+window.appendGalItemToBlock = function (blockEl, kind = 'image', data = null) {
+    if (!blockEl) return;
+    const container = blockEl.querySelector('.b-gal-items');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.className = 'b-gal-item-row';
+    row.style.display = 'flex';
+    row.style.gap = '8px';
+    row.style.alignItems = 'center';
+
+    const kindInput = `<input type="hidden" class="b-gal-kind" value="${kind}">`;
+    if (kind === 'pdf') {
+        row.innerHTML = `
+            ${kindInput}
+            <div style="flex:1; display:flex; gap:6px; align-items:center;">
+                <input type="text" class="b-gal-pdf-url" placeholder="PDF Datei URL" value="${data && data.pdfUrl ? data.pdfUrl : ''}" style="flex:1;">
+                <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-file-pdf"></i></button>
+            </div>
+            <div style="width:180px; display:flex; gap:6px; align-items:center;">
+                <input type="text" class="b-gal-pdf-thumb" placeholder="Vorschaubild URL" value="${data && data.imageUrl ? data.imageUrl : ''}" style="flex:1;">
+                <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-image"></i></button>
+            </div>
+            <input type="text" class="b-gal-item-title" placeholder="Titel" value="${data && data.title ? data.title : ''}" style="width:220px;">
+            <button type="button" class="btn-row-delete" onclick="this.closest('.b-gal-item-row').remove()"><i class="fas fa-trash"></i></button>
+        `;
+    } else {
+        row.innerHTML = `
+            ${kindInput}
+            <div style="flex:1; display:flex; gap:6px; align-items:center;">
+                <input type="text" class="b-gal-img-url" placeholder="Bild URL" value="${data && data.imageUrl ? data.imageUrl : ''}" style="flex:1;">
+                <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-upload"></i></button>
+            </div>
+            <input type="text" class="b-gal-item-title" placeholder="Titel" value="${data && data.title ? data.title : ''}" style="width:220px;">
+            <button type="button" class="btn-row-delete" onclick="this.closest('.b-gal-item-row').remove()"><i class="fas fa-trash"></i></button>
+        `;
+    }
+
+    container.appendChild(row);
+    // animate new gallery row
+    row.classList.add('new-gal-item');
+    setTimeout(() => row.classList.remove('new-gal-item'), 360);
+}
+
 

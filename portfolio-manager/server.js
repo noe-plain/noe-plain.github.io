@@ -38,7 +38,10 @@ const storage = multer.diskStorage({
 
         let uploadPath = '';
 
-        if (type === 'photography' && category) {
+        // If the uploaded file is a PDF, store under uploads to separate from image folders
+        if (file && file.mimetype && file.mimetype.includes('pdf')) {
+            uploadPath = path.join(IMAGES_DIR, 'uploads');
+        } else if (type === 'photography' && category) {
             uploadPath = path.join(IMAGES_DIR, 'photography');
         } else if (type === 'design') {
             uploadPath = path.join(IMAGES_DIR, 'design');
@@ -312,8 +315,11 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     // In JSON, links are `../../images/...`
 
     // Let's determine subfolder based on req.body.type
+    // If PDF, it's stored in uploads folder; otherwise choose by project type
     let typeDir = 'uploads';
-    if (req.body.type === 'design') typeDir = 'design';
+    if (req.file && req.file.mimetype && req.file.mimetype.includes('pdf')) {
+        typeDir = 'uploads';
+    } else if (req.body.type === 'design') typeDir = 'design';
     else if (req.body.type === 'illustration') typeDir = 'illustration';
     else if (req.body.type === 'video') typeDir = 'videografie';
 

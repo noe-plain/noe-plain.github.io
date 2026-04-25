@@ -18,18 +18,33 @@
                 "type": "gallery",
                 "items": [
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg"
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg",
+                        "title": ""
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-3.jpg"
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-3.jpg",
+                        "title": ""
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-2.jpg"
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-2.jpg",
+                        "title": ""
                     },
                     {
-                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-1.jpg"
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-1.jpg",
+                        "title": ""
                     }
                 ]
+            },
+            {
+                "id": "block-1777129114834",
+                "type": "pdf",
+                "title": "Dokumentation der Erstellung",
+                "pdfUrl": "../../images/portfolio/design/td-2025-IPA-Dokumentation-Noe-Plain-vf.pdf",
+                "imageUrl": "../../images/portfolio/design/ipa-noeplain-migrostechday-4.jpg"
             }
         ]
     },

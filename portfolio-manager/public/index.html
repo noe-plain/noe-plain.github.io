@@ -380,20 +380,45 @@
                 <div id="fields-blocks" class="block-editor-container hidden">
                     <h3>Inhalts-Blöcke (Gutenberg)</h3>
                     <p class="hint-text">Ziehen Sie die Blöcke an dem linken Handle, um sie zu sortieren.</p>
-                    
+
                     <div id="block-canvas" class="block-canvas">
                         <!-- Blocks will be injected here dynamically -->
                     </div>
 
-                    <div class="block-add-menu">
-                        <span><i class="fas fa-plus-circle"></i> Block hinzufügen:</span>
-                        <div class="block-btn-row">
-                            <button type="button" class="block-add-btn" onclick="addBlock('hero')"><i class="fas fa-image"></i> Hero</button>
-                            <button type="button" class="block-add-btn" onclick="addBlock('heading')"><i class="fas fa-heading"></i> Titel</button>
-                            <button type="button" class="block-add-btn" onclick="addBlock('text')"><i class="fas fa-align-left"></i> Text</button>
-                            <button type="button" class="block-add-btn" onclick="addBlock('media')"><i class="fas fa-photo-video"></i> Media (Bild/PDF)</button>
-                            <button type="button" class="block-add-btn" onclick="addBlock('youtube')"><i class="fab fa-youtube"></i> YouTube</button>
-                            <button type="button" class="block-add-btn" onclick="addBlock('gallery')"><i class="fas fa-images"></i> Fotogalerie</button>
+                    <div class="block-add-menu modern-add-menu">
+                        <div class="bam-header">
+                            <strong>Block hinzufügen</strong>
+                            <small class="bam-sub">schnell einfügen</small>
+                        </div>
+                        <div class="bam-grid">
+                            <button type="button" class="bam-item" onclick="addBlock('hero')">
+                                <i class="fas fa-image"></i>
+                                <span>Hero</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('heading')">
+                                <i class="fas fa-heading"></i>
+                                <span>Titel</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('text')">
+                                <i class="fas fa-align-left"></i>
+                                <span>Text</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('media')">
+                                <i class="fas fa-photo-video"></i>
+                                <span>Media</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('pdf')">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('youtube')">
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube</span>
+                            </button>
+                            <button type="button" class="bam-item" onclick="addBlock('gallery')">
+                                <i class="fas fa-images"></i>
+                                <span>Galerie</span>
+                            </button>
                         </div>
                     </div>
                 </div>
