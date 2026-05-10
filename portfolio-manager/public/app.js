@@ -775,11 +775,100 @@ window.moveRow = function (btn, direction) {
 /* --- Photography --- */
 const photoSelect = document.getElementById('photo-category-select');
 const photoInput = document.getElementById('photo-upload-input');
+const photoSwitch = document.getElementById('photo-category-switch');
+
+// Default categories (can be extended by user)
+let photoCategories = ['street', 'aviation', 'portraet', 'bts', 'event'];
 
 function setupPhotography() {
-    photoSelect.addEventListener('change', () => loadPhotography());
+    // Render the pill switch and attach events
+    renderPhotoCategories();
     photoInput.addEventListener('change', uploadPhoto);
 }
+
+// Drag & Drop handlers for multi-file upload
+const dropzone = document.getElementById('photo-dropzone');
+if (dropzone) {
+    ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.add('dragover');
+    }));
+    ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if (evt === 'drop') {
+            dropzone.classList.remove('dragover');
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files.length) {
+                uploadMultiplePhotos(dt.files);
+            }
+        } else {
+            dropzone.classList.remove('dragover');
+        }
+    }));
+
+    // Click on dropzone opens file chooser
+    dropzone.addEventListener('click', () => triggerPhotoUpload());
+}
+
+function renderPhotoCategories() {
+    if (!photoSwitch || !photoSelect) return;
+    photoSwitch.innerHTML = '';
+    photoCategories.forEach(cat => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'cat-pill' + (photoSelect.value === cat ? ' active' : '');
+        pill.innerText = capitalize(cat);
+        pill.dataset.cat = cat;
+        pill.onclick = () => {
+            selectPhotoCategory(cat);
+        };
+        photoSwitch.appendChild(pill);
+    });
+}
+
+function selectPhotoCategory(cat) {
+    if (!photoSelect) return;
+    photoSelect.value = cat;
+    // update active pill
+    document.querySelectorAll('.photo-category-switch .cat-pill').forEach(p => p.classList.toggle('active', p.dataset.cat === cat));
+    loadPhotography();
+}
+
+function openAddPhotoCategory() {
+    const name = prompt('Neue Kategorie hinzufügen (kurzer Name, z.B. moodboard):');
+    if (!name) return;
+    const slug = slugify(name);
+    if (photoCategories.includes(slug)) {
+        alert('Kategorie existiert bereits');
+        return;
+    }
+    addPhotoCategory(slug, name);
+}
+
+async function addPhotoCategory(slug, displayName) {
+    // Optimistically add category locally
+    photoCategories.push(slug);
+    renderPhotoCategories();
+
+    // Try to create server-side folder (best-effort)
+    try {
+        await fetch('/api/photography/category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: slug })
+        });
+    } catch (e) {
+        // ignore errors; server may not support category creation
+        console.warn('Could not create category on server', e);
+    }
+
+    // Select newly added category
+    selectPhotoCategory(slug);
+}
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
 
 async function loadPhotography() {
     if (currentType !== 'photography') return;
@@ -907,14 +996,51 @@ window.deletePhoto = async function (filename) {
 window.triggerPhotoUpload = function () { document.getElementById('photo-upload-input').click(); }
 
 async function uploadPhoto(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('category', photoSelect.value);
-    await fetch('/api/photography/upload', { method: 'POST', body: formData });
-    loadPhotography();
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    await uploadMultiplePhotos(files);
     photoInput.value = '';
+}
+
+async function uploadMultiplePhotos(filesList) {
+    const files = Array.from(filesList).filter(f => f && f.type.startsWith('image'));
+    if (files.length === 0) return;
+    const category = photoSelect.value;
+
+    // Upload files in parallel but limit concurrency to avoid spamming server
+    const concurrency = 4;
+    let idx = 0;
+    const results = [];
+
+    async function worker() {
+        while (idx < files.length) {
+            const i = idx++;
+            const file = files[i];
+            const fd = new FormData();
+            fd.append('image', file);
+            fd.append('category', category);
+            fd.append('filename', generatePhotoFilename(category, file.name));
+            try {
+                const res = await fetch('/api/photography/upload', { method: 'POST', body: fd });
+                results.push(res.ok);
+            } catch (e) {
+                console.error('Upload failed', e);
+                results.push(false);
+            }
+        }
+    }
+
+    const workers = Array.from({ length: Math.min(concurrency, files.length) }, worker);
+    await Promise.all(workers);
+
+    // Reload gallery after uploads
+    loadPhotography();
+}
+
+function generatePhotoFilename(category, originalName) {
+    const ext = (originalName.match(/\.([^.]+)$/) || [])[1] || 'jpg';
+    const base = originalName.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    return `${category}-${Date.now()}-${base}.${ext}`;
 }
 
 /* --- Generic Upload --- */
@@ -1012,27 +1138,38 @@ function renderLinks() {
         filterContainer.appendChild(pill);
     });
 
-    // Render all links as cards
+    // Render all links as modern cards
     linksData.forEach(link => {
         const card = document.createElement('div');
         card.className = 'link-card';
+        card.style = 'height: calc(100% - 30px)';
         card.dataset.category = link.category || 'Uncategorized';
 
-        const urlShort = link.url.replace(/^https?:\/\//i, '').substring(0, 35);
+        const domain = (link.url || '').replace(/^https?:\/\//i, '').split('/')[0];
+        const urlShort = domain.length > 36 ? domain.substring(0, 33) + '...' : domain;
         const safeName = link.name.replace(/'/g, "\\'");
 
+        // Use Google's favicon service for quick favicons
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}`;
+
         card.innerHTML = `
-            <div class="link-card-header">
-                <div class="link-card-icon"><i class="fas fa-link"></i></div>
-                <span class="link-card-badge">${link.category || 'Uncategorized'}</span>
+            <div class="link-card-left">
+                <img class="link-favicon" src="${faviconUrl}" alt="favicon">
             </div>
-            <div class="link-card-body">
-                <h3>${link.name}</h3>
-                <a href="${link.url}" target="_blank" title="${link.url}">${urlShort}...</a>
+            <div class="link-card-main">
+                <div class="link-main-top">
+                    <h3 class="link-title">${link.name}</h3>
+                    <span class="link-domain">${urlShort}</span>
+                </div>
+                <p class="link-desc">${link.description || ''}</p>
+                <div class="link-meta">
+                    <span class="link-badge">${link.category || 'Uncategorized'}</span>
+                    <a class="link-url" href="${link.url}" target="_blank">Öffnen</a>
+                </div>
             </div>
             <div class="link-card-actions">
-                <button class="btn-small btn-edit" onclick="editLink('${safeName}')"><i class="fas fa-pen"></i></button>
-                <button class="btn-small btn-delete" onclick="deleteLink('${safeName}')"><i class="fas fa-trash"></i></button>
+                <button class="icon-btn" title="Bearbeiten" onclick="editLink('${safeName}')"><i class="fas fa-pen"></i></button>
+                <button class="icon-btn danger" title="Löschen" onclick="deleteLink('${safeName}')"><i class="fas fa-trash"></i></button>
             </div>
         `;
         linksContainer.appendChild(card);

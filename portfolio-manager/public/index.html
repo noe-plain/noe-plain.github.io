@@ -236,19 +236,31 @@
                 <header>
                     <h1>Fotografie Manager</h1>
                     <div class="actions">
-                        <select id="photo-category-select">
-                            <option value="street">Street</option>
-                            <option value="aviation">Aviation</option>
-                            <option value="portraet">Porträt</option>
-                            <option value="bts">BTS</option>
-                            <option value="event">Event</option>
-                        </select>
                         <button class="primary-btn" onclick="triggerPhotoUpload()">
                             <i class="fas fa-upload"></i> Foto hochladen
                         </button>
-                        <input type="file" id="photo-upload-input" hidden accept="image/*">
+                        <input type="file" id="photo-upload-input" hidden accept="image/*" multiple>
                     </div>
                 </header>
+                <div class="photo-cats-container">
+                    <input type="hidden" id="photo-category-select" value="street">
+                    <div class="photo-category-row">
+                        <div class="photo-category-switch" id="photo-category-switch" aria-label="Fotokategorien">
+                            <!-- pills injected by JS -->
+                        </div>
+                        <button type="button" class="secondary-btn" id="add-photo-category-btn"
+                            onclick="openAddPhotoCategory()" title="Kategorie hinzufügen">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="photo-dropzone" class="photo-dropzone" aria-hidden="false">
+                        <p>Ziehe Bilder hierher oder klicke zum Auswählen (mehrere Dateien möglich)</p>
+                        <div class="photo-drop-actions">
+                            <button type="button" class="secondary-btn" onclick="triggerPhotoUpload()"><i
+                                    class="fas fa-folder-open"></i> Dateien wählen</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="photo-grid" id="photo-grid">
                     <!-- Loaded dynamically -->
                 </div>

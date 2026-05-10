@@ -230,11 +230,6 @@
         "category": "suche"
     },
     {
-        "name": "NZZ",
-        "url": "https://www.nzz.ch",
-        "category": "suche"
-    },
-    {
         "name": "Pexels",
         "url": "https://pexels.com",
         "category": "Bilder"
@@ -267,11 +262,6 @@
     {
         "name": "SRF",
         "url": "https://www.srf.ch",
-        "category": "suche"
-    },
-    {
-        "name": "Swiss Design Network",
-        "url": "https://www.swissdesignnetwork.org/",
         "category": "suche"
     },
     {

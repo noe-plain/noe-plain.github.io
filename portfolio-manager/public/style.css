@@ -196,26 +196,22 @@ header h1 {
     background-color: var(--primary);
     color: var(--text-light);
     border: none;
-    padding: 12px 28px;
+    padding: 8px 16px;
     font-family: 'switzer', sans-serif;
-    font-size: 1rem;
-    border-radius: 30px;
-    /* Rounded pill style or signature? */
-    /* Signature radius for buttons might look odd, standard pill is usually safer, 
-       but let's try signature to be "100% meaningful" */
-    border-radius: 12px 0 12px 12px;
+    font-size: 0.95rem;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(31, 0, 51, 0.12);
 }
 
 .primary-btn:hover {
     background-color: var(--primary-light);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(31, 0, 51, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(31, 0, 51, 0.16);
 }
 
 /* Grid Layouts */
@@ -287,27 +283,27 @@ header h1 {
 }
 
 .btn-small {
-    padding: 8px 16px;
-    border-radius: 8px 0 8px 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
     border: none;
     font-family: 'switzer', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.2s;
+    font-size: 0.85rem;
+    transition: transform 120ms ease, background 120ms;
 }
 
 .btn-edit {
-    background: #f0f0f5;
-    color: #333;
+    background: rgba(31, 0, 51, 0.04);
+    color: var(--primary);
 }
 
 .btn-edit:hover {
-    background: #e0e0ea;
+    background: rgba(31, 0, 51, 0.06);
 }
 
 .btn-delete {
-    background: #fff0f0;
+    background: rgba(214, 48, 49, 0.06);
     color: #d63031;
 }
 
@@ -334,7 +330,93 @@ header h1 {
 .photo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 12px;
+}
+
+/* Photo category switch (modern pills) */
+.photo-category-switch {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-right: 8px;
+}
+
+.photo-category-switch .cat-pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(31, 0, 51, 0.04);
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(31, 0, 51, 0.04);
+    transition: transform 120ms ease, background 120ms;
+    font-size: 0.9rem;
+}
+
+.photo-category-switch .cat-pill:hover {
+    transform: translateY(-2px);
+}
+
+.photo-category-switch .cat-pill.active {
+    background: var(--primary);
+    color: var(--text-light);
+    box-shadow: 0 8px 18px rgba(31, 0, 51, 0.12);
+}
+
+/* Adjust header spacing to accommodate pills */
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* Container for the category switch under the header */
+.photo-cats-container {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    max-width: 100%;
+}
+
+.section-divider {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    margin: 0 0 10px 0;
+}
+
+.photo-category-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Dropzone for multi-file upload */
+.photo-dropzone {
+    margin-top: 12px;
+    padding: 18px;
+    border: 2px dashed rgba(31, 0, 51, 0.08);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(250, 250, 252, 0.6));
+    text-align: center;
+    color: #666;
+}
+
+.photo-dropzone p {
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+}
+
+.photo-dropzone .photo-drop-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.photo-dropzone.dragover {
+    border-color: var(--primary);
+    background: rgba(109, 40, 217, 0.03);
+    box-shadow: 0 8px 20px rgba(109, 40, 217, 0.06);
 }
 
 .photo-item {
@@ -413,6 +495,18 @@ header h1 {
     box-shadow: 0 4px 10px rgba(31, 0, 51, 0.2);
 }
 
+.filter-pill {
+    background: rgba(31, 0, 51, 0.06);
+    color: var(--primary);
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px 10px 0;
+    font-family: 'switzer', sans-serif;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
 /* Modal Overhaul */
 .modal {
@@ -428,8 +522,8 @@ header h1 {
 
 .modal-content {
     background: #fff;
-    border-radius: 20px;
-    padding: 40px;
+    border-radius: 12px;
+    padding: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     width: 90%;
     max-width: 800px;
@@ -473,9 +567,9 @@ header h1 {
 .form-group textarea,
 .form-group select {
     background: #f9f9f9;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
     border-radius: 8px;
-    padding: 12px 15px;
+    padding: 8px 10px;
     font-family: 'switzer', sans-serif;
     font-size: 0.95rem;
     color: #333;
@@ -497,10 +591,10 @@ header h1 {
 
 .image-input-row {
     background: #f9f9f9;
-    border-radius: 12px;
-    padding: 15px;
+    border-radius: 10px;
+    padding: 10px;
     border: 1px solid #eee;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 
@@ -525,8 +619,8 @@ header h1 {
 /* --- New Form Styles regarding the refactor --- */
 
 .type-specific-fields {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 18px;
+    padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -555,13 +649,13 @@ header h1 {
 .video-item-row,
 .gallery-item-row {
     background: rgba(255, 255, 255, 0.4);
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .row-header {
@@ -575,17 +669,17 @@ header h1 {
 
 .secondary-btn {
     background: transparent;
-    border: 1px solid var(--primary);
+    border: 1px solid rgba(31, 0, 51, 0.08);
     color: var(--primary);
-    padding: 10px 20px;
-    border-radius: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
     cursor: pointer;
     font-family: 'switzer', sans-serif;
-    transition: all 0.2s;
+    transition: transform 120ms ease, background 120ms;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .secondary-btn:hover {
@@ -597,10 +691,8 @@ header h1 {
     background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);
     color: var(--text-light);
     border: none;
-    padding: 12px 28px;
-    /* match .primary-btn */
-    border-radius: 12px 0 12px 12px;
-    /* match .primary-btn */
+    padding: 8px 14px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
     font-size: 1rem;
@@ -747,6 +839,28 @@ header h1 {
     transform: scaleY(1);
 }
 
+/* Responsive grid for the Links tab (3 / 2 / 1 columns) */
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 15px;
+    /* row-gap column-gap */
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .links-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .links-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
 .link-info {
     display: flex;
     flex-direction: column;
@@ -850,8 +964,8 @@ header h1 {
 
 .hero-banner {
     background: var(--accent-gradient);
-    border-radius: 24px;
-    padding: 40px;
+    border-radius: 18px;
+    padding: 24px;
     position: relative;
     overflow: hidden;
     color: var(--primary);
@@ -893,7 +1007,7 @@ header h1 {
 /* Stats Row */
 .stats-pills-row {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -961,8 +1075,8 @@ header h1 {
 
 .recent-projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
 }
 
 .recent-card {
@@ -1214,6 +1328,123 @@ header h1 {
 .list-item-action:hover {
     background: #ddd;
 }
+
+/* Modern Link Cards */
+.link-card {
+    display: grid;
+    grid-template-columns: 56px 1fr 92px;
+    gap: 16px;
+    align-items: center;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff, #fbfbff);
+    border: 1px solid rgba(31, 0, 51, 0.06);
+    box-shadow: 0 6px 18px rgba(31, 0, 51, 0.03);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.link-card-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.link-favicon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.link-card-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.link-main-top {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: baseline;
+}
+
+.link-title {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.link-domain {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.link-desc {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+    max-height: 42px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.link-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.link-badge {
+    background: rgba(109, 40, 217, 0.08);
+    color: #6d28d9;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.link-url {
+    color: #0369a1;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.link-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: rgba(31, 0, 51, 0.8);
+}
+
+.icon-btn.danger {
+    color: #d63031;
+}
+
+@media (max-width:900px) {
+    .link-card {
+        grid-template-columns: 44px 1fr;
+    }
+
+    .link-card-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+    }
+}
+
 
 /* --- Block Editor: Modern, simple look --- */
 .block-canvas {
