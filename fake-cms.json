@@ -211,7 +211,7 @@
     },
     {
         "name": "My Wingo",
-        "url": "https://my.wingo.ch",
+        "url": "https://mywingo.wingo.ch",
         "category": "suche"
     },
     {
@@ -248,11 +248,6 @@
         "name": "Pixabay (Music)",
         "url": "https://pixabay.com/music/",
         "category": "Audio & Video"
-    },
-    {
-        "name": "Slack",
-        "url": "https://slack.com/",
-        "category": "suche"
     },
     {
         "name": "Smarty Mockups",
