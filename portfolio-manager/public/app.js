@@ -778,7 +778,16 @@ const photoInput = document.getElementById('photo-upload-input');
 const photoSwitch = document.getElementById('photo-category-switch');
 
 // Default categories (can be extended by user)
-let photoCategories = ['street', 'aviation', 'portraet', 'bts', 'event'];
+let photoCategories = ['street', 'human-nature', 'aviation', 'portraet', 'bts', 'event'];
+
+const categoryDisplayNames = {
+    'street': 'Street',
+    'human-nature': 'Human Nature',
+    'aviation': 'Aviation',
+    'portraet': 'Porträt',
+    'bts': 'BTS',
+    'event': 'Event'
+};
 
 function setupPhotography() {
     // Render the pill switch and attach events
@@ -817,7 +826,7 @@ function renderPhotoCategories() {
         const pill = document.createElement('button');
         pill.type = 'button';
         pill.className = 'cat-pill' + (photoSelect.value === cat ? ' active' : '');
-        pill.innerText = capitalize(cat);
+        pill.innerText = categoryDisplayNames[cat] || capitalize(cat);
         pill.dataset.cat = cat;
         pill.onclick = () => {
             selectPhotoCategory(cat);
@@ -848,6 +857,7 @@ function openAddPhotoCategory() {
 async function addPhotoCategory(slug, displayName) {
     // Optimistically add category locally
     photoCategories.push(slug);
+    categoryDisplayNames[slug] = displayName;
     renderPhotoCategories();
 
     // Try to create server-side folder (best-effort)
@@ -855,7 +865,7 @@ async function addPhotoCategory(slug, displayName) {
         await fetch('/api/photography/category', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: slug })
+            body: JSON.stringify({ name: slug, displayName: displayName })
         });
     } catch (e) {
         // ignore errors; server may not support category creation

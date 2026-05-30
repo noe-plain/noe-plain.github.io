@@ -302,6 +302,119 @@ app.post('/api/photography/reorder', (req, res) => {
     }
 });
 
+// Photography: Add Category and update code files
+app.post('/api/photography/category', (req, res) => {
+    const slug = req.body.name;
+    const displayName = req.body.displayName || slug;
+
+    if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+        return res.status(400).json({ error: 'Invalid category slug' });
+    }
+
+    try {
+        // 1. Update portfolio-manager/public/app.js
+        const appJsPath = path.join(__dirname, 'public/app.js');
+        if (fs.existsSync(appJsPath)) {
+            let content = fs.readFileSync(appJsPath, 'utf8');
+            
+            // Find let photoCategories = [...];
+            const photoCatRegex = /(let photoCategories\s*=\s*\[)([^\]]+)(\];)/;
+            const match = content.match(photoCatRegex);
+            if (match) {
+                const categoriesStr = match[2];
+                const categoriesList = categoriesStr.split(',').map(s => s.trim().replace(/['"]/g, ''));
+                if (!categoriesList.includes(slug)) {
+                    const updatedCategoriesStr = categoriesStr.trim().replace(/,?\s*$/, '') + `, '${slug}'`;
+                    content = content.replace(photoCatRegex, `$1${updatedCategoriesStr}$3`);
+                }
+            }
+            
+            // Find const categoryDisplayNames = { ... };
+            const displayNamesRegex = /(const categoryDisplayNames\s*=\s*\{)([\s\S]*?)(\};)/;
+            const matchDisp = content.match(displayNamesRegex);
+            if (matchDisp) {
+                const displayNamesStr = matchDisp[2];
+                if (!displayNamesStr.includes(`'${slug}':`)) {
+                    const cleanDisplayNamesStr = displayNamesStr.trim().replace(/,?\s*$/, '');
+                    const updatedDisplayNamesStr = cleanDisplayNamesStr + `,\n    '${slug}': '${displayName}'\n`;
+                    content = content.replace(displayNamesRegex, `$1${updatedDisplayNamesStr}$3`);
+                }
+            }
+            
+            fs.writeFileSync(appJsPath, content, 'utf8');
+        }
+        
+        // 2. Update portfolio/projekte/fotografie.js
+        const fotoJsPath = path.join(PROJECT_ROOT, 'portfolio/projekte/fotografie.js');
+        if (fs.existsSync(fotoJsPath)) {
+            let content = fs.readFileSync(fotoJsPath, 'utf8');
+            const categoriesRegex = /(const categories\s*=\s*\{)([\s\S]*?)(\};)/;
+            const matchCat = content.match(categoriesRegex);
+            if (matchCat) {
+                const categoriesStr = matchCat[2];
+                if (!categoriesStr.includes(`'${slug}':`)) {
+                    const cleanCategoriesStr = categoriesStr.trim().replace(/,?\s*$/, '');
+                    const newEntry = `    '${slug}': { prefix: '${slug}-', container: 'lightgallery-${slug}', path: '../../images/portfolio/photography/' }`;
+                    const updatedCategoriesStr = cleanCategoriesStr + `,\n${newEntry}\n`;
+                    content = content.replace(categoriesRegex, `$1${updatedCategoriesStr}$3`);
+                }
+            }
+            fs.writeFileSync(fotoJsPath, content, 'utf8');
+        }
+        
+        // 3. Update portfolio/projekte/fotografie.html
+        const fotoHtmlPath = path.join(PROJECT_ROOT, 'portfolio/projekte/fotografie.html');
+        if (fs.existsSync(fotoHtmlPath)) {
+            let content = fs.readFileSync(fotoHtmlPath, 'utf8');
+            
+            const pageNavRegex = /(<div id="page-nav">)([\s\S]*?)(<\/div>)/;
+            const pageNavMatch = content.match(pageNavRegex);
+            if (pageNavMatch) {
+                const tabsContent = pageNavMatch[2];
+                if (!tabsContent.includes(`href="?${slug}"`)) {
+                    const newTab = `\n            <a href="?${slug}" class="tab-btn">${displayName}</a>\n        `;
+                    const updatedTabsContent = tabsContent.trim() + newTab;
+                    content = content.replace(pageNavRegex, `$1${updatedTabsContent}$3`);
+                }
+            }
+            
+            const galleryContainerRegex = /(<div id="gallery-container">)([\s\S]*?)(<\/div>\s*<\/main>)/;
+            const galleryMatch = content.match(galleryContainerRegex);
+            if (galleryMatch) {
+                const galleryContent = galleryMatch[2];
+                if (!galleryContent.includes(`id="section-${slug}"`)) {
+                    const newSection = `\n            <div id="section-${slug}" class="gallery-section">\n                <h2>${displayName} Photo&shy;graphy</h2>\n                <div id="lightgallery-${slug}" class="project-gallery"></div>\n            </div>\n        `;
+                    const updatedGalleryContent = galleryContent.trim() + newSection;
+                    content = content.replace(galleryContainerRegex, `$1${updatedGalleryContent}$3`);
+                }
+            }
+            fs.writeFileSync(fotoHtmlPath, content, 'utf8');
+        }
+
+        // 4. Update portfolio/fotografie.html (the overview page)
+        const mainHtmlPath = path.join(PROJECT_ROOT, 'portfolio/fotografie.html');
+        if (fs.existsSync(mainHtmlPath)) {
+            let content = fs.readFileSync(mainHtmlPath, 'utf8');
+            const gridRegex = /(<div class="category-grid">)([\s\S]*?)(<\/div>\s*<\/main>)/;
+            const gridMatch = content.match(gridRegex);
+            if (gridMatch) {
+                const gridContent = gridMatch[2];
+                if (!gridContent.includes(`href="projekte/fotografie.html?${slug}"`)) {
+                    const newCard = `\n            <a href="projekte/fotografie.html?${slug}" class="category-card">\n                <img src="../images/portfolio/photography/${slug}-01.jpeg" alt="${displayName} Photography"\n                    class="category-bg-img" onerror="this.src='../images/portfolio/photography/hero-image.jpeg'">\n                <div class="category-overlay">\n                    <h3>${displayName}</h3>\n                    <p>${displayName} Photography.</p>\n                </div>\n            </a>\n        `;
+                    const updatedGridContent = gridContent.trim() + newCard;
+                    content = content.replace(gridRegex, `$1${updatedGridContent}$3`);
+                }
+            }
+            fs.writeFileSync(mainHtmlPath, content, 'utf8');
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to write category to files' });
+    }
+});
+
 // Generic File Upload (for project images)
 app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.file) {

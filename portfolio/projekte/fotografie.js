@@ -527,6 +527,7 @@ function updateTransform() {
 
 const categories = {
     street: { prefix: 'street-', container: 'lightgallery-street', path: '../../images/portfolio/photography/' },
+    'human-nature': { prefix: 'human-nature-', container: 'lightgallery-human-nature', path: '../../images/portfolio/photography/' },
     aviation: { prefix: 'aviation-', container: 'lightgallery-aviation', path: '../../images/portfolio/photography/' },
     portraet: { prefix: 'portraet-', container: 'lightgallery-portraet', path: '../../images/portfolio/photography/' },
     bts: { prefix: 'bts-', container: 'lightgallery-bts', path: '../../images/portfolio/photography/' },
