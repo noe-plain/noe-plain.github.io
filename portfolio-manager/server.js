@@ -2,13 +2,23 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const { processImage, processVideo } = require('./media-processor');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve index explicitly at root as a fallback
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 app.use('/images', express.static(path.join(__dirname, '../images')));
 app.use('/fonts', express.static(path.join(__dirname, '../fonts')));
 
@@ -22,6 +32,7 @@ const DATA_FILES = {
     design: path.join(PORTFOLIO_DATA_DIR, 'designs.json'),
     illustration: path.join(PORTFOLIO_DATA_DIR, 'illustrations.json'),
     video: path.join(PORTFOLIO_DATA_DIR, 'video-projects.json'),
+    photography: path.join(PORTFOLIO_DATA_DIR, 'photography.json'),
     links: path.join(PROJECT_ROOT, 'fake-cms.json')
 };
 
@@ -30,46 +41,125 @@ function ensureDir(dir) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-// Multer Setup for File Uploads
-const storage = multer.diskStorage({
+function moveAllAssociatedFiles(oldPath, newPath) {
+    if (!fs.existsSync(oldPath)) return;
+    const oldDir = path.dirname(oldPath);
+    const newDir = path.dirname(newPath);
+    const oldBase = path.basename(oldPath, path.extname(oldPath));
+    const newBase = path.basename(newPath, path.extname(newPath));
+
+    ensureDir(newDir);
+
+    // 1. Move main file
+    fs.renameSync(oldPath, newPath);
+
+    // 2. Move siblings (WebP, AVIF, responsive sizes, posters, etc.)
+    if (fs.existsSync(oldDir)) {
+        const files = fs.readdirSync(oldDir);
+        files.forEach(f => {
+            if (f !== path.basename(oldPath) && 
+                (f === `${oldBase}.webp` || f === `${oldBase}.avif` || f === `${oldBase}-poster.webp` || f === `${oldBase}-hevc.mp4` || f.startsWith(`${oldBase}-`))) {
+                const newSiblingName = f.replace(oldBase, newBase);
+                fs.renameSync(path.join(oldDir, f), path.join(newDir, newSiblingName));
+            }
+        });
+    }
+
+    // 3. Move raw files
+    const oldRawDir = path.join(oldDir, 'raw');
+    const newRawDir = path.join(newDir, 'raw');
+    if (fs.existsSync(oldRawDir)) {
+        const rawFiles = fs.readdirSync(oldRawDir);
+        rawFiles.forEach(f => {
+            const ext = path.extname(f);
+            const base = path.basename(f, ext);
+            if (base === oldBase) {
+                ensureDir(newRawDir);
+                const newRawName = f.replace(oldBase, newBase);
+                fs.renameSync(path.join(oldRawDir, f), path.join(newRawDir, newRawName));
+            }
+        });
+    }
+
+    // 4. Move HLS files
+    const oldHlsDir = path.join(oldDir, 'hls');
+    const newHlsDir = path.join(newDir, 'hls');
+    if (fs.existsSync(oldHlsDir)) {
+        const hlsFiles = fs.readdirSync(oldHlsDir);
+        hlsFiles.forEach(f => {
+            if (f.startsWith(oldBase)) {
+                ensureDir(newHlsDir);
+                const newHlsName = f.replace(oldBase, newBase);
+                fs.renameSync(path.join(oldHlsDir, f), path.join(newHlsDir, newHlsName));
+            }
+        });
+    }
+}
+
+function deleteAllAssociatedFiles(filePath) {
+    if (!fs.existsSync(filePath)) return;
+    const dir = path.dirname(filePath);
+    const base = path.basename(filePath, path.extname(filePath));
+
+    // 1. Delete main file
+    fs.unlinkSync(filePath);
+
+    // 2. Delete siblings (WebP, AVIF, responsive sizes, posters, etc.)
+    if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        files.forEach(f => {
+            if (f === `${base}.webp` || f === `${base}.avif` || f === `${base}-poster.webp` || f === `${base}-hevc.mp4` || f.startsWith(`${base}-`)) {
+                try { fs.unlinkSync(path.join(dir, f)); } catch (e) {}
+            }
+        });
+    }
+
+    // 3. Delete raw files
+    const rawDir = path.join(dir, 'raw');
+    if (fs.existsSync(rawDir)) {
+        const rawFiles = fs.readdirSync(rawDir);
+        rawFiles.forEach(f => {
+            const ext = path.extname(f);
+            const rawBase = path.basename(f, ext);
+            if (rawBase === base) {
+                try { fs.unlinkSync(path.join(rawDir, f)); } catch (e) {}
+            }
+        });
+        try {
+            if (fs.readdirSync(rawDir).length === 0) fs.rmdirSync(rawDir);
+        } catch (e) {}
+    }
+
+    // 4. Delete HLS files
+    const hlsDir = path.join(dir, 'hls');
+    if (fs.existsSync(hlsDir)) {
+        const hlsFiles = fs.readdirSync(hlsDir);
+        hlsFiles.forEach(f => {
+            if (f.startsWith(base)) {
+                try { fs.unlinkSync(path.join(hlsDir, f)); } catch (e) {}
+            }
+        });
+        try {
+            if (fs.readdirSync(hlsDir).length === 0) fs.rmdirSync(hlsDir);
+        } catch (e) {}
+    }
+}
+
+// Multer Setup - Save uploads temporarily to a temp directory
+const tempUploadsDir = path.join(PROJECT_ROOT, 'images/portfolio/temp');
+ensureDir(tempUploadsDir);
+
+const tempStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const type = req.body.type; // 'design', 'illustration', 'video', 'photography'
-        const category = req.body.category; // e.g., 'street', 'aviation' for photography
-
-        let uploadPath = '';
-
-        // If the uploaded file is a PDF, store under uploads to separate from image folders
-        if (file && file.mimetype && file.mimetype.includes('pdf')) {
-            uploadPath = path.join(IMAGES_DIR, 'uploads');
-        } else if (type === 'photography' && category) {
-            uploadPath = path.join(IMAGES_DIR, 'photography');
-        } else if (type === 'design') {
-            uploadPath = path.join(IMAGES_DIR, 'design');
-        } else if (type === 'illustration') {
-            uploadPath = path.join(IMAGES_DIR, 'illustration');
-        } else if (type === 'video') {
-            // Video thumbnails usually go to specific folder or generic
-            uploadPath = path.join(IMAGES_DIR, 'videografie'); // Corrected folder name
-        } else {
-            uploadPath = path.join(IMAGES_DIR, 'uploads'); // Fallback
-        }
-
-        ensureDir(uploadPath);
-        cb(null, uploadPath);
+        cb(null, tempUploadsDir);
     },
     filename: function (req, file, cb) {
-        // For photography, we might want custom naming logic handled AFTER upload or specifically here
-        // But Multer runs before body is fully parsed sometimes depending on order.
-        // We will stick to original name and rename later if needed, or use a temp name.
-
-        // Actually for this simple app, let's keep original name to avoid complexity, 
-        // OR better: use timestamp to avoid collisions
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: tempStorage });
 
 
 // --- API Endpoints ---
@@ -172,80 +262,249 @@ app.get('/api/photography/:category', (req, res) => {
     res.json(categoryFiles);
 });
 
-// Photography: Upload & Rename
-// We use a separate handler because we want to enforce specific naming: category-XX.jpg
-// We'll upload to temp then rename.
-const photoStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const dir = path.join(IMAGES_DIR, 'photography');
-        ensureDir(dir);
-        cb(null, dir);
-    },
-    filename: function (req, file, cb) {
-        // Temp name
-        cb(null, 'temp-' + Date.now() + path.extname(file.originalname));
+// List all media files under images/portfolio for Media Library
+app.get('/api/media', (req, res) => {
+    const startDir = IMAGES_DIR; // images/portfolio
+    const results = [];
+
+    function walk(dir, relPath = '') {
+        if (!fs.existsSync(dir)) return;
+        const items = fs.readdirSync(dir);
+        items.forEach(it => {
+            const p = path.join(dir, it);
+            const stats = fs.statSync(p);
+            if (stats.isDirectory()) {
+                walk(p, path.join(relPath, it));
+            } else {
+                // Build relative URL used by frontend JSON format (../../images/portfolio/...)
+                const rel = `../../images/portfolio/${path.join(relPath, it).replace(/\\/g, '/')}`;
+                results.push(rel);
+            }
+        });
+    }
+
+    try {
+        walk(startDir);
+        res.json(results);
+    } catch (e) {
+        console.error('media list error', e);
+        res.status(500).json({ error: 'Error listing media' });
     }
 });
-const photoUpload = multer({ storage: photoStorage });
 
-app.post('/api/photography/upload', photoUpload.single('image'), (req, res) => {
+// Move a media file to another folder and update references across data files
+app.post('/api/media/move', (req, res) => {
+    const { src, destDir, newName } = req.body || {};
+    if (!src || !destDir) return res.status(400).json({ error: 'Missing src or destDir' });
+
+    // Normalize source to relative path inside images/portfolio
+    let rel = src.replace(/\\\\/g, '/');
+    rel = rel.replace(/^\.\/.\/.\/images\/portfolio\//, '');
+    rel = rel.replace(/^\/images\/portfolio\//, '');
+    rel = rel.replace(/^images\/portfolio\//, '');
+
+    const oldPath = path.join(IMAGES_DIR, rel);
+    if (!fs.existsSync(oldPath)) return res.status(404).json({ error: 'Source file not found' });
+
+    // Ensure destination directory exists under images/portfolio
+    const cleanDest = String(destDir).replace(/^\/+|\/+$/g, '');
+    const destFolder = path.join(IMAGES_DIR, cleanDest);
+    ensureDir(destFolder);
+
+    const baseName = newName ? newName : path.basename(rel);
+    const newPath = path.join(destFolder, baseName);
+
+    try {
+        moveAllAssociatedFiles(oldPath, newPath);
+    } catch (e) {
+        console.error('move error', e);
+        return res.status(500).json({ error: 'Failed to move file' });
+    }
+
+    // Update JSON data files (projects) and HTML files under portfolio
+    try {
+        const filesToCheck = [];
+        // DATA_FILES are JSON paths
+        Object.values(DATA_FILES).forEach(p => { if (fs.existsSync(p)) filesToCheck.push(p); });
+
+        // Also check any .html, .js under portfolio/ for occurrences
+        function walkAndCollect(dir) {
+            if (!fs.existsSync(dir)) return;
+            const items = fs.readdirSync(dir);
+            items.forEach(it => {
+                const full = path.join(dir, it);
+                const st = fs.statSync(full);
+                if (st.isDirectory()) walkAndCollect(full);
+                else if (full.endsWith('.html') || full.endsWith('.js')) filesToCheck.push(full);
+            });
+        }
+        walkAndCollect(path.join(PROJECT_ROOT, 'portfolio'));
+
+        // Replace occurrences of main extension and secondary extensions
+        const oldExt = path.extname(rel);
+        const newExt = path.extname(baseName);
+        const oldBase = path.basename(rel, oldExt);
+        const newBase = path.basename(baseName, newExt);
+
+        filesToCheck.forEach(fpath => {
+            try {
+                let c = fs.readFileSync(fpath, 'utf8');
+                let replaced = false;
+
+                // Replace base files
+                const before = `../../images/portfolio/${rel.replace(/\\\\/g, '/')}`;
+                const after = `../../images/portfolio/${path.join(cleanDest, baseName).replace(/\\\\/g, '/')}`;
+                if (c.includes(before)) {
+                    c = c.split(before).join(after);
+                    replaced = true;
+                }
+
+                // Replace potential webp/avif references
+                const extsToUpdate = ['.webp', '.avif', '-poster.webp'];
+                extsToUpdate.forEach(subExt => {
+                    const beforeSub = `../../images/portfolio/${path.dirname(rel).replace(/\\\\/g, '/')}/${oldBase}${subExt}`;
+                    const afterSub = `../../images/portfolio/${cleanDest}/${newBase}${subExt}`;
+                    if (c.includes(beforeSub)) {
+                        c = c.split(beforeSub).join(afterSub);
+                        replaced = true;
+                    }
+                });
+
+                if (replaced) {
+                    fs.writeFileSync(fpath, c, 'utf8');
+                }
+            } catch (e) {
+                console.error('update refs error for', fpath, e);
+            }
+        });
+    } catch (e) {
+        console.error('reference update error', e);
+    }
+
+    // Return new relative url for frontend
+    const newRel = `../../images/portfolio/${path.join(cleanDest, baseName).replace(/\\\\/g, '/')}`;
+    res.json({ success: true, newUrl: newRel });
+});
+
+// Migrate photography categories (prefixes) into projects/<slug>/ folder
+app.post('/api/media/migrate-categories-to-projects', (req, res) => {
+    const photoDir = path.join(IMAGES_DIR, 'photography');
+    if (!fs.existsSync(photoDir)) return res.status(404).json({ error: 'Photography dir not found' });
+
+    const files = fs.readdirSync(photoDir).filter(f => !f.startsWith('.'));
+    const groups = {};
+    files.forEach(f => {
+        const m = f.match(/^([a-z0-9-]+)-/i);
+        if (m && m[1]) {
+            const prefix = m[1];
+            if (!groups[prefix]) groups[prefix] = [];
+            groups[prefix].push(f);
+        }
+    });
+
+    const migrated = [];
+    try {
+        Object.keys(groups).forEach(prefix => {
+            const destFolder = path.join(IMAGES_DIR, 'projects', prefix);
+            ensureDir(destFolder);
+            groups[prefix].forEach(fname => {
+                const oldPath = path.join(photoDir, fname);
+                const newPath = path.join(destFolder, fname);
+                moveAllAssociatedFiles(oldPath, newPath);
+                // update references in data files and html/js (reuse logic)
+                const before = `../../images/portfolio/photography/${fname}`;
+                const after = `../../images/portfolio/projects/${prefix}/${fname}`;
+                // update DATA_FILES
+                Object.values(DATA_FILES).forEach(p => {
+                    if (!fs.existsSync(p)) return;
+                    let c = fs.readFileSync(p, 'utf8');
+                    if (c.includes(before)) {
+                        c = c.split(before).join(after);
+                        fs.writeFileSync(p, c, 'utf8');
+                    }
+                });
+                // update portfolio/ html/js
+                function walkAndReplace(dir) {
+                    if (!fs.existsSync(dir)) return;
+                    const items = fs.readdirSync(dir);
+                    items.forEach(it => {
+                        const full = path.join(dir, it);
+                        const st = fs.statSync(full);
+                        if (st.isDirectory()) walkAndReplace(full);
+                        else if (full.endsWith('.html') || full.endsWith('.js')) {
+                            let c = fs.readFileSync(full, 'utf8');
+                            if (c.includes(before)) {
+                                c = c.split(before).join(after);
+                                fs.writeFileSync(full, c, 'utf8');
+                            }
+                        }
+                    });
+                }
+                walkAndReplace(path.join(PROJECT_ROOT, 'portfolio'));
+                migrated.push({ file: fname, to: `projects/${prefix}/${fname}` });
+            });
+        });
+        res.json({ success: true, migrated });
+    } catch (e) {
+        console.error('migration error', e);
+        res.status(500).json({ error: 'Migration failed', detail: String(e) });
+    }
+});
+
+// Photography: Upload & Rename (integrated with Asset Pipeline)
+app.post('/api/photography/upload', upload.single('image'), async (req, res) => {
     const category = req.body.category;
     if (!category || !req.file) {
         return res.status(400).json({ error: 'Missing category or file' });
     }
 
-    const photoDir = path.join(IMAGES_DIR, 'photography');
-    const files = fs.readdirSync(photoDir);
-    const existing = files.filter(f => f.startsWith(category + '-'));
+    try {
+        const photoDir = path.join(IMAGES_DIR, 'photography');
+        ensureDir(photoDir);
+        const files = fs.readdirSync(photoDir);
+        const existing = files.filter(f => f.startsWith(category + '-'));
 
-    // Find next index
-    let maxIdx = 0;
-    existing.forEach(f => {
-        // extract number: street-01.jpg -> 01
-        // regex
-        const match = f.match(new RegExp(`^${category}-(\\d+)`));
-        if (match && match[1]) {
-            const num = parseInt(match[1], 10);
-            if (num > maxIdx) maxIdx = num;
-        }
-    });
+        // Find next index
+        let maxIdx = 0;
+        existing.forEach(f => {
+            const match = f.match(new RegExp(`^${category}-(\\d+)`));
+            if (match && match[1]) {
+                const num = parseInt(match[1], 10);
+                if (num > maxIdx) maxIdx = num;
+            }
+        });
 
-    const nextIdx = maxIdx + 1;
-    const nextIdxStr = nextIdx < 10 ? `0${nextIdx}` : `${nextIdx}`;
-    const ext = path.extname(req.file.originalname).toLowerCase();
+        const nextIdx = maxIdx + 1;
+        const nextIdxStr = nextIdx < 10 ? `0${nextIdx}` : `${nextIdx}`;
+        const ext = path.extname(req.file.originalname).toLowerCase();
+        
+        const baseName = `${category}-${nextIdxStr}`;
+        const finalFilename = `${baseName}.jpeg`; // Force jpeg web fallback
 
-    // Enforce .jpeg or .jpg or .png? Original seems to use .jpeg mostly
-    // We keep original extension for now, but original code expects .jpeg mostly?
-    // Let's stick to original extension to be safe, but maybe user wants standardization.
-    // The previous code `category-XX.jpeg` suggests strict naming.
-    // Let's rename to .jpeg if it's an image?
-    // For safety, let's keep original extension but ensure it is handled in frontend.
-    // ACTUALLY, checking `fotografie.js` step 3, it loads `${prefix}${numStr}.jpeg`.
-    // So we MUST use .jpeg extension!
+        // Run through image processing pipeline, forcing .jpeg standard output
+        await processImage(req.file.path, photoDir, baseName, ext, '.jpeg');
 
-    const newFilename = `${category}-${nextIdxStr}.jpeg`; // Force jpeg
-    const oldPath = req.file.path;
-    const newPath = path.join(photoDir, newFilename);
-
-    // If it's not a jpeg, we might need to convert?
-    // For now we just rename and hope user uploaded a jpg/jpeg. 
-    // If they upload png, resizing/converting is complex without sharp/jimp.
-    // We assume user uploads photos. 
-
-    fs.renameSync(oldPath, newPath);
-
-    res.json({ success: true, filename: newFilename });
+        res.json({ success: true, filename: finalFilename });
+    } catch (err) {
+        console.error('Photography upload error:', err);
+        res.status(500).json({ error: 'Failed to process photography upload: ' + err.message });
+    }
 });
 
-// Photography: Delete Image
+// Photography: Delete Image (integrated with Asset Pipeline cleanup)
 app.delete('/api/photography', (req, res) => {
     const filename = req.body.filename;
     if (!filename) return res.status(400).json({ error: 'Missing filename' });
 
     const filePath = path.join(IMAGES_DIR, 'photography', filename);
     if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        res.json({ success: true });
+        try {
+            deleteAllAssociatedFiles(filePath);
+            res.json({ success: true });
+        } catch (e) {
+            console.error('Delete photography error:', e);
+            res.status(500).json({ error: 'Failed to delete all associated assets: ' + e.message });
+        }
     } else {
         res.status(404).json({ error: 'File not found' });
     }
@@ -415,41 +674,104 @@ app.post('/api/photography/category', (req, res) => {
     }
 });
 
-// Generic File Upload (for project images)
-app.post('/api/upload', upload.single('file'), (req, res) => {
+// Generic File Upload (integrated with Image/Video pipelines)
+app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Construct public URL relative to project root
-    // The file is saved in e.g. ../images/portfolio/design/filename.ext
-    // The URL should be ../../images/portfolio/design/filename.ext (relative to portfolio/projekte/design.html)
-    // BUT we need to be careful about where this URL is used.
-    // In JSON, links are `../../images/...`
-
-    // Let's determine subfolder based on req.body.type
-    // If PDF, it's stored in uploads folder; otherwise choose by project type
     let typeDir = 'uploads';
     if (req.file && req.file.mimetype && req.file.mimetype.includes('pdf')) {
         typeDir = 'uploads';
     } else if (req.body.type === 'design') typeDir = 'design';
     else if (req.body.type === 'illustration') typeDir = 'illustration';
     else if (req.body.type === 'video') typeDir = 'videografie';
+    else if (req.body.type === 'photography') typeDir = 'photography';
 
-    // Because server is in /portfolio-manager, and images are in /images
-    // The relative path from the *HTML files* (in /portfolio/projekte/...) to the image:
-    // HTML is in /portfolio/projekte/
-    // Image is in /images/portfolio/design/
-    // Path: ../../images/portfolio/design/filename
+    const destDir = path.join(IMAGES_DIR, typeDir);
+    ensureDir(destDir);
 
-    const filename = req.file.filename;
-    const relativeUrl = `../../images/portfolio/${typeDir}/${filename}`;
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const baseNameWithoutExt = path.basename(req.file.filename, path.extname(req.file.filename));
+    const finalFilename = `${baseNameWithoutExt}${ext}`;
+    const relativeUrl = `../../images/portfolio/${typeDir}/${finalFilename}`;
 
-    res.json({
-        success: true,
-        url: relativeUrl,
-        filename: filename
-    });
+    try {
+        const isPdf = req.file.mimetype.includes('pdf');
+        const isImage = req.file.mimetype.startsWith('image/');
+        const isVideo = req.file.mimetype.startsWith('video/');
+
+        if (isPdf) {
+            // PDF: move directly without processing
+            const destPath = path.join(destDir, finalFilename);
+            fs.renameSync(req.file.path, destPath);
+            res.json({
+                success: true,
+                url: relativeUrl,
+                filename: finalFilename
+            });
+        } else if (isVideo) {
+            // Video: Transcode in background
+            const result = processVideo(req.file.path, destDir, baseNameWithoutExt, ext);
+            
+            // Expected final video URL
+            const finalVideoUrl = `../../images/portfolio/${typeDir}/${baseNameWithoutExt}.mp4`;
+            res.json({
+                success: true,
+                url: finalVideoUrl,
+                filename: `${baseNameWithoutExt}.mp4`,
+                statusUrl: result.statusUrl,
+                posterUrl: result.posterUrl,
+                isAsync: true
+            });
+        } else if (isImage) {
+            // Image: Process synchronously
+            await processImage(req.file.path, destDir, baseNameWithoutExt, ext);
+            res.json({
+                success: true,
+                url: relativeUrl,
+                filename: finalFilename
+            });
+        } else {
+            // Fallback for other file types
+            const destPath = path.join(destDir, finalFilename);
+            fs.renameSync(req.file.path, destPath);
+            res.json({
+                success: true,
+                url: relativeUrl,
+                filename: finalFilename
+            });
+        }
+    } catch (err) {
+        console.error('File upload pipeline error:', err);
+        res.status(500).json({ error: 'Failed to process file through pipeline: ' + err.message });
+    }
+});
+
+// Video transcoding status endpoint
+app.get('/api/media/status/:baseName', (req, res) => {
+    const baseName = req.params.baseName;
+    const dirsToCheck = ['photography', 'design', 'illustration', 'videografie', 'uploads'];
+    let statusFile = null;
+
+    for (const d of dirsToCheck) {
+        const p = path.join(IMAGES_DIR, d, 'raw', `${baseName}.status.json`);
+        if (fs.existsSync(p)) {
+            statusFile = p;
+            break;
+        }
+    }
+
+    if (!statusFile) {
+        return res.status(404).json({ error: 'Video transcoding status file not found' });
+    }
+
+    try {
+        const data = fs.readFileSync(statusFile, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (e) {
+        res.status(500).json({ error: 'Error reading transcoding status' });
+    }
 });
 
 // --- Publish: run git add/commit/push in project root ---
@@ -459,13 +781,39 @@ const exec = util.promisify(child_process.exec);
 
 app.post('/api/publish', async (req, res) => {
     try {
-        // Check for changes
-        const { stdout: statusOut } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
-        if (!statusOut || statusOut.trim() === '') {
-            return res.json({ success: true, message: 'Keine Änderungen zum Veröffentlichen.' });
+        // Detect current branch
+        let branch = 'main';
+        try {
+            const { stdout: branchOut } = await exec('git rev-parse --abbrev-ref HEAD', { cwd: PROJECT_ROOT });
+            if (branchOut && branchOut.trim()) branch = branchOut.trim();
+        } catch (e) {
+            console.warn("Could not detect git branch, defaulting to 'main'", e);
         }
 
-        // Ensure a committer identity exists (local repo may be missing config)
+        // 1. Fetch and Rebase to prevent push rejections
+        try {
+            await exec('git fetch origin', { cwd: PROJECT_ROOT });
+            await exec(`git pull --rebase origin ${branch}`, { cwd: PROJECT_ROOT });
+        } catch (pullErr) {
+            console.error("Git pull --rebase failed:", pullErr);
+            return res.status(409).json({
+                success: false,
+                error: "Automatische Synchronisation fehlgeschlagen (Rebase-Konflikt). Bitte löse Konflikte manuell auf.",
+                details: pullErr.message
+            });
+        }
+
+        // 2. Check for changes
+        const { stdout: statusOut } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
+        if (!statusOut || statusOut.trim() === '') {
+            return res.json({ 
+                success: true, 
+                message: 'Keine Änderungen zum Veröffentlichen.',
+                deployment: getDeploymentTrackingInfo()
+            });
+        }
+
+        // Ensure a committer identity exists
         try {
             await exec('git config user.name "Portfolio Manager"', { cwd: PROJECT_ROOT });
             await exec('git config user.email "portfolio@local"', { cwd: PROJECT_ROOT });
@@ -473,33 +821,107 @@ app.post('/api/publish', async (req, res) => {
             // Non-fatal
         }
 
-        // Stage, commit and push
+        // 3. Stage & Commit
         await exec('git add -A', { cwd: PROJECT_ROOT });
 
-        // Use commit message provided by client if available
         const userMsg = req.body && req.body.message ? String(req.body.message) : null;
         const commitMsg = userMsg || `Publish via portfolio-manager: ${new Date().toISOString()}`;
         try {
             const safeMsg = commitMsg.replace(/"/g, '\\"');
             await exec(`git commit -m "${safeMsg}"`, { cwd: PROJECT_ROOT });
         } catch (commitErr) {
-            // git commit may fail if no changes after add or other reasons
             const { stdout: afterStatus } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
             if (!afterStatus || afterStatus.trim() === '') {
-                return res.json({ success: true, message: 'Keine Änderungen zum Veröffentlichen nach Staging.' });
+                return res.json({ 
+                    success: true, 
+                    message: 'Keine Änderungen zum Veröffentlichen nach Staging.',
+                    deployment: getDeploymentTrackingInfo()
+                });
             }
             throw commitErr;
         }
 
-        // Push
-        const { stdout: pushOut, stderr: pushErr } = await exec('git push', { cwd: PROJECT_ROOT });
+        // 4. Push
+        const { stdout: pushOut, stderr: pushErr } = await exec(`git push origin ${branch}`, { cwd: PROJECT_ROOT });
 
-        res.json({ success: true, message: pushOut || 'Pushed.', debug: pushErr });
+        res.json({ 
+            success: true, 
+            message: pushOut || 'Pushed.', 
+            debug: pushErr,
+            deployment: getDeploymentTrackingInfo()
+        });
     } catch (e) {
         console.error('Publish error:', e);
         const errMsg = (e && e.message) ? e.message : String(e);
         res.status(500).json({ success: false, error: 'Fehler beim Veröffentlichen: ' + errMsg });
     }
+});
+
+// Helper to detect deployment tracking keys
+function getDeploymentTrackingInfo() {
+    if (process.env.VERCEL_TOKEN && process.env.VERCEL_PROJECT_ID) {
+        return { type: 'vercel', projectId: process.env.VERCEL_PROJECT_ID };
+    }
+    if (process.env.NETLIFY_AUTH_TOKEN && process.env.NETLIFY_SITE_ID) {
+        return { type: 'netlify', siteId: process.env.NETLIFY_SITE_ID };
+    }
+    return { type: 'simulated', durationMs: 35000 };
+}
+
+// Live deployment status API
+app.get('/api/publish/status', async (req, res) => {
+    // Vercel deployment tracking
+    if (process.env.VERCEL_TOKEN && process.env.VERCEL_PROJECT_ID) {
+        try {
+            const url = `https://api.vercel.com/v6/deployments?projectId=${process.env.VERCEL_PROJECT_ID}&limit=1`;
+            const response = await fetch(url, {
+                headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` }
+            });
+            const data = await response.json();
+            if (data.deployments && data.deployments.length > 0) {
+                const dep = data.deployments[0];
+                return res.json({
+                    success: true,
+                    type: 'vercel',
+                    status: dep.state === 'READY' ? 'ready' : (dep.state === 'ERROR' ? 'error' : 'building'),
+                    url: dep.url,
+                    createdAt: dep.createdAt
+                });
+            }
+        } catch (e) {
+            return res.json({ success: false, status: 'error', detail: e.message });
+        }
+    }
+
+    // Netlify deployment tracking
+    if (process.env.NETLIFY_AUTH_TOKEN && process.env.NETLIFY_SITE_ID) {
+        try {
+            const url = `https://api.netlify.com/api/v1/sites/${process.env.NETLIFY_SITE_ID}/deploys?per_page=1`;
+            const response = await fetch(url, {
+                headers: { Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}` }
+            });
+            const deploys = await response.json();
+            if (deploys && deploys.length > 0) {
+                const dep = deploys[0];
+                return res.json({
+                    success: true,
+                    type: 'netlify',
+                    status: dep.state === 'ready' ? 'ready' : (dep.state === 'error' ? 'error' : 'building'),
+                    url: dep.ssl_url || dep.url,
+                    createdAt: dep.created_at
+                });
+            }
+        } catch (e) {
+            return res.json({ success: false, status: 'error', detail: e.message });
+        }
+    }
+
+    // Default simulated response
+    res.json({ 
+        success: true, 
+        type: 'simulated', 
+        status: 'not_configured' 
+    });
 });
 
 // Start Server

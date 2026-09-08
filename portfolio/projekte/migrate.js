@@ -3,6 +3,7 @@ const fs = require('fs');
 function migrateDesign(file) {
     let data = JSON.parse(fs.readFileSync(file, 'utf8'));
     data = data.map(project => {
+        if (project.blocks && project.blocks.length > 0) return project;
         let blocks = [];
         if (project.images) {
             let galleryItems = [];
@@ -39,6 +40,7 @@ function migrateDesign(file) {
 function migrateVideo(file) {
     let data = JSON.parse(fs.readFileSync(file, 'utf8'));
     data = data.map(project => {
+        if (project.blocks && project.blocks.length > 0) return project;
         let blocks = [];
         
         if (project.pdf) {
@@ -71,6 +73,53 @@ function migrateVideo(file) {
     fs.writeFileSync(file, JSON.stringify(data, null, 4), 'utf8');
 }
 
+function migratePhotography(file) {
+    let data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    data = data.map(project => {
+        // If already migrated (has blocks) skip
+        if (project.blocks && Array.isArray(project.blocks) && project.blocks.length > 0) return project;
+
+        const blocks = [];
+
+        // If project previously used an `items` or `images` array
+        let galleryItems = [];
+        if (project.items && Array.isArray(project.items)) {
+            project.items.forEach((it, idx) => {
+                if (typeof it === 'string') {
+                    galleryItems.push({ id: `img-${project.id || 'p'}-${idx+1}`, imageUrl: it, title: '' });
+                } else if (it.imageUrl) {
+                    galleryItems.push({ id: it.id || `img-${project.id || 'p'}-${idx+1}`, imageUrl: it.imageUrl, title: it.title || '' });
+                }
+            });
+        }
+
+        if (project.images && Array.isArray(project.images)) {
+            project.images.forEach((it, idx) => {
+                if (typeof it === 'string') {
+                    galleryItems.push({ id: `img-${project.id || 'p'}-${idx+1}`, imageUrl: it, title: '' });
+                } else if (it.imageUrl) {
+                    galleryItems.push({ id: it.id || `img-${project.id || 'p'}-${idx+1}`, imageUrl: it.imageUrl, title: it.title || '' });
+                }
+            });
+        }
+
+        // If the project used a simple pattern of hero-image and no list, attempt to generate 1-item gallery
+        if (galleryItems.length === 0 && project['hero-image']) {
+            galleryItems.push({ id: `img-${project.id || 'p'}-1`, imageUrl: project['hero-image'], title: project.title || '' });
+        }
+
+        if (galleryItems.length > 0) {
+            blocks.push({ id: `block-${project.id || Math.random().toString(36).substr(2,9)}-gallery`, type: 'gallery', title: project.title || 'Galerie', items: galleryItems });
+        }
+
+        project.blocks = blocks;
+        delete project.images;
+        delete project.items;
+        return project;
+    });
+    fs.writeFileSync(file, JSON.stringify(data, null, 4), 'utf8');
+}
+
 try {
     migrateVideo('/Users/noeplain/Developer/noe-plain.github.io/portfolio/projekte/video-projects.json');
     console.log('Migrated video-projects.json');
@@ -78,6 +127,8 @@ try {
     console.log('Migrated designs.json');
     migrateDesign('/Users/noeplain/Developer/noe-plain.github.io/portfolio/projekte/illustrations.json');
     console.log('Migrated illustrations.json');
+    migratePhotography('/Users/noeplain/Developer/noe-plain.github.io/portfolio/projekte/photography.json');
+    console.log('Migrated photography.json');
 } catch (e) {
     console.error(e);
 }

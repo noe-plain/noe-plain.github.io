@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
         n = document.getElementById("hamburgerNav"),
         e = document.getElementById("hamburgerNavBg");
     t && n && e && (t.addEventListener("click", function () {
-        n.classList.add("open"), e.classList.add("open")
+        n.classList.toggle("open"), e.classList.toggle("open")
     }), e.addEventListener("click", function () {
         n.classList.remove("open"), e.classList.remove("open")
     }));

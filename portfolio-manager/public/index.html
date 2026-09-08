@@ -234,35 +234,42 @@
             <!-- Photography Tab -->
             <section id="tab-photography" class="tab-content">
                 <header>
-                    <h1>Fotografie Manager</h1>
-                    <div class="actions">
-                        <button class="primary-btn" onclick="triggerPhotoUpload()">
-                            <i class="fas fa-upload"></i> Foto hochladen
-                        </button>
-                        <input type="file" id="photo-upload-input" hidden accept="image/*" multiple>
-                    </div>
+                    <h1>Fotografie Projekte</h1>
+                    <button class="primary-btn" onclick="openProjectModal('photography')">
+                        <i class="fas fa-plus"></i> Neues Projekt
+                    </button>
                 </header>
-                <div class="photo-cats-container">
-                    <input type="hidden" id="photo-category-select" value="street">
-                    <div class="photo-category-row">
-                        <div class="photo-category-switch" id="photo-category-switch" aria-label="Fotokategorien">
-                            <!-- pills injected by JS -->
-                        </div>
-                        <button type="button" class="secondary-btn" id="add-photo-category-btn"
-                            onclick="openAddPhotoCategory()" title="Kategorie hinzufügen">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <div id="photo-dropzone" class="photo-dropzone" aria-hidden="false">
-                        <p>Ziehe Bilder hierher oder klicke zum Auswählen (mehrere Dateien möglich)</p>
-                        <div class="photo-drop-actions">
-                            <button type="button" class="secondary-btn" onclick="triggerPhotoUpload()"><i
-                                    class="fas fa-folder-open"></i> Dateien wählen</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="photo-grid" id="photo-grid">
+                <div class="project-list" id="list-photography">
                     <!-- Loaded dynamically -->
+                </div>
+
+                <!-- Photography Management UI -->
+                <div class="photo-management">
+                    <div class="photo-actions-row" style="display:flex; gap:12px; align-items:center; justify-content:space-between; margin-top:20px;">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <select id="photo-category-select" class="photo-category-select">
+                                <!-- options injected dynamically -->
+                            </select>
+                            <div id="photo-category-switch" class="photo-category-switch"></div>
+                            <button class="secondary-btn" onclick="openAddPhotoCategory()">Neue Kategorie</button>
+                            <button class="secondary-btn" onclick="migrateCategoriesToProjects()" title="Kategorien in Projekte umwandeln" style="margin-left:8px;">Kategorien → Projekte</button>
+                        </div>
+                        <div>
+                            <input id="photo-upload-input" type="file" accept="image/*" multiple hidden>
+                            <button class="primary-btn" onclick="triggerPhotoUpload()">Bilder hochladen</button>
+                        </div>
+                    </div>
+
+                    <div id="photo-dropzone" class="photo-dropzone" style="margin-top:12px;">
+                        <p>Ziehe Fotos hierher oder klicke zum Hochladen</p>
+                        <div class="photo-drop-actions">
+                            <button type="button" class="secondary-btn" onclick="triggerPhotoUpload()">Dateien auswählen</button>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <div id="photo-grid" class="photo-grid" style="margin-top:12px;"></div>
                 </div>
             </section>
 
@@ -327,6 +334,9 @@
             <h2 id="modal-title">Projekt bearbeiten</h2>
 
             <form id="project-form">
+                        <div class="editor-shell">
+                            <div class="editor-meta">
+                                <!-- left column: meta fields -->
                 <input type="hidden" id="p-type" name="type">
                 <input type="hidden" id="p-id" name="id">
 
@@ -388,9 +398,14 @@
                     </button>
                 </div>
 
+                    </div>
+
+                    <div class="editor-canvas">
                 <!-- Gutenberg Block Editor -->
                 <div id="fields-blocks" class="block-editor-container hidden">
-                    <h3>Inhalts-Blöcke (Gutenberg)</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3>Inhalts-Blöcke (Gutenberg)</h3>
+                    </div>
                     <p class="hint-text">Ziehen Sie die Blöcke an dem linken Handle, um sie zu sortieren.</p>
 
                     <div id="block-canvas" class="block-canvas">
@@ -434,6 +449,19 @@
                         </div>
                     </div>
                 </div>
+                    </div>
+
+                    <div class="editor-inspector">
+                        <h4>Inspector</h4>
+                        <p class="hint-text">Wähle einen Block, um seine Einstellungen hier zu bearbeiten. Du kannst Blöcke per Drag & Drop sortieren. Vorschau wird automatisch aktualisiert.</p>
+                        <div id="inspector-content">
+                            <!-- dynamic inspector content (future) -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fullscreen editor overlay (created dynamically) -->
+                <!-- Fullscreen editor removed -->
 
                 <div class="modal-actions">
                     <button type="button" class="cancel-btn" onclick="closeModal()">Abbrechen</button>
@@ -482,8 +510,250 @@
     <!-- Hidden file input for generic uploads -->
     <input type="file" id="generic-upload-input" hidden>
 
+    <!-- Media Library Modal -->
+    <div id="media-library-modal" class="modal hidden">
+        <div class="modal-content" style="max-width:1000px;">
+            <span class="close-modal" onclick="closeMediaLibrary()">&times;</span>
+            <h2>Media Library</h2>
+            <div style="display:flex; gap:12px; margin-bottom:12px; align-items:center;">
+                <input id="media-search" placeholder="Suche..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #eee;">
+                <button class="primary-btn" onclick="fetchMedia()">Suchen</button>
+                <select id="media-target-type" style="margin-left:8px; padding:8px; border-radius:8px;">
+                    <option value="uploads">Allgemein</option>
+                    <option value="design">Design</option>
+                    <option value="illustration">Illustration</option>
+                    <option value="video">Video</option>
+                    <option value="photography">Photography</option>
+                </select>
+                <input id="media-upload-input" type="file" accept="image/*,application/pdf" multiple hidden>
+                <button class="secondary-btn" onclick="document.getElementById('media-upload-input').click()">Upload</button>
+                <button class="secondary-btn" onclick="openFileManager()" title="Dateimanager öffnen" style="margin-left:8px;">Dateimanager</button>
+            </div>
+
+            <div id="media-dropzone" class="media-dropzone" style="border:2px dashed #eee; border-radius:8px; padding:18px; text-align:center; margin-bottom:12px;">
+                Ziehe Dateien hierher zum Hochladen oder nutze den Upload-Button. (Ziel: <span id="media-target-label">Allgemein</span>)
+            </div>
+
+            <div id="media-upload-status" style="margin-bottom:12px;"></div>
+
+            <div id="media-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; max-height:60vh; overflow:auto;"></div>
+            <div style="margin-top:12px; text-align:right;"><button class="secondary-btn" onclick="closeMediaLibrary()">Schliessen</button></div>
+        </div>
+    </div>
+
     <!-- SortableJS for Drag and Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+        <!-- File Manager Modal -->
+        <div id="file-manager-modal" class="modal hidden">
+            <div class="modal-content" style="max-width:1000px;">
+                <span class="close-modal" onclick="closeFileManager()">&times;</span>
+                <h2>Datei Manager</h2>
+                <div style="display:flex; gap:12px;">
+                    <div style="width:260px; border-right:1px solid #eee; padding-right:12px;">
+                        <h4>Ordner</h4>
+                        <div id="fm-folders" style="display:flex; flex-direction:column; gap:6px; max-height:60vh; overflow:auto;"></div>
+                    </div>
+                    <div style="flex:1; padding-left:12px;">
+                        <h4 id="fm-current-title">Inhalt</h4>
+                        <div id="fm-files" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; max-height:60vh; overflow:auto;"></div>
+                    </div>
+                </div>
+                <div style="margin-top:12px; text-align:right;"><button class="secondary-btn" onclick="closeFileManager()">Schliessen</button></div>
+            </div>
+        </div>
+
+    <!-- Studio WYSIWYG Editor Overlay -->
+    <div id="studio-editor" class="studio-editor hidden">
+        <!-- Top Navigation / Control Bar -->
+        <div class="studio-topbar">
+            <div class="studio-logo">
+                <i class="fas fa-cubes"></i>
+                <span>Antigravity <span class="brand-sub">Studio</span></span>
+            </div>
+            <div class="studio-device-toggles">
+                <button class="device-btn active" data-device="desktop" onclick="setStudioDevice('desktop')" title="Desktop Ansicht">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button class="device-btn" data-device="tablet" onclick="setStudioDevice('tablet')" title="Tablet Ansicht">
+                    <i class="fas fa-tablet-alt"></i>
+                </button>
+                <button class="device-btn" data-device="mobile" onclick="setStudioDevice('mobile')" title="Smartphone Ansicht">
+                    <i class="fas fa-mobile-alt"></i>
+                </button>
+            </div>
+            <div class="studio-actions">
+                <span id="studio-unpublished-badge" class="studio-badge hidden">Unpublished</span>
+                <button class="secondary-btn studio-action-btn" onclick="closeStudioEditor(false)">
+                    <i class="fas fa-times"></i> Schliessen
+                </button>
+                <button class="primary-btn studio-action-btn" onclick="closeStudioEditor(true)">
+                    <i class="fas fa-save"></i> Speichern
+                </button>
+            </div>
+        </div>
+
+        <div class="studio-workspace">
+            <!-- Sidebar -->
+            <aside class="studio-sidebar" id="studio-sidebar">
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab-btn active" data-tab="settings" onclick="setStudioSidebarTab('settings')" title="Einstellungen">
+                        <i class="fas fa-sliders-h"></i> Settings
+                    </button>
+                    <button class="sidebar-tab-btn" data-tab="blocks" onclick="setStudioSidebarTab('blocks')" title="Blöcke">
+                        <i class="fas fa-th-large"></i> Blocks
+                    </button>
+                    <button class="sidebar-tab-btn" data-tab="media" onclick="setStudioSidebarTab('media')" title="Medienbibliothek">
+                        <i class="fas fa-images"></i> Media
+                    </button>
+                </div>
+
+                <div class="sidebar-panes">
+                    <!-- Pane 1: Project Settings & Meta -->
+                    <div id="pane-settings" class="sidebar-pane active">
+                        <h3>Projekt Einstellungen</h3>
+                        <div class="form-group">
+                            <label>Titel</label>
+                            <input type="text" id="studio-p-title" oninput="updateStudioMeta('title', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Tab Titel (Navigations-Name)</label>
+                            <input type="text" id="studio-p-tabtitle" oninput="updateStudioMeta('tabTitle', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Beschreibung</label>
+                            <textarea id="studio-p-desc" rows="3" oninput="updateStudioMeta('description', this.value)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero Bild</label>
+                            <div class="input-with-btn">
+                                <input type="text" id="studio-p-hero" placeholder="../../images/..." oninput="updateStudioMeta('hero-image', this.value)">
+                                <button type="button" onclick="triggerStudioHeroUpload()"><i class="fas fa-upload"></i></button>
+                            </div>
+                        </div>
+                        <div id="studio-video-meta" class="hidden">
+                            <h4>Video Meta-Daten</h4>
+                            <div class="form-group">
+                                <label>Rolle</label>
+                                <input type="text" id="studio-p-role" oninput="updateStudioMeta('role', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Equipment</label>
+                                <input type="text" id="studio-p-equipment" oninput="updateStudioMeta('equipment', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Werkzeuge (Tools)</label>
+                                <input type="text" id="studio-p-tools" oninput="updateStudioMeta('tools', this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pane 2: Block Library -->
+                    <div id="pane-blocks" class="sidebar-pane">
+                        <h3>Blöcke</h3>
+                        <p class="hint-text">Ziehe Blöcke auf den Live-Canvas, um sie hinzuzufügen.</p>
+                        <div class="studio-block-library">
+                            <div class="studio-library-item" draggable="true" data-type="heading" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-heading"></i>
+                                <span>Überschrift</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="text" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-align-left"></i>
+                                <span>Textabschnitt</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="hero" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-image"></i>
+                                <span>Hero Bild</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="beforeafter" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-columns"></i>
+                                <span>CGI Slider</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="gallery" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-images"></i>
+                                <span>Bild-Grid</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="pdf" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF Viewer</span>
+                            </div>
+                            <div class="studio-library-item" draggable="true" data-type="youtube" ondragstart="handleBlockLibDragStart(event)">
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube Player</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pane 3: Media Hub -->
+                    <div id="pane-media" class="sidebar-pane">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <h3>Media Hub</h3>
+                            <button class="btn-icon" onclick="triggerStudioMediaUpload()" title="Dateien hochladen"><i class="fas fa-upload"></i></button>
+                        </div>
+                        <input type="file" id="studio-media-upload-input" accept="image/*,video/*,application/pdf" multiple hidden onchange="handleStudioMediaUpload(event)">
+                        
+                        <div class="studio-media-controls">
+                            <select id="studio-media-folder-select" onchange="loadStudioMedia()">
+                                <option value="uploads">Allgemein (Uploads)</option>
+                                <option value="design">Design</option>
+                                <option value="illustration">Illustration</option>
+                                <option value="video">Videografie</option>
+                                <option value="photography">Photography</option>
+                            </select>
+                        </div>
+                        <div id="studio-media-grid" class="studio-media-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inspector: context-sensitive configurations -->
+                <div class="sidebar-inspector" id="studio-inspector">
+                    <h4>Block Einstellungen</h4>
+                    <div id="studio-inspector-content">
+                        <p class="hint-text">Wähle einen Block auf dem Canvas aus, um seine Einstellungen anzupassen.</p>
+                    </div>
+                </div>
+
+                <!-- Collapse Toggle -->
+                <button class="sidebar-collapse-btn" onclick="toggleStudioSidebar()" title="Sidebar einklappen">
+                    <i class="fas fa-chevron-left" id="sidebar-collapse-icon"></i>
+                </button>
+            </aside>
+
+            <!-- Live Preview Canvas -->
+            <div class="studio-canvas-preview">
+                <div class="canvas-viewport" id="canvas-viewport">
+                    <!-- The project live DOM will be rendered here directly -->
+                    <div id="studio-canvas" class="studio-canvas">
+                        <!-- Project content rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Tracker Overlay -->
+    <div id="deploy-overlay" class="deploy-overlay hidden">
+        <div class="deploy-status-card">
+            <div class="deploy-header">
+                <h3>Website wird aktualisiert</h3>
+                <span id="deploy-status-label" class="badge-status">In Warteschlange</span>
+            </div>
+            <p>Die Änderungen werden direkt an GitHub übertragen und ein statisches Deployment gestartet.</p>
+            
+            <div class="deploy-progress-container">
+                <div id="deploy-progress-bar" class="deploy-progress-bar"></div>
+            </div>
+            
+            <div class="deploy-logs-console" id="deploy-logs">
+                Git status checking...
+            </div>
+            <div style="text-align:right; margin-top:12px;">
+                <button id="deploy-close-btn" class="secondary-btn hidden" onclick="closeDeployOverlay()">Schliessen</button>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

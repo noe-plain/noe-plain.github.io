@@ -10,6 +10,8 @@ def migrate_design(file_path):
         data = json.load(f)
         
     for p in data:
+        if 'blocks' in p and p['blocks']:
+            continue
         blocks = []
         if 'images' in p:
             gallery_items = []
@@ -44,6 +46,8 @@ def migrate_video(file_path):
         data = json.load(f)
         
     for p in data:
+        if 'blocks' in p and p['blocks']:
+            continue
         blocks = []
         
         if 'pdf' in p and p['pdf']:

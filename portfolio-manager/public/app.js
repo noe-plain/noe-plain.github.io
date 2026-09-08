@@ -2,12 +2,14 @@
 let currentType = 'dashboard';
 let projectsData = [];
 let linksData = [];
+// Photo UI elements (initialized in setupPhotography)
+let photoSelect, photoInput, photoSwitch, dropzone;
 
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupModal();
-    setupPhotography();
     setupLinkModal();
+    setupPhotography();
 
     // Load initial data
     loadDashboard();
@@ -16,19 +18,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Publish repository (trigger server-side git push) ---
 window.publishRepo = async function () {
-    const btn = document.getElementById('publish-btn');
-    if (!btn) return;
-    // Ask for commit message
     const defaultMsg = `Publish via portfolio-manager: ${new Date().toISOString()}`;
     const userMsg = prompt('Commit-Nachricht für den Commit eingeben (Abbrechen bricht ab):', defaultMsg);
     if (userMsg === null) return; // user cancelled
 
-    btn.disabled = true;
-    const origText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Veröffentliche...';
+    const overlay = document.getElementById('deploy-overlay');
+    const prgBar = document.getElementById('deploy-progress-bar');
+    const label = document.getElementById('deploy-status-label');
+    const logs = document.getElementById('deploy-logs');
+    const closeBtn = document.getElementById('deploy-close-btn');
+
+    if (!overlay) return;
+
+    // Reset overlay
+    overlay.classList.remove('hidden');
+    prgBar.style.width = '0%';
+    label.innerText = 'Synchronisiere...';
+    label.className = 'badge-status'; // remove ready/error
+    logs.innerText = 'Initialisiere Git-Synchronisation...\n';
+    closeBtn.classList.add('hidden');
 
     try {
-        // Ensure we call the backend server (use absolute URL if page not served over http(s))
+        logs.innerText += 'Führe "git pull --rebase" aus, um Konflikte zu vermeiden...\n';
+        prgBar.style.width = '10%';
+        
         const apiBase = (location.protocol === 'http:' || location.protocol === 'https:') ? `${location.protocol}//${location.host}` : 'http://localhost:3000';
         const res = await fetch(`${apiBase}/api/publish`, {
             method: 'POST',
@@ -36,44 +49,206 @@ window.publishRepo = async function () {
             body: JSON.stringify({ message: userMsg })
         });
 
-        // Handle JSON and non-JSON responses robustly
-        const ct = res.headers.get('content-type') || '';
-        let payload;
-        if (ct.includes('application/json')) {
-            try {
-                payload = await res.json();
-            } catch (parseErr) {
-                const txt = await res.text();
-                throw new Error('Invalid JSON response: ' + txt);
-            }
-        } else {
-            const txt = await res.text();
-            // Try to interpret as JSON anyway
-            try {
-                payload = JSON.parse(txt);
-            } catch (_) {
-                // Non-JSON: show raw text as error or message depending on status
-                if (res.ok) alert('Veröffentlicht:\n' + txt);
-                else throw new Error(txt || 'Non-JSON response from server');
-                payload = null;
-            }
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Fehler beim Git-Push.');
         }
 
-        if (payload) {
-            if (res.ok && payload.success) {
-                alert('Veröffentlicht:\n' + (payload.message || 'Erfolgreich gepusht.'));
-            } else {
-                console.error(payload);
-                alert('Fehler beim Veröffentlichen:\n' + (payload.error || JSON.stringify(payload)));
-            }
+        logs.innerText += 'Git-Synchronisation abgeschlossen!\n';
+        logs.innerText += `Commit: "${userMsg}" erfolgreich auf GitHub gepusht.\n`;
+        prgBar.style.width = '30%';
+
+        // Check deployment type
+        const dep = data.deployment || { type: 'simulated', durationMs: 35000 };
+        logs.innerText += `Deployment-Dienst erkannt: ${dep.type.toUpperCase()}\n`;
+
+        if (dep.type === 'vercel' || dep.type === 'netlify') {
+            logs.innerText += 'Verbinde mit Live API, um den Build-Status zu überwachen...\n';
+            pollDeploymentStatus(dep.type);
+        } else {
+            // Run simulated deployment
+            logs.innerText += 'Starte simulierten Build-Prozess...\n';
+            runSimulatedDeployment(dep.durationMs || 35000);
         }
-    } catch (e) {
-        console.error(e);
-        alert('Netzwerkfehler beim Veröffentlichen. Siehe Konsole.');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = origText;
+
+        // Hide unpublished badge on successful publish
+        localStorage.removeItem('hasUnpublishedChanges');
+        const badge = document.getElementById('studio-unpublished-badge');
+        if (badge) badge.classList.add('hidden');
+
+    } catch (err) {
+        console.error(err);
+        logs.innerText += `\nFEHLER: ${err.message || err}\n`;
+        label.innerText = 'Fehler';
+        label.classList.add('error');
+        prgBar.style.width = '100%';
+        prgBar.style.background = '#ef4444';
+        closeBtn.classList.remove('hidden');
     }
+};
+
+window.closeDeployOverlay = function () {
+    const overlay = document.getElementById('deploy-overlay');
+    if (overlay) overlay.classList.add('hidden');
+};
+
+function runSimulatedDeployment(durationMs) {
+    const prgBar = document.getElementById('deploy-progress-bar');
+    const label = document.getElementById('deploy-status-label');
+    const logs = document.getElementById('deploy-logs');
+    const closeBtn = document.getElementById('deploy-close-btn');
+
+    label.innerText = 'Baut Website';
+    
+    const steps = [
+        { timePct: 0.1, msg: 'npm ci --production ...' },
+        { timePct: 0.3, msg: 'Führe Build-Skripte aus...' },
+        { timePct: 0.45, msg: 'Generiere statische HTML-Seiten für Portfolio...' },
+        { timePct: 0.65, msg: 'Optimiere Bildformate (AVIF/WebP) & Video HLS Segmente...' },
+        { timePct: 0.8, msg: 'Kompiliere CSS und Javascript Bundles...' },
+        { timePct: 0.9, msg: 'Lade Build-Ordner in CDN-Netzwerk hoch...' },
+        { timePct: 1.0, msg: 'Deployment erfolgreich bereitgestellt auf CDN!' }
+    ];
+
+    let startTime = Date.now();
+    let interval = setInterval(() => {
+        let elapsed = Date.now() - startTime;
+        let progress = 30 + (elapsed / durationMs) * 70; // Map elapsed to 30%-100%
+
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            label.innerText = 'Live';
+            label.className = 'badge-status ready';
+            prgBar.style.width = '100%';
+            closeBtn.classList.remove('hidden');
+        } else {
+            prgBar.style.width = `${progress}%`;
+        }
+
+        // Print step messages based on elapsed percentage
+        const elapsedPct = elapsed / durationMs;
+        steps.forEach(step => {
+            if (elapsedPct >= step.timePct && !logs.innerText.includes(step.msg)) {
+                logs.innerText += `[Build] ${step.msg}\n`;
+                logs.scrollTop = logs.scrollHeight; // Auto scroll
+            }
+        });
+    }, 200);
+}
+
+function pollDeploymentStatus(type) {
+    const prgBar = document.getElementById('deploy-progress-bar');
+    const label = document.getElementById('deploy-status-label');
+    const logs = document.getElementById('deploy-logs');
+    const closeBtn = document.getElementById('deploy-close-btn');
+
+    label.innerText = 'Baut Website';
+    let progress = 30;
+    
+    let interval = setInterval(async () => {
+        try {
+            const res = await fetch('/api/publish/status');
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                logs.innerText += '[API] Fehler beim Abrufen des Status, versuche erneut...\n';
+                return;
+            }
+
+            logs.innerText += `[API Status] Build-Status: ${data.status.toUpperCase()}\n`;
+            logs.scrollTop = logs.scrollHeight;
+
+            if (data.status === 'ready') {
+                clearInterval(interval);
+                label.innerText = 'Live';
+                label.className = 'badge-status ready';
+                prgBar.style.width = '100%';
+                logs.innerText += `\nDeployment erfolgreich! Website ist live unter:\n${data.url || 'https://noe-plain.github.io'}\n`;
+                logs.scrollTop = logs.scrollHeight;
+                closeBtn.classList.remove('hidden');
+            } else if (data.status === 'error') {
+                clearInterval(interval);
+                label.innerText = 'Fehler';
+                label.className = 'badge-status error';
+                prgBar.style.width = '100%';
+                prgBar.style.background = '#ef4444';
+                logs.innerText += `\nFEHLER: Build auf ${type.toUpperCase()} fehlgeschlagen.\n`;
+                logs.scrollTop = logs.scrollHeight;
+                closeBtn.classList.remove('hidden');
+            } else {
+                // still building
+                progress += (95 - progress) * 0.1;
+                prgBar.style.width = `${progress}%`;
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    }, 4000);
+}
+
+// Update WYSIWYG preview for a block element
+function updateBlockPreview(blockEl) {
+    try {
+        if (!blockEl) return;
+        const type = blockEl.dataset.type;
+        const preview = blockEl.querySelector('.block-preview');
+        if (!preview) return;
+        // Clear
+        preview.innerHTML = '';
+        console.debug('updateBlockPreview', blockEl.dataset.id, type);
+
+    if (type === 'hero') {
+        const img = blockEl.querySelector('.b-hero-img').value || '';
+        const txt = blockEl.querySelector('.b-hero-text').value || '';
+        if (img) {
+            const im = document.createElement('img'); im.src = normalizeUrl(img); im.className = 'hero-image'; preview.appendChild(im);
+        }
+        if (txt) {
+            const p = document.createElement('p'); p.innerText = txt; p.style.marginTop='8px'; preview.appendChild(p);
+        }
+    } else if (type === 'heading') {
+        const level = blockEl.querySelector('.b-head-level').value || 'h2';
+        const txt = blockEl.querySelector('.b-head-text').value || '';
+            const h = document.createElement(level); h.innerText = txt || 'Titel'; preview.appendChild(h);
+    } else if (type === 'text') {
+        const html = blockEl.querySelector('.b-text-content').value || '';
+        const div = document.createElement('div'); div.innerHTML = html; preview.appendChild(div);
+    } else if (type === 'pdf') {
+        const title = blockEl.querySelector('.b-pdf-title').value || 'PDF';
+        const url = blockEl.querySelector('.b-pdf-url').value || '';
+        const thumb = blockEl.querySelector('.b-pdf-thumb').value || '';
+        const wrap = document.createElement('div');
+        if (thumb) { const im = document.createElement('img'); im.src = normalizeUrl(thumb); im.style.maxWidth='200px'; im.style.display='block'; wrap.appendChild(im); }
+        const a = document.createElement('a'); a.href = url; a.innerText = title; a.target='_blank'; wrap.appendChild(a);
+        preview.appendChild(wrap);
+    } else if (type === 'youtube') {
+        const id = blockEl.querySelector('.b-yt-id').value || '';
+        const title = blockEl.querySelector('.b-yt-title').value || '';
+        if (id) {
+            const iframe = document.createElement('iframe'); iframe.width='560'; iframe.height='315'; iframe.src=`https://www.youtube.com/embed/${id}`; iframe.frameBorder=0; iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'; iframe.allowFullscreen = true; preview.appendChild(iframe);
+        } else {
+            const p = document.createElement('div'); p.innerText = title || 'YouTube Video (ID fehlt)'; preview.appendChild(p);
+        }
+    } else if (type === 'gallery' || type === 'media') {
+        const items = blockEl.querySelectorAll('.b-gal-item-row');
+        const grid = document.createElement('div'); grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(auto-fill,minmax(140px,1fr))'; grid.style.gap='8px';
+        items.forEach(r => {
+            const kind = (r.querySelector('.b-gal-kind') || {value:'image'}).value;
+            const thumb = (kind === 'pdf') ? (r.querySelector('.b-gal-pdf-thumb') ? r.querySelector('.b-gal-pdf-thumb').value : '') : (r.querySelector('.b-gal-img-url') ? r.querySelector('.b-gal-img-url').value : '');
+            const title = (r.querySelector('.b-gal-item-title') || {value:''}).value;
+            const c = document.createElement('div'); c.style.border='1px solid rgba(0,0,0,0.03)'; c.style.borderRadius='6px'; c.style.overflow='hidden'; c.style.background='#fff'; c.style.display='flex'; c.style.flexDirection='column';
+            const im = document.createElement('img'); im.src = normalizeUrl(thumb) || ''; im.style.width='100%'; im.style.height='120px'; im.style.objectFit='cover'; c.appendChild(im);
+            const t = document.createElement('div'); t.style.padding='6px'; t.innerText = title || '';
+            c.appendChild(t);
+            grid.appendChild(c);
+        });
+        preview.appendChild(grid);
+    }
+        } catch (e) {
+            console.error('updateBlockPreview error for block', blockEl && blockEl.dataset && blockEl.dataset.id, e);
+        }
 }
 
 function setupTabs() {
@@ -101,10 +276,10 @@ function setupTabs() {
             currentType = type;
             if (type === 'dashboard') {
                 loadDashboard();
-            } else if (type === 'photography') {
-                loadPhotography();
             } else if (type === 'links') {
                 loadLinks();
+            } else if (type === 'photography') {
+                loadPhotography();
             } else {
                 loadProjects(type);
             }
@@ -268,12 +443,13 @@ async function loadDashboard() {
 
             const card = document.createElement('div');
             card.className = 'recent-card';
-            card.onclick = () => {
+            card.onclick = async () => {
                 if (p._type === 'photography') {
                     document.querySelector('.nav-btn[data-tab="photography"]').click();
                 } else {
                     document.querySelector(`.nav-btn[data-tab="${p._type}"]`).click();
-                    setTimeout(() => editProject(p.id), 100);
+                    await loadProjects(p._type);
+                    editProject(p.id);
                 }
             };
             card.innerHTML = `
@@ -351,6 +527,12 @@ async function loadProjects(type) {
     }
 }
 
+// Normalize relative URLs like "../../images/..." to absolute 
+function normalizeUrl(u) {
+    if (!u) return '';
+    return String(u).replace(/^\.\.\//g, '/').replace(/^\.\//g, '/');
+}
+
 function renderProjects(data, type) {
     const container = document.getElementById(`list-${type}`);
     container.innerHTML = '';
@@ -425,64 +607,7 @@ function selectCategoryForNewProject(type) {
 }
 
 function openProjectModal(type, project = null) {
-    currentType = type;
-    document.getElementById('p-type').value = type;
-
-    // Clear all fields
-    form.reset();
-    document.getElementById('video-list-container').innerHTML = '';
-    document.getElementById('gallery-list-container').innerHTML = '';
-
-    // Toggle Visibility
-    document.querySelectorAll('.type-specific-fields').forEach(el => el.classList.add('hidden'));
-    document.getElementById('fields-blocks').classList.add('hidden');
-    document.getElementById('block-canvas').innerHTML = ''; // clear blocks
-
-    if (project) {
-        document.getElementById('modal-title').innerText = 'Projekt bearbeiten';
-        document.getElementById('p-id').value = project.id;
-        document.getElementById('p-title').value = project.title;
-        document.getElementById('p-desc').value = project.description || '';
-        document.getElementById('p-tabTitle').value = project.tabTitle || '';
-        document.getElementById('p-hero').value = project['hero-image'] || project.heroImage || '';
-
-        if (project.blocks) {
-            // Gutenberg Project
-            document.getElementById('fields-blocks').classList.remove('hidden');
-            project.blocks.forEach(b => renderBlockToCanvas(b));
-            initSortable();
-        } else {
-            // Legacy Project
-            if (type === 'video') {
-                document.getElementById('fields-video').classList.remove('hidden');
-                if (project.heroMeta) {
-                    project.heroMeta.forEach(m => {
-                        if (m.includes('Rolle')) document.getElementById('p-role').value = stripHtml(m).replace('Rolle:', '').trim();
-                        if (m.includes('Equipment')) document.getElementById('p-equipment').value = stripHtml(m).replace('Equipment:', '').trim();
-                        if (m.includes('Tools')) document.getElementById('p-tools').value = stripHtml(m).replace('Tools:', '').trim();
-                    });
-                }
-                if (project.videos) {
-                    project.videos.forEach(v => addVideoInput(v));
-                }
-            } else {
-                document.getElementById('fields-gallery').classList.remove('hidden');
-                if (project.images) {
-                    project.images.forEach(img => addGalleryImageInput(img));
-                }
-            }
-        }
-
-    } else {
-        document.getElementById('modal-title').innerText = 'Neues Projekt';
-        document.getElementById('p-id').value = '';
-
-        // NEW PROJECTS ALWAYS USE BLOCKS
-        document.getElementById('fields-blocks').classList.remove('hidden');
-        initSortable();
-    }
-
-    modal.classList.remove('hidden');
+    openStudioEditor(type, project);
 }
 
 function closeModal() {
@@ -542,7 +667,9 @@ async function handleSave(e) {
                 b.level = el.querySelector('.b-head-level').value;
                 b.text = el.querySelector('.b-head-text').value;
             } else if (type === 'text') {
-                b.html = el.querySelector('.b-text-content').value;
+                const rich = el.querySelector('.b-text-rich');
+                if (rich) b.html = rich.innerHTML;
+                else b.html = (el.querySelector('.b-text-content') || { value: '' }).value;
             } else if (type === 'pdf') {
                 b.title = el.querySelector('.b-pdf-title').value;
                 b.pdfUrl = el.querySelector('.b-pdf-url').value;
@@ -773,9 +900,6 @@ window.moveRow = function (btn, direction) {
 }
 
 /* --- Photography --- */
-const photoSelect = document.getElementById('photo-category-select');
-const photoInput = document.getElementById('photo-upload-input');
-const photoSwitch = document.getElementById('photo-category-switch');
 
 // Default categories (can be extended by user)
 let photoCategories = ['street', 'human-nature', 'aviation', 'portraet', 'bts', 'event'];
@@ -790,37 +914,61 @@ const categoryDisplayNames = {
 };
 
 function setupPhotography() {
+    // Initialize DOM refs
+    photoSelect = document.getElementById('photo-category-select');
+    photoInput = document.getElementById('photo-upload-input');
+    photoSwitch = document.getElementById('photo-category-switch');
+    dropzone = document.getElementById('photo-dropzone');
+
     // Render the pill switch and attach events
     renderPhotoCategories();
-    photoInput.addEventListener('change', uploadPhoto);
-}
 
-// Drag & Drop handlers for multi-file upload
-const dropzone = document.getElementById('photo-dropzone');
-if (dropzone) {
-    ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
-        e.preventDefault(); e.stopPropagation();
-        dropzone.classList.add('dragover');
-    }));
-    ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
-        e.preventDefault(); e.stopPropagation();
-        if (evt === 'drop') {
-            dropzone.classList.remove('dragover');
-            const dt = e.dataTransfer;
-            if (dt && dt.files && dt.files.length) {
-                uploadMultiplePhotos(dt.files);
+    if (photoInput) photoInput.addEventListener('change', uploadPhoto);
+
+    // Dropzone handlers for multi-file upload
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+            e.preventDefault(); e.stopPropagation();
+            dropzone.classList.add('dragover');
+        }));
+        ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+            e.preventDefault(); e.stopPropagation();
+            if (evt === 'drop') {
+                dropzone.classList.remove('dragover');
+                const dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length) {
+                    uploadMultiplePhotos(dt.files);
+                }
+            } else {
+                dropzone.classList.remove('dragover');
             }
-        } else {
-            dropzone.classList.remove('dragover');
-        }
-    }));
+        }));
 
-    // Click on dropzone opens file chooser
-    dropzone.addEventListener('click', () => triggerPhotoUpload());
+        // Click on dropzone opens file chooser
+        dropzone.addEventListener('click', () => triggerPhotoUpload());
+    }
+
+    // If currently viewing photography, load initial grid
+    if (currentType === 'photography') loadPhotography();
 }
+
+
 
 function renderPhotoCategories() {
     if (!photoSwitch || !photoSelect) return;
+    // Populate select options
+    photoSelect.innerHTML = '';
+    photoCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.innerText = categoryDisplayNames[cat] || capitalize(cat);
+        photoSelect.appendChild(opt);
+    });
+
+    // Ensure a selected value
+    if (!photoSelect.value && photoCategories.length > 0) photoSelect.value = photoCategories[0];
+
+    // Render pill switch
     photoSwitch.innerHTML = '';
     photoCategories.forEach(cat => {
         const pill = document.createElement('button');
@@ -1005,6 +1153,27 @@ window.deletePhoto = async function (filename) {
 
 window.triggerPhotoUpload = function () { document.getElementById('photo-upload-input').click(); }
 
+async function migrateCategoriesToProjects() {
+    if (!confirm('Möchtest du alle vorhandenen Fotokategorien in Projekte umwandeln? Dies verschiebt Dateien und passt Referenzen an.')) return;
+    try {
+        const res = await fetch('/api/media/migrate-categories-to-projects', { method: 'POST' });
+        const json = await res.json();
+        if (json && json.success) {
+            alert('Migration abgeschlossen. Verschobene Dateien: ' + (json.migrated ? json.migrated.length : 0));
+            // refresh UI
+            loadPhotography();
+            try { renderFileManager(); } catch(e){}
+            try { fetchMedia(); } catch(e){}
+        } else {
+            console.error(json);
+            alert('Migration fehlgeschlagen');
+        }
+    } catch (e) {
+        console.error('migration error', e);
+        alert('Migration fehlgeschlagen. Siehe Konsole.');
+    }
+}
+
 async function uploadPhoto(e) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -1098,8 +1267,12 @@ async function uploadFile(file, type, targetInputId) {
         const json = await res.json();
         if (json.success) {
             const input = document.getElementById(targetInputId);
-            if (input) input.value = json.url;
+            if (input) {
+                input.value = normalizeUrl(json.url);
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
         }
+        return json;
     } catch (e) { alert('Upload Error'); }
 }
 
@@ -1304,21 +1477,27 @@ async function saveAllLinks() {
 /* --- Gutenberg Block Editor Logistics --- */
 
 let sortableInstance = null;
+let selectedBlock = null;
 
 window.initSortable = function () {
-    const canvas = document.getElementById('block-canvas');
+    // prefer fullscreen canvas if present
+    const canvas = document.getElementById('fs-block-canvas') || document.getElementById('block-canvas');
     if (sortableInstance) sortableInstance.destroy();
 
-    if (typeof Sortable !== 'undefined') {
+    if (canvas && typeof Sortable !== 'undefined') {
         sortableInstance = new Sortable(canvas, {
             handle: '.block-drag-handle',
             animation: 150,
             ghostClass: 'sortable-ghost'
         });
     } else {
-        console.warn("SortableJS not loaded.");
+        console.warn("SortableJS not loaded or canvas missing.");
     }
 }
+
+// Fullscreen editor removed - provide no-op functions for compatibility
+window.openFullEditor = function () { console.debug('openFullEditor disabled'); };
+window.closeFullEditor = function () { console.debug('closeFullEditor disabled'); };
 
 window.addBlock = function (type) {
     const block = { id: 'block-' + Date.now(), type: type };
@@ -1347,7 +1526,7 @@ window.toggleBlock = function (el) {
 };
 
 window.renderBlockToCanvas = function (b) {
-    const canvas = document.getElementById('block-canvas');
+    const canvas = document.getElementById('fs-block-canvas') || document.getElementById('block-canvas');
     const div = document.createElement('div');
     div.className = 'editor-block';
     div.dataset.id = b.id;
@@ -1398,9 +1577,12 @@ window.renderBlockToCanvas = function (b) {
     } else if (b.type === 'gallery' || b.type === 'media') {
         title = 'Fotogalerie / Media'; icon = 'fa-images';
         innerHTML = `
+            <div class="b-gal-dropzone" style="padding:8px; border:1px dashed rgba(0,0,0,0.08); border-radius:8px; text-align:center; margin-bottom:8px;">
+                Ziehe Bilder hierher oder klicke auf "Bild hinzufügen".
+            </div>
             <div class="b-gal-items" style="display:flex;flex-direction:column;gap:8px;">
             </div>
-            <div style="margin-top:8px; display:flex; gap:8px;">
+            <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
                 <button type="button" class="secondary-btn" onclick="appendGalItemToBlock(this.closest('.editor-block'),'image')">Bild hinzufügen</button>
                 <button type="button" class="secondary-btn" onclick="appendGalItemToBlock(this.closest('.editor-block'),'pdf')">PDF hinzufügen</button>
             </div>
@@ -1418,6 +1600,7 @@ window.renderBlockToCanvas = function (b) {
                     <button type="button" class="block-delete-btn" onclick="removeBlock(this)"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
+            <div class="block-preview" data-preview-for="${b.id}"></div>
             ${innerHTML}
         </div>
     `;
@@ -1429,6 +1612,391 @@ window.renderBlockToCanvas = function (b) {
     // Populate gallery items if provided (for gallery/media blocks)
     if ((b.type === 'gallery' || b.type === 'media') && Array.isArray(b.items) && b.items.length) {
         b.items.forEach(it => appendGalItemToBlock(div, it.type || (it.pdfUrl ? 'pdf' : 'image'), it));
+    }
+
+    // initialize preview
+    updateBlockPreview(div);
+
+    // selection handler for inspector
+    div.addEventListener('click', (ev) => {
+        // avoid triggering when clicking inputs inside the block
+        if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'BUTTON')) return;
+        selectBlock(div);
+    });
+
+    // attach input listeners to update preview live
+    const inputs = div.querySelectorAll('input, textarea, select');
+    inputs.forEach(inp => inp.addEventListener('input', () => updateBlockPreview(div)));
+
+    // Block-local dropzone handling (for gallery/media blocks)
+    const blockDz = div.querySelector('.b-gal-dropzone');
+    if (blockDz) {
+        ['dragenter','dragover'].forEach(evt => blockDz.addEventListener(evt, (e)=>{ e.preventDefault(); e.stopPropagation(); blockDz.classList.add('dragover'); }));
+        ['dragleave','drop'].forEach(evt => blockDz.addEventListener(evt, async (e)=>{
+            e.preventDefault(); e.stopPropagation();
+            if (evt === 'drop') {
+                blockDz.classList.remove('dragover');
+                const dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length) {
+                    for (const f of Array.from(dt.files)) {
+                        if (!f.type.startsWith('image')) continue;
+                        const newRow = appendGalItemToBlock(div, 'image');
+                        const imgInput = newRow.querySelector('.b-gal-img-url');
+                        if (imgInput && !imgInput.id) imgInput.id = 'bgal-' + Date.now() + '-' + Math.floor(Math.random()*10000);
+                        try {
+                            const res = await uploadFile(f, currentType, imgInput.id);
+                            if (res && res.url) {
+                                const imgEl = newRow.querySelector('img');
+                                if (imgEl) imgEl.src = res.url;
+                                imgInput.value = res.url;
+                            }
+                        } catch (e) { console.error('block upload failed', e); }
+                    }
+                }
+            } else {
+                blockDz.classList.remove('dragover');
+            }
+        }));
+
+        blockDz.addEventListener('click', ()=>{
+            // Create a new row and trigger the generic upload for its input
+            const newRow = appendGalItemToBlock(div, 'image');
+            const imgInput = newRow.querySelector('.b-gal-img-url');
+            if (imgInput) triggerUpload(imgInput);
+        });
+    }
+}
+
+function selectBlock(blockEl) {
+    if (selectedBlock) selectedBlock.classList.remove('selected-block');
+    selectedBlock = blockEl;
+    if (selectedBlock) selectedBlock.classList.add('selected-block');
+    // Populate inspector
+    populateInspectorFor(selectedBlock);
+}
+
+function populateInspectorFor(blockEl) {
+    const inspector = document.getElementById('inspector-content');
+    if (!inspector) return;
+    inspector.innerHTML = '';
+    if (!blockEl) { inspector.innerHTML = '<p>Kein Block ausgewählt</p>'; return; }
+    const type = blockEl.dataset.type;
+    const title = document.createElement('h3'); title.innerText = 'Block: ' + (type || ''); inspector.appendChild(title);
+
+    if (type === 'hero') {
+        const inp = document.createElement('input'); inp.type='text'; inp.value = blockEl.querySelector('.b-hero-img').value || '';
+        inp.placeholder = '../../images/...'; inp.style.width='100%'; inp.addEventListener('input', () => {
+            const el = blockEl.querySelector('.b-hero-img'); if (el) el.value = inp.value; updateBlockPreview(blockEl);
+        });
+        const btn = document.createElement('button'); btn.className='secondary-btn'; btn.innerText='Aus Media wählen'; btn.onclick = ()=>{ openMediaLibrary((url)=>{ inp.value = url; inp.dispatchEvent(new Event('input',{bubbles:true})); }); };
+        inspector.appendChild(inp); inspector.appendChild(document.createElement('br')); inspector.appendChild(btn);
+    } else if (type === 'heading') {
+        const level = blockEl.querySelector('.b-head-level').value;
+        const sel = document.createElement('select'); ['h1','h2','h3','h4','h5','h6'].forEach(l=>{ const o=document.createElement('option'); o.value=l; o.innerText=l.toUpperCase(); if(l===level) o.selected=true; sel.appendChild(o); });
+        sel.addEventListener('change', ()=>{ blockEl.querySelector('.b-head-level').value = sel.value; updateBlockPreview(blockEl); });
+        const txt = document.createElement('input'); txt.type='text'; txt.value = blockEl.querySelector('.b-head-text').value || ''; txt.style.width='100%'; txt.addEventListener('input', ()=>{ blockEl.querySelector('.b-head-text').value = txt.value; updateBlockPreview(blockEl); });
+        inspector.appendChild(sel); inspector.appendChild(document.createElement('br')); inspector.appendChild(txt);
+    } else if (type === 'text') {
+        // prefer rich contenteditable if present
+        let rich = blockEl.querySelector('.b-text-rich');
+        if (!rich) {
+            // create rich editor and hide textarea
+            const ta = blockEl.querySelector('.b-text-content');
+            rich = document.createElement('div'); rich.className='b-text-rich'; rich.contentEditable = 'true'; rich.style.minHeight='140px'; rich.style.border='1px solid rgba(0,0,0,0.06)'; rich.style.padding='8px'; rich.style.borderRadius='6px'; rich.innerHTML = ta ? ta.value : '';
+            if (ta) ta.style.display='none';
+            ta && ta.parentNode && ta.parentNode.insertBefore(rich, ta);
+            rich.addEventListener('input', ()=>{ updateBlockPreview(blockEl); });
+        }
+        const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='6px'; controls.style.marginBottom='6px';
+        ['B','I','U'].forEach(cmd=>{ const b=document.createElement('button'); b.className='secondary-btn'; b.innerText=cmd; b.onclick=(e)=>{ e.preventDefault(); document.execCommand(cmd==='B'?'bold':cmd==='I'?'italic':'underline', false, null); rich.focus(); }; controls.appendChild(b); });
+        inspector.appendChild(controls); inspector.appendChild(document.createElement('div')).appendChild(document.createTextNode('')); inspector.appendChild(document.createElement('div'));
+        // show current HTML
+        const show = document.createElement('div'); show.style.marginTop='8px'; show.style.fontSize='0.85rem'; show.style.color='#666'; show.innerText='Vorschau (editable)'; inspector.appendChild(show);
+    } else if (type === 'gallery' || type==='media') {
+        const btnAdd = document.createElement('button'); btnAdd.className='primary-btn'; btnAdd.innerText='Neues Bild via Media Library hinzufügen'; btnAdd.onclick = ()=>{ openMediaLibrary((url)=>{ const newRow = appendGalItemToBlock(blockEl,'image',{imageUrl:url}); updateBlockPreview(blockEl); }); };
+        inspector.appendChild(btnAdd);
+        const info = document.createElement('p'); info.innerText='Galerie-Items bearbeiten im Block. Klick auf ein Item zeigt Upload/URL.'; inspector.appendChild(info);
+    } else if (type === 'pdf') {
+        const title = blockEl.querySelector('.b-pdf-title').value || '';
+        const url = blockEl.querySelector('.b-pdf-url').value || '';
+        const thumb = blockEl.querySelector('.b-pdf-thumb').value || '';
+        const it = document.createElement('div'); it.innerHTML = `<input type='text' class='ins-pdf-title' placeholder='Titel' value='${title}' style='width:100%'>`;
+        inspector.appendChild(it);
+        const inUrl = document.createElement('input'); inUrl.type='text'; inUrl.value=url; inUrl.style.width='100%'; inUrl.placeholder='PDF URL'; inUrl.addEventListener('input',()=>{ blockEl.querySelector('.b-pdf-url').value = inUrl.value; updateBlockPreview(blockEl); }); inspector.appendChild(inUrl);
+        const btn = document.createElement('button'); btn.className='secondary-btn'; btn.innerText='Wähle Vorschaubild'; btn.onclick = ()=> openMediaLibrary((u)=>{ blockEl.querySelector('.b-pdf-thumb').value = u; updateBlockPreview(blockEl); }); inspector.appendChild(btn);
+    } else if (type === 'youtube') {
+        const id = blockEl.querySelector('.b-yt-id').value || '';
+        const idInp = document.createElement('input'); idInp.type='text'; idInp.value=id; idInp.placeholder='YouTube ID'; idInp.style.width='100%'; idInp.addEventListener('input', ()=>{ blockEl.querySelector('.b-yt-id').value = idInp.value; updateBlockPreview(blockEl); }); inspector.appendChild(idInp);
+    }
+}
+
+/* --- Media Library --- */
+function openMediaLibrary(onSelect) {
+    window._mediaSelectCallback = onSelect || null;
+    document.getElementById('media-library-modal').classList.remove('hidden');
+    fetchMedia();
+}
+
+function closeMediaLibrary() {
+    document.getElementById('media-library-modal').classList.add('hidden');
+    window._mediaSelectCallback = null;
+}
+
+async function fetchMedia() {
+    const q = document.getElementById('media-search').value || '';
+    const grid = document.getElementById('media-grid');
+    grid.innerHTML = 'Lade...';
+    try {
+        const res = await fetch('/api/media');
+        const items = await res.json();
+        // Apply search and folder filter
+        let filtered = items;
+        const qLower = q.toLowerCase();
+        const folder = (document.getElementById('media-target-type') && document.getElementById('media-target-type').value) || '';
+        if (q) filtered = items.filter(i => i.toLowerCase().includes(qLower));
+        if (folder && folder !== 'uploads') {
+            // items are like ../../images/portfolio/<folder>/...
+            filtered = filtered.filter(i => i.includes(`/portfolio/${folder}/`));
+        }
+        grid.innerHTML = '';
+            filtered.slice().reverse().forEach(u => {
+            const div = document.createElement('div'); div.className='media-item';
+            const img = document.createElement('img'); img.src = normalizeUrl(u);
+            div.appendChild(img);
+            div.onclick = () => {
+                if (window._mediaSelectCallback) window._mediaSelectCallback(u);
+                closeMediaLibrary();
+            };
+            grid.appendChild(div);
+        });
+    } catch (e) {
+        grid.innerHTML = 'Fehler beim Laden der Media Library';
+    }
+}
+
+// Media upload from Media Library modal
+document.addEventListener('DOMContentLoaded', ()=>{
+    const mu = document.getElementById('media-upload-input');
+    if (mu) mu.addEventListener('change', async (e)=>{
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        try {
+            await uploadFilesWithProgress(files, (document.getElementById('media-target-type') && document.getElementById('media-target-type').value) || 'uploads');
+            // refresh media grid
+            fetchMedia();
+        } catch (e) {
+            console.error('media upload failed', e);
+            alert('Upload fehlgeschlagen');
+        } finally {
+            mu.value = '';
+        }
+    });
+    
+    // Setup dropzone for media modal
+    const dz = document.getElementById('media-dropzone');
+    const targetLabel = document.getElementById('media-target-label');
+    const targetSelect = document.getElementById('media-target-type');
+    if (targetSelect && targetLabel) {
+        targetSelect.addEventListener('change', ()=>{ targetLabel.innerText = targetSelect.options[targetSelect.selectedIndex].text; });
+    }
+
+    if (dz) {
+        ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dz.style.background='#fbfbff'; dz.style.borderColor='#cbd5e1'; }));
+        ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dz.style.background=''; dz.style.borderColor='#eee'; }));
+        dz.addEventListener('drop', async (e)=>{
+            const dt = e.dataTransfer;
+            if (!dt || !dt.files || dt.files.length === 0) return;
+            const files = Array.from(dt.files);
+            try {
+                await uploadFilesWithProgress(files, (document.getElementById('media-target-type') && document.getElementById('media-target-type').value) || 'uploads');
+                fetchMedia();
+            } catch (err) {
+                console.error('Drop upload error', err);
+                alert('Upload via Drag&Drop fehlgeschlagen');
+            }
+        });
+    }
+});
+
+// Upload helper with progress UI using XMLHttpRequest
+function uploadFilesWithProgress(files, targetType) {
+    return new Promise((resolve) => {
+        const statusContainer = document.getElementById('media-upload-status');
+        if (!statusContainer) return resolve();
+        statusContainer.innerHTML = '';
+
+        const promises = files.map((file) => new Promise((res) => {
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '8px';
+            row.style.marginBottom = '6px';
+
+            const name = document.createElement('div'); name.innerText = file.name; name.style.flex = '1'; name.style.fontSize='13px';
+            const progWrap = document.createElement('div'); progWrap.style.width='220px'; progWrap.style.background='#f3f4f6'; progWrap.style.borderRadius='6px'; progWrap.style.overflow='hidden';
+            const progBar = document.createElement('div'); progBar.style.width='0%'; progBar.style.height='10px'; progBar.style.background='#2563eb'; progBar.style.transition='width 120ms linear';
+            progWrap.appendChild(progBar);
+            const status = document.createElement('div'); status.innerText='...'; status.style.width='80px'; status.style.textAlign='right'; status.style.fontSize='12px';
+
+            row.appendChild(name); row.appendChild(progWrap); row.appendChild(status);
+            statusContainer.appendChild(row);
+
+            const xhr = new XMLHttpRequest();
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('type', targetType || 'uploads');
+
+            xhr.open('POST', '/api/upload');
+            xhr.upload.onprogress = function (ev) {
+                if (ev.lengthComputable) {
+                    const pct = Math.round((ev.loaded / ev.total) * 100);
+                    progBar.style.width = pct + '%';
+                    status.innerText = pct + '%';
+                }
+            };
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    progBar.style.width = '100%';
+                    status.innerText = 'Fertig';
+                    res({ success: true, resp: xhr.responseText });
+                } else {
+                    status.innerText = 'Fehler';
+                    row.style.opacity = '0.6';
+                    res({ success: false, resp: xhr.responseText });
+                }
+            };
+            xhr.onerror = function () { status.innerText = 'Fehler'; row.style.opacity='0.6'; res({ success: false }); };
+            xhr.send(fd);
+        }));
+
+        Promise.all(promises).then(() => {
+            // clear status after short delay
+            setTimeout(()=>{ if (statusContainer) statusContainer.innerHTML=''; }, 900);
+            resolve();
+        });
+    });
+}
+
+// Gallery item selection for inspector
+function selectGalleryItem(blockEl, rowEl) {
+    // mark selection
+    blockEl.querySelectorAll('.b-gal-item-row').forEach(r=>r.classList.remove('selected-gal-item'));
+    rowEl.classList.add('selected-gal-item');
+    // populate inspector
+    const inspector = document.getElementById('inspector-content');
+    if (!inspector) return;
+    inspector.innerHTML = '';
+    const h = document.createElement('h4'); h.innerText = 'Gallery Item'; inspector.appendChild(h);
+
+    const kind = (rowEl.querySelector('.b-gal-kind') || {value:'image'}).value;
+    if (kind === 'pdf') {
+        const pdfUrl = rowEl.querySelector('.b-gal-pdf-url');
+        const thumb = rowEl.querySelector('.b-gal-pdf-thumb');
+        const title = rowEl.querySelector('.b-gal-item-title');
+        const inTitle = document.createElement('input'); inTitle.type='text'; inTitle.value = title.value || ''; inTitle.placeholder='Titel'; inTitle.style.width='100%'; inTitle.addEventListener('input', ()=>{ title.value = inTitle.value; updateBlockPreview(blockEl); });
+        const btnThumb = document.createElement('button'); btnThumb.className='secondary-btn'; btnThumb.innerText='Wähle Vorschaubild'; btnThumb.onclick=()=>openMediaLibrary((u)=>{ thumb.value = u; updateBlockPreview(blockEl); });
+        inspector.appendChild(inTitle); inspector.appendChild(document.createElement('br')); inspector.appendChild(btnThumb);
+        inspector.appendChild(document.createElement('br'));
+        const inPdf = document.createElement('input'); inPdf.type='text'; inPdf.value = pdfUrl.value || ''; inPdf.placeholder='PDF URL'; inPdf.style.width='100%'; inPdf.addEventListener('input', ()=>{ pdfUrl.value = inPdf.value; updateBlockPreview(blockEl); }); inspector.appendChild(inPdf);
+    } else {
+        const imgInput = rowEl.querySelector('.b-gal-img-url');
+        const title = rowEl.querySelector('.b-gal-item-title');
+        const inTitle = document.createElement('input'); inTitle.type='text'; inTitle.value = title.value || ''; inTitle.placeholder='Titel'; inTitle.style.width='100%'; inTitle.addEventListener('input', ()=>{ title.value = inTitle.value; updateBlockPreview(blockEl); });
+        const btnChoose = document.createElement('button'); btnChoose.className='secondary-btn'; btnChoose.innerText='Aus Media wählen'; btnChoose.onclick=()=>openMediaLibrary((u)=>{ imgInput.value = u; updateBlockPreview(blockEl); imgInput.dispatchEvent(new Event('input',{bubbles:true})); });
+        inspector.appendChild(inTitle); inspector.appendChild(document.createElement('br')); inspector.appendChild(btnChoose);
+        const btnUpload = document.createElement('button'); btnUpload.className='secondary-btn'; btnUpload.style.marginLeft='8px'; btnUpload.innerText='Upload'; btnUpload.onclick=()=>{ document.getElementById('generic-upload-input').dataset.targetInput = imgInput.id || (imgInput.id = 'tmp-'+Date.now()); document.getElementById('generic-upload-input').click(); };
+        inspector.appendChild(btnUpload);
+    }
+    const btnDel = document.createElement('button'); btnDel.className='btn-delete'; btnDel.innerText='Löschen'; btnDel.style.marginTop='8px'; btnDel.onclick=()=>{ if(confirm('Löschen?')){ rowEl.remove(); updateBlockPreview(blockEl); inspector.innerHTML=''; } };
+    inspector.appendChild(document.createElement('br'));
+    inspector.appendChild(btnDel);
+}
+
+/* --- File Manager --- */
+function openFileManager() {
+    document.getElementById('file-manager-modal').classList.remove('hidden');
+    renderFileManager();
+}
+
+function closeFileManager() {
+    document.getElementById('file-manager-modal').classList.add('hidden');
+}
+
+async function renderFileManager() {
+    const res = await fetch('/api/media');
+    const items = await res.json();
+    // Build folder map
+    const map = {};
+    items.forEach(it => {
+        const rel = it.replace(/\\\\/g, '/').replace(/^\.\/.\/.\/images\/portfolio\//, '');
+        const parts = rel.split('/');
+        const folder = parts.length > 1 ? parts[0] : 'uploads';
+        if (!map[folder]) map[folder] = [];
+        map[folder].push({ rel, full: it });
+    });
+
+    const foldersEl = document.getElementById('fm-folders');
+    const filesEl = document.getElementById('fm-files');
+    foldersEl.innerHTML = '';
+    filesEl.innerHTML = '';
+
+    const folders = Object.keys(map).sort();
+    folders.forEach(f => {
+        const btn = document.createElement('button'); btn.className='secondary-btn'; btn.style.textAlign='left'; btn.innerText = f; btn.dataset.folder = f;
+        btn.addEventListener('click', ()=>{ selectFolder(f, map); });
+        // allow drop on folder
+        btn.addEventListener('dragover', (e)=>{ e.preventDefault(); btn.style.background='#f8fafc'; });
+        btn.addEventListener('dragleave', (e)=>{ btn.style.background=''; });
+        btn.addEventListener('drop', async (e)=>{
+            e.preventDefault(); btn.style.background='';
+            const src = e.dataTransfer.getData('text/plain');
+            if (src) await moveMedia(src, f);
+        });
+        foldersEl.appendChild(btn);
+    });
+
+    // select first folder by default
+    if (folders.length) selectFolder(folders[0], map);
+}
+
+function selectFolder(folder, map) {
+    document.getElementById('fm-current-title').innerText = 'Inhalt: ' + folder;
+    const filesEl = document.getElementById('fm-files');
+    filesEl.innerHTML = '';
+    const items = map[folder] || [];
+    items.forEach(it => {
+        const div = document.createElement('div'); div.className='media-item'; div.draggable = true; div.title = it.rel;
+        const img = document.createElement('img'); img.src = normalizeUrl('../../images/portfolio/' + it.rel);
+        const caption = document.createElement('div'); caption.style.fontSize='12px'; caption.style.marginTop='6px'; caption.innerText = it.rel.split('/').slice(1).join('/') || it.rel;
+        div.appendChild(img); div.appendChild(caption);
+        div.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', '../../images/portfolio/' + it.rel); });
+        // quick move button
+        const moveBtn = document.createElement('button'); moveBtn.className='secondary-btn'; moveBtn.style.marginTop='6px'; moveBtn.innerText='Verschieben';
+        moveBtn.onclick = async ()=>{
+            const dest = prompt('Zielordner (z.B. photography, design):', folder);
+            if (dest && dest !== folder) await moveMedia('../../images/portfolio/' + it.rel, dest);
+        };
+        const wrap = document.createElement('div'); wrap.style.display='flex'; wrap.style.flexDirection='column'; wrap.appendChild(div); wrap.appendChild(moveBtn);
+        filesEl.appendChild(wrap);
+    });
+}
+
+async function moveMedia(src, destDir) {
+    try {
+        const payload = { src, destDir };
+        const res = await fetch('/api/media/move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const json = await res.json();
+        if (json && json.success) {
+            alert('Datei verschoben: ' + json.newUrl);
+            renderFileManager();
+            fetchMedia();
+        } else {
+            alert('Fehler beim Verschieben');
+            console.error(json);
+        }
+    } catch (e) {
+        console.error('moveMedia error', e);
+        alert('Fehler beim Verschieben');
     }
 }
 
@@ -1443,10 +2011,44 @@ window.appendGalItemToBlock = function (blockEl, kind = 'image', data = null) {
     row.style.display = 'flex';
     row.style.gap = '8px';
     row.style.alignItems = 'center';
+    row.style.padding = '6px';
+    row.style.border = '1px solid rgba(0,0,0,0.04)';
+    row.style.borderRadius = '8px';
+
+    // drag handle
+    const dragHandle = document.createElement('div');
+    dragHandle.className = 'gal-drag-handle';
+    dragHandle.style.cursor = 'grab';
+    dragHandle.style.paddingRight = '6px';
+    dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
+    row.appendChild(dragHandle);
 
     const kindInput = `<input type="hidden" class="b-gal-kind" value="${kind}">`;
+    // Thumbnail column
+    const thumbCol = document.createElement('div');
+    thumbCol.style.width = '96px';
+    thumbCol.style.height = '64px';
+    thumbCol.style.flex = '0 0 96px';
+    thumbCol.style.display = 'flex';
+    thumbCol.style.alignItems = 'center';
+    thumbCol.style.justifyContent = 'center';
+    thumbCol.style.background = '#fafafa';
+    thumbCol.style.borderRadius = '6px';
+    const thumbImg = document.createElement('img');
+    thumbImg.style.maxWidth = '100%';
+    thumbImg.style.maxHeight = '64px';
+    thumbImg.style.objectFit = 'cover';
+    thumbImg.src = (data && (data.imageUrl || data.pdfThumb || data.pdfUrl)) ? normalizeUrl(data.imageUrl || data.pdfThumb || '') : '';
+    thumbCol.appendChild(thumbImg);
+    row.appendChild(thumbCol);
+
+    const contentWrap = document.createElement('div');
+    contentWrap.style.display = 'flex';
+    contentWrap.style.gap = '8px';
+    contentWrap.style.flex = '1';
+
     if (kind === 'pdf') {
-        row.innerHTML = `
+        contentWrap.innerHTML = `
             ${kindInput}
             <div style="flex:1; display:flex; gap:6px; align-items:center;">
                 <input type="text" class="b-gal-pdf-url" placeholder="PDF Datei URL" value="${data && data.pdfUrl ? data.pdfUrl : ''}" style="flex:1;">
@@ -1457,24 +2059,1224 @@ window.appendGalItemToBlock = function (blockEl, kind = 'image', data = null) {
                 <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-image"></i></button>
             </div>
             <input type="text" class="b-gal-item-title" placeholder="Titel" value="${data && data.title ? data.title : ''}" style="width:220px;">
-            <button type="button" class="btn-row-delete" onclick="this.closest('.b-gal-item-row').remove()"><i class="fas fa-trash"></i></button>
         `;
     } else {
-        row.innerHTML = `
+        contentWrap.innerHTML = `
             ${kindInput}
             <div style="flex:1; display:flex; gap:6px; align-items:center;">
                 <input type="text" class="b-gal-img-url" placeholder="Bild URL" value="${data && data.imageUrl ? data.imageUrl : ''}" style="flex:1;">
                 <button type="button" onclick="triggerUpload(this.previousElementSibling)"><i class="fas fa-upload"></i></button>
             </div>
             <input type="text" class="b-gal-item-title" placeholder="Titel" value="${data && data.title ? data.title : ''}" style="width:220px;">
-            <button type="button" class="btn-row-delete" onclick="this.closest('.b-gal-item-row').remove()"><i class="fas fa-trash"></i></button>
         `;
     }
+
+    row.appendChild(contentWrap);
+
+    // delete button
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-row-delete';
+    delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    delBtn.onclick = () => row.remove();
+    row.appendChild(delBtn);
 
     container.appendChild(row);
     // animate new gallery row
     row.classList.add('new-gal-item');
     setTimeout(() => row.classList.remove('new-gal-item'), 360);
+
+    // Make the list sortable using SortableJS
+    try {
+        if (typeof Sortable !== 'undefined') {
+            if (!container._sortable) {
+                container._sortable = new Sortable(container, {
+                    handle: '.gal-drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost'
+                });
+            }
+        }
+    } catch (e) { console.warn(e); }
+
+    // Update thumbnail when URL inputs change
+    const imgInput = row.querySelector('.b-gal-img-url');
+    const pdfThumbInput = row.querySelector('.b-gal-pdf-thumb');
+    const pdfUrlInput = row.querySelector('.b-gal-pdf-url');
+    const updateThumb = () => {
+        const val = (imgInput && imgInput.value) || (pdfThumbInput && pdfThumbInput.value) || '';
+        thumbImg.src = normalizeUrl(val) || '';
+    };
+    if (imgInput) imgInput.addEventListener('input', updateThumb);
+    if (pdfThumbInput) pdfThumbInput.addEventListener('input', updateThumb);
+    if (pdfUrlInput && !thumbImg.src) pdfUrlInput.addEventListener('input', () => { /* could fetch preview for PDFs later */ });
+
+    // Ensure block preview updates
+    try {
+        const block = blockEl || (row.closest && row.closest('.editor-block'));
+        if (block) updateBlockPreview(block);
+    } catch (e) { }
+
+    // Make row selectable for inspector
+    row.addEventListener('click', (ev)=>{ ev.stopPropagation(); try { const block = blockEl || row.closest('.editor-block'); selectGalleryItem(block, row); } catch(e){} });
+
+    return row;
+}
+
+// ==========================================================================
+// Antigravity Fullscreen Studio WYSIWYG Editor Client Logic
+// ==========================================================================
+
+let studioProject = null;
+let studioType = null;
+let selectedStudioBlock = null;
+
+// Initialize unpublished changes on load
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('hasUnpublishedChanges') === 'true') {
+        const badge = document.getElementById('studio-unpublished-badge');
+        if (badge) badge.classList.remove('hidden');
+    }
+    setupStudioCanvasDragDrop();
+});
+
+window.openStudioEditor = function (type, project = null) {
+    studioType = type;
+    
+    // Resolve project if it's an ID
+    if (typeof project === 'string') {
+        project = projectsData.find(p => p.id === project) || null;
+    }
+
+    if (project) {
+        studioProject = JSON.parse(JSON.stringify(project));
+        if (!studioProject.blocks) {
+            studioProject.blocks = [];
+        }
+    } else {
+        // Create clean skeleton for new projects
+        studioProject = {
+            id: '',
+            title: 'Neues Projekt',
+            description: '',
+            tabTitle: '',
+            blocks: []
+        };
+    }
+
+    // Bind settings meta fields
+    document.getElementById('studio-p-title').value = studioProject.title || '';
+    document.getElementById('studio-p-tabtitle').value = studioProject.tabTitle || '';
+    document.getElementById('studio-p-desc').value = studioProject.description || '';
+    document.getElementById('studio-p-hero').value = studioProject['hero-image'] || studioProject.heroImage || '';
+
+    // Handle video metadata specifically
+    const videoMeta = document.getElementById('studio-video-meta');
+    if (type === 'video') {
+        videoMeta.classList.remove('hidden');
+        let role = studioProject.role || '';
+        let equipment = studioProject.equipment || '';
+        let tools = studioProject.tools || '';
+        
+        if (studioProject.heroMeta && Array.isArray(studioProject.heroMeta)) {
+            studioProject.heroMeta.forEach(meta => {
+                if (meta.includes('Rolle:')) role = meta.replace(/.*Rolle:<\/strong>\s*/, '');
+                if (meta.includes('Equipment:')) equipment = meta.replace(/.*Equipment:<\/strong>\s*/, '');
+                if (meta.includes('Tools:')) tools = meta.replace(/.*Tools:<\/strong>\s*/, '');
+            });
+        }
+        document.getElementById('studio-p-role').value = role;
+        document.getElementById('studio-p-equipment').value = equipment;
+        document.getElementById('studio-p-tools').value = tools;
+    } else {
+        videoMeta.classList.add('hidden');
+    }
+
+    // Toggle fullscreen studio editor view
+    document.getElementById('studio-editor').classList.remove('hidden');
+    
+    // Render blocks onto canvas
+    selectedStudioBlock = null;
+    populateStudioInspector(null);
+    renderStudioCanvas();
+
+    // Default sidebar tab
+    setStudioSidebarTab('settings');
+
+    // Init sortable dragging
+    initStudioSortable();
+};
+
+window.closeStudioEditor = async function (save = false) {
+    if (save) {
+        const titleVal = document.getElementById('studio-p-title').value.trim();
+        if (!titleVal) {
+            alert('Bitte gib dem Projekt einen Titel.');
+            return;
+        }
+
+        // Save current changes from UI back to data model
+        studioProject.title = titleVal;
+        studioProject.tabTitle = document.getElementById('studio-p-tabtitle').value.trim() || titleVal;
+        studioProject.description = document.getElementById('studio-p-desc').value.trim();
+        
+        const heroVal = document.getElementById('studio-p-hero').value.trim();
+        if (studioType === 'video') {
+            studioProject.heroImage = heroVal;
+            const role = document.getElementById('studio-p-role').value.trim();
+            const equip = document.getElementById('studio-p-equipment').value.trim();
+            const tools = document.getElementById('studio-p-tools').value.trim();
+            studioProject.role = role;
+            studioProject.equipment = equip;
+            studioProject.tools = tools;
+            studioProject.heroMeta = [];
+            if (role) studioProject.heroMeta.push(`<strong>Rolle:</strong> ${role}`);
+            if (equip) studioProject.heroMeta.push(`<strong>Equipment:</strong> ${equip}`);
+            if (tools) studioProject.heroMeta.push(`<strong>Tools:</strong> ${tools}`);
+        } else {
+            studioProject['hero-image'] = heroVal;
+            delete studioProject.heroImage;
+        }
+
+        // Generate ID if empty
+        if (!studioProject.id) {
+            studioProject.id = generateId(titleVal);
+        }
+
+        // Update local projects list
+        const idx = projectsData.findIndex(p => p.id === studioProject.id);
+        if (idx > -1) {
+            projectsData[idx] = studioProject;
+        } else {
+            projectsData.unshift(studioProject);
+        }
+
+        // Post to backend API
+        try {
+            const apiBase = (location.protocol === 'http:' || location.protocol === 'https:') ? `${location.protocol}//${location.host}` : 'http://localhost:3000';
+            const res = await fetch(`${apiBase}/api/projects/${studioType}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(projectsData)
+            });
+
+            if (res.ok) {
+                // Set unpublished flag
+                localStorage.setItem('hasUnpublishedChanges', 'true');
+                const badge = document.getElementById('studio-unpublished-badge');
+                if (badge) badge.classList.remove('hidden');
+                
+                // Reload lists
+                loadProjects(studioType);
+            } else {
+                alert('Fehler beim Speichern des Projekts.');
+                return;
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Netzwerkfehler beim Speichern.');
+            return;
+        }
+    }
+
+    // Hide editor view
+    document.getElementById('studio-editor').classList.add('hidden');
+    studioProject = null;
+    selectedStudioBlock = null;
+};
+
+window.setStudioDevice = function (device) {
+    const viewport = document.getElementById('canvas-viewport');
+    if (!viewport) return;
+
+    viewport.classList.remove('desktop', 'tablet', 'mobile');
+    viewport.classList.add(device);
+
+    document.querySelectorAll('.studio-device-toggles .device-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.device === device);
+    });
+};
+
+window.setStudioSidebarTab = function (tabName) {
+    document.querySelectorAll('.sidebar-panes .sidebar-pane').forEach(pane => {
+        pane.classList.remove('active');
+    });
+    const pane = document.getElementById(`pane-${tabName}`);
+    if (pane) pane.classList.add('active');
+
+    document.querySelectorAll('.sidebar-tabs .sidebar-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    if (tabName === 'media') {
+        loadStudioMedia();
+    }
+};
+
+window.toggleStudioSidebar = function () {
+    const sidebar = document.getElementById('studio-sidebar');
+    const icon = document.getElementById('sidebar-collapse-icon');
+    if (!sidebar || !icon) return;
+
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+    } else {
+        icon.className = 'fas fa-chevron-left';
+    }
+};
+
+window.loadStudioMedia = async function () {
+    const folder = document.getElementById('studio-media-folder-select').value || 'uploads';
+    const grid = document.getElementById('studio-media-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#888;"><i class="fas fa-spinner fa-spin"></i> Lade Medien...</div>';
+
+    try {
+        const res = await fetch('/api/media');
+        const items = await res.json();
+        
+        let filtered = items;
+        if (folder && folder !== 'uploads') {
+            filtered = items.filter(i => i.includes(`/portfolio/${folder}/`));
+        } else {
+            filtered = items.filter(i => i.includes('/portfolio/uploads/') || i.includes('/uploads/'));
+        }
+
+        grid.innerHTML = '';
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#555; font-size:0.8rem;">Keine Medien gefunden.</div>';
+            return;
+        }
+
+        filtered.slice().reverse().forEach(u => {
+            const div = document.createElement('div');
+            div.className = 'studio-media-item';
+            div.draggable = true;
+            div.dataset.url = u;
+
+            const isPdf = u.toLowerCase().endsWith('.pdf');
+            if (isPdf) {
+                div.innerHTML = `
+                    <div class="media-pdf-icon">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>${u.split('/').pop()}</span>
+                    </div>
+                `;
+            } else {
+                const img = document.createElement('img');
+                img.src = normalizeUrl(u);
+                img.loading = 'lazy';
+                div.appendChild(img);
+            }
+
+            // Click interaction
+            div.onclick = () => {
+                if (window._mediaSelectCallback) {
+                    window._mediaSelectCallback(u);
+                } else if (selectedStudioBlock) {
+                    const blockId = selectedStudioBlock.dataset.id;
+                    const block = studioProject.blocks.find(b => b.id === blockId);
+                    if (block) {
+                        if (block.type === 'hero') {
+                            block.imageUrl = u;
+                        } else if (block.type === 'beforeafter') {
+                            if (!block.imageUrl) block.imageUrl = u;
+                            else block.imageUrlAfter = u;
+                        } else if (block.type === 'gallery' || block.type === 'media') {
+                            if (!block.items) block.items = [];
+                            block.items.push({ type: isPdf ? 'pdf' : 'image', imageUrl: isPdf ? '' : u, pdfUrl: isPdf ? u : '', title: '' });
+                        }
+                        renderStudioCanvas();
+                        populateStudioInspector(selectedStudioBlock);
+                    }
+                }
+            };
+
+            // Drag support
+            div.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/uri-list', u);
+                e.dataTransfer.setData('text/plain', u);
+                e.dataTransfer.setData('application/x-pdf', isPdf ? 'true' : 'false');
+            });
+
+            grid.appendChild(div);
+        });
+    } catch (err) {
+        console.error(err);
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#ef4444;">Fehler beim Laden.</div>';
+    }
+};
+
+window.handleStudioMediaUpload = async function (e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const folder = document.getElementById('studio-media-folder-select').value || 'uploads';
+    const grid = document.getElementById('studio-media-grid');
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#888;"><i class="fas fa-spinner fa-spin"></i> Lade hoch...</div>';
+
+    try {
+        for (const file of files) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('type', folder);
+            await fetch('/api/upload', {
+                method: 'POST',
+                body: fd
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Upload failed.');
+    } finally {
+        e.target.value = '';
+        loadStudioMedia();
+    }
+};
+
+window.triggerStudioMediaUpload = function () {
+    document.getElementById('studio-media-upload-input').click();
+};
+
+window.triggerStudioHeroUpload = function () {
+    openMediaLibrary((url) => {
+        document.getElementById('studio-p-hero').value = url;
+        updateStudioMeta('hero-image', url);
+    });
+};
+
+window.updateStudioMeta = function (field, value) {
+    if (field === 'hero-image') {
+        studioProject['hero-image'] = value;
+    } else {
+        studioProject[field] = value;
+    }
+    const badge = document.getElementById('studio-unpublished-badge');
+    if (badge) badge.classList.remove('hidden');
+};
+
+window.handleBlockLibDragStart = function (e) {
+    e.dataTransfer.setData('text/plain', e.currentTarget.dataset.type);
+};
+
+window.initStudioSortable = function () {
+    const canvas = document.getElementById('studio-canvas');
+    if (!canvas) return;
+
+    if (window._studioSortableInstance) {
+        window._studioSortableInstance.destroy();
+    }
+
+    if (typeof Sortable !== 'undefined') {
+        window._studioSortableInstance = new Sortable(canvas, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            draggable: '.canvas-block',
+            onEnd: function () {
+                const reordered = [];
+                canvas.querySelectorAll('.canvas-block').forEach(el => {
+                    const b = studioProject.blocks.find(x => x.id === el.dataset.id);
+                    if (b) reordered.push(b);
+                });
+                studioProject.blocks = reordered;
+            }
+        });
+    }
+};
+
+window.deleteStudioBlock = function (blockId) {
+    if (!confirm('Diesen Block wirklich löschen?')) return;
+    
+    studioProject.blocks = studioProject.blocks.filter(b => b.id !== blockId);
+    if (selectedStudioBlock && selectedStudioBlock.dataset.id === blockId) {
+        selectedStudioBlock = null;
+        populateStudioInspector(null);
+    }
+    renderStudioCanvas();
+};
+
+function setupStudioCanvasDragDrop() {
+    const canvas = document.getElementById('studio-canvas');
+    if (!canvas) return;
+
+    canvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const placeholder = document.getElementById('canvas-drop-placeholder') || document.createElement('div');
+        placeholder.id = 'canvas-drop-placeholder';
+        placeholder.className = 'canvas-drop-placeholder';
+
+        const after = getDragAfterElement(canvas, e.clientY);
+        if (after == null) {
+            canvas.appendChild(placeholder);
+        } else {
+            canvas.insertBefore(placeholder, after);
+        }
+    });
+
+    canvas.addEventListener('dragleave', () => {
+        const p = document.getElementById('canvas-drop-placeholder');
+        if (p) p.remove();
+    });
+
+    canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const placeholder = document.getElementById('canvas-drop-placeholder');
+        if (!placeholder) return;
+
+        const mediaUrl = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+        const isPdfStr = e.dataTransfer.getData('application/x-pdf');
+        let type = e.dataTransfer.getData('text/plain');
+
+        placeholder.remove();
+
+        let newBlock = null;
+        if (mediaUrl && (mediaUrl.startsWith('/') || mediaUrl.startsWith('..') || mediaUrl.includes('/images/') || mediaUrl.includes('/portfolio/'))) {
+            const isPdf = isPdfStr === 'true' || mediaUrl.toLowerCase().endsWith('.pdf');
+            newBlock = {
+                id: 'block-' + Date.now() + '-' + Math.floor(Math.random()*1000),
+                type: isPdf ? 'pdf' : 'hero',
+                title: isPdf ? 'PDF Dokument' : '',
+                imageUrl: isPdf ? '' : mediaUrl,
+                pdfUrl: isPdf ? mediaUrl : '',
+                text: ''
+            };
+        } else if (type && !type.includes('/') && !type.startsWith('http')) {
+            newBlock = {
+                id: 'block-' + Date.now() + '-' + Math.floor(Math.random()*1000),
+                type: type
+            };
+
+            if (type === 'heading') {
+                newBlock.level = 'h2';
+                newBlock.text = 'Neue Überschrift';
+            } else if (type === 'text') {
+                newBlock.html = '<p>Hier neuen Textabschnitt eingeben...</p>';
+            } else if (type === 'beforeafter') {
+                newBlock.imageUrl = '';
+                newBlock.imageUrlAfter = '';
+            } else if (type === 'gallery' || type === 'media') {
+                newBlock.items = [];
+            } else if (type === 'pdf') {
+                newBlock.title = 'PDF Dokument';
+                newBlock.pdfUrl = '';
+                newBlock.imageUrl = '';
+            } else if (type === 'youtube') {
+                newBlock.title = 'YouTube Video';
+                newBlock.videoId = '';
+                newBlock.tags = '';
+            }
+        }
+
+        if (!newBlock) return;
+
+        const children = [...canvas.children];
+        const blockChildren = children.filter(c => c.classList.contains('canvas-block'));
+        let insertIdx = blockChildren.indexOf(placeholder);
+
+        if (insertIdx === -1) {
+            const after = getDragAfterElement(canvas, e.clientY);
+            if (after) {
+                insertIdx = studioProject.blocks.findIndex(b => b.id === after.dataset.id);
+            }
+        }
+
+        if (insertIdx === -1 || insertIdx === undefined) {
+            studioProject.blocks.push(newBlock);
+        } else {
+            studioProject.blocks.splice(insertIdx, 0, newBlock);
+        }
+
+        renderStudioCanvas();
+        const el = canvas.querySelector(`.canvas-block[data-id="${newBlock.id}"]`);
+        if (el) selectStudioBlock(el);
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggables = [...container.querySelectorAll('.canvas-block:not(.dragging)')];
+        return draggables.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+}
+
+function renderStudioCanvas() {
+    const canvas = document.getElementById('studio-canvas');
+    if (!canvas) return;
+    canvas.innerHTML = '';
+
+    if (!studioProject.blocks || studioProject.blocks.length === 0) {
+        canvas.innerHTML = `
+            <div class="empty-canvas-message" style="text-align:center; padding:80px 20px; color:rgba(255,255,255,0.3); border:2px dashed rgba(255,255,255,0.05); border-radius:12px;">
+                <i class="fas fa-cubes" style="font-size:3rem; margin-bottom:15px; color:rgba(255,255,255,0.1);"></i>
+                <p style="font-size:1.1rem; margin:0 0 8px 0;">Der Canvas ist leer</p>
+                <p style="font-size:0.9rem; margin:0;">Ziehe Blöcke aus der Sidebar hierher oder wähle den "Blocks" Tab, um Inhalte hinzuzufügen.</p>
+            </div>
+        `;
+        return;
+    }
+
+    studioProject.blocks.forEach((b) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'canvas-block';
+        wrapper.dataset.id = b.id;
+        wrapper.dataset.type = b.type;
+        if (selectedStudioBlock && selectedStudioBlock.dataset.id === b.id) {
+            wrapper.classList.add('selected');
+        }
+
+        const toolbar = document.createElement('div');
+        toolbar.className = 'block-toolbar';
+        toolbar.innerHTML = `
+            <button class="block-toolbar-btn drag-handle" title="Verschieben"><i class="fas fa-grip-vertical"></i></button>
+            <button class="block-toolbar-btn delete-btn" title="Löschen" onclick="event.stopPropagation(); deleteStudioBlock('${b.id}')"><i class="fas fa-trash"></i></button>
+        `;
+        wrapper.appendChild(toolbar);
+
+        const content = document.createElement('div');
+        content.className = `block-content-view g-block-${b.type}`;
+
+        switch (b.type) {
+            case 'heading':
+                const lvl = b.level || 'h2';
+                const h = document.createElement(lvl);
+                h.contentEditable = 'true';
+                h.innerText = b.text || 'Überschrift';
+                h.addEventListener('blur', () => {
+                    b.text = h.innerText;
+                });
+                content.appendChild(h);
+                break;
+
+            case 'text':
+                const div = document.createElement('div');
+                div.className = 'g-block-text-inner';
+                div.contentEditable = 'true';
+                div.innerHTML = b.html || '<p>Hier Text eingeben...</p>';
+                div.addEventListener('blur', () => {
+                    b.html = div.innerHTML;
+                });
+                content.appendChild(div);
+                break;
+
+            case 'hero':
+                content.className = 'g-block-hero';
+                content.innerHTML = `
+                    ${b.imageUrl ? `<img src="${normalizeUrl(b.imageUrl)}" class="hero-image">` : `<div style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); height:200px; display:flex; align-items:center; justify-content:center; border-radius:12px; color:rgba(255,255,255,0.25);"><i class="fas fa-image" style="margin-right:8px;"></i> Kein Hero-Bild</div>`}
+                    <div class="hero-text-caption" contenteditable="true" style="margin-top:10px; font-style:italic; text-align:center; color:rgba(255,255,255,0.5); font-size:0.9rem;">${b.text || 'Optionaler Bilduntertitel...'}</div>
+                `;
+                const cap = content.querySelector('.hero-text-caption');
+                if (cap) {
+                    cap.addEventListener('blur', () => {
+                        b.text = cap.innerText;
+                    });
+                }
+                break;
+
+            case 'beforeafter':
+                const img1 = b.imageUrl || '';
+                const img2 = b.imageUrlAfter || '';
+                content.className = 'cgi-slider-block';
+                content.innerHTML = `
+                    <div class="cgi-slider-container">
+                        <div class="cgi-slider-before">
+                            ${img1 ? `<img src="${normalizeUrl(img1)}" draggable="false">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#555;">[Vorher-Bild]</div>`}
+                        </div>
+                        <div class="cgi-slider-after" style="width:50%;">
+                            ${img2 ? `<img src="${normalizeUrl(img2)}" draggable="false">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#555;">[Nachher-Bild]</div>`}
+                        </div>
+                        <div class="cgi-slider-handle" style="left:50%;">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {
+                    initCgiSlider(wrapper.querySelector('.cgi-slider-container'));
+                }, 0);
+                break;
+
+            case 'gallery':
+            case 'media':
+                content.className = 'project-gallery-grid';
+                if (b.items && b.items.length > 0) {
+                    const grid = document.createElement('div');
+                    grid.style.display = 'grid';
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(180px, 1fr))';
+                    grid.style.gap = '12px';
+                    
+                    b.items.forEach(it => {
+                        const cell = document.createElement('div');
+                        cell.style.background = 'rgba(255,255,255,0.02)';
+                        cell.style.border = '1px solid rgba(255,255,255,0.05)';
+                        cell.style.borderRadius = '8px';
+                        cell.style.overflow = 'hidden';
+                        cell.style.aspectRatio = '1';
+                        cell.style.display = 'flex';
+                        cell.style.flexDirection = 'column';
+                        cell.style.position = 'relative';
+
+                        if (it.type === 'pdf') {
+                            const thumb = it.imageUrl || '';
+                            cell.innerHTML = `
+                                <div style="flex:1; background:rgba(239,68,68,0.08); display:flex; align-items:center; justify-content:center; color:#ef4444; overflow:hidden;">
+                                    ${thumb ? `<img src="${normalizeUrl(thumb)}" style="width:100%; height:100%; object-fit:cover;">` : `<i class="fas fa-file-pdf" style="font-size:2rem;"></i>`}
+                                </div>
+                                <div style="padding:6px; font-size:0.75rem; background:rgba(0,0,0,0.4); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${it.title || 'PDF'}</div>
+                            `;
+                        } else {
+                            const img = it.imageUrl || '';
+                            cell.innerHTML = `
+                                <div style="flex:1; overflow:hidden;">
+                                    ${img ? `<img src="${normalizeUrl(img)}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:#222; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fas fa-image"></i></div>`}
+                                </div>
+                                ${it.title ? `<div style="padding:6px; font-size:0.75rem; background:rgba(0,0,0,0.4); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${it.title}</div>` : ''}
+                            `;
+                        }
+                        grid.appendChild(cell);
+                    });
+                    content.appendChild(grid);
+                } else {
+                    content.innerHTML = `<div style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); padding:20px; text-align:center; color:#555; border-radius:8px;"><i class="fas fa-images"></i> Keine Bilder zugewiesen</div>`;
+                }
+                break;
+
+            case 'pdf':
+                content.className = 'videokarte';
+                content.style.padding = "0";
+                content.style.border = "1px solid rgba(255,255,255,0.05)";
+                content.style.background = "#181424";
+                content.innerHTML = `
+                    <div style="width:100%; height:280px; background:#120e1a; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.3); overflow:hidden; position:relative;">
+                        ${b.imageUrl ? `<img src="${normalizeUrl(b.imageUrl)}" style="width:100%; height:100%; object-fit:cover; opacity:0.5;">` : `<i class="fas fa-file-pdf" style="font-size:3rem; color:#ef4444;"></i>`}
+                        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;">
+                            <span style="font-size:1rem; font-weight:500;">${b.title || 'PDF Dokument'}</span>
+                            <span style="font-size:0.8rem; color:#888;">PDF: ${b.pdfUrl ? b.pdfUrl.split('/').pop() : 'Keine URL'}</span>
+                        </div>
+                    </div>
+                `;
+                break;
+
+            case 'youtube':
+                content.className = 'videokarte';
+                content.style.padding = "0";
+                content.style.border = "1px solid rgba(255,255,255,0.05)";
+                content.style.background = "#181424";
+                content.innerHTML = `
+                    <div class="video-container" style="position:relative; aspect-ratio:16/9; background:#000;">
+                        ${b.videoId ? `<iframe style="width:100%; height:100%; pointer-events:none;" src="https://www.youtube-nocookie.com/embed/${b.videoId}" frameborder="0"></iframe>` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#555;"><i class="fab fa-youtube" style="font-size:2.5rem; color:#ef4444; margin-right:10px;"></i> YouTube ID fehlt</div>`}
+                    </div>
+                    <div style="padding:12px;">
+                        <h4 style="margin:0 0 6px 0; color:#fff; font-size:0.95rem;">${b.title || 'YouTube Video'}</h4>
+                        ${b.tags ? `<span style="font-size:0.75rem; color:#888;">Tags: ${b.tags}</span>` : ''}
+                    </div>
+                `;
+                break;
+        }
+
+        wrapper.appendChild(content);
+
+        wrapper.addEventListener('click', (e) => {
+            if (e.target.closest('.block-toolbar') || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.closest('button')) {
+                return;
+            }
+            selectStudioBlock(wrapper);
+        });
+
+        canvas.appendChild(wrapper);
+    });
+}
+
+function selectStudioBlock(blockEl) {
+    document.querySelectorAll('.canvas-block').forEach(b => b.classList.remove('selected'));
+    selectedStudioBlock = blockEl;
+    if (selectedStudioBlock) {
+        selectedStudioBlock.classList.add('selected');
+        populateStudioInspector(blockEl);
+    }
+}
+
+function populateStudioInspector(blockEl) {
+    const insp = document.getElementById('studio-inspector-content');
+    if (!insp) return;
+    insp.innerHTML = '';
+
+    if (!blockEl) {
+        insp.innerHTML = '<p class="hint-text">Wähle einen Block aus, um Einstellungen zu bearbeiten.</p>';
+        return;
+    }
+
+    const blockId = blockEl.dataset.id;
+    const block = studioProject.blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    const type = block.type;
+    const t = document.createElement('h3');
+    t.style.fontSize = '0.85rem';
+    t.style.color = '#c084fc';
+    t.style.textTransform = 'uppercase';
+    t.style.marginBottom = '12px';
+    t.innerText = `${type} block`;
+    insp.appendChild(t);
+
+    switch (type) {
+        case 'heading':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Ebene</label>
+                    <select id="ins-heading-level">
+                        <option value="h1" ${block.level === 'h1' ? 'selected' : ''}>H1 (Sehr groß)</option>
+                        <option value="h2" ${block.level === 'h2' ? 'selected' : ''}>H2 (Titel)</option>
+                        <option value="h3" ${block.level === 'h3' ? 'selected' : ''}>H3 (Unterüberschrift)</option>
+                        <option value="h4" ${block.level === 'h4' ? 'selected' : ''}>H4 (Klein)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Text</label>
+                    <input type="text" id="ins-heading-text" value="${block.text || ''}">
+                </div>
+            `;
+            setTimeout(() => {
+                const lvl = document.getElementById('ins-heading-level');
+                const txt = document.getElementById('ins-heading-text');
+                lvl.addEventListener('change', () => {
+                    block.level = lvl.value;
+                    renderStudioCanvas();
+                });
+                txt.addEventListener('input', () => {
+                    block.text = txt.value;
+                    const h = blockEl.querySelector('h1, h2, h3, h4, h5, h6');
+                    if (h) h.innerText = txt.value;
+                });
+            }, 0);
+            break;
+
+        case 'text':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Inhalt (HTML möglich)</label>
+                    <textarea id="ins-text-html" rows="8" style="font-family:monospace; font-size:0.8rem;">${block.html || ''}</textarea>
+                </div>
+            `;
+            setTimeout(() => {
+                const html = document.getElementById('ins-text-html');
+                html.addEventListener('input', () => {
+                    block.html = html.value;
+                    const inner = blockEl.querySelector('.g-block-text-inner');
+                    if (inner) inner.innerHTML = html.value;
+                });
+                const inner = blockEl.querySelector('.g-block-text-inner');
+                if (inner) {
+                    inner.addEventListener('input', () => {
+                        block.html = inner.innerHTML;
+                        html.value = inner.innerHTML;
+                    });
+                }
+            }, 0);
+            break;
+
+        case 'hero':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Bild URL</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="ins-hero-img" value="${block.imageUrl || ''}" style="flex:1;">
+                        <button type="button" class="secondary-btn btn-small" id="btn-ins-hero-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bilduntertitel (Optional)</label>
+                    <input type="text" id="ins-hero-text" value="${block.text || ''}">
+                </div>
+            `;
+            setTimeout(() => {
+                const img = document.getElementById('ins-hero-img');
+                const txt = document.getElementById('ins-hero-text');
+                
+                img.addEventListener('input', () => {
+                    block.imageUrl = img.value;
+                    renderStudioCanvas();
+                });
+                txt.addEventListener('input', () => {
+                    block.text = txt.value;
+                    const cap = blockEl.querySelector('.hero-text-caption');
+                    if (cap) cap.innerText = txt.value;
+                });
+                document.getElementById('btn-ins-hero-media').addEventListener('click', () => {
+                    openMediaLibrary((url) => {
+                        img.value = url;
+                        block.imageUrl = url;
+                        renderStudioCanvas();
+                    });
+                });
+            }, 0);
+            break;
+
+        case 'beforeafter':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Vorher (Links)</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="ins-ba-before" value="${block.imageUrl || ''}" style="flex:1;">
+                        <button type="button" class="secondary-btn btn-small" id="btn-ins-ba-before-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nachher (Rechts)</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="ins-ba-after" value="${block.imageUrlAfter || ''}" style="flex:1;">
+                        <button type="button" class="secondary-btn btn-small" id="btn-ins-ba-after-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                const bef = document.getElementById('ins-ba-before');
+                const aft = document.getElementById('ins-ba-after');
+                
+                bef.addEventListener('input', () => {
+                    block.imageUrl = bef.value;
+                    renderStudioCanvas();
+                });
+                aft.addEventListener('input', () => {
+                    block.imageUrlAfter = aft.value;
+                    renderStudioCanvas();
+                });
+                document.getElementById('btn-ins-ba-before-media').addEventListener('click', () => {
+                    openMediaLibrary((url) => {
+                        bef.value = url;
+                        block.imageUrl = url;
+                        renderStudioCanvas();
+                    });
+                });
+                document.getElementById('btn-ins-ba-after-media').addEventListener('click', () => {
+                    openMediaLibrary((url) => {
+                        aft.value = url;
+                        block.imageUrlAfter = url;
+                        renderStudioCanvas();
+                    });
+                });
+            }, 0);
+            break;
+
+        case 'gallery':
+        case 'media':
+            insp.innerHTML += `
+                <div style="margin-bottom:12px; display:flex; gap:6px;">
+                    <button class="primary-btn btn-small" id="btn-ins-gal-add-img" style="flex:1; margin:0;"><i class="fas fa-image"></i> Bild +</button>
+                    <button class="secondary-btn btn-small" id="btn-ins-gal-add-pdf" style="flex:1; margin:0;"><i class="fas fa-file-pdf"></i> PDF +</button>
+                </div>
+                <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
+                    <label style="margin-bottom:6px; display:block;">Elemente Liste:</label>
+                    <div id="ins-gal-items-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+                </div>
+            `;
+            setTimeout(() => {
+                const itemsList = document.getElementById('ins-gal-items-list');
+                const refresh = () => {
+                    itemsList.innerHTML = '';
+                    if (!block.items || block.items.length === 0) {
+                        itemsList.innerHTML = '<span style="font-size:0.75rem; color:#555;">Keine Elemente vorhanden.</span>';
+                        return;
+                    }
+                    block.items.forEach((item, idx) => {
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.alignItems = 'center';
+                        row.style.gap = '6px';
+                        row.style.background = 'rgba(255,255,255,0.03)';
+                        row.style.padding = '4px 6px';
+                        row.style.borderRadius = '4px';
+
+                        const span = document.createElement('span');
+                        span.style.flex = '1';
+                        span.style.fontSize = '0.75rem';
+                        span.style.overflow = 'hidden';
+                        span.style.textOverflow = 'ellipsis';
+                        span.style.whiteSpace = 'nowrap';
+                        span.innerText = item.title || (item.type === 'pdf' ? 'PDF Datei' : 'Bild');
+
+                        const edit = document.createElement('button');
+                        edit.className = 'secondary-btn btn-small';
+                        edit.style.padding = '3px 6px';
+                        edit.style.margin = '0';
+                        edit.innerHTML = '<i class="fas fa-pen"></i>';
+                        edit.onclick = () => editGalleryItemDetails(block, idx, refresh);
+
+                        const del = document.createElement('button');
+                        del.className = 'btn-delete btn-small';
+                        del.style.padding = '3px 6px';
+                        del.style.margin = '0';
+                        del.innerHTML = '<i class="fas fa-trash"></i>';
+                        del.onclick = () => {
+                            if (confirm('Element entfernen?')) {
+                                block.items.splice(idx, 1);
+                                refresh();
+                                renderStudioCanvas();
+                            }
+                        };
+
+                        row.appendChild(span);
+                        row.appendChild(edit);
+                        row.appendChild(del);
+                        itemsList.appendChild(row);
+                    });
+                };
+
+                document.getElementById('btn-ins-gal-add-img').addEventListener('click', () => {
+                    openMediaLibrary((url) => {
+                        if (!block.items) block.items = [];
+                        block.items.push({ type: 'image', imageUrl: url, title: '' });
+                        refresh();
+                        renderStudioCanvas();
+                    });
+                });
+
+                document.getElementById('btn-ins-gal-add-pdf').addEventListener('click', () => {
+                    if (!block.items) block.items = [];
+                    block.items.push({ type: 'pdf', pdfUrl: '', imageUrl: '', title: '' });
+                    refresh();
+                    renderStudioCanvas();
+                });
+
+                refresh();
+            }, 0);
+            break;
+
+        case 'pdf':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Titel</label>
+                    <input type="text" id="ins-pdf-title" value="${block.title || ''}">
+                </div>
+                <div class="form-group">
+                    <label>PDF Datei URL</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="ins-pdf-url" value="${block.pdfUrl || ''}" style="flex:1;">
+                        <button type="button" class="secondary-btn btn-small" id="btn-ins-pdf-media" style="margin:0;"><i class="fas fa-file-pdf"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Vorschaubild URL (Optional)</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="ins-pdf-thumb" value="${block.imageUrl || ''}" style="flex:1;">
+                        <button type="button" class="secondary-btn btn-small" id="btn-ins-pdf-thumb-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                const tit = document.getElementById('ins-pdf-title');
+                const url = document.getElementById('ins-pdf-url');
+                const th = document.getElementById('ins-pdf-thumb');
+
+                tit.addEventListener('input', () => {
+                    block.title = tit.value;
+                    renderStudioCanvas();
+                });
+                url.addEventListener('input', () => {
+                    block.pdfUrl = url.value;
+                    renderStudioCanvas();
+                });
+                th.addEventListener('input', () => {
+                    block.imageUrl = th.value;
+                    renderStudioCanvas();
+                });
+
+                document.getElementById('btn-ins-pdf-media').addEventListener('click', () => {
+                    openMediaLibrary((u) => {
+                        url.value = u;
+                        block.pdfUrl = u;
+                        renderStudioCanvas();
+                    });
+                });
+                document.getElementById('btn-ins-pdf-thumb-media').addEventListener('click', () => {
+                    openMediaLibrary((u) => {
+                        th.value = u;
+                        block.imageUrl = u;
+                        renderStudioCanvas();
+                    });
+                });
+            }, 0);
+            break;
+
+        case 'youtube':
+            insp.innerHTML += `
+                <div class="form-group">
+                    <label>Video Titel</label>
+                    <input type="text" id="ins-yt-title" value="${block.title || ''}">
+                </div>
+                <div class="form-group">
+                    <label>YouTube ID</label>
+                    <input type="text" id="ins-yt-id" value="${block.videoId || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Tags (Komma-separiert)</label>
+                    <input type="text" id="ins-yt-tags" value="${block.tags || ''}">
+                </div>
+            `;
+            setTimeout(() => {
+                const tit = document.getElementById('ins-yt-title');
+                const id = document.getElementById('ins-yt-id');
+                const tags = document.getElementById('ins-yt-tags');
+
+                tit.addEventListener('input', () => {
+                    block.title = tit.value;
+                    renderStudioCanvas();
+                });
+                id.addEventListener('input', () => {
+                    block.videoId = id.value;
+                    renderStudioCanvas();
+                });
+                tags.addEventListener('input', () => {
+                    block.tags = tags.value;
+                    renderStudioCanvas();
+                });
+            }, 0);
+            break;
+    }
+}
+
+function editGalleryItemDetails(block, idx, onComplete) {
+    const item = block.items[idx];
+    const insp = document.getElementById('studio-inspector-content');
+    if (!insp) return;
+
+    insp.innerHTML = `
+        <div style="margin-bottom:10px;">
+            <button class="secondary-btn btn-small" id="btn-ins-gal-back" style="margin:0;"><i class="fas fa-chevron-left"></i> Zurück</button>
+        </div>
+        <h4 style="font-size:0.75rem; color:#a78bfa; margin-bottom:12px;">Element #${idx+1} (${item.type === 'pdf' ? 'PDF' : 'Bild'})</h4>
+        
+        <div class="form-group">
+            <label>Titel / Caption</label>
+            <input type="text" id="ins-gitem-title" value="${item.title || ''}">
+        </div>
+    `;
+
+    if (item.type === 'pdf') {
+        insp.innerHTML += `
+            <div class="form-group">
+                <label>PDF URL</label>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="ins-gitem-pdfurl" value="${item.pdfUrl || ''}" style="flex:1;">
+                    <button type="button" class="secondary-btn btn-small" id="btn-ins-gitem-pdf-media" style="margin:0;"><i class="fas fa-file-pdf"></i></button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Vorschaubild URL (Optional)</label>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="ins-gitem-imgurl" value="${item.imageUrl || ''}" style="flex:1;">
+                    <button type="button" class="secondary-btn btn-small" id="btn-ins-gitem-img-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                </div>
+            </div>
+        `;
+    } else {
+        insp.innerHTML += `
+            <div class="form-group">
+                <label>Bild URL</label>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="ins-gitem-imgurl" value="${item.imageUrl || ''}" style="flex:1;">
+                    <button type="button" class="secondary-btn btn-small" id="btn-ins-gitem-img-media" style="margin:0;"><i class="fas fa-images"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    setTimeout(() => {
+        const tit = document.getElementById('ins-gitem-title');
+        const img = document.getElementById('ins-gitem-imgurl');
+        const pdf = document.getElementById('ins-gitem-pdfurl');
+
+        tit.addEventListener('input', () => {
+            item.title = tit.value;
+            renderStudioCanvas();
+        });
+
+        if (img) {
+            img.addEventListener('input', () => {
+                item.imageUrl = img.value;
+                renderStudioCanvas();
+            });
+            document.getElementById('btn-ins-gitem-img-media').addEventListener('click', () => {
+                openMediaLibrary((u) => {
+                    img.value = u;
+                    item.imageUrl = u;
+                    renderStudioCanvas();
+                });
+            });
+        }
+
+        if (pdf) {
+            pdf.addEventListener('input', () => {
+                item.pdfUrl = pdf.value;
+                renderStudioCanvas();
+            });
+            document.getElementById('btn-ins-gitem-pdf-media').addEventListener('click', () => {
+                openMediaLibrary((u) => {
+                    pdf.value = u;
+                    item.pdfUrl = u;
+                    renderStudioCanvas();
+                });
+            });
+        }
+
+        document.getElementById('btn-ins-gal-back').addEventListener('click', () => {
+            populateStudioInspector(selectedStudioBlock);
+        });
+    }, 0);
+}
+
+function initCgiSlider(container) {
+    if (!container) return;
+    const after = container.querySelector('.cgi-slider-after');
+    const handle = container.querySelector('.cgi-slider-handle');
+    if (!after || !handle) return;
+
+    let dragging = false;
+
+    function update(x) {
+        const r = container.getBoundingClientRect();
+        let pct = ((x - r.left) / r.width) * 100;
+        if (pct < 0) pct = 0;
+        if (pct > 100) pct = 100;
+        after.style.width = pct + '%';
+        handle.style.left = pct + '%';
+    }
+
+    handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        dragging = true;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        update(e.clientX);
+    });
+
+    window.addEventListener('mouseup', () => {
+        dragging = false;
+    });
+
+    handle.addEventListener('touchstart', () => {
+        dragging = true;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        if (e.touches && e.touches[0]) {
+            update(e.touches[0].clientX);
+        }
+    });
+
+    window.addEventListener('touchend', () => {
+        dragging = false;
+    });
 }
 
 
