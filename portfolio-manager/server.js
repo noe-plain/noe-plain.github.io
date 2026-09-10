@@ -11,6 +11,8 @@ const { processImage, processVideo } = require('./media-processor');
 const app = express();
 const port = process.env.PORT || 3000;
 
+require('./studio')(app, path.resolve(__dirname, '..'));
+
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -688,13 +690,17 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     else if (req.body.type === 'video') typeDir = 'videografie';
     else if (req.body.type === 'photography') typeDir = 'photography';
 
-    const destDir = path.join(IMAGES_DIR, typeDir);
-    ensureDir(destDir);
-
+    let asset;
+    const typeFolder = typeof req.body.folder === 'string' ? req.body.folder : typeDir;
+    try { asset = require('./media-library').library(PROJECT_ROOT).reserve(req.body.originalName || req.file.originalname, typeFolder); }
+    catch(error) { fs.unlinkSync(req.file.path); return res.status(400).json({error:error.message}); }
+    const destDir = asset.dir;
     const ext = path.extname(req.file.originalname).toLowerCase();
-    const baseNameWithoutExt = path.basename(req.file.filename, path.extname(req.file.filename));
-    const finalFilename = `${baseNameWithoutExt}${ext}`;
-    const relativeUrl = `../../images/portfolio/${typeDir}/${finalFilename}`;
+    const isImageUpload = req.file.mimetype.startsWith('image/');
+    const standardExt = isImageUpload ? (ext === '.png' ? '.png' : '.jpg') : ext;
+    const baseNameWithoutExt = asset.name;
+    const finalFilename = `${baseNameWithoutExt}${standardExt}`;
+    const relativeUrl = `../../images/portfolio/${typeFolder ? typeFolder + '/' : ''}${finalFilename}`;
 
     try {
         const isPdf = req.file.mimetype.includes('pdf');
@@ -705,6 +711,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             // PDF: move directly without processing
             const destPath = path.join(destDir, finalFilename);
             fs.renameSync(req.file.path, destPath);
+            asset.record(isPdf);
             res.json({
                 success: true,
                 url: relativeUrl,
@@ -715,7 +722,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             const result = processVideo(req.file.path, destDir, baseNameWithoutExt, ext);
             
             // Expected final video URL
-            const finalVideoUrl = `../../images/portfolio/${typeDir}/${baseNameWithoutExt}.mp4`;
+            const finalVideoUrl = `../../images/portfolio/${typeFolder ? typeFolder + '/' : ''}${baseNameWithoutExt}.mp4`;
+            asset.record(isPdf);
             res.json({
                 success: true,
                 url: finalVideoUrl,
@@ -726,7 +734,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             });
         } else if (isImage) {
             // Image: Process synchronously
-            await processImage(req.file.path, destDir, baseNameWithoutExt, ext);
+            await processImage(req.file.path, destDir, baseNameWithoutExt, ext, standardExt);
+            asset.record(isPdf);
             res.json({
                 success: true,
                 url: relativeUrl,
@@ -736,6 +745,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             // Fallback for other file types
             const destPath = path.join(destDir, finalFilename);
             fs.renameSync(req.file.path, destPath);
+            asset.record(isPdf);
             res.json({
                 success: true,
                 url: relativeUrl,
@@ -745,7 +755,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     } catch (err) {
         console.error('File upload pipeline error:', err);
         res.status(500).json({ error: 'Failed to process file through pipeline: ' + err.message });
-    }
+    } finally { asset.release(); }
 });
 
 // Video transcoding status endpoint
@@ -774,158 +784,10 @@ app.get('/api/media/status/:baseName', (req, res) => {
     }
 });
 
-// --- Publish: run git add/commit/push in project root ---
-const util = require('util');
-const child_process = require('child_process');
-const exec = util.promisify(child_process.exec);
-
-app.post('/api/publish', async (req, res) => {
-    try {
-        // Detect current branch
-        let branch = 'main';
-        try {
-            const { stdout: branchOut } = await exec('git rev-parse --abbrev-ref HEAD', { cwd: PROJECT_ROOT });
-            if (branchOut && branchOut.trim()) branch = branchOut.trim();
-        } catch (e) {
-            console.warn("Could not detect git branch, defaulting to 'main'", e);
-        }
-
-        // 1. Fetch and Rebase to prevent push rejections
-        try {
-            await exec('git fetch origin', { cwd: PROJECT_ROOT });
-            await exec(`git pull --rebase origin ${branch}`, { cwd: PROJECT_ROOT });
-        } catch (pullErr) {
-            console.error("Git pull --rebase failed:", pullErr);
-            return res.status(409).json({
-                success: false,
-                error: "Automatische Synchronisation fehlgeschlagen (Rebase-Konflikt). Bitte löse Konflikte manuell auf.",
-                details: pullErr.message
-            });
-        }
-
-        // 2. Check for changes
-        const { stdout: statusOut } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
-        if (!statusOut || statusOut.trim() === '') {
-            return res.json({ 
-                success: true, 
-                message: 'Keine Änderungen zum Veröffentlichen.',
-                deployment: getDeploymentTrackingInfo()
-            });
-        }
-
-        // Ensure a committer identity exists
-        try {
-            await exec('git config user.name "Portfolio Manager"', { cwd: PROJECT_ROOT });
-            await exec('git config user.email "portfolio@local"', { cwd: PROJECT_ROOT });
-        } catch (e) {
-            // Non-fatal
-        }
-
-        // 3. Stage & Commit
-        await exec('git add -A', { cwd: PROJECT_ROOT });
-
-        const userMsg = req.body && req.body.message ? String(req.body.message) : null;
-        const commitMsg = userMsg || `Publish via portfolio-manager: ${new Date().toISOString()}`;
-        try {
-            const safeMsg = commitMsg.replace(/"/g, '\\"');
-            await exec(`git commit -m "${safeMsg}"`, { cwd: PROJECT_ROOT });
-        } catch (commitErr) {
-            const { stdout: afterStatus } = await exec('git status --porcelain', { cwd: PROJECT_ROOT });
-            if (!afterStatus || afterStatus.trim() === '') {
-                return res.json({ 
-                    success: true, 
-                    message: 'Keine Änderungen zum Veröffentlichen nach Staging.',
-                    deployment: getDeploymentTrackingInfo()
-                });
-            }
-            throw commitErr;
-        }
-
-        // 4. Push
-        const { stdout: pushOut, stderr: pushErr } = await exec(`git push origin ${branch}`, { cwd: PROJECT_ROOT });
-
-        res.json({ 
-            success: true, 
-            message: pushOut || 'Pushed.', 
-            debug: pushErr,
-            deployment: getDeploymentTrackingInfo()
-        });
-    } catch (e) {
-        console.error('Publish error:', e);
-        const errMsg = (e && e.message) ? e.message : String(e);
-        res.status(500).json({ success: false, error: 'Fehler beim Veröffentlichen: ' + errMsg });
-    }
-});
-
-// Helper to detect deployment tracking keys
-function getDeploymentTrackingInfo() {
-    if (process.env.VERCEL_TOKEN && process.env.VERCEL_PROJECT_ID) {
-        return { type: 'vercel', projectId: process.env.VERCEL_PROJECT_ID };
-    }
-    if (process.env.NETLIFY_AUTH_TOKEN && process.env.NETLIFY_SITE_ID) {
-        return { type: 'netlify', siteId: process.env.NETLIFY_SITE_ID };
-    }
-    return { type: 'simulated', durationMs: 35000 };
-}
-
-// Live deployment status API
-app.get('/api/publish/status', async (req, res) => {
-    // Vercel deployment tracking
-    if (process.env.VERCEL_TOKEN && process.env.VERCEL_PROJECT_ID) {
-        try {
-            const url = `https://api.vercel.com/v6/deployments?projectId=${process.env.VERCEL_PROJECT_ID}&limit=1`;
-            const response = await fetch(url, {
-                headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` }
-            });
-            const data = await response.json();
-            if (data.deployments && data.deployments.length > 0) {
-                const dep = data.deployments[0];
-                return res.json({
-                    success: true,
-                    type: 'vercel',
-                    status: dep.state === 'READY' ? 'ready' : (dep.state === 'ERROR' ? 'error' : 'building'),
-                    url: dep.url,
-                    createdAt: dep.createdAt
-                });
-            }
-        } catch (e) {
-            return res.json({ success: false, status: 'error', detail: e.message });
-        }
-    }
-
-    // Netlify deployment tracking
-    if (process.env.NETLIFY_AUTH_TOKEN && process.env.NETLIFY_SITE_ID) {
-        try {
-            const url = `https://api.netlify.com/api/v1/sites/${process.env.NETLIFY_SITE_ID}/deploys?per_page=1`;
-            const response = await fetch(url, {
-                headers: { Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}` }
-            });
-            const deploys = await response.json();
-            if (deploys && deploys.length > 0) {
-                const dep = deploys[0];
-                return res.json({
-                    success: true,
-                    type: 'netlify',
-                    status: dep.state === 'ready' ? 'ready' : (dep.state === 'error' ? 'error' : 'building'),
-                    url: dep.ssl_url || dep.url,
-                    createdAt: dep.created_at
-                });
-            }
-        } catch (e) {
-            return res.json({ success: false, status: 'error', detail: e.message });
-        }
-    }
-
-    // Default simulated response
-    res.json({ 
-        success: true, 
-        type: 'simulated', 
-        status: 'not_configured' 
-    });
-});
-
 // Start Server
-app.listen(port, () => {
+if (require.main === module) app.listen(port, '127.0.0.1', () => {
     console.log(`Portfolio Manager running at http://localhost:${port}`);
     console.log(`Project Root: ${PROJECT_ROOT}`);
 });
+
+module.exports = app;

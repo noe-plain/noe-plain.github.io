@@ -118,7 +118,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "Street Photo­graphy"
     },
     {
         "id": "human-nature",
@@ -164,7 +165,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "Human Nature Photo­graphy"
     },
     {
         "id": "aviation",
@@ -285,7 +287,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "Aviation Photo­graphy"
     },
     {
         "id": "portraet",
@@ -421,7 +424,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "Porträt Foto­grafie"
     },
     {
         "id": "bts",
@@ -492,7 +496,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "BTS"
     },
     {
         "id": "event",
@@ -573,6 +578,7 @@
                     }
                 ]
             }
-        ]
+        ],
+        "sectionTitle": "Event Photo­graphy"
     }
 ]

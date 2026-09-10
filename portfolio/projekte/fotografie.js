@@ -119,7 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    setupPageNav();
+    initialisePhotography().catch(error => {
+        const target = document.getElementById("gallery-container");
+        const message = document.createElement("p"); message.textContent = "Die Bilder konnten nicht geladen werden. Bitte die Seite erneut laden."; target.prepend(message); console.error(error);
+    });
     setupZoomPan();
     updateFloatingDownloadBar();
 
@@ -638,95 +641,77 @@ function hideLoader(id) {
 }
 
 function loadImages(category) {
-    const catConfig = categories[category];
-    const container = document.getElementById(catConfig.container);
-    if (!container || container.dataset.loaded === 'true' || container.dataset.loading === 'true') return;
-
-    container.dataset.loading = 'true';
-    showLoader(catConfig.container);
-
-    let index = 1;
-
-    function loadNext() {
-        // Try up to 999 images or until 404
-        const numStr = index < 10 ? `0${index}` : index;
-        const filename = `${catConfig.prefix}${numStr}.jpeg`;
-        const url = catConfig.path + filename;
-        const id = `${catConfig.prefix}${index}`;
-
-        // Check if exists in DOM (shouldn't if check above passed, but safety)
-        if (container.querySelector(`div.gallery-item[data-id="${id}"]`)) {
-            index++;
-            if (index > 999) finish(); else loadNext();
-            return;
-        }
-
-        const img = new Image();
-        img.onload = function () {
-            // Success
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'gallery-item';
-            itemDiv.dataset.id = id;
-            itemDiv.style.position = 'relative'; // Ensure relative
-
-            const dataObj = {
-                id: id,
-                imageUrl: url,
-                title: `${category.charAt(0).toUpperCase() + category.slice(1)} #${index}`,
-                category: category,
-                photographer: 'Noé Plain'
-            };
-
-            if (!galleryData.find(p => p.id === id)) galleryData.push(dataObj);
-
-            // Thumbnail
-            const thumb = document.createElement('img');
-            thumb.src = url;
-            thumb.alt = `${category} photography ${index}`;
-            // Open click
-            thumb.addEventListener('click', () => openDetail(id));
-            thumb.style.cursor = 'pointer';
-
-            // Fav Button
-            const favBtn = document.createElement('button');
-            favBtn.className = 'grid-fav-btn';
-            favBtn.dataset.id = id;
-            if (favoriteIds.includes(id)) favBtn.classList.add('active');
-            favBtn.innerHTML = '<i class="fas fa-heart"></i>';
-            favBtn.title = "Zu Favoriten hinzufügen";
-            favBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(id);
-            });
-
-            itemDiv.appendChild(thumb);
-            itemDiv.appendChild(favBtn);
-            container.appendChild(itemDiv);
-
-            requestAnimationFrame(() => relayoutGrid(container));
-
-            index++;
-            loadNext();
-        };
-        img.onerror = function () {
-            // Stop loading on first error (assuming change in sequence means end)
-            finish();
-        };
-        img.src = url;
+    const config = categories[category];
+    if (!config) return;
+    const container = document.getElementById(config.container);
+    if (!container || container.dataset.loaded === 'true') return;
+    const project = photographyProjects.find(p => p.id === category);
+    if (!project) return;
+    const blocks = project.blocks || [];
+    // Preserve the original masonry for albums consisting of one gallery.
+    const plainGallery = blocks.length === 1 && ['gallery', 'media'].includes(blocks[0].type);
+    if (plainGallery) {
+        container.className = 'project-gallery';
+        container.replaceChildren();
+        for (const item of blocks[0].items || []) container.append(photoTile(item, category));
+    } else {
+        container.className = 'gutenberg-article-container';
+        renderBlocksFromData(blocks, config.container);
     }
+    container.dataset.loaded = 'true';
+    hideLoader(config.container);
+    requestAnimationFrame(() => relayoutGrid(container));
+}
 
-    function finish() {
-        container.dataset.loaded = 'true';
-        container.dataset.loading = 'false';
-        hideLoader(catConfig.container);
-        relayoutGrid(container);
+function photoTile(item, category) {
+    const cell = document.createElement('div'); cell.className = 'gallery-item';
+    cell.dataset.id = item.id; cell.style.position = 'relative';
+    const image = document.createElement('img'); image.src = item.imageUrl;
+    image.alt = item.alt || item.title || ''; image.style.cursor = 'pointer';
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(item.id);
+    link.onclick = event => { event.preventDefault(); openDetail(item.id); };
+    link.setAttribute('aria-label', item.title || 'Bild in der Detailansicht öffnen'); link.style.cssText = 'display:block;width:100%;height:100%'; link.append(image);
+    image.onload = () => relayoutGrid(cell.closest('.project-gallery'));
+    image.onerror = () => { image.alt = 'Bild nicht verfügbar: ' + (item.title || item.id); };
+    const fav = document.createElement('button'); fav.className = 'grid-fav-btn';
+    fav.dataset.id = item.id; fav.classList.toggle('active', favoriteIds.includes(item.id));
+    fav.innerHTML = '<i class="fas fa-heart"></i>'; fav.title = 'Zu Favoriten hinzufügen';
+    fav.onclick = event => { event.preventDefault(); event.stopPropagation(); toggleFavorite(item.id); };
+    cell.append(link, fav); return cell;
+}
+
+let photographyProjects = [];
+async function initialisePhotography() {
+    const response = await fetch('photography.json');
+    if (!response.ok) throw new Error('Fotografie-Inhalte nicht erreichbar');
+    photographyProjects = await response.json();
+    const nav = document.getElementById('page-nav'); nav.replaceChildren();
+    const host = document.getElementById('gallery-container');
+    const existing = new Set(photographyProjects.map(p => 'section-' + p.id));
+    host.querySelectorAll('.gallery-section').forEach(el => { if (!existing.has(el.id)) el.remove(); });
+    Object.keys(categories).forEach(key => delete categories[key]);
+    galleryData = [];
+    for (const p of photographyProjects) {
+        categories[p.id] = { prefix: p.id + '-', container: 'lightgallery-' + p.id, path: '' };
+        const tab = document.createElement('a'); tab.href = '?' + p.id; tab.className = 'tab-btn'; tab.textContent = p.tabTitle || p.title; nav.append(tab);
+        let section = document.getElementById('section-' + p.id);
+        if (!section) { section = document.createElement('div'); section.id = 'section-' + p.id; section.className = 'gallery-section'; const title = document.createElement('h2'); section.append(title); const content = document.createElement('div'); content.id = 'lightgallery-' + p.id; section.append(content); host.append(section); }
+        section.querySelector('h2').textContent = p.sectionTitle || p.title;
+        for (const block of p.blocks || []) for (const item of block.items || []) galleryData.push({ ...item, category: p.id, photographer: item.photographer || 'Noé Plain' });
     }
-
-    loadNext();
+    if (photographyProjects.length) setupPageNav();
 }
 
 
 function showGallery(category, tabElement = null, pushState = true) {
+    const project = photographyProjects.find(p => p.id === category);
+    if (project) {
+        document.querySelector('.detail-hero-content h1').textContent = project.title;
+        document.querySelector('.detail-hero-beschreibung').textContent = project.description || '';
+        document.querySelector('.detail-hero').style.backgroundImage = `url("${project['hero-image']}")`;
+        document.title = project.title + ' – Medien vom Noé';
+    }
     // Hide all headers/sections
     document.querySelectorAll('.gallery-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -919,7 +904,8 @@ function setupPageNav() {
 
     // Validate
     const allKeys = Object.keys(categories);
-    if (!allKeys.includes(activeTab)) activeTab = 'street';
+    if (!allKeys.includes(activeTab)) activeTab = allKeys[0];
+    if (!activeTab) return;
 
     // Bind checks
     document.querySelectorAll('#page-nav a.tab-btn').forEach(btn => {
