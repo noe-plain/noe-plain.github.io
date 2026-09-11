@@ -84,12 +84,59 @@ function drawAssets(){
 }
 async function refreshAssets(){const result=await api('/api/studio/media');if(type!=='media')return;managerItems=result.items;managerFolders=result.folders;renderAssets();}
 function newMediaFolder(){if(managerBusy)return;const el=dialog('Ordner erstellen');const form=document.createElement('form');const label=labeled('Ordnername',managerFolder&&managerFolder!=='*'?managerFolder+'/':'',{name:'folder',required:true});const hint=document.createElement('p');hint.className='hint';hint.textContent='Unterordner mit / trennen, zum Beispiel Reisen/Schweiz.';const submit=document.createElement('button');submit.type='submit';submit.className='primary';submit.textContent='Ordner erstellen';form.append(label,hint,submit);el.querySelector('.manager-dialog-body').append(form);form.oninput=()=>{dirty=true;};form.onsubmit=safely(async e=>{e.preventDefault();if(managerBusy)return;const folder=form.elements.folder.value.trim();managerBusy=true;submit.disabled=true;try{await api('/api/studio/media/folders',{folder});managerFolder=folder;saved();el.close();await refreshAssets();notice('Ordner erstellt.');}finally{managerBusy=false;submit.disabled=false;}});}
-function chooseUpload(){if(managerBusy)return;const input=document.createElement('input');input.type='file';input.accept='image/*,video/*,application/pdf';input.multiple=true;input.onchange=safely(async()=>{
-    const files=[...input.files];if(!files.length)return;const folder=managerFolder==='*'?'uploads':managerFolder;managerBusy=true;
-    try{for(let i=0;i<files.length;i++){setStatus(`Upload ${i+1}/${files.length}: ${files[i].name} → ${folder||'Hauptordner'}`);const body=new FormData();body.append('file',files[i]);body.append('originalName',files[i].name);body.append('folder',folder);const response=await fetch('/api/upload',{method:'POST',headers:{'X-CMS-Token':token},body});const result=await response.json();if(!response.ok)throw Error(result.error||'Upload fehlgeschlagen.');}if(type==='media'){managerFolder=folder;await refreshAssets();setStatus(`${files.length} Dateien lokal hochgeladen. Videos werden gegebenenfalls im Hintergrund verarbeitet.`);}notice('Upload abgeschlossen.');}
-    catch(error){await refreshAssets();setStatus('Upload unterbrochen. Bereits hochgeladene Dateien bleiben erhalten.');throw error;}
-    finally{managerBusy=false;}
-});input.click();}
+function uploadWithProgress(body,onProgress){
+    return new Promise((resolve,reject)=>{
+        const xhr=new XMLHttpRequest();xhr.open('POST','/api/upload');xhr.setRequestHeader('X-CMS-Token',token);
+        xhr.upload.addEventListener('progress',event=>onProgress(event.lengthComputable?Math.round(event.loaded/event.total*100):null,false));
+        xhr.upload.addEventListener('load',()=>onProgress(null,true));
+        xhr.addEventListener('load',()=>{let result;try{result=JSON.parse(xhr.responseText);}catch{reject(Error('Ungültige Serverantwort (HTTP '+xhr.status+').'));return;}if(xhr.status<200||xhr.status>=300||!result.success){reject(Error(result.error||'Upload fehlgeschlagen (HTTP '+xhr.status+').'));return;}resolve(result);});
+        xhr.addEventListener('error',()=>reject(Error('Verbindung zum lokalen CMS unterbrochen. Bitte vor einem erneuten Upload prüfen, ob die Datei bereits angekommen ist.')));
+        xhr.addEventListener('abort',()=>reject(Error('Upload abgebrochen.')));
+        xhr.send(body);
+    });
+}
+function chooseUpload(){
+    if(managerBusy)return;
+    const input=document.createElement('input');input.type='file';input.accept='image/*,video/*,application/pdf';input.multiple=true;input.hidden=true;document.body.append(input);
+    input.addEventListener('cancel',()=>input.remove());
+    input.onchange=safely(async()=>{
+        const files=[...input.files];input.remove();if(!files.length)return;
+        const folder=managerFolder==='*'?'uploads':managerFolder;
+        const el=dialog('Dateien werden hochgeladen');el.classList.add('upload-dialog');const host=el.querySelector('.manager-dialog-body');
+        const info=document.createElement('p');info.className='hint';info.textContent='Ziel: '+(folder||'Hauptordner')+'. Nach der Übertragung werden die Bildformate und Grössen erstellt.';
+        const total=document.createElement('p');total.className='upload-total';total.setAttribute('role','status');total.textContent=`0 von ${files.length} Dateien abgeschlossen`;
+        host.append(info,total);
+        const rows=files.map(file=>{const row=document.createElement('div');row.className='upload-row';const name=document.createElement('strong');name.textContent=file.name;const stage=document.createElement('span');stage.textContent='Wartet';stage.setAttribute('role','status');const bar=document.createElement('progress');bar.max=100;bar.value=0;bar.setAttribute('aria-label',file.name);row.append(name,stage,bar);host.append(row);return {row,stage,bar};});
+        managerBusy=true;dirty=true;let finished=0,background=0;
+        try{
+            ({token}=await api('/api/studio/session'));
+            for(let i=0;i<files.length;i++){
+                const file=files[i],view=rows[i];view.stage.textContent='Übertragung beginnt …';
+                const body=new FormData();body.append('file',file);body.append('originalName',file.name);body.append('folder',folder);
+                let result;
+                try{result=await uploadWithProgress(body,(percent,processing)=>{
+                    if(processing){view.stage.textContent=file.type.startsWith('image/')?'Bild wird optimiert · Formate und Grössen werden erstellt …':'Datei wird verarbeitet …';view.bar.removeAttribute('value');}
+                    else{view.stage.textContent=percent===null?'Wird übertragen …':`Übertragung: ${percent} %`;if(percent===null)view.bar.removeAttribute('value');else view.bar.value=percent;}
+                });}catch(error){view.stage.textContent=error.message;view.row.classList.add('upload-failed');view.bar.hidden=true;throw error;}
+                finished++;view.bar.value=100;view.row.classList.add('upload-done');
+                if(result.isAsync){background++;view.stage.textContent='Übertragen · Videokonvertierung läuft im Hintergrund';}else view.stage.textContent='Fertig · lokal gespeichert';
+                total.textContent=`${finished} von ${files.length} Dateien abgeschlossen`;
+            }
+            managerFolder=folder;
+            el.querySelector('h2').textContent='Upload abgeschlossen';
+            if(background)total.textContent=`${finished} Dateien übertragen · ${background} Videos werden noch konvertiert.`;
+            try{await refreshAssets();}catch{info.textContent='Die Dateien sind gespeichert. Bitte die Mediathek neu laden, um sie anzuzeigen.';}
+            setStatus(`${finished} Dateien lokal hochgeladen.`);
+        }catch(error){
+            el.querySelector('h2').textContent='Upload unterbrochen';total.textContent=`${finished} von ${files.length} Dateien gespeichert. Erfolgreiche Uploads bleiben erhalten.`;
+            for(let i=finished+1;i<rows.length;i++)rows[i].stage.textContent='Nicht hochgeladen';
+            try{await refreshAssets();}catch{}
+            throw error;
+        }finally{
+            managerBusy=false;saved();host.append(button('Schliessen',()=>el.close(),'primary'));
+        }
+    });input.click();
+}
 function assetDetails(item){
     if(managerBusy)return;const el=dialog(item.title);el.classList.add('asset-dialog');const body=el.querySelector('.manager-dialog-body');
     const preview=document.createElement('div');preview.className='asset-detail-preview';if(item.image){const img=document.createElement('img');img.src=mediaURL(item.url);img.alt=item.title;preview.append(img);}else if(/\.(mp4|mov|webm)$/i.test(item.url)){const video=document.createElement('video');video.src=mediaURL(item.url);video.controls=true;preview.append(video);}else preview.textContent='PDF-Dokument';body.append(preview);

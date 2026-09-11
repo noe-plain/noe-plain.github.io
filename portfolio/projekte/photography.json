@@ -580,5 +580,81 @@
             }
         ],
         "sectionTitle": "Event Photo­graphy"
+    },
+    {
+        "id": "mkw",
+        "title": "Musikkollegium Winterthur",
+        "description": "",
+        "tabTitle": "Musikkollegium Winterthur",
+        "hero-image": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-2.jpg",
+        "blocks": [
+            {
+                "id": "c45cfceb-6ec2-42c5-b270-442bbce21f22",
+                "type": "gallery",
+                "items": [
+                    {
+                        "id": "d5f13052-3e73-4310-b432-efb8cd7a372b",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-3.jpg",
+                        "title": ""
+                    },
+                    {
+                        "id": "acebe698-34bb-402e-b82b-99a1b509fa69",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-12.jpg",
+                        "title": ""
+                    },
+                    {
+                        "id": "f34ae634-538e-4435-9788-db9ee5da271e",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-11.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-11.jpg"
+                    },
+                    {
+                        "id": "56d05c4f-62fd-460f-bec4-054713c7a6cc",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-2.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain.jpg"
+                    },
+                    {
+                        "id": "e133262d-0bb0-4960-9152-3480f4e4ad98",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-7.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-7.jpg"
+                    },
+                    {
+                        "id": "f034842f-f0da-470e-95c9-e342a04c4aca",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-10.jpg",
+                        "title": "Bassistin vom Musikkollegium"
+                    },
+                    {
+                        "id": "52d80373-1fb7-4b91-a0e5-611a378508b6",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-5.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-5.jpg"
+                    },
+                    {
+                        "id": "ddbbfa57-aedc-4781-8c92-b0aceffa4fc7",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-13.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-13.jpg"
+                    },
+                    {
+                        "id": "13d9bc6b-9582-4583-8361-0a6a3987853f",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-8.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-8.jpg"
+                    },
+                    {
+                        "id": "e31752e8-cc2d-4299-9d2e-eb8dcee41d9a",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-9.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-9.jpg"
+                    }
+                ]
+            }
+        ],
+        "sectionTitle": "Musikkollegium Winterthur"
     }
 ]
