@@ -52,3 +52,7 @@ Die Mediathek und die Bildauswahl zeigen Original und erzeugte Grössen-/Formatv
 Ordner lassen sich erstellen, auswählen und als Upload-Ziel verwenden. „Verschieben“ verschiebt das gesamte Medienpaket einschliesslich Original und aktualisiert vorhandene Verweise in den Website-Dateien. Zielkonflikte werden abgelehnt. Laufende Bildverarbeitungen sind gegen Verschieben gesperrt. Neue Dateinamen bleiben lesbar, etwa `Ferien-Foto.png`; bei Kollisionen entsteht `Ferien-Foto-2.png`.
 
 Weitere Tests: `node --test media-library.test.js upload.test.js`. Beide verwenden ausschliesslich temporäre Dateien.
+
+## Bildvarianten bei neuen Uploads
+
+Neue Bilder erzeugen genau vier öffentliche Varianten: `<Name>.jpg` in Originalabmessungen mit JPEG-Qualität 100 und 4:4:4-Farbabtastung, `<Name>-mobile.jpg` mit maximal 640 px Breite (Qualität 85), `<Name>.webp` mit maximal 2560 px (Qualität 85) und `<Name>-mobile.webp` mit maximal 640 px (Qualität 80). Es wird nicht hochskaliert. Transparenz wird auf Weiss reduziert. Die hochgeladene Quelldatei bleibt separat im nicht als Variante angezeigten `raw/`-Archiv. Bestehende Varianten werden nicht gelöscht.

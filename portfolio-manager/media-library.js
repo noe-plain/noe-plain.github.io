@@ -26,9 +26,9 @@ function library(root) {
             const groups = new Map();
             for (const name of names) {
                 let stem = path.parse(name).name;
-                const candidate = stem.replace(/-(?:640|1280|1920|2560|poster|hevc)$/, '');
+                const candidate = stem.replace(/-(?:640|1280|1920|2560|poster|hevc|mobile)$/, '');
                 // Only collapse a size suffix when its full-size sibling exists.
-                if (candidate !== stem && stems.has(candidate) && /\.(webp|avif|mp4)$/i.test(name) && !(fs.existsSync(path.join(dir,'raw')) && fs.readdirSync(path.join(dir,'raw')).some(n=>path.parse(n).name===stem))) stem = candidate;
+                if (candidate !== stem && stems.has(candidate) && (/\.(webp|avif|mp4)$/i.test(name) || /-mobile\.jpg$/i.test(name)) && !(fs.existsSync(path.join(dir,'raw')) && fs.readdirSync(path.join(dir,'raw')).some(n=>path.parse(n).name===stem))) stem = candidate;
                 const key = stem + (name.endsWith('.pdf') ? ':pdf' : '');
                 if (!groups.has(key)) groups.set(key, []);
                 groups.get(key).push(name);

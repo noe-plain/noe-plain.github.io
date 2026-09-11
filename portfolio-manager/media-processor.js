@@ -30,80 +30,25 @@ function getSharpSettings(format) {
     return { format: 'jpeg', options: { quality: 82, progressive: true } };
 }
 
-/**
- * Image processing pipeline
- * - Moves raw file to raw/ subdirectory
- * - Generates web-optimized version of the original image (compressed JPG/PNG)
- * - Generates WebP and AVIF versions
- * - Generates responsive sizes (2560w, 1920w, 1280w, 640w) for WebP and AVIF
- */
+/** Four public variants per image; the source is kept separately in raw/. */
 async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standardExt = null) {
     const rawDestDir = path.join(destDir, 'raw');
     ensureDir(rawDestDir);
     ensureDir(destDir);
-
-    const actualStandardExt = standardExt || rawExt;
     const rawFilePath = path.join(rawDestDir, `${baseNameWithoutExt}${rawExt}`);
-
-    // 1. Move original uploaded file to raw/ directory
     fs.renameSync(srcPath, rawFilePath);
-
-    try {
-        const image = sharp(rawFilePath);
-        const metadata = await image.metadata();
-        const originalWidth = metadata.width || 1920;
-        const inputFormat = metadata.format;
-
-        // 2. Generate standard optimized fallback image in destDir
-        const standardDest = path.join(destDir, `${baseNameWithoutExt}${actualStandardExt}`);
-        const outputFormat = actualStandardExt.toLowerCase().replace('.', '');
-        
-        if (outputFormat === 'png' || (actualStandardExt === rawExt && inputFormat === 'png')) {
-            await sharp(rawFilePath)
-                .png({ compressionLevel: 8, palette: true })
-                .toFile(standardDest);
-        } else {
-            await sharp(rawFilePath)
-                .jpeg({ quality: 82, progressive: true, mozjpeg: true })
-                .toFile(standardDest);
-        }
-
-        // 3. Generate main WebP and AVIF images
-        const webpDest = path.join(destDir, `${baseNameWithoutExt}.webp`);
-        const avifDest = path.join(destDir, `${baseNameWithoutExt}.avif`);
-
-        await sharp(rawFilePath).webp({ quality: 75, effort: 4 }).toFile(webpDest);
-        await sharp(rawFilePath).avif({ quality: 65, effort: 4 }).toFile(avifDest);
-
-        // 4. Generate responsive sizes (AVIF and WebP only to save space)
-        // Responsive widths to generate (only if original image is wider than target)
-        const targetWidths = [640, 1280, 1920, 2560];
-
-        for (const width of targetWidths) {
-            if (originalWidth > width) {
-                const resizedImage = sharp(rawFilePath).resize(width);
-
-                const widthWebpDest = path.join(destDir, `${baseNameWithoutExt}-${width}.webp`);
-                const widthAvifDest = path.join(destDir, `${baseNameWithoutExt}-${width}.avif`);
-
-                await resizedImage.clone().webp({ quality: 75, effort: 3 }).toFile(widthWebpDest);
-                await resizedImage.clone().avif({ quality: 65, effort: 3 }).toFile(widthAvifDest);
-            }
-        }
-
-        console.log(`Successfully processed image: ${baseNameWithoutExt}`);
-        return {
-            success: true,
-            rawPath: rawFilePath,
-            standardPath: standardDest,
-            webpPath: webpDest,
-            avifPath: avifDest
-        };
-
-    } catch (error) {
-        console.error(`Error processing image ${baseNameWithoutExt}:`, error);
-        throw error;
-    }
+    const extension = standardExt === '.jpeg' ? '.jpeg' : '.jpg';
+    const standardPath = path.join(destDir, `${baseNameWithoutExt}${extension}`);
+    const mobileJpegPath = path.join(destDir, `${baseNameWithoutExt}-mobile.jpg`);
+    const webpPath = path.join(destDir, `${baseNameWithoutExt}.webp`);
+    const mobileWebpPath = path.join(destDir, `${baseNameWithoutExt}-mobile.webp`);
+    const image = () => sharp(rawFilePath).rotate().flatten({ background: '#ffffff' });
+    // Full dimensions and maximum JPEG quality. Smaller variants never upscale.
+    await image().jpeg({ quality: 100, chromaSubsampling: '4:4:4' }).toFile(standardPath);
+    await image().resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 85 }).toFile(mobileJpegPath);
+    await image().resize({ width: 2560, withoutEnlargement: true }).webp({ quality: 85, effort: 4 }).toFile(webpPath);
+    await image().resize({ width: 640, withoutEnlargement: true }).webp({ quality: 80, effort: 4 }).toFile(mobileWebpPath);
+    return { success: true, rawPath: rawFilePath, standardPath, mobileJpegPath, webpPath, mobileWebpPath };
 }
 
 /**

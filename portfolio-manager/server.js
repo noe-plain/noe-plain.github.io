@@ -697,7 +697,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const destDir = asset.dir;
     const ext = path.extname(req.file.originalname).toLowerCase();
     const isImageUpload = req.file.mimetype.startsWith('image/');
-    const standardExt = isImageUpload ? (ext === '.png' ? '.png' : '.jpg') : ext;
+    const standardExt = isImageUpload ? '.jpg' : ext;
     const baseNameWithoutExt = asset.name;
     const finalFilename = `${baseNameWithoutExt}${standardExt}`;
     const relativeUrl = `../../images/portfolio/${typeFolder ? typeFolder + '/' : ''}${finalFilename}`;
