@@ -308,5 +308,10 @@
         "name": "YouTube",
         "url": "https://youtube.com",
         "category": "Ressourcen"
+    },
+    {
+        "name": "Fredie",
+        "url": "https://chatgpt.com/",
+        "category": "Ressourcen"
     }
 ]
