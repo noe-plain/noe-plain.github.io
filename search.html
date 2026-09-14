@@ -69,7 +69,7 @@
                 <label for="suche" class="sr-only">Was suchst du?</label>
                 <div class="finder-field">
                     <span class="finder-magnifier" aria-hidden="true">⌕</span>
-                    <input id="suche" name="q" type="text" placeholder="Tool, Inspiration oder Webadresse …" autocomplete="off" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="finder-results">
+                    <input id="suche" name="q" type="text" placeholder="Tool, Inspiration oder Webadresse …" autocomplete="off" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="finder-results" autofocus>
                     <button type="button" id="finder-clear" aria-label="Suche löschen" hidden>×</button>
                     <button type="submit" class="finder-submit">Suchen <span aria-hidden="true">↗</span></button>
                 </div>
@@ -309,6 +309,7 @@
     }
     $('finder-retry').addEventListener('click', load);
     load();
+    input.focus({ preventScroll: true });
 })();
 
     </script>
