@@ -313,5 +313,30 @@
         "name": "Fredie",
         "url": "https://chatgpt.com/",
         "category": "Ressourcen"
+    },
+    {
+        "name": "MKW FD-Kampagnen Studio",
+        "url": "https://noe-plain.github.io/MKW-Sujet-Studio",
+        "category": "suche"
+    },
+    {
+        "name": "Thomann Music",
+        "url": "https://www.thomannmusic.ch/",
+        "category": "suche"
+    },
+    {
+        "name": "Planner",
+        "url": "https://planner.cloud.microsoft/",
+        "category": "suche"
+    },
+    {
+        "name": "Mailchimp",
+        "url": "https://mailchimp.com/",
+        "category": "suche"
+    },
+    {
+        "name": "Future Demand",
+        "url": "https://app.future-demand.com/",
+        "category": "suche"
     }
 ]
