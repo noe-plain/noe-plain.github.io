@@ -1,0 +1,140 @@
+/* The search page owns its layout; shared navigation and footer stay unchanged. */
+.search-page { background: #f7f7f7; }
+.finder { max-width: 1440px; margin: 90px auto 90px; padding: 0 32px; color: #25172c; }
+.finder [hidden] { display: none !important; }
+.finder *, .finder *::before, .finder *::after { box-sizing: border-box; }
+.finder button, .finder input { font: inherit; }
+.finder button { cursor: pointer; }
+.finder :is(button, input, a):focus-visible { outline: 3px solid #80519b; outline-offset: 4px; }
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.finder-hero { position: relative; min-height: 300px; padding: 38px 48px 48px; border-radius: 28px 0 28px 28px; background: #344638; isolation: isolate; overflow: hidden; }
+.finder-photo { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; object-position: 60% center; z-index: -2; }
+.finder-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(15,28,21,.82),rgba(15,28,21,.28) 65%,rgba(15,28,21,.08)); z-index: -1; }
+.finder-intro { max-width: 570px; color: #fff; }
+.finder-eyebrow { display: block; font-size: 11px; font-weight: 500; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 14px; }
+.finder h1 { font-family: boska, serif; font-weight: 600; font-size: clamp(42px,4.5vw,60px); line-height: 1.02; letter-spacing: -.025em; margin: 0; }
+.finder-intro p { font-size: 17px; line-height: 1.55; max-width: 370px; margin: 18px 0 20px; }
+.finder-search { position: relative; z-index: 2; margin: -28px 48px 0; }
+#finder-form { position: relative; display: block; }
+.finder-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 6px 22px;
+    border: 1px solid #d4c7db;
+    border-radius: 9999px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(37, 23, 44, 0.08);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.finder-field:focus-within {
+    border-color: #623b79;
+    box-shadow: 0 0 0 3px rgba(221, 207, 230, 0.7), 0 8px 24px rgba(37, 23, 44, 0.1);
+}
+.finder-magnifier {
+    font: 26px/1 sans-serif;
+    color: #746779;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    flex-shrink: 0;
+}
+#suche { flex: 1; min-width: 0; width: 100%; padding: 11px 0; border: 0; background: transparent; color: #25172c; font-size: 17px; outline: none; }
+#suche::placeholder { color: #776a7d; opacity: 1; }
+#finder-clear {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: #625268;
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+#finder-clear:hover { background: #eee5f2; color: #25172c; }
+.finder-submit {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 46px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 10px 9999px 9999px 10px;
+    color: #fff;
+    background: #32133f;
+    font-weight: 500 !important;
+    transition: background-color .15s ease;
+}
+.finder-submit:hover { background: #59306d; }
+.finder-suggestions { position: absolute; left: 0; right: 0; top: calc(100% + 8px); max-height: min(430px,55vh); overflow-y: auto; background: #fff; border: 1px solid #d9ccdf; border-radius: 12px; box-shadow: 0 15px 40px #25172c26; }
+#finder-results { list-style: none; padding: 6px; margin: 0; }
+.finder-option { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 7px; cursor: pointer; }
+.finder-option:hover, .finder-option[aria-selected="true"] { background: #eee5f2; }
+.finder-option-copy, .finder-link-copy { display: grid; gap: 5px; min-width: 0; }
+.finder strong { font-weight: 500; overflow-wrap: anywhere; }
+.finder small { color: #746779; font-size: 12px; overflow-wrap: anywhere; }
+.finder-library { margin: 44px 48px 0; }
+.finder-library-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.finder-library-heading .finder-eyebrow { color: #76647f; margin-bottom: 6px; }
+.finder h2 { font-family: boska,serif; font-weight: 600; font-size: 42px; }
+#finder-count { font-size: 13px; color: #746779; margin: 0 0 7px; }
+.finder-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 22px 0 26px; border-bottom: 1px solid #ded5e2; }
+.finder-filter { min-height: 40px; padding: 8px 16px; border-radius: 24px; border: 1px solid #ddd3e2; color: #5f4e69; background: transparent; font-size: 13px !important; }
+.finder-filter:hover { background: #ebe2f0; }
+.finder-filter[aria-pressed="true"] { background: #ddcfe6; color: #32133f; border-color: #ddcfe6; font-weight: 500; }
+.finder-group { padding-top: 26px; }
+.finder-group h3 { display: flex; align-items: center; gap: 10px; font: 500 17px switzer,sans-serif; margin: 0 0 14px; }
+.finder-group-count { color: #83708c; font-size: 12px; font-weight: 400; }
+.finder-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; }
+.finder-link { display: flex; justify-content: space-between; align-items: center; gap: 16px; height: 100%; min-height: 84px; padding: 17px 18px; color: #321f3b; text-decoration: none; border: 1px solid #e5dee8; border-radius: 10px; background: #fff; transition: background .15s, border-color .15s; font-size: 15px; }
+.finder-link:hover { background: #efe7f3; border-color: #c7b3d1; }
+.finder-arrow { font-size: 22px; color: #846791; flex-shrink: 0; }
+.finder-empty { padding: 40px 20px; text-align: center; background: #eee7f2; border-radius: 12px; margin-top: 24px; }
+.finder-empty h3 { font: 500 21px switzer,sans-serif; }
+.finder-empty p { font-size: 15px; }
+.finder-empty button { min-height: 44px; border: 1px solid #b5a1c0; border-radius: 7px; padding: 10px 18px; color: #32133f; background: #fff; }
+@media (max-width: 950px) {
+    .finder { padding: 0 20px; }
+    .finder-hero { padding: 34px; }
+    .finder-search { margin-left: 22px; margin-right: 22px; }
+    .finder-library { margin-left: 22px; margin-right: 22px; }
+    .finder-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+    .finder { margin-top: 88px; margin-bottom: 48px; padding: 0 14px; }
+    .finder-hero { min-height: 280px; padding: 28px 20px 40px; border-radius: 22px 0 22px 22px; }
+    .finder-intro p { font-size: 15px; max-width: 265px; }
+    .finder-hero::after { background: linear-gradient(90deg,#14231acc,#14231a55); }
+    .finder-search { margin: -24px 8px 0; }
+    .finder-field { gap: 6px; padding: 5px 5px 5px 16px; }
+    .finder-magnifier { display: none; }
+    #suche { font-size: 16px; }
+    .finder-submit { padding: 0 14px; font-size: 13px !important; }
+    .finder-submit span { display: none; }
+    #finder-clear { width: 28px; height: 28px; font-size: 20px; }
+    .finder-library { margin: 36px 8px 0; }
+    .finder-library-heading { align-items: start; gap: 8px; }
+    .finder h2 { font-size: 36px; }
+    #finder-count { margin-top: 25px; white-space: nowrap; font-size: 11px; }
+    .finder-filters { gap: 7px; padding: 18px 0 22px; }
+    .finder-filter { padding: 8px 12px; }
+    .finder-grid { grid-template-columns: minmax(0,1fr); gap: 8px; }
+    .finder-link { min-height: 76px; }
+}
+@media (prefers-reduced-motion: reduce) { .search-page { scroll-behavior: auto; } .finder-link { transition: none; } }

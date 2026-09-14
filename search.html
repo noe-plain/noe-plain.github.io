@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./images/illustrationen/logos/favicon.png">
-    <title>Search – Medie vom Noé</title>
+    <title>Search & Quick-Links – Medien von Noé</title>
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/search.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="common.js" defer></script>
     <meta name="description"
@@ -15,10 +16,10 @@
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
 
-<body>
+<body class="search-page">
     <header>
         <nav class="header-nav">
-            <a class="logo-a" href="../index.html">Medien von <span>Noé</span></a>
+            <a class="logo-a" href="./index.html">Medien von <span>Noé</span></a>
             <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
                 <span></span>
                 <span></span>
@@ -28,49 +29,63 @@
         <div class="hamburger-nav-bg" id="hamburgerNavBg"></div>
         <nav class="hamburger-nav-overlay" id="hamburgerNav">
             <div class="hamburger-nav-links">
-                <a class="hamburger-nav-link" href="../search.html">Search &#8197; &#128270;</a>
+                <a class="hamburger-nav-link" href="./search.html">Search &#8197; &#128270;</a>
                 <hr>
-                <a class="hamburger-nav-link" href="../index.html">Medien von Noé</a>
+                <a class="hamburger-nav-link" href="./index.html">Medien von Noé</a>
                 <div class="nav-group">
                     <div class="nav-item-row">
-                        <a class="hamburger-nav-link" href="../index.html#portfolio">Portfolio</a>
+                        <a class="hamburger-nav-link" href="./index.html#portfolio">Portfolio</a>
                         <button class="submenu-toggle" id="portfolio-toggle" aria-label="Portfolio Menü öffnen">
                             <i class="fas fa-chevron-down"></i>
                         </button>
                     </div>
                     <ul class="hamburger-nav-sublinks collapsed" id="portfolio-sublinks">
-                        <li><a class="hamburger-nav-link sub-link" href="../portfolio/fotografie.html">Fotografie</a>
+                        <li><a class="hamburger-nav-link sub-link" href="./portfolio/fotografie.html">Fotografie</a>
                         </li>
-                        <li><a class="hamburger-nav-link sub-link" href="../portfolio/videografie.html">Videografie</a>
+                        <li><a class="hamburger-nav-link sub-link" href="./portfolio/videografie.html">Videografie</a>
                         </li>
                         <li><a class="hamburger-nav-link sub-link"
-                                href="../portfolio/illustration.html">Illustration</a></li>
-                        <li><a class="hamburger-nav-link sub-link" href="../portfolio/design.html">Design</a></li>
+                                href="./portfolio/illustration.html">Illustration</a></li>
+                        <li><a class="hamburger-nav-link sub-link" href="./portfolio/design.html">Design</a></li>
                     </ul>
                 </div>
-                <a class="hamburger-nav-link" href="../index.html#about">Das bin ich</a>
-                <a class="hamburger-nav-link" href="../index.html#contact">Kontakt</a>
+                <a class="hamburger-nav-link" href="./index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="./index.html#contact">Kontakt</a>
             </div>
         </nav>
     </header>
 
-    <main class="max-width">
-        <div id="search" class="mood-pic"
-            style="background-image: url(../images/NP_06864.jpeg); background-position: 50% 50%;"></div>
-        <div id="search-overlay" class="search-overlay">
-            <div class="search-container">
-                <div class="search-input-wrapper">
-                    <i class="fas fa-search search-icon"></i>
-                    <input id="suche" type="text" class="search-input" placeholder="Suchen" autocomplete="off">
-                    <button id="cancel-search-btn" class="cancel-search-btn" aria-label="Abbrechen"><i
-                            class="fas fa-times"></i></button>
-                </div>
-                <div class="autocomplete-dropdown" id="autocomplete-dropdown">
-                    <ul id="autocomplete-list" class="autocomplete-list"></ul>
-                </div>
+    <main class="finder" id="main-content">
+        <section class="finder-hero" aria-labelledby="finder-title">
+            <img class="finder-photo" src="./images/NP_06864.jpeg" alt="Häuser in einer grünen Berglandschaft im Abendlicht" width="2400" height="741" fetchpriority="high">
+            <div class="finder-intro">
+                <span class="finder-eyebrow">Noés Werkzeugkasten</span>
+                <h1 id="finder-title">Gute Ideen.<br>Gute Fundstücke.</h1>
+                <p>Tools, Inspiration und kleine Helfer für deinen nächsten Entwurf.</p>
             </div>
-        </div>
-        <div id="categories-root"></div>
+        </section>
+        <section class="finder-search" aria-label="Suche">
+            <form id="finder-form" role="search" action="https://www.google.com/search" method="get">
+                <label for="suche" class="sr-only">Was suchst du?</label>
+                <div class="finder-field">
+                    <span class="finder-magnifier" aria-hidden="true">⌕</span>
+                    <input id="suche" name="q" type="text" placeholder="Tool, Inspiration oder Webadresse …" autocomplete="off" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="finder-results">
+                    <button type="button" id="finder-clear" aria-label="Suche löschen" hidden>×</button>
+                    <button type="submit" class="finder-submit">Suchen <span aria-hidden="true">↗</span></button>
+                </div>
+                <div class="finder-suggestions" id="finder-suggestions" hidden>
+                    <ul id="finder-results" role="listbox" aria-label="Suchvorschläge"></ul>
+                </div>
+            </form>
+        </section>
+        <section class="finder-library" aria-labelledby="quick-title">
+            <div class="finder-library-heading"><div><span class="finder-eyebrow">Gesammelt & gerne genutzt</span><h2 id="quick-title">Quick-Links</h2></div><p id="finder-count" role="status" aria-live="polite">Links werden geladen …</p></div>
+            <div class="finder-filters" id="finder-filters" role="group" aria-label="Quick-Links nach Kategorie filtern"></div>
+            <div id="categories-root"></div>
+            <div class="finder-empty" id="finder-empty" hidden><h3>Hier gibt es noch keinen Treffer.</h3><p>Versuche einen anderen Suchbegriff oder eine andere Kategorie.</p><button type="button" id="finder-reset">Alle Quick-Links anzeigen</button></div>
+            <div class="finder-empty" id="finder-error" hidden><h3>Die Quick-Links konnten nicht geladen werden.</h3><p>Die Google-Suche funktioniert weiterhin.</p><button type="button" id="finder-retry">Erneut versuchen</button></div>
+            <noscript><p>Für die Quick-Links bitte JavaScript aktivieren. Die Google-Suche oben funktioniert auch ohne JavaScript.</p></noscript>
+        </section>
     </main>
     <footer>
         <nav class="footer-nav">
@@ -115,300 +130,187 @@
     </footer>
 
     <script>
-        let localData = [];
-        let state = {
-            query: "",
-            rawQuery: "",
-            results: [],
-            selectedIndex: -1,
-            isMobileActive: false
-        };
-
-        const inputEl = document.getElementById("suche");
-        const listEl = document.getElementById("autocomplete-list");
-        const dropdownEl = document.getElementById("autocomplete-dropdown");
-        const overlayEl = document.getElementById("search-overlay");
-        const cancelBtn = document.getElementById("cancel-search-btn");
-
-        // UI Helpers
-        function setVisibility(isOpen) {
-            if (isOpen && state.results.length > 0) {
-                dropdownEl.classList.add("open");
-            } else {
-                dropdownEl.classList.remove("open");
-            }
-        }
-
-        function setMobileMode(isActive) {
-            state.isMobileActive = isActive;
-            if (isActive) {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                overlayEl.classList.add("mobile-active");
-                document.body.classList.add("search-active");
-            } else {
-                overlayEl.classList.remove("mobile-active");
-                document.body.classList.remove("search-active");
-                inputEl.blur();
-
-                // Allow CSS transition of search-overlay to finish before resetting content
-                setTimeout(() => {
-                    if (!state.isMobileActive) {
-                        inputEl.value = "";
-                        state.query = "";
-                        state.results = [];
-                        renderResults();
-                    }
-                }, 300);
-            }
-        }
-
-        let blurTimeout = null;
-
-        function isUrlSegment(str) {
-            return /^(https?:\/\/)?([\w\-]+\.)+[a-z]{2,}(\/[\w\-.\/?%&=]*)?$/i.test(str);
-        }
-
-        // Logic
-        function renderResults() {
-            listEl.innerHTML = "";
-            if (state.results.length === 0) {
-                setVisibility(false);
-                return;
-            }
-
-            state.results.forEach((item, idx) => {
-                const li = document.createElement("li");
-
-                let iconClass = "fas fa-bookmark";
-                if (item.type === "url") iconClass = "fas fa-link";
-                if (item.type === "google") iconClass = "fab fa-google";
-
-                li.innerHTML = `
-                    <div class="result-content">
-                        <i class="${iconClass}"></i>
-                        <span>${item.name}</span>
-                    </div>
-                `;
-
-                if (idx === state.selectedIndex) li.classList.add("active");
-
-                li.addEventListener("mousedown", (e) => {
-                    // Only prevent default on desktop to keep input focus.
-                    if (!state.isMobileActive) {
-                        e.preventDefault();
-                    }
-                });
-
-                // Standard tap/click
-                li.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    clearTimeout(blurTimeout);
-                    executeSearch(item);
-                });
-
-                // Redundant safety net for extremely stubborn mobile browsers
-                li.addEventListener("touchstart", (e) => {
-                    e.preventDefault();
-                    clearTimeout(blurTimeout);
-                    executeSearch(item);
-                }, { passive: false });
-
-                li.addEventListener("mouseenter", () => {
-                    if (state.selectedIndex !== idx) {
-                        state.selectedIndex = idx;
-                        updateActiveSelection();
-                    }
-                });
-
-                listEl.appendChild(li);
-            });
-            setVisibility(true);
-        }
-
-        function updateActiveSelection() {
-            const items = listEl.querySelectorAll("li");
-            items.forEach((item, index) => {
-                if (index === state.selectedIndex) {
-                    item.classList.add("active");
-                } else {
-                    item.classList.remove("active");
-                }
-            });
-        }
-
-        function executeSearch(item) {
-            if (!item && state.results[state.selectedIndex]) {
-                item = state.results[state.selectedIndex];
-            }
-            if (!item && state.rawQuery) {
-                item = isUrlSegment(state.rawQuery)
-                    ? { type: 'url', url: (/^https?:\/\//i.test(state.rawQuery) ? "" : "https://") + state.rawQuery }
-                    : { type: 'google', name: state.rawQuery };
-            }
-
-            if (!item) return;
-
-            setMobileMode(false);
-            setVisibility(false);
-
-            let targetUrl = "";
-            if (item.type === "url" || item.type === "local") {
-                targetUrl = item.url || item.name;
-            } else {
-                targetUrl = "https://www.google.com/search?q=" + encodeURIComponent(item.name);
-            }
-
-            window.location.href = targetUrl;
-        }
-
-        function updateSearch() {
-            state.rawQuery = inputEl.value.trim();
-            state.query = state.rawQuery.toLowerCase();
-            state.selectedIndex = -1;
-
-            if (!state.query || !/[\p{L}\p{N}]/u.test(state.query.charAt(0))) {
-                state.results = [];
-                renderResults();
-                return;
-            }
-
-            let results = [];
-            const isUrl = isUrlSegment(state.rawQuery);
-
-            if (isUrl) {
-                let formattedUrl = state.rawQuery;
-                if (!/^https?:\/\//i.test(formattedUrl)) formattedUrl = "https://" + formattedUrl;
-                results.push({ type: 'url', url: formattedUrl, name: `Öffne: ${state.rawQuery}` });
-            }
-
-            // Local matches
-            const localMatches = localData.filter(link =>
-                (link.name && link.name.toLowerCase().includes(state.query)) ||
-                (link.url && link.url.toLowerCase().includes(state.query))
-            ).slice(0, 5);
-
-            localMatches.forEach(m => results.push({ type: 'local', url: m.url, name: m.name }));
-
-            const neededFromGoogle = 8 - results.length;
-            if (neededFromGoogle > 0) {
-                fetchGoogle(state.query, neededFromGoogle, results);
-            } else {
-                state.results = results;
-                renderResults();
-            }
-        }
-
-        let debounceGoogleTimer = null;
-        function fetchGoogle(query, count, currentResults) {
-            clearTimeout(debounceGoogleTimer);
-            const callbackName = 'googleSuggestCallback_' + Math.random().toString(36).substr(2, 8);
-
-            debounceGoogleTimer = setTimeout(() => {
-                state.results = currentResults; // Fallback update if API is too slow
-                renderResults();
-            }, 300);
-
-            window[callbackName] = function (data) {
-                clearTimeout(debounceGoogleTimer);
-                const scriptToRemove = document.getElementById(callbackName);
-                if (scriptToRemove) document.body.removeChild(scriptToRemove);
-                delete window[callbackName];
-
-                const suggestions = (data && data[1]) ? data[1].slice(0, count) : [];
-                let newResults = [...currentResults];
-                suggestions.forEach(s => newResults.push({ type: 'google', name: s }));
-
-                // Only update if query hasn't fundamentally changed during network
-                if (query === state.query) {
-                    state.results = newResults;
-                    renderResults();
-                }
-            };
+(() => {
+    const $ = id => document.getElementById(id);
+    const input = $('suche'), form = $('finder-form'), list = $('finder-results');
+    const panel = $('finder-suggestions'), filters = $('finder-filters'), root = $('categories-root');
+    const order = ['Ressourcen', 'Inspiration', 'Fonts', 'Bilder', 'Colors', 'Audio & Video', 'Icons'];
+    let links = [], category = '', results = [], selected = -1, loaded = false;
+    let googleTimer, cancelGoogle = () => {}, googleQuery = '', googleSuggestions = [];
+    let suggestionRequest = 0;
+    const normalize = value => value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('de');
+    const query = () => input.value.trim();
+    const matches = link => normalize(`${link.name} ${link.url} ${link.category}`).includes(normalize(query()));
+    const google = text => 'https://www.google.com/search?q=' + encodeURIComponent(text);
+    function safeURL(value) {
+        try { const url = new URL(value, location.href); return /^https?:$/.test(url.protocol) ? url.href : null; }
+        catch { return null; }
+    }
+    function typedURL(value) {
+        if (!/^(https?:\/\/)?([\p{L}\d-]+\.)+[\p{L}]{2,}(?::\d+)?(?:[/?#]\S*)?$/iu.test(value)) return null;
+        return safeURL(/^https?:\/\//i.test(value) ? value : 'https://' + value);
+    }
+    const domain = url => new URL(url).hostname.replace(/^www\./, '');
+    function node(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+    }
+    function scheduleGoogle() {
+        clearTimeout(googleTimer);
+        cancelGoogle();
+        googleSuggestions = []; googleQuery = '';
+        const text = query();
+        if (text.length < 2 || typedURL(text)) return;
+        googleTimer = setTimeout(() => {
+            const callback = 'finderGoogleSuggest' + (++suggestionRequest);
             const script = document.createElement('script');
-            script.id = callbackName;
-            script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${callbackName}`;
-            document.body.appendChild(script);
-        }
-
-        // Render Categories completely separately so search is isolated
-        const categoryOrder = ["Ressourcen", "Inspiration", "Fonts", "Bilder", "Colors", "Audio & Video", "Icons"];
-        function renderCategories() {
-            const root = document.getElementById('categories-root');
-            root.innerHTML = '';
-            categoryOrder.forEach(category => {
-                const catLinks = localData.filter(l => l.category === category && category.toLowerCase() !== "suche" && l.category.toLowerCase() !== "suche");
-                if (catLinks.length === 0) return;
-                const div = document.createElement('div');
-                div.className = 'category';
-                if (category !== "Ressourcen") {
-                    const h2 = document.createElement('h2');
-                    h2.textContent = category;
-                    div.appendChild(h2);
-                }
-                const container = document.createElement('div');
-                container.className = 'card-container';
-                catLinks.forEach(link => {
-                    const a = document.createElement('a');
-                    a.className = 'card';
-                    a.href = link.url;
-                    a.textContent = link.name;
-                    container.appendChild(a);
-                });
-                div.appendChild(container);
-                root.appendChild(div);
+            let timeout;
+            const cleanup = () => {
+                clearTimeout(timeout); script.remove();
+                // A response already in flight may still invoke its callback.
+                window[callback] = () => {};
+                setTimeout(() => { delete window[callback]; }, 60000);
+                cancelGoogle = () => {};
+            };
+            cancelGoogle = cleanup;
+            window[callback] = data => {
+                cleanup();
+                if (query() !== text) return;
+                googleQuery = text;
+                googleSuggestions = Array.isArray(data?.[1]) ? [...new Set(data[1].filter(value => typeof value === 'string' && value.trim() && normalize(value) !== normalize(text)))].slice(0, 3) : [];
+                // Never move an option while someone is selecting it with the keyboard.
+                if (document.activeElement === input && !panel.hidden && selected < 0) suggest();
+            };
+            script.onerror = cleanup;
+            timeout = setTimeout(cleanup, 5000);
+            script.src = 'https://suggestqueries.google.com/complete/search?client=firefox&hl=de&q=' + encodeURIComponent(text) + '&callback=' + callback;
+            document.head.append(script);
+        }, 250);
+    }
+    function close() {
+        panel.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+        input.removeAttribute('aria-activedescendant');
+        selected = -1;
+    }
+    function suggest() {
+        close(); list.replaceChildren(); results = [];
+        const text = query();
+        if (!text || document.activeElement !== input) return;
+        const address = typedURL(text);
+        if (address) results.push({ name: text, url: address, detail: 'Webadresse öffnen' });
+        results.push(...links.filter(matches).slice(0, 5).map(link => ({ ...link, detail: `${link.category === 'suche' ? 'Quick-Link' : link.category} · ${domain(link.url)}` })));
+        if (googleQuery === text) results.push(...googleSuggestions.map(value => ({ name: value, url: google(value), detail: 'Google-Vorschlag' })));
+        results.push({ name: `«${text}» auf Google suchen`, url: google(text), detail: 'Im Web suchen' });
+        results.forEach((result, index) => {
+            const item = node('li', 'finder-option');
+            item.id = `finder-option-${index}`;
+            item.setAttribute('role', 'option'); item.setAttribute('aria-selected', 'false');
+            const content = node('span', 'finder-option-copy');
+            content.append(node('strong', '', result.name), node('small', '', result.detail));
+            const arrow = node('span', 'finder-arrow', '↗'); arrow.setAttribute('aria-hidden', 'true');
+            item.append(content, arrow);
+            item.addEventListener('mousedown', event => event.preventDefault());
+            item.addEventListener('click', () => location.assign(result.url));
+            list.append(item);
+        });
+        panel.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+    }
+    function categories() {
+        return [...new Set(links.filter(link => link.category !== 'suche').map(link => link.category))].sort((a, b) => {
+            const rank = value => order.includes(value) ? order.indexOf(value) : order.length;
+            return rank(a) - rank(b) || a.localeCompare(b, 'de');
+        });
+    }
+    function renderFilters() {
+        filters.replaceChildren();
+        ['', ...categories()].forEach(value => {
+            const button = node('button', 'finder-filter', value || 'Alle');
+            button.type = 'button'; button.dataset.category = value;
+            button.setAttribute('aria-pressed', String(category === value));
+            button.addEventListener('click', () => {
+                category = value;
+                for (const child of filters.children) child.setAttribute('aria-pressed', String(child.dataset.category === value));
+                renderLinks();
             });
+            filters.append(button);
+        });
+    }
+    function renderLinks() {
+        root.replaceChildren();
+        const visible = links.filter(link => (query() || link.category !== 'suche') && (!category || category === link.category) && matches(link));
+        const groups = [...categories(), ...(query() ? ['suche'] : [])];
+        for (const name of groups) {
+            const items = visible.filter(link => link.category === name);
+            if (!items.length) continue;
+            const section = node('section', 'finder-group');
+            const heading = node('h3', '', name === 'suche' ? 'Weitere Fundstücke' : name);
+            heading.append(node('span', 'finder-group-count', String(items.length)));
+            const grid = node('ul', 'finder-grid');
+            items.forEach(link => {
+                const item = node('li'); const anchor = node('a', 'finder-link'); anchor.href = link.url;
+                const copy = node('span', 'finder-link-copy');
+                copy.append(node('strong', '', link.name), node('small', '', domain(link.url)));
+                const arrow = node('span', 'finder-arrow', '↗'); arrow.setAttribute('aria-hidden', 'true');
+                anchor.append(copy, arrow); item.append(anchor); grid.append(item);
+            });
+            section.append(heading, grid); root.append(section);
         }
+        $('finder-count').textContent = loaded ? `${visible.length} ${query() ? 'Treffer' : 'Links'}${category ? ' · ' + category : ''}` : 'Links werden geladen …';
+        $('finder-empty').hidden = !loaded || visible.length > 0;
+    }
+    function update() {
+        $('finder-clear').hidden = !input.value;
+        renderLinks(); suggest();
+    }
+    input.addEventListener('input', () => { scheduleGoogle(); update(); });
+    input.addEventListener('focus', suggest);
+    input.addEventListener('keydown', event => {
+        if (event.isComposing) return;
+        if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+        if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+        if (panel.hidden) suggest();
+        if (!results.length) return;
+        event.preventDefault();
+        selected = (selected + (event.key === 'ArrowDown' ? 1 : selected < 0 ? 0 : -1) + results.length) % results.length;
+        [...list.children].forEach((item, index) => item.setAttribute('aria-selected', String(index === selected)));
+        input.setAttribute('aria-activedescendant', list.children[selected].id);
+        list.children[selected].scrollIntoView({ block: 'nearest' });
+    });
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!query()) { input.focus(); return; }
+        location.assign(!panel.hidden && selected >= 0 ? results[selected].url : typedURL(query()) || google(query()));
+    });
+    $('finder-clear').addEventListener('click', () => { input.value = ''; scheduleGoogle(); input.focus(); update(); });
+    $('finder-reset').addEventListener('click', () => { input.value = ''; scheduleGoogle(); category = ''; renderFilters(); input.focus(); update(); });
+    document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) close(); });
+    form.addEventListener('focusout', () => { queueMicrotask(() => { if (document.activeElement !== input) close(); }); });
+    async function load() {
+        $('finder-error').hidden = true;
+        $('finder-retry').disabled = true;
+        loaded = false; renderLinks();
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        try {
+            const response = await fetch('./fake-cms.json', { signal: controller.signal });
+            if (!response.ok) throw new Error('Links unavailable');
+            const data = await response.json();
+            if (!Array.isArray(data)) throw new Error('Invalid links');
+            links = data.filter(link => typeof link?.name === 'string' && typeof link?.url === 'string' && safeURL(link.url)).map(link => ({ ...link, url: safeURL(link.url), category: typeof link.category === 'string' && link.category.trim() ? link.category.trim() : 'Ressourcen' }));
+            loaded = true; renderFilters(); update();
+        } catch {
+            $('finder-count').textContent = 'Quick-Links nicht verfügbar';
+            $('finder-error').hidden = false;
+        } finally { clearTimeout(timeout); $('finder-retry').disabled = false; }
+    }
+    $('finder-retry').addEventListener('click', load);
+    load();
+})();
 
-        // Event Setup
-        inputEl.addEventListener("input", updateSearch);
-
-        inputEl.addEventListener("focus", () => {
-            clearTimeout(blurTimeout);
-            if (window.innerWidth <= 600) setMobileMode(true);
-            if (state.results.length > 0) setVisibility(true);
-        });
-
-        inputEl.addEventListener("blur", () => {
-            if (!state.isMobileActive) {
-                // Increased timeout to ensure mobile clicks register before the element hides
-                blurTimeout = setTimeout(() => setVisibility(false), 400);
-            }
-        });
-
-        cancelBtn.addEventListener("click", () => setMobileMode(false));
-
-        inputEl.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                executeSearch();
-            } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                if (state.results.length > 0) {
-                    state.selectedIndex = (state.selectedIndex + 1) % state.results.length;
-                    updateActiveSelection();
-                }
-            } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                if (state.results.length > 0) {
-                    state.selectedIndex = (state.selectedIndex - 1 + state.results.length) % state.results.length;
-                    updateActiveSelection();
-                }
-            } else if (e.key === "Escape") {
-                setVisibility(false);
-            }
-        });
-
-        fetch('./fake-cms.json')
-            .then(res => res.json())
-            .then(data => {
-                localData = data;
-                renderCategories();
-            })
-            .catch(err => console.error(err));
-
-        window.addEventListener("DOMContentLoaded", () => {
-            if (window.innerWidth > 600) inputEl.focus();
-        });
     </script>
 </body>
 
