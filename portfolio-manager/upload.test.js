@@ -1,0 +1,20 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const os=require('node:os');
+const sharp=require('sharp');
+test('Real image upload keeps original names, creates one media entry, respects folder and avoids overwrites',async t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'noe-upload-'));const manager=path.join(root,'portfolio-manager');fs.mkdirSync(manager);
+ for(const file of ['server.js','studio.js','media-library.js'])fs.copyFileSync(path.join(__dirname,file),path.join(manager,file));
+ fs.copyFileSync(path.join(__dirname,'media-processor.js'),path.join(manager,'media-processor.js'));
+ const app=require(path.join(manager,'server.js'));const server=await new Promise(resolve=>{const server=app.listen(0,'127.0.0.1',()=>resolve(server));});
+ t.after(()=>{server.close();fs.rmSync(root,{recursive:true,force:true});});
+ const origin='http://127.0.0.1:'+server.address().port;const token=(await(await fetch(origin+'/api/studio/session')).json()).token;
+ const image=await sharp({create:{width:32,height:32,channels:3,background:'#abcdef'}}).png().toBuffer();
+ const send=async folder=>{const form=new FormData();form.append('file',new Blob([image],{type:'image/png'}),'Ferien Foto.png');form.append('originalName','Ferien Foto.png');form.append('folder',folder);return fetch(origin+'/api/upload',{method:'POST',headers:{Origin:origin,'X-CMS-Token':token},body:form});};
+ const one=await send('Reisen/Alpen');assert.equal(one.status,200);assert.ok((await one.json()).url.endsWith('Reisen/Alpen/Ferien-Foto.jpg'));
+ const two=await send('Reisen/Alpen');assert.equal(two.status,200);assert.ok((await two.json()).url.endsWith('Ferien-Foto-2.jpg'));
+ const catalog=await(await fetch(origin+'/api/studio/media')).json();assert.equal(catalog.items.length,2);assert.equal(catalog.items[0].title,'Ferien Foto.png');assert.equal(catalog.items[0].variants.length,4);
+ assert.equal((await send('../outside')).status,400);
+});
