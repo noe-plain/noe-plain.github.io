@@ -338,5 +338,10 @@
         "name": "Future Demand",
         "url": "https://app.future-demand.com/",
         "category": "suche"
+    },
+    {
+        "name": "Disney",
+        "url": "https://www.disneyplus.com/",
+        "category": "suche"
     }
 ]
