@@ -343,5 +343,10 @@
         "name": "Disney",
         "url": "https://www.disneyplus.com/",
         "category": "suche"
+    },
+    {
+        "name": "SBB - Zugfahrplan",
+        "url": "https://sbb.ch/",
+        "category": "suche"
     }
 ]
