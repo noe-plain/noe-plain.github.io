@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FD Kampagnen Layouttool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'SoraLocal';
+            src: url('assets/fonts/Sora-Regular.ttf');
+        }
+
+        img {
+            height: 100%;
+            width: auto;
+        }
+
+        :root {
+            --font-main: 'Sora', 'SoraLocal', system-ui, -apple-system, sans-serif;
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-bg-hover: rgba(255, 255, 255, 0.22);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-border-hover: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            --accent-green: #2ecc71;
+            --accent-green-hover: #27ae60;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 20%, #1e2640 0%, #0f1423 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow elements for glass effect visualization */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 350px;
+            height: 350px;
+            background: rgba(46, 204, 113, 0.25);
+            bottom: 40px;
+            left: 30%;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(52, 152, 219, 0.2);
+            bottom: 20px;
+            right: 25%;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 20px 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #editor {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .layout {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 260px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+            transition: border-color 0.3s ease;
+        }
+
+        .layout:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #16x9 {
+            width: 1080px;
+            height: 1920px;
+        }
+
+        #1x1 {
+            width: 1080px;
+            height: 1080px;
+        }
+
+        /* Glassmorphism Toolbar */
+        #tool-bar {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #tool-bar:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        /* Toolbar Buttons */
+        .tool-btn {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tool-btn svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s ease, stroke 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            background: var(--glass-bg-hover);
+            border-color: var(--glass-border-hover);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+
+        .tool-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        .tool-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Toolbar Divider */
+        .tool-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 4px;
+        }
+
+        /* Export Accent Button */
+        .tool-btn.export-btn {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.85), rgba(39, 174, 96, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .tool-btn.export-btn:hover {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 1), rgba(39, 174, 96, 1));
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5), 0 0 15px rgba(46, 204, 113, 0.4);
+            transform: translateY(-3px) scale(1.06);
+        }
+
+        /* Glassmorphic Tooltips */
+        .tool-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px) scale(0.92);
+            opacity: 0;
+            pointer-events: none;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1010;
+        }
+
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            opacity: 0;
+            pointer-events: none;
+            border-width: 6px 6px 0 6px;
+            border-style: solid;
+            border-color: rgba(15, 23, 42, 0.85) transparent transparent transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1010;
+        }
+
+        .tool-btn:hover::after,
+        .tool-btn:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div id="editor">
+            <div class="layout" id="16x9">
+                <img src="" alt="Logo-black.png">
+                <img src="./testbilder/260831_A1_Probe_c-noe-plain-4.jpg" alt="Main-Image">
+                <p class="date">Datum</p>
+                <p class="title">Title</p>
+                <p class="subtitle">Subtitle</p>
+            </div>
+            <div class="layout" id="1x1">
+                <img src="" alt="Logo-black.png">
+                <img src="" alt="Main-Image">
+                <p>Title</p>
+                <p>Subtitle</p>
+            </div>
+        </div>
+
+        <nav id="tool-bar" aria-label="Toolbar">
+            <!-- Bilder hochladen -->
+            <button class="tool-btn" data-tooltip="Bilder hochladen" aria-label="Bilder hochladen">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                    <circle cx="9" cy="9" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    <path d="M12 8v6"/>
+                    <path d="M9 11h6"/>
+                </svg>
+            </button>
+
+            <!-- Text edit -->
+            <button class="tool-btn" data-tooltip="Text bearbeiten" aria-label="Text bearbeiten">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4 7 4 4 20 4 20 7"/>
+                    <line x1="9" y1="20" x2="15" y2="20"/>
+                    <line x1="12" y1="4" x2="12" y2="20"/>
+                </svg>
+            </button>
+
+            <!-- Resize image -->
+            <button class="tool-btn" data-tooltip="Bildgröße anpassen" aria-label="Bildgröße anpassen">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h6v6"/>
+                    <path d="M9 21H3v-6"/>
+                    <path d="M21 3l-7 7"/>
+                    <path d="M3 21l7-7"/>
+                </svg>
+            </button>
+
+            <!-- Text color -->
+            <button class="tool-btn" data-tooltip="Textfarbe" aria-label="Textfarbe">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/>
+                    <path d="m5 2 5 5"/>
+                    <path d="M2 13h15"/>
+                    <path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z" fill="currentColor"/>
+                </svg>
+            </button>
+
+            <!-- Logo Color -->
+            <button class="tool-btn" data-tooltip="Logofarbe" aria-label="Logofarbe">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.75 1.7-1.7 0-.46-.19-.88-.48-1.19-.29-.3-.48-.73-.48-1.18 0-.93.75-1.69 1.69-1.69H16.5c3.03 0 5.5-2.47 5.5-5.5C22 6.5 17.5 2 12 2z"/>
+                </svg>
+            </button>
+
+            <div class="tool-divider"></div>
+
+            <!-- Export -->
+            <button class="tool-btn export-btn" data-tooltip="Exportieren" aria-label="Exportieren">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </button>
+        </nav>
+    </main>
+</body>
+
+</html>

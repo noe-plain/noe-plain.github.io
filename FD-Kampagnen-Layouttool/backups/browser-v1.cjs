@@ -1,0 +1,46 @@
+const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
+const assert=require('node:assert/strict');const fs=require('fs');const path=require('path');
+(async()=>{
+ require('node:child_process').execFileSync('.venv/bin/python',['tests/make_fixtures.py']);
+ const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--no-first-run']});
+ const page=await browser.newPage({viewport:{width:1512,height:982},deviceScaleFactor:1});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ await page.goto('http://127.0.0.1:8765');await page.waitForFunction(()=>typeof token!=='undefined'&&token&&fontStatus['Replica LL']);
+ await page.evaluate(async()=>{p=fresh();const blob=await(await fetch('/fonts/ReplicaLL-Bold.otf')).blob();p.fonts.push({role:'Replica LL',name:'ReplicaLL-Bold.otf',data:await dataURL(blob)});await loadFonts();render()});
+ await page.locator('#files').setInputFiles(['testbilder/260831_A1_Probe_c-noe-plain-4.jpg','testbilder/260831_A1_Probe_c-noe-plain-5.jpg']);
+ await page.waitForFunction(()=>p.images.length===2&&p.boards.length===4&&!busy);console.log('PASS multiple JPG import, 4 boards');
+ await page.locator('#date').fill('15.11.26');await page.locator('#date').press('Tab');await page.locator('#code').fill('E2');await page.locator('#code').press('Tab');await page.locator('#title').fill('Dichterlos');await page.locator('#title').press('Tab');await page.locator('#start').fill('3');await page.locator('#start').press('Tab');
+ const originalStory=await page.evaluate(()=>JSON.stringify(p.boards.find(b=>b.imageId===board().imageId&&b.h===1920).image));
+ await page.locator('#scale').fill('150');await page.locator('#scale').press('Tab');
+ assert.equal(await page.evaluate(()=>board().image.scale),1.5);assert.equal(await page.evaluate(()=>JSON.stringify(p.boards.find(b=>b.imageId===board().imageId&&b.h===1920).image)),originalStory);console.log('PASS independent crop');
+ await page.locator('#undo').click();assert.notEqual(await page.evaluate(()=>board().image.scale),1.5);await page.locator('#redo').click();assert.equal(await page.evaluate(()=>board().image.scale),1.5);console.log('PASS undo / redo');
+ await page.locator('[data-fit="fill"]').click();
+ await page.locator('#width').fill('2160');await page.locator('#height').fill('2160');await page.locator('#resizeMode').selectOption('layout');const before=await page.evaluate(()=>board().image.scale);await page.locator('#resize').click();assert.equal(await page.evaluate(()=>board().image.scale),before*2);assert.equal(await page.evaluate(()=>board().w),2160);
+ await page.locator('[data-size="1080,1080"]').click();assert.equal(await page.evaluate(()=>board().w),1080);console.log('PASS output resize');
+ await page.locator('#concert').fill('15. NOVEMBER 2026');await page.locator('#concert').press('Tab');await page.locator('#headline').fill('Dichterlos');await page.locator('#headline').press('Tab');await page.locator('#applyContent').click();
+ await page.locator('#layer').selectOption('title');await page.locator('#visible').check();await page.locator('#layer').selectOption('date');await page.locator('#visible').check();await page.locator('#layer').selectOption('logo');await page.locator('#visible').check();
+ await page.locator('#applyDesign').click();assert.equal(await page.evaluate(()=>p.boards[0].elements.title.text),'DICHTERLOS');
+ await page.evaluate(async()=>{await autosave()});const beforeSave=await page.evaluate(()=>JSON.stringify(p));await page.reload();await page.waitForFunction(()=>p.boards.length===4&&fontStatus['Replica LL']);assert.equal(await page.evaluate(()=>JSON.stringify(p)),beforeSave);console.log('PASS autosave restore with image/font/layout');
+ const savePromise=page.waitForEvent('download');await page.locator('#save').click();const save=await savePromise;await save.saveAs('/private/tmp/mkw-test-project.mkw');
+ await page.locator('#projectFile').setInputFiles('/private/tmp/mkw-test-project.mkw');await page.waitForTimeout(1000);assert.equal(await page.evaluate(()=>JSON.stringify(p)),beforeSave);console.log('PASS portable project roundtrip');
+ await page.evaluate(()=>{selected=p.boards[0].id;layer='image';render()});
+ const bb=await page.locator('#canvas').boundingBox();const pos=await page.evaluate(()=>board().image.x);await page.mouse.move(bb.x+bb.width/2,bb.y+bb.height/2);await page.mouse.down();await page.mouse.move(bb.x+bb.width/2+30,bb.y+bb.height/2+10);await page.mouse.up();assert.notEqual(await page.evaluate(()=>board().image.x),pos);console.log('PASS mouse image movement');
+ await page.locator('[data-fit="fill"]').click();
+ // Ensure layout deliberately remains inside canvas after resize tests.
+ await page.evaluate(()=>{for(const b of p.boards){const defaults=createBoard(asset(b),b.w,b.h);for(const key of ['date','title','subtitle','copyright','logo']){b.elements[key].x=defaults.elements[key].x;b.elements[key].y=defaults.elements[key].y;b.elements[key].size=defaults.elements[key].size;}b.elements.logo.source='white';}render()});
+ // Actual corner handle scales uniformly.
+ await page.waitForTimeout(200);const handleBox=await page.locator('#canvas').boundingBox();const scaleBefore=await page.evaluate(()=>board().image.scale);
+ await page.mouse.move(handleBox.x+handleBox.width-4,handleBox.y+handleBox.height-4);await page.mouse.down();await page.mouse.move(handleBox.x+handleBox.width+28,handleBox.y+handleBox.height+28);await page.mouse.up();assert((await page.evaluate(()=>board().image.scale))>scaleBefore);await page.locator('[data-fit="fill"]').click();console.log('PASS proportional corner scale');
+ await page.locator('#export').click();assert((await page.locator('#exportNames').innerText()).includes('261115_E2_Dichterlos_1x1_3.jpg'));
+ const zipPromise=page.waitForEvent('download');await page.locator('#zip').click();const zip=await zipPromise;await zip.saveAs('/private/tmp/mkw-test-export.zip');await page.waitForFunction(()=>!busy);console.log('PASS ZIP export');await page.locator('#closeExport').click();
+ const pixelCompare=await page.evaluate(async()=>{const b=board(),a=document.createElement('canvas'),z=document.createElement('canvas');a.width=z.width=b.w;a.height=z.height=b.h;await paint(a.getContext('2d'),b,1,false);const im=await image(await canvasPNG(b));z.getContext('2d').drawImage(im,0,0);const aa=a.getContext('2d').getImageData(0,0,b.w,b.h).data,zz=z.getContext('2d').getImageData(0,0,b.w,b.h).data;return aa.every((v,i)=>v===zz[i])});assert(pixelCompare);console.log('PASS same layout renderer, exact PNG pixels');
+ await page.locator('#layer').selectOption('copyright');await page.locator('#visible').check();await page.locator('#text').fill('© Noé Plain');await page.locator('#text').press('Tab');await page.waitForTimeout(200);assert((await page.locator('#warning').innerText()).includes('Harriet'));console.log('PASS missing Harriet warning');
+ await page.locator('#layer').selectOption('image');await page.waitForTimeout(300);await page.screenshot({path:'/private/tmp/mkw-studio-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'/private/tmp/mkw-studio-mobile.png',fullPage:true});console.log('PASS narrow window no horizontal overflow');
+ await page.setViewportSize({width:1512,height:982});
+ await page.locator('#files').setInputFiles(['/private/tmp/mkw-fixtures/test.png','/private/tmp/mkw-fixtures/test.tiff','/private/tmp/mkw-fixtures/test.webp','/private/tmp/mkw-fixtures/broken.jpg']);await page.waitForFunction(()=>!busy&&p.images.length===5);assert.equal(await page.evaluate(()=>p.boards.length),10);console.log('PASS mixed PNG/TIFF/WebP import and broken JPG recovery');
+ await page.locator('#harriet').click();await page.locator('#fontFile').setInputFiles('/private/tmp/mkw-fixtures/broken.otf');await page.waitForTimeout(300);assert.equal(await page.evaluate(()=>!!fontStatus.Harriet),false);console.log('PASS damaged font rejected');
+ const background=await page.evaluate(async()=>{const b=board();b.bg='#123456';b.image.x=-10000;const im=await image(await canvasPNG(b));const c=document.createElement('canvas');c.width=c.height=1;c.getContext('2d').drawImage(im,0,0);return [...c.getContext('2d').getImageData(0,0,1,1).data]});assert.deepEqual(background,[18,52,86,255]);console.log('PASS opaque chosen background');
+ await page.evaluate(()=>{p.boards.forEach(b=>b.checked=false);p.boards[3].checked=true;p.images.reverse();render()});await page.locator('#export').click();assert.equal(await page.locator('#exportNames>div').count(),1);assert((await page.locator('#exportNames').innerText()).includes('_3.jpg'));await page.locator('#closeExport').click();console.log('PASS single selection numbering');
+ assert.deepEqual(errors,[]);console.log('PASS no browser errors');await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
