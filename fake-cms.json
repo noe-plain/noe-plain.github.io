@@ -348,5 +348,10 @@
         "name": "SBB - Zugfahrplan",
         "url": "https://sbb.ch/",
         "category": "suche"
+    },
+    {
+        "name": "Musikkollegium Winterthur – MKW",
+        "url": "https://musikkollegium.ch/",
+        "category": "suche"
     }
 ]
