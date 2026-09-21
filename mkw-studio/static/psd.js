@@ -5,7 +5,7 @@ async function layerBitmap(b,key){
  const block=textBlock(b);await prepareLogo(b);let left=0,top=0,w=b.w,h=b.h;
  if(!['image','background','textShadow'].includes(key)){
   let r;if(key==='textShadow')r=MKWLayout.recordsRect(block.records);else if(key==='logoShadow'||key==='logo')r=MKWLayout.logoRect(b.elements.logo,logoAspects.get(b.id));else{const e=block.records.find(e=>e.key===key);r=MKWLayout.recordRect(e)}
-  const fade=key.endsWith('Shadow')?380:2;left=Math.max(0,Math.floor(r.x-fade));top=Math.max(0,Math.floor(r.y-fade));w=Math.max(1,Math.min(b.w,Math.ceil(r.x+r.w+fade))-left);h=Math.max(1,Math.min(b.h,Math.ceil(r.y+r.h+fade))-top);
+  const fade=key==='logoShadow'?LOGO_SHADOW_PADDING:key.endsWith('Shadow')?380:2;left=Math.max(0,Math.floor(r.x-fade));top=Math.max(0,Math.floor(r.y-fade));w=Math.max(1,Math.min(b.w,Math.ceil(r.x+r.w+fade))-left);h=Math.max(1,Math.min(b.h,Math.ceil(r.y+r.h+fade))-top);
  }
  const canvas=makeCanvas(w,h),ctx=canvas.getContext('2d',{colorSpace:'srgb'});ctx.translate(-left,-top);await paint(ctx,b,1,{only:key});return {canvas,left,top};
 }

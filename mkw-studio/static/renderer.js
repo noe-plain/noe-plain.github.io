@@ -10,14 +10,15 @@ const textMetrics=e=>({w:e.w||Math.max(e.size,...(e.lines||e.text.split('\n')).m
 const logoAspects=new Map();
 async function prepareLogo(b){const im=await logoImage(b.elements.logo),aspect=im.width/im.height;logoAspects.set(b.id,aspect);MKWLayout.constrainLogo(b,aspect);return im}
 // Rasterize the actual alpha silhouette first; blur only a black mask, never the SVG box.
+const LOGO_SHADOW_BLUR=150,LOGO_SHADOW_PADDING=LOGO_SHADOW_BLUR*4+4;
 const logoShadowCache=new Map();
 function softLogoShadow(ctx,b,logo,opacity=.28){
- const e=b.elements.logo,w=e.size,h=w*logo.height/logo.width,pad=200;
+ const e=b.elements.logo,w=e.size,h=w*logo.height/logo.width,pad=LOGO_SHADOW_PADDING;
  const key=JSON.stringify([logo.src,w,h]);let shadow=logoShadowCache.get(key);
  if(!shadow){
   const mask=makeCanvas(w+2*pad,h+2*pad),m=mask.getContext('2d');
   m.drawImage(logo,pad,pad,w,h);m.globalCompositeOperation='source-in';m.fillStyle='#000';m.fillRect(0,0,mask.width,mask.height);
-  shadow=makeCanvas(mask.width,mask.height);const blur=shadow.getContext('2d');blur.filter='blur(42px)';blur.drawImage(mask,0,0);
+  shadow=makeCanvas(mask.width,mask.height);const blur=shadow.getContext('2d');blur.filter=`blur(${LOGO_SHADOW_BLUR}px)`;blur.drawImage(mask,0,0);
   if(logoShadowCache.size>=12)logoShadowCache.clear();logoShadowCache.set(key,shadow);
  }
  const off=e.align==='center'?-w/2:e.align==='right'?-w:0;
