@@ -102,7 +102,32 @@ $('#projectFile').onchange=async ev=>{
  finally{busy=fromStart&&$('#startDialog').open;if(fromStart)buttons.forEach((b,i)=>b.disabled=disabled[i]);ev.target.value=''}
 };
 $('#newproject').onclick=()=>{if(confirm('Neues Projekt beginnen? Bei Bedarf dein aktuelles Projekt zuerst speichern.'))mutate(()=>{const fonts=p.fonts;p=fresh();p.fonts=fonts;selected=null})};
-$('#save').onclick=()=>{if(editingText)editingText.el.blur();$('#psdStatus').textContent='';$('#saveDialog').showModal()};$('#closeSave').onclick=()=>$('#saveDialog').close();$('#saveProject').onclick=async()=>{await autosave();download(new Blob([JSON.stringify(p)],{type:'application/json'}),MKW.clean(p.meta.title)+'.mkw');status('Studio-Projekt gespeichert.');$('#saveDialog').close()};
+function saveFileName(extension){return MKW.clean(($('#saveName').value.trim()||p.meta.title).replace(/\.(mkw|psd)$/i,''))+'.'+extension}
+function chooseSaveTarget(name,extension){
+ if(!window.showSaveFilePicker)return Promise.resolve(null);
+ return window.showSaveFilePicker({suggestedName:name,types:[{description:extension==='mkw'?'Studio-Projekt':'Photoshop-Datei',accept:{[extension==='mkw'?'application/json':'image/vnd.adobe.photoshop']:['.'+extension]}}]});
+}
+async function writeSaveFile(handle,blob,name){
+ if(!handle){download(blob,name);return}
+ const stream=await handle.createWritable();
+ try{await stream.write(blob);await stream.close()}catch(e){try{await stream.abort()}catch{}throw e}
+}
+function setSaveBusy(value){busy=value;for(const id of ['savePSD','saveProject','closeSave','saveName'])$('#'+id).disabled=value}
+$('#save').onclick=()=>{
+ if(editingText)editingText.el.blur();$('#psdStatus').textContent='';$('#saveName').value=MKW.clean(p.meta.title);
+ $('#saveLocationHint').textContent=window.showSaveFilePicker?'Im nächsten Schritt wählst du den Speicherort.':'Dieser Browser speichert per Download. Den Speicherort bestimmt deine Browser-Einstellung.';
+ $('#saveDialog').showModal();
+};
+$('#closeSave').onclick=()=>$('#saveDialog').close();
+$('#saveProject').onclick=async()=>{
+ if(busy)return;setSaveBusy(true);
+ try{
+  const name=saveFileName('mkw'),handle=await chooseSaveTarget(name,'mkw');
+  await autosave();await writeSaveFile(handle,new Blob([JSON.stringify(p)],{type:'application/json'}),name);
+  status(handle?'Studio-Projekt unter gewähltem Namen gespeichert.':'Studio-Projekt: Download gestartet.');$('#saveDialog').close();
+ }catch(e){$('#psdStatus').textContent=e.name==='AbortError'?'Speichern abgebrochen.':'Projekt konnte nicht gespeichert werden: '+e.message}
+ finally{setSaveBusy(false)}
+};
 $('#fontFile').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{const data=await dataURL(f);await new FontFace(fontRole,`url(${data})`).load();checkpoint();p.fonts=p.fonts.filter(x=>x.role!==fontRole);p.fonts.push({role:fontRole,name:f.name,data});await loadFonts();changed()}catch(e){alert('Schrift kann nicht geladen werden: '+e.message)}ev.target.value=''};
 $('#logoFile').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{const data=await dataURL(f);await image(data);mutate(()=>{const l={id:uid(),name:f.name,data};p.logos.push(l);if(board())for(const b of p.boards.filter(x=>x.imageId===board().imageId)){b.elements.logo.source=l.id;b.elements.logo.visible=true}})}catch(e){alert('Logo kann nicht geladen werden: '+e.message)}ev.target.value=''};
 const orderedBoards=()=>p.images.flatMap(im=>p.boards.filter(b=>b.imageId===im.id));

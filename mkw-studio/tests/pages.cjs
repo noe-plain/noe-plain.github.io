@@ -7,6 +7,8 @@ const root=process.env.STUDIO_ROOT||path.resolve(__dirname,'..');
 const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
 try{
 const page=await browser.newPage();page.setDefaultTimeout(60000);
+// This suite checks the download fallback independently of native OS pickers.
+await page.addInitScript(()=>{window.showSaveFilePicker=undefined});
 const errors=[],bad=[],posts=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&!r.url().endsWith('/api/session'))bad.push(r.url())});page.on('request',r=>{if(r.method()==='POST')posts.push(r.url())});
 page.on('dialog',d=>d.accept());
 await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8891/mkw-studio/');

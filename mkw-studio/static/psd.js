@@ -43,5 +43,15 @@ async function buildPSD(progress=()=>{}){
  }
  progress('PSD mit Zeichenflächen und Ebenen schreiben …');await new Promise(r=>setTimeout(r,50));psd.children.reverse();const buffer=agPsd.writePsd(psd,{generateThumbnail:true,trimImageData:true});return withPSDProfile(buffer);
 }
-$('#savePSD').onclick=async()=>{if(busy)return;busy=true;$('#savePSD').disabled=$('#saveProject').disabled=$('#closeSave').disabled=true;try{const file=await buildPSD(text=>$('#psdStatus').textContent=text);download(file,MKW.clean(p.meta.title)+'.psd');$('#psdStatus').textContent='PSD gespeichert: echte Zeichenflächen, bearbeitbare Texte und eingebettete Bild-Smartobjekte. Zum Weiterarbeiten hier zusätzlich MKW speichern.';status('Photoshop-Datei gespeichert.')}catch(e){$('#psdStatus').textContent='PSD konnte nicht gespeichert werden: '+e.message}finally{busy=false;$('#savePSD').disabled=$('#saveProject').disabled=$('#closeSave').disabled=false}};
+$('#savePSD').onclick=async()=>{
+ if(busy)return;setSaveBusy(true);
+ try{
+  // Open the native picker while the click still has user activation, before generating the PSD.
+  const name=saveFileName('psd'),handle=await chooseSaveTarget(name,'psd');
+  const file=await buildPSD(text=>$('#psdStatus').textContent=text);await writeSaveFile(handle,file,name);
+  $('#psdStatus').textContent=(handle?'PSD gespeichert.':'PSD-Download gestartet.')+' Zeichenflächen, bearbeitbare Texte und eingebettete Bild-Smartobjekte. Zum Weiterarbeiten hier zusätzlich MKW speichern.';
+  status(handle?'Photoshop-Datei unter gewähltem Namen gespeichert.':'Photoshop-Datei: Download gestartet.');
+ }catch(e){$('#psdStatus').textContent=e.name==='AbortError'?'Speichern abgebrochen.':'PSD konnte nicht gespeichert werden: '+e.message}
+ finally{setSaveBusy(false)}
+};
 $('#saveDialog').addEventListener('cancel',ev=>{if(busy)ev.preventDefault()});
