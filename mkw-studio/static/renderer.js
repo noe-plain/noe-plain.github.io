@@ -1,6 +1,6 @@
 'use strict';
-const elementNames={date:'Konzertdatum',title:'Konzerttitel',subtitle:'Untertitel',copyright:'Copyright',logo:'Logo'};
-const placeholders={date:'Konzertdatum',title:'TITEL EINGEBEN',subtitle:'Untertitel',copyright:'© Copyright'};
+const elementNames={date:'Überschrift',title:'Konzerttitel',subtitle:'Untertitel',copyright:'Copyright',logo:'Logo'};
+const placeholders={date:'Überschrift',title:'TITEL EINGEBEN',subtitle:'Untertitel',copyright:'© Copyright'};
 const surfaceScale=()=>.24*view;
 const makeCanvas=(w,h)=>{const c=document.createElement('canvas');c.width=Math.ceil(w);c.height=Math.ceil(h);return c};
 const measureContext=makeCanvas(1,1).getContext('2d');
