@@ -17,15 +17,16 @@ startDialog.addEventListener('cancel',ev=>ev.preventDefault());
   $('#startStatus').textContent=restoreError?'Letzter Stand nicht verfügbar: '+restoreError:saved?`${saved.meta.title||'Unbenanntes Projekt'} · ${saved.images.length} Bilder`:'Noch kein gespeichertes Projekt vorhanden.';
   $('#startContinue').disabled=!saved;
  }catch(e){$('#startStatus').textContent='Start nur eingeschränkt möglich: '+e.message}
- $('#startNew').disabled=false;
+ $('#startNew').disabled=$('#startOpen').disabled=false;
+ $('#startOpen').onclick=()=>$('#projectFile').click();
  $('#startNew').onclick=()=>{
   // Keep the previous autosave until the new project is actually edited.
   const fonts=p.fonts;p=fresh();p.fonts=fonts;selected=null;history=[];future=[];revision=savedRevision=0;
   busy=false;startDialog.close();render();status('Neues Projekt · Bilder auswählen oder hierher ziehen.');
  };
  $('#startContinue').onclick=async()=>{
-  $('#startNew').disabled=$('#startContinue').disabled=true;
+  $('#startNew').disabled=$('#startContinue').disabled=$('#startOpen').disabled=true;
   try{await restore(clone(saved));busy=false;startDialog.close();status('Dein letzter Stand ist wieder da.')}
-  catch(e){$('#startStatus').textContent='Projekt konnte nicht geöffnet werden: '+e.message;$('#startNew').disabled=false;$('#startContinue').disabled=false}
+  catch(e){$('#startStatus').textContent='Projekt konnte nicht geöffnet werden: '+e.message;$('#startNew').disabled=$('#startContinue').disabled=$('#startOpen').disabled=false}
  };
 })();

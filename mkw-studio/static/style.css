@@ -153,3 +153,10 @@ dialog{background:#242a34;border-color:#485267;color:#dfe7f5;box-shadow:0 24px 8
 .tool-sidebar .step-panel{flex:1;min-height:0;overflow:auto}
 .tool-sidebar .workspace-info{flex:none}
 #toolEmpty{flex:1}
+
+.start-open-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.start-open-options button{height:100%;line-height:1.4}
+.add-more-images{display:flex;align-items:center;justify-content:center;gap:11px;width:min(820px,100%);margin:36px auto 0;padding:22px;border:1px dashed #536078;border-radius:12px;background:#202733;color:#c5d2ed;font-size:13px}
+.add-more-images:hover{background:#2b374e;border-color:#91a8df;color:#edf2ff}
+.add-more-images svg{width:20px;height:20px}
+@media(max-width:480px){.start-open-options{grid-template-columns:1fr}.add-more-images{padding:20px 14px;font-size:12px}}
