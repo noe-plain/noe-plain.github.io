@@ -9,14 +9,15 @@ try{
 const page=await browser.newPage();page.setDefaultTimeout(60000);
 const errors=[],bad=[],posts=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&!r.url().endsWith('/api/session'))bad.push(r.url())});page.on('request',r=>{if(r.method()==='POST')posts.push(r.url())});
 page.on('dialog',d=>d.accept());
-await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8876/FD-Kampagnen-Layouttool/');
+await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8891/mkw-studio/');
 await page.waitForFunction(()=>fontStatus['Harriet Regular']&&fontStatus['Replica LL']);
+await page.locator('#startNew').click();
 assert.equal(await page.locator('footer span').first().innerText(),'● Lokal in deinem Browser');
 await page.locator('#files').setInputFiles(path.join(root,'testbilder/260831_A1_Probe_c-noe-plain-4.jpg'));
 await page.waitForFunction(()=>p.boards.length===2&&!busy);
 await page.locator('[data-step="logo"]').click();await page.locator('[data-logo="white"]').click();await page.locator('#allLogos').click();
 await page.evaluate(async()=>{p.meta.title='Pages-Test';p.textOverrides={};await autosave()});
-const before=await page.evaluate(()=>JSON.stringify(p));await page.reload();await page.waitForFunction(()=>p.boards.length===2&&fontStatus['Harriet Regular']);const after=await page.evaluate(()=>JSON.stringify(p));
+const before=await page.evaluate(()=>JSON.stringify(p));await page.reload();await page.locator('#startContinue').click();await page.waitForFunction(()=>p.boards.length===2&&fontStatus['Harriet Regular']);const after=await page.evaluate(()=>JSON.stringify(p));
 if(before!==after){const a=JSON.parse(before),b=JSON.parse(after);const diffs=[];function compare(a,b,path=''){if(JSON.stringify(a)===JSON.stringify(b))return;if(a&&b&&typeof a==='object'&&typeof b==='object'){for(const k of new Set([...Object.keys(a),...Object.keys(b)]))compare(a[k],b[k],path+'.'+k)}else diffs.push(path+': '+String(a).slice(0,80)+' -> '+String(b).slice(0,80))}compare(a,b);assert.deepEqual(diffs,[])}
 await page.locator('#export').click();await page.locator('#date').fill('15.11.26');await page.locator('#code').fill('E2');await page.waitForFunction(()=>document.querySelectorAll('.export-preview img').length===2);
 const zip=page.waitForEvent('download');await page.locator('#zip').click();await(await zip).saveAs('/private/tmp/mkw-pages.zip');await page.waitForFunction(()=>!busy);await page.locator('#closeExport').click();
