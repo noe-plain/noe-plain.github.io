@@ -26,7 +26,7 @@ function softLogoShadow(ctx,b,logo,opacity=.28){
 }
 let gradientCache=null;
 function textGradient(ctx,b,layout,opacity=.42){
- const main=layout.mainRecords.filter(e=>e.visible&&e.text),copyright=layout.copyright;
+ const main=layout.mainRecords.filter(e=>e.visible&&e.text);
  const first=main[0],title=main.find(e=>e.key==='title')||first;
  let start=0,baseline=0;
  if(first){
@@ -35,11 +35,11 @@ function textGradient(ctx,b,layout,opacity=.42){
   measureContext.font=`${title.size}px ${fontFamily(title.role)}`;
   measureContext.textBaseline='alphabetic';const ascent=measureContext.measureText('Mg').actualBoundingBoxAscent;
   measureContext.textBaseline='top';baseline=title.y+ascent-measureContext.measureText('Mg').actualBoundingBoxAscent;
- }else if(copyright?.visible&&copyright.text){start=copyright.y-copyright.w-50;baseline=copyright.y}
- const signature=JSON.stringify([b.w,b.h,start,baseline,!!first,!!copyright?.text]);
+ }
+ const signature=JSON.stringify([b.w,b.h,start,baseline,!!first]);
  if(gradientCache?.signature!==signature){
   const canvas=makeCanvas(b.w,b.h),mask=canvas.getContext('2d');
-  if(first||(copyright?.visible&&copyright.text)){const g=mask.createLinearGradient(0,start,0,Math.max(start+1,baseline));g.addColorStop(0,'#0000');g.addColorStop(1,'#000');mask.fillStyle=g;mask.fillRect(0,Math.max(0,start),b.w,b.h-Math.max(0,start))}
+  if(first){const g=mask.createLinearGradient(0,start,0,Math.max(start+1,baseline));g.addColorStop(0,'#0000');g.addColorStop(1,'#000');mask.fillStyle=g;mask.fillRect(0,Math.max(0,start),b.w,b.h-Math.max(0,start))}
   gradientCache={signature,canvas};
  }
  // Apply opacity once, including overlapping gradients, exactly like the PSD layer.

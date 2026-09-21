@@ -1,6 +1,6 @@
 /* Output-pixel geometry shared by editor, JPG and PSD. No screen-zoom inputs. */
 (function(root){
- const copyrightText=text=>{const name=String(text||'').replace(/[©\r\n]+/g,' ').trim();return name?'© '+name:''};
+ const copyrightText=text=>{const value=String(text||'').replace(/[\r\n]+/g,' ').trim();return value?(value.includes('©')?value:'© '+value):''};
  const lineHeight=e=>e.key==='copyright'?1.15:1;
  const keys=['date','title','subtitle','copyright'];
  const clamp=(n,a,b)=>Math.min(Math.max(a,b),Math.max(a,Number.isFinite(n)?n:a));
@@ -11,7 +11,7 @@
   let records=rows(1),height=records.reduce((n,r)=>n+r.h,0)+Math.max(0,records.length-1)*gap,factor=1;
   if(height>safe.h||records.some(r=>r.maxWidth>safe.w)){let lo=.00001,hi=1;for(let i=0;i<22;i++){const mid=(lo+hi)/2,r=rows(mid),h=r.reduce((n,r)=>n+r.h,0)+Math.max(0,r.length-1)*gap*mid;if(h>safe.h||r.some(r=>r.maxWidth>safe.w))hi=mid;else lo=mid}factor=lo;records=rows(factor);height=records.reduce((n,r)=>n+r.h,0)+Math.max(0,records.length-1)*gap*factor}
   const offset=clamp(b.textBox?.offset||0,0,safe.h-height),y=safe.y+safe.h-offset-height;let cursor=y;
-  records=records.map(e=>{const row={...e,x:safe.x+(e.align==='right'?safe.w:e.align==='center'?safe.w/2:0),y:cursor,w:safe.w,angle:0};cursor+=e.h+gap*factor;return row});
+  records=records.map(e=>{const row={...e,x:safe.x+(e.align==='right'?safe.w:e.align==='center'?safe.w/2:0),y:Math.min(cursor+(e.key==='title'?2.5:0),safe.y+safe.h-e.h),w:safe.w,angle:0};cursor+=e.h+gap*factor;return row});
   const ce=b.elements.copyright,showCopyright=(ce.visible&&ce.text)||activeKey==='copyright';let copyright=null;
   if(showCopyright){const text=copyrightText(ce.text);let size=Math.min(Math.max(.1,ce.size),safe.right/1.15),width=measure(text,size,ce.role);if(width>safe.h){size*=safe.h/width;width=measure(text,size,ce.role)}const h=size*1.15,displayWidth=ce.text?width:Math.max(width,160*b.w/1080);copyright={key:'copyright',...ce,text,size,lines:[text],maxWidth:width,w:displayWidth,h,x:safe.x+safe.w+safe.right/2-h/2,y:safe.y+safe.h,angle:-90,align:'left',fixed:true};}
   return {x:safe.x,y,w:safe.w,h:height,offset,factor,mainRecords:records,copyright,records:copyright?[...records,copyright]:records,safe};
