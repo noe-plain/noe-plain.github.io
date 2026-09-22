@@ -148,7 +148,7 @@ Copyright-Angaben ohne © erhalten das Zeichen automatisch vorangestellt. Ein vo
 
 ## Familienkonzerte
 
-Im Menü „Textarten auswählen“ unterhalb der Trennlinie „Familienkonzert“ aktivieren. Der Modus verwendet einen frei wählbaren einfarbigen Hintergrund ohne Verlauf. Für freigestellte Illustrationen transparente PNG- oder WebP-Dateien importieren. Positionen von Logo und Text bleiben erhalten; beim Wechsel zurück wird der ursprüngliche Bildausschnitt wiederhergestellt.
+Im Menü „Textarten auswählen“ unterhalb der Trennlinie „Familienkonzert“ aktivieren. Der Modus verwendet einen einfarbigen Hintergrund ohne Verlauf. Die Zeichenflächenfarbe lässt sich in der Seitenleiste unter „Bildausschnitt“ direkt auswählen. Für freigestellte Illustrationen transparente PNG- oder WebP-Dateien importieren. Positionen von Logo und Text bleiben erhalten; beim Wechsel zurück wird der ursprüngliche Bildausschnitt wiederhergestellt.
 
 Die acht Buchstabenfarben haben dieselbe OKLCH-Helligkeit (0,72), mit für sRGB begrenzter Farbsättigung. Sichtbare Zeichen wechseln durch die Palette, ohne direkt wiederholte Farben. Eine dunkle 2-px-Kontur verbessert die Lesbarkeit. Die Farbreihenfolge lässt sich wechseln. Die PSD-Datei enthält weiterhin editierbare Texte mit einzelnen Farbläufen.
 
