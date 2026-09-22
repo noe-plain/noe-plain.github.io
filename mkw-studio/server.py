@@ -76,6 +76,7 @@ class Handler(BaseHTTPRequestHandler):
         files={'/':'index.html','/fonts/Harrietv2Text-Regular.otf':'static/fonts/Harrietv2Text-Regular.otf','/fonts/ReplicaLL-Bold.otf':'static/fonts/ReplicaLL-Bold.otf','/fonts/HarrietText-Bold.otf':'static/fonts/HarrietText-Bold.otf','/fonts/HarrietText-BoldItalic.otf':'static/fonts/HarrietText-BoldItalic.otf','/state.js':'static/state.js','/layout.js':'static/layout.js','/renderer.js':'static/renderer.js','/studio.js':'static/studio.js','/psd.js':'static/psd.js','/start.js':'static/start.js','/vendor/ag-psd.js':'static/vendor/ag-psd.js','/style.css':'static/style.css','/core.js':'static/core.js','/logo-black.svg':'mkw-logo-bold-pos.svg','/logo-white.svg':'mkw-logo-bold-neg.svg'}
         files.update({'/' + value: value for value in list(files.values())})
         files['/static/browser.js'] = 'static/browser.js'
+        files['/static/family.js'] = 'static/family.js'
         files['/static/srgb.icc'] = 'static/srgb.icc'
         if path not in files: return self.reply({'error':'Nicht gefunden'},status=404)
         p=ROOT/files[path]

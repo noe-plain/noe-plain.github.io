@@ -9,10 +9,15 @@ async function layerBitmap(b,key){
  }
  const canvas=makeCanvas(w,h),ctx=canvas.getContext('2d',{colorSpace:'srgb'});ctx.translate(-left,-top);await paint(ctx,b,1,{only:key});return {canvas,left,top};
 }
-function textLayerData(e,left,top){
+function textLayerData(e,left,top,family,layout){
  const ctx=makeCanvas(1,1).getContext('2d');ctx.font=`${e.size}px ${fontFamily(e.role)}`;ctx.textBaseline='alphabetic';const a=ctx.measureText('Mg').actualBoundingBoxAscent;ctx.textBaseline='top';const baseline=a-ctx.measureText('Mg').actualBoundingBoxAscent;const angle=(e.angle||0)*Math.PI/180;
  const f=p.fonts.find(f=>f.role===e.role),name=fontStatus[e.role]?(f?.postscriptName||f?.name.replace(/\.(otf|ttf|woff2?)$/i,'')||e.role):e.role.startsWith('Harriet')?'Georgia':'ArialMT';
- return {text:(e.lines||e.text.split('\n')).join('\n'),transform:[Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle),left+e.x-Math.sin(angle)*baseline,top+e.y+Math.cos(angle)*baseline],shapeType:'point',antiAlias:'smooth',style:{font:{name},fontSize:e.size,fillColor:rgb(e.color),autoLeading:false,leading:e.size*MKWLayout.lineHeight(e)},paragraphStyle:{justification:e.align},orientation:'horizontal'};
+ const result={text:(e.lines||e.text.split('\n')).join('\n'),transform:[Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle),left+e.x-Math.sin(angle)*baseline,top+e.y+Math.cos(angle)*baseline],shapeType:'point',antiAlias:'smooth',style:{font:{name},fontSize:e.size,fillColor:rgb(e.color),autoLeading:false,leading:e.size*MKWLayout.lineHeight(e)},paragraphStyle:{justification:e.align},orientation:'horizontal'};
+ if(family?.enabled){
+  Object.assign(result.style,{autoKerning:false,kerning:0,ligatures:false,strokeFlag:true,fillFlag:true,fillFirst:true,outlineWidth:MKWFamily.outlineWidth,strokeColor:rgb(MKWFamily.outline)});
+  result.styleRuns=MKWFamily.runs(result.text,familyTextOffset(layout,e.key,family.offset)).map(run=>({length:run.length,style:{fillColor:rgb(run.color)}}));
+ }
+ return result;
 }
 async function withPSDProfile(buffer){
  // Add Photoshop image resource 1039 (ICC), using the same sRGB profile as JPG.
@@ -29,9 +34,11 @@ async function buildPSD(progress=()=>{}){
   progress(`Zeichenfläche ${index+1} / ${layout.boards.length} vorbereiten …`);await new Promise(r=>setTimeout(r,0));const im=asset(b),children=[],textChildren=[],block=textBlock(b);
   ctx.save();ctx.translate(left,top);ctx.beginPath();ctx.rect(0,0,b.w,b.h);ctx.clip();await paint(ctx,b);ctx.restore();
   for(const key of ['logo','logoShadow','copyright','subtitle','title','date','textShadow','image','background']){
+   if(b.family?.enabled&&key==='logoShadow')continue;
+   if(b.family?.enabled&&key==='textShadow'){if(textChildren.length)children.push({name:'Text · Familienkonzert',opened:true,children:textChildren.reverse()});continue}
    const shadow=key.endsWith('Shadow'),e=key==='logo'?b.elements.logo:block.records.find(e=>e.key===key);if(key==='logo'||key==='logoShadow'){if(!b.elements.logo.visible)continue}else if((shadow||MKWLayout.keys.includes(key))&&(!block.records.length||(!shadow&&!e)))continue;
    const bitmap=await layerBitmap(b,key),l={name:key==='image'?im.name:key==='background'?'Hintergrund':shadow?'Schatten · Kontur · 28 %':elementNames[key],left:left+bitmap.left,top:top+bitmap.top,canvas:bitmap.canvas,hidden:e?!e.visible:false};
-   if(shadow){l.blendMode='multiply';l.opacity=key==='textShadow'?.42:.28;if(key==='textShadow')l.name='Textkontrast · Verlauf · 42 %'}else if(e&&key!=='logo')l.text=textLayerData(e,left,top);
+   if(shadow){l.blendMode='multiply';l.opacity=key==='textShadow'?.42:.28;if(key==='textShadow')l.name='Textkontrast · Verlauf · 42 %'}else if(e&&key!=='logo')l.text=textLayerData(e,left,top,b.family,block);
    if(key==='image'){
     if(!linked.has(im.id)){const id=uid();linked.set(im.id,id);psd.linkedFiles.push({id,name:im.name.replace(/\.[^.]+$/,'')+'_sRGB.png',type:'PNG ',data:bytesFromData(im.data)})}
     const t=b.image,transform=[[-1,-1],[1,-1],[1,1],[-1,1]].flatMap(([sx,sy])=>{const q=rotatePoint(sx*im.width*t.scale*t.flipX/2,sy*im.height*t.scale*t.flipY/2,t.angle);return[left+t.x+q.x,top+t.y+q.y]});l.placedLayer={id:linked.get(im.id),placed:uid(),type:'raster',width:im.width,height:im.height,transform,resolution:{value:72,units:'Density'}};
@@ -39,7 +46,7 @@ async function buildPSD(progress=()=>{}){
    if(MKWLayout.keys.includes(key)||key==='textShadow'){textChildren.push(l);if(key==='textShadow')children.push({name:'Text · Titelblock + Copyright',opened:true,children:textChildren.reverse()})}else children.push(l);
   }
   const shadowIndex=children.findIndex(l=>l.blendMode==='multiply');if(shadowIndex>=0){const shadow=children.splice(shadowIndex,1)[0];children.splice(children.findIndex(l=>l.placedLayer),0,shadow)}
-  psd.children.push({name:`${String(index+1).padStart(2,'0')} · ${im.name.replace(/\.[^.]+$/,'')} · ${MKW.ratio(b.w,b.h)}`,artboard:{rect:{left,top,right:left+b.w,bottom:top+b.h},color:rgb(b.bg),backgroundType:4},opened:true,children:children.reverse()});
+  psd.children.push({name:`${String(index+1).padStart(2,'0')} · ${im.name.replace(/\.[^.]+$/,'')} · ${MKW.ratio(b.w,b.h)}`,artboard:{rect:{left,top,right:left+b.w,bottom:top+b.h},color:rgb(b.family?.enabled?b.family.background:b.bg),backgroundType:4},opened:true,children:children.reverse()});
  }
  progress('PSD mit Zeichenflächen und Ebenen schreiben …');await new Promise(r=>setTimeout(r,50));psd.children.reverse();const buffer=agPsd.writePsd(psd,{generateThumbnail:true,trimImageData:true});return withPSDProfile(buffer);
 }

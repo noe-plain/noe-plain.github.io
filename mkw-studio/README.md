@@ -129,7 +129,7 @@ Der Server hört ausschliesslich auf `127.0.0.1`. Port 8765 muss frei sein.
 
 ```sh
 .venv/bin/python -m unittest discover -s tests -v
-node --test tests/core.test.js tests/layout.test.js
+npm test
 ```
 
 Der Browser-Test `tests/studio.cjs` verwendet ausschliesslich Port 8876. Dafür separat starten:
@@ -144,4 +144,12 @@ Die Textgestaltung verwendet 100 % Zeilenhöhe und 8 px Abstand zwischen Datum, 
 
 Beim ersten Öffnen älterer Projekte wird Copyright bis zur bisherigen Standardgrösse von 24 px einmalig auf 32 px angehoben. Danach bleibt die Grösse frei einstellbar.
 
-Copyright-Namen erhalten automatisch genau ein vorangestelltes ©. Leere Namen bleiben unsichtbar. Bestehende Projekte werden einmalig auf Harriet V2 Text Regular umgestellt.
+Copyright-Angaben ohne © erhalten das Zeichen automatisch vorangestellt. Ein vorhandenes © bleibt an seiner Position, auch nach einer Bildbeschreibung. Leere Namen bleiben unsichtbar. Bestehende Projekte werden einmalig auf Harriet V2 Text Regular umgestellt.
+
+## Familienkonzerte
+
+Im Menü „Textarten auswählen“ unterhalb der Trennlinie „Familienkonzert“ aktivieren. Der Modus verwendet einen frei wählbaren einfarbigen Hintergrund ohne Verlauf. Für freigestellte Illustrationen transparente PNG- oder WebP-Dateien importieren. Positionen von Logo und Text bleiben erhalten; beim Wechsel zurück wird der ursprüngliche Bildausschnitt wiederhergestellt.
+
+Die acht Buchstabenfarben haben dieselbe OKLCH-Helligkeit (0,72), mit für sRGB begrenzter Farbsättigung. Sichtbare Zeichen wechseln durch die Palette, ohne direkt wiederholte Farben. Eine dunkle 2-px-Kontur verbessert die Lesbarkeit. Die Farbreihenfolge lässt sich wechseln. Die PSD-Datei enthält weiterhin editierbare Texte mit einzelnen Farbläufen.
+
+Änderungen am ersten Bild gelten auch für die weiteren Bilder und neue Importe. Pro Bild geänderte Einstellungen bleiben individuell; „Design vom ersten Bild übernehmen“ setzt sie zurück. Die Texte verwenden weiterhin die bestehende gemeinsame Texteingabe und individuelle Anpassungen. Die Oberfläche verwendet die mitgelieferten MKW-Schriften Replica LL und Harriet.

@@ -160,3 +160,24 @@ dialog{background:#242a34;border-color:#485267;color:#dfe7f5;box-shadow:0 24px 8
 .add-more-images:hover{background:#2b374e;border-color:#91a8df;color:#edf2ff}
 .add-more-images svg{width:20px;height:20px}
 @media(max-width:480px){.start-open-options{grid-template-columns:1fr}.add-more-images{padding:20px 14px;font-size:12px}}
+
+/* Bundled MKW brand fonts, independent of fonts stored in individual projects. */
+@font-face{font-family:'MKW UI';src:url('fonts/ReplicaLL-Bold.otf') format('opentype');font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:'MKW Editorial';src:url('fonts/Harrietv2Text-Regular.otf') format('opentype');font-style:normal;font-weight:400;font-display:swap}
+:root,body,button,input,select,textarea{font-family:'MKW UI',sans-serif}
+.group-heading .image-copyright input,.export-card span{font-family:'MKW UI',sans-serif}
+.text-editor:empty:before{font-family:inherit}
+#startDialog>p,.panel-caption,dialog>p{font-family:'MKW Editorial',Georgia,serif}
+.group-heading .family-picker{border-top:1px solid #48536a;margin-top:12px;padding-top:10px}
+.group-heading .family-picker>label{font-size:13px}
+.family-settings{padding:8px 9px 4px}
+.group-heading .family-settings label{padding:6px 0;display:flex;justify-content:space-between}
+.group-heading .family-settings input[type=color]{width:44px;height:32px;padding:3px;border:1px solid #5b6980;border-radius:5px;background:#1d2430;cursor:pointer}
+.family-palette{display:flex;gap:4px;margin:12px 0}
+.family-palette span{flex:1;height:20px;border-radius:4px;border:1px solid #ffffff20}
+.family-picker button{width:100%;font-size:10px;padding:9px 7px}
+.group-heading .family-picker small{font-family:'MKW Editorial',Georgia,serif;line-height:1.65}
+.family-picker [data-family-reset]{margin-top:10px}
+
+.group-heading .text-type-options{max-height:min(530px,calc(100dvh - 210px));overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:760px){.group-heading .text-type-options{position:static;margin-top:8px;max-height:440px;box-shadow:none}}
