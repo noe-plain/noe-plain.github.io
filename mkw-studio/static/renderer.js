@@ -121,7 +121,7 @@ window.addEventListener('pointermove',ev=>{
  if(key==='textBox'){const block=textBlock(b);e.offset=MKWLayout.clamp(i.offset-(pt.y-start.y),0,block.safe.h-block.h)}
  else if(key==='image'&&corner!==null){const im=asset(b),{fixed,signs:{sx,sy}}=movement,q=rotatePoint(pt.x-fixed.x,pt.y-fixed.y,-i.angle);const scale=Math.max(.001,Math.min(100,(q.x*sx*im.width+q.y*sy*im.height)/(im.width**2+im.height**2)));const v=rotatePoint(sx*im.width*scale/2,sy*im.height*scale/2,i.angle);e.scale=scale;e.x=fixed.x+v.x;e.y=fixed.y+v.y}
  else if(corner!==null){e.size=Math.max(1,Math.min(5000,i.size*Math.hypot(pt.x-i.x,pt.y-i.y)/Math.max(1,Math.hypot(start.x-i.x,start.y-i.y))))}
- else{e.x=i.x+pt.x-start.x;e.y=i.y+pt.y-start.y}
+ else{let dx=pt.x-start.x,dy=pt.y-start.y;if(key==='image'&&ev.shiftKey){const angle=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*Math.PI/4,distance=dx*Math.cos(angle)+dy*Math.sin(angle);dx=distance*Math.cos(angle);dy=distance*Math.sin(angle)}e.x=i.x+dx;e.y=i.y+dy}
  if(key==='logo')MKWLayout.constrainLogo(b,logoAspects.get(b.id)||3);
  changed(false);
 },{passive:false});

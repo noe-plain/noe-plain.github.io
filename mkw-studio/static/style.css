@@ -200,3 +200,8 @@ dialog{background:#242a34;border-color:#485267;color:#dfe7f5;box-shadow:0 24px 8
 #textContentField input{width:100%;max-width:100%}
 .tool-sidebar{z-index:30}
 .tools-toggle{z-index:31}
+
+.custom-logo-item{position:relative;width:100%;padding-right:38px}
+.custom-logo-item .logo-choice{width:100%}
+.remove-custom-logo{position:absolute;right:0;top:50%;transform:translateY(-50%);width:30px;height:32px;padding:0;font-size:21px;color:#b6c3d9;background:transparent}
+.remove-custom-logo:hover{background:#55343d;color:#ffd8df;border-color:#95606e}
