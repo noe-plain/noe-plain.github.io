@@ -353,5 +353,10 @@
         "name": "Musikkollegium Winterthur – MKW",
         "url": "https://musikkollegium.ch/",
         "category": "suche"
+    },
+    {
+        "name": "FD-Kampagnen - Layouttool",
+        "url": "https://noe-plain.github.io/mkw-studio/",
+        "category": "Ressourcen"
     }
 ]
