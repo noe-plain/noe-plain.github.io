@@ -185,3 +185,18 @@ dialog{background:#242a34;border-color:#485267;color:#dfe7f5;box-shadow:0 24px 8
 .tool-sidebar .tool-details{width:100%;padding-top:15px;border-top:1px solid #394250;font-size:12px;color:#d0d9e9}
 .tool-sidebar .tool-details h3{margin:0;font-size:12px;font-weight:inherit;color:#d0d9e9}
 .tool-sidebar .tool-details>.more-options:first-child{margin-top:0}
+
+/* Sidebar groups follow the editing workflow; every control stays expanded. */
+.tool-sidebar .tool-section{display:flex;flex-direction:column;gap:12px;width:100%;min-width:0}
+.tool-sidebar .tool-section+.tool-section{padding-top:20px;margin-top:4px;border-top:1px solid #394250}
+.tool-sidebar .tool-section h3{margin:0 0 2px;font-size:12px;line-height:1.5;color:#edf1fa}
+.tool-sidebar .tool-button-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.tool-sidebar .tool-button-grid button{min-width:0;padding:10px 5px;font-size:10px}
+.tool-sidebar .tool-stacked{flex-direction:column;align-items:stretch;gap:7px!important}
+.tool-sidebar .tool-section select{width:100%;max-width:none}
+.tool-sidebar .tool-hint{margin:0;font-family:'MKW Editorial',Georgia,serif;font-size:11px;line-height:1.6;color:#a9b7ce}
+.tool-sidebar .tool-secondary{background:transparent;color:#a9b7ce}
+#textContentField:empty{display:none}
+#textContentField input{width:100%;max-width:100%}
+.tool-sidebar{z-index:30}
+.tools-toggle{z-index:31}
