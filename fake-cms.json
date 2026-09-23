@@ -315,9 +315,9 @@
         "category": "Ressourcen"
     },
     {
-        "name": "MKW FD-Kampagnen Studio",
-        "url": "https://noe-plain.github.io/MKW-Sujet-Studio",
-        "category": "suche"
+        "name": "MKW Studio (Future Demand & WebP)",
+        "url": "https://noe-plain.github.io/mkw-studio",
+        "category": "Ressourcen"
     },
     {
         "name": "Thomann Music",
@@ -353,10 +353,5 @@
         "name": "Musikkollegium Winterthur – MKW",
         "url": "https://musikkollegium.ch/",
         "category": "suche"
-    },
-    {
-        "name": "FD-Kampagnen - Layouttool",
-        "url": "https://noe-plain.github.io/mkw-studio/",
-        "category": "Ressourcen"
     }
 ]
