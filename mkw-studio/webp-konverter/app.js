@@ -12,7 +12,15 @@
   let codecPromise;
   function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error)}
   function valid(){return Number.isInteger(s.width)&&Number.isInteger(s.height)&&s.width>0&&s.height>0&&s.width<=10000&&s.height<=10000&&s.width*s.height<=maxPixels}
-  function ready(){ $('downloadLabel').textContent=s.items.length>1?`${s.items.length} Bilder als ZIP herunterladen`:formats[s.format].label+' herunterladen'; $('download').disabled=s.loading||s.exporting||!s.image||!canExport()||(s.resize&&!valid());
+  function updateSummary(){
+    const count=s.items.length,label=formats[s.format].label;
+    $('selectionCount').textContent=count;
+    $('chooseLabel').textContent=count?'Auswahl ersetzen':'Bilder auswählen';
+    $('selectionHint').textContent=count?'Eine neue Auswahl ersetzt die bisherigen Bilder.':'Dateien hierher ziehen oder auswählen.';
+    $('workflowCount').textContent=count?`${count} ${count===1?'BILD':'BILDER'}`:'BILDER';
+    $('exportSummary').textContent=count?`${count} ${count===1?'Bild':'Bilder'} · ${label} · ${s.resize?s.width+' × '+s.height+' px':'Originalmasse'}${count>1?' · ZIP-Download':''}`:'Wähle Bilder für den Export aus.';
+  }
+  function ready(){updateSummary(); $('downloadLabel').textContent=s.items.length>1?`${s.items.length} Bilder als ZIP herunterladen`:formats[s.format].label+' herunterladen'; $('download').disabled=s.loading||s.exporting||!s.image||!canExport()||(s.resize&&!valid());
     if(!canExport())status('Der lokale WebP-Encoder konnte nicht geladen werden. Bitte das gesamte Tool entpacken.',true);
     else if(s.resize&&!valid())status('Breite und Höhe: 1 bis 10 000 px; maximal 24 Megapixel.',true);
     else if(s.image){const {w,h}=size();status(`${w} × ${h} px · Bereit für ${formats[s.format].label}`)}else status('Wähle zuerst ein Bild aus.'); }
@@ -25,7 +33,11 @@
     svg.querySelectorAll('line').forEach(e=>{e.setAttribute('stroke','#e9edff');e.setAttribute('stroke-opacity','0.83');e.setAttribute('stroke-width','1');e.setAttribute('vector-effect','non-scaling-stroke')});svg.querySelectorAll('circle').forEach(e=>{e.setAttribute('fill','#e9edff');e.setAttribute('stroke','#222a3b');e.setAttribute('stroke-width','0.25')})}
   function render(){if(!s.image)return;ready();if(s.resize&&!valid())return;const {w,h}=size(),factor=Math.min(1,940/w,650/h),c=$('previewCanvas');c.width=Math.max(1,Math.round(w*factor));c.height=Math.max(1,Math.round(h*factor));paint(c);drawGuides();$('previewBadge').textContent=s.resize?`${w} × ${h} PX`:'ORIGINALGRÖSSE';$('canvasHint').textContent=s.resize?'Bild ziehen, um den Ausschnitt zu verschieben. Hilfslinien werden nicht exportiert.':'Das Bild wird vollständig in seiner Originalgrösse konvertiert.';$('artworkFrame').classList.toggle('draggable',s.resize)}
   function mode(resize){s.items.forEach(item=>{item.zoom=1;item.panX=item.panY=0});s.resize=resize;s.zoom=1;s.panX=s.panY=0;s.drag=null;$('zoom').value=100;$('zoomValue').textContent='100 %';$('modeOriginal').classList.toggle('selected',!resize);$('modeOriginal').setAttribute('aria-pressed',String(!resize));$('modeResize').classList.toggle('selected',resize);$('modeResize').setAttribute('aria-pressed',String(resize));$('resizeControls').hidden=!resize;$('sizeExplanation').textContent=resize?'Zielgrösse und Bildausschnitt festlegen.':'Originalmasse beibehalten. Das Bild wird im gewählten Format exportiert.';render()}
-  $('exportFormat').addEventListener('change',()=>{s.format=$('exportFormat').value;const label=formats[s.format].label;$('filenameExtension').textContent='.'+s.format;$('downloadLabel').textContent=label+' herunterladen';$('workflowFormat').textContent=label.toUpperCase();$('formatSummary').textContent='JPG / PNG / WEBP → '+label.toUpperCase();$('formatHint').textContent=s.format==='jpg'?'Transparente Flächen werden weiss.':'Transparenz bleibt erhalten.';ready();render()});
+  function setFormat(format){s.format=format;const label=formats[format].label;
+    for(const [id,value] of [['formatWebp','webp'],['formatJpg','jpg']]){$(id).classList.toggle('selected',format===value);$(id).setAttribute('aria-pressed',String(format===value))}
+    $('filenameExtension').textContent='.'+format;$('workflowFormat').textContent=label.toUpperCase();$('formatSummary').textContent='JPG / PNG / WEBP → '+label.toUpperCase();$('formatHint').textContent=format==='jpg'?'Transparente Flächen werden weiss.':'Transparenz bleibt erhalten.';ready();render();
+  }
+  $('formatWebp').addEventListener('click',()=>setFormat('webp'));$('formatJpg').addEventListener('click',()=>setFormat('jpg'));
   $('modeOriginal').addEventListener('click',()=>mode(false));$('modeResize').addEventListener('click',()=>mode(true));
   function dimensions(){s.items.forEach(item=>{item.panX=item.panY=0});s.width=Number($('targetWidth').value);s.height=Number($('targetHeight').value);s.panX=s.panY=0;render()}
   $('targetWidth').addEventListener('input',dimensions);$('targetHeight').addEventListener('input',dimensions);document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{const [w,h]=b.dataset.size.split('x').map(Number);$('targetWidth').value=w;$('targetHeight').value=h;dimensions()}));
@@ -37,9 +49,17 @@
     s.image=item.image;s.file=item.file;s.zoom=item.zoom;s.panX=item.panX;s.panY=item.panY;s.drag=null;
     $('zoom').value=Math.round(s.zoom*100);$('zoomValue').textContent=$('zoom').value+' %';$('filename').value=item.name;
     $('sourceName').textContent=item.file.name;$('sourceMeta').textContent=`${s.image.naturalWidth} × ${s.image.naturalHeight} px · ${prettyBytes(item.file.size)} · ${s.items.length} Bild(er)`;
-    $('previewTitle').textContent=item.file.name;$('imageList').value=String(index);$('sourceDetails').hidden=false;$('emptyState').hidden=true;$('previewState').hidden=false;render();
+    $('previewTitle').textContent=item.file.name;$('previewPosition').textContent=`VORSCHAU · BILD ${index+1} VON ${s.items.length}`;$('thumbnailList').querySelectorAll('button').forEach((button,i)=>{button.classList.toggle('selected',i===index);button.setAttribute('aria-pressed',String(i===index))});$('sourceDetails').hidden=false;$('emptyState').hidden=true;$('previewState').hidden=false;render();
   }
-  $('imageList').addEventListener('change',()=>selectImage(Number($('imageList').value)));
+  function renderThumbnails(){
+    $('imageTray').hidden=!s.items.length;$('trayCount').textContent=`${s.items.length} ${s.items.length===1?'Bild':'Bilder'}`;
+    $('thumbnailList').replaceChildren(...s.items.map((item,index)=>{
+      const button=document.createElement('button');button.type='button';button.className='thumbnail';button.title=item.file.name;button.setAttribute('aria-label',`Bild ${index+1}: ${item.file.name}`);
+      const img=document.createElement('img');img.src=item.url;img.alt='';
+      const label=document.createElement('span');label.textContent=item.file.name;
+      button.append(img,label);button.addEventListener('click',()=>selectImage(index));return button;
+    }));
+  }
   async function loadFiles(files){
     if(s.loading||s.exporting||!files.length)return;
     s.loading=true;ready();const items=[],errors=[];
@@ -58,8 +78,7 @@
       }
       if(items.length){
         s.items.forEach(item=>URL.revokeObjectURL(item.url));s.items=items;s.selected=-1;
-        $('imageList').replaceChildren(...items.map((item,index)=>{const option=document.createElement('option');option.value=index;option.textContent=`${index+1}. ${item.file.name}`;return option}));
-        $('batchControls').hidden=items.length<2;selectImage(0);
+        renderThumbnails();selectImage(0);
       }
     }finally{s.loading=false;ready();if(errors.length)status(errors.join(' · '),true)}
   }
@@ -106,7 +125,7 @@
     saveSelection();
     const format=s.format,quality=Number($('quality').value)/100,settings={resize:s.resize,width:s.width,height:s.height};
     const jobs=s.items.map(item=>({...item})),used=new Set(),files=[];
-    s.exporting=true;$('download').disabled=true;
+    s.exporting=true;$('download').disabled=true;$('downloadLabel').textContent='Bilder werden exportiert …';$('exportProgress').hidden=false;$('exportProgress').value=0;
     try{
       for(const [index,item] of jobs.entries()){
         status(`${formats[format].label}: Bild ${index+1} von ${jobs.length} wird erstellt …`);
@@ -118,7 +137,7 @@
           paint(canvas,format);
         }finally{Object.assign(s,previous)}
         const blob=await (format==='jpg'?encodeJPG(canvas,quality):encodeWebP(canvas,quality));
-        canvas.width=canvas.height=1;
+        canvas.width=canvas.height=1;$('exportProgress').value=Math.round((index+1)/jobs.length*100);
         const base=(item.name.trim().replace(/\.(webp|jpe?g|png)$/i,'')||'bild').replace(/[\\/:*?"<>|\x00-\x1f]/g,'_');
         let name=base+'.'+format,suffix=2;while(used.has(name.toLowerCase()))name=base+'-'+suffix+++'.'+format;used.add(name.toLowerCase());files.push({name,blob});
       }
@@ -127,7 +146,7 @@
       const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60_000);
       status(`${name} · ${files.length} Bild(er) · ${prettyBytes(blob.size)}`);
     }catch(error){status(error.message||String(error),true)}
-    finally{s.exporting=false;$('download').disabled=s.loading||!s.image||!canExport()||(s.resize&&!valid())}
+    finally{s.exporting=false;$('exportProgress').hidden=true;$('downloadLabel').textContent=s.items.length>1?`${s.items.length} Bilder als ZIP herunterladen`:formats[s.format].label+' herunterladen';$('download').disabled=s.loading||!s.image||!canExport()||(s.resize&&!valid())}
   });
   ready();
 })();
