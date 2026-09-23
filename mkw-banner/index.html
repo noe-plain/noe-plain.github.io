@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MKW · Banner Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead"><div class="mark">MKW<span> / </span>STUDIO</div><div class="mastmeta">HTML5 BANNER BUILDER <span>·</span> LOKAL IM BROWSER</div></header>
+  <main class="layout">
+    <aside class="controls">
+      <div class="eyebrow">WERKZEUG / 01</div><h1>Banner<br><em>gestalten.</em></h1>
+      <p class="intro">Bild wählen, Botschaft setzen und den fertigen Werbebanner als ZIP exportieren.</p>
+      <section class="panel"><div class="section-head"><span class="number">01</span><h2>Format &amp; Link</h2></div>
+        <div class="field"><label for="preset">Auflösung</label><select id="preset"><option value="300x600">Desktop · 300 × 600 px</option><option value="600x500">Mobile · 600 × 500 px</option><option value="custom">Eigenes Format</option></select></div>
+        <div class="row"><div class="field"><label for="width">Breite / px</label><input id="width" type="number" min="100" max="1200" value="300"></div><div class="field"><label for="height">Höhe / px</label><input id="height" type="number" min="100" max="1200" value="600"></div></div>
+        <div class="field"><label for="clickUrl">Zieladresse / clickTag</label><input id="clickUrl" type="url" value="https://www.musikkollegium.ch"></div>
+      </section>
+      <section class="panel"><div class="section-head"><span class="number">02</span><h2>Bild &amp; Ausschnitt</h2></div>
+        <label class="upload" for="imageFile"><span class="upload-icon">↥</span><span><strong>Hintergrundbild auswählen</strong><small>JPG, PNG, WebP · bleibt auf diesem Gerät</small></span></label><input id="imageFile" type="file" accept="image/*" hidden>
+        <p id="imageName" class="asset-name">Beispielbild geladen</p>
+        <div class="field"><label for="zoom">Endausschnitt · Vergrösserung <output id="zoomValue">100 %</output></label><input id="zoom" type="range" min="1" max="3.5" step="0.01" value="1"></div>
+        <p class="hint">Das Bild im Rahmen verschieben. Dieser Ausschnitt erscheint am Ende der Animation; der Export ergänzt rundherum 10 % Bildfläche.</p>
+        <div class="crop-wrap"><canvas id="cropCanvas" aria-label="Bildausschnitt am Ende der Animation"></canvas><span class="crop-caption">FINALES BILD · ZIEHEN ZUM VERSCHIEBEN</span></div>
+      </section>
+      <section class="panel"><div class="section-head"><span class="number">03</span><h2>Schrift &amp; Layout</h2></div>
+        <p class="hint">Direkt im Satzspiegel schreiben. Text markieren, um Schrift, Grösse oder Farbe zu ändern. Jede Zeile hat ihren eigenen Zeilenabstand.</p>
+        <div class="toolbar"><select id="fontChoice" aria-label="Schrift"><option value="replica">Replica LL Bold</option><option value="harriet">Harriet Text</option></select><input id="fontSize" type="number" min="8" max="120" value="37" title="Schriftgrösse in Pixel"><input id="textColor" type="color" value="#ffffff" title="Textfarbe"><button id="applyStyle" type="button" class="smallbtn">Auswahl formatieren</button></div>
+        <div class="editor-shell"><div id="editorStage"><div id="textEditor" aria-label="Textlayout"></div></div></div>
+        <div class="line-actions"><button id="addLine" type="button" class="smallbtn">+ Zeile</button><button id="removeLine" type="button" class="smallbtn">− Zeile</button></div>
+        <div class="field"><label for="lineSelect">Zeilenabstand <output id="leadingValue">1.05</output></label><select id="lineSelect" aria-label="Zeile auswählen"></select><input id="leading" type="range" min="0.75" max="2" step="0.05" value="1.05"></div>
+        <p id="textIssue" class="issue" role="status"></p>
+      </section>
+      <section class="panel"><div class="section-head"><span class="number">04</span><h2>Marke &amp; Partner</h2></div>
+        <div class="field"><label>Musikkollegium Logo</label><div class="segmented"><button id="logoWhite" class="active" type="button">Weiss</button><button id="logoBlack" type="button">Schwarz</button></div></div>
+        <label class="upload" for="sponsorFile"><span class="upload-icon">↥</span><span><strong>Sponsorenlogos importieren</strong><small>Eine gemeinsame Datei; Ausgabe als PNG8</small></span></label><input id="sponsorFile" type="file" accept="image/*" hidden><p id="sponsorName" class="asset-name">Beispiellogos geladen</p>
+        <div class="field"><label for="sponsorWidth">Breite der Logos <output id="sponsorWidthValue">100 %</output></label><input id="sponsorWidth" type="range" min="30" max="100" value="100"></div>
+      </section>
+      <section class="panel export-panel"><div class="section-head"><span class="number">05</span><h2>Export</h2></div>
+        <div class="field"><label for="filename">Bannername</label><input id="filename" value="MKW_Banner_Desktop" autocomplete="off"></div>
+        <div class="field"><label for="sizeLimit">Maximale ZIP-Grösse</label><select id="sizeLimit"><option value="150">Desktop · 150 KB</option><option value="100">Mobile · 100 KB</option></select></div>
+        <button id="download" class="primary" type="button">ZIP erstellen <span>↗</span></button><p id="exportStatus" class="status" role="status" aria-live="polite">Fertig zum Exportieren.</p>
+      </section>
+      <footer>Alle Dateien werden lokal verarbeitet. Der exportierte Banner benötigt keine externen Bibliotheken oder Webfonts.</footer>
+    </aside>
+    <section class="preview"><div class="preview-top"><div><div class="eyebrow">LIVE VORSCHAU / 02</div><h2>So wirkt dein Banner.</h2></div><button id="replay" class="replay" type="button">↺ <span>Animation neu starten</span></button></div>
+      <div class="preview-space"><div class="preview-frame"><iframe id="bannerPreview" title="Animierte Bannervorschau" sandbox="allow-scripts allow-popups" scrolling="no"></iframe></div></div>
+      <div class="preview-bottom"><span id="previewDimensions">300 × 600 PX</span><span class="separator">/</span><span>12 SEK. BILDANIMATION</span><span class="dot"></span><span>VORSCHAU IM ORIGINALFORMAT</span></div>
+    </section>
+  </main>
+  <script src="assets/data.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

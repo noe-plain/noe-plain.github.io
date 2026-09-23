@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Musikkollegium Winterthur · WebP Studio</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="assets/webp-codec.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="Musikkollegium Winterthur">MUSIKKOLLEGIUM<br>WINTERTHUR</div>
+    <div class="header-divider"></div>
+    <div class="header-title"><span>WERKZEUG</span><strong>WebP Studio</strong></div>
+    <div class="header-spacer"></div>
+    <div class="header-tag">BILD KONVERTER</div>
+  </header>
+
+  <div class="workspace">
+    <main class="stage" id="dropArea" aria-label="Bildvorschau und Import">
+      <div id="emptyState" class="empty-state">
+        <div class="picture-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><rect x="5" y="6" width="22" height="20" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="13" r="2" stroke="currentColor" stroke-width="1.7"/><path d="m6 23 7-7 5 5 3-3 5 5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+        <h1>Ein Bild.<br>Ein neues Format.</h1>
+        <p>Ziehe ein JPG oder PNG hierher<br>und verwandle es in WebP.</p>
+        <button id="chooseMain" type="button" class="button primary">Bild auswählen</button>
+        <span class="empty-formats">JPG · JPEG · PNG</span>
+      </div>
+      <div id="previewState" class="preview-state" hidden>
+        <div class="image-heading"><div><span class="eyebrow">VORSCHAU</span><strong id="previewTitle">Bild</strong></div><span id="previewBadge" class="preview-badge">ORIGINALGRÖSSE</span></div>
+        <div class="artwork-frame" id="artworkFrame">
+          <canvas id="previewCanvas" aria-label="Vorschau des WebP-Bildes; beim Zuschneiden ziehen zum Verschieben"></canvas>
+          <svg id="guides" class="guides" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+        <p class="canvas-hint" id="canvasHint">Das Bild wird vollständig in seiner Originalgrösse konvertiert.</p>
+      </div>
+      <div id="dragOverlay" class="drag-overlay" hidden>Bild hier ablegen</div>
+      <div class="workflow" aria-hidden="true"><span class="workflow-item current"><span class="step-icon">▧</span>BILD</span><span class="workflow-arrow">›</span><span class="workflow-item"><span class="step-icon">↘</span>WEBP</span></div>
+    </main>
+
+    <aside class="tools" aria-label="Konvertierungswerkzeuge">
+      <div class="tools-head"><span class="eyebrow">WERKZEUGE</span><h2>Bild konvertieren</h2></div>
+      <div class="tools-body">
+        <section class="tool-section">
+          <div class="section-title"><span class="section-no">01</span><h3>Quelldatei</h3></div>
+          <button id="chooseSide" class="file-button" type="button"><span class="file-button-icon">＋</span><span>JPG oder PNG auswählen</span></button>
+          <div id="sourceDetails" class="source-details" hidden><strong id="sourceName"></strong><span id="sourceMeta"></span></div>
+        </section>
+        <section class="tool-section">
+          <div class="section-title"><span class="section-no">02</span><h3>Grösse</h3></div>
+          <div class="mode-switch" role="group" aria-label="Grösse wählen"><button id="modeOriginal" type="button" class="selected" aria-pressed="true">Original</button><button id="modeResize" type="button" aria-pressed="false">Resize</button></div>
+          <p class="microcopy" id="sizeExplanation">Originalmasse beibehalten. Das Bild wird nur in WebP konvertiert.</p>
+          <div id="resizeControls" hidden>
+            <div class="preset-row"><button type="button" data-size="300x600">300 × 600</button><button type="button" data-size="600x500">600 × 500</button></div>
+            <div class="dimensions"><label>Breite <span>PX</span><input id="targetWidth" type="number" min="1" max="10000" step="1" value="300" inputmode="numeric"></label><span class="dimension-cross">×</span><label>Höhe <span>PX</span><input id="targetHeight" type="number" min="1" max="10000" step="1" value="600" inputmode="numeric"></label></div>
+            <p class="microcopy">Das Bild füllt die Zielgrösse. Den Ausschnitt in der Vorschau verschieben.</p>
+            <label class="range-label" for="zoom">Zoom <output id="zoomValue">100 %</output></label><input id="zoom" type="range" min="100" max="300" value="100" step="1">
+            <div class="guides-heading"><span>Hilfslinien</span><small>nur in der Vorschau</small></div>
+            <select id="guideType" aria-label="Hilfslinien"><option value="golden">Goldener Schnitt · 38,2 / 61,8 %</option><option value="thirds">Drittelraster · 33,3 / 66,7 %</option><option value="center">Mitte · 50 %</option><option value="none">Keine Hilfslinien</option></select>
+          </div>
+        </section>
+        <section class="tool-section">
+          <div class="section-title"><span class="section-no">03</span><h3>WebP Export</h3></div>
+          <label class="range-label" for="quality">Qualität <output id="qualityValue">80 %</output></label><input id="quality" type="range" min="20" max="100" value="80" step="1">
+          <p class="microcopy">Höhere Qualität erzeugt meist eine grössere Datei.</p>
+          <label class="text-label" for="filename">Dateiname</label><div class="filename-wrap"><input id="filename" type="text" value="bild" spellcheck="false"><span>.webp</span></div>
+          <button id="download" class="button primary download" type="button" disabled><span>WebP herunterladen</span><span aria-hidden="true">↗</span></button>
+          <p id="status" class="status" role="status" aria-live="polite">Wähle zuerst ein Bild aus.</p>
+        </section>
+      </div>
+      <div class="tools-foot"><span class="local-dot">●</span> Lokal in deinem Browser<br><span class="subtle">Bilder werden nicht hochgeladen.</span></div>
+    </aside>
+  </div>
+  <footer class="statusbar"><span>● Lokal in deinem Browser</span><span>JPG / PNG → WEBP</span></footer>
+  <input id="fileInput" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" hidden>
+</body>
+</html>
