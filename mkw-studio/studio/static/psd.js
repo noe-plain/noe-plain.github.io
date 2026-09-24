@@ -13,7 +13,8 @@ function textLayerData(e,left,top,family,layout){
  const ctx=makeCanvas(1,1).getContext('2d');ctx.font=`${e.size}px ${fontFamily(e.role)}`;ctx.textBaseline='alphabetic';const a=ctx.measureText('Mg').actualBoundingBoxAscent;ctx.textBaseline='top';const baseline=a-ctx.measureText('Mg').actualBoundingBoxAscent;const angle=(e.angle||0)*Math.PI/180;
  const f=p.fonts.find(f=>f.role===e.role),name=fontStatus[e.role]?(f?.postscriptName||f?.name.replace(/\.(otf|ttf|woff2?)$/i,'')||e.role):e.role.startsWith('Harriet')?'Georgia':'ArialMT';
  const result={text:(e.lines||e.text.split('\n')).join('\n'),transform:[Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle),left+e.x-Math.sin(angle)*baseline,top+e.y+Math.cos(angle)*baseline],shapeType:'point',antiAlias:'smooth',style:{font:{name},fontSize:e.size,fillColor:rgb(e.color),autoLeading:false,leading:e.size*MKWLayout.lineHeight(e)},paragraphStyle:{justification:e.align},orientation:'horizontal'};
- if(family?.enabled){
+ if(family?.enabled&&e.key==='copyright')result.style.fillColor=rgb(MKWFamily.copyrightColor(e.color));
+ if(family?.enabled&&e.key!=='copyright'){
   Object.assign(result.style,{autoKerning:false,kerning:0,ligatures:false,strokeFlag:true,fillFlag:true,fillFirst:true,outlineWidth:MKWFamily.outlineWidth,strokeColor:rgb(MKWFamily.outline)});
   result.styleRuns=MKWFamily.runs(result.text,familyTextOffset(layout,e.key,family.offset)).map(run=>({length:run.length,style:{fillColor:rgb(run.color)}}));
  }

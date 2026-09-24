@@ -11,5 +11,6 @@
  const segments=text=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter('de',{granularity:'grapheme'}).segment(String(text))].map(x=>x.segment):Array.from(String(text));
  function runs(text,offset=0){let n=offset;return segments(text).map(text=>{const visible=/\S/u.test(text),color=palette[((n%8)+8)%8].hex;if(visible)n++;return {text,color,visible,length:text.length}})}
  const count=text=>runs(text).filter(r=>r.visible).length;
- const api={palette,defaults,runs,count,outline:'#29313d',outlineWidth:2};if(typeof module!=='undefined')module.exports=api;else root.MKWFamily=api;
+ const copyrightColor=color=>String(color).toLowerCase()==='#ffffff'?'#ffffff':'#000000';
+ const api={palette,defaults,runs,count,copyrightColor,outline:'#29313d',outlineWidth:2};if(typeof module!=='undefined')module.exports=api;else root.MKWFamily=api;
 })(globalThis);
