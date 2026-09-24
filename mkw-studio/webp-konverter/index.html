@@ -26,43 +26,61 @@
         <button id="chooseMain" type="button" class="button primary">Bilder auswählen</button>
         <span class="empty-formats">IMPORT: JPG · PNG · WEBP</span>
       </div>
-      <div id="previewState" class="preview-state" hidden>
-        <div class="image-heading"><div><span class="eyebrow" id="previewPosition">VORSCHAU</span><strong id="previewTitle">Bild</strong></div><span id="previewBadge" class="preview-badge">ORIGINALGRÖSSE</span></div>
-        <div class="artwork-frame" id="artworkFrame">
-          <canvas id="previewCanvas" aria-label="Vorschau des exportierten Bildes; beim Zuschneiden ziehen zum Verschieben"></canvas>
-          <svg id="guides" class="guides" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-        </div>
-        <p class="canvas-hint" id="canvasHint">Das Bild wird vollständig in seiner Originalgrösse konvertiert.</p>
-        <div class="image-tray" id="imageTray" hidden><div class="tray-heading"><span>Deine Auswahl</span><span id="trayCount"></span></div><div id="thumbnailList" class="thumbnail-list" role="group" aria-label="Bild für die Bearbeitung wählen"></div></div>
+      <div id="previewState" class="artboard-workspace" hidden>
+        <div class="workspace-heading"><div><span class="eyebrow">DEINE ARBEITSFLÄCHE</span><h1 id="workspaceTitle">Zeichenflächen</h1></div><span id="artboardCount" class="preview-badge">0 ZEICHENFLÄCHEN</span></div>
+        <p class="workspace-hint" id="canvasHint">Ein Bild auswählen, Zeichenflächen hinzufügen und jeden Ausschnitt einzeln anpassen.</p>
+        <div id="artboardGrid" class="artboard-grid" aria-label="Alle Bilder und Zielgrössen"></div>
       </div>
       <div id="dragOverlay" class="drag-overlay" hidden>Bilder hier ablegen</div>
-      <div class="workflow" aria-hidden="true"><span class="workflow-item current"><span class="step-icon">▧</span><span id="workflowCount">BILDER</span></span><span class="workflow-arrow">›</span><span class="workflow-item"><span class="step-icon">↘</span><span id="workflowFormat">WEBP</span></span></div>
+      <nav class="workflow" aria-label="Workflow"><button id="workflowEdit" type="button" class="workflow-item current" aria-current="step"><span class="step-icon" aria-hidden="true">▧</span>Bilder bearbeiten <span id="workflowCount" class="workflow-count"></span></button><span class="workflow-arrow" aria-hidden="true">›</span><button id="workflowExport" type="button" class="workflow-item"><span class="step-icon" aria-hidden="true">↗</span>Export</button></nav>
     </main>
 
     <aside class="tools" aria-label="Konvertierungswerkzeuge">
-      <div class="tools-head"><span class="eyebrow">WERKZEUGE</span><h2>Bilder konvertieren</h2><p>Einzeln oder als ganze Serie.</p></div>
+      <div class="tools-head"><span class="eyebrow">WERKZEUGE</span><h2 id="toolsTitle">Bilder bearbeiten</h2><p id="toolsSubtitle">Zeichenflächen pro Bild anlegen.</p></div>
       <div class="tools-body">
-        <section class="tool-section">
+        <section class="tool-section" id="sourceSection">
           <div class="section-title"><span class="section-no">01</span><h3>Bilder</h3><span class="section-badge" id="selectionCount">0</span></div>
           <button id="chooseSide" class="file-button" type="button"><span class="file-button-icon">＋</span><span><strong id="chooseLabel">Bilder auswählen</strong><small>JPG, PNG oder WebP · Mehrfachauswahl</small></span></button>
           <div id="sourceDetails" class="source-details" hidden><strong id="sourceName"></strong><span id="sourceMeta"></span></div>
           <p class="microcopy" id="selectionHint">Dateien hierher ziehen oder auswählen.</p>
+          <label class="text-label" for="filename">Dateiname <span class="field-scope">Aktuelles Bild</span></label><div class="filename-wrap"><input id="filename" type="text" value="bild" spellcheck="false"><span id="filenameExtension">.webp</span></div>
+          <p class="microcopy filename-hint">Web-safe: Kleinbuchstaben, Zahlen und Bindestriche. Im Resize-Modus wird die Grösse ergänzt.</p>
+          <div id="filenamePreview" class="filename-preview" aria-label="Dateiname beim Export"></div>
+
         </section>
-        <section class="tool-section">
-          <div class="section-title"><span class="section-no">02</span><h3>Grösse</h3><span class="scope-label">Für alle Bilder</span></div>
-          <div class="mode-switch" role="group" aria-label="Grösse wählen"><button id="modeOriginal" type="button" class="selected" aria-pressed="true">Original</button><button id="modeResize" type="button" aria-pressed="false">Zuschneiden</button></div>
+        <section class="tool-section" id="sizeSection">
+          <div class="section-title"><span class="section-no">02</span><h3>Zeichenflächen</h3><span class="scope-label">Dieses Bild</span></div>
+          <p id="sizeImageName" class="size-image-name">Zuerst ein Bild auswählen</p>
+          <div class="mode-switch" role="group" aria-label="Grösse wählen"><button id="modeOriginal" type="button" class="selected" aria-pressed="true">Original</button><button id="modeResize" type="button" aria-pressed="false">Resize</button></div>
           <p class="microcopy" id="sizeExplanation">Originalmasse beibehalten. Das Bild wird im gewählten Format exportiert.</p>
           <div id="resizeControls" hidden>
-            <div class="preset-row"><button type="button" data-size="300x600">300 × 600</button><button type="button" data-size="600x500">600 × 500</button></div>
+            <div class="sizes-heading"><span>Zielgrössen</span><span id="sizeCount">1 Grösse</span></div>
+            <div id="sizeList" class="size-list" aria-label="Zielgrössen bearbeiten"></div>
+            <div class="preset-row"><button type="button" data-size="300x600">＋ 300 × 600</button><button type="button" data-size="600x500">＋ 600 × 500</button></div>
+            <button id="addSize" class="add-size" type="button">＋ Zeichenfläche hinzufügen</button>
+            <p class="microcopy">Weitere Grössen nur für dieses Bild hinzufügen. Wähle eine Zeichenfläche zum Bearbeiten.</p>
             <div class="dimensions"><label>Breite <span>PX</span><input id="targetWidth" type="number" min="1" max="10000" step="1" value="300" inputmode="numeric"></label><span class="dimension-cross">×</span><label>Höhe <span>PX</span><input id="targetHeight" type="number" min="1" max="10000" step="1" value="600" inputmode="numeric"></label></div>
-            <p class="microcopy">Das Bild füllt die Zielgrösse. Den Ausschnitt in der Vorschau verschieben.</p>
-            <label class="range-label" for="zoom">Zoom · aktuelles Bild <output id="zoomValue">100 %</output></label><input id="zoom" type="range" min="100" max="300" value="100" step="1">
+            <div class="crop-settings"><span class="eyebrow">AKTIVE ZEICHENFLÄCHE</span><strong id="activeArtboard">Noch kein Bild ausgewählt</strong>
+              <p class="microcopy">Ausschnitt direkt in der Zeichenfläche verschieben. Zoom und Ausschnitt gelten nur hier.</p>
+              <label class="range-label" for="zoom">Zoom <output id="zoomValue">100 %</output></label><input id="zoom" type="range" min="100" max="300" value="100" step="1">
+              <button id="resetCrop" type="button" class="reset-crop">Ausschnitt zurücksetzen</button>
+            </div>
             <div class="guides-heading"><span>Hilfslinien</span><small>nur in der Vorschau</small></div>
             <select id="guideType" aria-label="Hilfslinien"><option value="golden">Goldener Schnitt · 38,2 / 61,8 %</option><option value="thirds">Drittelraster · 33,3 / 66,7 %</option><option value="center">Mitte · 50 %</option><option value="none">Keine Hilfslinien</option></select>
           </div>
         </section>
-        <section class="tool-section">
-          <div class="section-title"><span class="section-no">03</span><h3>Export</h3><span class="scope-label">Für alle Bilder</span></div>
+
+      </div>
+      <p id="status" class="status tool-status" role="status" aria-live="polite">Wähle zuerst ein Bild aus.</p>
+      <div class="workspace-zoom"><div class="zoom-heading"><strong>Arbeitsfläche</strong><span>Nur die Ansicht</span></div><div class="view-control"><button id="viewZoomOut" type="button" aria-label="Arbeitsfläche verkleinern">−</button><button id="viewZoomReset" type="button" title="Auf 100 % zurücksetzen">100 %</button><button id="viewZoomIn" type="button" aria-label="Arbeitsfläche vergrössern">＋</button></div><label class="sr-only" for="viewZoom">Zoom der Arbeitsfläche</label><input id="viewZoom" type="range" min="25" max="200" step="5" value="100"></div>
+      <div class="tools-foot"><span class="local-dot">●</span> Lokal in deinem Browser<br><span class="subtle">Bilder werden nicht hochgeladen.</span></div>
+    </aside>
+  </div>
+  <footer class="statusbar"><span>● Lokal in deinem Browser</span><span id="formatSummary">JPG / PNG / WEBP → WEBP</span></footer>
+  <dialog id="exportDialog" aria-labelledby="exportTitle">
+    <div class="dialog-heading"><div><span class="eyebrow">BILD STUDIO · EXPORT</span><h2 id="exportTitle">Bereit für den Download.</h2><p>Zeichenflächen auswählen, Dateinamen prüfen und als WebP oder JPG exportieren.</p></div><button id="closeExport" type="button" class="dialog-close" aria-label="Zurück zur Bearbeitung">×</button></div>
+    <div class="export-layout">        <section class="tool-section" id="exportSection">
+
           <div class="format-options" role="group" aria-label="Exportformat">
             <button class="format-card selected" id="formatWebp" type="button" aria-pressed="true"><strong>WebP</strong><span>Mit Transparenz</span><span class="format-check" aria-hidden="true">✓</span></button>
             <button class="format-card" id="formatJpg" type="button" aria-pressed="false"><strong>JPG</strong><span>Weisser Hintergrund</span><span class="format-check" aria-hidden="true">✓</span></button>
@@ -70,17 +88,14 @@
           <p id="formatHint" class="microcopy">Transparenz bleibt erhalten.</p>
           <label class="range-label" for="quality">Qualität <output id="qualityValue">80 %</output></label><input id="quality" type="range" min="20" max="100" value="80" step="1">
           <p class="microcopy">Höhere Qualität erzeugt meist eine grössere Datei.</p>
-          <label class="text-label" for="filename">Dateiname <span class="field-scope">Aktuelles Bild</span></label><div class="filename-wrap"><input id="filename" type="text" value="bild" spellcheck="false"><span id="filenameExtension">.webp</span></div>
-          <div class="export-summary" id="exportSummary">Wähle Bilder für den Export aus.</div>
+</section>
+      <div class="export-selection"><div class="export-selection-heading"><strong id="exportSelectionCount"></strong><div><button id="exportSelectAll" type="button">Alle</button><button id="exportSelectNone" type="button">Keine</button></div></div><div id="exportGrid" class="export-grid"></div></div>
+    </div>
+    <div class="dialog-actions"><p id="dialogStatus" role="status" aria-live="polite"></p>          <div class="export-summary" id="exportSummary">Wähle Bilder für den Export aus.</div>
           <progress id="exportProgress" aria-label="Exportfortschritt" max="100" value="0" hidden></progress>
           <button id="download" class="button primary download" type="button" disabled><span id="downloadLabel">WebP herunterladen</span><span aria-hidden="true">↗</span></button>
-          <p id="status" class="status" role="status" aria-live="polite">Wähle zuerst ein Bild aus.</p>
-        </section>
-      </div>
-      <div class="tools-foot"><span class="local-dot">●</span> Lokal in deinem Browser<br><span class="subtle">Bilder werden nicht hochgeladen.</span></div>
-    </aside>
-  </div>
-  <footer class="statusbar"><span>● Lokal in deinem Browser</span><span id="formatSummary">JPG / PNG / WEBP → WEBP</span></footer>
+        </div>
+  </dialog>
   <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden>
 </body>
 </html>
