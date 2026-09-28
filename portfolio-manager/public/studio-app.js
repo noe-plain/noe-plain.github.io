@@ -31,8 +31,107 @@ const add=document.createElement('div');add.className='add-block';const menu=doc
 function renderBlock(b,index){const detail=document.createElement('details');detail.className='block';const summary=document.createElement('summary');summary.textContent=String(index+1).padStart(2,'0')+'  '+(blockNames[b.type]||b.type)+(b.title?' · '+b.title:'');detail.append(summary);const body=document.createElement('div');body.className='block-body';const tools=document.createElement('div');tools.className='block-tools';for(const [label,offset]of [['↑',-1],['↓',1]]){const btn=button(label,()=>{const blocks=data[selected].blocks;const to=index+offset;if(to<0||to>=blocks.length)return;[blocks[index],blocks[to]]=[blocks[to],blocks[index]];mark();renderFields();});btn.setAttribute('aria-label',offset<0?'Block nach oben':'Block nach unten');btn.disabled=index+offset<0||index+offset>=data[selected].blocks.length;tools.append(btn);}tools.append(button('Entfernen',()=>{if(confirm('Diesen Block entfernen?')){data[selected].blocks.splice(index,1);mark();renderFields();}}));body.append(tools);
 const specs={heading:[['Text','text'],['Ebene (h2 oder h3)','level']],text:[['Text / HTML','html',true]],hero:[['Bildpfad','imageUrl'],['Bildunterschrift','text']],pdf:[['Titel','title'],['PDF-Pfad','pdfUrl'],['Vorschaubild','imageUrl']],youtube:[['Video-ID','videoId'],['Titel','title'],['Rollen (mit Komma trennen)','tags']],beforeafter:[['Vorher · Bildpfad','imageUrl'],['Nachher · Bildpfad','imageUrlAfter']],gallery:[['Titel','title']],media:[['Titel','title']]};
 for(const [label,key,area]of specs[b.type]||[]){if(b.type==='text'&&key==='html'){body.append(richText(b));}else body.append(field(label,b[key],v=>b[key]=v,{area}));}
-if(['gallery','media'].includes(b.type)){(b.items||[]).forEach((item,i)=>{const box=document.createElement('div');box.className='gallery-item';if(item.imageUrl){const thumb=document.createElement('img');thumb.className='media-thumb';thumb.alt=item.title||'';thumb.loading='lazy';thumb.src=item.imageUrl.replace(/^\.\.\/\.\.\//,'/');box.append(thumb);}box.append(field('Bild '+(i+1)+' · Pfad',item.imageUrl,v=>item.imageUrl=v),field('Titel',item.title,v=>item.title=v));box.append(button('↑',()=>{if(i){[b.items[i-1],b.items[i]]=[b.items[i],b.items[i-1]];mark();renderFields();}}),button('Bild entfernen',()=>{b.items.splice(i,1);mark();renderFields();}));body.append(box);});body.append(button('Bilder auswählen / hochladen',()=>pickMedia(items=>{b.items??=[];const urls=new Set(b.items.map(item=>item.imageUrl));for(const item of items){if(urls.has(item.url))continue;b.items.push({id:uid(),type:'image',imageUrl:item.url,title:item.title||''});urls.add(item.url);}mark();renderFields();$('#fields').querySelectorAll('.block')[index].open=true;},{multiple:true,imagesOnly:true}),'primary'));}
+if(['gallery','media'].includes(b.type)) body.append(galleryEditor(b));
 detail.append(body);return detail;}
+function galleryEditor(block) {
+    const wrap = document.createElement('section');
+    wrap.className = 'gallery-editor';
+    wrap.setAttribute('aria-label', 'Bilder der Galerie');
+    block.items ??= [];
+    let removed = null;
+    const filename = item => {
+        try { return decodeURIComponent((item.imageUrl || '').split('/').pop().split('?')[0]); }
+        catch { return item.imageUrl || 'Bild ohne Datei'; }
+    };
+    function render(focusIndex, action) {
+        wrap.replaceChildren();
+        const head = document.createElement('div');
+        head.className = 'gallery-heading';
+        const count = document.createElement('strong');
+        count.textContent = `${block.items.length} ${block.items.length === 1 ? 'Bild' : 'Bilder'}`;
+        head.append(count, button('＋ Bilder hinzufügen', () => pickMedia(items => {
+            const urls = new Set(block.items.map(item => item.imageUrl));
+            let added = 0;
+            for (const item of items) {
+                if (urls.has(item.url)) continue;
+                block.items.push({ id: uid(), type: 'image', imageUrl: item.url, title: item.title || '' });
+                urls.add(item.url); added++;
+            }
+            if (added) mark();
+            render();
+            notice(added ? `${added} Bilder zur Galerie hinzugefügt.` : 'Diese Bilder sind bereits in der Galerie.');
+        }, { multiple: true, imagesOnly: true }), 'primary'));
+        const help = document.createElement('p');
+        help.className = 'hint gallery-help';
+        help.textContent = 'Wähle mehrere Bilder aus der Mediathek oder lade neue hoch. Die Reihenfolge hier entspricht der Website.';
+        wrap.append(head, help);
+        if (removed) {
+            const undo = document.createElement('div'); undo.className = 'gallery-undo'; undo.setAttribute('role', 'status');
+            undo.append(document.createTextNode('Bild aus der Galerie entfernt.'), button('Rückgängig', () => {
+                block.items.splice(Math.min(removed.index, block.items.length), 0, removed.item);
+                removed = null; mark(); render();
+            }));
+            wrap.append(undo);
+        }
+        if (!block.items.length) {
+            const empty = document.createElement('div'); empty.className = 'gallery-blank';
+            const title = document.createElement('strong'); title.textContent = 'Deine Galerie ist noch leer';
+            const hint = document.createElement('p'); hint.textContent = 'Füge oben die ersten Bilder hinzu. Du kannst sie danach jederzeit umsortieren.';
+            empty.append(title, hint); wrap.append(empty);
+        }
+        const list = document.createElement('ol'); list.className = 'gallery-cards';
+        block.items.forEach((item, index) => {
+            const card = document.createElement('li'); card.className = 'gallery-card';
+            const overview = document.createElement('div'); overview.className = 'gallery-card-overview';
+            const image = document.createElement('img'); image.src = (item.imageUrl || '').replace(/^\.\.\/\.\.\//, '/');
+            image.alt = item.title || filename(item); image.loading = 'lazy';
+            const info = document.createElement('div'); info.className = 'gallery-card-info';
+            const position = document.createElement('span'); position.textContent = `Bild ${index + 1}`;
+            const title = document.createElement('strong'); title.textContent = item.title || filename(item) || 'Ohne Titel';
+            info.append(position, title); overview.append(image, info); card.append(overview);
+            const toolbar = document.createElement('div'); toolbar.className = 'gallery-card-actions';
+            for (const [text, offset, key] of [['↑ Früher', -1, 'earlier'], ['↓ Später', 1, 'later']]) {
+                const move = button(text, () => {
+                    const target = index + offset;
+                    if (target < 0 || target >= block.items.length) return;
+                    [block.items[index], block.items[target]] = [block.items[target], block.items[index]];
+                    mark(); render(target, key); notice(`Bild an Position ${target + 1} verschoben.`);
+                });
+                move.dataset.action = key;
+                move.setAttribute('aria-label', `Bild ${index + 1} ${offset < 0 ? 'nach vorne' : 'nach hinten'} verschieben`);
+                move.disabled = index + offset < 0 || index + offset >= block.items.length;
+                toolbar.append(move);
+            }
+            card.append(toolbar);
+            const edit = document.createElement('details'); edit.className = 'gallery-card-edit';
+            const summary = document.createElement('summary'); summary.textContent = 'Bild bearbeiten'; edit.append(summary);
+            const content = document.createElement('div'); content.className = 'gallery-card-fields';
+            content.append(field('Bildtitel (optional)', item.title, value => { item.title = value; title.textContent = value || filename(item); image.alt = value || filename(item); }));
+            content.append(button('Bild ersetzen', () => pickMedia(items => {
+                const replacement = items[0];
+                if (!replacement) return;
+                if (block.items.some(other => other !== item && other.imageUrl === replacement.url)) { notice('Dieses Bild ist bereits in der Galerie.', true); return; }
+                item.imageUrl = replacement.url; mark(); render();
+            }, { multiple: true, imagesOnly: true, maxSelection: 1 })));
+            const advanced = document.createElement('details'); advanced.className = 'gallery-file';
+            const fileSummary = document.createElement('summary'); fileSummary.textContent = 'Dateipfad anzeigen / ändern'; advanced.append(fileSummary);
+            advanced.append(field('Dateiadresse', item.imageUrl, value => { item.imageUrl = value; image.src = value.replace(/^\.\.\/\.\.\//, '/'); }));
+            content.append(advanced, button('Aus Galerie entfernen', () => {
+                removed = { item, index }; block.items.splice(index, 1); mark(); render();
+            }, 'danger'));
+            const note = document.createElement('p'); note.className = 'hint'; note.textContent = 'Die Datei bleibt in der Mediathek erhalten.'; content.append(note);
+            edit.append(content); card.append(edit); list.append(card);
+        });
+        wrap.append(list);
+        if (focusIndex !== undefined) {
+            const card = list.children[focusIndex];
+            const target = card?.querySelector(`[data-action="${action}"]:not(:disabled)`) || card?.querySelector('.gallery-card-actions button:not(:disabled)') || card?.querySelector('summary');
+            target?.focus({ preventScroll: true });
+        }
+    }
+    render(); return wrap;
+}
+
 function parsePage(){return new DOMParser().parseFromString(pageHtml,'text/html');}
 function renderPage(root){renderPageForm(root);}
 
@@ -57,24 +156,24 @@ $('#confirm-publish').onclick=safely(async()=>{const btn=$('#confirm-publish');c
 document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=safely(()=>navigate(b.dataset.nav)));document.querySelectorAll('[data-width]').forEach(b=>b.onclick=()=>{$('#preview').style.width=b.dataset.width;$('#preview').style.flexShrink='0';document.querySelectorAll('[data-width]').forEach(el=>el.classList.toggle('active',el===b));});$('#save').onclick=safely(save);$('#new').onclick=safely(create);$('#search').oninput=renderList;$('#publish').onclick=safely(review);window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});document.addEventListener('keydown',safely(async e=>{if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();if(document.querySelector('#manager-dialog form')){document.querySelector('#manager-dialog form').requestSubmit();return;}if(['links','media'].includes(type)){document.querySelector('#manager-dialog form')?.requestSubmit();return;}await save();}}));
 safely(async()=>{({token}=await api('/api/studio/session'));await navigate('dashboard');if(location.search==='?publish')await review();})();
 function richText(block){const wrap=document.createElement('div');const bar=document.createElement('div');bar.className='rich-bar';const editor=document.createElement('div');editor.contentEditable='true';editor.className='rich-editor';editor.setAttribute('role','textbox');editor.setAttribute('aria-label','Artikeltext');editor.setAttribute('aria-multiline','true');editor.innerHTML=block.html||'';for(const [label,command,value]of [['Fett','bold'],['Kursiv','italic'],['Absatz','formatBlock','p'],['Liste','insertUnorderedList']]){const b=button(label,()=>{editor.focus();document.execCommand(command,false,value);block.html=editor.innerHTML;mark();});b.onmousedown=e=>e.preventDefault();bar.append(b);}editor.oninput=()=>{block.html=editor.innerHTML;mark();};wrap.append(bar,editor);return wrap;}
-async function pickMedia(onPick,{multiple=false,imagesOnly=false}={}){
+async function pickMedia(onPick,{multiple=false,imagesOnly=false,maxSelection=Infinity}={}){
     $('#media-dialog')?.remove();const modal=document.createElement('dialog');modal.id='media-dialog';modal.className='editor-media-picker';
     modal.innerHTML='<div class="dialog-heading"><h2></h2><button type="button" aria-label="Schliessen">×</button></div><div class="picker-toolbar"><select aria-label="Medienordner"></select><input type="search" placeholder="Dateinamen suchen …" aria-label="Medien suchen"></div><div class="picker-upload-tools"></div><p class="picker-message hint" role="status"></p><progress class="picker-progress" max="100" hidden></progress><div class="picker-grid"></div><div class="picker-footer"><span role="status"></span><button type="button" class="primary" disabled></button></div>';
-    modal.querySelector('h2').textContent=multiple?'Bilder zur Galerie hinzufügen':'Medien auswählen';
+    modal.querySelector('h2').textContent=maxSelection===1?'Bild ersetzen':multiple?'Bilder zur Galerie hinzufügen':'Medien auswählen';
     let uploading=false,catalog={items:[],folders:[]};const chosen=new Map();const menu=modal.querySelector('select'),search=modal.querySelector('input[type=search]'),grid=modal.querySelector('.picker-grid'),message=modal.querySelector('.picker-message'),progress=modal.querySelector('progress'),insert=modal.querySelector('.picker-footer button');
     const report=error=>{message.textContent=error.message||String(error);message.classList.add('error');};
     const action=fn=>async(...args)=>{try{await fn(...args);}catch(error){report(error);}};
     modal.querySelector('.dialog-heading button').onclick=()=>{if(!uploading)modal.close();};modal.addEventListener('cancel',event=>{if(uploading)event.preventDefault();});modal.addEventListener('close',()=>modal.remove());
-    const updateSelection=()=>{modal.querySelector('.picker-footer span').textContent=`${chosen.size} ausgewählt`;insert.textContent=multiple?`${chosen.size} Bilder einfügen`:'Medium einsetzen';insert.disabled=uploading||!chosen.size;};
+    const updateSelection=()=>{modal.querySelector('.picker-footer span').textContent=`${chosen.size} ausgewählt`;insert.textContent=maxSelection===1?'Bild übernehmen':multiple?`${chosen.size} Bilder einfügen`:'Medium einsetzen';insert.disabled=uploading||!chosen.size;};
     insert.onclick=()=>{if(uploading||!chosen.size)return;const values=[...chosen.values()];modal.close();onPick(multiple?values:values[0].url);};
     function render(){
         grid.replaceChildren();const query=search.value.toLowerCase();const items=catalog.items.filter(item=>(!imagesOnly||item.image)&&(menu.value==='*'||item.folder===menu.value)&&item.title.toLowerCase().includes(query));
-        for(const item of items){const card=document.createElement('button');card.type='button';card.className='picker-choice';card.disabled=uploading;card.setAttribute('aria-pressed',String(chosen.has(item.url)));if(item.image){const img=document.createElement('img');img.src=item.url.replace(/^\.\.\/\.\.\//,'/');img.alt='';img.loading='lazy';card.append(img);}const name=document.createElement('span');name.textContent=item.title;card.append(name);card.onclick=()=>{if(uploading)return;if(multiple){if(chosen.has(item.url))chosen.delete(item.url);else chosen.set(item.url,item);render();}else{modal.close();onPick(item.url);}};grid.append(card);}
+        for(const item of items){const card=document.createElement('button');card.type='button';card.className='picker-choice';card.disabled=uploading;card.setAttribute('aria-pressed',String(chosen.has(item.url)));if(item.image){const img=document.createElement('img');img.src=item.url.replace(/^\.\.\/\.\.\//,'/');img.alt='';img.loading='lazy';card.append(img);}const name=document.createElement('span');name.textContent=item.title;card.append(name);card.onclick=()=>{if(uploading)return;if(multiple){if(chosen.has(item.url))chosen.delete(item.url);else {if(maxSelection===1)chosen.clear();chosen.set(item.url,item);}render();}else{modal.close();onPick(item.url);}};grid.append(card);}
         if(!items.length){const empty=document.createElement('p');empty.className='hint';empty.textContent='Keine passenden Medien. Du kannst hier neue Bilder hochladen.';grid.append(empty);}updateSelection();
     }
-    async function reload(){const folder=menu.value;catalog=await api('/api/studio/media');menu.replaceChildren(new Option('Alle Ordner','*'));[...new Set([...catalog.folders,'uploads'])].forEach(f=>menu.add(new Option(f||'Hauptordner',f)));menu.value=[...menu.options].some(o=>o.value===folder)?folder:'*';render();}
-    const uploadInput=document.createElement('input');uploadInput.type='file';uploadInput.accept='image/*';uploadInput.multiple=multiple;uploadInput.hidden=true;
-    const uploadButton=document.createElement('button');uploadButton.type='button';uploadButton.textContent=multiple?'＋ Bilder hochladen':'＋ Bild hochladen';uploadButton.onclick=()=>{if(!uploading)uploadInput.click();};
+    async function reload(){const folder=menu.options.length?menu.value:'*';catalog=await api('/api/studio/media');menu.replaceChildren(new Option('Alle Ordner','*'));[...new Set([...catalog.folders,'uploads'])].forEach(f=>menu.add(new Option(f||'Hauptordner',f)));menu.value=[...menu.options].some(o=>o.value===folder)?folder:'*';render();}
+    const uploadInput=document.createElement('input');uploadInput.type='file';uploadInput.accept='image/*';uploadInput.multiple=multiple&&maxSelection!==1;uploadInput.hidden=true;
+    const uploadButton=document.createElement('button');uploadButton.type='button';uploadButton.textContent=multiple&&maxSelection!==1?'＋ Bilder hochladen':'＋ Bild hochladen';uploadButton.onclick=()=>{if(!uploading)uploadInput.click();};
     const destination=document.createElement('span');destination.className='hint';const showDestination=()=>{destination.textContent='Upload-Ziel: '+(menu.value==='*'?'uploads':menu.value||'Hauptordner');};modal.querySelector('.picker-upload-tools').append(uploadButton,uploadInput,destination);
     uploadInput.onchange=action(async()=>{
         const files=[...uploadInput.files];if(!files.length)return;
@@ -86,7 +185,7 @@ async function pickMedia(onPick,{multiple=false,imagesOnly=false}={}){
                 message.textContent=`${finished+1}/${files.length}: ${file.name}`;progress.value=0;
                 const body=new FormData();body.append('file',file);body.append('originalName',file.name);body.append('folder',folder);
                 const result=await uploadWithProgress(body,(percent,processing)=>{message.textContent=`${finished+1}/${files.length}: ${file.name} · ${processing?'Bild wird optimiert …':percent===null?'Wird übertragen …':percent+' % übertragen'}`;if(processing||percent===null)progress.removeAttribute('value');else progress.value=percent;});
-                const item={url:result.url,title:file.name,image:true,folder,variants:[result.url]};if(!multiple)chosen.clear();chosen.set(item.url,item);finished++;
+                const item={url:result.url,title:file.name,image:true,folder,variants:[result.url]};if(!multiple||maxSelection===1)chosen.clear();chosen.set(item.url,item);finished++;
             }
             message.textContent=`${finished} Bilder lokal hochgeladen und ausgewählt. Zum Übernehmen auf „${multiple?'Bilder einfügen':'Medium einsetzen'}“ klicken.`;
         }catch(error){report(Error(`${finished} Bilder hochgeladen. ${error.message} Erfolgreiche Uploads bleiben in der Mediathek.`));}
@@ -96,7 +195,7 @@ async function pickMedia(onPick,{multiple=false,imagesOnly=false}={}){
         }
     });
     menu.onchange=()=>{showDestination();render();};search.oninput=render;
-    document.body.append(modal);modal.showModal();message.textContent=multiple?'Mehrere Bilder anklicken. Die Auswahl bleibt beim Wechsel von Ordner und Suche erhalten.':'Ein Medium anklicken oder direkt ein neues Bild hochladen.';
+    document.body.append(modal);modal.showModal();message.textContent=maxSelection===1?'Wähle ein Ersatzbild aus und bestätige mit „Bild übernehmen“.':multiple?'Mehrere Bilder anklicken. Die Auswahl bleibt beim Wechsel von Ordner und Suche erhalten.':'Ein Medium anklicken oder direkt ein neues Bild hochladen.';
     try{await reload();showDestination();}catch(error){report(error);}
 }
 

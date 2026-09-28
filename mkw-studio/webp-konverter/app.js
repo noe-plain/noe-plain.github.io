@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const maxPixels = 24_000_000, golden = (3 - Math.sqrt(5)) / 2;
+  const maxPixels = 50_000_000, maxSourcePixels = 50_000_000, golden = (3 - Math.sqrt(5)) / 2;
   const formats = { webp: { label: 'WebP' }, jpg: { label: 'JPG' } };
   const s = {
     items: [], nextSizeId: 1, selected: 0, selectedSize: 0, step: 'edit', format: 'webp',
@@ -31,7 +31,7 @@
   function sizeError() {
     for (const item of s.items) {
       if (!item.resize) continue;
-      if (item.sizes.some(size => !validSize(size))) return `${item.file.name}: Jede Grösse benötigt 1 bis 10 000 px je Seite; maximal 24 Megapixel.`;
+      if (item.sizes.some(size => !validSize(size))) return `${item.file.name}: Jede Grösse benötigt 1 bis 10 000 px je Seite; maximal 50 Megapixel.`;
       const keys = item.sizes.map(size => `${size.w}x${size.h}`);
       if (new Set(keys).size !== keys.length) return `${item.file.name}: Diese Zielgrösse ist schon vorhanden. Bitte die doppelte Grösse ändern oder entfernen.`;
     }
@@ -59,11 +59,12 @@
         let name = `${base}${dimensions}.${s.format}`, suffix = 2;
         while (used.has(name)) name = `${base}-${suffix++}${dimensions}.${s.format}`;
         used.add(name);
-        return { image: item.image, imageIndex, sizeId: target.id, w: target.w, h: target.h,
+        return { image: boardSource(item, target.id).image, imageIndex, sizeId: target.id, w: target.w, h: target.h,
           resize: item.resize, crop: item.resize ? { ...cropFor(item, target.id) } : { zoom: 1, panX: 0, panY: 0 }, name };
       });
     });
   }
+  const boardSource = (item, sizeId) => item.sources?.[sizeId] || item;
   const jobKey = job => `${job.imageIndex}:${job.sizeId}`;
   const selectedJobs = () => jobs().filter(job => !s.excluded.has(jobKey(job)));
   function renderExportCards() {
@@ -104,9 +105,6 @@
   function updateControls() {
     const count = s.items.length, outputs = selectedJobs().length;
     const error = sizeError(), label = formats[s.format].label;
-    $('selectionCount').textContent = count;
-    $('chooseLabel').textContent = count ? 'Auswahl ersetzen' : 'Bilder auswählen';
-    $('selectionHint').textContent = count ? 'Eine neue Auswahl ersetzt die bisherigen Bilder.' : 'Dateien hierher ziehen oder auswählen.';
     $('workflowCount').textContent = count ? `${count}` : '';
     $('artboardCount').textContent = `${outputs} ${outputs === 1 ? 'ZEICHENFLÄCHE' : 'ZEICHENFLÄCHEN'}`;
     $('exportSummary').textContent = count
@@ -117,11 +115,11 @@
     document.querySelectorAll('button, input, select').forEach(control => { control.disabled = busy(); });
     document.querySelectorAll('[data-remove-size]').forEach(button => { button.disabled = busy() || sizes().length === 1; });
     $('zoom').disabled = $('resetCrop').disabled = busy() || !count;
-    $('filename').disabled = busy() || !count;
     for (const id of ['modeOriginal', 'modeResize', 'targetWidth', 'targetHeight', 'addSize']) $(id).disabled = busy() || !count;
     document.querySelectorAll('[data-size]').forEach(button => { button.disabled = busy() || !count; });
     $('workflowExport').disabled = busy() || !count;
-    document.querySelectorAll('[data-add-board]').forEach(button => { button.hidden = s.step !== 'edit'; });
+    document.querySelectorAll('[data-add-board], [data-replace-board]').forEach(button => { button.hidden = s.step !== 'edit'; });
+    $('addImages').hidden = s.step !== 'edit';
     $('workflowEdit').setAttribute('aria-current', s.step === 'edit' ? 'step' : 'false');
     $('workflowExport').setAttribute('aria-current', s.step === 'export' ? 'step' : 'false');
     $('download').disabled = s.step !== 'export' || busy() || !outputs || !canExport() || !!error;
@@ -166,8 +164,6 @@
     s.boards.forEach((board, index) => {
       board.filename.textContent = plan[index].name; board.filename.title = plan[index].name;
     });
-    const job = plan.find(job => job.imageIndex === s.selected && (!job.resize || job.sizeId === s.selectedSize));
-    $('filenamePreview').textContent = job ? job.name : '';
     (s.groups || []).forEach((group, index) => {
       if (group.nameInput.value !== s.items[index].name) group.nameInput.value = s.items[index].name;
       const names = plan.filter(job => job.imageIndex === index).map(job => job.name);
@@ -183,15 +179,12 @@
     }
     $('resizeControls').hidden = !resize;
     $('sizeExplanation').textContent = resize ? 'Zeichenflächen nur für dieses Bild. Jede Grösse und jeder Ausschnitt lassen sich einzeln bearbeiten.' : 'Dieses Bild behält seine Originalmasse.';
-    $('sizeImageName').textContent = item ? item.file.name : 'Zuerst ein Bild auswählen';
+    const activeSource = item ? boardSource(item, item.resize ? target.id : 0) : null;
+    $('sizeImageName').textContent = activeSource ? activeSource.file.name : 'Zuerst ein Bild auswählen';
     $('targetWidth').value = Number.isFinite(target.w) && target.w ? target.w : '';
     $('targetHeight').value = Number.isFinite(target.h) && target.h ? target.h : '';
-    $('sourceDetails').hidden = !item;
-    if (item) {
-      $('sourceName').textContent = item.file.name;
-      $('sourceMeta').textContent = `${item.image.naturalWidth} × ${item.image.naturalHeight} px · ${prettyBytes(item.file.size)}`;
-      $('filename').value = item.name;
-    }
+    $('selectedImageNumber').textContent = item ? String(s.selected + 1).padStart(2, '0') : '–';
+    $('selectedImageMeta').textContent = activeSource ? `${activeSource.image.naturalWidth} × ${activeSource.image.naturalHeight} px · ${prettyBytes(activeSource.file.size)}` : 'Wähle ein Bild auf der Arbeitsfläche.';
     const crop = item ? cropFor(item, target.id) : { zoom: 1 };
     $('zoom').value = Math.round(crop.zoom * 100); $('zoomValue').textContent = `${Math.round(crop.zoom * 100)} %`;
     $('activeArtboard').textContent = item ? `${item.file.name} · ${target.w} × ${target.h} px` : 'Noch kein Bild ausgewählt';
@@ -213,7 +206,7 @@
     renderSizes(); syncSelection(); updateControls();
   }
   function drawBoard(board) {
-    const item = s.items[board.imageIndex];
+    const item = s.items[board.imageIndex], source = boardSource(item, board.sizeId);
     const target = item.resize ? item.sizes.find(size => size.id === board.sizeId) : { w: item.image.naturalWidth, h: item.image.naturalHeight };
     const valid = item.resize ? validSize(target) : target.w > 0 && target.h > 0;
     const gcd = (a, b) => b ? gcd(b, a % b) : a;
@@ -230,8 +223,9 @@
     board.canvas.width = Math.max(1, Math.round(target.w * factor));
     board.canvas.height = Math.max(1, Math.round(target.h * factor));
     const crop = cropFor(item, board.sizeId);
-    paint(board.canvas, { image: item.image, ...target, resize: item.resize, crop }, s.format);
-    board.canvas.setAttribute('aria-label', `${item.file.name}, ${target.w} × ${target.h} Pixel`);
+    paint(board.canvas, { image: source.image, ...target, resize: item.resize, crop }, s.format);
+    board.sourceLabel.textContent = source.file.name;
+    board.canvas.setAttribute('aria-label', `${source.file.name}, ${target.w} × ${target.h} Pixel`);
     board.frame.classList.toggle('draggable', item.resize && s.step === 'edit'); drawGuides(board.guides, item.resize);
   }
   function element(tag, className, text) {
@@ -280,8 +274,16 @@
       guides.setAttribute('class', 'guides'); guides.setAttribute('viewBox', '0 0 100 100'); guides.setAttribute('preserveAspectRatio', 'none'); guides.setAttribute('aria-hidden', 'true');
       frame.append(canvas, guides);
       const invalid = element('p', 'invalid-board', 'Bitte eine gültige Zielgrösse eingeben.'); body.append(frame, invalid);
-      const filename = element('div', 'artboard-filename'); card.append(select, body, filename);
-      const board = { ...job, card, select, title, dimensions, frame, canvas, guides, invalid, filename }; bindArtboard(board); drawBoard(board); return board;
+      const header = element('div', 'artboard-header'), replace = element('button', 'replace-board', '↻ Ersetzen'); replace.type = 'button'; replace.dataset.replaceBoard = 'true';
+      replace.setAttribute('aria-label', `Bild dieser Zeichenfläche ersetzen: ${s.items[job.imageIndex].file.name}, ${job.w} × ${job.h} Pixel`);
+      replace.addEventListener('click', () => {
+        if (busy() || s.step !== 'edit') return;
+        replacementTarget = { item: s.items[job.imageIndex], sizeId: job.sizeId };
+        $('replaceFileInput').click();
+      });
+      header.append(select, replace);
+      const sourceLabel = element('small', 'board-source'), filename = element('div', 'artboard-filename'); card.append(header, sourceLabel, body, filename);
+      const board = { ...job, card, select, title, dimensions, frame, canvas, guides, invalid, filename, sourceLabel }; bindArtboard(board); drawBoard(board); return board;
     });
     s.groups = s.items.map((item, imageIndex) => {
       const group = element('section', 'image-group');
@@ -307,13 +309,11 @@
       nameInput.addEventListener('input', () => {
         if (busy()) return;
         item.name = nameInput.value;
-        if (s.selected === imageIndex) $('filename').value = item.name;
         updateNames();
       });
       resetName.addEventListener('click', () => {
         if (busy()) return;
         item.name = item.file.name.replace(/\.[^.]+$/, '') || 'bild';
-        if (s.selected === imageIndex) $('filename').value = item.name;
         updateNames();
       });
       naming.append(label, resetName, namePreview); heading.append(naming);
@@ -337,6 +337,8 @@
         if (busy() || sizes().length === 1) return;
         selectedItem().sizes = sizes().filter(value => value.id !== size.id);
         delete selectedItem().crops[size.id];
+        const oldSource = selectedItem().sources?.[size.id];
+        if (oldSource) { URL.revokeObjectURL(oldSource.url); delete selectedItem().sources[size.id]; }
         if (s.selectedSize === size.id) s.selectedSize = sizes()[0].id;
         renderSizes(); rebuildBoards();
       });
@@ -357,7 +359,7 @@
   function setStep(step) {
     if (busy() || (step === 'export' && !s.items.length)) return;
     s.step = step; s.drag = null;
-    $('sourceSection').hidden = $('sizeSection').hidden = step === 'export';
+    $('sizeSection').hidden = step === 'export';
     $('exportSection').hidden = step !== 'export';
     $('workflowEdit').classList.toggle('current', step === 'edit');
     $('workflowExport').classList.toggle('current', step === 'export');
@@ -378,7 +380,6 @@
     for (const [id, value] of [['formatWebp', 'webp'], ['formatJpg', 'jpg']]) {
       $(id).classList.toggle('selected', format === value); $(id).setAttribute('aria-pressed', String(format === value));
     }
-    $('filenameExtension').textContent = '.' + format;
 
     $('formatSummary').textContent = 'JPG / PNG / WEBP → ' + formats[format].label.toUpperCase();
     $('formatHint').textContent = format === 'jpg' ? 'Transparente Flächen werden weiss.' : 'Transparenz bleibt erhalten.';
@@ -423,12 +424,9 @@
   });
   $('guideType').addEventListener('change', () => s.boards.forEach(board => drawGuides(board.guides, s.items[board.imageIndex].resize)));
   $('quality').addEventListener('input', event => { $('qualityValue').textContent = event.target.value + ' %'; });
-  $('filename').addEventListener('input', () => {
-    if (busy() || !s.items.length) return;
-    s.items[s.selected].name = $('filename').value; updateNames();
-  });
 
-  async function loadFiles(files) {
+
+  async function loadFiles(files, append = false) {
     if (busy() || s.step !== 'edit' || !files.length) return;
     s.loading = true; updateControls(); const items = [], errors = [];
     try {
@@ -440,25 +438,61 @@
         try {
           await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = () => reject(Error('Bild konnte nicht gelesen werden')); image.src = url; });
           if (!image.naturalWidth || !image.naturalHeight) throw Error('Keine lesbaren Pixel');
-          if (image.naturalWidth * image.naturalHeight > maxPixels) throw Error('Mehr als 24 Megapixel');
+          if (image.naturalWidth * image.naturalHeight > maxSourcePixels) throw Error('Das Ausgangsbild überschreitet 50 Megapixel.');
           const factor = Math.min(1, 10000 / Math.max(image.naturalWidth, image.naturalHeight));
           items.push({ image, file, url, name: file.name.replace(/\.[^.]+$/, '') || 'bild', crops: {}, resize: false,
             sizes: [{ id: s.nextSizeId++, w: Math.max(1, Math.round(image.naturalWidth * factor)), h: Math.max(1, Math.round(image.naturalHeight * factor)) }] });
         } catch (error) { URL.revokeObjectURL(url); errors.push(`${file.name}: ${error.message}`); }
       }
       if (items.length) {
-        s.items.forEach(item => URL.revokeObjectURL(item.url)); s.items = items; s.excluded.clear(); s.selected = 0; s.selectedSize = items[0].sizes[0].id; renderSizes(); rebuildBoards();
+        if (append) {
+          const firstNew = s.items.length;
+          s.items.push(...items); s.selected = firstNew;
+        } else {
+          s.items.forEach(item => { URL.revokeObjectURL(item.url); Object.values(item.sources || {}).forEach(source => URL.revokeObjectURL(source.url)); }); s.items = items;
+          s.excluded.clear(); s.selected = 0;
+        }
+        s.selectedSize = items[0].sizes[0].id; renderSizes(); rebuildBoards();
       }
     } finally { s.loading = false; ready(); if (errors.length) status(errors.join(' · '), true); }
   }
+  let replacementTarget = null;
+  async function replaceBoardImage(file, target) {
+    if (!file || !target || busy() || s.step !== 'edit' || !s.items.includes(target.item)) return;
+    if (!(/^image\/(jpeg|png|webp)$/.test(file.type) || (!file.type && /\.(jpe?g|png|webp)$/i.test(file.name)))) { status('Bitte JPG, PNG oder WebP auswählen.', true); return; }
+    s.loading = true; updateControls(); const url = URL.createObjectURL(file), image = new Image();
+    try {
+      await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = () => reject(Error('Bild konnte nicht gelesen werden.')); image.src = url; });
+      if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > maxSourcePixels) throw Error('Das Bild ist ungültig oder überschreitet 50 Megapixel.');
+      const item = target.item, sizeId = target.sizeId || item.sizes[0].id;
+      if (!item.sizes.some(size => size.id === sizeId)) throw Error('Die Zeichenfläche existiert nicht mehr.');
+      item.sources ||= {};
+      if (item.sources[sizeId]) URL.revokeObjectURL(item.sources[sizeId].url);
+      item.sources[sizeId] = { image, file, url };
+      if (!item.resize) {
+        item.resize = true;
+        if (s.excluded.delete(`${s.items.indexOf(item)}:0`)) s.excluded.add(`${s.items.indexOf(item)}:${sizeId}`);
+      }
+      s.selected = s.items.indexOf(item); s.selectedSize = sizeId;
+      renderSizes(); rebuildBoards(); status('Bild dieser Zeichenfläche ersetzt.');
+    } catch (error) { URL.revokeObjectURL(url); status(error.message, true); }
+    finally { s.loading = false; updateControls(); }
+  }
+  $('replaceFileInput').addEventListener('change', event => {
+    const target = replacementTarget; replacementTarget = null;
+    replaceBoardImage(event.target.files[0], target); event.target.value = '';
+  });
+  const addInput = $('addFileInput');
+  $('addImages').addEventListener('click', () => addInput.click());
+  addInput.addEventListener('change', event => { loadFiles(Array.from(event.target.files), true); addInput.value = ''; });
   const input = $('fileInput');
-  $('chooseMain').addEventListener('click', () => input.click()); $('chooseSide').addEventListener('click', () => input.click());
+  $('chooseMain').addEventListener('click', () => input.click());
   input.addEventListener('change', event => { loadFiles(Array.from(event.target.files)); input.value = ''; });
   const drop = $('dropArea'); let dragDepth = 0;
   drop.addEventListener('dragenter', event => { event.preventDefault(); if (busy()) return; dragDepth++; drop.classList.add('drag-active'); $('dragOverlay').hidden = false; });
   drop.addEventListener('dragover', event => { event.preventDefault(); event.dataTransfer.dropEffect = busy() ? 'none' : 'copy'; });
   drop.addEventListener('dragleave', event => { event.preventDefault(); dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) { drop.classList.remove('drag-active'); $('dragOverlay').hidden = true; } });
-  drop.addEventListener('drop', event => { event.preventDefault(); dragDepth = 0; drop.classList.remove('drag-active'); $('dragOverlay').hidden = true; loadFiles(Array.from(event.dataTransfer.files)); });
+  drop.addEventListener('drop', event => { event.preventDefault(); dragDepth = 0; drop.classList.remove('drag-active'); $('dragOverlay').hidden = true; loadFiles(Array.from(event.dataTransfer.files), true); });
   async function fallbackWebP(canvas,quality){
     if(!codecPromise){
       codecPromise=(async()=>{const base64=window.MKWWebPWasm,raw=atob(base64),binary=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)binary[i]=raw.charCodeAt(i);const module=await window.MKWWebPCodec({wasmBinary:binary});window.MKWWebPWasm=null;return module})();

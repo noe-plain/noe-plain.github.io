@@ -1,4 +1,5 @@
 const sharp = require('sharp');
+const { photoMetadata } = require('./photo-metadata');
 const ffmpegPath = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
@@ -42,7 +43,12 @@ async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standa
     const mobileJpegPath = path.join(destDir, `${baseNameWithoutExt}-mobile.jpg`);
     const webpPath = path.join(destDir, `${baseNameWithoutExt}.webp`);
     const mobileWebpPath = path.join(destDir, `${baseNameWithoutExt}-mobile.webp`);
-    const image = () => sharp(rawFilePath).rotate().flatten({ background: '#ffffff' });
+    const metadata = photoMetadata((await sharp(rawFilePath).metadata()).exif);
+    const image = () => {
+        const pipeline = sharp(rawFilePath).rotate().flatten({ background: '#ffffff' });
+        // Replace EXIF rather than merging it; other source metadata stays stripped.
+        return Object.keys(metadata).length ? pipeline.withExif(metadata) : pipeline;
+    };
     // Full dimensions and maximum JPEG quality. Smaller variants never upscale.
     await image().jpeg({ quality: 100, chromaSubsampling: '4:4:4' }).toFile(standardPath);
     await image().resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 85 }).toFile(mobileJpegPath);

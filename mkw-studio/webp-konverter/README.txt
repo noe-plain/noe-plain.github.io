@@ -7,7 +7,7 @@ Das Tool läuft lokal und benötigt keine Internetverbindung.
 Schritt 1: Bilder bearbeiten
 ---------------------------
 Eine oder mehrere JPG-, JPEG-, PNG- oder WebP-Dateien auswählen oder auf die
-Arbeitsfläche ziehen. Eine neue Auswahl ersetzt die bisherigen Bilder.
+Arbeitsfläche ziehen. Weitere Bilder lassen sich über die Karte unter den Zeichenflächen hinzufügen.
 Jedes Bild erhält eine eigene Zeichenfläche, alle werden gleichzeitig angezeigt.
 
 Ein Bild über seine Zeichenfläche auswählen. Die Einstellungen rechts gelten
@@ -55,8 +55,10 @@ und im Export stimmen überein.
 
 Transparenz bleibt in WebP erhalten; bei JPG werden transparente Flächen weiss.
 Der enthaltene lokale WebP-Encoder übernimmt, falls der Browser WebP nicht
-selbst ausgeben kann. Der Ausgabetyp wird geprüft. Pro Bild bzw. Zielgrösse
-sind maximal 24 Megapixel erlaubt (Zielseiten maximal 10 000 Pixel).
+selbst ausgeben kann. Der Ausgabetyp wird geprüft. Ausgangsbilder dürfen
+bis zu 50 Megapixel haben, auch beim Hinzufügen oder Ersetzen. Im Originalmodus
+bleiben ihre Pixelmasse erhalten. Resize-Zielgrössen sind auf 50 Megapixel
+und maximal 10 000 Pixel je Seite begrenzt.
 
 Lizenztexte für den mitgelieferten WebP-Encoder: assets/LICENSES.txt.
 
@@ -77,4 +79,17 @@ das Schliessen gesperrt. Alle Bilder bleiben lokal im Browser.
 Jede Bildleiste enthält ein eigenes Feld für den Exportnamen. Der Name gilt
 für alle Zeichenflächen dieses Bildes. Darunter stehen die tatsächlichen
 web-safe Dateinamen mit Grössen. „Originalname“ stellt den ursprünglichen
-Basisnamen wieder her. Das Namensfeld in der Seitenleiste bleibt synchron.
+Basisnamen wieder her. Die Benennung erfolgt direkt in der jeweiligen Bildleiste.
+
+Bilder hinzufügen und ersetzen
+------------------------------
+Unter allen Zeichenflächen befindet sich die Karte „Bilder hinzufügen“.
+Sie ergänzt die bestehende Auswahl. Hineingezogene Dateien werden ebenfalls
+hinzugefügt. Vorhandene Namen, Zeichenflächen und Ausschnitte bleiben erhalten.
+
+Jede Zeichenflächen-Überschrift hat einen eigenen „Ersetzen“-Button. Er tauscht
+nur das Bild dieser Zeichenfläche aus. Andere Zeichenflächen bleiben unverändert.
+Zielmasse und Exportname bleiben bestehen. Der Ausschnitt bleibt soweit möglich
+erhalten und wird bei anderer Bildproportion auf die neue Bildfläche begrenzt.
+Unter der Überschrift wird der tatsächliche Quelldateiname angezeigt.
+Die Seitenleiste zeigt die Quelle der ausgewählten Zeichenfläche.

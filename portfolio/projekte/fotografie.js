@@ -341,12 +341,18 @@ function updateDetailContent(item) {
             function addBadge(container, icon, text) {
                 const s = document.createElement('span');
                 s.className = "spec-badge";
-                s.innerHTML = `<i class="${icon}"></i> ${text}`;
+                const glyph = document.createElement('i');
+                glyph.className = icon;
+                glyph.setAttribute('aria-hidden', 'true');
+                s.append(glyph, document.createTextNode(` ${text}`));
                 container.appendChild(s);
             }
 
             if (exif) {
-                if (exif.Model) addBadge(specsEq, "fas fa-camera", exif.Model);
+                if (exif.Model) {
+                    const model = String(exif.Model).trim();
+                    addBadge(specsEq, "fas fa-camera", model.toUpperCase() === 'ILCE-7CM2' ? 'Sony a7c II' : model);
+                }
                 if (exif.LensModel) addBadge(specsEq, "fas fa-circle-notch", exif.LensModel);
 
                 if (exif.FNumber) addBadge(specsTech, "fas fa-bullseye", `f/${exif.FNumber}`);
