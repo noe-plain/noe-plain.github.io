@@ -17,5 +17,6 @@ function headingDate(text){
  if(!m)return '';const month=/^\d+$/.test(m[2])?+m[2]:months.indexOf(m[2].replace('MAERZ','MÄR').slice(0,3))+1,year=+m[3]<100?2000+(+m[3]):+m[3];if(year<2000||year>2099)return '';const value=m[1].padStart(2,'0')+'.'+String(month).padStart(2,'0')+'.'+String(year).slice(-2);try{dateName(value);return value}catch{return ''}
 }
 function imageCovers(b,im){const t=b.image,a=-t.angle*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return [[0,0],[b.w,0],[b.w,b.h],[0,b.h]].every(([x,y])=>{const dx=x-t.x,dy=y-t.y;return Math.abs(dx*c-dy*s)<=im.width*t.scale/2+.01&&Math.abs(dx*s+dy*c)<=im.height*t.scale/2+.01})}
-const api={headingDate,imageCovers,ratio,dateName,clean,filenameDate,weekday,names}; if(typeof module!=='undefined')module.exports=api;else root.MKW=api;
+function projectName(meta){let date='';try{date=dateName(meta.date)}catch{}return [date,meta.code&&clean(meta.code),clean(meta.title||'Ohne-Titel')].filter(Boolean).join('_')}
+const api={projectName,headingDate,imageCovers,ratio,dateName,clean,filenameDate,weekday,names}; if(typeof module!=='undefined')module.exports=api;else root.MKW=api;
 })(globalThis);

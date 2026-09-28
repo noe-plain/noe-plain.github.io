@@ -129,7 +129,7 @@ async function writeSaveFile(handle,blob,name){
 }
 function setSaveBusy(value){busy=value;for(const id of ['savePSD','saveProject','closeSave','saveName'])$('#'+id).disabled=value}
 $('#save').onclick=()=>{
- if(editingText)editingText.el.blur();$('#psdStatus').textContent='';$('#saveName').value=MKW.clean(p.meta.title);
+ if(editingText)editingText.el.blur();$('#psdStatus').textContent='';const inferred=MKW.headingDate(p.boards.find(b=>b.imageId===p.images[0]?.id)?.elements.date.text||'');if(inferred)p.meta.date=inferred;$('#saveName').value=MKW.projectName(p.meta);
  $('#saveLocationHint').textContent=window.showSaveFilePicker?'Im nächsten Schritt wählst du den Speicherort.':'Dieser Browser speichert per Download. Den Speicherort bestimmt deine Browser-Einstellung.';
  $('#saveDialog').showModal();
 };
