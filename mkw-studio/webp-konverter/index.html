@@ -27,9 +27,10 @@
         <span class="empty-formats">IMPORT: JPG · PNG · WEBP</span>
       </div>
       <div id="previewState" class="artboard-workspace" hidden>
-        <div class="workspace-heading"><div><span class="eyebrow">DEINE ARBEITSFLÄCHE</span><h1 id="workspaceTitle">Zeichenflächen</h1></div><span id="artboardCount" class="preview-badge">0 ZEICHENFLÄCHEN</span></div>
+        <div class="workspace-heading"><div><span class="eyebrow">DEINE ARBEITSFLÄCHE</span><h1 id="workspaceTitle">Zeichenflächen</h1></div><div class="workspace-heading-actions"><span id="artboardCount" class="preview-badge">0 ZEICHENFLÄCHEN</span></div></div>
         <p class="workspace-hint" id="canvasHint">Ein Bild auswählen, Zeichenflächen hinzufügen und jeden Ausschnitt einzeln anpassen.</p>
         <div id="artboardGrid" class="artboard-grid" aria-label="Alle Bilder und Zielgrössen"></div>
+        <button id="addImages" type="button" class="add-image-card"><span class="add-image-symbol" aria-hidden="true">＋</span><span><strong>Bilder hinzufügen</strong><small>JPG, PNG oder WebP · Bestehende Zeichenflächen bleiben erhalten</small></span></button>
       </div>
       <div id="dragOverlay" class="drag-overlay" hidden>Bilder hier ablegen</div>
       <nav class="workflow" aria-label="Workflow"><button id="workflowEdit" type="button" class="workflow-item current" aria-current="step"><span class="step-icon" aria-hidden="true">▧</span>Bilder bearbeiten <span id="workflowCount" class="workflow-count"></span></button><span class="workflow-arrow" aria-hidden="true">›</span><button id="workflowExport" type="button" class="workflow-item"><span class="step-icon" aria-hidden="true">↗</span>Export</button></nav>
@@ -38,19 +39,9 @@
     <aside class="tools" aria-label="Konvertierungswerkzeuge">
       <div class="tools-head"><span class="eyebrow">WERKZEUGE</span><h2 id="toolsTitle">Bilder bearbeiten</h2><p id="toolsSubtitle">Zeichenflächen pro Bild anlegen.</p></div>
       <div class="tools-body">
-        <section class="tool-section" id="sourceSection">
-          <div class="section-title"><span class="section-no">01</span><h3>Bilder</h3><span class="section-badge" id="selectionCount">0</span></div>
-          <button id="chooseSide" class="file-button" type="button"><span class="file-button-icon">＋</span><span><strong id="chooseLabel">Bilder auswählen</strong><small>JPG, PNG oder WebP · Mehrfachauswahl</small></span></button>
-          <div id="sourceDetails" class="source-details" hidden><strong id="sourceName"></strong><span id="sourceMeta"></span></div>
-          <p class="microcopy" id="selectionHint">Dateien hierher ziehen oder auswählen.</p>
-          <label class="text-label" for="filename">Dateiname <span class="field-scope">Aktuelles Bild</span></label><div class="filename-wrap"><input id="filename" type="text" value="bild" spellcheck="false"><span id="filenameExtension">.webp</span></div>
-          <p class="microcopy filename-hint">Web-safe: Kleinbuchstaben, Zahlen und Bindestriche. Im Resize-Modus wird die Grösse ergänzt.</p>
-          <div id="filenamePreview" class="filename-preview" aria-label="Dateiname beim Export"></div>
-
-        </section>
         <section class="tool-section" id="sizeSection">
-          <div class="section-title"><span class="section-no">02</span><h3>Zeichenflächen</h3><span class="scope-label">Dieses Bild</span></div>
-          <p id="sizeImageName" class="size-image-name">Zuerst ein Bild auswählen</p>
+          <div class="section-title"><h3>Zeichenflächen</h3></div>
+          <div class="selected-image" aria-live="polite"><span class="eyebrow">AUSGEWÄHLTES BILD</span><div class="selected-image-heading"><span id="selectedImageNumber" class="image-number">–</span><strong id="sizeImageName">Zuerst ein Bild auswählen</strong></div><small id="selectedImageMeta">Wähle ein Bild auf der Arbeitsfläche.</small></div>
           <div class="mode-switch" role="group" aria-label="Grösse wählen"><button id="modeOriginal" type="button" class="selected" aria-pressed="true">Original</button><button id="modeResize" type="button" aria-pressed="false">Resize</button></div>
           <p class="microcopy" id="sizeExplanation">Originalmasse beibehalten. Das Bild wird im gewählten Format exportiert.</p>
           <div id="resizeControls" hidden>
@@ -96,6 +87,8 @@
           <button id="download" class="button primary download" type="button" disabled><span id="downloadLabel">WebP herunterladen</span><span aria-hidden="true">↗</span></button>
         </div>
   </dialog>
+  <input id="replaceFileInput" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden>
+  <input id="addFileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden>
   <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden>
 </body>
 </html>

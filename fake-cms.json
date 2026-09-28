@@ -353,5 +353,10 @@
         "name": "Musikkollegium Winterthur – MKW",
         "url": "https://musikkollegium.ch/",
         "category": "suche"
+    },
+    {
+        "name": "Xoyondo – Umfragen",
+        "url": "https://xoyondo.com/de",
+        "category": "suche"
     }
 ]
