@@ -663,6 +663,12 @@
                         "type": "image",
                         "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-4.jpg",
                         "title": "260831_A1_Probe_c-noe-plain-4.jpg"
+                    },
+                    {
+                        "id": "0dca867c-9db9-44f7-8e68-da3e90157eae",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/_NP_0035.jpg",
+                        "title": "_NP_0035.JPG"
                     }
                 ]
             }
