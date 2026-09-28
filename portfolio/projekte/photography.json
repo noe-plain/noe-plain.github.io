@@ -589,86 +589,86 @@
         "hero-image": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-2.jpg",
         "blocks": [
             {
-                "id": "c45cfceb-6ec2-42c5-b270-442bbce21f22",
+                "id": "81290825-74cf-4cee-8175-d8da6505cd3f",
+                "type": "hero",
+                "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-8.jpg",
+                "text": "Musikkollegium während einer Probe für das Konzert mit Beethovens Pastorale"
+            },
+            {
+                "id": "b6bf4dbe-49cb-4361-a2d4-2dfda37859b0",
                 "type": "gallery",
                 "items": [
                     {
-                        "id": "d5f13052-3e73-4310-b432-efb8cd7a372b",
+                        "id": "335585d4-7efd-4a84-900a-d5aa94f142c6",
                         "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-3.jpg",
-                        "title": ""
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-3.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-3.jpg"
                     },
                     {
-                        "id": "278343a7-45ac-4f45-a04c-9877763a7554",
+                        "id": "63d69bd8-b295-4ca3-b3d6-44212dc5ef68",
                         "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260921_F2_Italienische_cNoePlain-05.jpg",
-                        "title": "260921_F2_Italienische_cNoePlain-05.jpg"
-                    },
-                    {
-                        "id": "acebe698-34bb-402e-b82b-99a1b509fa69",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-12.jpg",
-                        "title": ""
-                    },
-                    {
-                        "id": "f34ae634-538e-4435-9788-db9ee5da271e",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-11.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-11.jpg"
-                    },
-                    {
-                        "id": "56d05c4f-62fd-460f-bec4-054713c7a6cc",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-2.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain.jpg"
-                    },
-                    {
-                        "id": "e133262d-0bb0-4960-9152-3480f4e4ad98",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-7.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-7.jpg"
-                    },
-                    {
-                        "id": "f034842f-f0da-470e-95c9-e342a04c4aca",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-10.jpg",
-                        "title": "Bassistin vom Musikkollegium"
-                    },
-                    {
-                        "id": "52d80373-1fb7-4b91-a0e5-611a378508b6",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-5.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-5.jpg"
-                    },
-                    {
-                        "id": "ddbbfa57-aedc-4781-8c92-b0aceffa4fc7",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-13.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-13.jpg"
-                    },
-                    {
-                        "id": "13d9bc6b-9582-4583-8361-0a6a3987853f",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-8.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-8.jpg"
-                    },
-                    {
-                        "id": "e31752e8-cc2d-4299-9d2e-eb8dcee41d9a",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-9.jpg",
-                        "title": "260831_A1_Probe_c-noe-plain-9.jpg"
-                    },
-                    {
-                        "id": "8c2896e0-338d-48e8-9254-142093688be9",
-                        "type": "image",
-                        "imageUrl": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-4.jpg",
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-4.jpg",
                         "title": "260831_A1_Probe_c-noe-plain-4.jpg"
                     },
                     {
-                        "id": "0dca867c-9db9-44f7-8e68-da3e90157eae",
+                        "id": "77cf2e22-95d9-4635-86b0-ef06ece891a4",
                         "type": "image",
-                        "imageUrl": "../../images/portfolio/uploads/_NP_0035.jpg",
-                        "title": "_NP_0035.JPG"
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-5.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-5.jpg"
+                    },
+                    {
+                        "id": "99158f1f-e508-41d7-8cbe-dff4a28d6c2d",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-7.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-7.jpg"
+                    },
+                    {
+                        "id": "ece978cd-3b29-48dc-ba86-d0dc8b8fe344",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-9.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-9.jpg"
+                    },
+                    {
+                        "id": "136fa3d0-ef02-436d-85b9-e0851896fffe",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-10.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain-10.jpg"
+                    },
+                    {
+                        "id": "3edefd84-4b32-465e-b87e-6a61da9e8012",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260831_A1_Probe_c-noe-plain-2.jpg",
+                        "title": "260831_A1_Probe_c-noe-plain.jpg"
+                    },
+                    {
+                        "id": "63ad9dc3-e433-4244-ba14-06eab5b4ea36",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260921_F2_Italienische_cNoePlain-31.jpg",
+                        "title": "260921_F2_Italienische_cNoePlain-31.jpg"
+                    },
+                    {
+                        "id": "837af019-cca3-4749-8a74-fc3cf7dc2ce4",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260921_F2_Italienische_cNoePlain-32.jpg",
+                        "title": "260921_F2_Italienische_cNoePlain-32.jpg"
+                    },
+                    {
+                        "id": "c108cad4-41d2-44ad-a704-64f8206dfad2",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260921_F2_Italienische_cNoePlain-33.jpg",
+                        "title": "260921_F2_Italienische_cNoePlain-33.jpg"
+                    },
+                    {
+                        "id": "c4b78cdb-4dd3-43a9-bb6e-c236ad25db27",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260921_F2_Italienische_cNoePlain-34.jpg",
+                        "title": "260921_F2_Italienische_cNoePlain-34.jpg"
+                    },
+                    {
+                        "id": "f69dfa21-e516-41de-9a53-18f8024aac05",
+                        "type": "image",
+                        "imageUrl": "../../images/portfolio/uploads/260921_F2_Italienische_cNoePlain-35.jpg",
+                        "title": "260921_F2_Italienische_cNoePlain-35.jpg"
                     }
                 ]
             }
