@@ -6,7 +6,7 @@ let p=fresh(),selected=null,layer='title',token='',history=[],future=[],cache=ne
 const board=()=>p.boards.find(b=>b.id===selected),asset=b=>p.images.find(i=>i.id===b.imageId);
 const clone=x=>JSON.parse(JSON.stringify(x));
 const status=s=>$('#status').textContent=s;
-function snapshot(){return {...p,meta:clone(p.meta),textOverrides:clone(p.textOverrides||{}),familyOverrides:clone(p.familyOverrides||{}),boards:clone(p.boards),images:[...p.images],fonts:[...p.fonts],logos:[...p.logos]}}
+function snapshot(){return {...p,meta:clone(p.meta),textOverrides:clone(p.textOverrides||{}),textTypeOverrides:clone(p.textTypeOverrides||{}),familyOverrides:clone(p.familyOverrides||{}),boards:clone(p.boards),images:[...p.images],fonts:[...p.fonts],logos:[...p.logos]}}
 function checkpoint(){history.push(snapshot());if(history.length>30)history.shift();future=[];}
 function changed(full=true){$('#undo').disabled=!history.length;$('#redo').disabled=!future.length;revision++;clearTimeout(saveTimer);saveTimer=setTimeout(()=>autosave(),1200);if(full)render();else draw();}
 let saveQueue=Promise.resolve();
@@ -38,7 +38,7 @@ function undo(){if(!history.length)return;future.push(snapshot());p=history.pop(
 function createBoard(im,w=1080,h=1080){
  const b=basicBoard(im,w,h),template=p.boards.find(b=>b.imageId===im.id)||p.boards.find(b=>b.imageId===p.images[0]?.id);
  if(template)for(const key of ['date','title','subtitle','copyright']){b.elements[key].text=template.elements[key].text;b.elements[key].visible=template.elements[key].visible;b.elements[key].enabled=template.elements[key].enabled;b.elements[key].size=template.elements[key].size}
- if(!template||template.imageId!==im.id)for(const key of ['date','title','subtitle']){b.elements[key].enabled=key!=='subtitle';b.elements[key].visible=key!=='subtitle'}
+ if(!template)for(const key of ['date','title','subtitle']){b.elements[key].enabled=key!=='subtitle';b.elements[key].visible=key!=='subtitle'}
  applyFamilyBoard(b,template?.family||p.meta.familyDesign||MKWFamily.defaults());
  return b;
 }

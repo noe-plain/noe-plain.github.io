@@ -26,7 +26,7 @@ function imageHeading(im,i){return `<div class="group-heading"><div class="image
 document.addEventListener('click',ev=>{document.querySelectorAll('.text-type-picker[open]').forEach(picker=>{if(!picker.contains(ev.target))picker.open=false})});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){const picker=document.activeElement.closest('.text-type-picker[open]');if(picker){picker.open=false;picker.querySelector('summary').focus();ev.preventDefault()}}});
 function setImageTextType(imageId,key,enabled){
- for(const b of p.boards.filter(b=>b.imageId===imageId)){b.elements[key].enabled=enabled;b.elements[key].visible=enabled}
+ const first=imageId===p.images[0]?.id;p.textTypeOverrides??={};if(!first){p.textTypeOverrides[imageId]??={};p.textTypeOverrides[imageId][key]=true}for(const b of p.boards.filter(b=>b.imageId===imageId||(first&&!p.textTypeOverrides[b.imageId]?.[key]))){b.elements[key].enabled=enabled;b.elements[key].visible=enabled}
  if(enabled){selected=p.boards.find(b=>b.imageId===imageId)?.id;layer=key;step='text'}
  syncTextTypes();renderPanel();updateDock();syncOverlays(true);
 }
@@ -43,11 +43,11 @@ function render(){
  refreshFamilyControls();
  document.querySelectorAll('[data-text-type]').forEach(input=>input.onchange=()=>mutate(()=>setImageTextType(input.dataset.image,input.dataset.textType,input.checked),false));
  document.querySelectorAll('[data-copyright]').forEach(input=>{input.onfocus=()=>checkpoint();input.onblur=()=>{input.value=MKWLayout.copyrightText(input.value)};input.oninput=()=>{const id=input.dataset.copyright,text=MKWLayout.copyrightText(input.value);p.textOverrides??={};p.textOverrides[id]??={};p.textOverrides[id].copyright=true;for(const b of p.boards.filter(b=>b.imageId===id)){b.elements.copyright.text=text;b.elements.copyright.visible=!!text.trim()}if(board()?.imageId===id&&$('#copyrightText'))$('#copyrightText').value=text;changed(false)}});
- document.querySelectorAll('canvas[data-board]').forEach(c=>c.onpointerdown=ev=>{const b=p.boards.find(b=>b.id===c.dataset.board);if(step==='crop')beginMove(ev,b,'image');else selectBoard(b.id)});
+ document.querySelectorAll('canvas[data-board]').forEach(c=>c.onpointerdown=ev=>{const b=p.boards.find(b=>b.id===c.dataset.board);activateAtPoint(ev,b)});
  renderPanel();updateDock();draw();
 }
 function updateDock(){document.querySelectorAll('.dock [data-step]').forEach(b=>b.classList.toggle('active',b.dataset.step===step));$('#viewValue').textContent=Math.round(view*100)+'%'}
-function chooseStep(value){if(editingText)editingText.el.blur();if(value==='import'){add();return}step=value;if(!selected)selected=p.boards[0]?.id;if(value==='text'&&!MKWLayout.keys.includes(layer))layer='title';if(value==='logo')layer='logo';updateDock();renderPanel();syncOverlays(true);draw();if(value==='export')openExport()}
+function chooseStep(value){if(editingText)editingText.el.blur();if(value==='import'){add();return}step=value;if(value==='text'&&!MKWLayout.keys.includes(layer))layer='title';if(value==='logo')layer='logo';updateDock();renderPanel();syncOverlays(true);draw();if(value==='export')openExport()}
 function renderPanel(){
  const b=board(),panel=$('#stepPanel');panel.hidden=!b||step==='export';$('#toolTitle').textContent=!b?'Dein Bild gestalten':{text:'Text gestalten',logo:'Logo auswählen',crop:'Bildausschnitt',export:'Vorschau & Export'}[step]||'Dein Bild gestalten';$('#toolEmpty').hidden=!!b&&step!=='export';$('#toolEmpty').textContent=step==='export'?'Wähle im Exportfenster deine Formate und Dateinamen.':'Wähle ein Bild und einen Schritt in der Prozessleiste.';if(!b)return;
  if(step==='crop'){
@@ -70,7 +70,7 @@ function renderPanel(){
  }
 }
 function beginText(b,key,el){
- selected=b.id;layer=key;checkpoint();editingText={boardId:b.id,key,el};el.classList.add('editing');el.style.color=b.family?.enabled&&key==='copyright'?MKWFamily.copyrightColor(b.elements[key].color):b.elements[key].color;
+ selected=b.id;layer=key;step='text';updateDock();checkpoint();editingText={boardId:b.id,key,el};el.classList.add('editing');el.style.color=b.family?.enabled&&key==='copyright'?MKWFamily.copyrightColor(b.elements[key].color):b.elements[key].color;
  document.querySelectorAll('.board-card').forEach(c=>c.classList.toggle('selected',c.dataset.id===b.id));renderPanel();draw();
 }
 function setSharedText(b,key,text){
@@ -147,6 +147,7 @@ $('#logoFile').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{c
 const orderedBoards=()=>p.images.flatMap(im=>p.boards.filter(b=>b.imageId===im.id));
 async function openExport(){
  if(!p.boards.length){status('Zuerst Bilder importieren.');return}
+ const inferred=MKW.headingDate(p.boards.find(b=>b.imageId===p.images[0]?.id)?.elements.date.text||'');if(inferred)p.meta.date=inferred;
  $('#exportFields').innerHTML=field('Konzertdatum · TT.MM.JJ','date',p.meta.date,'text','placeholder="15.11.26"')+field('Projektkürzel','code',p.meta.code,'text','placeholder="E2"')+field('Projekttitel','title',p.meta.title,'text','placeholder="Dichterlos"')+field('Startnummer','start',p.meta.start,'number','min="0" step="1"');
  for(const key of ['date','code','title','start'])on(key,'input',ev=>{p.meta[key]=key==='start'?+ev.target.value:ev.target.value;revision++;clearTimeout(saveTimer);saveTimer=setTimeout(autosave,1200);updateExportNames()});
  $('#exportNames').innerHTML=orderedBoards().map(b=>`<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked?'checked':''}> <small>${MKW.ratio(b.w,b.h)} · ${b.w} × ${b.h} px</small><span class="export-name"></span></label>`).join('');
@@ -167,3 +168,5 @@ function bytesFromData(data){const base64=data.slice(data.indexOf(',')+1);if(Uin
 $('#zip').onclick=()=>runExport('zip');$('#folder').onclick=()=>runExport('folder');$('#exportDialog').addEventListener('cancel',ev=>{if(busy)ev.preventDefault()});window.addEventListener('beforeunload',ev=>{if(savedRevision<revision){ev.preventDefault();ev.returnValue=''}});
 
 $('#toolsToggle').onclick=()=>{const open=document.body.classList.toggle('tools-open');$('#toolsToggle').setAttribute('aria-expanded',String(open));$('#toolsToggle').textContent=open?'Schliessen':'Werkzeuge'};
+
+$('#workspace').addEventListener('pointerdown',ev=>{if(ev.target.closest('.board-card,.group-heading,button,input,select,textarea,details'))return;if(editingText)editingText.el.blur();selectBoard(null);draw()});

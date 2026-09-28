@@ -82,7 +82,7 @@ async function draw(){
   syncOverlays();updateWarning();
  }catch(e){status(e.message)}finally{drawing=false;if(drawAgain){drawAgain=false;requestAnimationFrame(draw)}}
 }
-function updateWarning(){const b=board();if(!b){$('#warning').textContent='';return}const fonts=[...new Set(Object.values(b.elements).filter(e=>e.visible&&e.role&&['Replica LL','Harriet','Harriet Regular','Harriet Italic'].includes(e.role)&&!fontStatus[e.role]).map(e=>e.role))];$('#warning').textContent=[b.image.scale>1.001?'Bildauflösung gering – Export ist möglich.':'',fonts.length?`${fonts.join(', ')} fehlt · Ersatzschrift aktiv.`:'',textBlock(b).factor<.999?'Text wurde verkleinert, damit er vollständig in die Schutzzone passt.':''].filter(Boolean).join(' ')}
+function updateWarning(){for(const x of p.boards){const card=document.querySelector(`.board-card[data-id="${x.id}"]`);if(card){const uncovered=!x.family?.enabled&&!MKW.imageCovers(x,asset(x));card.classList.toggle('uncovered',uncovered);card.classList.toggle('low-resolution',x.image.scale>1.001);card.title=[uncovered?'Bild deckt die Zeichenfläche nicht vollständig ab.':'',x.image.scale>1.001?'Bildauflösung gering.':''].filter(Boolean).join(' ')}}const b=board();if(!b){$('#warning').textContent='';return}const fonts=[...new Set(Object.values(b.elements).filter(e=>e.visible&&e.role&&['Replica LL','Harriet','Harriet Regular','Harriet Italic'].includes(e.role)&&!fontStatus[e.role]).map(e=>e.role))];$('#warning').textContent=[!b.family?.enabled&&!MKW.imageCovers(b,asset(b))?'Bild deckt die Zeichenfläche nicht vollständig ab.':'',b.image.scale>1.001?'Bildauflösung gering – Export ist möglich.':'',fonts.length?`${fonts.join(', ')} fehlt · Ersatzschrift aktiv.`:'',textBlock(b).factor<.999?'Text wurde verkleinert, damit er vollständig in die Schutzzone passt.':''].filter(Boolean).join(' ')}
 function rotatePoint(x,y,angle){const a=angle*Math.PI/180;return{x:x*Math.cos(a)-y*Math.sin(a),y:x*Math.sin(a)+y*Math.cos(a)}}
 function positionInBoard(ev,b){const r=document.querySelector(`canvas[data-board="${b.id}"]`).getBoundingClientRect();return{x:(ev.clientX-r.left)*b.w/r.width,y:(ev.clientY-r.top)*b.h/r.height}}
 function transformRect(b){const im=asset(b),t=b.image;return {x:t.x-im.width*t.scale/2,y:t.y-im.height*t.scale/2,w:im.width*t.scale,h:im.height*t.scale,angle:t.angle}}
@@ -95,7 +95,7 @@ function syncOverlays(force=false){
    root.dataset.signature=signature;root.innerHTML='';
    if(step!=='export'){const zone=document.createElement('div');zone.className='safe-zone';zone.setAttribute('aria-label',`Schutzzone: oben ${safe.top}, rechts ${safe.right}, unten ${safe.bottom}, links ${safe.left} Pixel`);root.append(zone)}
    if(step==='crop'&&selected===b.id){const box=document.createElement('div');box.className='image-transform';for(let n=0;n<4;n++){const h=document.createElement('button');h.className='handle';h.dataset.corner=n;h.setAttribute('aria-label','Bild proportional skalieren');h.onpointerdown=ev=>beginMove(ev,b,'image',n);box.append(h)}root.append(box)}
-   if(step==='text'){
+   if(step==='text'&&selected===b.id){
     const group=document.createElement('div');group.className='text-group';group.setAttribute('aria-label','Gemeinsame Textbox');group.onpointerdown=ev=>{if(ev.target===group)beginMove(ev,b,'textBox')};root.append(group);
     if(selected===b.id){const move=document.createElement('button');move.className='text-group-move';move.innerHTML='↕';move.title='Gesamte Textbox nur vertikal verschieben';move.setAttribute('aria-label','Textbox vertikal verschieben');move.onpointerdown=ev=>beginMove(ev,b,'textBox');group.append(move)}
     for(const key of MKWLayout.keys){const el=document.createElement('div');el.className='text-editor'+(key==='copyright'?' copyright-editor':'');el.contentEditable='plaintext-only';el.spellcheck=false;el.dataset.key=key;el.dataset.placeholder=placeholders[key];el.setAttribute('role','textbox');el.setAttribute('aria-label',`${elementNames[key]} · ${asset(b).name} · ${MKW.ratio(b.w,b.h)}`);el.onfocus=()=>beginText(b,key,el);el.oninput=()=>inputText(b,key,el);el.onblur=()=>endText(b,key,el);el.onkeydown=ev=>{if(ev.key==='Escape'){el.blur();ev.preventDefault()}};(key==='copyright'?root:group).append(el)}
@@ -127,3 +127,11 @@ window.addEventListener('pointermove',ev=>{
 },{passive:false});
 function finishMovement(){if(movement){movement=null;renderPanel();draw()}}
 window.addEventListener('pointerup',finishMovement);window.addEventListener('pointercancel',finishMovement);
+
+function activateAtPoint(ev,b){
+ const pt=positionInBoard(ev,b),block=textBlock(b);let hit=null;
+ for(const e of [...block.records].reverse()){if(!e.visible||!e.text)continue;const q=rotatePoint(pt.x-e.x,pt.y-e.y,-(e.angle||0)),w=e.w||block.w,off=e.align==='center'?-w/2:e.align==='right'?-w:0;if(q.x>=off&&q.x<=off+w&&q.y>=0&&q.y<=e.h){hit=e.key;break}}
+ if(!hit&&b.elements.logo.visible){const e=b.elements.logo,q=rotatePoint(pt.x-e.x,pt.y-e.y,-(e.angle||0)),h=e.size/(logoAspects.get(b.id)||3),off=e.align==='center'?-e.size/2:e.align==='right'?-e.size:0;if(q.x>=off&&q.x<=off+e.size&&q.y>=0&&q.y<=h)hit='logo'}
+ if(editingText)editingText.el.blur();step=hit?(hit==='logo'?'logo':'text'):'crop';layer=hit||'image';selectBoard(b.id);updateDock();draw();
+ if(!hit)beginMove(ev,b,'image');else if(hit!=='logo'){const el=document.querySelector(`.interaction[data-board="${b.id}"] .text-editor[data-key="${hit}"]`);el?.focus()}
+}
