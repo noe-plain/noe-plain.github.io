@@ -132,6 +132,11 @@ function activateAtPoint(ev,b){
  const pt=positionInBoard(ev,b),block=textBlock(b,step==='text'?layer:null);let hit=null;
  for(const e of [...block.records].reverse()){if((!e.visible||!e.text)&&!(step==='text'&&e.enabled!==false&&!e.text.trim()))continue;const q=rotatePoint(pt.x-e.x,pt.y-e.y,-(e.angle||0)),w=e.w||block.w,off=e.align==='center'?-w/2:e.align==='right'?-w:0;if(q.x>=off&&q.x<=off+w&&q.y>=0&&q.y<=e.h){hit=e.key;break}}
  if(!hit&&b.elements.logo.visible){const e=b.elements.logo,q=rotatePoint(pt.x-e.x,pt.y-e.y,-(e.angle||0)),h=e.size/(logoAspects.get(b.id)||3),off=e.align==='center'?-e.size/2:e.align==='right'?-e.size:0;if(q.x>=off&&q.x<=off+e.size&&q.y>=0&&q.y<=h)hit='logo'}
+ // Selecting an empty board in text mode must not also start cropping it.
+ const emptyText=!['date','title','subtitle'].some(key=>{const e=b.elements[key];return e.enabled!==false&&e.visible&&e.text.trim()});
+ if(!hit&&step==='text'&&selected!==b.id&&emptyText){
+  ev.preventDefault();if(editingText)editingText.el.blur();selectBoard(b.id);updateDock();draw();return;
+ }
  if(editingText)editingText.el.blur();step=hit?(hit==='logo'?'logo':'text'):'crop';layer=hit||'image';selectBoard(b.id);updateDock();draw();
  if(!hit)beginMove(ev,b,'image');else if(hit!=='logo'){ev.preventDefault();const el=document.querySelector(`.interaction[data-board="${b.id}"] .text-editor[data-key="${hit}"]`);el?.focus()}
 }
