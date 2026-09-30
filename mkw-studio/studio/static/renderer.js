@@ -64,10 +64,10 @@ function drawLogo(ctx,b,logo,opts={}){const e=b.elements.logo;if((opts.only&&opt
 async function paint(ctx,b,s=1,opts={}){
  const layout=textBlock(b,opts.editKey),logo=await prepareLogo(b),safe=layout.safe;
  ctx.save();ctx.scale(s,s);
- if(!opts.only||opts.only==='background'){ctx.fillStyle=b.family?.enabled?b.family.background:b.bg;ctx.fillRect(0,0,b.w,b.h)}
+ if(!opts.transparent&&(!opts.only||opts.only==='background')){ctx.fillStyle=b.family?.enabled?b.family.background:b.bg;ctx.fillRect(0,0,b.w,b.h)}
  if(!opts.only||opts.only==='image'){const im=await image(asset(b).data),t=b.image;ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.angle*Math.PI/180);ctx.scale(t.scale*t.flipX,t.scale*t.flipY);ctx.drawImage(im,-im.width/2,-im.height/2);ctx.restore()}
- if(!b.family?.enabled&&(!opts.only||opts.only==='textShadow')&&layout.records.some(e=>e.visible&&e.text))textGradient(ctx,b,layout,opts.only?1:.42);
- if(!b.family?.enabled&&(!opts.only||opts.only==='logoShadow')&&b.elements.logo.visible)softLogoShadow(ctx,b,logo,opts.only?1:.28);
+ if(!opts.transparent&&!b.family?.enabled&&(!opts.only||opts.only==='textShadow')&&layout.records.some(e=>e.visible&&e.text))textGradient(ctx,b,layout,opts.only?1:.42);
+ if(!opts.transparent&&!b.family?.enabled&&(!opts.only||opts.only==='logoShadow')&&b.elements.logo.visible)softLogoShadow(ctx,b,logo,opts.only?1:.28);
  ctx.save();ctx.beginPath();ctx.rect(safe.x,safe.y,safe.w,safe.h);ctx.clip();
  drawText(ctx,layout,{...opts,family:b.family,excludeKey:'copyright'});
  drawLogo(ctx,b,logo,opts);

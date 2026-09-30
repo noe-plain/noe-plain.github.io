@@ -14,6 +14,7 @@ page.on('dialog',d=>d.accept());
 await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8891/mkw-studio/');
 await page.waitForFunction(()=>fontStatus['Harriet Regular']&&fontStatus['Replica LL']);
 await page.locator('#startNew').click();
+await page.locator('[data-format-enabled]').nth(2).uncheck();await page.locator('#createProject').click();
 assert.equal(await page.locator('footer span').first().innerText(),'● Lokal in deinem Browser');
 await page.locator('#files').setInputFiles(path.join(root,'testbilder/260831_A1_Probe_c-noe-plain-4.jpg'));
 await page.waitForFunction(()=>p.boards.length===2&&!busy);

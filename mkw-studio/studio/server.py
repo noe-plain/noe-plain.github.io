@@ -78,9 +78,12 @@ class Handler(BaseHTTPRequestHandler):
         files['/static/browser.js'] = 'static/browser.js'
         files['/static/family.js'] = 'static/family.js'
         files['/static/srgb.icc'] = 'static/srgb.icc'
+        files['/static/upgrade.css'] = 'static/upgrade.css'
+        for name in ('project-formats.js','subject.js','subject-worker.js','export.js','png-worker.js','vendor/vision.js','vendor/png.js','vendor/person.tflite','vendor/vision-wasm/vision_wasm_internal.js','vendor/vision-wasm/vision_wasm_internal.wasm','vendor/vision-wasm/vision_wasm_nosimd_internal.js','vendor/vision-wasm/vision_wasm_nosimd_internal.wasm'):
+            files['/static/'+name] = 'static/'+name
         if path not in files: return self.reply({'error':'Nicht gefunden'},status=404)
         p=ROOT/files[path]
-        mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.svg':'image/svg+xml','.otf':'font/otf','.icc':'application/octet-stream'}[p.suffix]
+        mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.svg':'image/svg+xml','.otf':'font/otf','.icc':'application/octet-stream','.wasm':'application/wasm','.tflite':'application/octet-stream'}[p.suffix]
         self.reply(p.read_bytes(),mime)
     def do_POST(self):
         if not self.valid_host() or self.headers.get('X-MKW-Token')!=TOKEN: return self.reply({'error':'Zugriff verweigert'},status=403)

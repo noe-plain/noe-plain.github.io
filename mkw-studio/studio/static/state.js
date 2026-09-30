@@ -1,7 +1,7 @@
 'use strict';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>crypto.randomUUID();
-const fresh=()=>({version:1,copyrightSizeVersion:1,copyrightFontVersion:1,meta:{date:'',code:'',title:'',start:1,concert:'',headline:'',subtitle:'',uppercase:true},images:[],boards:[],fonts:[],logos:[]});
+const fresh=()=>({version:1,copyrightSizeVersion:1,copyrightFontVersion:1,formats:[{w:1080,h:1920,top:200,bottom:500},{w:1080,h:1080,top:100,bottom:200},{w:1080,h:1350,top:100,bottom:200}],meta:{date:'',code:'',title:'',start:1,concert:'',headline:'',subtitle:'',uppercase:true},images:[],boards:[],fonts:[],logos:[]});
 let p=fresh(),selected=null,layer='title',token='',history=[],future=[],cache=new Map(),fontStatus={},view=1,saveTimer,drag=null,replaceId=null,busy=false,revision=0,savedRevision=0;
 const board=()=>p.boards.find(b=>b.id===selected),asset=b=>p.images.find(i=>i.id===b.imageId);
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -16,14 +16,26 @@ function dataURL(file){return new Promise((resolve,reject)=>{const r=new FileRea
 async function image(src){if(!cache.has(src))cache.set(src,new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(Error('Bild oder Logo kann nicht geladen werden.'));i.src=src}));return cache.get(src)}
 function item(text,x,y,size,role='Replica LL'){return {text,x,y,size,role,color:'#ffffff',visible:false,align:'left',angle:0}}
 function basicBoard(im,w=1080,h=1080){return {id:uid(),imageId:im.id,w,h,checked:true,bg:'#ffffff',image:{x:w/2,y:h/2,scale:Math.max(w/im.width,h/im.height),angle:0,flipX:1,flipY:1},elements:{date:{...item(p.meta.concert.toUpperCase(),64,h-300,52),enabled:true,visible:true},title:{...item(p.meta.uppercase?p.meta.headline.toUpperCase():p.meta.headline,64,h-240,104),enabled:true,visible:true},subtitle:{...item(p.meta.subtitle,64,h-120,52),enabled:false},copyright:{...item('',w-35,h-35,32,'Harriet Regular'),align:'right'},logo:{x:64,y:64,size:650,visible:false,source:'black',angle:0,align:'left'}}}}
-async function importFiles(files){if(busy)return;busy=true;checkpoint();let ok=0,errors=[];try{for(const f of files){status(`Importiere ${f.name} …`);try{if(f.size>100*1024*1024)throw Error('Maximal 100 MB pro Originaldatei.');const normalized=await (await api('/api/import',f)).json(),fallback=MKW.filenameDate(f.name);const im={id:replaceId||uid(),name:f.name,original:await dataURL(f),...normalized,captureDate:normalized.captureDate||fallback,captureDay:normalized.captureDay||MKW.weekday(fallback)};await image(im.data);if(replaceId){p.images=p.images.map(i=>i.id===replaceId?im:i);p.boards.filter(b=>b.imageId===replaceId).forEach(b=>{if(b.family){delete b.family.photoImage;delete b.family.illustrationImage}fit(b,b.family?.enabled?'fit':'fill')});replaceId=null;}else{p.images.push(im);const square=createBoard(im),story=createBoard(im,1080,1920);p.boards.push(square,story);selected=square.id;}ok++;}catch(e){errors.push(`${f.name}: ${e.message}`)}}if(ok&&typeof step!=='undefined'){step='text';layer='title'}changed();status(`${ok} Bilder importiert${errors.length?' · '+errors.join(' · '):''}`);if(errors.length)alert(errors.join('\n'));}finally{busy=false;replaceId=null;$('#files').value=''}}
+async function importFiles(files){
+ if(busy||!files.length)return;busy=true;checkpoint();let ok=0,errors=[],recognitionFailed=0;
+ try{for(const f of files){status(`Importiere ${f.name} …`);try{
+  if(f.size>100*1024*1024)throw Error('Maximal 100 MB pro Originaldatei.');
+  const normalized=await(await api('/api/import',f)).json(),fallback=MKW.filenameDate(f.name),im={id:replaceId||uid(),name:f.name,original:await dataURL(f),...normalized,captureDate:normalized.captureDate||fallback,captureDay:normalized.captureDay||MKW.weekday(fallback)};
+  await image(im.data);status(`Suche Personen in ${f.name} …`);
+  try{im.people=await MKWSubject.detect(im);im.subjectStatus=im.people.length?'Personenausschnitt vorbereitet':'Keine Person erkannt · mittiger Ausschnitt'}catch{im.people=[];im.subjectStatus='Personenerkennung nicht verfügbar · mittiger Ausschnitt';recognitionFailed++}
+  if(replaceId){p.images=p.images.map(i=>i.id===replaceId?im:i);p.boards.filter(b=>b.imageId===replaceId).forEach(b=>{if(b.family){delete b.family.photoImage;delete b.family.illustrationImage}fit(b,b.family?.enabled?'fit':'fill');MKWSubject.crop(b,im)});replaceId=null}
+  else{p.images.push(im);const boards=(p.formats||MKWFormats.legacy()).map(f=>{const b=createBoard(im,f.w,f.h);b.safe={top:f.top,bottom:f.bottom};if(!b.family?.enabled)MKWSubject.crop(b,im);return b});p.boards.push(...boards);selected=boards[0].id}ok++;
+ }catch(e){errors.push(`${f.name}: ${e.message}`)}}
+ if(ok){step='text';layer='title'}changed();status(`${ok} Bilder importiert${recognitionFailed?' · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen.':''}${errors.length?' · '+errors.join(' · '):''}`);if(errors.length)alert(errors.join('\n'));
+ }finally{busy=false;replaceId=null;$('#files').value=''}
+}
 function fit(b,mode){const im=asset(b),t=b.image,rad=t.angle*Math.PI/180,c=Math.abs(Math.cos(rad)),s=Math.abs(Math.sin(rad));if(mode==='reset'){t.angle=0;t.flipX=t.flipY=1;mode='fill'}if(mode==='fill')t.scale=Math.max((c*b.w+s*b.h)/im.width,(s*b.w+c*b.h)/im.height);if(mode==='fit')t.scale=Math.min(b.w/(c*im.width+s*im.height),b.h/(s*im.width+c*im.height));if(mode==='original')t.scale=1;t.x=b.w/2;t.y=b.h/2;}
 function reorder(arr,id,delta){const n=arr.findIndex(x=>x.id===id),m=n+delta;if(m<0||m>=arr.length)return;[arr[n],arr[m]]=[arr[m],arr[n]]}
 function field(label,id,value,type='text',extra=''){return `<label class="field">${label}<input id="${id}" type="${type}" value="${esc(value)}" ${extra}></label>`}
 function check(label,id,value){return `<label class="check"><input type="checkbox" id="${id}" ${value?'checked':''}>${label}</label>`}
 function options(values,current){return values.map(([v,l])=>`<option value="${esc(v)}" ${v===current?'selected':''}>${esc(l)}</option>`).join('')}
 
-function resize(w,h,mode){if(!Number.isInteger(w)||!Number.isInteger(h)||w<16||h<16||w>10000||h>10000||w*h>40000000){alert('Breite/Höhe: 16–10000 px, maximal 40 Millionen Pixel.');return}mutate(()=>{const b=board(),ow=b.w,oh=b.h,s=Math.min(w/ow,h/oh);if(mode==='layout'){const dx=(w-ow*s)/2,dy=(h-oh*s)/2;b.image.x=b.image.x*s+dx;b.image.y=b.image.y*s+dy;b.image.scale*=s;Object.values(b.elements).forEach(e=>{e.x=e.x*s+dx;e.y=e.y*s+dy;e.size*=s})}else{b.image.x+=(w-ow)/2;b.image.y+=(h-oh)/2}if(b.textBox&&mode==='layout')b.textBox.offset*=s;b.w=w;b.h=h})}
+function resize(w,h,mode){if(!Number.isInteger(w)||!Number.isInteger(h)||w<16||h<16||w>10000||h>10000||w*h>40000000){alert('Breite/Höhe: 16–10000 px, maximal 40 Millionen Pixel.');return}mutate(()=>{const b=board(),ow=b.w,oh=b.h,s=Math.min(w/ow,h/oh);if(mode==='layout'){const dx=(w-ow*s)/2,dy=(h-oh*s)/2;b.image.x=b.image.x*s+dx;b.image.y=b.image.y*s+dy;b.image.scale*=s;Object.values(b.elements).forEach(e=>{e.x=e.x*s+dx;e.y=e.y*s+dy;e.size*=s})}else{b.image.x+=(w-ow)/2;b.image.y+=(h-oh)/2}if(b.textBox&&mode==='layout')b.textBox.offset*=s;if(b.safe){const f=h/oh;b.safe.top*=f;b.safe.bottom*=f}b.w=w;b.h=h})}
 function fontFamily(role){return fontStatus[role]?`"${role}"`:role.startsWith('Harriet')?'Georgia':'Arial'}
 async function logoImage(e){return image(e.source==='black'?'mkw-logo-bold-pos.svg':e.source==='white'?'mkw-logo-bold-neg.svg':p.logos.find(l=>l.id===e.source)?.data||'mkw-logo-bold-pos.svg')}
 
@@ -37,6 +49,8 @@ function undo(){if(!history.length)return;future.push(snapshot());p=history.pop(
 
 function createBoard(im,w=1080,h=1080){
  const b=basicBoard(im,w,h),template=p.boards.find(b=>b.imageId===im.id)||p.boards.find(b=>b.imageId===p.images[0]?.id);
+ const format=p.formats?.find(f=>f.w===w&&f.h===h);if(format)b.safe={top:format.top,bottom:format.bottom};
+ b.elements.logo.visible=true;b.elements.logo.source='white';
  if(template)for(const key of ['date','title','subtitle','copyright']){b.elements[key].text=template.elements[key].text;b.elements[key].visible=template.elements[key].visible;b.elements[key].enabled=template.elements[key].enabled;b.elements[key].size=template.elements[key].size}
  if(!template)for(const key of ['date','title','subtitle']){b.elements[key].enabled=key!=='subtitle';b.elements[key].visible=key!=='subtitle'}
  applyFamilyBoard(b,template?.family||p.meta.familyDesign||MKWFamily.defaults());
@@ -53,6 +67,8 @@ function applyFamilyBoard(b,source){
  b.family={...previous,...next};
 }
 function validateFamilyProject(q){
+ if(q.formats&&(!Array.isArray(q.formats)||!q.formats.length||q.formats.some(f=>!MKWFormats.validate(f))))throw Error('Ungültige Projektformate.');
+ for(const b of q.boards)if(b.safe&&(!['top','bottom'].every(k=>Number.isFinite(b.safe[k])&&b.safe[k]>=0)||b.safe.top+b.safe.bottom>=b.h))throw Error('Ungültige Schutzzone.');
  const valid=config=>{if(!config)return;if(typeof config.enabled!=='boolean'||!/^#[0-9a-f]{6}$/i.test(config.background)||!Number.isInteger(config.offset)||config.offset<0||config.offset>7)throw Error('Ungültiges Familienkonzert-Design.');for(const name of ['photoImage','illustrationImage'])if(config[name]){const t=config[name];if(!['x','y','scale','angle','flipX','flipY'].every(k=>Number.isFinite(t[k]))||t.scale<=0||t.scale>100||![1,-1].includes(t.flipX)||![1,-1].includes(t.flipY))throw Error('Ungültige Bildposition im Familienkonzert-Design.')}};
  valid(q.meta.familyDesign);for(const b of q.boards)valid(b.family);
 }

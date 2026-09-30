@@ -32,7 +32,7 @@ const MKWBrowser = (() => {
  }
  // Uncompressed ZIP: images are already JPEG-compressed. UTF-8 names and CRC32.
  function zip(items){let offset=0;const files=[],directory=[],encoder=new TextEncoder();
-  for(const item of items){const name=encoder.encode(item.name),data=bytesFromData(item.jpg);let crc=0xffffffff;for(const byte of data){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}crc=(crc^0xffffffff)>>>0;
+  for(const item of items){const name=encoder.encode(item.name),data=item.bytes||bytesFromData(item.jpg);let crc=0xffffffff;for(const byte of data){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}crc=(crc^0xffffffff)>>>0;
    const header=new Uint8Array(30+name.length),v=new DataView(header.buffer);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint16(12,33,true);v.setUint32(14,crc,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);header.set(name,30);
    const entry=new Uint8Array(46+name.length),e=new DataView(entry.buffer);e.setUint32(0,0x02014b50,true);e.setUint16(4,20,true);e.setUint16(6,20,true);e.setUint16(8,0x800,true);e.setUint16(14,33,true);e.setUint32(16,crc,true);e.setUint32(20,data.length,true);e.setUint32(24,data.length,true);e.setUint16(28,name.length,true);e.setUint32(42,offset,true);entry.set(name,46);files.push(header,data);directory.push(entry);offset+=header.length+data.length;
   }
@@ -50,5 +50,5 @@ const MKWBrowser = (() => {
    default:throw Error('Unbekannte Aktion: '+path);
   }
  }
- return {init,saved,request};
+ return {init,saved,request,zip};
 })();
