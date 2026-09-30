@@ -1,7 +1,7 @@
 'use strict';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>crypto.randomUUID();
-const fresh=()=>({version:1,copyrightSizeVersion:1,copyrightFontVersion:1,formats:[{w:1080,h:1920,top:200,bottom:500},{w:1080,h:1080,top:100,bottom:200},{w:1080,h:1350,top:100,bottom:200}],meta:{date:'',code:'',title:'',start:1,concert:'',headline:'',subtitle:'',uppercase:true},images:[],boards:[],fonts:[],logos:[]});
+const fresh=()=>({version:1,copyrightSizeVersion:1,copyrightFontVersion:1,formats:[{w:1080,h:1920,top:200,bottom:500},{w:1080,h:1080,top:100,bottom:200}],meta:{date:'',code:'',title:'',start:1,concert:'',headline:'',subtitle:'',uppercase:true},images:[],boards:[],fonts:[],logos:[]});
 let p=fresh(),selected=null,layer='title',token='',history=[],future=[],cache=new Map(),fontStatus={},view=1,saveTimer,drag=null,replaceId=null,busy=false,revision=0,savedRevision=0;
 const board=()=>p.boards.find(b=>b.id===selected),asset=b=>p.images.find(i=>i.id===b.imageId);
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -16,18 +16,27 @@ function dataURL(file){return new Promise((resolve,reject)=>{const r=new FileRea
 async function image(src){if(!cache.has(src))cache.set(src,new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(Error('Bild oder Logo kann nicht geladen werden.'));i.src=src}));return cache.get(src)}
 function item(text,x,y,size,role='Replica LL'){return {text,x,y,size,role,color:'#ffffff',visible:false,align:'left',angle:0}}
 function basicBoard(im,w=1080,h=1080){return {id:uid(),imageId:im.id,w,h,checked:true,bg:'#ffffff',image:{x:w/2,y:h/2,scale:Math.max(w/im.width,h/im.height),angle:0,flipX:1,flipY:1},elements:{date:{...item(p.meta.concert.toUpperCase(),64,h-300,52),enabled:true,visible:true},title:{...item(p.meta.uppercase?p.meta.headline.toUpperCase():p.meta.headline,64,h-240,104),enabled:true,visible:true},subtitle:{...item(p.meta.subtitle,64,h-120,52),enabled:false},copyright:{...item('',w-35,h-35,32,'Harriet Regular'),align:'right'},logo:{x:64,y:64,size:650,visible:false,source:'black',angle:0,align:'left'}}}}
+function showImportStage(index,total,file,stage){
+ $('#importFile').textContent=file;$('#importCount').textContent=`Bild ${index+1} von ${total}`;$('#importProgress').max=total*3;$('#importProgress').value=index*3+stage;
+ $('#importExplanation').textContent=['Dein Bild wird geladen und für die Bearbeitung vorbereitet.','Personen werden direkt in deinem Browser erkannt. Beim ersten Import wird dafür das Modell geladen.','Die gewählten Formate werden zugeschnitten und mit dem weissen MKW-Logo versehen.'][stage];
+ document.querySelectorAll('[data-import-stage]').forEach(el=>{el.classList.toggle('active',+el.dataset.importStage===stage);el.classList.toggle('done',+el.dataset.importStage<stage)});
+}
+$('#importDialog').addEventListener('cancel',ev=>ev.preventDefault());
 async function importFiles(files){
  if(busy||!files.length)return;busy=true;checkpoint();let ok=0,errors=[],recognitionFailed=0;
- try{for(const f of files){status(`Importiere ${f.name} …`);try{
+ $('#importDialog').showModal();
+ try{for(const [index,f] of [...files].entries()){showImportStage(index,files.length,f.name,0);await new Promise(resolve=>requestAnimationFrame(resolve));status(`Importiere ${f.name} …`);try{
   if(f.size>100*1024*1024)throw Error('Maximal 100 MB pro Originaldatei.');
   const normalized=await(await api('/api/import',f)).json(),fallback=MKW.filenameDate(f.name),im={id:replaceId||uid(),name:f.name,original:await dataURL(f),...normalized,captureDate:normalized.captureDate||fallback,captureDay:normalized.captureDay||MKW.weekday(fallback)};
   await image(im.data);status(`Suche Personen in ${f.name} …`);
+  showImportStage(index,files.length,f.name,1);
   try{im.people=await MKWSubject.detect(im);im.subjectStatus=im.people.length?'Personenausschnitt vorbereitet':'Keine Person erkannt · mittiger Ausschnitt'}catch{im.people=[];im.subjectStatus='Personenerkennung nicht verfügbar · mittiger Ausschnitt';recognitionFailed++}
+  showImportStage(index,files.length,f.name,2);await new Promise(resolve=>setTimeout(resolve,30));
   if(replaceId){p.images=p.images.map(i=>i.id===replaceId?im:i);p.boards.filter(b=>b.imageId===replaceId).forEach(b=>{if(b.family){delete b.family.photoImage;delete b.family.illustrationImage}fit(b,b.family?.enabled?'fit':'fill');MKWSubject.crop(b,im)});replaceId=null}
   else{p.images.push(im);const boards=(p.formats||MKWFormats.legacy()).map(f=>{const b=createBoard(im,f.w,f.h);b.safe={top:f.top,bottom:f.bottom};if(!b.family?.enabled)MKWSubject.crop(b,im);return b});p.boards.push(...boards);selected=boards[0].id}ok++;
  }catch(e){errors.push(`${f.name}: ${e.message}`)}}
  if(ok){step='text';layer='title'}changed();status(`${ok} Bilder importiert${recognitionFailed?' · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen.':''}${errors.length?' · '+errors.join(' · '):''}`);if(errors.length)alert(errors.join('\n'));
- }finally{busy=false;replaceId=null;$('#files').value=''}
+ }finally{$('#importDialog').close();busy=false;replaceId=null;$('#files').value=''}
 }
 function fit(b,mode){const im=asset(b),t=b.image,rad=t.angle*Math.PI/180,c=Math.abs(Math.cos(rad)),s=Math.abs(Math.sin(rad));if(mode==='reset'){t.angle=0;t.flipX=t.flipY=1;mode='fill'}if(mode==='fill')t.scale=Math.max((c*b.w+s*b.h)/im.width,(s*b.w+c*b.h)/im.height);if(mode==='fit')t.scale=Math.min(b.w/(c*im.width+s*im.height),b.h/(s*im.width+c*im.height));if(mode==='original')t.scale=1;t.x=b.w/2;t.y=b.h/2;}
 function reorder(arr,id,delta){const n=arr.findIndex(x=>x.id===id),m=n+delta;if(m<0||m>=arr.length)return;[arr[n],arr[m]]=[arr[m],arr[n]]}

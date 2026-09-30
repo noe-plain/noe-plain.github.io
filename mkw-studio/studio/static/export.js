@@ -16,9 +16,10 @@ async function encodedBoard(b,settings){
  await document.fonts.ready;const c=makeCanvas(b.w,b.h);await paint(c.getContext('2d',{colorSpace:'srgb'}),b,1,{transparent:settings.transparent});
  const mime={jpg:'image/jpeg',png:'image/png',webp:'image/webp'}[settings.format];
  const blob=settings.format==='png'&&settings.png8?await encodePNG8(c,settings.colours):await new Promise((resolve,reject)=>c.toBlob(blob=>blob?resolve(blob):reject(Error('Bild konnte nicht exportiert werden.')),mime,settings.quality/100));
+ let hasTransparency=false;if(settings.transparent){const pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let i=3;i<pixels.length;i+=4)if(pixels[i]<255){hasTransparency=true;break}}
  c.width=c.height=1;if(blob.type!==mime)throw Error('Dieses Bildformat wird von deinem Browser nicht unterstützt.');
  if(exportCache.has(key))return exportCache.get(key);
- const entry={blob,url:URL.createObjectURL(blob)};
+ const entry={blob,url:URL.createObjectURL(blob),hasTransparency};
  // Bound memory while keeping recent preview files ready for download.
  while(exportCacheBytes+blob.size>128*1024*1024&&exportCache.size){const oldest=exportCache.keys().next().value,old=exportCache.get(oldest);exportCacheBytes-=old.blob.size;URL.revokeObjectURL(old.url);exportCache.delete(oldest)}
  exportCache.set(key,entry);exportCacheBytes+=blob.size;return entry;
@@ -32,11 +33,12 @@ async function openExport(){
  $('#exportFields').innerHTML=field('Konzertdatum · TT.MM.JJ','date',p.meta.date,'text','placeholder="15.11.26"')+field('Projektkürzel','code',p.meta.code)+field('Projekttitel','title',p.meta.title)+field('Startnummer','start',p.meta.start,'number','min="0" step="1"');
  for(const key of ['date','code','title','start'])on(key,'input',ev=>{p.meta[key]=key==='start'?+ev.target.value:ev.target.value;revision++;clearTimeout(saveTimer);saveTimer=setTimeout(autosave,1200);updateExportNames()});
  $('#exportFormat').value=exportOptions.format;$('#exportQuality').value=exportOptions.quality;$('#png8').checked=exportOptions.png8;$('#pngColours').value=exportOptions.colours;$('#exportTransparent').checked=exportOptions.transparent;
- $('#exportNames').innerHTML=orderedBoards().map(b=>`<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview checkerboard"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked?'checked':''}> <small>${MKW.ratio(b.w,b.h)} · ${b.w} × ${b.h} px</small><span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`).join('');
+ $('#exportNames').innerHTML=orderedBoards().map(b=>`<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked?'checked':''}> <small>${MKW.ratio(b.w,b.h)} · ${b.w} × ${b.h} px</small><span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`).join('');
  $('#exportNames').onchange=ev=>{if(ev.target.dataset.exportId){p.boards.find(b=>b.id===ev.target.dataset.exportId).checked=ev.target.checked;changed(false);updateExportNames();updateExportTotal()}};
- $('#exportProgress').hidden=true;$('#exportDialog').showModal();syncExportSettings();updateExportNames();scheduleExportPreviews();
+ setExportProgress(0,1,'Bereit zum Exportieren');$('#exportProgress').classList.remove('is-running');$('#exportDialog').showModal();syncExportSettings();updateExportNames();scheduleExportPreviews();
 }
 function syncExportSettings(){
+ document.querySelectorAll('[data-export-format]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.exportFormat===exportOptions.format));
  const jpg=exportOptions.format==='jpg',png=exportOptions.format==='png';$('#qualityField').hidden=png;$('#pngSettings').hidden=!png;$('#pngColoursField').hidden=!exportOptions.png8;$('#transparencyField').hidden=jpg;$('#qualityValue').textContent=exportOptions.quality+' %';$('#exportFormatHint').textContent=jpg?'JPG · deckender Hintergrund · sRGB':'Transparenz entfernt die Zeichenflächenfarbe. Fotos werden dadurch nicht freigestellt.';
 }
 function exportOptionsChanged(){
@@ -44,6 +46,9 @@ function exportOptionsChanged(){
 }
 for(const id of ['exportFormat','png8','pngColours','exportTransparent'])$('#'+id).onchange=exportOptionsChanged;
 $('#exportQuality').oninput=exportOptionsChanged;
+ document.querySelectorAll('[data-export-format]').forEach(button=>button.onclick=()=>{$('#exportFormat').value=button.dataset.exportFormat;exportOptionsChanged()});
+ function selectExports(checked){if(busy)return;p.boards.forEach(b=>b.checked=checked);document.querySelectorAll('[data-export-id]').forEach(input=>input.checked=checked);changed(false);updateExportNames();updateExportTotal()}
+ $('#selectAllExports').onclick=()=>selectExports(true);$('#deselectAllExports').onclick=()=>selectExports(false);
 function scheduleExportPreviews(){
  exportGeneration++;clearTimeout(previewTimer);const generation=exportGeneration;
  document.querySelectorAll('.export-size').forEach(el=>{el.textContent='Wird berechnet …';delete el.dataset.bytes});$('#exportTotal').textContent='Dateigrössen werden berechnet …';
@@ -53,13 +58,14 @@ async function refreshExportPreviews(generation){
  const settings=exportSettings();for(const b of orderedBoards()){
   if(generation!==exportGeneration||!$('#exportDialog').open)return;
   const cell=[...document.querySelectorAll('.export-card')].find(el=>el.dataset.id===b.id);if(!cell)continue;
-  try{const entry=await encodedBoard(clone(b),settings);if(generation!==exportGeneration)return;const img=new Image();img.src=entry.url;img.alt=asset(b).name;cell.querySelector('.export-preview').replaceChildren(img);const size=cell.querySelector('.export-size');size.textContent='ca. '+exportBytes(entry.blob.size);size.dataset.bytes=entry.blob.size}
+  try{const entry=await encodedBoard(clone(b),settings);if(generation!==exportGeneration)return;const img=new Image();img.src=entry.url;img.alt=asset(b).name;cell.querySelector('.export-preview').replaceChildren(img);cell.querySelector('.export-preview').classList.toggle('checkerboard',entry.hasTransparency);const size=cell.querySelector('.export-size');size.textContent='ca. '+exportBytes(entry.blob.size);size.dataset.bytes=entry.blob.size}
   catch(e){if(generation!==exportGeneration)return;cell.querySelector('.export-size').textContent=e.message}
   updateExportTotal();await new Promise(resolve=>setTimeout(resolve,0));
  }
 }
 function updateExportTotal(){let total=0,missing=0;for(const cell of document.querySelectorAll('.export-card'))if(cell.querySelector('input').checked){const bytes=cell.querySelector('.export-size').dataset.bytes;if(bytes===undefined)missing++;else total+=+bytes}$('#exportTotal').textContent=`Auswahl: ca. ${exportBytes(total)}${missing?' · weitere Grössen werden berechnet':''}`}
 function updateExportNames(){
+ $('#exportSelectionCount').textContent=`${p.boards.filter(b=>b.checked).length} von ${p.boards.length} ausgewählt`;
  let error='',names=[];const bs=orderedBoards().filter(b=>b.checked);try{names=MKW.names(p.meta,bs).map(name=>name.replace(/\.jpg$/,'.'+exportOptions.format));if(!bs.length)throw Error('Wähle mindestens ein Sujet.')}catch(e){error=e.message}
  exportPlan=error?[]:bs.map((b,i)=>({board:clone(b),name:names[i]}));
  document.querySelectorAll('.export-card').forEach(el=>{el.querySelector('.export-name').textContent=exportPlan.find(x=>x.board.id===el.dataset.id)?.name||'Nicht im Export'});
@@ -73,12 +79,12 @@ async function runExport(mode){
  $('#exportDialog').querySelectorAll('input,select,button').forEach(el=>{disabled.set(el,el.disabled);el.disabled=true});const failures=[],items=[];let folder;
  try{
   if(mode==='folder')folder=await window.showDirectoryPicker({mode:'readwrite'});
-  setExportProgress(0,plan.length,'Bilder werden vorbereitet …');
+  setExportProgress(0,plan.length+(mode==='zip'?1:0),'Bilder werden vorbereitet …');
   for(const [i,x] of plan.entries()){
-   setExportProgress(i,plan.length,`${i+1} / ${plan.length} · ${x.name}`);await new Promise(resolve=>setTimeout(resolve,20));
+   setExportProgress(i,plan.length+(mode==='zip'?1:0),`${i+1} / ${plan.length} · ${x.name}`);await new Promise(resolve=>setTimeout(resolve,20));
    try{const {blob}=await encodedBoard(x.board,settings);if(mode==='folder'){try{await folder.getFileHandle(x.name);throw Error('Datei existiert bereits.')}catch(e){if(e.name!=='NotFoundError')throw e}const handle=await folder.getFileHandle(x.name,{create:true}),stream=await handle.createWritable();try{await stream.write(blob);await stream.close()}catch(e){await stream.abort().catch(()=>{});throw e}}else items.push({name:x.name,bytes:new Uint8Array(await blob.arrayBuffer())})}
    catch(e){failures.push(`${x.name}: ${e.message}`)}
-   setExportProgress(i+1,plan.length,`${i+1} / ${plan.length} verarbeitet`);
+   setExportProgress(i+1,plan.length+(mode==='zip'?1:0),`${i+1} / ${plan.length} verarbeitet`);
   }
   if(mode==='zip'&&items.length){setExportProgress(plan.length,plan.length+1,'ZIP wird zusammengestellt …');await new Promise(resolve=>setTimeout(resolve,20));download(MKWBrowser.zip(items),MKW.projectName(p.meta)+'_'+settings.format.toUpperCase()+'.zip')}
   const successes=plan.length-failures.length;$('#exportStatus').textContent=`${successes} von ${plan.length} Dateien ${mode==='zip'?'als ZIP an den Browser übergeben':'gespeichert'}.${failures.length?' '+failures.join(' · '):''}`;setExportProgress(plan.length,plan.length,failures.length?'Abgeschlossen mit Hinweisen':'Fertig · '+successes+' Dateien');status(`${successes} Bilder exportiert`);
@@ -91,9 +97,9 @@ $('#folder').hidden=!window.showDirectoryPicker;
 function reviewBoards(){return orderedBoards().filter(b=>b.checked)}
 async function showReview(){
  const boards=reviewBoards();if(!boards.length)return;reviewIndex=(reviewIndex+boards.length)%boards.length;const b=boards[reviewIndex],index=reviewIndex;
- document.querySelector('.review-stage').classList.toggle('checkerboard',exportSettings().transparent);
+ document.querySelector('.review-stage').classList.remove('checkerboard');
  $('#reviewPosition').textContent=`${index+1} / ${boards.length} · ${MKW.ratio(b.w,b.h)} · ${b.w} × ${b.h} px`;$('#reviewImage').hidden=true;$('#reviewMessage').textContent='Vorschau wird erstellt …';
- try{const {blob}=await encodedBoard(clone(b),exportSettings());if(index!==reviewIndex||!$('#reviewDialog').open)return;URL.revokeObjectURL(reviewURL);reviewURL=URL.createObjectURL(blob);$('#reviewImage').src=reviewURL;$('#reviewImage').alt=asset(b).name;$('#reviewImage').hidden=false;$('#reviewMessage').textContent=''}catch(e){$('#reviewMessage').textContent=e.message}
+ try{const {blob,hasTransparency}=await encodedBoard(clone(b),exportSettings());document.querySelector('.review-stage').classList.toggle('checkerboard',hasTransparency);if(index!==reviewIndex||!$('#reviewDialog').open)return;URL.revokeObjectURL(reviewURL);reviewURL=URL.createObjectURL(blob);$('#reviewImage').src=reviewURL;$('#reviewImage').alt=asset(b).name;$('#reviewImage').hidden=false;$('#reviewMessage').textContent=''}catch(e){$('#reviewMessage').textContent=e.message}
 }
 $('#reviewExport').onclick=()=>{reviewIndex=0;$('#reviewDialog').showModal();showReview()};
 $('#reviewPrevious').onclick=()=>{reviewIndex--;showReview()};$('#reviewNext').onclick=()=>{reviewIndex++;showReview()};$('#closeReview').onclick=()=>$('#reviewDialog').close();
