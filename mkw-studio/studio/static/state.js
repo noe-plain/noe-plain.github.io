@@ -36,7 +36,7 @@ async function importFiles(files){
   else{p.images.push(im);const boards=(p.formats||MKWFormats.legacy()).map(f=>{const b=createBoard(im,f.w,f.h);b.safe={top:f.top,bottom:f.bottom};if(!b.family?.enabled)MKWSubject.crop(b,im);return b});p.boards.push(...boards);selected=boards[0].id}ok++;
  }catch(e){errors.push(`${f.name}: ${e.message}`)}}
  if(ok){step='text';layer='title'}changed();status(`${ok} Bilder importiert${recognitionFailed?' · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen.':''}${errors.length?' · '+errors.join(' · '):''}`);if(errors.length)alert(errors.join('\n'));
- }finally{$('#importDialog').close();busy=false;replaceId=null;$('#files').value=''}
+ }finally{$('#importDialog').close();busy=false;replaceId=null;$('#files').value='';syncOverlays(true);renderPanel()}
 }
 function fit(b,mode){const im=asset(b),t=b.image,rad=t.angle*Math.PI/180,c=Math.abs(Math.cos(rad)),s=Math.abs(Math.sin(rad));if(mode==='reset'){t.angle=0;t.flipX=t.flipY=1;mode='fill'}if(mode==='fill')t.scale=Math.max((c*b.w+s*b.h)/im.width,(s*b.w+c*b.h)/im.height);if(mode==='fit')t.scale=Math.min(b.w/(c*im.width+s*im.height),b.h/(s*im.width+c*im.height));if(mode==='original')t.scale=1;t.x=b.w/2;t.y=b.h/2;}
 function reorder(arr,id,delta){const n=arr.findIndex(x=>x.id===id),m=n+delta;if(m<0||m>=arr.length)return;[arr[n],arr[m]]=[arr[m],arr[n]]}
