@@ -18,15 +18,28 @@ async function open(entry, password, dir) {
 test('Secure customer upload, browser-compatible password, updates and pause', async t => {
     const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'noe-clients-')); const manager = path.join(root, 'portfolio-manager'); await fsp.mkdir(manager);
     for (const file of ['studio.js', 'media-library.js', 'client-galleries.js', 'photo-metadata.js']) await fsp.copyFile(path.join(__dirname, file), path.join(manager, file));
+    await fsp.mkdir(path.join(root, 'portfolio/kunden'), { recursive: true }); await fsp.copyFile(path.join(__dirname, '../portfolio/kunden/links.js'), path.join(root, 'portfolio/kunden/links.js'));
+    const { execFileSync } = require('node:child_process');
+    execFileSync('git', ['init'], { cwd: root, stdio: 'ignore' }); execFileSync('git', ['remote', 'add', 'origin', 'git@github.com:noe-plain/noe-plain.github.io.git'], { cwd: root });
     const app = express(); require(path.join(manager, 'studio'))(app, root);
     const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     t.after(async () => { await new Promise(resolve => server.close(resolve)); await fsp.rm(root, { recursive: true, force: true }); });
     const origin = 'http://127.0.0.1:' + server.address().port, token = (await (await fetch(origin + '/api/studio/session')).json()).token;
     const send = async data => fetch(origin + '/api/studio/clients', { method: 'POST', headers: { Origin: origin, 'X-CMS-Token': token, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    assert.equal((await (await fetch(origin + '/api/studio/clients/site')).json()).url, 'https://noe-plain.github.io/');
+    execFileSync('git', ['remote', 'set-url', 'origin', 'https://github.com/noe-plain/project.git'], { cwd: root });
+    assert.equal((await (await fetch(origin + '/api/studio/clients/site')).json()).url, 'https://noe-plain.github.io/project/');
+    await fsp.writeFile(path.join(root, 'CNAME'), 'www.noeplain.ch\n');
+    assert.equal((await (await fetch(origin + '/api/studio/clients/site')).json()).url, 'https://www.noeplain.ch/'); await fsp.unlink(path.join(root, 'CNAME'));
     const unauthorized = await fetch(origin + '/api/studio/clients', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }); assert.equal(unauthorized.status, 403);
     assert.equal((await send({ title: 'Anlass', password: 'kurz' })).status, 400);
     let result = await send({ title: 'Firmenfest', date: '2026-10-02', password: 'Ein-langes-Testpasswort' }); assert.equal(result.status, 200);
-    let event = await result.json(); assert.equal(event.key, undefined); assert.equal(event.salt, undefined);
+    let event = await result.json(); assert.equal(event.key, undefined); assert.equal(event.salt, undefined); assert.equal(event.slug, 'firmenfest');
+    assert.equal((await send({ title: 'Anderer Anlass', slug: 'firmenfest', password: 'Ein-langes-Testpasswort' })).status, 409);
+    assert.equal((await send({ title: 'Anderer Anlass', slug: '../bad', password: 'Ein-langes-Testpasswort' })).status, 400);
+    result = await send({ ...event, title: 'Neuer Titel', slug: undefined, password: '' }); assert.equal(result.status, 200); event = await result.json(); assert.equal(event.slug, 'firmenfest');
+    result = await send({ ...event, slug: 'firmenfest-2026', password: '' }); assert.equal(result.status, 200); event = await result.json();
+    assert.equal(JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/data/index.json')))[0].slug, 'firmenfest-2026');
     const form = new FormData(); form.append('revision', event.revision);
     const image = await sharp({ create: { width: 120, height: 80, channels: 3, background: '#ddcfe6' } }).jpeg().withExif({ IFD0: { Model: 'ILCE-7CM2', Artist: 'PRIVATE ARTIST' }, IFD2: { FNumber: '28/10', ISOSpeedRatings: '400' } }).toBuffer();
     form.append('images', new Blob([image], { type: 'image/jpeg' }), 'Testbild.jpg');
@@ -56,4 +69,33 @@ test('ZIP selection preserves bytes and disambiguates duplicate filenames', asyn
         const result = execFileSync('python3', ['-c', 'import zipfile,sys; z=zipfile.ZipFile(sys.argv[1]); assert z.namelist()==["Bild.jpg","Bild-2.jpg"]; assert z.read("Bild.jpg")==bytes([1,2,3]); assert z.testzip() is None', file]);
         assert.equal(result.length, 0);
     } finally { await fsp.rm(file); }
+});
+
+test('Stable named links, legacy ID links and unique default names', () => {
+    const { assignSlugs, slugify, galleryLink, selectedEvent } = require('../portfolio/kunden/links');
+    const events = assignSlugs([{ id: 'a', title: 'Eröffnungsfest Zürich' }, { id: 'b', title: 'Eröffnungsfest Zürich' }, { id: 'c', title: 'Neuer Titel', slug: 'kundenfest' }]);
+    assert.equal(slugify('Ä Ö Ü ß é'), 'ae-oe-ue-ss-e');
+    assert.equal(events[0].slug, 'eroeffnungsfest-zuerich'); assert.equal(events[1].slug, 'eroeffnungsfest-zuerich-2');
+    assert.equal(galleryLink('https://example.com/project/', events[0].slug), 'https://example.com/project/kunden.html?eroeffnungsfest-zuerich');
+    assert.equal(galleryLink('https://example.com/'), 'https://example.com/kunden.html');
+    assert.equal(selectedEvent('?eroeffnungsfest-zuerich', events).id, 'a');
+    assert.equal(selectedEvent('?veranstaltung=b', events).id, 'b');
+    assert.equal(selectedEvent('?kundenfest', events).id, 'c');
+    assert.equal(selectedEvent('?%invalid', events), null);
+    assert.equal(assignSlugs([{ ...events[0], title: 'Geänderter Titel' }])[0].slug, events[0].slug);
+});
+
+test('Legacy names are persisted consistently with paused events, without changing encrypted bundles', async t => {
+    const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'noe-legacy-links-'));
+    t.after(() => fsp.rm(root, { recursive: true, force: true }));
+    const privateDir = path.join(root, 'portfolio-manager/.client-galleries'), publicDir = path.join(root, 'portfolio/kunden/data');
+    await fsp.mkdir(privateDir, { recursive: true }); await fsp.mkdir(publicDir, { recursive: true });
+    const events = [{ id: 'a', title: 'Fest', active: false, revision: 'old-a' }, { id: 'b', title: 'Fest', active: true, revision: 'old-b' }];
+    await fsp.writeFile(path.join(privateDir, 'events.json'), JSON.stringify(events));
+    await fsp.writeFile(path.join(publicDir, 'index.json'), JSON.stringify([{ id: 'b', title: 'Fest', bundle: 'same/gallery.bin' }]));
+    require('./client-galleries').register(express(), root, fn => fn);
+    const stored = JSON.parse(await fsp.readFile(path.join(privateDir, 'events.json'))), index = JSON.parse(await fsp.readFile(path.join(publicDir, 'index.json')));
+    assert.equal(stored[0].slug, 'fest'); assert.equal(stored[1].slug, 'fest-2'); assert.equal(index[0].slug, stored[1].slug); assert.equal(index[0].bundle, 'same/gallery.bin');
+    require('./client-galleries').register(express(), root, fn => fn);
+    assert.deepEqual(JSON.parse(await fsp.readFile(path.join(privateDir, 'events.json'))), stored);
 });

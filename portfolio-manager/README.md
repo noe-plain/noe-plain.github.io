@@ -59,7 +59,7 @@ Neue Bilder erzeugen genau vier öffentliche Varianten: `<Name>.jpg` in Original
 
 ## Kundengalerien
 
-Die öffentliche Unterseite `kunden.html` wird nicht in die Navigation aufgenommen. Unter **Verwaltung → Kundengalerien** werden Veranstaltungen erstellt, Kundenbilder direkt hochgeladen und Freigabelinks kopiert. Veranstaltungsnamen, Datum und Bildanzahl erscheinen vor der Passworteingabe. Die Website-Adresse für Links lässt sich im Bearbeitungsdialog einstellen (auch ein GitHub-Pages-Unterpfad ist möglich).
+Die öffentliche Unterseite `kunden.html` wird nicht in die Navigation aufgenommen. Unter **Verwaltung → Kundengalerien** werden Veranstaltungen erstellt, Kundenbilder direkt hochgeladen und Freigabelinks kopiert. Veranstaltungsnamen, Datum und Bildanzahl erscheinen vor der Passworteingabe. Die feste Einstiegsseite ist `kunden.html`. Direktlinks haben die Form `kunden.html?sommerfest-2026`; den eindeutigen Linknamen legt man pro Veranstaltung fest. Die Website-Adresse wird aus `CNAME` oder dem GitHub-Remote automatisch ermittelt (auch GitHub-Pages-Unterpfade). Titeländerungen ändern gespeicherte Linknamen nicht. Alte Links mit `?veranstaltung=<ID>` bleiben gültig.
 
 Ein neues Passwort benötigt mindestens 12 Zeichen; der CMS-Button erzeugt ein zufälliges Passwort. Es wird nur zur Schlüsselableitung verwendet und nicht gespeichert. Den Kundinnen Link und Passwort getrennt weitergeben. Nach jedem Speichern oder Upload liegen die öffentlichen Änderungen lokal bereit; anschliessend die Dateien über **Änderungen prüfen → Commit erstellen & pushen** veröffentlichen. Vor einer Online-Freigabe mit dem richtigen Passwort über „Lokal ansehen“ testen.
 

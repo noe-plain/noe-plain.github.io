@@ -2,8 +2,8 @@
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
 <title>Deine Bilder – Medien von Noé</title><link rel="icon" href="./images/illustrationen/logos/favicon.png">
-<link rel="stylesheet" href="css/layout.css"><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/kunden.css">
-<script src="common.js" defer></script><script src="portfolio/kunden/zip.js" defer></script><script src="portfolio/kunden/client.js" defer></script>
+<link rel="stylesheet" href="css/layout.css"><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/gallery-overlay.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link rel="stylesheet" href="css/kunden.css">
+<script src="common.js" defer></script><script src="portfolio/kunden/zip.js" defer></script><script src="portfolio/kunden/links.js" defer></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js" defer></script><script src="portfolio/kunden/client.js" defer></script>
 </head><body class="client-page">
     <header>
         <nav class="header-nav">
@@ -45,14 +45,42 @@
 
 <main class="client-main">
 <section class="client-intro"><span class="client-eyebrow">Medien von Noé · Kundengalerie</span><h1>Deine Momente.<br>Deine Bilder.</h1><p>Wähle deine Veranstaltung und öffne die Galerie mit dem Passwort, das du von mir erhalten hast.</p></section>
-<section class="client-event-picker"><label for="client-events">Deine Veranstaltung</label><select id="client-events"><option>Wird geladen …</option></select><p id="client-empty" hidden>Zurzeit sind keine Veranstaltungen freigegeben.</p></section>
+<section class="client-event-picker" aria-label="Veranstaltung auswählen"><h2 class="client-nav-heading">Deine Veranstaltung</h2><div class="client-nav-wrap"><button id="page-nav-left-gradient" class="client-nav-scroll" aria-label="Vorherige Veranstaltungen" hidden>‹</button><nav id="page-nav" aria-label="Veranstaltungen"></nav><button id="page-nav-scroll-btn" class="client-nav-scroll" aria-label="Weitere Veranstaltungen" hidden>›</button></div><p id="client-empty" hidden>Zurzeit sind keine Veranstaltungen freigegeben.</p></section>
 <section id="client-unlock" class="client-unlock" hidden><h2 id="client-event-title"></h2><p id="client-event-summary"></p><form id="client-form"><label for="client-password">Passwort für diese Veranstaltung</label><div class="client-password-field"><input type="password" id="client-password" required autocomplete="current-password"><button type="button" id="client-show" aria-pressed="false">Anzeigen</button></div><button id="client-open" type="submit" class="client-primary">Galerie öffnen →</button></form></section>
 <p id="client-status" role="status" aria-live="polite"></p><button id="client-retry" hidden>Erneut versuchen</button>
 <section id="client-gallery" hidden><div class="client-gallery-heading"><div><h2 id="client-title"></h2><p id="client-description"></p></div><button id="client-lock">Galerie schliessen</button></div><p class="client-guide">Bild anklicken für die Grossansicht. Mit + wählst du Bilder für deinen Download aus.</p>
 <div class="client-selection-bar"><div class="client-select-tools"><button id="client-all">Alle auswählen</button><button id="client-none">Alle abwählen</button></div><span id="client-selection" role="status"></span><button class="client-primary" id="client-download" disabled>Auswahl als ZIP herunterladen ↓</button></div><p id="client-download-status" role="status"></p>
 <div id="client-ready"></div><div id="client-grid" class="project-gallery" aria-label="Bilder der Veranstaltung"></div><p id="client-grid-empty" hidden>Die Bilder für diese Veranstaltung folgen in Kürze.</p></section>
 </main>
-<dialog id="client-detail" aria-labelledby="client-detail-title"><div class="client-detail-top"><div><strong id="client-detail-title"></strong><span id="client-detail-position"></span></div><button id="client-close" aria-label="Grossansicht schliessen">×</button></div><div class="client-detail-stage"><button id="client-prev" aria-label="Vorheriges Bild">‹</button><div class="client-detail-photo"><img id="client-detail-image" alt=""></div><button id="client-next" aria-label="Nächstes Bild">›</button></div><p id="client-detail-status" role="status"></p><div id="client-detail-ready"></div><div class="client-detail-bottom"><details><summary>Bildinformationen</summary><p id="client-detail-info"></p></details><span class="client-zoom-hint">Bild anklicken zum Zoomen</span><button id="client-detail-select">Bild auswählen</button><button class="client-primary" id="client-single">Bild herunterladen ↓</button></div></dialog>
+<dialog id="detail-screen" aria-labelledby="client-detail-title">
+    <div class="detail-container">
+        <div class="detail-image-wrapper">
+            <div class="zoom-container"><div class="zoom-target" id="zoom-target"><img id="client-detail-image" class="detail-img" alt="" draggable="false"></div></div>
+            <div class="zoom-controls">
+                <button id="zoom-out-btn" class="client-zoom-button" aria-label="Verkleinern"><i class="fas fa-search-minus small-icon" aria-hidden="true"></i></button>
+                <input type="range" id="zoom-slider" min="1" max="4" step="0.1" value="1" aria-label="Bild vergrössern">
+                <button id="zoom-in-btn" class="client-zoom-button" aria-label="Vergrössern"><i class="fas fa-search-plus small-icon" aria-hidden="true"></i></button>
+            </div>
+            <button class="icon-btn detail-nav-button left" id="client-prev" aria-label="Vorheriges Bild"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+            <button class="icon-btn detail-nav-button right" id="client-next" aria-label="Nächstes Bild"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+        </div>
+        <div class="detail-header-overlay">
+            <button class="icon-btn" id="client-close" aria-label="Zurück zur Galerie"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+            <div class="right-actions">
+                <button class="icon-btn bookmark-btn" id="client-detail-select" aria-label="Bild auswählen" aria-pressed="false"><i class="far fa-heart" aria-hidden="true"></i></button>
+                <button class="icon-btn" id="info-toggle-btn" aria-label="Bildinformationen anzeigen" aria-expanded="false" aria-controls="detail-content-sheet"><i class="fas fa-info" aria-hidden="true"></i></button>
+                <button class="icon-btn" id="client-single" aria-label="Bild herunterladen"><i class="fas fa-download" aria-hidden="true"></i></button>
+            </div>
+        </div>
+        <div class="client-detail-feedback"><span id="client-detail-position"></span><p id="client-detail-status" role="status"></p><div id="client-detail-ready"></div></div>
+        <div class="detail-content" id="detail-content-sheet" hidden>
+            <button class="sheet-close-btn" id="sheet-close-btn" aria-label="Bildinformationen schliessen"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <div class="detail-info-header"><h2 id="client-detail-title"></h2><p class="photographer"><i class="fas fa-user-circle" aria-hidden="true"></i> Noé Plain</p></div>
+            <div class="specs-row" id="specs-equipment"></div><div class="specs-row" id="specs-technical"></div>
+            <div class="description"><p id="client-detail-info"></p></div>
+        </div>
+    </div>
+</dialog>
     <footer>
         <nav class="footer-nav">
             <svg class="footer-logo" preserveAspectRatio="xMidYMid meet" data-bbox="55.13 44.69 1889.73 1060.63"

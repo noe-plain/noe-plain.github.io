@@ -1,8 +1,8 @@
 'use strict';
-let clientEvents = [], clientQuery = '';
+let clientEvents = [], clientQuery = '', clientSite = '';
 async function loadClients() {
     const root = $('#management'); root.innerHTML = '<p class="hint">Kundengalerien werden geladen …</p>';
-    try { clientEvents = await api('/api/studio/clients'); if (type === 'clients') renderClients(); }
+    try { const [events, site] = await Promise.all([api('/api/studio/clients'), api('/api/studio/clients/site')]); clientEvents = events; clientSite = site.url; if (type === 'clients') renderClients(); }
     catch (error) { root.textContent = error.message; root.append(button('Erneut versuchen', loadClients)); }
 }
 function renderClients() {
@@ -10,6 +10,9 @@ function renderClients() {
     root.querySelector('.manager-heading').append(button('＋ Veranstaltung erstellen', () => editClient(), 'primary'));
     const hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Eigener Upload mit Passwortschutz. Veranstaltungsnamen und Datum sind öffentlich sichtbar. Bilder werden verschlüsselt bereitgestellt und danach über „Änderungen prüfen“ veröffentlicht.';
     root.querySelector('.manager-toolbar').append(hint);
+    const access = document.createElement('div'); access.className = 'client-access-links';
+    const entry = document.createElement('a'); entry.href = ClientGalleryLinks.galleryLink(clientSite); entry.target = '_blank'; entry.rel = 'noopener'; entry.textContent = 'Feste Kundenseite: ' + entry.href;
+    access.append(entry, button('Seitenlink kopieren', async () => { await navigator.clipboard.writeText(entry.href); notice('Link zur Kundenseite kopiert.'); })); root.querySelector('.manager-toolbar').append(access);
     const search = document.createElement('input'); search.type = 'search'; search.placeholder = 'Veranstaltung suchen …'; search.setAttribute('aria-label', 'Veranstaltung suchen'); search.value = clientQuery;
     root.querySelector('.manager-toolbar').append(search);
     const body = root.querySelector('.manager-body'); body.className += ' client-manager-grid';
@@ -22,26 +25,30 @@ function renderClients() {
             const info = document.createElement('p'); info.className = 'hint'; info.textContent = `${event.date || 'Ohne Datum'} · ${event.images.length} Bilder · ${event.active ? 'Freigegeben (lokaler Stand)' : 'Pausiert'}`;
             const tools = document.createElement('div'); tools.className = 'manager-actions';
             tools.append(button('Bearbeiten & Bilder', () => editClient(event)), button('Link kopieren', async () => {
-                const link = clientLink(event.id); await navigator.clipboard.writeText(link); notice('Link kopiert. Er funktioniert online nach Commit und Push.');
-            }), button('Lokal ansehen ↗', () => window.open('/kunden.html?veranstaltung=' + event.id, '_blank', 'noopener')));
+                const link = clientLink(event.slug); await navigator.clipboard.writeText(link); notice('Link kopiert. Er funktioniert online nach Commit und Push.');
+            }), button('Lokal ansehen ↗', () => window.open('/kunden.html?' + encodeURIComponent(event.slug), '_blank', 'noopener')));
             card.append(heading, info, tools); body.append(card);
         }
         if (!events.length) { const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = clientEvents.length ? 'Keine passende Veranstaltung.' : 'Noch keine Kundengalerien. Erstelle eine Veranstaltung und lade die Bilder direkt dort hoch.'; body.append(empty); }
     }
     search.oninput = () => { clientQuery = search.value; cards(); }; cards();
 }
-function clientLink(id) {
-    const value = $('#client-site-url')?.value || localStorage.getItem('noe-client-site-url') || 'https://noe-plain.github.io/';
-    const url = new URL(value); if (url.protocol !== 'https:') throw Error('Bitte die HTTPS-Adresse deiner Website eingeben.');
-    if (!url.pathname.endsWith('/')) url.pathname += '/';
-    const link = new URL('kunden.html', url); link.searchParams.set('veranstaltung', id); return link.href;
-}
+function clientLink(slug) { return ClientGalleryLinks.galleryLink(clientSite, slug); }
 function editClient(original) {
     let event = original ? structuredClone(original) : null;
     let images = event ? [...event.images] : [];
     const el = dialog(event ? 'Kundengalerie bearbeiten' : 'Neue Veranstaltung'); el.classList.add('client-editor-dialog');
     const host = el.querySelector('.manager-dialog-body'), form = document.createElement('form');
     const title = labeled('Veranstaltung', event?.title, { required: true }); title.querySelector('input').maxLength = 160;
+    const slug = labeled('Name für den Direktlink', event?.slug || '', { required: true });
+    const slugInput = slug.querySelector('input'); slugInput.maxLength = 80; slugInput.pattern = '[a-z0-9]+(-[a-z0-9]+)*'; slugInput.placeholder = 'zum-beispiel-sommerfest-2026';
+    let customSlug = !!event;
+    const linkPreview = document.createElement('a'); linkPreview.className = 'client-link-preview'; linkPreview.target = '_blank'; linkPreview.rel = 'noopener';
+    function updateLink() { linkPreview.href = clientLink(slugInput.value); linkPreview.textContent = linkPreview.href; }
+    title.querySelector('input').addEventListener('input', () => { if (!customSlug) slugInput.value = ClientGalleryLinks.slugify(title.querySelector('input').value); updateLink(); });
+    slugInput.addEventListener('input', () => { customSlug = true; updateLink(); });
+    slugInput.addEventListener('change', () => { slugInput.value = ClientGalleryLinks.slugify(slugInput.value); updateLink(); }); updateLink();
+    const linkHint = document.createElement('p'); linkHint.className = 'hint'; linkHint.textContent = 'Die Website-Adresse wird automatisch bestimmt. Der Linkname bleibt bei Titeländerungen gleich. Nur kleine Buchstaben, Zahlen und Bindestriche.';
     const date = labeled('Datum (optional)', event?.date, { type: 'date' });
     const description = document.createElement('label'); description.textContent = 'Nachricht für die Kundinnen (optional)'; const text = document.createElement('textarea'); text.value = event?.description || ''; description.append(text);
     const password = labeled(event ? 'Neues Passwort (leer lassen zum Beibehalten)' : 'Passwort für diese Veranstaltung', '', { type: 'password', required: !event });
@@ -51,7 +58,6 @@ function editClient(original) {
     for (const b of passTools.children) b.type = 'button'; password.append(passTools);
     const passHint = document.createElement('p'); passHint.className = 'hint'; passHint.textContent = 'Mindestens 12 Zeichen. Das Passwort wird nicht gespeichert. Bewahre es auf und gib es den Kundinnen getrennt vom Link weiter.';
     const active = document.createElement('label'); active.className = 'client-active-toggle'; const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = event?.active ?? true; active.append(checkbox, document.createTextNode('Veranstaltung auf der Kundenseite freigeben'));
-    const site = labeled('Adresse deiner Website für den Freigabelink', localStorage.getItem('noe-client-site-url') || 'https://noe-plain.github.io/', { type: 'url' }); site.querySelector('input').id = 'client-site-url';
     const privacy = document.createElement('p'); privacy.className = 'hint'; privacy.textContent = 'Titel und Datum erscheinen vor der Passworteingabe. Lade Kundenbilder hier hoch, damit sie nicht in der öffentlichen Mediathek landen. Bereits heruntergeladene Bilder lassen sich durch Pausieren oder ein neues Passwort nicht zurückholen.';
     const message = document.createElement('p'); message.setAttribute('role', 'status'); message.className = 'hint';
     const list = document.createElement('div'); list.className = 'client-manager-images';
@@ -72,15 +78,13 @@ function editClient(original) {
     const upload = button('＋ Kundenbilder hochladen', () => files.click(), 'primary'); upload.type = 'button'; upload.disabled = !event;
     const uploadHint = document.createElement('p'); uploadHint.className = 'hint'; uploadHint.textContent = event ? 'JPG, PNG, WebP, AVIF oder TIFF · maximal 40 MB pro Datei. Download als JPG in voller Auflösung.' : 'Speichere zuerst die Veranstaltung. Danach kannst du Bilder hochladen.';
     const save = button(event ? 'Änderungen lokal speichern' : 'Veranstaltung erstellen', () => {}, 'primary'); save.type = 'submit';
-    form.append(title, date, description, password, passHint, active, site, privacy, save, message, upload, files, uploadHint, list); host.append(form); renderImages();
+    form.append(title, slug, linkPreview, linkHint, date, description, password, passHint, active, privacy, save, message, upload, files, uploadHint, list); host.append(form); renderImages();
     form.addEventListener('input', input => { if (input.target !== files) dirty = true; });
     async function saveEvent() {
         if (!form.reportValidity()) return false;
-        clientLink(event?.id || '');
-        localStorage.setItem('noe-client-site-url', site.querySelector('input').value);
         message.textContent = 'Galerie wird verschlüsselt und lokal gespeichert …';
-        const result = await api('/api/studio/clients', { id: event?.id, revision: event?.revision, title: title.querySelector('input').value, date: date.querySelector('input').value, description: text.value, password: passInput.value, active: checkbox.checked, images: event ? images.map(image => image.id) : undefined });
-        event = result; images = [...event.images]; password.firstChild.textContent = 'Neues Passwort (leer lassen zum Beibehalten)'; passInput.value = ''; passInput.required = false;
+        const result = await api('/api/studio/clients', { id: event?.id, revision: event?.revision, title: title.querySelector('input').value, slug: slugInput.value, date: date.querySelector('input').value, description: text.value, password: passInput.value, active: checkbox.checked, images: event ? images.map(image => image.id) : undefined });
+        event = result; slugInput.value = event.slug; customSlug = true; updateLink(); images = [...event.images]; password.firstChild.textContent = 'Neues Passwort (leer lassen zum Beibehalten)'; passInput.value = ''; passInput.required = false;
         save.textContent = 'Änderungen lokal speichern'; upload.disabled = false; uploadHint.textContent = 'Bilder direkt hier hochladen. Veröffentlichung über „Änderungen prüfen“.';
         saved(); renderImages(); message.textContent = 'Lokal gespeichert. Für die Online-Freigabe anschliessend Commit & Push durchführen.';
         clientEvents = await api('/api/studio/clients'); if (type === 'clients') renderClients(); return true;

@@ -8,6 +8,7 @@ test('Real image upload keeps original names, creates one media entry, respects 
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'noe-upload-'));const manager=path.join(root,'portfolio-manager');fs.mkdirSync(manager);
  for(const file of ['server.js','studio.js','media-library.js','photo-metadata.js','client-galleries.js'])fs.copyFileSync(path.join(__dirname,file),path.join(manager,file));
  fs.copyFileSync(path.join(__dirname,'media-processor.js'),path.join(manager,'media-processor.js'));
+ fs.mkdirSync(path.join(root,'portfolio/kunden'),{recursive:true}); fs.copyFileSync(path.join(__dirname,'../portfolio/kunden/links.js'),path.join(root,'portfolio/kunden/links.js'));
  const app=require(path.join(manager,'server.js'));const server=await new Promise(resolve=>{const server=app.listen(0,'127.0.0.1',()=>resolve(server));});
  t.after(()=>{server.close();fs.rmSync(root,{recursive:true,force:true});});
  const origin='http://127.0.0.1:'+server.address().port;const token=(await(await fetch(origin+'/api/studio/session')).json()).token;
