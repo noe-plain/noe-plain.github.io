@@ -62,6 +62,7 @@ function drawText(ctx,layout,opts={}){
 }
 function drawLogo(ctx,b,logo,opts={}){const e=b.elements.logo;if((opts.only&&opts.only!=='logo')||!e.visible)return;const w=e.size,h=w*logo.height/logo.width,off=e.align==='center'?-w/2:e.align==='right'?-w:0;ctx.save();ctx.translate(e.x,e.y);ctx.rotate((e.angle||0)*Math.PI/180);ctx.drawImage(logo,off,0,w,h);ctx.restore()}
 async function paint(ctx,b,s=1,opts={}){
+ if(p.carousel&&Number.isInteger(b.carouselSlide))return carouselPaint(ctx,b.carouselSlide,s,opts.transparent);
  const layout=textBlock(b,opts.editKey),logo=await prepareLogo(b),safe=layout.safe;
  ctx.save();ctx.scale(s,s);
  if(!opts.transparent&&(!opts.only||opts.only==='background')){ctx.fillStyle=b.family?.enabled?b.family.background:b.bg;ctx.fillRect(0,0,b.w,b.h)}
@@ -76,6 +77,7 @@ async function paint(ctx,b,s=1,opts={}){
 async function canvasPNG(b){await document.fonts.ready;const c=makeCanvas(b.w,b.h);await paint(c.getContext('2d',{colorSpace:'srgb'}),b);return c.toDataURL('image/png')}
 let drawing=false,drawAgain=false;
 async function draw(){
+ if(p.carousel){carouselRefresh();return}
  if(drawing){drawAgain=true;return}drawing=true;
  try{
   for(const b of p.boards){const c=document.querySelector(`canvas[data-board="${b.id}"]`);if(!c)continue;const s=surfaceScale(),w=Math.round(b.w*s*devicePixelRatio),h=Math.round(b.h*s*devicePixelRatio);const buffer=makeCanvas(w,h);await paint(buffer.getContext('2d',{colorSpace:'srgb'}),b,w/b.w,{skip:editingText?.boardId===b.id?editingText.key:null,editKey:step==='text'&&selected===b.id?layer:null});if(!c.isConnected)continue;c.width=w;c.height=h;c.getContext('2d').drawImage(buffer,0,0)}
