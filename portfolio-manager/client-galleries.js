@@ -11,6 +11,7 @@ const { assignSlugs, slugify } = require('../portfolio/kunden/links');
 const execFile = promisify(require('node:child_process').execFile);
 const derive = promisify(crypto.pbkdf2);
 const iterations = 310000;
+const maxImages = 500;
 const uuid = /^[a-f0-9-]{36}$/;
 function seal(data, key) {
     const iv = crypto.randomBytes(12), cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
@@ -35,8 +36,16 @@ function register(app, root, route) {
         }
     }
     const fail = (text, status = 400) => Object.assign(new Error(text), { status });
-    let busy = false;
-    async function exclusive(fn) { if (busy) throw fail('Eine Kundengalerie wird gerade verarbeitet. Bitte warten.', 409); busy = true; try { return await fn(); } finally { busy = false; } }
+    let busy = false, progress = null;
+    const operationId = value => typeof value === 'string' && uuid.test(value) ? value : crypto.randomUUID();
+    function stage(name, total = 0) { progress.stage = name; progress.completed = 0; progress.total = total; }
+    async function exclusive(fn, operation) {
+        if (busy) throw fail('Eine Kundengalerie wird gerade verarbeitet. Bitte warten.', 409);
+        busy = true; progress = { operation: operationId(operation), active: true, stage: 'preparing', completed: 0, total: 0 };
+        try { const result = await fn(); progress.stage = 'done'; progress.completed = progress.total; return result; }
+        catch (error) { progress.stage = 'failed'; throw error; }
+        finally { progress.active = false; busy = false; }
+    }
     function read() { return fs.existsSync(stateFile) ? assignSlugs(JSON.parse(fs.readFileSync(stateFile, 'utf8'))) : []; }
     function event(id) { const found = read().find(e => e.id === id); if (!found) throw fail('Veranstaltung nicht gefunden.', 404); return found; }
     const safe = e => ({ id: e.id, slug: e.slug, title: e.title, date: e.date, description: e.description, active: e.active, revision: e.revision, images: e.images.map(({ id, name, width, height, size }) => ({ id, name, width, height, size })) });
@@ -48,6 +57,7 @@ function register(app, root, route) {
         try {
             if (next.active) {
                 await fsp.mkdir(temp, { recursive: true });
+                stage('encrypting', next.images.length);
                 const key = Buffer.from(next.key, 'base64'), images = [];
                 for (const image of next.images) {
                     const source = path.join(privateDir, next.id, image.id + '.jpg');
@@ -56,11 +66,13 @@ function register(app, root, route) {
                     const thumb = await sharp(original).resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
                     for (const [kind, buffer] of [['full', original], ['preview', preview], ['thumb', thumb]]) await fsp.writeFile(path.join(temp, image.id + '-' + kind + '.bin'), seal(buffer, key));
                     images.push({ ...image, full: image.id + '-full.bin', preview: image.id + '-preview.bin', thumb: image.id + '-thumb.bin' });
+                    progress.completed = images.length;
                 }
                 await fsp.writeFile(path.join(temp, 'gallery.bin'), seal(Buffer.from(JSON.stringify({ title: next.title, description: next.description, images })), key));
                 await fsp.mkdir(destination, { recursive: true });
                 await fsp.rename(temp, path.join(destination, release));
             }
+            stage('saving');
             next.release = release; next.revision = crypto.randomUUID();
             const entries = all.filter(e => e.active).map(e => ({ id: e.id, slug: e.slug, title: e.title, date: e.date, count: e.images.length, salt: e.salt, iterations, bundle: e.id + '/' + e.release + '/gallery.bin' }));
             await atomic(stateFile, JSON.stringify(all, null, 2));
@@ -105,23 +117,28 @@ function register(app, root, route) {
         const [, owner, name] = match;
         res.json({ url: `https://${owner.toLowerCase()}.github.io/${name.toLowerCase() === owner.toLowerCase() + '.github.io' ? '' : name + '/'}` });
     }));
+    app.get('/api/studio/clients/progress', route(async (req, res) => res.json(progress && req.query.operation === progress.operation ? progress : null)));
     app.get('/api/studio/clients', route(async (req, res) => res.json(read().map(safe))));
     app.post('/api/studio/clients', route(async (req, res) => res.json(await exclusive(async () => {
         const all = read(), next = validate(req, all);
         if (req.body.password) { const salt = crypto.randomBytes(16); next.salt = salt.toString('base64'); next.key = (await derive(req.body.password, salt, iterations, 32, 'sha256')).toString('base64'); }
         return publish(next, all);
-    }))));
-    const upload = multer({ dest: path.join(privateDir, 'temp'), limits: { fileSize: 40 * 1024 * 1024, files: 100 }, fileFilter: (req, file, cb) => cb(null, /^image\/(jpeg|png|webp|avif|heic|heif|tiff)$/.test(file.mimetype)) }).array('images', 100);
+    }, req.body.operation))));
+    const upload = multer({ dest: path.join(privateDir, 'temp'), limits: { fileSize: 40 * 1024 * 1024, files: maxImages }, fileFilter: (req, file, cb) => cb(null, /^image\/(jpeg|png|webp|avif|heic|heif|tiff)$/.test(file.mimetype)) }).array('images', maxImages);
     app.post('/api/studio/clients/:id/upload', (req, res) => upload(req, res, async error => {
         const files = req.files || [], created = [];
         try {
-            if (error) throw fail(error.code === 'LIMIT_FILE_SIZE' ? 'Ein Bild ist grösser als 40 MB.' : error.message);
+            if (error) {
+                if (error.code === 'LIMIT_FILE_COUNT' || error.code === 'LIMIT_UNEXPECTED_FILE' && error.field === 'images') throw fail('Pro Upload sind höchstens 500 Bilder möglich.');
+                throw fail(error.code === 'LIMIT_FILE_SIZE' ? 'Ein Bild ist grösser als 40 MB.' : error.message);
+            }
             const result = await exclusive(async () => {
                 const all = read(), next = all.find(e => e.id === req.params.id);
                 if (!next) throw fail('Veranstaltung nicht gefunden.', 404);
                 if (req.body.revision !== next.revision) throw fail('Die Veranstaltung wurde inzwischen geändert. Bitte neu laden.', 409);
                 if (!files.length) throw fail('Bitte unterstützte Bilddateien auswählen (JPG, PNG, WebP, AVIF oder TIFF).');
-                if (next.images.length + files.length > 500) throw fail('Eine Galerie kann höchstens 500 Bilder enthalten.');
+                if (next.images.length + files.length > maxImages) throw fail('Eine Galerie kann höchstens 500 Bilder enthalten.');
+                stage('optimizing', files.length);
                 await fsp.mkdir(path.join(privateDir, next.id), { recursive: true, mode: 0o700 });
                 for (const file of files) {
                     const meta = await sharp(file.path).metadata(), id = crypto.randomUUID();
@@ -134,9 +151,10 @@ function register(app, root, route) {
                     const rawName = Buffer.from(file.originalname, 'latin1').toString('utf8');
                     const name = path.parse(path.basename(rawName.replace(/\\/g, '/'))).name.replace(/[\x00-\x1f]/g, '').slice(0, 160) + '.jpg';
                     next.images.push({ id, name, width: out.width, height: out.height, size: buffer.length });
+                    progress.completed++;
                 }
                 return publish(next, all);
-            });
+            }, req.body.operation);
             res.json(result);
         } catch (error) {
             for (const file of created) await fsp.rm(file, { force: true });

@@ -60,6 +60,35 @@ function editClient(original) {
     const active = document.createElement('label'); active.className = 'client-active-toggle'; const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = event?.active ?? true; active.append(checkbox, document.createTextNode('Veranstaltung auf der Kundenseite freigeben'));
     const privacy = document.createElement('p'); privacy.className = 'hint'; privacy.textContent = 'Titel und Datum erscheinen vor der Passworteingabe. Lade Kundenbilder hier hoch, damit sie nicht in der öffentlichen Mediathek landen. Bereits heruntergeladene Bilder lassen sich durch Pausieren oder ein neues Passwort nicht zurückholen.';
     const message = document.createElement('p'); message.setAttribute('role', 'status'); message.className = 'hint';
+    const operationProgress = document.createElement('div'); operationProgress.className = 'client-operation-progress'; operationProgress.hidden = true;
+    const progressHeading = document.createElement('div'); progressHeading.className = 'client-operation-heading';
+    const progressText = document.createElement('span'); progressText.setAttribute('role', 'status'); progressText.setAttribute('aria-live', 'polite');
+    const progressPercent = document.createElement('span'); progressPercent.setAttribute('aria-hidden', 'true');
+    const progressBar = document.createElement('progress'); progressBar.setAttribute('aria-label', 'Verarbeitung der Kundenbilder');
+    progressHeading.append(progressText, progressPercent); operationProgress.append(progressHeading, progressBar);
+    function showProgress(label, completed = null, total = 0) {
+        operationProgress.hidden = false; progressBar.hidden = false; progressText.textContent = label;
+        if (completed === null || !total) { progressBar.removeAttribute('value'); progressPercent.textContent = ''; }
+        else { progressBar.max = total; progressBar.value = completed; progressPercent.textContent = Math.round(completed / total * 100) + ' %'; }
+    }
+    async function trackOperation(operation, label, work) {
+        let stopped = false, timer;
+        operationProgress.classList.remove('is-error'); showProgress(label); operationProgress.scrollIntoView({ block: 'nearest' });
+        async function poll() {
+            try {
+                const result = await api('/api/studio/clients/progress?operation=' + encodeURIComponent(operation));
+                if (stopped || !el.isConnected || !result) return;
+                const names = { preparing: 'Galerie wird vorbereitet …', optimizing: 'Bilder optimieren', encrypting: 'Bilder verschlüsseln', saving: 'Galerie lokal speichern …', done: 'Verarbeitung abgeschlossen', failed: 'Verarbeitung fehlgeschlagen' };
+                if (result.stage === 'done') showProgress(names.done, 1, 1);
+                else showProgress(names[result.stage] + (result.total ? ` · ${result.completed} von ${result.total} Bildern fertig` : ''), result.completed, result.total);
+            } catch { /* The upload request reports connection errors; keep its current progress. */ }
+            finally { if (!stopped && el.isConnected) timer = setTimeout(poll, 500); }
+        }
+        poll();
+        try { const result = await work(); showProgress('Verarbeitung abgeschlossen · lokal gespeichert', 1, 1); return result; }
+        catch (error) { operationProgress.classList.add('is-error'); progressBar.hidden = true; progressPercent.textContent = ''; progressText.textContent = 'Verarbeitung fehlgeschlagen'; throw error; }
+        finally { stopped = true; clearTimeout(timer); }
+    }
     const list = document.createElement('div'); list.className = 'client-manager-images';
     function renderImages() {
         list.replaceChildren();
@@ -76,14 +105,15 @@ function editClient(original) {
     }
     const files = document.createElement('input'); files.type = 'file'; files.accept = 'image/jpeg,image/png,image/webp,image/avif,image/tiff'; files.multiple = true; files.hidden = true;
     const upload = button('＋ Kundenbilder hochladen', () => files.click(), 'primary'); upload.type = 'button'; upload.disabled = !event;
-    const uploadHint = document.createElement('p'); uploadHint.className = 'hint'; uploadHint.textContent = event ? 'JPG, PNG, WebP, AVIF oder TIFF · maximal 40 MB pro Datei. Download als JPG in voller Auflösung.' : 'Speichere zuerst die Veranstaltung. Danach kannst du Bilder hochladen.';
+    const uploadHint = document.createElement('p'); uploadHint.className = 'hint'; uploadHint.textContent = event ? 'Bis zu 500 Bilder pro Upload und Veranstaltung · maximal 40 MB pro Datei. JPG, PNG, WebP, AVIF oder TIFF; Download als JPG in voller Auflösung.' : 'Speichere zuerst die Veranstaltung. Danach kannst du Bilder hochladen.';
     const save = button(event ? 'Änderungen lokal speichern' : 'Veranstaltung erstellen', () => {}, 'primary'); save.type = 'submit';
-    form.append(title, slug, linkPreview, linkHint, date, description, password, passHint, active, privacy, save, message, upload, files, uploadHint, list); host.append(form); renderImages();
+    form.append(title, slug, linkPreview, linkHint, date, description, password, passHint, active, privacy, save, message, operationProgress, upload, files, uploadHint, list); host.append(form); renderImages();
     form.addEventListener('input', input => { if (input.target !== files) dirty = true; });
     async function saveEvent() {
         if (!form.reportValidity()) return false;
         message.textContent = 'Galerie wird verschlüsselt und lokal gespeichert …';
-        const result = await api('/api/studio/clients', { id: event?.id, revision: event?.revision, title: title.querySelector('input').value, slug: slugInput.value, date: date.querySelector('input').value, description: text.value, password: passInput.value, active: checkbox.checked, images: event ? images.map(image => image.id) : undefined });
+        const operation = crypto.randomUUID();
+        const result = await trackOperation(operation, 'Galerie wird vorbereitet …', () => api('/api/studio/clients', { operation, id: event?.id, revision: event?.revision, title: title.querySelector('input').value, slug: slugInput.value, date: date.querySelector('input').value, description: text.value, password: passInput.value, active: checkbox.checked, images: event ? images.map(image => image.id) : undefined }));
         event = result; slugInput.value = event.slug; customSlug = true; updateLink(); images = [...event.images]; password.firstChild.textContent = 'Neues Passwort (leer lassen zum Beibehalten)'; passInput.value = ''; passInput.required = false;
         save.textContent = 'Änderungen lokal speichern'; upload.disabled = false; uploadHint.textContent = 'Bilder direkt hier hochladen. Veröffentlichung über „Änderungen prüfen“.';
         saved(); renderImages(); message.textContent = 'Lokal gespeichert. Für die Online-Freigabe anschliessend Commit & Push durchführen.';
@@ -97,16 +127,21 @@ function editClient(original) {
     form.onsubmit = event => { event.preventDefault(); run(saveEvent); };
     files.onchange = () => run(async () => {
         const selected = [...files.files]; if (!selected.length) return;
+        if (selected.length > 500 || images.length + selected.length > 500) {
+            files.value = '';
+            throw Error(`Eine Veranstaltung kann höchstens 500 Bilder enthalten. Du kannst noch ${Math.max(0, 500 - images.length)} Bilder hinzufügen.`);
+        }
         if (dirty && !await saveEvent()) return;
-        const body = new FormData(); body.append('revision', event.revision); for (const file of selected) body.append('images', file);
+        const operation = crypto.randomUUID();
+        const body = new FormData(); body.append('operation', operation); body.append('revision', event.revision); for (const file of selected) body.append('images', file);
         message.textContent = `${selected.length} Bilder werden hochgeladen …`;
-        const result = await new Promise((resolve, reject) => {
+        const result = await trackOperation(operation, `${selected.length} Bilder werden übertragen …`, () => new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest(); xhr.open('POST', `/api/studio/clients/${event.id}/upload`); xhr.setRequestHeader('X-CMS-Token', token);
-            xhr.upload.onprogress = progress => { if (progress.lengthComputable) message.textContent = `${Math.round(progress.loaded / progress.total * 100)} % übertragen`; };
-            xhr.upload.onload = () => message.textContent = 'Bilder werden optimiert und verschlüsselt. Bitte warten …';
+            xhr.upload.onprogress = progress => { if (progress.lengthComputable) { message.textContent = `${Math.round(progress.loaded / progress.total * 100)} % übertragen`; showProgress(`${selected.length} Bilder werden übertragen …`, progress.loaded, progress.total); } };
+            xhr.upload.onload = () => { message.textContent = 'Bilder werden optimiert und verschlüsselt …'; showProgress('Bilder werden optimiert …'); };
             xhr.onload = () => { try { const data = JSON.parse(xhr.responseText); xhr.status < 300 ? resolve(data) : reject(Error(data.error || 'Upload fehlgeschlagen.')); } catch { reject(Error('Upload fehlgeschlagen.')); } };
             xhr.onerror = () => reject(Error('Das lokale CMS ist nicht erreichbar.')); xhr.send(body);
-        });
+        }));
         event = result; images = [...event.images]; saved(); renderImages(); files.value = ''; message.textContent = 'Bilder verschlüsselt und lokal gespeichert. Veröffentlichung über „Änderungen prüfen“.';
         clientEvents = await api('/api/studio/clients'); if (type === 'clients') renderClients();
     });

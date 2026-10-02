@@ -8,5 +8,15 @@
     "salt": "RDWYrVtuU0ez5Pntavs61g==",
     "iterations": 310000,
     "bundle": "16b6aa5b-b954-482f-92cb-13d1638954e3/64e51ec1-f8b4-4f5a-873b-79e1c31a7d52/gallery.bin"
+  },
+  {
+    "id": "0ad7176e-9801-406f-87ab-c996ed4b51b7",
+    "slug": "norwegen",
+    "title": "Norwegen",
+    "date": "2025-07-21",
+    "count": 141,
+    "salt": "wvJyDSC0DuIMG5bdbv+FDw==",
+    "iterations": 310000,
+    "bundle": "0ad7176e-9801-406f-87ab-c996ed4b51b7/8153c5c5-7006-4bb3-9b04-6e6664840f82/gallery.bin"
   }
 ]

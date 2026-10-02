@@ -125,7 +125,7 @@
     async function download(images, zip) {
         if (state.downloading || !images.length) return;
         const total = images.reduce((sum, image) => sum + image.size, 0);
-        if (zip && total > 600 * 1024 * 1024) { status('Diese Auswahl ist sehr gross. Bitte in kleineren Gruppen mit höchstens 600 MB herunterladen.'); return; }
+        if (zip && total > 1_000_000_000) { status('Diese Auswahl ist grösser als 1 GB. Bitte in kleineren Gruppen mit höchstens 1 GB herunterladen.'); return; }
         state.downloading = true; navBusy(true); $('client-lock').disabled = true; $('client-single').disabled = true; selection();
         const target = zip ? $('client-download-status') : $('client-detail-status');
         if (zip) {
