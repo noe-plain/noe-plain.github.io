@@ -21,7 +21,7 @@
         for (const url of state.urls) URL.revokeObjectURL(url); state.urls.clear();
         $('client-grid').replaceChildren(); $('client-gallery').hidden = true; $('client-unlock').hidden = !state.event;
         $('client-password').value = ''; $('client-password').type = 'password'; $('client-show').setAttribute('aria-pressed', 'false'); $('client-show').textContent = 'Anzeigen';
-        $('client-lock').disabled = state.downloading; $('client-download-status').textContent = ''; $('client-ready').replaceChildren(); $('client-detail-ready').replaceChildren(); status('');
+        $('client-lock').disabled = state.downloading; $('client-download-progress-wrap').hidden = true; $('client-download-status').textContent = ''; $('client-ready').replaceChildren(); $('client-detail-ready').replaceChildren(); status('');
     }
     function navBusy(busy) { $('page-nav').querySelectorAll('a').forEach(link => link.setAttribute('aria-disabled', String(busy))); }
     function choose(id, push = false) {
@@ -115,19 +115,42 @@
         anchor.href = url; anchor.download = name; host.replaceChildren(anchor);
         if (autoStart) anchor.click();
     }
+    function zipProgress(completed, total, message, error = false) {
+        const wrap = $('client-download-progress-wrap'), bar = $('client-download-progress');
+        wrap.hidden = false; wrap.classList.toggle('is-error', error); bar.hidden = error;
+        $('client-download-progress-text').textContent = message;
+        if (completed === null) { bar.removeAttribute('value'); $('client-download-percent').textContent = ''; }
+        else { bar.max = total; bar.value = completed; $('client-download-percent').textContent = error ? '' : Math.round(completed / total * 100) + ' %'; }
+    }
     async function download(images, zip) {
         if (state.downloading || !images.length) return;
         const total = images.reduce((sum, image) => sum + image.size, 0);
         if (zip && total > 600 * 1024 * 1024) { status('Diese Auswahl ist sehr gross. Bitte in kleineren Gruppen mit höchstens 600 MB herunterladen.'); return; }
         state.downloading = true; navBusy(true); $('client-lock').disabled = true; $('client-single').disabled = true; selection();
         const target = zip ? $('client-download-status') : $('client-detail-status');
+        if (zip) {
+            $('client-download').textContent = 'ZIP wird vorbereitet …'; target.textContent = '';
+            const previous = $('client-ready').querySelector('a'); if (previous) releaseURL(previous.href); $('client-ready').replaceChildren();
+            zipProgress(0, images.length + 1, `0 von ${images.length} Bildern vorbereitet`);
+        }
         try {
             const files = [];
-            for (const [index, image] of images.entries()) { target.textContent = `Download wird vorbereitet: ${index + 1} von ${images.length} …`; files.push({ name: image.name, data: await imageData(image, 'full') }); }
-            downloadBlob(zip ? createClientZip(files) : new Blob([files[0].data], { type: 'image/jpeg' }), zip ? state.event.title.replace(/[^\p{L}\p{N}_ -]/gu, '-').slice(0, 80) + '-Bilder.zip' : files[0].name, zip ? 'client-ready' : 'client-detail-ready', zip);
+            for (const [index, image] of images.entries()) {
+                if (!zip) target.textContent = `Download wird vorbereitet: ${index + 1} von ${images.length} …`;
+                files.push({ name: image.name, data: await imageData(image, 'full') });
+                if (zip) zipProgress(index + 1, images.length + 1, `${index + 1} von ${images.length} Bildern vorbereitet`);
+            }
+            if (zip) {
+                zipProgress(null, images.length + 1, 'Bilder vorbereitet · ZIP wird erstellt …');
+                // Yield to the browser before building the archive, including in background tabs.
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const blob = zip ? createClientZip(files) : new Blob([files[0].data], { type: 'image/jpeg' });
+            if (zip) zipProgress(images.length + 1, images.length + 1, 'ZIP fertig · Download angefordert');
+            downloadBlob(blob, zip ? state.event.title.replace(/[^\p{L}\p{N}_ -]/gu, '-').slice(0, 80) + '-Bilder.zip' : files[0].name, zip ? 'client-ready' : 'client-detail-ready', zip);
             target.textContent = zip ? 'ZIP vorbereitet. Falls der Download nicht automatisch startet, nutze den Speicherlink.' : 'Download bereit. Klicke auf den Link zum Speichern.';
-        } catch (error) { target.textContent = error.message; }
-        finally { state.downloading = false; navBusy(false); $('client-lock').disabled = false; $('client-single').disabled = false; selection(); }
+        } catch (error) { target.textContent = error.message; if (zip) zipProgress(0, images.length + 1, 'Vorbereitung fehlgeschlagen: ' + error.message, true); }
+        finally { if (zip) $('client-download').textContent = 'Auswahl als ZIP herunterladen ↓'; state.downloading = false; navBusy(false); $('client-lock').disabled = false; $('client-single').disabled = false; selection(); }
     }
     $('client-form').onsubmit = unlock;
     $('client-show').onclick = () => { const show = $('client-password').type === 'password'; $('client-password').type = show ? 'text' : 'password'; $('client-show').setAttribute('aria-pressed', String(show)); $('client-show').textContent = show ? 'Verbergen' : 'Anzeigen'; };
