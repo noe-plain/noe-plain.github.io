@@ -20,19 +20,19 @@ function carouselSetup(){
 function carouselWarning(o){const c=p.carousel;if(o.type!=='text'||!o.text.trim()||o.visible===false)return '';const index=Math.floor(o.x/c.w);if(index<0||index>=c.n||o.x+o.w>(index+1)*c.w||o.y<0||o.y+o.h>c.h)return 'Text überschreitet eine Slide-Grenze.';if(o.x<index*c.w+100||o.x+o.w>(index+1)*c.w-100||o.y<c.top||o.y+o.h>c.h-c.bottom||o.x<c.left||o.x+o.w>c.n*c.w-c.right)return 'Text liegt ausserhalb der empfohlenen Safezone.';if(carouselTextHeight(o)>o.h+1)return 'Text passt nicht vollständig in den Textrahmen.';return ''}
 function carouselAnglePath(o){const path=new Path2D(),w=o.w,h=o.h,t=Math.min(o.thickness*Math.SQRT2,w*.9,h*.44);path.moveTo(0,0);path.lineTo(w,h/2);path.lineTo(0,h);path.lineTo(0,h-t);path.lineTo(w-t,h/2);path.lineTo(0,t);path.closePath();return path}
 async function carouselPaint(ctx,slide=null,scale=1,transparent=false,editingId=null){const c=p.carousel;carouselKeepLogosOnTop(c);ctx.save();ctx.scale(scale,scale);if(slide!==null){ctx.beginPath();ctx.rect(0,0,c.w,c.h);ctx.clip();ctx.translate(-slide*c.w,0)}if(!transparent){ctx.fillStyle=c.bg;ctx.fillRect(0,0,c.w*c.n,c.h)}for(const o of c.objects){if(o.visible===false||o.id===editingId)continue;ctx.save();ctx.globalAlpha=o.opacity??1;ctx.globalCompositeOperation=o.blend||'source-over';ctx.translate(o.x,o.y);
- if(o.type==='text'){ctx.fillStyle=o.color;ctx.font=`${o.size}px "${o.font}"`;ctx.textBaseline='top';const lines=MKWLayout.wrap(o.text,o.w,t=>ctx.measureText(t).width);lines.forEach((line,i)=>ctx.fillText(line,0,i*o.size*1.12));}
+ if(o.type==='text'){ctx.fillStyle=o.color;ctx.textBaseline='top';for(const line of carouselTextLayout(o,ctx).lines){ctx.font=`${line.size}px "${o.font}"`;ctx.fillText(line.text,0,line.y)}}
  else if(o.type==='gradient'){const a=o.rotation*Math.PI/180,dx=Math.cos(a)*o.w/2,dy=Math.sin(a)*o.h/2,start=o.gradientStart?{x:o.gradientStart.x*o.w,y:o.gradientStart.y*o.h}:o.kind==='radial'?{x:o.w/2,y:o.h/2}:{x:o.w/2-dx,y:o.h/2-dy},end=o.gradientEnd?{x:o.gradientEnd.x*o.w,y:o.gradientEnd.y*o.h}:{x:o.w/2+dx,y:o.h/2+dy};const g=o.kind==='radial'?ctx.createRadialGradient(start.x,start.y,0,start.x,start.y,Math.max(1,Math.hypot(end.x-start.x,end.y-start.y))):ctx.createLinearGradient(start.x,start.y,end.x,end.y);g.addColorStop(0,o.color+Math.round((o.startAlpha??1)*255).toString(16).padStart(2,'0'));g.addColorStop(1,o.endColor+Math.round((o.endAlpha??0)*255).toString(16).padStart(2,'0'));ctx.fillStyle=g;ctx.fillRect(0,0,o.w,o.h)}
  else if(o.type==='logo'){const im=await image(o.source==='black'?'mkw-logo-bold-pos.svg':'mkw-logo-bold-neg.svg');ctx.drawImage(im,0,0,o.w,o.h)}
- else{if(o.type==='angle'){const path=carouselAngleMask(o);ctx.save();ctx.shadowColor=o.glowColor+Math.round(o.glowAlpha*255).toString(16).padStart(2,'0');ctx.shadowBlur=o.glow*scale;ctx.fillStyle='#ffffff';ctx.fill(path);ctx.restore();ctx.clip(path)}else{ctx.beginPath();ctx.rect(0,0,o.w,o.h);ctx.clip()}
+ else{if(o.type==='angle'){const path=carouselAngleMask(o);ctx.save();ctx.shadowColor=o.glowColor+Math.round(o.glowAlpha*255).toString(16).padStart(2,'0');ctx.shadowBlur=o.glow*scale;ctx.fillStyle='#ffffff';ctx.fill(path);ctx.restore();ctx.clip(path)}else{ctx.clip(carouselImageMask(o))}
  const im=p.images.find(im=>im.id===o.imageId);if(im){const bitmap=await image(im.data),fw=o.w,fh=o.h,s=Math.max(fw/im.width,fh/im.height)*o.scale;ctx.translate(fw/2+o.panX,fh/2+o.panY);ctx.scale(o.flipX,o.flipY);ctx.drawImage(bitmap,-im.width*s/2,-im.height*s/2,im.width*s,im.height*s)}else{ctx.fillStyle='#68768b';ctx.fillRect(0,0,o.w,o.h)}}ctx.restore()}ctx.restore()}
 function validateCarousel(q){
  const c=q.carousel;if(!c)return;
  if(!['w','h','n','top','bottom','left','right'].every(k=>Number.isInteger(c[k]))||c.w<240||c.h<240||c.w>4000||c.h>4000||c.n<2||c.n>20||Math.min(c.top,c.bottom,c.left,c.right)<0||c.top+c.bottom>=c.h||c.left+c.right>=c.w||!/^#[0-9a-f]{6}$/i.test(c.bg)||!Array.isArray(c.objects)||c.objects.length>500||q.boards.length!==c.n)throw Error('Ungültiges Carousel-Projekt.');
  for(const [i,b] of q.boards.entries())if(b.carouselSlide!==i||b.w!==c.w||b.h!==c.h)throw Error('Ungültige Carousel-Slides.');
- const ids=new Set();for(const o of c.objects){if(typeof o.id!=='string'||ids.has(o.id)||!['text','image','logo','gradient','angle'].includes(o.type)||!['x','y','w','h','opacity'].every(k=>Number.isFinite(o[k]))||o.w<=0||o.h<=0||o.w>100000||o.h>100000||Math.abs(o.x)>100000||Math.abs(o.y)>100000||o.opacity<0||o.opacity>1)throw Error('Ungültige Carousel-Ebene.');ids.add(o.id);if(o.type==='gradient'&&['startAlpha','endAlpha'].some(key=>o[key]!==undefined&&(!Number.isFinite(o[key])||o[key]<0||o[key]>1)))throw Error('Ungültige Verlaufstransparenz.');if(o.type==='text'&&(typeof o.text!=='string'||!Number.isFinite(o.size)||o.size<1||o.size>1000))throw Error('Ungültiger Carousel-Text.');if(o.imageId&&!q.images.some(im=>im.id===o.imageId))throw Error('Carousel-Bild fehlt.');}
+ const ids=new Set();for(const o of c.objects){if(typeof o.id!=='string'||ids.has(o.id)||!['text','image','logo','gradient','angle'].includes(o.type)||!['x','y','w','h','opacity'].every(k=>Number.isFinite(o[k]))||o.w<=0||o.h<=0||o.w>100000||o.h>100000||Math.abs(o.x)>100000||Math.abs(o.y)>100000||o.opacity<0||o.opacity>1)throw Error('Ungültige Carousel-Ebene.');ids.add(o.id);if(o.framePoints&&(o.type!=='image'||!Array.isArray(o.framePoints)||![4,5].includes(o.framePoints.length)||o.framePoints.some(point=>!point||!['x','y'].every(key=>Number.isFinite(point[key])&&point[key]>=0&&point[key]<=1))||(o.framePointSide&&!['left','right','top','bottom'].includes(o.framePointSide))))throw Error('Ungültige Bildrahmenpunkte.');if(o.type==='gradient'&&['startAlpha','endAlpha'].some(key=>o[key]!==undefined&&(!Number.isFinite(o[key])||o[key]<0||o[key]>1)))throw Error('Ungültige Verlaufstransparenz.');if(o.textStyles&&(o.type!=='text'||!Array.isArray(o.textStyles)||o.textStyles.length>10000||o.textStyles.some(style=>style&&((style.size!==undefined&&(!Number.isFinite(style.size)||style.size<1||style.size>1000))||(style.leading&&(!Array.isArray(style.leading)||style.leading.length>10000||style.leading.some(value=>value!==null&&(!Number.isFinite(value)||value<1||value>3000))))))))throw Error('Ungültige Absatzformatierung.');if(o.type==='text'&&(typeof o.text!=='string'||!Number.isFinite(o.size)||o.size<1||o.size>1000))throw Error('Ungültiger Carousel-Text.');if(o.imageId&&!q.images.some(im=>im.id===o.imageId))throw Error('Carousel-Bild fehlt.');}
 }
 
-const carouselUI={tool:'select',ids:new Set(),editing:null,space:false,content:false,guides:true,snap:true,drag:null,clipboard:[],layerDrag:null,propertyUndo:false,snapLines:[],slide:null,touches:new Map(),pinch:null};
+const carouselUI={tool:'select',ids:new Set(),editing:null,space:false,content:false,framePoints:false,textParagraph:0,textLine:0,guides:true,snap:true,drag:null,clipboard:[],layerDrag:null,propertyUndo:false,snapLines:[],slide:null,touches:new Map(),pinch:null};
 const carouselToolNames={select:'Auswahl',content:'Bildinhalt',text:'Text',image:'Bildrahmen',gradient:'Verlauf',angle:'Winkel',hand:'Hand',zoom:'Zoom'};
 const carouselToolKeys={v:'select',a:'content',t:'text',f:'image',g:'gradient',w:'angle',h:'hand',z:'zoom'};
 const carouselIcons={
@@ -51,9 +51,9 @@ function carouselSelected(){
  if(carouselSelection&&!carouselUI.ids.has(carouselSelection))carouselUI.ids=new Set([carouselSelection]);
  return c.objects.filter(o=>carouselUI.ids.has(o.id));
 }
-function carouselSelect(ids){carouselUI.slide=null;carouselUI.ids=new Set(ids);carouselSelection=ids.at(-1)||null;carouselUI.content=false;carouselPanel();carouselRefresh()}
+function carouselSelect(ids){const same=carouselSelection===ids.at(-1);carouselUI.slide=null;carouselUI.ids=new Set(ids);carouselSelection=ids.at(-1)||null;carouselUI.content=false;carouselUI.framePoints=false;if(!same)carouselUI.textParagraph=carouselUI.textLine=0;carouselPanel();carouselRefresh()}
 function carouselTool(tool){
- carouselEndText();carouselUI.tool=tool;carouselUI.content=tool==='content';carouselToolUI();carouselPanel();carouselRefresh();
+ carouselEndText();carouselUI.tool=tool;carouselUI.content=tool==='content';carouselUI.framePoints=false;carouselToolUI();carouselPanel();carouselRefresh();
 }
 function carouselToolUI(){
  if(!$('#carouselEditor'))return;
@@ -69,7 +69,7 @@ function carouselDefault(type,rect={}){
  return {id:uid(),type,name:{text:'Text',gradient:'Verlauf',angle:'Winkel',image:'Bildrahmen'}[type],x,y:c.top,w:Math.min(800,c.w-200),h:type==='text'?200:400,visible:true,locked:false,opacity:1,text:'',size:70,font:'Replica LL',color:'#ffffff',startAlpha:1,endColor:'#000000',endAlpha:0,blend:'source-over',kind:'linear',rotation:0,direction:'right',thickness:150,glow:25,glowColor:'#ffffff',glowAlpha:.6,scale:1,panX:0,panY:0,flipX:1,flipY:1,...rect};
 }
 function carouselObject(type,rect={}){
- checkpoint();carouselUI.slide=null;const o=carouselDefault(type,rect);if(type==='angle'&&!rect.w){o.w=550;o.h=1100}
+ checkpoint();carouselUI.slide=null;carouselUI.framePoints=false;const o=carouselDefault(type,rect);if(type==='angle'&&!rect.w){o.w=550;o.h=1100}
  if(type==='angle')carouselAngleAlign(o);p.carousel.objects.push(o);carouselUI.ids=new Set([o.id]);carouselSelection=o.id;changed();return o;
 }
 function carouselFile(target=null){const input=$('#carouselFile');input.value='';input.multiple=!target;input.onchange=ev=>carouselImport([...ev.target.files],target);input.click()}
@@ -87,8 +87,8 @@ async function carouselImport(files,target){
 function carouselHit(pt){
  return [...p.carousel.objects].reverse().find(o=>{
   if(o.visible===false||o.locked||pt.x<o.x||pt.x>o.x+o.w||pt.y<o.y||pt.y>o.y+o.h)return false;
-  if(o.type!=='angle')return true;
-  const ctx=makeCanvas(1,1).getContext('2d');return ctx.isPointInPath(carouselAngleMask(o),pt.x-o.x,pt.y-o.y);
+  if(o.type!=='angle'&&!(o.type==='image'&&o.framePoints))return true;
+  const ctx=makeCanvas(1,1).getContext('2d');return ctx.isPointInPath(o.type==='angle'?carouselAngleMask(o):carouselImageMask(o),pt.x-o.x,pt.y-o.y);
  });
 }
 function carouselRender(){
@@ -106,7 +106,7 @@ function carouselRender(){
  $('#carouselSnapToggle').onclick=()=>{carouselUI.snap=!carouselUI.snap;$('#carouselSnapToggle').setAttribute('aria-pressed',carouselUI.snap)};
  const viewport=$('#carouselViewport');if(firstView)carouselZoom=Math.min(.6,(viewport.clientWidth-160)/(c.w*c.n),(viewport.clientHeight-128)/c.h);
  viewport.onscroll=()=>{c.scrollX=viewport.scrollLeft;c.scrollY=viewport.scrollTop};viewport.onpointerdown=carouselPointer;
- viewport.ondblclick=ev=>{if(carouselUI.space||carouselUI.tool==='hand')return;const o=carouselHit(carouselPoint(ev));if(!o)return;carouselSelect([o.id]);if(o.type==='text')carouselEditText(o);else if(['image','angle'].includes(o.type)){carouselUI.content=!carouselUI.content;carouselRefresh();carouselPanel()}};
+ viewport.ondblclick=ev=>{if(carouselUI.space||carouselUI.tool==='hand'||ev.target.closest('.carousel-inline-text'))return;const o=carouselHit(carouselPoint(ev));if(!o)return;carouselSelect([o.id]);if(o.type==='text')carouselEditText(o);else if(['image','angle'].includes(o.type)){carouselUI.content=!carouselUI.content;carouselRefresh();carouselPanel()}};
  viewport.onwheel=ev=>{if(ev.ctrlKey||ev.metaKey||ev.altKey){ev.preventDefault();carouselSetZoom(carouselZoom*Math.exp(-ev.deltaY*.003),ev)}else if(ev.shiftKey){ev.preventDefault();viewport.scrollLeft+=ev.deltaY||ev.deltaX}};
  carouselToolUI();carouselPanel();carouselRefresh();if(firstView)carouselCenter();else{viewport.scrollLeft=c.scrollX??(viewport.scrollWidth-viewport.clientWidth)/2;viewport.scrollTop=c.scrollY??(viewport.scrollHeight-viewport.clientHeight)/2}return true;
 }
@@ -134,9 +134,11 @@ function carouselDrawSelection(){
  const s=carouselZoom;const frame=document.createElement('div');frame.className='carousel-frame'+(carouselUI.content?' content-selected':'')+(items.every(o=>o.locked)?' locked':'');
  Object.assign(frame.style,{left:bounds.x*s+'px',top:bounds.y*s+'px',width:bounds.w*s+'px',height:bounds.h*s+'px'});
  frame.innerHTML=`<span class="carousel-frame-label">${items.length===1?esc(items[0].name):items.length+' Elemente'}${carouselUI.content?' · Bildinhalt':''}</span>`;
- if(!items.every(o=>o.locked)&&carouselUI.tool!=='hand'&&!carouselUI.content){for(const corner of ['nw','n','ne','e','se','s','sw','w']){const btn=document.createElement('button');btn.className='carousel-handle';btn.dataset.corner=corner;btn.setAttribute('aria-label','Auswahl skalieren: '+corner);btn.onpointerdown=ev=>{ev.stopPropagation();carouselResize(ev,corner)};frame.append(btn)}}
+ const points=carouselUI.framePoints&&items.length===1&&items[0].type==='image';
+ if(!items.every(o=>o.locked)&&carouselUI.tool!=='hand'&&!carouselUI.content&&!points){for(const corner of ['nw','n','ne','e','se','s','sw','w']){const btn=document.createElement('button');btn.className='carousel-handle';btn.dataset.corner=corner;btn.setAttribute('aria-label','Auswahl skalieren: '+corner);btn.onpointerdown=ev=>{ev.stopPropagation();carouselResize(ev,corner)};frame.append(btn)}}
  if(content){frame.style.pointerEvents='auto';frame.onpointerdown=ev=>{ev.stopPropagation();carouselMove(ev)};if(!items[0].locked)for(const corner of ['nw','n','ne','e','se','s','sw','w']){const btn=document.createElement('button');btn.className='carousel-handle';btn.dataset.corner=corner;btn.setAttribute('aria-label','Bildinhalt skalieren: '+corner);btn.onpointerdown=ev=>{ev.stopPropagation();carouselImageResize(ev,items[0],corner)};frame.append(btn)}}root.append(frame);
  if(items.length===1&&items[0].type==='gradient'&&carouselUI.tool==='gradient')carouselDrawGradient(items[0],root);
+ if(items.length===1&&items[0].type==='image'&&!carouselUI.content&&(items[0].framePoints||points))carouselDrawFramePoints(items[0],root,points);
 }
 function carouselDrawGradient(o,root){
  const start=o.gradientStart||{x:0,y:.5},end=o.gradientEnd||{x:1,y:.5},s=carouselZoom;
@@ -148,7 +150,7 @@ function carouselListen(ev,move,finish,cancel=finish){
  carouselUI.drag={cancel:()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);carouselUI.drag=null;carouselUI.snapLines=[];carouselDrawSnap();cancel(ev)}};window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);window.addEventListener('pointercancel',onUp);
 }
 function carouselPointer(ev){
- if(busy||ev.button!==0||ev.target.closest('textarea,button,input'))return;carouselEndText();
+ if(busy||ev.button!==0||ev.target.closest('textarea,button,input,.carousel-inline-text'))return;carouselEndText();
  const pt=carouselPoint(ev),tool=carouselUI.space?'hand':carouselUI.tool;
  if(tool==='hand'){const v=$('#carouselViewport'),x=ev.clientX,y=ev.clientY,sx=v.scrollLeft,sy=v.scrollTop;carouselListen(ev,e=>{v.scrollLeft=sx-(e.clientX-x);v.scrollTop=sy-(e.clientY-y)},()=>{});return}
  if(tool==='zoom'){carouselSetZoom(carouselZoom*(ev.altKey?.8:1.25),ev);return}
@@ -227,7 +229,7 @@ function carouselResize(ev,corner){
   const preserve=e.shiftKey||objects.some(o=>o.type==='angle'||o.type==='logo');if(preserve){if(corner==='n'||corner==='s')w=h*b.w/b.h;else if(corner==='e'||corner==='w')h=w*b.h/b.w;else{const scale=Math.max(w/b.w,h/b.h);w=b.w*scale;h=b.h*scale}}
   let x=corner.includes('w')?b.x+b.w-w:b.x,y=corner.includes('n')?b.y+b.h-h:b.y;if(e.altKey){x=b.x+(b.w-w)/2;y=b.y+(b.h-h)/2}
   const snap=carouselSnapResize({x,y,w,h},corner,e.ctrlKey||e.metaKey,preserve,e.altKey);({x,y,w,h}=snap);carouselUI.snapLines=snap.guides;
-  objects.forEach((o,i)=>{const old=base[i];o.x=x+(old.x-b.x)*w/b.w;o.y=y+(old.y-b.y)*h/b.h;o.w=old.w*w/b.w;o.h=old.h*h/b.h;if(e.shiftKey&&o.type==='text')o.size=Math.max(1,Math.min(1000,old.size*w/b.w))});carouselRefresh();carouselCoordinates(objects);
+  objects.forEach((o,i)=>{const old=base[i];o.x=x+(old.x-b.x)*w/b.w;o.y=y+(old.y-b.y)*h/b.h;o.w=old.w*w/b.w;o.h=old.h*h/b.h;if(e.shiftKey&&o.type==='text'){const factor=w/b.w;o.size=Math.max(1,Math.min(1000,old.size*factor));if(old.textStyles)o.textStyles=old.textStyles.map(style=>style?{...style,size:style.size?Math.max(1,Math.min(1000,style.size*factor)):undefined,leading:style.leading?.map(value=>value==null?null:Math.max(1,Math.min(3000,value*factor)))}:null)}});carouselRefresh();carouselCoordinates(objects);
  },()=>{if(begun){objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleAlign(o));changed(false)}carouselPanel()});
 }
 function carouselCoordinates(objects){const b=carouselBounds(objects);if(b)$('#carouselCoordinates').textContent=`X ${Math.round(b.x)} · Y ${Math.round(b.y)} · ${Math.round(b.w)} × ${Math.round(b.h)} px`}
@@ -236,15 +238,30 @@ function carouselGradientDrag(ev,o,key=null){
  if(!key){const pt=carouselPoint(ev);o.gradientStart={x:(pt.x-o.x)/o.w,y:(pt.y-o.y)/o.h};o.gradientEnd={...o.gradientStart}}
  carouselListen(ev,update,()=>{changed(false);carouselPanel()});
 }
-function carouselTextHeight(o){const ctx=makeCanvas(1,1).getContext('2d');ctx.font=`${o.size}px "${o.font}"`;return Math.max(o.size*1.12,MKWLayout.wrap(o.text,o.w,t=>ctx.measureText(t).width).length*o.size*1.12)}
-function carouselPositionText(el,o){Object.assign(el.style,{left:o.x*carouselZoom+'px',top:o.y*carouselZoom+'px',width:o.w*carouselZoom+'px',height:Math.max(o.h,carouselTextHeight(o))*carouselZoom+'px',fontFamily:fontFamily(o.font),fontSize:o.size*carouselZoom+'px',lineHeight:'1.12',color:o.color})}
+function carouselTextLayout(o,ctx=makeCanvas(1,1).getContext('2d')){
+ const lines=[];let y=0,offset=0;for(const [paragraph,text] of o.text.split('\n').entries()){
+  const style=o.textStyles?.[paragraph],size=style?.size??o.size;ctx.font=`${size}px "${o.font}"`;const wrapped=carouselWrapText(text,o.w,t=>ctx.measureText(t).width);
+  wrapped.forEach((part,index)=>{const leading=style?.leading?.[index]??size*1.12;lines.push({text:part.raw.trimEnd(),raw:part.raw,start:offset+part.start,end:offset+part.end,paragraph,index,size,leading,y});y+=leading});offset+=text.length+1;
+ }const last=lines.at(-1);return {lines,height:last?last.y+last.size*1.12:0};
+}
+function carouselTextHeight(o){return carouselTextLayout(o).height}
+function carouselPositionText(el,o){Object.assign(el.style,{left:o.x*carouselZoom+'px',top:o.y*carouselZoom+'px',width:o.w*carouselZoom+'px',height:Math.max(o.h,carouselTextHeight(o))*carouselZoom+'px',fontFamily:fontFamily(o.font),fontSize:o.size*carouselZoom+'px',lineHeight:'1.12',color:o.color});el.querySelectorAll('[data-text-size]').forEach(line=>{line.style.fontSize=line.dataset.textSize*carouselZoom+'px';line.style.lineHeight=line.dataset.textSize*1.12*carouselZoom+'px';line.style.height=line.dataset.textHeight*carouselZoom+'px'})}
 function carouselEditText(o){
  if(o.locked)return;carouselEndText();carouselUI.ids=new Set([o.id]);carouselSelection=o.id;checkpoint();
- const el=document.createElement('textarea');el.className='carousel-inline-text';el.setAttribute('aria-label','Text direkt bearbeiten');el.value=o.text;el.spellcheck=false;
- carouselUI.editing={id:o.id,el};$('#carouselEditingOverlay').append(el);carouselPositionText(el,o);
- el.oninput=()=>{o.text=el.value;changed(false);const sidebar=$('#carouselProperties [data-prop=text]');if(sidebar)sidebar.value=o.text;carouselUpdateWarning(o)};
- el.onkeydown=ev=>{if(ev.key==='Escape'){ev.preventDefault();carouselEndText();$('#carouselViewport').focus()}};
- el.onblur=()=>carouselEndText();carouselPanel();carouselRefresh();el.focus();el.setSelectionRange(el.value.length,el.value.length);
+ const el=document.createElement('div');el.className='carousel-inline-text';el.contentEditable='true';el.setAttribute('role','textbox');el.setAttribute('aria-multiline','true');el.setAttribute('aria-label','Text direkt bearbeiten');el.spellcheck=false;
+ const edit={id:o.id,el,undo:[],redo:[],composing:false};carouselUI.editing=edit;$('#carouselEditingOverlay').append(el);carouselFormatEditable(el,o);carouselPositionText(el,o);
+ const apply=(value,caret,styles,remember=true)=>{const nextStyles=styles??carouselTextStylesForInput(o,value);if(remember&&value!==o.text){edit.undo.push({text:o.text,styles:clone(o.textStyles||[]),caret:Math.min(caret,o.text.length)});if(edit.undo.length>100)edit.undo.shift();edit.redo=[]}o.text=value;o.textStyles=nextStyles;carouselFormatEditable(el,o);carouselEditableCaret(el,caret);changed(false);const sidebar=$('#carouselProperties [data-prop=text]');if(sidebar)sidebar.value=o.text;carouselUpdateWarning(o);carouselTrackTextCaret(o,el);carouselRefreshTextStyles(o)};
+ el.oninput=ev=>{if(ev.isComposing||edit.composing)return;const caret=carouselEditableSelection(el).end;apply(carouselEditableValue(el),caret)};
+ el.oncompositionstart=()=>edit.composing=true;el.oncompositionend=()=>{edit.composing=false;apply(carouselEditableValue(el),carouselEditableSelection(el).end)};
+ el.onbeforeinput=ev=>{if(ev.isComposing||edit.composing)return;const {start,end}=carouselEditableSelection(el);let a=start,b=end,insert='';
+  if(['insertParagraph','insertLineBreak'].includes(ev.inputType))insert='\n';else if(ev.inputType==='deleteContentBackward'){if(a===b&&a>0)a-=Array.from(o.text.slice(0,a)).at(-1).length}else if(ev.inputType==='deleteContentForward'){if(a===b&&b<o.text.length)b+=Array.from(o.text.slice(b))[0].length}else return;
+  ev.preventDefault();apply(o.text.slice(0,a)+insert+o.text.slice(b),a+insert.length,carouselReplaceTextStyles(o,a,b,insert));
+ };
+ el.onpaste=ev=>{ev.preventDefault();const text=ev.clipboardData.getData('text/plain').replace(/\r\n?/g,'\n'),{start,end}=carouselEditableSelection(el);apply(o.text.slice(0,start)+text+o.text.slice(end),start+text.length,carouselReplaceTextStyles(o,start,end,text))};
+ el.oncopy=el.oncut=ev=>{const {start,end}=carouselEditableSelection(el);if(start===end)return;ev.preventDefault();ev.clipboardData.setData('text/plain',o.text.slice(start,end));if(ev.type==='cut')apply(o.text.slice(0,start)+o.text.slice(end),start,carouselReplaceTextStyles(o,start,end,''))};
+ el.onmouseup=el.onkeyup=()=>carouselTrackTextCaret(o,el);
+ el.onkeydown=ev=>{const key=ev.key.toLowerCase();if((ev.metaKey||ev.ctrlKey)&&key==='z'){ev.preventDefault();const from=ev.shiftKey?edit.redo:edit.undo,to=ev.shiftKey?edit.undo:edit.redo;if(from.length){const value=from.pop();to.push({text:o.text,styles:clone(o.textStyles||[]),caret:carouselEditableSelection(el).end});apply(value.text,value.caret,value.styles,false)}return}if(ev.key==='Escape'){ev.preventDefault();carouselEndText();$('#carouselViewport').focus()}};
+ el.onblur=()=>carouselEndText();carouselPanel();carouselRefresh();el.focus();carouselEditableCaret(el,o.text.length);
 }
 function carouselEndText(){const edit=carouselUI.editing;if(!edit)return;carouselUI.editing=null;edit.el.onblur=null;edit.el.remove();if(carouselActive()&&$('#carouselProperties')){carouselPanel();carouselRefresh()}}
 function carouselUpdateWarning(o){const warning=$('#carouselProperties .carousel-warning');if(warning)warning.textContent=carouselWarning(o)}
@@ -269,9 +286,11 @@ function carouselPanel(){
  if(items.length>1){panel.innerHTML=`<h3>${items.length} Elemente ausgewählt</h3><p>Gemeinsam verschieben und an den Griffen skalieren.</p><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></div>`;$('#carouselDuplicate').onclick=carouselDuplicate;$('#carouselDelete').onclick=carouselDelete}
  else if(o){panel.innerHTML=`<div class="carousel-section-heading"><h3>${esc(o.name)}</h3><span>${o.locked?'Gesperrt':carouselUI.content?'Bildinhalt':'Eigenschaften'}</span></div>${['image','angle'].includes(o.type)?'<button id="carouselReplace" class="primary carousel-place-image">Bild platzieren / ersetzen</button>':''}${section('Transformieren',`<div class="carousel-fields">${number('x','X',-100000)}${number('y','Y',-100000)}${number('w','Breite',1)}${number('h','Höhe',1)}</div>`)}
  ${section('Darstellung',`<div class="carousel-fields carousel-appearance">${select('blend','Mischmodus',[['source-over','Normal'],['multiply','Multiplizieren']])}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity*100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity*100)}"></label></div>`)}
- ${o.type==='text'?section('Text',`<label>Inhalt<textarea data-prop="text" placeholder="Text eingeben …">${esc(o.text)}</textarea></label><div class="carousel-fields">${number('size','Grösse',1,1000)}${color('color','Farbe')}</div>${select('font','Schrift',[['Replica LL','Replica'],['Harriet','Harriet Bold'],['Harriet Regular','Harriet Regular'],['Harriet Italic','Harriet Italic']])}<button id="carouselTextEdit">Auf der Fläche bearbeiten</button>`):''}
+ ${o.type==='text'?section('Text',`<label>Inhalt<textarea data-prop="text" placeholder="Text eingeben …">${esc(o.text)}</textarea></label><div class="carousel-fields">${number('size','Standardgrösse',1,1000)}${color('color','Farbe')}</div>${select('font','Schrift',[['Replica LL','Replica'],['Harriet','Harriet Bold'],['Harriet Regular','Harriet Regular'],['Harriet Italic','Harriet Italic']])}<button id="carouselTextEdit">Auf der Fläche bearbeiten</button>`):''}
+ ${o.type==='text'?carouselTextStylePanel(o):''}
  ${o.type==='gradient'?section('Verlauf',select('kind','Art',[['linear','Linear'],['radial','Radial']])+`<div class="carousel-fields carousel-gradient-colors">${transparency('startAlpha','Anfangsfarbe',1)}${transparency('endAlpha','Endfarbe',0)}</div>`+number('rotation','Richtung · °',-360,360)+'<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>'):''}
  ${o.type==='angle'?section('Winkel',select('direction','Richtung',[['up','Oben'],['right','Rechts'],['down','Unten']])+`<div class="carousel-fields">${number('thickness','Schenkelbreite',1)}${number('glow','Schein · px',0,200)}${color('glowColor','Scheinfarbe')}${number('glowAlpha','Intensität',0,1)}</div><p>Die Spitze sitzt auf einer Slide-Mittellinie. Der Winkel überragt eine Artwork-Kante um mindestens 1 px.</p>`):''}
+ ${o.type==='image'?section('Rahmenform',`<div class="carousel-fields carousel-point-count"><button data-frame-count="4" aria-pressed="${!o.framePoints||o.framePoints.length===4}">4 Eckpunkte</button><button data-frame-count="5" aria-pressed="${o.framePoints?.length===5}">5 Eckpunkte</button></div>${o.framePoints?.length===5?`<label>Zusatzpunkt<select id="carouselPointSide">${options([['left','Links'],['right','Rechts'],['top','Oben'],['bottom','Unten']],o.framePointSide||'right')}</select></label>`:''}<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints?'Punktbearbeitung beenden':'Rahmenpunkte bearbeiten'}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button><p>Eckpunkte direkt ziehen, um Bildübergänge hinter dem Winkel zu verbergen. Der Bildinhalt bleibt an seiner Position.</p>`):''}
  ${['image','angle'].includes(o.type)?section('Bildinhalt','<div class="carousel-fields">'+number('scale','Bildzoom',.05,20)+number('panX','Ausschnitt X',-100000)+number('panY','Ausschnitt Y',-100000)+select('flipX','Horizontal',[['1','Original'],['-1','Gespiegelt']])+select('flipY','Vertikal',[['1','Original'],['-1','Gespiegelt']])+'</div><button id="carouselContentEdit">Bildinhalt verschieben</button><button id="carouselImageFit">Rahmen füllen</button>'):''}
  ${o.type==='logo'?section('MKW Logo',select('source','Farbe',[['white','Weiss'],['black','Schwarz']])):''}
  <p class="carousel-warning" role="status">${carouselWarning(o)}</p><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button>${o.type!=='logo'?'<button id="carouselDelete">Entfernen</button>':''}</div>`;
@@ -279,21 +298,27 @@ function carouselPanel(){
    let value=['number','range'].includes(input.type)||['flipX','flipY'].includes(input.dataset.prop)?Number(input.value):input.value;
    if(input.type==='number'){if(!Number.isFinite(value))return;value=Math.max(+input.min,Math.min(+input.max,value))}
    if(input.type==='range'){input.closest('label').querySelector('output').value=value+' %';value=input.dataset.transparency?1-value/100:value/100}
-   if(!carouselUI.propertyUndo){checkpoint();carouselUI.propertyUndo=true}const oldRatio=o.h/o.w;o[input.dataset.prop]=value;
+   if(!carouselUI.propertyUndo){checkpoint();carouselUI.propertyUndo=true}const oldRatio=o.h/o.w;if(o.type==='text'&&input.dataset.prop==='text')o.textStyles=carouselTextStylesForInput(o,value);o[input.dataset.prop]=value;
    if(o.type==='angle'){if(input.dataset.prop==='direction'){const tall=o.h>o.w;if((value==='right')!==tall)[o.w,o.h]=[o.h,o.w]}else if(input.dataset.prop==='w')o.h=o.direction==='right'?o.w*2:o.w/2;else if(input.dataset.prop==='h')o.w=o.direction==='right'?o.h/2:o.h*2}
    if(o.type==='angle')carouselAngleAlign(o);if(o.type==='logo'){if(input.dataset.prop==='w')o.h=o.w*oldRatio;if(input.dataset.prop==='h')o.w=o.h/oldRatio}
    if(o.type==='gradient'&&input.dataset.prop==='rotation'){delete o.gradientStart;delete o.gradientEnd}
    changed(false);carouselUpdateWarning(o);
-   if(carouselUI.editing?.id===o.id&&input.dataset.prop==='text')carouselUI.editing.el.value=o.text;
+   if(carouselUI.editing?.id===o.id&&input.dataset.prop==='text')carouselFormatEditable(carouselUI.editing.el,o);
+   if(o.type==='text'&&['text','size','font','w'].includes(input.dataset.prop))carouselRefreshTextStyles(o);
    for(const key of ['x','y','w','h']){const field=panel.querySelector(`[data-prop="${key}"]`);if(field&&field!==input)field.value=Math.round(o[key]*100)/100}
   }});
   panel.querySelectorAll('[data-transparent]').forEach(input=>{input.disabled=!!o.locked;input.onchange=()=>{checkpoint();const key=input.dataset.transparent;o[key]=input.checked ? .5 : 1;changed(false);carouselPanel()}});
   $('#carouselDuplicate').onclick=carouselDuplicate;if($('#carouselDelete'))$('#carouselDelete').onclick=carouselDelete;
   if($('#carouselReplace'))$('#carouselReplace').onclick=()=>carouselFile(o.id);
   if($('#carouselTextEdit'))$('#carouselTextEdit').onclick=()=>carouselEditText(o);
+  if(o.type==='text')carouselBindTextStyles(o,panel);
   if($('#carouselGradientEdit'))$('#carouselGradientEdit').onclick=()=>carouselTool('gradient');
   if($('#carouselContentEdit'))$('#carouselContentEdit').onclick=()=>carouselTool('content');
   if($('#carouselImageFit'))$('#carouselImageFit').onclick=()=>{checkpoint();o.scale=1;o.panX=o.panY=0;changed(false);carouselPanel()};
+  panel.querySelectorAll('[data-frame-count]').forEach(btn=>btn.onclick=()=>carouselSetFramePoints(o,+btn.dataset.frameCount));
+  if($('#carouselPointSide')){$('#carouselPointSide').disabled=!!o.locked;$('#carouselPointSide').onchange=ev=>carouselSetFramePoints(o,5,ev.target.value)}
+  if($('#carouselFrameEdit'))$('#carouselFrameEdit').onclick=()=>{carouselUI.framePoints=!carouselUI.framePoints;carouselUI.content=false;carouselUI.tool='select';carouselToolUI();carouselRefresh();carouselPanel()};
+  if($('#carouselFrameReset'))$('#carouselFrameReset').onclick=()=>{checkpoint();delete o.framePoints;delete o.framePointSide;carouselUI.framePoints=false;changed(false);carouselPanel()};
   if(o.locked)panel.querySelectorAll('button:not(#carouselDuplicate)').forEach(btn=>btn.disabled=true);
  }else{panel.innerHTML=`<h3>Dokument</h3><p>Werkzeug links auswählen. Rahmen aufziehen oder vorhandene Elemente mit dem Auswahlwerkzeug anklicken.</p>${section('Hintergrund',`<label>Farbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}<p>V Auswahl · T Text · F Bildrahmen · G Verlauf · W Winkel · H Hand · Z Zoom</p><p>Leertaste zum Verschieben der Montagefläche. Shift zum Hinzufügen zur Auswahl.</p>`;$('#carouselBackground').onchange=e=>{checkpoint();c.bg=e.target.value;changed(false)}}
  carouselLayerPanel();
@@ -402,4 +427,69 @@ function carouselAngleTipSnap(o,c=p.carousel,tolerance=6/carouselZoom){
 function carouselAngleAlign(o,c=p.carousel){
  const tip=carouselAngleTip(o),candidates=Array.from({length:c.n},(_,i)=>({axis:'x',value:(i+.5)*c.w-tip.x+o.x}));candidates.push({axis:'y',value:c.h/2-tip.y+o.y});
  let best=null,distance=Infinity;for(const {axis,value} of candidates){const candidate={...o,[axis]:value};carouselAngleBleed(candidate,c,axis);const score=Math.hypot(candidate.x-o.x,candidate.y-o.y);if(score<distance){best=candidate;distance=score}}o.x=best.x;o.y=best.y;
+}
+function carouselFramePoints(o){return o.framePoints||[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:0,y:1}]}
+function carouselImageMask(o){const path=new Path2D(),points=carouselFramePoints(o);points.forEach((point,i)=>path[i?'lineTo':'moveTo'](point.x*o.w,point.y*o.h));path.closePath();return path}
+function carouselFrameCorners(o){const points=carouselFramePoints(o).map(point=>({...point}));if(points.length===5)points.splice({top:1,right:2,bottom:3,left:4}[o.framePointSide||'right'],1);return points}
+function carouselSetFramePoints(o,count,side=o.framePointSide||'right'){
+ if(o.locked)return;checkpoint();const base=clone(o),points=carouselFrameCorners(o);if(count===5){const index={top:0,right:1,bottom:2,left:3}[side],a=points[index],b=points[(index+1)%4];points.splice(index+1,0,{x:(a.x+b.x)/2,y:(a.y+b.y)/2})}o.framePointSide=side;carouselSetImageFrame(o,base,points.map(point=>({x:base.x+point.x*base.w,y:base.y+point.y*base.h})));carouselUI.framePoints=true;carouselUI.content=false;carouselUI.tool='select';carouselToolUI();changed(false);carouselPanel();
+}
+function carouselDrawFramePoints(o,root,editing){
+ const points=carouselFramePoints(o),s=carouselZoom,svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('carousel-frame-path');svg.setAttribute('width',o.w*s);svg.setAttribute('height',o.h*s);Object.assign(svg.style,{left:o.x*s+'px',top:o.y*s+'px'});svg.innerHTML=`<polygon points="${points.map(point=>`${point.x*o.w*s},${point.y*o.h*s}`).join(' ')}"/>`;root.append(svg);
+ if(editing&&!o.locked)points.forEach((point,index)=>{const handle=document.createElement('button');handle.className='carousel-point-handle';handle.dataset.framePoint=index;handle.setAttribute('aria-label',`Rahmenpunkt ${index+1} verschieben`);handle.style.left=(o.x+point.x*o.w)*s+'px';handle.style.top=(o.y+point.y*o.h)*s+'px';handle.onpointerdown=ev=>{ev.stopPropagation();carouselFramePointDrag(ev,o,index)};root.append(handle)});
+}
+function carouselFramePointDrag(ev,o,index){
+ if(o.locked)return;const start=carouselPoint(ev),base=clone(o),original=carouselFramePoints(base).map(point=>({x:base.x+point.x*base.w,y:base.y+point.y*base.h}));let begun=false;
+ carouselListen(ev,e=>{
+  const pt=carouselPoint(e);let dx=pt.x-start.x,dy=pt.y-start.y;if(!begun&&Math.hypot(dx,dy)*carouselZoom<2)return;if(!begun){checkpoint();begun=true}
+  if(e.shiftKey){const angle=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*Math.PI/4,length=Math.hypot(dx,dy);dx=Math.cos(angle)*length;dy=Math.sin(angle)*length}
+  const snap=carouselSnap(original[index].x+dx,original[index].y+dy,{w:0,h:0},e.ctrlKey||e.metaKey||e.shiftKey),points=original.map(point=>({...point}));points[index]={x:snap.x,y:snap.y};carouselUI.snapLines=snap.guides;
+  if(!carouselSetImageFrame(o,base,points))return;carouselRefresh();carouselCoordinates([o]);
+ },()=>{if(begun)changed(false);carouselPanel()});
+}
+function carouselTextStylePanel(o){
+ const paragraphs=o.text.split('\n');carouselUI.textParagraph=Math.max(0,Math.min(paragraphs.length-1,carouselUI.textParagraph));const paragraph=carouselUI.textParagraph,lines=carouselTextLayout(o).lines.filter(line=>line.paragraph===paragraph);carouselUI.textLine=Math.max(0,Math.min(lines.length-1,carouselUI.textLine));const line=lines[carouselUI.textLine];
+ const label=(text)=>text.trim().slice(0,30)||'Leer';return `<section id="carouselTextStyles" class="carousel-property-section"><h4>Absätze & Zeilen</h4><label>Absatz<select id="carouselTextParagraph">${options(paragraphs.map((text,i)=>[String(i),`${i+1} · ${label(text)}`]),String(paragraph))}</select></label><label>Absatzgrösse (px)<input id="carouselParagraphSize" type="number" min="1" max="1000" step="any" value="${o.textStyles?.[paragraph]?.size??o.size}"></label><button id="carouselParagraphReset">Standardgrösse übernehmen</button><label>Zeile im Absatz<select id="carouselTextLine">${options(lines.map((line,i)=>[String(i),`${i+1} · ${label(line.text)}`]),String(carouselUI.textLine))}</select></label><label>Abstand zur nächsten Zeile (px)<input id="carouselLineLeading" type="number" min="1" max="3000" step="any" value="${Math.round(line.leading*100)/100}"></label><button id="carouselLeadingReset">Automatischen Zeilenabstand verwenden</button><p>Jeder Absatz erhält seine eigene Schriftgrösse. Der Zeilenabstand gilt nur für die ausgewählte Zeile – auch bei automatischen Umbrüchen.</p></section>`;
+}
+function carouselBindTextStyles(o,panel){
+ for(const id of ['carouselTextParagraph','carouselTextLine','carouselParagraphSize','carouselLineLeading'])$('#'+id).disabled=!!o.locked;
+ $('#carouselTextParagraph').onchange=ev=>{carouselUI.textParagraph=+ev.target.value;carouselUI.textLine=0;carouselPanel()};$('#carouselTextLine').onchange=ev=>{carouselUI.textLine=+ev.target.value;carouselPanel()};
+ const edit=(input,key)=>{input.onfocus=()=>{carouselUI.propertyUndo=false};input.oninput=()=>{const value=+input.value;if(!Number.isFinite(value)||value<+input.min||value>+input.max)return;if(!carouselUI.propertyUndo){checkpoint();carouselUI.propertyUndo=true}o.textStyles??=[];const style=o.textStyles[carouselUI.textParagraph]??={};if(key==='size')style.size=value;else{style.leading??=[];style.leading[carouselUI.textLine]=value}changed(false);carouselUpdateWarning(o);if(key==='size'){const lines=carouselTextLayout(o).lines.filter(line=>line.paragraph===carouselUI.textParagraph);carouselUI.textLine=Math.min(carouselUI.textLine,lines.length-1);$('#carouselTextLine').innerHTML=options(lines.map((line,i)=>[String(i),`${i+1} · ${line.text.slice(0,30)||'Leer'}`]),String(carouselUI.textLine));$('#carouselLineLeading').value=Math.round(lines[carouselUI.textLine].leading*100)/100;}}};
+ edit($('#carouselParagraphSize'),'size');edit($('#carouselLineLeading'),'leading');
+ const reset=key=>{checkpoint();const style=o.textStyles?.[carouselUI.textParagraph];if(style){if(key==='size')delete style.size;else if(style.leading)style.leading[carouselUI.textLine]=null}changed(false);carouselPanel()};$('#carouselParagraphReset').onclick=()=>reset('size');$('#carouselLeadingReset').onclick=()=>reset('leading');
+}
+function carouselWrapText(text,width,measure){
+ if(!text.length)return [{raw:'',start:0,end:0}];const parts=[];let start=0;
+ while(start<text.length){let end=start,fit=start,space=-1;for(const char of Array.from(text.slice(start))){end+=char.length;if(fit>start&&measure(text.slice(start,end).trimEnd())>width)break;fit=end;if(/\s/u.test(char))space=end}const stop=fit<text.length&&space>start?space:fit;parts.push({raw:text.slice(start,stop),start,end:stop});start=stop}
+ return parts;
+}
+function carouselFormatEditable(el,o){
+ const layout=carouselTextLayout(o),paragraphs=o.text.split('\n');el.innerHTML=paragraphs.map((_,paragraph)=>`<div data-text-paragraph="${paragraph}">${layout.lines.filter(line=>line.paragraph===paragraph).map(line=>`<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-size="${line.size}" data-text-height="${line===layout.lines.at(-1)?line.size*1.12:line.leading}">${line.raw?esc(line.raw):'<br data-placeholder="true">'}</span>`).join('')}</div>`).join('');carouselPositionText(el,o);
+}
+function carouselEditableValue(root){
+ if(root.nodeType===Node.TEXT_NODE)return root.textContent;if(root.nodeName==='BR')return root.hasAttribute('data-placeholder')?'':'\n';return [...root.childNodes].map((child,i)=>(i&&['DIV','P'].includes(child.nodeName)?'\n':'')+carouselEditableValue(child)).join('');
+}
+function carouselEditableSelection(el){
+ const selection=window.getSelection();if(!selection.rangeCount||!el.contains(selection.anchorNode)||!el.contains(selection.focusNode)){const end=carouselEditableValue(el).length;return {start:end,end}}
+ const range=selection.getRangeAt(0),offset=(node,pos)=>{const prefix=document.createRange();prefix.selectNodeContents(el);prefix.setEnd(node,pos);return carouselEditableValue(prefix.cloneContents()).length};return {start:offset(range.startContainer,range.startOffset),end:offset(range.endContainer,range.endOffset)};
+}
+function carouselEditableCaret(el,offset){
+ const lines=[...el.querySelectorAll('[data-text-start]')],line=lines.find(line=>+line.dataset.textStart<=offset&&offset<=+line.dataset.textEnd)||lines.at(-1);if(!line)return;const range=document.createRange();if(line.firstChild?.nodeType===Node.TEXT_NODE)range.setStart(line.firstChild,Math.max(0,Math.min(line.firstChild.length,offset-line.dataset.textStart)));else range.setStart(line,0);range.collapse(true);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+}
+
+function carouselReplaceTextStyles(o,start,end,text){
+ const styles=clone(o.textStyles||[]);while(styles.length<o.text.split('\n').length)styles.push(null);const paragraph=o.text.slice(0,start).split('\n').length-1,removed=o.text.slice(start,end).split('\n').length-1,inserted=text.split('\n').length-1;if(removed)styles.splice(paragraph+1,removed);if(inserted)styles.splice(paragraph+1,0,...Array.from({length:inserted},()=>styles[paragraph]?.size!==undefined?{size:styles[paragraph].size}:null));return styles;
+}
+
+function carouselSetImageFrame(o,base,points){
+ const x=Math.min(...points.map(point=>point.x)),y=Math.min(...points.map(point=>point.y)),w=Math.max(10,Math.max(...points.map(point=>point.x))-x),h=Math.max(10,Math.max(...points.map(point=>point.y))-y);if(w>100000||h>100000||Math.abs(x)>100000||Math.abs(y)>100000)return false;
+ const im=p.images.find(im=>im.id===o.imageId),oldFit=im?Math.max(base.w/im.width,base.h/im.height):1,newFit=im?Math.max(w/im.width,h/im.height):1;
+ Object.assign(o,{x,y,w,h,framePoints:points.map(point=>({x:(point.x-x)/w,y:(point.y-y)/h})),scale:base.scale*oldFit/newFit,panX:base.x+base.w/2+base.panX-x-w/2,panY:base.y+base.h/2+base.panY-y-h/2});return true;
+}
+function carouselTextStylesForInput(o,value){
+ let start=0;while(start<o.text.length&&start<value.length&&o.text[start]===value[start])start++;let end=o.text.length,next=value.length;while(end>start&&next>start&&o.text[end-1]===value[next-1]){end--;next--}return carouselReplaceTextStyles(o,start,end,value.slice(start,next));
+}
+function carouselRefreshTextStyles(o){const section=$('#carouselTextStyles');if(!section)return;section.outerHTML=carouselTextStylePanel(o);carouselBindTextStyles(o,$('#carouselProperties'));if(o.locked)$('#carouselTextStyles').querySelectorAll('button').forEach(btn=>btn.disabled=true)}
+function carouselTrackTextCaret(o,el){
+ const offset=carouselEditableSelection(el).start,paragraph=o.text.slice(0,offset).split('\n').length-1,lines=carouselTextLayout(o).lines.filter(line=>line.paragraph===paragraph),index=Math.max(0,lines.findIndex(line=>line.start<=offset&&offset<=line.end));if(carouselUI.textParagraph!==paragraph||carouselUI.textLine!==index){carouselUI.textParagraph=paragraph;carouselUI.textLine=index;carouselRefreshTextStyles(o)}
 }
