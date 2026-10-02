@@ -1,3 +1,6 @@
 node_modules/
 *.log
 .DS_Store
+
+# Private customer sources and encryption keys must stay on this Mac.
+portfolio-manager/.client-galleries/

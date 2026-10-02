@@ -56,3 +56,17 @@ Weitere Tests: `node --test media-library.test.js upload.test.js`. Beide verwend
 ## Bildvarianten bei neuen Uploads
 
 Neue Bilder erzeugen genau vier öffentliche Varianten: `<Name>.jpg` in Originalabmessungen mit JPEG-Qualität 100 und 4:4:4-Farbabtastung, `<Name>-mobile.jpg` mit maximal 640 px Breite (Qualität 85), `<Name>.webp` mit maximal 2560 px (Qualität 85) und `<Name>-mobile.webp` mit maximal 640 px (Qualität 80). Es wird nicht hochskaliert. Transparenz wird auf Weiss reduziert. Die hochgeladene Quelldatei bleibt separat im nicht als Variante angezeigten `raw/`-Archiv. Bestehende Varianten werden nicht gelöscht.
+
+## Kundengalerien
+
+Die öffentliche Unterseite `kunden.html` wird nicht in die Navigation aufgenommen. Unter **Verwaltung → Kundengalerien** werden Veranstaltungen erstellt, Kundenbilder direkt hochgeladen und Freigabelinks kopiert. Veranstaltungsnamen, Datum und Bildanzahl erscheinen vor der Passworteingabe. Die Website-Adresse für Links lässt sich im Bearbeitungsdialog einstellen (auch ein GitHub-Pages-Unterpfad ist möglich).
+
+Ein neues Passwort benötigt mindestens 12 Zeichen; der CMS-Button erzeugt ein zufälliges Passwort. Es wird nur zur Schlüsselableitung verwendet und nicht gespeichert. Den Kundinnen Link und Passwort getrennt weitergeben. Nach jedem Speichern oder Upload liegen die öffentlichen Änderungen lokal bereit; anschliessend die Dateien über **Änderungen prüfen → Commit erstellen & pushen** veröffentlichen. Vor einer Online-Freigabe mit dem richtigen Passwort über „Lokal ansehen“ testen.
+
+Die Bilder werden in JPEGs mit voller Auflösung und Qualität 100 umgewandelt. Kamera, Objektiv, Blende, Verschlusszeit und ISO bleiben erhalten. Nur lokal gespeicherte Quellen und Schlüssel liegen unter `portfolio-manager/.client-galleries/`; dieser Ordner ist in `.gitignore` ausgeschlossen und wird nicht über öffentliche statische Routen ausgeliefert. Diesen Ordner in die lokale Datensicherung aufnehmen: Er wird für weitere Änderungen und Passwortwechsel benötigt. Die öffentliche Mediathek eignet sich nicht für neue private Kundenbilder, da ihre Dateien öffentlich erreichbar sind.
+
+Die Kundenseite entschlüsselt Manifest, Vorschaubilder und Downloadbilder erst nach der Passworteingabe im Browser. AES-256-GCM mit zufälliger Nonce pro Datei, PBKDF2-SHA-256 mit 310000 Durchläufen und zufälligem Salt pro Veranstaltung; der Browser hält den Schlüssel nur für die geöffnete Galerie im Arbeitsspeicher. Die Website muss über HTTPS oder localhost geöffnet werden. Es werden keine Passwörter in Links, Cookies oder Browser-Speicher geschrieben. Der ZIP-Download wird lokal im Browser erstellt; für grosse Galerien die Auswahl in Gruppen bis 600 MB herunterladen.
+
+Zum Pausieren die Freigabe im Veranstaltungsdialog abwählen, speichern und die Änderungen pushen. Ein neues Passwort verschlüsselt alle aktuellen Dateien neu. Git-Verlauf, Caches und bereits empfangene Downloads lassen sich damit nicht zurückholen; bei GitHub Pages ist keine personenbezogene Zugriffskontrolle oder echte nachträgliche Download-Sperre möglich. Kundinnen mit dem Passwort können Bilder speichern und weitergeben.
+
+Prüfung: `node --test client-galleries.test.js`. Der Test verwendet ausschliesslich temporäre Uploads und prüft Authentifizierung, falsche Passwörter, Browser-kompatible Entschlüsselung, Metadaten, Versionskonflikte, Passwortwechsel, Pausieren und gültige ZIP-Dateien.

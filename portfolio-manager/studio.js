@@ -17,7 +17,7 @@ module.exports = function studio(app, root) {
     const route = fn => async (req, res) => { try { await fn(req, res); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } };
     const git = async (...args) => (await execFile('git', args, { cwd: root, timeout: 120000, maxBuffer: 4 * 1024 * 1024, env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } })).stdout.trimEnd();
     function resolve(relative) {
-        if (typeof relative !== 'string' || relative.split(/[\\/]/).some(p => p === '..' || p.startsWith('.')) || path.isAbsolute(relative)) throw fail('Ungültiger Dateipfad.');
+        if (typeof relative !== 'string' || relative.split(/[\\/]/).some(p => p === '..' || p.startsWith('.') && relative !== '.gitignore') || path.isAbsolute(relative)) throw fail('Ungültiger Dateipfad.');
         const full = path.resolve(root, relative);
         if (!full.startsWith(root + path.sep)) throw fail('Ungültiger Dateipfad.');
         let check = full;
@@ -25,7 +25,7 @@ module.exports = function studio(app, root) {
         return full;
     }
     const isPage = p => typeof p === 'string' && /^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.html$/.test(p) && !p.startsWith('portfolio-manager/');
-    const allowed = p => /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['common.js','lebenslauf.js','lebenslauf.json'].includes(p);
+    const allowed = p => /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['.gitignore','common.js','lebenslauf.js','lebenslauf.json'].includes(p);
     function write(relative, content, revision) {
         const full = resolve(relative);
         const before = fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : '';
@@ -52,6 +52,7 @@ module.exports = function studio(app, root) {
         catch { fetchError = 'GitHub ist nicht erreichbar oder die Anmeldung fehlt. Angezeigt wird der zuletzt lokal bekannte Stand.'; }
     }
     require('./media-library').register(app, root, route);
+    require('./client-galleries').register(app, root, route);
     app.get('/api/studio/session', (req, res) => res.json({ token }));
     app.get('/api/studio/content/:type', route(async (req, res) => {
         const file = files[req.params.type]; if (!file) throw fail('Unbekannter Inhalt.');
