@@ -67,7 +67,7 @@ function editClient(original) {
     const progressBar = document.createElement('progress'); progressBar.setAttribute('aria-label', 'Verarbeitung der Kundenbilder');
     progressHeading.append(progressText, progressPercent); operationProgress.append(progressHeading, progressBar);
     function showProgress(label, completed = null, total = 0) {
-        operationProgress.hidden = false; progressBar.hidden = false; progressText.textContent = label;
+        operationProgress.hidden = false; progressBar.hidden = false; if (progressText.textContent !== label) progressText.textContent = label;
         if (completed === null || !total) { progressBar.removeAttribute('value'); progressPercent.textContent = ''; }
         else { progressBar.max = total; progressBar.value = completed; progressPercent.textContent = Math.round(completed / total * 100) + ' %'; }
     }
@@ -115,11 +115,12 @@ function editClient(original) {
         const operation = crypto.randomUUID();
         const result = await trackOperation(operation, 'Galerie wird vorbereitet …', () => api('/api/studio/clients', { operation, id: event?.id, revision: event?.revision, title: title.querySelector('input').value, slug: slugInput.value, date: date.querySelector('input').value, description: text.value, password: passInput.value, active: checkbox.checked, images: event ? images.map(image => image.id) : undefined }));
         event = result; slugInput.value = event.slug; customSlug = true; updateLink(); images = [...event.images]; password.firstChild.textContent = 'Neues Passwort (leer lassen zum Beibehalten)'; passInput.value = ''; passInput.required = false;
-        save.textContent = 'Änderungen lokal speichern'; upload.disabled = false; uploadHint.textContent = 'Bilder direkt hier hochladen. Veröffentlichung über „Änderungen prüfen“.';
+        save.textContent = 'Änderungen lokal speichern'; upload.disabled = false; uploadHint.textContent = 'Bis zu 500 Bilder pro Veranstaltung · maximal 40 MB pro Datei. Veröffentlichung über „Änderungen prüfen“.';
         saved(); renderImages(); message.textContent = 'Lokal gespeichert. Für die Online-Freigabe anschliessend Commit & Push durchführen.';
         clientEvents = await api('/api/studio/clients'); if (type === 'clients') renderClients(); return true;
     }
     async function run(fn) {
+        message.classList.remove('error'); operationProgress.hidden = true;
         managerBusy = true; for (const b of form.querySelectorAll('button')) b.disabled = true;
         try { await fn(); } catch (error) { message.textContent = error.message; message.classList.add('error'); }
         finally { managerBusy = false; for (const b of form.querySelectorAll('button')) b.disabled = false; upload.disabled = !event; renderImages(); }

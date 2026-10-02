@@ -99,3 +99,42 @@ test('Legacy names are persisted consistently with paused events, without changi
     require('./client-galleries').register(express(), root, fn => fn);
     assert.deepEqual(JSON.parse(await fsp.readFile(path.join(privateDir, 'events.json'))), stored);
 });
+
+test('Customer upload accepts 500 files at once and rejects larger batches or a full gallery', async t => {
+    const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'noe-clients-500-'));
+    const app = express(); require('./studio')(app, root);
+    const server = await new Promise(resolve => { const server = app.listen(0, '127.0.0.1', () => resolve(server)); });
+    t.after(async () => { await new Promise(resolve => server.close(resolve)); await fsp.rm(root, { recursive: true, force: true }); });
+    const origin = 'http://127.0.0.1:' + server.address().port;
+    const token = (await (await fetch(origin + '/api/studio/session')).json()).token;
+    const headers = { Origin: origin, 'X-CMS-Token': token };
+    const response = await fetch(origin + '/api/studio/clients', { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ title: '500 Bilder', password: 'Ein-langes-Testpasswort' }) });
+    assert.equal(response.status, 200); let event = await response.json();
+    const jpeg = await sharp({ create: { width: 8, height: 8, channels: 3, background: '#ddcfe6' } }).jpeg().toBuffer();
+    async function upload(count, operation = crypto.randomUUID()) {
+        const form = new FormData(); form.append('operation', operation); form.append('revision', event.revision);
+        for (let n = 0; n < count; n++) form.append('images', new Blob([jpeg], { type: 'image/jpeg' }), `Bild-${n + 1}.jpg`);
+        return fetch(origin + `/api/studio/clients/${event.id}/upload`, { method: 'POST', headers, body: form });
+    }
+    const oversized = await upload(501); assert.equal(oversized.status, 400); assert.match((await oversized.json()).error, /Pro Upload.*500/);
+    const operation = crypto.randomUUID(), samples = []; let finished = false;
+    const pending = upload(500, operation).finally(() => { finished = true; });
+    while (!finished) {
+        const progress = await (await fetch(origin + '/api/studio/clients/progress?operation=' + operation)).json();
+        if (progress) samples.push(progress);
+        await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    const accepted = await pending; assert.equal(accepted.status, 200); event = await accepted.json(); assert.equal(event.images.length, 500);
+    assert.ok(samples.some(p => p.stage === 'optimizing' && p.total === 500));
+    assert.ok(samples.some(p => p.stage === 'encrypting' && p.total === 500 && p.completed > 0 && p.completed < 500));
+    for (const phase of ['optimizing', 'encrypting']) {
+        const values = samples.filter(p => p.stage === phase).map(p => p.completed);
+        assert.ok(values.every((value, index) => value >= 0 && value <= 500 && (!index || value >= values[index - 1])));
+    }
+    const done = await (await fetch(origin + '/api/studio/clients/progress?operation=' + operation)).json(); assert.equal(done.stage, 'done'); assert.equal(done.active, false);
+    assert.deepEqual(Object.keys(done).sort(), ['active', 'completed', 'operation', 'stage', 'total']);
+    assert.equal(await (await fetch(origin + '/api/studio/clients/progress?operation=' + crypto.randomUUID())).json(), null);
+    const index = JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/data/index.json'))); assert.equal(index[0].count, 500);
+    const additional = await upload(1); assert.equal(additional.status, 400); assert.match((await additional.json()).error, /Galerie.*500/);
+    const current = await (await fetch(origin + '/api/studio/clients')).json(); assert.equal(current[0].images.length, 500); assert.equal(current[0].revision, event.revision);
+});
