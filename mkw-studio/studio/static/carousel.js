@@ -19,9 +19,9 @@ function carouselSetup(){
 }
 function carouselWarning(o){const c=p.carousel;if(o.type!=='text'||!o.text.trim()||o.visible===false)return '';const index=Math.floor(o.x/c.w);if(index<0||index>=c.n||o.x+o.w>(index+1)*c.w||o.y<0||o.y+o.h>c.h)return 'Text überschreitet eine Slide-Grenze.';if(o.x<index*c.w+100||o.x+o.w>(index+1)*c.w-100||o.y<c.top||o.y+o.h>c.h-c.bottom||o.x<c.left||o.x+o.w>c.n*c.w-c.right)return 'Text liegt ausserhalb der empfohlenen Safezone.';if(carouselTextHeight(o)>o.h+1)return 'Text passt nicht vollständig in den Textrahmen.';return ''}
 function carouselAnglePath(o){const path=new Path2D(),w=o.w,h=o.h,t=Math.min(o.thickness*Math.SQRT2,w*.9,h*.44);path.moveTo(0,0);path.lineTo(w,h/2);path.lineTo(0,h);path.lineTo(0,h-t);path.lineTo(w-t,h/2);path.lineTo(0,t);path.closePath();return path}
-async function carouselPaint(ctx,slide=null,scale=1,transparent=false,editingId=null){const c=p.carousel;ctx.save();ctx.scale(scale,scale);if(slide!==null){ctx.beginPath();ctx.rect(0,0,c.w,c.h);ctx.clip();ctx.translate(-slide*c.w,0)}if(!transparent){ctx.fillStyle=c.bg;ctx.fillRect(0,0,c.w*c.n,c.h)}for(const o of c.objects){if(o.visible===false||o.id===editingId)continue;ctx.save();ctx.globalAlpha=o.opacity??1;ctx.globalCompositeOperation=o.blend||'source-over';ctx.translate(o.x,o.y);
+async function carouselPaint(ctx,slide=null,scale=1,transparent=false,editingId=null){const c=p.carousel;carouselKeepLogosOnTop(c);ctx.save();ctx.scale(scale,scale);if(slide!==null){ctx.beginPath();ctx.rect(0,0,c.w,c.h);ctx.clip();ctx.translate(-slide*c.w,0)}if(!transparent){ctx.fillStyle=c.bg;ctx.fillRect(0,0,c.w*c.n,c.h)}for(const o of c.objects){if(o.visible===false||o.id===editingId)continue;ctx.save();ctx.globalAlpha=o.opacity??1;ctx.globalCompositeOperation=o.blend||'source-over';ctx.translate(o.x,o.y);
  if(o.type==='text'){ctx.fillStyle=o.color;ctx.font=`${o.size}px "${o.font}"`;ctx.textBaseline='top';const lines=MKWLayout.wrap(o.text,o.w,t=>ctx.measureText(t).width);lines.forEach((line,i)=>ctx.fillText(line,0,i*o.size*1.12));}
- else if(o.type==='gradient'){const a=o.rotation*Math.PI/180,dx=Math.cos(a)*o.w/2,dy=Math.sin(a)*o.h/2,start=o.gradientStart?{x:o.gradientStart.x*o.w,y:o.gradientStart.y*o.h}:o.kind==='radial'?{x:o.w/2,y:o.h/2}:{x:o.w/2-dx,y:o.h/2-dy},end=o.gradientEnd?{x:o.gradientEnd.x*o.w,y:o.gradientEnd.y*o.h}:{x:o.w/2+dx,y:o.h/2+dy};const g=o.kind==='radial'?ctx.createRadialGradient(start.x,start.y,0,start.x,start.y,Math.max(1,Math.hypot(end.x-start.x,end.y-start.y))):ctx.createLinearGradient(start.x,start.y,end.x,end.y);g.addColorStop(0,o.color);g.addColorStop(1,o.endColor+Math.round(o.endAlpha*255).toString(16).padStart(2,'0'));ctx.fillStyle=g;ctx.fillRect(0,0,o.w,o.h)}
+ else if(o.type==='gradient'){const a=o.rotation*Math.PI/180,dx=Math.cos(a)*o.w/2,dy=Math.sin(a)*o.h/2,start=o.gradientStart?{x:o.gradientStart.x*o.w,y:o.gradientStart.y*o.h}:o.kind==='radial'?{x:o.w/2,y:o.h/2}:{x:o.w/2-dx,y:o.h/2-dy},end=o.gradientEnd?{x:o.gradientEnd.x*o.w,y:o.gradientEnd.y*o.h}:{x:o.w/2+dx,y:o.h/2+dy};const g=o.kind==='radial'?ctx.createRadialGradient(start.x,start.y,0,start.x,start.y,Math.max(1,Math.hypot(end.x-start.x,end.y-start.y))):ctx.createLinearGradient(start.x,start.y,end.x,end.y);g.addColorStop(0,o.color+Math.round((o.startAlpha??1)*255).toString(16).padStart(2,'0'));g.addColorStop(1,o.endColor+Math.round((o.endAlpha??0)*255).toString(16).padStart(2,'0'));ctx.fillStyle=g;ctx.fillRect(0,0,o.w,o.h)}
  else if(o.type==='logo'){const im=await image(o.source==='black'?'mkw-logo-bold-pos.svg':'mkw-logo-bold-neg.svg');ctx.drawImage(im,0,0,o.w,o.h)}
  else{if(o.type==='angle'){const path=carouselAngleMask(o);ctx.save();ctx.shadowColor=o.glowColor+Math.round(o.glowAlpha*255).toString(16).padStart(2,'0');ctx.shadowBlur=o.glow*scale;ctx.fillStyle='#ffffff';ctx.fill(path);ctx.restore();ctx.clip(path)}else{ctx.beginPath();ctx.rect(0,0,o.w,o.h);ctx.clip()}
  const im=p.images.find(im=>im.id===o.imageId);if(im){const bitmap=await image(im.data),fw=o.w,fh=o.h,s=Math.max(fw/im.width,fh/im.height)*o.scale;ctx.translate(fw/2+o.panX,fh/2+o.panY);ctx.scale(o.flipX,o.flipY);ctx.drawImage(bitmap,-im.width*s/2,-im.height*s/2,im.width*s,im.height*s)}else{ctx.fillStyle='#68768b';ctx.fillRect(0,0,o.w,o.h)}}ctx.restore()}ctx.restore()}
@@ -29,10 +29,10 @@ function validateCarousel(q){
  const c=q.carousel;if(!c)return;
  if(!['w','h','n','top','bottom','left','right'].every(k=>Number.isInteger(c[k]))||c.w<240||c.h<240||c.w>4000||c.h>4000||c.n<2||c.n>20||Math.min(c.top,c.bottom,c.left,c.right)<0||c.top+c.bottom>=c.h||c.left+c.right>=c.w||!/^#[0-9a-f]{6}$/i.test(c.bg)||!Array.isArray(c.objects)||c.objects.length>500||q.boards.length!==c.n)throw Error('Ungültiges Carousel-Projekt.');
  for(const [i,b] of q.boards.entries())if(b.carouselSlide!==i||b.w!==c.w||b.h!==c.h)throw Error('Ungültige Carousel-Slides.');
- const ids=new Set();for(const o of c.objects){if(typeof o.id!=='string'||ids.has(o.id)||!['text','image','logo','gradient','angle'].includes(o.type)||!['x','y','w','h','opacity'].every(k=>Number.isFinite(o[k]))||o.w<=0||o.h<=0||o.w>100000||o.h>100000||Math.abs(o.x)>100000||Math.abs(o.y)>100000||o.opacity<0||o.opacity>1)throw Error('Ungültige Carousel-Ebene.');ids.add(o.id);if(o.type==='text'&&(typeof o.text!=='string'||!Number.isFinite(o.size)||o.size<1||o.size>1000))throw Error('Ungültiger Carousel-Text.');if(o.imageId&&!q.images.some(im=>im.id===o.imageId))throw Error('Carousel-Bild fehlt.');}
+ const ids=new Set();for(const o of c.objects){if(typeof o.id!=='string'||ids.has(o.id)||!['text','image','logo','gradient','angle'].includes(o.type)||!['x','y','w','h','opacity'].every(k=>Number.isFinite(o[k]))||o.w<=0||o.h<=0||o.w>100000||o.h>100000||Math.abs(o.x)>100000||Math.abs(o.y)>100000||o.opacity<0||o.opacity>1)throw Error('Ungültige Carousel-Ebene.');ids.add(o.id);if(o.type==='gradient'&&['startAlpha','endAlpha'].some(key=>o[key]!==undefined&&(!Number.isFinite(o[key])||o[key]<0||o[key]>1)))throw Error('Ungültige Verlaufstransparenz.');if(o.type==='text'&&(typeof o.text!=='string'||!Number.isFinite(o.size)||o.size<1||o.size>1000))throw Error('Ungültiger Carousel-Text.');if(o.imageId&&!q.images.some(im=>im.id===o.imageId))throw Error('Carousel-Bild fehlt.');}
 }
 
-const carouselUI={tool:'select',ids:new Set(),editing:null,space:false,content:false,guides:true,snap:true,drag:null,clipboard:[],layerDrag:null,propertyUndo:false,slide:null,touches:new Map(),pinch:null};
+const carouselUI={tool:'select',ids:new Set(),editing:null,space:false,content:false,guides:true,snap:true,drag:null,clipboard:[],layerDrag:null,propertyUndo:false,snapLines:[],slide:null,touches:new Map(),pinch:null};
 const carouselToolNames={select:'Auswahl',content:'Bildinhalt',text:'Text',image:'Bildrahmen',gradient:'Verlauf',angle:'Winkel',hand:'Hand',zoom:'Zoom'};
 const carouselToolKeys={v:'select',a:'content',t:'text',f:'image',g:'gradient',w:'angle',h:'hand',z:'zoom'};
 const carouselIcons={
@@ -60,17 +60,17 @@ function carouselToolUI(){
  document.querySelectorAll('button[data-tool]').forEach(btn=>btn.setAttribute('aria-pressed',btn.dataset.tool===carouselUI.tool));
  $('#carouselViewport').dataset.tool=carouselUI.space?'hand':carouselUI.tool;
  $('#carouselToolName').textContent=carouselToolNames[carouselUI.tool];
- $('#carouselHint').textContent=({select:'Auswählen & verschieben · Shift: Mehrfachauswahl / 45° · Alt: Kopie ziehen',content:'Bildinhalt im Rahmen verschieben · Doppelklick auf ein Bild zum Umschalten',text:'Textrahmen aufziehen · Doppelklick auf Text zum Schreiben',image:'Bildrahmen aufziehen, danach Bild auswählen',gradient:'Verlaufsrahmen aufziehen · auf bestehendem Verlauf Richtung ziehen',angle:'Winkelrahmen aufziehen · Bildfüllung rechts auswählen',hand:'Montagefläche ziehen · Leertaste: vorübergehend Handwerkzeug',zoom:'Klicken: vergrössern · Alt: verkleinern · Pinch oder Cmd/Ctrl + Mausrad: Zoom'})[carouselUI.tool];
+ $('#carouselHint').textContent=({select:'Auswählen & verschieben · Shift: Mehrfachauswahl / 45° · Alt: Kopie ziehen',content:'Bildinhalt im Rahmen verschieben · Doppelklick auf ein Bild zum Umschalten',text:'Textrahmen aufziehen · Doppelklick auf Text zum Schreiben',image:'Bildrahmen aufziehen, danach Bild auswählen',gradient:'Verlaufsrahmen aufziehen · auf bestehendem Verlauf Richtung ziehen',angle:'Winkelrahmen aufziehen · Bildfüllung rechts auswählen',hand:'Montagefläche ziehen · Leertaste: vorübergehend Handwerkzeug',zoom:'Klicken: vergrössern · Alt: verkleinern · Pinch oder Alt/Option + Scrollen: Zoom'})[carouselUI.tool];
 }
 function carouselBounds(objects){if(!objects.length)return null;const x=Math.min(...objects.map(o=>o.x)),y=Math.min(...objects.map(o=>o.y));return {x,y,w:Math.max(...objects.map(o=>o.x+o.w))-x,h:Math.max(...objects.map(o=>o.y+o.h))-y}}
 function carouselPoint(ev){const rect=$('#carouselCanvas').getBoundingClientRect();return {x:(ev.clientX-rect.left)/carouselZoom,y:(ev.clientY-rect.top)/carouselZoom}}
 function carouselDefault(type,rect={}){
  const c=p.carousel;const viewport=$('#carouselViewport'),canvasRect=$('#carouselCanvas')?.getBoundingClientRect(),viewRect=viewport?.getBoundingClientRect();const x=Math.max(c.left,Math.min((c.n-1)*c.w,canvasRect&&viewRect?(viewRect.left-canvasRect.left)/carouselZoom:0));
- return {id:uid(),type,name:{text:'Text',gradient:'Verlauf',angle:'Winkel',image:'Bildrahmen'}[type],x,y:c.top,w:Math.min(800,c.w-200),h:type==='text'?200:400,visible:true,locked:false,opacity:1,text:'',size:70,font:'Replica LL',color:'#ffffff',endColor:'#000000',endAlpha:0,blend:'source-over',kind:'linear',rotation:0,direction:'right',thickness:75,glow:25,glowColor:'#ffffff',glowAlpha:.6,scale:1,panX:0,panY:0,flipX:1,flipY:1,...rect};
+ return {id:uid(),type,name:{text:'Text',gradient:'Verlauf',angle:'Winkel',image:'Bildrahmen'}[type],x,y:c.top,w:Math.min(800,c.w-200),h:type==='text'?200:400,visible:true,locked:false,opacity:1,text:'',size:70,font:'Replica LL',color:'#ffffff',startAlpha:1,endColor:'#000000',endAlpha:0,blend:'source-over',kind:'linear',rotation:0,direction:'right',thickness:150,glow:25,glowColor:'#ffffff',glowAlpha:.6,scale:1,panX:0,panY:0,flipX:1,flipY:1,...rect};
 }
 function carouselObject(type,rect={}){
  checkpoint();carouselUI.slide=null;const o=carouselDefault(type,rect);if(type==='angle'&&!rect.w){o.w=550;o.h=1100}
- if(type==='angle')carouselAngleBleed(o);p.carousel.objects.push(o);carouselUI.ids=new Set([o.id]);carouselSelection=o.id;changed();return o;
+ if(type==='angle')carouselAngleAlign(o);p.carousel.objects.push(o);carouselUI.ids=new Set([o.id]);carouselSelection=o.id;changed();return o;
 }
 function carouselFile(target=null){const input=$('#carouselFile');input.value='';input.multiple=!target;input.onchange=ev=>carouselImport([...ev.target.files],target);input.click()}
 async function carouselImport(files,target){
@@ -93,13 +93,13 @@ function carouselHit(pt){
 }
 function carouselRender(){
  carouselEndText();document.body.classList.toggle('carousel-mode',carouselActive());$('#carouselEditor')?.remove();if(!carouselActive())return false;
- const c=p.carousel;c.objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleBleed(o,c));if(carouselUI.slide!==null)carouselUI.slide=Math.max(0,Math.min(c.n-1,carouselUI.slide));const firstView=!Number.isFinite(c.zoom);carouselZoom=c.zoom||carouselZoom;carouselUI.ids=new Set([...carouselUI.ids].filter(id=>c.objects.some(o=>o.id===id)));if(!c.objects.some(o=>o.id===carouselSelection))carouselSelection=null;
+ const c=p.carousel;carouselKeepLogosOnTop(c);c.objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleAlign(o,c));if(carouselUI.slide!==null)carouselUI.slide=Math.max(0,Math.min(c.n-1,carouselUI.slide));const firstView=!Number.isFinite(c.zoom);carouselZoom=c.zoom||carouselZoom;carouselUI.ids=new Set([...carouselUI.ids].filter(id=>c.objects.some(o=>o.id===id)));if(!c.objects.some(o=>o.id===carouselSelection))carouselSelection=null;
  $('#projectName').value=p.meta.title;$('#projectCode').value=p.meta.code;$('#savePSD').hidden=true;
  const host=document.createElement('section');host.id='carouselEditor';host.innerHTML=`
- <nav class="carousel-contextbar" aria-label="Carousel-Aktionen"><div class="carousel-document"><strong>${esc(p.meta.title)}</strong><span>${c.n} Slides · ${c.w} × ${c.h} px</span></div><span id="carouselToolName"></span><div class="carousel-view-actions"><button id="carouselGuidesToggle" aria-pressed="${carouselUI.guides}" title="Hilfslinien anzeigen">Hilfslinien</button><button id="carouselSnapToggle" aria-pressed="${carouselUI.snap}" title="An Hilfslinien einrasten">Einrasten</button><button id="carouselFit">Einpassen</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom*100)}"> %</label></div><span id="carouselNotice" role="status"></span><button id="carouselExport" class="primary">Export</button></nav>
+ <nav class="carousel-contextbar" aria-label="Carousel-Aktionen"><div class="carousel-document"><strong>${esc(p.meta.title)}</strong><span>${c.n} Slides · ${c.w} × ${c.h} px</span></div><span id="carouselToolName"></span><div class="carousel-view-actions"><button id="carouselGuidesToggle" aria-pressed="${carouselUI.guides}" title="Hilfslinien anzeigen">Hilfslinien</button><button id="carouselSnapToggle" aria-pressed="${carouselUI.snap}" title="An Hilfslinien einrasten">Einrasten</button></div><span id="carouselNotice" role="status"></span><button id="carouselExport" class="primary">Export</button></nav>
  <nav class="carousel-toolrail" aria-label="Gestaltungswerkzeuge">${Object.entries(carouselToolNames).map(([key,name])=>`<button data-tool="${key}" aria-label="${name}" aria-pressed="${carouselUI.tool===key}" title="${name} (${Object.keys(carouselToolKeys).find(k=>carouselToolKeys[k]===key).toUpperCase()})">${carouselIcon(key)}<span>${name}</span></button>`).join('')}</nav>
- <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div></div>
- <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3><span>Oben liegt vorne</span></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint"></span><span id="carouselCoordinates"></span></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
+ <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div></div>
+ <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3><span>Oben liegt vorne</span></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint"></span><span id="carouselCoordinates"></span><div class="carousel-zoom-controls"><button id="carouselFit">Einpassen</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom*100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
  document.body.append(host);host.querySelectorAll('button[data-tool]').forEach(btn=>btn.onclick=()=>carouselTool(btn.dataset.tool));
  $('#carouselExport').onclick=()=>{carouselEndText();openExport()};$('#carouselZoom').onchange=ev=>carouselSetZoom(+ev.target.value/100);
  $('#carouselFit').onclick=carouselFit;$('#carouselGuidesToggle').onclick=()=>{carouselUI.guides=!carouselUI.guides;$('#carouselGuidesToggle').setAttribute('aria-pressed',carouselUI.guides);carouselRefresh()};
@@ -107,7 +107,7 @@ function carouselRender(){
  const viewport=$('#carouselViewport');if(firstView)carouselZoom=Math.min(.6,(viewport.clientWidth-160)/(c.w*c.n),(viewport.clientHeight-128)/c.h);
  viewport.onscroll=()=>{c.scrollX=viewport.scrollLeft;c.scrollY=viewport.scrollTop};viewport.onpointerdown=carouselPointer;
  viewport.ondblclick=ev=>{if(carouselUI.space||carouselUI.tool==='hand')return;const o=carouselHit(carouselPoint(ev));if(!o)return;carouselSelect([o.id]);if(o.type==='text')carouselEditText(o);else if(['image','angle'].includes(o.type)){carouselUI.content=!carouselUI.content;carouselRefresh();carouselPanel()}};
- viewport.onwheel=ev=>{if(ev.ctrlKey||ev.metaKey){ev.preventDefault();carouselSetZoom(carouselZoom*Math.exp(-ev.deltaY*.003),ev)}else if(ev.shiftKey){ev.preventDefault();viewport.scrollLeft+=ev.deltaY||ev.deltaX}};
+ viewport.onwheel=ev=>{if(ev.ctrlKey||ev.metaKey||ev.altKey){ev.preventDefault();carouselSetZoom(carouselZoom*Math.exp(-ev.deltaY*.003),ev)}else if(ev.shiftKey){ev.preventDefault();viewport.scrollLeft+=ev.deltaY||ev.deltaX}};
  carouselToolUI();carouselPanel();carouselRefresh();if(firstView)carouselCenter();else{viewport.scrollLeft=c.scrollX??(viewport.scrollWidth-viewport.clientWidth)/2;viewport.scrollTop=c.scrollY??(viewport.scrollHeight-viewport.clientHeight)/2}return true;
 }
 function carouselMaxZoom(){const c=p.carousel;return Math.min(2,16000/(c.w*c.n),Math.sqrt(24000000/(c.w*c.n*c.h)))}
@@ -119,13 +119,14 @@ function carouselSetZoom(value,event=null){
 function carouselCenter(){const v=$('#carouselViewport');v.scrollLeft=(v.scrollWidth-v.clientWidth)/2;v.scrollTop=(v.scrollHeight-v.clientHeight)/2;p.carousel.scrollX=v.scrollLeft;p.carousel.scrollY=v.scrollTop}
 function carouselFit(){const c=p.carousel,v=$('#carouselViewport');carouselSetZoom(Math.min((v.clientWidth-160)/(c.w*c.n),(v.clientHeight-128)/c.h));carouselCenter()}
 function carouselRefresh(){
- if(!carouselActive()||!$('#carouselCanvas'))return;const c=p.carousel;carouselZoom=Math.max(.05,Math.min(carouselZoom,carouselMaxZoom()));const s=carouselZoom,canvas=$('#carouselCanvas'),generation=++carouselDraw;c.zoom=s;
+ if(!carouselActive()||!$('#carouselCanvas'))return;const c=p.carousel;carouselKeepLogosOnTop(c);carouselZoom=Math.max(.05,Math.min(carouselZoom,carouselMaxZoom()));const s=carouselZoom,canvas=$('#carouselCanvas'),generation=++carouselDraw;c.zoom=s;
  if(canvas.width!==Math.ceil(c.w*c.n*s))canvas.width=Math.ceil(c.w*c.n*s);if(canvas.height!==Math.ceil(c.h*s))canvas.height=Math.ceil(c.h*s);$('#carouselArtwork').style.width=canvas.width+'px';$('#carouselArtwork').style.height=canvas.height+'px';const viewport=$('#carouselViewport'),padX=Math.max(400,Math.round(viewport.clientWidth*.8)),padY=Math.max(250,Math.round(viewport.clientHeight*.6));$('#carouselPasteboard').style.width=(canvas.width+2*padX)+'px';$('#carouselPasteboard').style.height=(canvas.height+2*padY)+'px';$('#carouselArtwork').style.left=padX+'px';$('#carouselArtwork').style.top=padY+'px';$('#carouselZoom').value=Math.round(s*100);
  const buffer=makeCanvas(canvas.width,canvas.height);carouselPaint(buffer.getContext('2d'),null,s,false,carouselUI.editing?.id).then(()=>{if(generation===carouselDraw&&canvas.isConnected)canvas.getContext('2d').drawImage(buffer,0,0)}).catch(e=>status(e.message));
  $('#carouselGuides').hidden=!carouselUI.guides;
  $('#carouselGuides').innerHTML=Array.from({length:c.n},(_,i)=>`<div class="slide-guide" style="left:${i*c.w*s}px;width:${c.w*s}px;height:${c.h*s}px"><div class="sixths" style="left:${100*s}px;right:${100*s}px;top:${c.top*s}px;bottom:${c.bottom*s}px"></div></div>`).join('')+`<div class="artwork-safe" style="left:${c.left*s}px;top:${c.top*s}px;width:${(c.w*c.n-c.left-c.right)*s}px;height:${(c.h-c.top-c.bottom)*s}px"></div>`;
+ if(carouselSelected().some(o=>o.type==='angle')||carouselUI.tool==='angle')$('#carouselGuides').insertAdjacentHTML('beforeend',Array.from({length:c.n},(_,i)=>`<div class="carousel-angle-axis vertical" style="left:${(i+.5)*c.w*s}px;height:${c.h*s}px"></div>`).join('')+`<div class="carousel-angle-axis horizontal" style="top:${c.h*s/2}px;width:${c.w*c.n*s}px"></div>`);
  const warnings=c.objects.filter(o=>carouselWarning(o)).length;$('#carouselNotice').textContent=warnings?`⚠ ${warnings} Texthinweis${warnings>1?'e':''}`:'';
- carouselDrawSelection();carouselSlideControls();
+ carouselDrawSelection();carouselDrawSnap();carouselSlideControls();
  if(carouselUI.editing){const o=c.objects.find(o=>o.id===carouselUI.editing.id);if(o)carouselPositionText(carouselUI.editing.el,o)}
 }
 function carouselDrawSelection(){
@@ -143,8 +144,8 @@ function carouselDrawGradient(o,root){
  for(const [key,point] of [['gradientStart',start],['gradientEnd',end]]){const handle=document.createElement('button');handle.className='carousel-gradient-stop';handle.style.left=(o.x+point.x*o.w)*s+'px';handle.style.top=(o.y+point.y*o.h)*s+'px';handle.style.background=key==='gradientStart'?o.color:o.endColor;handle.setAttribute('aria-label',key==='gradientStart'?'Verlauf Anfang':'Verlauf Ende');handle.onpointerdown=ev=>{ev.stopPropagation();carouselGradientDrag(ev,o,key)};root.append(handle)}
 }
 function carouselListen(ev,move,finish,cancel=finish){
- ev.preventDefault();const onMove=e=>{if(e.pointerId!==ev.pointerId)return;move(e)};const onUp=e=>{if(e.pointerId!==ev.pointerId)return;window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);carouselUI.drag=null;finish(e)};
- carouselUI.drag={cancel:()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);carouselUI.drag=null;cancel(ev)}};window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);window.addEventListener('pointercancel',onUp);
+ ev.preventDefault();const onMove=e=>{if(e.pointerId!==ev.pointerId)return;move(e)};const onUp=e=>{if(e.pointerId!==ev.pointerId)return;window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);carouselUI.drag=null;carouselUI.snapLines=[];carouselDrawSnap();finish(e)};
+ carouselUI.drag={cancel:()=>{window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);window.removeEventListener('pointercancel',onUp);carouselUI.drag=null;carouselUI.snapLines=[];carouselDrawSnap();cancel(ev)}};window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);window.addEventListener('pointercancel',onUp);
 }
 function carouselPointer(ev){
  if(busy||ev.button!==0||ev.target.closest('textarea,button,input'))return;carouselEndText();
@@ -163,21 +164,47 @@ function carouselPointer(ev){
  if(!ev.shiftKey)carouselSelect([]);carouselMarquee(ev,pt,ev.shiftKey);
 }
 function carouselCreateDrag(ev,type,start){
+ const anchor=carouselSnap(start.x,start.y,{w:0,h:0},ev.ctrlKey||ev.metaKey,[]);start={x:anchor.x,y:anchor.y};
  const sketch=document.createElement('div');sketch.className='carousel-marquee';$('#carouselSelectionOverlay').append(sketch);let rect={x:start.x,y:start.y,w:1,h:1};
- carouselListen(ev,e=>{const end=carouselPoint(e);let w=Math.abs(end.x-start.x),h=Math.abs(end.y-start.y);if(type==='angle')h=w*2;else if(e.shiftKey)w=h=Math.max(w,h);rect={x:end.x<start.x?start.x-w:start.x,y:end.y<start.y?start.y-h:start.y,w:Math.max(1,w),h:Math.max(1,h)};Object.assign(sketch.style,{left:rect.x*carouselZoom+'px',top:rect.y*carouselZoom+'px',width:rect.w*carouselZoom+'px',height:rect.h*carouselZoom+'px'})},()=>{
+ carouselListen(ev,e=>{const end=carouselPoint(e);let w=Math.abs(end.x-start.x),h=Math.abs(end.y-start.y);if(type==='angle')h=w*2;else if(e.shiftKey)w=h=Math.max(w,h);rect={x:end.x<start.x?start.x-w:start.x,y:end.y<start.y?start.y-h:start.y,w:Math.max(1,w),h:Math.max(1,h)};rect=carouselSnapResize(rect,(end.y<start.y?'n':'s')+(end.x<start.x?'w':'e'),e.ctrlKey||e.metaKey,type==='angle'||e.shiftKey,false,[]);carouselUI.snapLines=[...anchor.guides,...rect.guides];carouselDrawSnap();Object.assign(sketch.style,{left:rect.x*carouselZoom+'px',top:rect.y*carouselZoom+'px',width:rect.w*carouselZoom+'px',height:rect.h*carouselZoom+'px'})},()=>{
   if(rect.w*carouselZoom<5||rect.h*carouselZoom<5){sketch.remove();status('Rahmen mit gedrückter Maustaste aufziehen.');return}
-  const o=carouselObject(type,rect);carouselUI.tool='select';carouselToolUI();if(type==='text')carouselEditText(o);else if(type==='image')carouselFile(o.id);
+  const o=carouselObject(type,{x:rect.x,y:rect.y,w:rect.w,h:rect.h});carouselUI.tool='select';carouselToolUI();if(type==='text')carouselEditText(o);else if(type==='image')carouselFile(o.id);
  },()=>sketch.remove());
 }
 function carouselMarquee(ev,start,add){
  const existing=add?carouselSelected().map(o=>o.id):[],sketch=document.createElement('div');sketch.className='carousel-marquee';$('#carouselSelectionOverlay').append(sketch);let end=start;
  carouselListen(ev,e=>{end=carouselPoint(e);Object.assign(sketch.style,{left:Math.min(start.x,end.x)*carouselZoom+'px',top:Math.min(start.y,end.y)*carouselZoom+'px',width:Math.abs(end.x-start.x)*carouselZoom+'px',height:Math.abs(end.y-start.y)*carouselZoom+'px'})},()=>{const x=Math.min(start.x,end.x),y=Math.min(start.y,end.y),w=Math.abs(end.x-start.x),h=Math.abs(end.y-start.y);const found=p.carousel.objects.filter(o=>!o.locked&&o.visible!==false&&o.x<x+w&&o.x+o.w>x&&o.y<y+h&&o.y+o.h>y);carouselSelect([...new Set([...existing,...found.map(o=>o.id)])])},()=>sketch.remove());
 }
-function carouselSnap(x,y,bounds,disabled=false){
- if(disabled||!carouselUI.snap)return {x,y};const c=p.carousel,tolerance=5/carouselZoom;
- const xs=[c.left,c.n*c.w-c.right,...Array.from({length:c.n},(_,i)=>Array.from({length:7},(_,j)=>i*c.w+100+j*(c.w-200)/6)).flat()],ys=Array.from({length:7},(_,j)=>c.top+j*(c.h-c.top-c.bottom)/6);
- let dx=tolerance,dy=tolerance;for(const line of xs)for(const edge of [0,bounds.w/2,bounds.w]){const delta=line-x-edge;if(Math.abs(delta)<Math.abs(dx))dx=delta}for(const line of ys)for(const edge of [0,bounds.h/2,bounds.h]){const delta=line-y-edge;if(Math.abs(delta)<Math.abs(dy))dy=delta}
- return {x:x+(Math.abs(dx)<tolerance?dx:0),y:y+(Math.abs(dy)<tolerance?dy:0)};
+function carouselSnapLines(excluded=[...carouselUI.ids]){
+ const c=p.carousel,xs=[0,c.w*c.n,c.left,c.w*c.n-c.right],ys=[0,c.h,c.h/2];
+ for(let i=0;i<c.n;i++){xs.push(i*c.w,(i+1)*c.w,(i+.5)*c.w);for(let j=0;j<=6;j++)xs.push(i*c.w+100+j*(c.w-200)/6)}
+ for(let j=0;j<=6;j++)ys.push(c.top+j*(c.h-c.top-c.bottom)/6);
+ for(const o of c.objects)if(o.visible!==false&&!excluded.includes(o.id)){xs.push(o.x,o.x+o.w,o.x+o.w/2);ys.push(o.y,o.y+o.h,o.y+o.h/2)}
+ return {x:[...new Set(xs)],y:[...new Set(ys)]};
+}
+function carouselNearestSnap(values,lines){
+ const tolerance=6/carouselZoom;let best=null;
+ for(const value of values)for(const line of lines){const delta=line-value;if(Math.abs(delta)<=tolerance&&(!best||Math.abs(delta)<Math.abs(best.delta)))best={delta,line}}
+ return best;
+}
+function carouselSnap(x,y,bounds,disabled=false,excluded){
+ const guides=[];if(disabled||!carouselUI.snap)return {x,y,guides};const lines=carouselSnapLines(excluded),sx=carouselNearestSnap([x,x+bounds.w,x+bounds.w/2],lines.x),sy=carouselNearestSnap([y,y+bounds.h,y+bounds.h/2],lines.y);
+ if(sx){x+=sx.delta;guides.push({axis:'x',value:sx.line})}if(sy){y+=sy.delta;guides.push({axis:'y',value:sy.line})}return {x,y,guides};
+}
+function carouselSnapResize(rect,corner,disabled=false,preserve=false,symmetric=false,excluded){
+ // Snap the dragged edge; the opposite edge (or Alt centre) remains the anchor.
+ const result={...rect,guides:[]};if(disabled||!carouselUI.snap)return result;
+ const lines=carouselSnapLines(excluded),horizontal=/[ew]/.test(corner),vertical=/[ns]/.test(corner),west=corner.includes('w'),north=corner.includes('n');
+ const sx=horizontal?carouselNearestSnap([west?rect.x:rect.x+rect.w],lines.x):null,sy=vertical?carouselNearestSnap([north?rect.y:rect.y+rect.h],lines.y):null;
+ const setSize=(w,h)=>({x:symmetric?rect.x+(rect.w-w)/2:west?rect.x+rect.w-w:rect.x,y:symmetric?rect.y+(rect.h-h)/2:north?rect.y+rect.h-h:rect.y,w,h});
+ if(preserve){
+  const candidates=[];if(sx){const w=rect.w+sx.delta*(west?-1:1)*(symmetric?2:1);candidates.push({w,h:w*rect.h/rect.w,delta:Math.abs(sx.delta)})}if(sy){const h=rect.h+sy.delta*(north?-1:1)*(symmetric?2:1);candidates.push({w:h*rect.w/rect.h,h,delta:Math.abs(sy.delta)})}
+  const best=candidates.filter(r=>r.w>=10&&r.h>=10).sort((a,b)=>a.delta-b.delta)[0];if(best)Object.assign(result,setSize(best.w,best.h));
+ }else{const w=rect.w+(sx?sx.delta*(west?-1:1)*(symmetric?2:1):0),h=rect.h+(sy?sy.delta*(north?-1:1)*(symmetric?2:1):0);Object.assign(result,setSize(w>=10?w:rect.w,h>=10?h:rect.h))}
+ if(sx&&Math.abs((west?result.x:result.x+result.w)-sx.line)<.001)result.guides.push({axis:'x',value:sx.line});if(sy&&Math.abs((north?result.y:result.y+result.h)-sy.line)<.001)result.guides.push({axis:'y',value:sy.line});return result;
+}
+function carouselDrawSnap(){
+ const root=$('#carouselSnapOverlay');if(!root)return;const c=p.carousel,s=carouselZoom;root.innerHTML=carouselUI.snapLines.map(line=>`<div class="carousel-snap-line ${line.axis==='x'?'vertical':'horizontal'}" style="${line.axis==='x'?`left:${line.value*s}px;height:${c.h*s}px`:`top:${line.value*s}px;width:${c.w*c.n*s}px`}"></div>`).join('');
 }
 function carouselMove(ev){
  let objects=carouselSelected().filter(o=>!o.locked);if(!objects.length)return;
@@ -186,10 +213,12 @@ function carouselMove(ev){
   const pt=carouselPoint(e);let dx=pt.x-start.x,dy=pt.y-start.y;if(!begun&&Math.hypot(dx,dy)*carouselZoom<3)return;
   if(!begun){checkpoint();if(ev.altKey&&!content){objects=objects.map(o=>{const copy=clone(o);copy.id=uid();p.carousel.objects.push(copy);return copy});carouselUI.ids=new Set(objects.map(o=>o.id));carouselSelection=objects.at(-1).id}original=objects.map(clone);bounds=carouselBounds(original);begun=true}
   if(e.shiftKey){const angle=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*Math.PI/4,length=Math.hypot(dx,dy);dx=Math.cos(angle)*length;dy=Math.sin(angle)*length}
+  carouselUI.snapLines=[];
   if(content){const o=objects[0],base=original[0];o.panX=base.panX+dx;o.panY=base.panY+dy}
-  else{const snap=carouselSnap(bounds.x+dx,bounds.y+dy,bounds,e.ctrlKey||e.metaKey||e.shiftKey);objects.forEach((o,i)=>{o.x=Math.round(original[i].x+snap.x-bounds.x);o.y=Math.round(original[i].y+snap.y-bounds.y)})}
+  else{const snap=carouselSnap(bounds.x+dx,bounds.y+dy,bounds,e.ctrlKey||e.metaKey||e.shiftKey);carouselUI.snapLines=snap.guides;objects.forEach((o,i)=>{o.x=original[i].x+snap.x-bounds.x;o.y=original[i].y+snap.y-bounds.y})}
+  if(!content&&objects.length===1&&objects[0].type==='angle'&&carouselUI.snap&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){const o=objects[0],raw={...o,x:original[0].x+dx,y:original[0].y+dy},snap=carouselAngleTipSnap(raw);if(snap.x!==null){o.x=snap.x;carouselUI.snapLines=carouselUI.snapLines.filter(line=>line.axis!=='x');carouselUI.snapLines.push({axis:'x',value:carouselAngleTip(o).x})}if(snap.y!==null){o.y=snap.y;carouselUI.snapLines=carouselUI.snapLines.filter(line=>line.axis!=='y');carouselUI.snapLines.push({axis:'y',value:carouselAngleTip(o).y})}}
   carouselRefresh();carouselCoordinates(objects);
- },()=>{if(begun){objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleBleed(o));changed(false)}carouselPanel()});
+ },()=>{if(begun){objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleAlign(o));changed(false)}carouselPanel()});
 }
 function carouselResize(ev,corner){
  const objects=carouselSelected().filter(o=>!o.locked);if(!objects.length)return;const start=carouselPoint(ev),base=objects.map(clone),b=carouselBounds(base);let begun=false;
@@ -197,8 +226,9 @@ function carouselResize(ev,corner){
   if(!begun){checkpoint();begun=true}const pt=carouselPoint(e),dx=pt.x-start.x,dy=pt.y-start.y;let w=Math.max(10,b.w+(corner.includes('e')?dx:corner.includes('w')?-dx:0)),h=Math.max(10,b.h+(corner.includes('s')?dy:corner.includes('n')?-dy:0));
   const preserve=e.shiftKey||objects.some(o=>o.type==='angle'||o.type==='logo');if(preserve){if(corner==='n'||corner==='s')w=h*b.w/b.h;else if(corner==='e'||corner==='w')h=w*b.h/b.w;else{const scale=Math.max(w/b.w,h/b.h);w=b.w*scale;h=b.h*scale}}
   let x=corner.includes('w')?b.x+b.w-w:b.x,y=corner.includes('n')?b.y+b.h-h:b.y;if(e.altKey){x=b.x+(b.w-w)/2;y=b.y+(b.h-h)/2}
+  const snap=carouselSnapResize({x,y,w,h},corner,e.ctrlKey||e.metaKey,preserve,e.altKey);({x,y,w,h}=snap);carouselUI.snapLines=snap.guides;
   objects.forEach((o,i)=>{const old=base[i];o.x=x+(old.x-b.x)*w/b.w;o.y=y+(old.y-b.y)*h/b.h;o.w=old.w*w/b.w;o.h=old.h*h/b.h;if(e.shiftKey&&o.type==='text')o.size=Math.max(1,Math.min(1000,old.size*w/b.w))});carouselRefresh();carouselCoordinates(objects);
- },()=>{if(begun){objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleBleed(o));changed(false)}carouselPanel()});
+ },()=>{if(begun){objects.filter(o=>o.type==='angle').forEach(o=>carouselAngleAlign(o));changed(false)}carouselPanel()});
 }
 function carouselCoordinates(objects){const b=carouselBounds(objects);if(b)$('#carouselCoordinates').textContent=`X ${Math.round(b.x)} · Y ${Math.round(b.y)} · ${Math.round(b.w)} × ${Math.round(b.h)} px`}
 function carouselGradientDrag(ev,o,key=null){
@@ -220,33 +250,44 @@ function carouselEndText(){const edit=carouselUI.editing;if(!edit)return;carouse
 function carouselUpdateWarning(o){const warning=$('#carouselProperties .carousel-warning');if(warning)warning.textContent=carouselWarning(o)}
 function carouselDuplicate(){const objects=carouselSelected().filter(o=>!o.locked);if(!objects.length)return;checkpoint();const copies=objects.map(o=>({...clone(o),id:uid(),x:o.x+30,y:o.y+30}));p.carousel.objects.push(...copies);carouselUI.ids=new Set(copies.map(o=>o.id));carouselSelection=copies.at(-1).id;changed()}
 function carouselDelete(){const ids=carouselSelected().filter(o=>!o.locked&&o.type!=='logo').map(o=>o.id);if(!ids.length)return;checkpoint();p.carousel.objects=p.carousel.objects.filter(o=>!ids.includes(o.id));carouselSelection=null;carouselUI.ids.clear();changed()}
-function carouselLayerOrder(direction){const selectedIds=new Set(carouselSelected().map(o=>o.id));if(!selectedIds.size)return;checkpoint();const a=p.carousel.objects;if(direction==='front'||direction==='back'){const chosen=a.filter(o=>selectedIds.has(o.id)),rest=a.filter(o=>!selectedIds.has(o.id));p.carousel.objects=direction==='front'?[...rest,...chosen]:[...chosen,...rest]}else if(direction==='up'){for(let i=a.length-2;i>=0;i--)if(selectedIds.has(a[i].id)&&!selectedIds.has(a[i+1].id))[a[i],a[i+1]]=[a[i+1],a[i]]}else{for(let i=1;i<a.length;i++)if(selectedIds.has(a[i].id)&&!selectedIds.has(a[i-1].id))[a[i],a[i-1]]=[a[i-1],a[i]]}changed()}
+function carouselLayerOrder(direction){
+ const selectedIds=new Set(carouselSelected().filter(o=>o.type!=='logo').map(o=>o.id));if(!selectedIds.size)return;
+ let a=p.carousel.objects.filter(o=>o.type!=='logo');const logos=p.carousel.objects.filter(o=>o.type==='logo');
+ if(direction==='front'||direction==='back'){const chosen=a.filter(o=>selectedIds.has(o.id)),rest=a.filter(o=>!selectedIds.has(o.id));a=direction==='front'?[...rest,...chosen]:[...chosen,...rest]}
+ else if(direction==='up'){for(let i=a.length-2;i>=0;i--)if(selectedIds.has(a[i].id)&&!selectedIds.has(a[i+1].id))[a[i],a[i+1]]=[a[i+1],a[i]]}
+ else{for(let i=1;i<a.length;i++)if(selectedIds.has(a[i].id)&&!selectedIds.has(a[i-1].id))[a[i],a[i-1]]=[a[i-1],a[i]]}
+ const next=[...a,...logos];if(next.every((o,i)=>o===p.carousel.objects[i]))return;checkpoint();p.carousel.objects=next;changed();
+}
 function carouselPanel(){
  if(!carouselActive()||!$('#carouselProperties'))return;const c=p.carousel,items=carouselSelected(),o=items.at(-1),panel=$('#carouselProperties');
  const number=(key,label,min=0,max=100000)=>`<label>${label}<input data-prop="${key}" type="number" value="${Math.round(o[key]*100)/100}" min="${min}" max="${max}" step="any"></label>`;
  const color=(key,label)=>`<label>${label}<input data-prop="${key}" type="color" value="${esc(o[key])}"></label>`;
  const select=(key,label,values)=>`<label>${label}<select data-prop="${key}">${options(values,o[key])}</select></label>`;
  const section=(title,body)=>`<section class="carousel-property-section"><h4>${title}</h4>${body}</section>`;
+ const transparency=(key,label,fallback)=>{const value=Math.round((1-(o[key]??fallback))*100);return `<div class="carousel-color-stop">${color(key==='startAlpha'?'color':'endColor',label)}<label class="carousel-transparency-toggle"><input type="checkbox" data-transparent="${key}" ${value>0?'checked':''}> Transparenz</label><label class="carousel-slider"><span>Transparenz <output>${value} %</output></span><input data-prop="${key}" data-transparency="true" type="range" min="0" max="100" step="1" value="${value}" ${value===0?'disabled':''}></label></div>`};
  if(!items.length&&carouselUI.slide!==null){carouselSlidePanel(panel);carouselLayerPanel();return}
  if(items.length>1){panel.innerHTML=`<h3>${items.length} Elemente ausgewählt</h3><p>Gemeinsam verschieben und an den Griffen skalieren.</p><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></div>`;$('#carouselDuplicate').onclick=carouselDuplicate;$('#carouselDelete').onclick=carouselDelete}
- else if(o){panel.innerHTML=`<div class="carousel-section-heading"><h3>${esc(o.name)}</h3><span>${o.locked?'Gesperrt':carouselUI.content?'Bildinhalt':'Eigenschaften'}</span></div>${section('Transformieren',`<div class="carousel-fields">${number('x','X',-100000)}${number('y','Y',-100000)}${number('w','Breite',1)}${number('h','Höhe',1)}${number('opacity','Deckkraft · 0–1',0,1)}</div>`)}
+ else if(o){panel.innerHTML=`<div class="carousel-section-heading"><h3>${esc(o.name)}</h3><span>${o.locked?'Gesperrt':carouselUI.content?'Bildinhalt':'Eigenschaften'}</span></div>${['image','angle'].includes(o.type)?'<button id="carouselReplace" class="primary carousel-place-image">Bild platzieren / ersetzen</button>':''}${section('Transformieren',`<div class="carousel-fields">${number('x','X',-100000)}${number('y','Y',-100000)}${number('w','Breite',1)}${number('h','Höhe',1)}</div>`)}
+ ${section('Darstellung',`<div class="carousel-fields carousel-appearance">${select('blend','Mischmodus',[['source-over','Normal'],['multiply','Multiplizieren']])}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity*100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity*100)}"></label></div>`)}
  ${o.type==='text'?section('Text',`<label>Inhalt<textarea data-prop="text" placeholder="Text eingeben …">${esc(o.text)}</textarea></label><div class="carousel-fields">${number('size','Grösse',1,1000)}${color('color','Farbe')}</div>${select('font','Schrift',[['Replica LL','Replica'],['Harriet','Harriet Bold'],['Harriet Regular','Harriet Regular'],['Harriet Italic','Harriet Italic']])}<button id="carouselTextEdit">Auf der Fläche bearbeiten</button>`):''}
- ${o.type==='gradient'?section('Verlauf',select('kind','Art',[['linear','Linear'],['radial','Radial']])+`<div class="carousel-fields">${color('color','Anfang')}${color('endColor','Ende')}${number('endAlpha','Enddeckkraft',0,1)}${number('rotation','Richtung · °',-360,360)}</div>`+select('blend','Mischmodus',[['source-over','Normal'],['multiply','Multiplizieren']])+'<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>'):''}
- ${o.type==='angle'?section('Winkel',select('direction','Richtung',[['up','Oben'],['right','Rechts'],['down','Unten']])+`<div class="carousel-fields">${number('thickness','Schenkelbreite',1)}${number('glow','Schein · px',0,200)}${color('glowColor','Scheinfarbe')}${number('glowAlpha','Intensität',0,1)}</div><p>Der Winkel überragt automatisch die nächste Artwork-Kante um mindestens 1 px.</p>`):''}
- ${['image','angle'].includes(o.type)?section('Bildinhalt','<button id="carouselReplace">Bild platzieren / ersetzen</button><div class="carousel-fields">'+number('scale','Bildzoom',.05,20)+number('panX','Ausschnitt X',-100000)+number('panY','Ausschnitt Y',-100000)+select('flipX','Horizontal',[['1','Original'],['-1','Gespiegelt']])+select('flipY','Vertikal',[['1','Original'],['-1','Gespiegelt']])+'</div><button id="carouselContentEdit">Bildinhalt verschieben</button><button id="carouselImageFit">Rahmen füllen</button>'):''}
+ ${o.type==='gradient'?section('Verlauf',select('kind','Art',[['linear','Linear'],['radial','Radial']])+`<div class="carousel-fields carousel-gradient-colors">${transparency('startAlpha','Anfangsfarbe',1)}${transparency('endAlpha','Endfarbe',0)}</div>`+number('rotation','Richtung · °',-360,360)+'<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>'):''}
+ ${o.type==='angle'?section('Winkel',select('direction','Richtung',[['up','Oben'],['right','Rechts'],['down','Unten']])+`<div class="carousel-fields">${number('thickness','Schenkelbreite',1)}${number('glow','Schein · px',0,200)}${color('glowColor','Scheinfarbe')}${number('glowAlpha','Intensität',0,1)}</div><p>Die Spitze sitzt auf einer Slide-Mittellinie. Der Winkel überragt eine Artwork-Kante um mindestens 1 px.</p>`):''}
+ ${['image','angle'].includes(o.type)?section('Bildinhalt','<div class="carousel-fields">'+number('scale','Bildzoom',.05,20)+number('panX','Ausschnitt X',-100000)+number('panY','Ausschnitt Y',-100000)+select('flipX','Horizontal',[['1','Original'],['-1','Gespiegelt']])+select('flipY','Vertikal',[['1','Original'],['-1','Gespiegelt']])+'</div><button id="carouselContentEdit">Bildinhalt verschieben</button><button id="carouselImageFit">Rahmen füllen</button>'):''}
  ${o.type==='logo'?section('MKW Logo',select('source','Farbe',[['white','Weiss'],['black','Schwarz']])):''}
  <p class="carousel-warning" role="status">${carouselWarning(o)}</p><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button>${o.type!=='logo'?'<button id="carouselDelete">Entfernen</button>':''}</div>`;
-  panel.querySelectorAll('[data-prop]').forEach(input=>{input.disabled=!!o.locked;input.onfocus=()=>{carouselUI.propertyUndo=false};input.oninput=()=>{
-   let value=input.type==='number'||['flipX','flipY'].includes(input.dataset.prop)?Number(input.value):input.value;
+  panel.querySelectorAll('[data-prop]').forEach(input=>{input.disabled=!!o.locked||input.disabled;input.onfocus=()=>{carouselUI.propertyUndo=false};input.oninput=()=>{
+   let value=['number','range'].includes(input.type)||['flipX','flipY'].includes(input.dataset.prop)?Number(input.value):input.value;
    if(input.type==='number'){if(!Number.isFinite(value))return;value=Math.max(+input.min,Math.min(+input.max,value))}
+   if(input.type==='range'){input.closest('label').querySelector('output').value=value+' %';value=input.dataset.transparency?1-value/100:value/100}
    if(!carouselUI.propertyUndo){checkpoint();carouselUI.propertyUndo=true}const oldRatio=o.h/o.w;o[input.dataset.prop]=value;
    if(o.type==='angle'){if(input.dataset.prop==='direction'){const tall=o.h>o.w;if((value==='right')!==tall)[o.w,o.h]=[o.h,o.w]}else if(input.dataset.prop==='w')o.h=o.direction==='right'?o.w*2:o.w/2;else if(input.dataset.prop==='h')o.w=o.direction==='right'?o.h/2:o.h*2}
-   if(o.type==='angle')carouselAngleBleed(o);if(o.type==='logo'){if(input.dataset.prop==='w')o.h=o.w*oldRatio;if(input.dataset.prop==='h')o.w=o.h/oldRatio}
+   if(o.type==='angle')carouselAngleAlign(o);if(o.type==='logo'){if(input.dataset.prop==='w')o.h=o.w*oldRatio;if(input.dataset.prop==='h')o.w=o.h/oldRatio}
    if(o.type==='gradient'&&input.dataset.prop==='rotation'){delete o.gradientStart;delete o.gradientEnd}
    changed(false);carouselUpdateWarning(o);
    if(carouselUI.editing?.id===o.id&&input.dataset.prop==='text')carouselUI.editing.el.value=o.text;
-   for(const key of ['w','h']){const field=panel.querySelector(`[data-prop="${key}"]`);if(field&&field!==input)field.value=Math.round(o[key]*100)/100}
+   for(const key of ['x','y','w','h']){const field=panel.querySelector(`[data-prop="${key}"]`);if(field&&field!==input)field.value=Math.round(o[key]*100)/100}
   }});
+  panel.querySelectorAll('[data-transparent]').forEach(input=>{input.disabled=!!o.locked;input.onchange=()=>{checkpoint();const key=input.dataset.transparent;o[key]=input.checked ? .5 : 1;changed(false);carouselPanel()}});
   $('#carouselDuplicate').onclick=carouselDuplicate;if($('#carouselDelete'))$('#carouselDelete').onclick=carouselDelete;
   if($('#carouselReplace'))$('#carouselReplace').onclick=()=>carouselFile(o.id);
   if($('#carouselTextEdit'))$('#carouselTextEdit').onclick=()=>carouselEditText(o);
@@ -258,12 +299,12 @@ function carouselPanel(){
  carouselLayerPanel();
 }
 function carouselLayerPanel(){
- const c=p.carousel,ids=new Set(carouselSelected().map(o=>o.id));
- $('#carouselLayers').innerHTML=[...c.objects].reverse().map(o=>`<div class="carousel-layer ${ids.has(o.id)?'active':''}" data-layer="${o.id}" draggable="true"><button data-action="visible" aria-label="${o.visible===false?'Einblenden':'Ausblenden'}: ${esc(o.name)}">${o.visible===false?'○':'●'}</button><button data-action="locked" aria-label="${o.locked?'Entsperren':'Sperren'}: ${esc(o.name)}">${o.locked?'▣':'◇'}</button><button class="carousel-layer-name" data-action="select" title="${esc(o.name)}">${carouselIcon(o.type==='logo'?'image':o.type)}<span>${esc(o.name)}${carouselWarning(o)?' ⚠':''}</span></button><button data-action="up" aria-label="Nach vorne: ${esc(o.name)}">↑</button><button data-action="down" aria-label="Nach hinten: ${esc(o.name)}">↓</button></div>`).join('');
+ const c=p.carousel;carouselKeepLogosOnTop(c);const ids=new Set(carouselSelected().map(o=>o.id));
+ $('#carouselLayers').innerHTML=[...c.objects].reverse().map(o=>`<div class="carousel-layer ${ids.has(o.id)?'active':''}" data-layer="${o.id}" draggable="${o.type!=='logo'}"><button data-action="visible" aria-label="${o.visible===false?'Einblenden':'Ausblenden'}: ${esc(o.name)}">${o.visible===false?'○':'●'}</button><button data-action="locked" aria-label="${o.locked?'Entsperren':'Sperren'}: ${esc(o.name)}">${o.locked?'▣':'◇'}</button><button class="carousel-layer-name" data-action="select" title="${esc(o.name)}">${carouselIcon(o.type==='logo'?'image':o.type)}<span>${esc(o.name)}${carouselWarning(o)?' ⚠':''}</span></button><button data-action="up" ${o.type==='logo'||c.objects[c.objects.indexOf(o)+1]?.type==='logo'?'disabled':''} aria-label="Nach vorne: ${esc(o.name)}">↑</button><button data-action="down" ${o.type==='logo'||c.objects.indexOf(o)===0?'disabled':''} aria-label="Nach hinten: ${esc(o.name)}">↓</button></div>`).join('');
  $('#carouselLayers').querySelectorAll('[data-layer]').forEach(row=>{
   row.ondragstart=ev=>{carouselUI.layerDrag=row.dataset.layer;ev.dataTransfer.setData('text/plain',row.dataset.layer);ev.dataTransfer.effectAllowed='move'};
   row.ondragover=ev=>{ev.preventDefault();row.classList.add('drop-target')};row.ondragleave=()=>row.classList.remove('drop-target');
-  row.ondrop=ev=>{ev.preventDefault();ev.stopPropagation();row.classList.remove('drop-target');const source=carouselUI.layerDrag,target=row.dataset.layer;if(!source||source===target)return;const index=c.objects.findIndex(o=>o.id===source);if(index<0)return;checkpoint();const [o]=c.objects.splice(index,1),targetIndex=c.objects.findIndex(o=>o.id===target);c.objects.splice(targetIndex+1,0,o);carouselUI.layerDrag=null;changed()};
+  row.ondrop=ev=>{ev.preventDefault();ev.stopPropagation();row.classList.remove('drop-target');const source=carouselUI.layerDrag,target=row.dataset.layer;if(!source||source===target)return;const index=c.objects.findIndex(o=>o.id===source);if(index<0||c.objects[index].type==='logo')return;checkpoint();const [o]=c.objects.splice(index,1),targetIndex=c.objects.findIndex(o=>o.id===target);c.objects.splice(targetIndex+1,0,o);carouselUI.layerDrag=null;changed()};
   row.ondragend=()=>carouselUI.layerDrag=null;
   row.querySelectorAll('button').forEach(btn=>btn.onclick=ev=>{const o=c.objects.find(o=>o.id===row.dataset.layer),action=btn.dataset.action;if(action==='select'){if(ev.shiftKey){const set=new Set(carouselSelected().map(o=>o.id));set.has(o.id)?set.delete(o.id):set.add(o.id);carouselSelect([...set])}else carouselSelect([o.id]);return}
    if(action==='up'||action==='down'){carouselSelect([o.id]);carouselLayerOrder(action);return}checkpoint();o[action]=action==='visible'?o.visible===false:!o.locked;changed(false);carouselPanel();
@@ -284,7 +325,7 @@ window.addEventListener('keydown',ev=>{
  if(key==='escape'){ev.preventDefault();carouselEndText();carouselSelect([]);carouselUI.tool='select';carouselToolUI();return}
  if(key==='delete'||key==='backspace'){ev.preventDefault();if(carouselUI.slide!==null)carouselSlideDelete();else carouselDelete();return}
  if(key==='['||key===']'){ev.preventDefault();carouselLayerOrder(key===']'?(ev.shiftKey?'front':'up'):(ev.shiftKey?'back':'down'));return}
- if(key.startsWith('arrow')){const chosen=carouselSelected().filter(o=>!o.locked);if(!chosen.length)return;ev.preventDefault();checkpoint();const delta=ev.shiftKey?10:1;chosen.forEach(o=>{if(key==='arrowleft')o.x-=delta;if(key==='arrowright')o.x+=delta;if(key==='arrowup')o.y-=delta;if(key==='arrowdown')o.y+=delta});changed(false);carouselPanel();return}
+ if(key.startsWith('arrow')){const chosen=carouselSelected().filter(o=>!o.locked);if(!chosen.length)return;ev.preventDefault();checkpoint();const delta=ev.shiftKey?10:1;chosen.forEach(o=>{if(key==='arrowleft')o.x-=delta;if(key==='arrowright')o.x+=delta;if(key==='arrowup')o.y-=delta;if(key==='arrowdown')o.y+=delta});chosen.filter(o=>o.type==='angle').forEach(o=>carouselAngleAlign(o));changed(false);carouselPanel();return}
  if(!command&&carouselToolKeys[key]){ev.preventDefault();carouselTool(carouselToolKeys[key])}
 },true);
 window.addEventListener('keyup',ev=>{if(ev.code==='Space'&&carouselUI.space){carouselUI.space=false;carouselToolUI()}});
@@ -319,12 +360,12 @@ function carouselSlideMove(delta){
  c.objects.forEach(o=>{if(o.x>=index*c.w&&o.x+o.w<=(index+1)*c.w)o.x+=delta*c.w;else if(o.x>=next*c.w&&o.x+o.w<=(next+1)*c.w)o.x-=delta*c.w});[p.boards[index],p.boards[next]]=[p.boards[next],p.boards[index]];carouselBoardIndexes();carouselUI.slide=next;changed();carouselSlideCenter(next);
 }
 function carouselSlideCenter(index){const v=$('#carouselViewport'),r=$('#carouselCanvas').getBoundingClientRect(),vr=v.getBoundingClientRect();v.scrollLeft+=r.left+(index+.5)*p.carousel.w*carouselZoom-vr.left-v.clientWidth/2}
-function carouselAngleBleed(o,c=p.carousel){
+function carouselAngleBleed(o,c=p.carousel,lockedAxis=null){
  const width=c.w*c.n,height=c.h;
- if(o.x>=width)o.x=width-1;if(o.x+o.w<=0)o.x=1-o.w;
- if(o.y>=height)o.y=height-1;if(o.y+o.h<=0)o.y=1-o.h;
+ if(lockedAxis!=='x'){if(o.x>=width)o.x=width-1;if(o.x+o.w<=0)o.x=1-o.w;}
+ if(lockedAxis!=='y'){if(o.y>=height)o.y=height-1;if(o.y+o.h<=0)o.y=1-o.h;}
  const crosses=(o.x<=-1&&o.x+o.w>0)||(o.x+o.w>=width+1&&o.x<width)||(o.y<=-1&&o.y+o.h>0)||(o.y+o.h>=height+1&&o.y<height);if(crosses)return;
- const edges=[{axis:'x',value:-1},{axis:'x',value:width-o.w+1},{axis:'y',value:-1},{axis:'y',value:height-o.h+1}].sort((a,b)=>Math.abs(o[a.axis]-a.value)-Math.abs(o[b.axis]-b.value));o[edges[0].axis]=edges[0].value;
+ const edges=[{axis:'x',value:-1},{axis:'x',value:width-o.w+1},{axis:'y',value:-1},{axis:'y',value:height-o.h+1}].filter(edge=>edge.axis!==lockedAxis).sort((a,b)=>Math.abs(o[a.axis]-a.value)-Math.abs(o[b.axis]-b.value));o[edges[0].axis]=edges[0].value;
 }
 window.addEventListener('pointerdown',ev=>{
  if(!carouselActive()||busy||ev.pointerType!=='touch'||!ev.target.closest?.('#carouselViewport'))return;
@@ -349,3 +390,16 @@ function carouselImageResize(ev,o,corner){
 }
 let carouselGestureZoom=null;
 for(const name of ['gesturestart','gesturechange','gestureend'])window.addEventListener(name,ev=>{if(!carouselActive()||busy||!ev.target.closest?.('#carouselViewport'))return;ev.preventDefault();if(name==='gesturestart')carouselGestureZoom=carouselZoom;else if(name==='gesturechange'&&carouselGestureZoom!==null)carouselSetZoom(carouselGestureZoom*ev.scale,Number.isFinite(ev.clientX)?ev:null);else if(name==='gestureend')carouselGestureZoom=null},{passive:false});
+function carouselKeepLogosOnTop(c=p.carousel){
+ const first=c.objects.findIndex(o=>o.type==='logo');if(first<0||!c.objects.slice(first).some(o=>o.type!=='logo'))return;
+ c.objects=[...c.objects.filter(o=>o.type!=='logo'),...c.objects.filter(o=>o.type==='logo')];
+}
+function carouselAngleTip(o){return {x:o.x+(o.direction==='right'?o.w:o.w/2),y:o.y+(o.direction==='up'?0:o.direction==='down'?o.h:o.h/2)}}
+function carouselAngleTipSnap(o,c=p.carousel,tolerance=6/carouselZoom){
+ const tip=carouselAngleTip(o),centers=Array.from({length:c.n},(_,i)=>(i+.5)*c.w),nearest=centers.reduce((a,b)=>Math.abs(a-tip.x)<=Math.abs(b-tip.x)?a:b),dy=c.h/2-tip.y;
+ return {x:Math.abs(nearest-tip.x)<=tolerance?o.x+nearest-tip.x:null,y:Math.abs(dy)<=tolerance?o.y+dy:null};
+}
+function carouselAngleAlign(o,c=p.carousel){
+ const tip=carouselAngleTip(o),candidates=Array.from({length:c.n},(_,i)=>({axis:'x',value:(i+.5)*c.w-tip.x+o.x}));candidates.push({axis:'y',value:c.h/2-tip.y+o.y});
+ let best=null,distance=Infinity;for(const {axis,value} of candidates){const candidate={...o,[axis]:value};carouselAngleBleed(candidate,c,axis);const score=Math.hypot(candidate.x-o.x,candidate.y-o.y);if(score<distance){best=candidate;distance=score}}o.x=best.x;o.y=best.y;
+}
