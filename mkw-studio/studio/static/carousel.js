@@ -242,7 +242,7 @@ function carouselTextLayout(o,ctx=makeCanvas(1,1).getContext('2d')){
  const lines=[];let y=0,offset=0;for(const [paragraph,text] of o.text.split('\n').entries()){
   const style=o.textStyles?.[paragraph],size=style?.size??o.size;ctx.font=`${size}px "${o.font}"`;const wrapped=carouselWrapText(text,o.w,t=>ctx.measureText(t).width);
   wrapped.forEach((part,index)=>{const leading=style?.leading?.[index]??size*.95;lines.push({text:part.raw.trimEnd(),raw:part.raw,start:offset+part.start,end:offset+part.end,paragraph,index,size,leading,y});y+=leading});offset+=text.length+1;
- }const last=lines.at(-1);return {lines,height:last?last.y+last.size*1.12:0};
+ }return {lines,height:Math.max(0,...lines.map(line=>line.y+line.size*1.12))};
 }
 function carouselTextHeight(o){return carouselTextLayout(o).height}
 function carouselTextOffset(o,layout=carouselTextLayout(o)){return o.textAnchor==='bottom'?o.h-layout.height:0}
