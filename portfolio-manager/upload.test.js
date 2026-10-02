@@ -6,7 +6,7 @@ const os=require('node:os');
 const sharp=require('sharp');
 test('Real image upload keeps original names, creates one media entry, respects folder and avoids overwrites',async t=>{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'noe-upload-'));const manager=path.join(root,'portfolio-manager');fs.mkdirSync(manager);
- for(const file of ['server.js','studio.js','media-library.js','photo-metadata.js'])fs.copyFileSync(path.join(__dirname,file),path.join(manager,file));
+ for(const file of ['server.js','studio.js','media-library.js','photo-metadata.js','client-galleries.js'])fs.copyFileSync(path.join(__dirname,file),path.join(manager,file));
  fs.copyFileSync(path.join(__dirname,'media-processor.js'),path.join(manager,'media-processor.js'));
  const app=require(path.join(manager,'server.js'));const server=await new Promise(resolve=>{const server=app.listen(0,'127.0.0.1',()=>resolve(server));});
  t.after(()=>{server.close();fs.rmSync(root,{recursive:true,force:true});});

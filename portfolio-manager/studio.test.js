@@ -56,7 +56,7 @@ test('Local editor: revision checks, exact preview, host protection and real Git
     assert.deepEqual(state.changes.map(c=>c.file),['portfolio/projekte/designs.json']);
     assert.equal(state.changes[0].state,' M');
     // A file not in the publication scope remains untouched and uncommitted.
-    fs.mkdirSync(path.join(root,'portfolio-manager')); fs.writeFileSync(path.join(root,'portfolio-manager','notes.txt'),'private tool change');
+    fs.mkdirSync(path.join(root,'portfolio-manager'), {recursive:true}); fs.writeFileSync(path.join(root,'portfolio-manager','notes.txt'),'private tool change');
     state = (await request('/api/studio/git')).body;
     assert.equal(state.changes.find(c=>c.file==='portfolio-manager/notes.txt').allowed,false);
     assert.equal((await request('/api/publish',{signature:'stale',files:[],message:'No'})).status,409);
