@@ -108,11 +108,12 @@
         try { const data = await imageData(image, 'preview'); if (seq !== detailSequence || generation !== state.generation || !$('detail-screen').open) return; detailURL = imageURL(data, 'image/webp'); $('client-detail-image').src = detailURL; $('client-detail-status').textContent = ''; }
         catch (error) { if (seq === detailSequence && generation === state.generation) $('client-detail-status').textContent = error.message; }
     }
-    function downloadBlob(blob, name, target) {
+    function downloadBlob(blob, name, target, autoStart = false) {
         const host = $(target);
         const previous = host.querySelector('a'); if (previous) releaseURL(previous.href);
         const url = imageURL(blob, blob.type), anchor = make('a', '↓ ' + name + ' speichern', 'client-primary client-ready-link');
         anchor.href = url; anchor.download = name; host.replaceChildren(anchor);
+        if (autoStart) anchor.click();
     }
     async function download(images, zip) {
         if (state.downloading || !images.length) return;
@@ -123,8 +124,8 @@
         try {
             const files = [];
             for (const [index, image] of images.entries()) { target.textContent = `Download wird vorbereitet: ${index + 1} von ${images.length} …`; files.push({ name: image.name, data: await imageData(image, 'full') }); }
-            downloadBlob(zip ? createClientZip(files) : new Blob([files[0].data], { type: 'image/jpeg' }), zip ? state.event.title.replace(/[^\p{L}\p{N}_ -]/gu, '-').slice(0, 80) + '-Bilder.zip' : files[0].name, zip ? 'client-ready' : 'client-detail-ready');
-            target.textContent = 'Download bereit. Klicke auf den Link zum Speichern.';
+            downloadBlob(zip ? createClientZip(files) : new Blob([files[0].data], { type: 'image/jpeg' }), zip ? state.event.title.replace(/[^\p{L}\p{N}_ -]/gu, '-').slice(0, 80) + '-Bilder.zip' : files[0].name, zip ? 'client-ready' : 'client-detail-ready', zip);
+            target.textContent = zip ? 'ZIP vorbereitet. Falls der Download nicht automatisch startet, nutze den Speicherlink.' : 'Download bereit. Klicke auf den Link zum Speichern.';
         } catch (error) { target.textContent = error.message; }
         finally { state.downloading = false; navBusy(false); $('client-lock').disabled = false; $('client-single').disabled = false; selection(); }
     }
