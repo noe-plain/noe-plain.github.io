@@ -61,9 +61,8 @@
         $('client-none').disabled = !count || state.downloading;
         $('client-all').disabled = !state.gallery?.images.length || count === state.gallery.images.length || state.downloading;
         document.querySelectorAll('.client-select').forEach(button => {
-            const selected = state.selected.has(button.dataset.id); button.setAttribute('aria-pressed', String(selected)); button.textContent = selected ? '✓' : '+';
+            const selected = state.selected.has(button.dataset.id); button.setAttribute('aria-pressed', String(selected)); button.classList.toggle('active', selected); button.querySelector('i').className = selected ? 'fas fa-heart' : 'far fa-heart';
             button.setAttribute('aria-label', `${selected ? 'Abwählen' : 'Auswählen'}: ${button.dataset.name}`);
-            button.closest('.gallery-item').classList.toggle('client-selected', selected);
         });
         if (state.gallery) { const image = state.gallery.images[state.active]; const selected = state.selected.has(image?.id), button = $('client-detail-select'); button.setAttribute('aria-pressed', String(selected)); button.setAttribute('aria-label', selected ? 'Bild abwählen' : 'Bild auswählen'); button.classList.toggle('active', selected); button.querySelector('i').className = selected ? 'fas fa-heart' : 'far fa-heart'; }
     }
@@ -83,8 +82,8 @@
             const cell = make('div', undefined, 'gallery-item client-cell');
             const view = make('button', undefined, 'client-view'); view.type = 'button'; view.setAttribute('aria-label', `${image.name} in Grossansicht öffnen`);
             const img = make('img'); img.alt = image.name; view.append(img); view.onclick = () => openDetail(index);
-            const select = make('button', '+', 'client-select'); select.type = 'button'; select.dataset.id = image.id; select.dataset.name = image.name; select.onclick = () => toggle(image.id);
-            const label = make('span', image.name, 'client-caption'); cell.append(view, select, label); grid.append(cell);
+            const select = make('button', undefined, 'client-select icon-btn bookmark-btn'); const heart = make('i', undefined, 'far fa-heart'); heart.setAttribute('aria-hidden', 'true'); select.append(heart); select.type = 'button'; select.dataset.id = image.id; select.dataset.name = image.name; select.onclick = () => toggle(image.id);
+            cell.append(view, select); grid.append(cell);
             jobs.push(async () => {
                 try { const bytes = await imageData(image, 'thumb'); if (seq !== state.generation) return; img.src = imageURL(bytes, 'image/webp'); }
                 catch { if (seq !== state.generation) return; view.textContent = 'Vorschau erneut laden'; view.onclick = async () => { view.replaceChildren(img); view.onclick = () => openDetail(index); await jobs[index](); }; }
