@@ -18,5 +18,15 @@
     "salt": "wvJyDSC0DuIMG5bdbv+FDw==",
     "iterations": 310000,
     "bundle": "0ad7176e-9801-406f-87ab-c996ed4b51b7/8153c5c5-7006-4bb3-9b04-6e6664840f82/gallery.bin"
+  },
+  {
+    "id": "5d97fa9d-0c4c-49ed-9c6b-b80c44a3b19c",
+    "slug": "zjso-budapest",
+    "title": "ZJSO – Reise nach Budapest",
+    "date": "2026-10-06",
+    "count": 178,
+    "salt": "g1VxJ/ixw994KPWD63DxGQ==",
+    "iterations": 310000,
+    "bundle": "5d97fa9d-0c4c-49ed-9c6b-b80c44a3b19c/56ae00b3-fbb2-4e90-9dec-e039fa38e277/gallery.bin"
   }
 ]
