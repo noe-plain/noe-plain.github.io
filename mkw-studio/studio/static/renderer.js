@@ -84,7 +84,24 @@ async function draw(){
   syncOverlays();updateWarning();
  }catch(e){status(e.message)}finally{drawing=false;if(drawAgain){drawAgain=false;requestAnimationFrame(draw)}}
 }
-function updateWarning(){for(const x of p.boards){const card=document.querySelector(`.board-card[data-id="${x.id}"]`);if(card){const uncovered=!x.family?.enabled&&!MKW.imageCovers(x,asset(x));card.classList.toggle('uncovered',uncovered);card.classList.toggle('low-resolution',x.image.scale>1.001);card.title=[uncovered?'Bild deckt die Zeichenfläche nicht vollständig ab.':'',x.image.scale>1.001?'Bildauflösung gering.':''].filter(Boolean).join(' ')}}const b=board();if(!b){$('#warning').textContent='';return}const fonts=[...new Set(Object.values(b.elements).filter(e=>e.visible&&e.role&&['Replica LL','Harriet','Harriet Regular','Harriet Italic'].includes(e.role)&&!fontStatus[e.role]).map(e=>e.role))];$('#warning').textContent=[!b.family?.enabled&&!MKW.imageCovers(b,asset(b))?'Bild deckt die Zeichenfläche nicht vollständig ab.':'',b.image.scale>1.001?'Bildauflösung gering – Export ist möglich.':'',fonts.length?`${fonts.join(', ')} fehlt · Ersatzschrift aktiv.`:'',textBlock(b).factor<.999?'Text wurde verkleinert, damit er vollständig in die Schutzzone passt.':''].filter(Boolean).join(' ')}
+function updateWarning(){
+ const warnings=[];
+ for(const b of p.boards){
+  const im=asset(b),uncovered=!b.family?.enabled&&!MKW.imageCovers(b,im),low=b.image.scale>1.001,card=document.querySelector(`.board-card[data-id="${b.id}"]`);
+  if(card){card.classList.toggle('uncovered',uncovered);card.classList.toggle('low-resolution',low);card.title=[uncovered?'Bild deckt die Zeichenfläche nicht vollständig ab.':'',low?'Bildauflösung gering.':''].filter(Boolean).join(' ')}
+  const title=`${im.name} · ${MKW.ratio(b.w,b.h).replace('x',':')}`;
+  const add=(message,step,key)=>warnings.push({id:b.id,title,message,step,key});
+  if(uncovered)add('Bild deckt die Zeichenfläche nicht vollständig ab.','crop');
+  if(low)add('Bildauflösung gering – Export ist möglich.','crop');
+  const fonts=[...new Set(Object.values(b.elements).filter(e=>e.visible&&e.role&&['Replica LL','Harriet','Harriet Regular','Harriet Italic'].includes(e.role)&&!fontStatus[e.role]).map(e=>e.role))];
+  if(fonts.length)add(`${fonts.join(', ')} fehlt · Ersatzschrift aktiv.`,'text','title');
+  if(textBlock(b).factor<.999)add('Text wurde verkleinert, damit er vollständig in die Schutzzone passt.','text','title');
+ }
+ studioSetWarnings(warnings);
+ const current=warnings.filter(item=>item.id===selected),root=$('#warning');
+ root.innerHTML=current.map((item,index)=>`<button class="studio-inline-warning" data-board-warning="${index}">${studioIcon('warning')}<span>${esc(item.message)}</span></button>`).join('');
+ root.querySelectorAll('[data-board-warning]').forEach(button=>button.onclick=()=>studioFocusWarning(current[+button.dataset.boardWarning]));
+}
 function rotatePoint(x,y,angle){const a=angle*Math.PI/180;return{x:x*Math.cos(a)-y*Math.sin(a),y:x*Math.sin(a)+y*Math.cos(a)}}
 function positionInBoard(ev,b){const r=document.querySelector(`canvas[data-board="${b.id}"]`).getBoundingClientRect();return{x:(ev.clientX-r.left)*b.w/r.width,y:(ev.clientY-r.top)*b.h/r.height}}
 function transformRect(b){const im=asset(b),t=b.image;return {x:t.x-im.width*t.scale/2,y:t.y-im.height*t.scale/2,w:im.width*t.scale,h:im.height*t.scale,angle:t.angle}}
