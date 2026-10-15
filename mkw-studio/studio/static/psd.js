@@ -27,6 +27,7 @@ async function withPSDProfile(buffer){
  return new Blob([data.subarray(0,offset),size,data.subarray(offset+4,offset+4+length),resource,data.subarray(offset+4+length)],{type:'image/vnd.adobe.photoshop'});
 }
 async function buildPSD(progress=()=>{}){
+ if(p.carousel)return buildCarouselPSD(progress);
  const layout=psdArrangement();if(!layout.boards.length)throw Error('Bitte zuerst Bilder importieren.');
  if(layout.width>30000||layout.height>30000||layout.width*layout.height>80000000)throw Error('Dieses Projekt ist für eine einzelne PSD zu gross (max. 30 000 px je Seite / 80 Mio. Gesamtpixel). Bitte in kleinere MKW-Projekte aufteilen.');
  await document.fonts.ready;const composite=makeCanvas(layout.width,layout.height),ctx=composite.getContext('2d',{colorSpace:'srgb'});const psd={width:layout.width,height:layout.height,canvas:composite,children:[],linkedFiles:[],artboards:{count:layout.boards.length,autoExpandEnabled:false,autoNestEnabled:false,autoPositionEnabled:false},imageResources:{versionInfo:{hasRealMergedData:true,writerName:'MKW Sujet Studio',readerName:'Adobe Photoshop',fileVersion:1},resolutionInfo:{horizontalResolution:72,verticalResolution:72,horizontalResolutionUnit:'PPI',verticalResolutionUnit:'PPI',widthUnit:'Inches',heightUnit:'Inches'}}};
@@ -57,7 +58,7 @@ $('#savePSD').onclick=async()=>{
   // Open the native picker while the click still has user activation, before generating the PSD.
   const name=saveFileName('psd'),handle=await chooseSaveTarget(name,'psd');
   const file=await buildPSD(text=>$('#psdStatus').textContent=text);await writeSaveFile(handle,file,name);
-  $('#psdStatus').textContent=(handle?'PSD gespeichert.':'PSD-Download gestartet.')+' Zeichenflächen, bearbeitbare Texte und eingebettete Bild-Smartobjekte. Zum Weiterarbeiten hier zusätzlich MKW speichern.';
+  $('#psdStatus').textContent=(handle?'PSD gespeichert.':'PSD-Download gestartet.')+(p.carousel?' Zusammenhängendes Artwork, Ebenen, bearbeitbare Texte und Slide-Slices.':' Zeichenflächen, bearbeitbare Texte und eingebettete Bild-Smartobjekte.')+' Zum Weiterarbeiten hier zusätzlich MKW speichern.';
   status(handle?'Photoshop-Datei unter gewähltem Namen gespeichert.':'Photoshop-Datei: Download gestartet.');
  }catch(e){$('#psdStatus').textContent=e.name==='AbortError'?'Speichern abgebrochen.':'PSD konnte nicht gespeichert werden: '+e.message}
  finally{setSaveBusy(false)}

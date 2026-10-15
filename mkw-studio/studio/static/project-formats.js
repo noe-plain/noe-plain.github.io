@@ -1,6 +1,6 @@
 'use strict';
 const MKWFormats = (() => {
- const defaults=()=>[{w:1080,h:1920,top:200,bottom:500},{w:1080,h:1080,top:100,bottom:200},{w:1080,h:1350,top:100,bottom:200}];
+ const defaults=()=>[{w:1080,h:1920,top:200,bottom:500},{w:1080,h:1080,top:100,bottom:200},{w:1080,h:1350,top:100,bottom:200},{w:1080,h:1440,top:100,bottom:200}];
  function validate(f){return f&&['w','h','top','bottom'].every(k=>Number.isInteger(f[k]))&&f.w>=240&&f.h>=240&&f.w<=10000&&f.h<=10000&&f.w*f.h<=40000000&&f.top>=0&&f.bottom>=0&&f.top+f.bottom<f.h;}
  const legacy=()=>[{w:1080,h:1080,top:100,bottom:200},{w:1080,h:1920,top:200,bottom:500}];
  return {defaults,validate,legacy};

@@ -16,7 +16,7 @@ const MKWBrowser = (() => {
  });}
  async function init(){
   if(['localhost','127.0.0.1'].includes(location.hostname))try{const response=await fetch('api/session');if(response.ok){const session=await response.json();localServer=typeof session.token==='string';if(localServer)token=session.token}}catch{}
-  if(!localServer){document.querySelector('footer span').textContent='● Lokal in deinem Browser';document.querySelector('#files').accept='.jpg,.jpeg,.png,.webp';document.querySelector('#empty small').textContent='JPG · PNG · WebP';if(!window.showDirectoryPicker){document.querySelector('#folder').hidden=true;}}
+  if(!localServer){document.querySelector('.save-indicator')?.setAttribute('title','Lokal in deinem Browser gespeichert');document.querySelector('#files').accept='.jpg,.jpeg,.png,.webp';document.querySelector('#empty small').textContent='JPG · PNG · WebP';if(!window.showDirectoryPicker){document.querySelector('#folder').hidden=true;}}
  }
  async function saved(){return localServer?(await fetch('api/autosave')).json():storage(false);}
  function canvasBlob(canvas,type){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Bild konnte nicht exportiert werden.')),type,1));}

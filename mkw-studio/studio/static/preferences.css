@@ -1,0 +1,7 @@
+/* Guide preferences apply to editor overlays only, in both themes. */
+:root{--studio-guide-colour:#93a8ef;--studio-guide-soft:#93a8ef88;--studio-guide-faint:#93a8ef33;--studio-snap-colour:#f5a8e8}
+html[data-theme] .safe-zone,html[data-theme] .slide-guide>div,html[data-theme] .artwork-safe{border-color:var(--studio-guide-colour)}
+html[data-theme] .slide-guide{border-left-color:var(--studio-guide-soft)}
+html[data-theme] .sixths{background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(16.6667% - 1px),var(--studio-guide-faint) calc(16.6667% - 1px),var(--studio-guide-faint) 16.6667%),repeating-linear-gradient(to bottom,transparent 0,transparent calc(16.6667% - 1px),var(--studio-guide-faint) calc(16.6667% - 1px),var(--studio-guide-faint) 16.6667%)}
+html[data-theme] .carousel-angle-axis{border-color:var(--studio-snap-colour)}
+html[data-theme] .carousel-snap-line{background:var(--studio-snap-colour)}

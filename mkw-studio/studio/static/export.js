@@ -27,7 +27,7 @@ async function encodedBoard(b,settings){
 async function openExport(){
  if(!p.boards.length){status('Zuerst Bilder importieren.');return}
  const inferred=MKW.headingDate(p.boards.find(b=>b.imageId===p.images[0]?.id)?.elements.date.text||'');if(inferred)p.meta.date=inferred;
- exportOptions={format:'jpg',quality:90,png8:false,colours:256,transparent:false,...p.exportOptions};
+ exportOptions={format:studioPreferences.exportFormat,quality:90,png8:false,colours:256,transparent:false,...p.exportOptions};
  if(!['jpg','png','webp'].includes(exportOptions.format))exportOptions.format='jpg';
  exportOptions.quality=Math.max(10,Math.min(100,Number(exportOptions.quality)||90));if(![2,4,8,16,32,64,128,256].includes(exportOptions.colours))exportOptions.colours=256;
  $('#exportFields').innerHTML=field('Konzertdatum · TT.MM.JJ','date',p.meta.date,'text','placeholder="15.11.26"')+field('Projektkürzel','code',p.meta.code)+field('Projekttitel','title',p.meta.title)+field('Startnummer','start',p.meta.start,'number','min="0" step="1"');
