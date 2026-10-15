@@ -29,13 +29,13 @@ async function buildCarouselPSD(progress=()=>{}){
    const layout=carouselTextLayout(o),offset=carouselTextOffset(o,layout),lines=[];
    for(const line of layout.lines){
     if(!line.text)continue;
-    const record={...o,text:line.text,textStyles:undefined,size:line.size,textAnchor:'top',y:o.y+line.y+offset,h:line.size*1.12,opacity:1,blend:'source-over',visible:true};
+    const record={...o,textAlpha:1,text:line.text,textStyles:undefined,size:line.size,textAnchor:'top',y:o.y+line.y+offset,h:line.size*1.12,opacity:1,blend:'source-over',visible:true};
     const layer=await carouselPSDLayer(record);if(!layer)continue;
     layer.name=line.text;
     layer.text=textLayerData({text:line.text,x:o.x,y:record.y,size:line.size,role:o.font,color:o.color,align:'left',angle:0},0,0);
     layer.text.style.leading=line.leading;lines.push(layer);
    }
-   children.push({name:o.name,opened:true,hidden:o.visible===false,opacity:o.opacity??1,blendMode:({'source-over':'normal',multiply:'multiply',screen:'screen'})[o.blend]||'normal',children:lines});
+   children.push({name:o.name,opened:true,hidden:o.visible===false,opacity:(o.opacity??1)*(o.textAlpha??1),blendMode:({'source-over':'normal',multiply:'multiply',screen:'screen'})[o.blend]||'normal',children:lines});
   }else{const layer=await carouselPSDLayer(o);if(layer)children.push(layer)}
  }
  const slices=Array.from({length:c.n},(_,i)=>({id:i+1,groupId:1,origin:'userGenerated',associatedLayerId:0,name:MKW.projectName(p.meta)+'_'+String(i+1).padStart(2,'0'),type:'image',bounds:{left:i*c.w,top:0,right:(i+1)*c.w,bottom:height},url:'',target:'',message:'',altTag:`Slide ${i+1}`,cellTextIsHTML:false,cellText:'',horizontalAlignment:'default',verticalAlignment:'default',backgroundColorType:'none',backgroundColor:{r:0,g:0,b:0,a:0}}));
