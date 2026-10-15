@@ -1,6 +1,6 @@
 'use strict';
 function carouselPSDBounds(o){
- const c=p.carousel,pad=o.type==='angle'?Math.ceil(o.glow*3)+3:o.type==='text'?Math.ceil(o.size*.4)+4:2;
+ const c=p.carousel,pad=carouselIsVector(o)?carouselVectorPadding(o):o.type==='angle'?Math.ceil(o.glow*3)+3:o.type==='text'?Math.ceil(o.size*.4)+4:2;
  let right=o.x+o.w,bottom=o.y+o.h;
  if(o.type==='text'){
   const ctx=makeCanvas(1,1).getContext('2d'),layout=carouselTextLayout(o,ctx);

@@ -1,9 +1,10 @@
 'use strict';
 // Google Fonts Material Symbols Rounded, bundled locally for GitHub Pages.
-const studioIconNames={image:'image',crop:'crop',text:'text_fields',logo:'branding_watermark',export:'download',undo:'undo',redo:'redo',folder:'folder_open',save:'save',new:'note_add',plus:'add',minus:'remove',close:'close',up:'expand_less',down:'expand_more',trash:'delete',replace:'swap_vert',move:'open_with',layers:'layers',duplicate:'content_copy',select:'arrow_selector_tool',content:'drag_pan',gradient:'gradient',angle:'chevron_right',hand:'drag_pan',zoom:'zoom_in',visible:'visibility',hidden:'visibility_off',locked:'lock',unlocked:'lock_open',front:'keyboard_arrow_up',back:'keyboard_arrow_down',warning:'warning',info:'info',guides:'grid_on',snap:'align_horizontal_center',sidebar:'right_panel_close',sidebarOpen:'right_panel_open',fit:'center_focus_strong',settings:'settings',light:'light_mode',dark:'dark_mode',flip:'flip'};
+const studioIconSprite='static/icons/material-symbols.svg?v=65293b529052';
+const studioIconNames={image:'image',crop:'crop',text:'text_fields',logo:'branding_watermark',export:'download',undo:'undo',redo:'redo',folder:'folder_open',save:'save',new:'note_add',plus:'add',minus:'remove',close:'close',up:'expand_less',down:'expand_more',trash:'delete',replace:'swap_vert',move:'open_with',layers:'layers',duplicate:'content_copy',select:'arrow_selector_tool',content:'drag_pan',gradient:'gradient',angle:'chevron_right',hand:'drag_pan',zoom:'zoom_in',visible:'visibility',hidden:'visibility_off',locked:'lock',unlocked:'lock_open',front:'keyboard_arrow_up',back:'keyboard_arrow_down',warning:'warning',info:'info',guides:'grid_on',snap:'align_horizontal_center',sidebar:'right_panel_close',sidebarOpen:'right_panel_open',fit:'center_focus_strong',settings:'settings',light:'light_mode',dark:'dark_mode',flip:'flip',path:'polyline',shape:'shapes',builder:'shape_line',curve:'gesture'};
 function studioIcon(name,extra=''){
  const symbol=studioIconNames[name]||studioIconNames.plus;
- return `<svg class="ui-icon ${extra}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-google-icon="${symbol}"><use width="24" height="24" href="static/icons/material-symbols.svg#${symbol}"></use></svg>`;
+ return `<svg class="ui-icon ${extra}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-google-icon="${symbol}"><use width="24" height="24" href="${studioIconSprite}#${symbol}"></use></svg>`;
 }
 
 let studioSidebarOpen=!matchMedia('(max-width:760px)').matches,studioWarningItems=[];
