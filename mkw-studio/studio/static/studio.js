@@ -30,7 +30,7 @@ function touchMeta() {
   saveTimer = setTimeout(() => autosave().catch(() => {}), 1200);
 }
 const textTypes = [
-  ["date", "Überschrift"],
+  ["date", "Übertitel"],
   ["title", "Konzerttitel"],
   ["subtitle", "Untertitel"],
 ];
@@ -381,7 +381,7 @@ function renderPanel() {
             MKWFamily.copyrightColor(e.color),
           )}</select></label>`
         : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du bei den Textarten am Bild.</p>' : ""}<label><input id="uppercase" type="checkbox" ${layer === "date" ? "checked disabled" : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Überschrift immer in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
+    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du bei den Textarten am Bild.</p>' : ""}<label><input id="uppercase" type="checkbox" ${layer === "date" ? "checked disabled" : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel immer in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
     if (layer === "copyright") {
       const input = document.createElement("input");
       input.type = "text";
