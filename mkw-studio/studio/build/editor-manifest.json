@@ -37,8 +37,6 @@
     "static/settings-ui.js",
     "static/post-workspace.js",
     "static/project-session.js",
-    "static/batch-data.js",
-    "static/batch-import.js",
     "static/start.js"
   ],
   "styles": [

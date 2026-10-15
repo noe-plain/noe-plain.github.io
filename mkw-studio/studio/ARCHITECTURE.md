@@ -26,8 +26,6 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-bootstrap.js` | Carousel event registration and setup integration. |
 | `carousel-vectors.js`, `carousel-curves.js`, `carousel-constructor.js` | Bézier model and drawing, curve editing and boolean construction. |
 | `paint-model.js`, `paint-picker.js` | Paint interpretation/validation and picker UI. |
-| `batch-data.js` | Pure CSV/JSON parsing, field mapping and template expansion. |
-| `batch-import.js` | Preview, image matching, independent series projects and ZIP production. |
 | `appearance.js`, `settings-ui.js`, `user-fonts.js` | Device/tool preferences and user font library. Existing design objects must not change when a default changes. |
 | `export.js`, `carousel-pdf.js`, `carousel-psd*.js` | Export sessions, image encoding, PDF and PSD. Export options are not project defaults. |
 
@@ -53,4 +51,4 @@ Canvas previews and image downloads share encoded bytes. PDFs use pdf-lib/fontki
 
 ## Validation
 
-`npm test` checks naming, calendar dates, layout, palette, asset references and CSV/template expansion. `npm run test:browser` serves the committed production build on an ephemeral port and runs isolated Chromium suites. `CHROME_PATH` optionally selects a browser; macOS can use installed Chrome, CI installs Playwright Chromium. `MKW_TEST_OUTPUT` selects screenshot/export output. CI runs unit, formatting, reproducible-build and browser checks on pushes/PRs touching the app. Existing legacy Python/Photoshop scripts remain separate manual checks.
+`npm test` checks naming, calendar dates, layout, palette, asset references. `npm run test:browser` serves the committed production build on an ephemeral port and runs isolated Chromium suites. `CHROME_PATH` optionally selects a browser; macOS can use installed Chrome, CI installs Playwright Chromium. `MKW_TEST_OUTPUT` selects screenshot/export output. CI runs unit, formatting, reproducible-build and browser checks on pushes/PRs touching the app. Existing legacy Python/Photoshop scripts remain separate manual checks.

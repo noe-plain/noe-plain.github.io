@@ -3,10 +3,10 @@
 function saveFileName(extension) {
   return (
     MKW.clean(
-      ($("#saveName").value.trim() || p.meta.title).replace(
-        /\.(mkw|psd)$/i,
-        "",
-      ),
+      ($("#saveDialog").open
+        ? $("#saveName").value.trim() || MKW.projectName(p.meta)
+        : MKW.projectName(p.meta)
+      ).replace(/\.(mkw|psd)$/i, ""),
     ) +
     "." +
     extension
@@ -15,6 +15,7 @@ function saveFileName(extension) {
 function chooseSaveTarget(name, extension) {
   if (!window.showSaveFilePicker) return Promise.resolve(null);
   return window.showSaveFilePicker({
+    id: "mkw-" + extension,
     suggestedName: name,
     types: [
       {

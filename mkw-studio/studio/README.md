@@ -12,13 +12,15 @@ Im Carousel lassen sich Bildrahmen, Bildwinkel, Texte und Verläufe frei anordne
 
 ## Sicher speichern
 
-**Gesicherte Projekte** im Header oder Startbildschirm öffnet die Projektübersicht. Jedes Projekt besitzt eine eigene Browsersicherung. Mehrere Tabs werden nicht live synchronisiert: Bei konkurrierenden Änderungen wird eine separate Konfliktkopie gesichert, anstatt einen Stand zu überschreiben.
+**Projekt öffnen** im Header oder Startbildschirm öffnet die gemeinsame Auswahl für MKW-Dateien und Browsersicherungen. Jedes Projekt besitzt eine eigene Browsersicherung. Mehrere Tabs werden nicht live synchronisiert: Bei konkurrierenden Änderungen wird eine separate Konfliktkopie gesichert, anstatt einen Stand zu überschreiben.
 
 **Projekt speichern** verknüpft in Browsern mit Dateizugriff eine MKW-Datei. Weitere manuelle und automatische Sicherungen aktualisieren diese Datei, solange Zugriff besteht und sie extern unverändert ist. **Speichern unter …** legt bei einem neuen Ziel eine eigenständige Projektkopie an. Cmd/Ctrl+S speichert; Shift+Cmd/Ctrl+S öffnet „Speichern unter …“.
 
 Browser ohne Dateizugriff sichern automatisch ausschliesslich im Browser. Ein MKW-Download wird dort nur ausdrücklich ausgelöst. Wichtige Projekte zusätzlich als MKW-Datei sichern: Das Löschen von Browserdaten entfernt auch die Browsersicherungen. In der Projektübersicht lassen sich nicht aktive Browsersicherungen löschen; Dateien auf dem Gerät bleiben erhalten.
 
 MKW enthält nur verwendete Bilder, Logos und Schriften. Gelöschte Elemente und die bis zu 30 Schritte umfassende Sitzungshistorie werden nicht mitgeschrieben; ausgeblendete Elemente bleiben erhalten. Das vollständige normalisierte PNG-Arbeitsbild ersetzt die frühere doppelte Speicherung von Rohoriginal und Arbeitsbild. Alte MKW-Dateien bleiben lesbar.
+
+**Speichern unter …** öffnet in Browsern mit Dateizugriff immer die Auswahl für Ordner und Dateiname, auch bei bereits verknüpften Dateien. In Browsern ohne diese Funktion wird der Speicherort durch die Download-Einstellungen des Browsers bestimmt; dort lässt sich die Nachfrage vor jedem Download aktivieren.
 
 ## Einstellungen und Export
 
@@ -28,15 +30,9 @@ JPG, PNG, PNG-8, WebP und Carousel-PDF sind verfügbar. Der Export zeigt Vorscha
 
 Datum ist optional. Ohne Datum erscheint ein Hinweis und der Datumspräfix entfällt. Ein eingegebenes Datum muss `TT.MM.JJ` entsprechen. Ein eindeutig erkennbares Datum im Übertitel kann übernommen werden. Dateinamen folgen `JJMMTT_Kürzel_Projektname_Format_Nummer`; MKW und PDF verwenden den gemeinsamen Projektnamen ohne Format/Nummer.
 
-## Datenimport und Serienproduktion
+## Projekte öffnen
 
-1. Eine Gestaltung als Vorlage vorbereiten; bei Einzelposts gilt das erste Bild.
-2. **Datenimport & Serienproduktion** im Header öffnen. CSV oder JSON wählen.
-3. Spalten zuordnen: Datum, Kürzel, Projektname, Übertitel, Konzerttitel, Untertitel, Copyright, Bilddatei. Zugehörige Bilder anhand ihrer Dateinamen hinzufügen.
-4. Vorschau und Hinweise prüfen, Datensätze auswählen. Fehlende Bildzuordnungen oder ungültige Daten werden vor dem Erzeugen angezeigt.
-5. Getrennte Projekte im Browser erstellen und optional alle Bildvarianten als ZIP exportieren. Die Vorlage bleibt erhalten.
-
-CSV unterstützt Semikolon, Komma, Tab, Anführungszeichen und mehrzeilige Zellen. JSON erwartet eine Objektliste oder `{ "records": [...] }`. Maximal 500 Datensätze pro Import. Eine Beispieldatei steht im Dialog bereit. Leere Bildangaben behalten das Vorlagenbild. Im Carousel Texte mit Platzhaltern wie `{{konzerttitel}}`, `{{übertitel}}`, `{{untertitel}}`, `{{copyright}}` oder `{{datum}}` vorbereiten; das zugeordnete Bild ersetzt den ersten Bildrahmen.
+**Projekt öffnen** auf der Startseite oder im Header führt zu einer gemeinsamen Ansicht. Dort kannst du eine **MKW-Datei öffnen** oder eines der **in diesem Browser** gesicherten Projekte auswählen. Browsersicherungen lassen sich dort auch löschen; die MKW-Datei auf deinem Gerät bleibt erhalten.
 
 ## Entwicklung
 

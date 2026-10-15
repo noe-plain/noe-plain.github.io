@@ -181,6 +181,7 @@ const MKWProjects = (() => {
     revision = savedRevision = 0;
     busy = false;
     $("#startDialog").close();
+    $("#projectLibrary")?.close();
     await autosave({ writeFile: false });
     notice(
       handle
@@ -188,7 +189,7 @@ const MKWProjects = (() => {
         : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
     );
   }
-  async function chooseOpen() {
+  async function chooseFile() {
     if (window.showOpenFilePicker) {
       try {
         const [handle] = await showOpenFilePicker({
@@ -203,7 +204,7 @@ const MKWProjects = (() => {
         await openFile(await handle.getFile(), handle);
       } catch (error) {
         if (error.name !== "AbortError")
-          notice("Projekt konnte nicht geöffnet werden: " + error.message);
+          openError("Projekt konnte nicht geöffnet werden: " + error.message);
       }
     } else $("#projectFile").click();
   }
@@ -281,56 +282,81 @@ const MKWProjects = (() => {
       setSaveBusy(false);
     }
   }
+  function openError(message) {
+    const field = $("#projectOpenStatus");
+    if (field && $("#projectLibrary").open) field.textContent = message;
+    else notice(message);
+  }
   async function library() {
     let dialog = $("#projectLibrary");
     if (!dialog) {
       dialog = document.createElement("dialog");
       dialog.id = "projectLibrary";
-      dialog.innerHTML =
-        '<div class="dialog-heading"><div><h2>Deine Projekte</h2><p>Getrennt in diesem Browser gesichert. MKW-Dateien bleiben zusätzlich auf deinem Gerät.</p></div><button id="closeProjectLibrary" class="icon-button" aria-label="Projektübersicht schliessen">' +
-        studioIcon("close") +
-        '</button></div><div id="projectLibraryList"></div>';
+      dialog.setAttribute("aria-labelledby", "projectOpenTitle");
+      dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Wähle ein gespeichertes Projekt oder eine MKW-Datei.</p></div><button id="closeProjectLibrary" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><button id="openProjectFile" class="project-open-file">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small>Eine Projektdatei von deinem Gerät auswählen</small></span></button><div class="project-library-heading"><h3>In diesem Browser</h3><small>Zuletzt bearbeitet zuerst</small></div><p id="projectOpenStatus" role="status"></p><div id="projectLibraryList" aria-label="Gespeicherte Projekte"></div>`;
       document.body.append(dialog);
       $("#closeProjectLibrary").onclick = () => dialog.close();
+      $("#openProjectFile").onclick = chooseFile;
     }
-    const records = await MKWProjectStore.list();
-    $("#projectLibraryList").innerHTML = records.length
+    $("#projectOpenStatus").textContent = "";
+    const list = $("#projectLibraryList");
+    list.innerHTML =
+      '<p class="project-library-empty">Projekte werden geladen …</p>';
+    list.setAttribute("aria-busy", "true");
+    if (!dialog.open) dialog.showModal();
+    let records;
+    try {
+      records = await MKWProjectStore.list();
+    } catch (error) {
+      list.innerHTML = "";
+      openError(
+        "Browsersicherungen konnten nicht geladen werden. Du kannst weiterhin eine MKW-Datei öffnen. " +
+          error.message,
+      );
+      return;
+    } finally {
+      list.setAttribute("aria-busy", "false");
+    }
+    list.innerHTML = records.length
       ? records
           .map(
             (record) =>
               `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}"><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Carousel" : "Einzelposts"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></button><button data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
           )
           .join("")
-      : "<p>Noch keine Projekte in diesem Browser gesichert.</p>";
-    dialog.querySelectorAll("[data-project-id]").forEach(
-      (button) =>
-        (button.onclick = async () => {
-          try {
-            await open(await MKWProjectStore.open(button.dataset.projectId));
-          } catch (error) {
-            notice(error.message);
-          }
-        }),
-    );
-    dialog.querySelectorAll("[data-delete-project]").forEach(
-      (button) =>
-        (button.onclick = async () => {
-          if (
-            !confirm(
-              "Diese Browsersicherung löschen? Eine gespeicherte MKW-Datei auf deinem Gerät bleibt erhalten.",
-            )
+      : '<p class="project-library-empty">Noch keine Projekte in diesem Browser.<br>Öffne eine MKW-Datei oder starte ein neues Projekt.</p>';
+    let opening = false;
+    list.querySelectorAll("[data-project-id]").forEach((button) => {
+      button.onclick = async () => {
+        if (opening) return;
+        opening = true;
+        $("#projectOpenStatus").textContent = "Projekt wird geöffnet …";
+        try {
+          await open(await MKWProjectStore.open(button.dataset.projectId));
+        } catch (error) {
+          openError("Projekt konnte nicht geöffnet werden: " + error.message);
+        } finally {
+          opening = false;
+        }
+      };
+    });
+    list.querySelectorAll("[data-delete-project]").forEach((button) => {
+      button.onclick = async () => {
+        if (
+          opening ||
+          !confirm(
+            "Diese Browsersicherung löschen? Eine gespeicherte MKW-Datei auf deinem Gerät bleibt erhalten.",
           )
-            return;
-          try {
-            await MKWProjectStore.remove(button.dataset.deleteProject);
-            dialog.close();
-            await library();
-          } catch (error) {
-            notice(error.message);
-          }
-        }),
-    );
-    dialog.showModal();
+        )
+          return;
+        try {
+          await MKWProjectStore.remove(button.dataset.deleteProject);
+          await library();
+        } catch (error) {
+          openError(error.message);
+        }
+      };
+    });
   }
   function setup() {
     const banner = document.createElement("div");
@@ -339,36 +365,25 @@ const MKWProjects = (() => {
     banner.setAttribute("role", "status");
     banner.hidden = true;
     document.body.append(banner);
-    const libraryButton = document.createElement("button");
-    libraryButton.id = "projects";
-    libraryButton.className = "icon-button";
-    libraryButton.title = "Gesicherte Projekte";
-    libraryButton.setAttribute("aria-label", "Gesicherte Projekte");
-    libraryButton.innerHTML = studioIcon("folder");
-    $("#open").before(libraryButton);
-    libraryButton.onclick = () =>
-      library().catch((error) => notice(error.message));
-    const startLibrary = document.createElement("button");
-    startLibrary.id = "startProjects";
-    startLibrary.textContent = "Alle gesicherten Projekte";
-    $("#startDialog .start-choices").append(startLibrary);
-    startLibrary.onclick = () =>
-      library().catch((error) => notice(error.message));
     const saveAs = document.createElement("button");
     saveAs.id = "saveProjectAs";
     saveAs.textContent = "Speichern unter …";
     saveAs.className = "save-as-button";
     $("#saveProject").after(saveAs);
     saveAs.onclick = () => saveFile(true);
-    $("#open").onclick = chooseOpen;
-    $("#startOpen").onclick = chooseOpen;
+    const saveAsHint = document.createElement("p");
+    saveAsHint.id = "saveAsHint";
+    saveAs.setAttribute("aria-describedby", "saveAsHint");
+    saveAs.after(saveAsHint);
+    $("#open").onclick = () =>
+      library().catch((error) => notice(error.message));
     $("#projectFile").onchange = async (event) => {
       const file = event.target.files[0];
       if (file)
         try {
           await openFile(file);
         } catch (error) {
-          notice(error.message);
+          openError("Projekt konnte nicht geöffnet werden: " + error.message);
         }
       event.target.value = "";
     };
@@ -388,6 +403,9 @@ const MKWProjects = (() => {
     $("#save").onclick = () => {
       original();
       updateDateHint();
+      $("#saveAsHint").textContent = window.showSaveFilePicker
+        ? "„Speichern unter …“ öffnet die Auswahl für Ordner und Dateiname."
+        : "Dieser Browser bestimmt den Downloadordner. Aktiviere in seinen Download-Einstellungen „Vor jedem Download nach dem Speicherort fragen“, um den Ordner bei jedem Speichern auszuwählen.";
       $("#saveName").closest("label").firstChild.textContent = fileLink()
         ? "Dateiname für Speichern unter / PSD"
         : "Dateiname";
@@ -412,7 +430,6 @@ const MKWProjects = (() => {
     attach,
     open,
     openFile,
-    chooseOpen,
     saveFile,
     library,
     setup,
