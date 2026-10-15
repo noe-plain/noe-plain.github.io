@@ -18,6 +18,8 @@ jobs:
       MKW_TEST_OUTPUT: /tmp/mkw-test-results
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: mkw-studio/studio
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
