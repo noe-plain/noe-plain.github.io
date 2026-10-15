@@ -69,43 +69,55 @@ function encodePNG8(canvas, colours) {
     );
   });
 }
+// Export canvases are read back immediately for encoding. On Firefox's accelerated
+// canvas backend, large decoded photos can otherwise disappear from that readback.
+function exportContext(canvas) {
+  return canvas.getContext("2d", {
+    colorSpace: "srgb",
+    willReadFrequently: true,
+  });
+}
 async function encodedBoard(b, settings) {
   if (settings.format === "pdf") return carouselEncodePDFPage(b, settings);
   const key = exportKey(b, settings);
   if (exportCache.has(key)) return exportCache.get(key);
   await document.fonts.ready;
   const c = makeCanvas(b.w, b.h);
-  await paint(c.getContext("2d", { colorSpace: "srgb" }), b, 1, {
-    transparent: settings.transparent,
-  });
   const mime = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" }[
     settings.format
   ];
-  const blob =
-    settings.format === "png" && settings.png8
-      ? await encodePNG8(c, settings.colours)
-      : await new Promise((resolve, reject) =>
-          c.toBlob(
-            (blob) =>
-              blob
-                ? resolve(blob)
-                : reject(Error("Bild konnte nicht exportiert werden.")),
-            mime,
-            settings.quality / 100,
-          ),
-        );
-  let hasTransparency = false;
-  if (settings.transparent) {
-    const pixels = c
-      .getContext("2d")
-      .getImageData(0, 0, c.width, c.height).data;
-    for (let i = 3; i < pixels.length; i += 4)
-      if (pixels[i] < 255) {
-        hasTransparency = true;
-        break;
-      }
+  let blob,
+    hasTransparency = false;
+  try {
+    await paint(exportContext(c), b, 1, {
+      transparent: settings.transparent,
+    });
+    blob =
+      settings.format === "png" && settings.png8
+        ? await encodePNG8(c, settings.colours)
+        : await new Promise((resolve, reject) =>
+            c.toBlob(
+              (blob) =>
+                blob
+                  ? resolve(blob)
+                  : reject(Error("Bild konnte nicht exportiert werden.")),
+              mime,
+              settings.quality / 100,
+            ),
+          );
+    if (settings.transparent) {
+      const pixels = c
+        .getContext("2d")
+        .getImageData(0, 0, c.width, c.height).data;
+      for (let i = 3; i < pixels.length; i += 4)
+        if (pixels[i] < 255) {
+          hasTransparency = true;
+          break;
+        }
+    }
+  } finally {
+    c.width = c.height = 1;
   }
-  c.width = c.height = 1;
   if (blob.type !== mime)
     throw Error("Dieses Bildformat wird von deinem Browser nicht unterstützt.");
   if (exportCache.has(key)) return exportCache.get(key);

@@ -111,27 +111,35 @@ async function image(src) {
   }
   const promise = new Promise((resolve, reject) => {
     const bitmap = new Image();
-    bitmap.onload = () => {
-      if (cache.get(src) === promise) {
-        const bytes = bitmap.naturalWidth * bitmap.naturalHeight * 4;
-        imageCacheSizes.set(src, bytes);
-        imageCacheBytes += bytes;
-        while (
-          (imageCacheBytes > 128 * 1024 * 1024 || cache.size > 32) &&
-          cache.size > 1
-        ) {
-          const key = cache.keys().next().value;
-          cache.delete(key);
-          imageCacheBytes -= imageCacheSizes.get(key) || 0;
-          imageCacheSizes.delete(key);
+    const fail = () => {
+      if (cache.get(src) === promise) cache.delete(src);
+      reject(Error("Bild oder Logo kann nicht vollständig dekodiert werden."));
+    };
+    bitmap.decoding = "sync";
+    bitmap.onload = async () => {
+      try {
+        if (bitmap.decode) await bitmap.decode();
+        if (!bitmap.naturalWidth || !bitmap.naturalHeight) return fail();
+        if (cache.get(src) === promise) {
+          const bytes = bitmap.naturalWidth * bitmap.naturalHeight * 4;
+          imageCacheSizes.set(src, bytes);
+          imageCacheBytes += bytes;
+          while (
+            (imageCacheBytes > 128 * 1024 * 1024 || cache.size > 32) &&
+            cache.size > 1
+          ) {
+            const key = cache.keys().next().value;
+            cache.delete(key);
+            imageCacheBytes -= imageCacheSizes.get(key) || 0;
+            imageCacheSizes.delete(key);
+          }
         }
+        resolve(bitmap);
+      } catch {
+        fail();
       }
-      resolve(bitmap);
     };
-    bitmap.onerror = () => {
-      cache.delete(src);
-      reject(Error("Bild oder Logo kann nicht geladen werden."));
-    };
+    bitmap.onerror = fail;
     bitmap.src = src;
   });
   cache.set(src, promise);

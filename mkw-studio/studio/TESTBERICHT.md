@@ -1,3 +1,13 @@
+# Ergänzung: fehlende Carousel-Fotos in Firefox · 15. Oktober 2026
+
+- Mit der bereitgestellten MKW-Datei (399 MB, fünf Slides, zehn Fotos) in Firefox 158 auf macOS nachgestellt: Mit normaler Grafikbeschleunigung fehlen Fotos auf Slide 2, 3 und 4, im Headless-Test erscheinen sie. Keine Projektdatei wurde verändert.
+- `willReadFrequently` für alle Bild-, PDF- und PSD-Exportkontexte behebt die Auslassungen beim Auslesen des beschleunigten Canvas. Der Editor behält seinen bisherigen Zeichenweg. Bilddekodierung wird vollständig abgewartet; pro Slide werden nur überschneidende Fotorahmen geladen.
+- Korrigierten Export mit der Originaldatei im normalen Firefox geprüft: alle fünf Slides vollständig. PNG- und PDF-Vorschau stimmen an den betroffenen Fotobereichen exakt mit der vollständigen Referenz überein; JPG/WebP unterscheiden sich dort im Mittel um weniger als einen RGB-Wert durch die Komprimierung.
+- Neuer wiederholbarer Browsertest mit synthetischen Fotos von 24 bis 33 Megapixeln: JPG, PNG, WebP, PDF, PSD, Fotos über Slide-Kanten, eigene Rahmenpunkte, explizite Dekodierungsfehler und Freigabe temporärer Exportflächen. Private Fotos sind kein Bestandteil der Tests oder des Repositories.
+- Bestehende Prüfungen für Typografie, Bildexport, PDF, PSD, Rendering und Cache-Schutz erfolgreich. GitHub Actions prüft die Exportabläufe zusätzlich in Firefox.
+
+---
+
 # Prüfung der Speicher- und Serienüberarbeitung · 15. Oktober 2026
 
 - 30 Unit-Tests erfolgreich: Kalenderdaten/optionales Datum, Dateinamen, Layout, Farbsystem, Asset-Referenzen, CSV/JSON und Vorlagenexpansion.

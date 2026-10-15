@@ -27,6 +27,13 @@ async function carouselPaint(
   for (const o of objects || c.objects) {
     if (!isCurrent()) break;
     if (o.visible === false || o.id === editingId) continue;
+    // Photos clipped to other slides must not repeatedly decode during each export.
+    if (
+      slide !== null &&
+      o.type === "image" &&
+      !carouselImageOnSlide(o, slide, c)
+    )
+      continue;
     ctx.save();
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
@@ -94,6 +101,20 @@ async function carouselPaint(
     ctx.restore();
   }
   ctx.restore();
+}
+
+function carouselImageOnSlide(o, slide, c = p.carousel) {
+  const points = carouselFramePoints(o),
+    xs = points.map((point) => o.x + point.x * o.w),
+    ys = points.map((point) => o.y + point.y * o.h);
+  // Custom vertices can extend beyond the stored frame. Merely touching an edge
+  // contributes no pixels to that slide.
+  return (
+    Math.max(...xs) > slide * c.w &&
+    Math.min(...xs) < (slide + 1) * c.w &&
+    Math.max(...ys) > 0 &&
+    Math.min(...ys) < c.h
+  );
 }
 
 function carouselToolUI() {

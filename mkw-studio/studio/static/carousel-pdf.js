@@ -68,47 +68,50 @@ async function carouselEncodePDFPage(b, settings) {
     );
   await document.fonts.ready;
   const c = makeCanvas(opts.w, opts.h),
-    ctx = c.getContext("2d", { colorSpace: "srgb" });
-  ctx.fillStyle = opts.paper;
-  ctx.fillRect(0, 0, c.width, c.height);
-  const scale = (opts.fit === "cover" ? Math.max : Math.min)(
-    opts.w / b.w,
-    opts.h / b.h,
-  );
-  ctx.save();
-  ctx.translate((opts.w - b.w * scale) / 2, (opts.h - b.h * scale) / 2);
-  await paint(ctx, b, scale, { transparent: false });
-  ctx.restore();
+    ctx = exportContext(c);
   let data, filter, previewBlob;
-  if (opts.compression === "jpeg") {
-    previewBlob = await new Promise((resolve) =>
-      c.toBlob(resolve, "image/jpeg", opts.quality / 100),
+  try {
+    ctx.fillStyle = opts.paper;
+    ctx.fillRect(0, 0, c.width, c.height);
+    const scale = (opts.fit === "cover" ? Math.max : Math.min)(
+      opts.w / b.w,
+      opts.h / b.h,
     );
-    data = new Uint8Array(await previewBlob.arrayBuffer());
-    filter = "DCTDecode";
-  } else {
-    previewBlob = await new Promise((resolve) =>
-      c.toBlob(resolve, "image/png"),
-    );
-    const pixels = ctx.getImageData(0, 0, c.width, c.height).data,
-      rgb = new Uint8Array(c.width * c.height * 3);
-    for (let i = 0, j = 0; i < pixels.length; i += 4) {
-      rgb[j++] = pixels[i];
-      rgb[j++] = pixels[i + 1];
-      rgb[j++] = pixels[i + 2];
-    }
-    if (typeof CompressionStream !== "undefined") {
-      data = new Uint8Array(
-        await new Response(
-          new Blob([rgb])
-            .stream()
-            .pipeThrough(new CompressionStream("deflate")),
-        ).arrayBuffer(),
+    ctx.save();
+    ctx.translate((opts.w - b.w * scale) / 2, (opts.h - b.h * scale) / 2);
+    await paint(ctx, b, scale, { transparent: false });
+    ctx.restore();
+    if (opts.compression === "jpeg") {
+      previewBlob = await new Promise((resolve) =>
+        c.toBlob(resolve, "image/jpeg", opts.quality / 100),
       );
-      filter = "FlateDecode";
-    } else data = rgb;
+      data = new Uint8Array(await previewBlob.arrayBuffer());
+      filter = "DCTDecode";
+    } else {
+      previewBlob = await new Promise((resolve) =>
+        c.toBlob(resolve, "image/png"),
+      );
+      const pixels = ctx.getImageData(0, 0, c.width, c.height).data,
+        rgb = new Uint8Array(c.width * c.height * 3);
+      for (let i = 0, j = 0; i < pixels.length; i += 4) {
+        rgb[j++] = pixels[i];
+        rgb[j++] = pixels[i + 1];
+        rgb[j++] = pixels[i + 2];
+      }
+      if (typeof CompressionStream !== "undefined") {
+        data = new Uint8Array(
+          await new Response(
+            new Blob([rgb])
+              .stream()
+              .pipeThrough(new CompressionStream("deflate")),
+          ).arrayBuffer(),
+        );
+        filter = "FlateDecode";
+      } else data = rgb;
+    }
+  } finally {
+    c.width = c.height = 1;
   }
-  c.width = c.height = 1;
   if (exportCache.has(key)) return exportCache.get(key);
   const blob = new Blob([data]),
     entry = {

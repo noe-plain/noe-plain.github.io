@@ -41,7 +41,7 @@ async function carouselPSDLayer(o) {
   const bounds = carouselPSDBounds(o);
   if (!bounds.w || !bounds.h) return null;
   const canvas = makeCanvas(bounds.w, bounds.h),
-    ctx = canvas.getContext("2d", { colorSpace: "srgb" });
+    ctx = exportContext(canvas);
   ctx.translate(-bounds.left, -bounds.top);
   await carouselPaint(ctx, null, 1, true, null, [
     { ...o, visible: true, opacity: 1, blend: "source-over" },
@@ -70,7 +70,7 @@ async function buildCarouselPSD(progress = () => {}) {
   await document.fonts.ready;
   carouselKeepLogosOnTop(c);
   const composite = makeCanvas(width, height);
-  await carouselPaint(composite.getContext("2d", { colorSpace: "srgb" }));
+  await carouselPaint(exportContext(composite));
   const background = makeCanvas(width, height),
     bg = background.getContext("2d");
   bg.fillStyle = c.bg;

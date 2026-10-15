@@ -47,6 +47,8 @@ Carousel text has a `textAlign` default (`left`, `center`, `right`) and optional
 
 ## Export fidelity
 
+All image, PDF and PSD export canvases are created with `exportContext` (sRGB, `willReadFrequently: true`) before their first drawing operation. Firefox's accelerated canvas readback can silently omit large photos even when the editor renders them correctly; the export context uses the CPU readback path. Photo loading waits for `Image.decode()`, and per-slide rendering skips photo frames outside that slide (including custom frame vertices). Original image data and resolution stay unchanged. Temporary image/PDF canvases are released even on encoding or decoding failure.
+
 Canvas previews and image downloads share encoded bytes. PDFs use pdf-lib/fontkit: the rendered page preserves the artwork and an invisible embedded-font text layer enables search/selection. This is not an editable vector PDF. PSD preserves editable text, slide slices and native solid-fill/stroke Bézier paths. Complex image/gradient path paints retain exact raster appearance plus a disabled editable vector mask, labelled in the layer name. Photoshop behaviour and font substitution cannot be validated by the ag-psd round trip alone.
 
 ## Validation
