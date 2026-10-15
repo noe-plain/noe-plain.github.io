@@ -35,7 +35,7 @@ const { launch, artifact } = require('./browser.cjs');
     const last = page.locator('canvas[data-board]').last();
     await last.scrollIntoViewIfNeeded();
     await page.waitForFunction(() => { const c = document.querySelector('canvas[data-board="' + p.boards.at(-1).id + '"]'); return postPaintStates.has(c); });
-    const pixel = await last.evaluate(c => Array.from(c.getContext('2d').getImageData(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1).data));
+    const pixel = await last.evaluate(c => Array.from(c.getContext('2d').getImageData(Math.floor(c.width / 2), Math.floor(c.height * .8), 1, 1).data));
     assert.deepEqual(pixel, [130, 60, 100, 255], 'Scrolling must paint newly visible photos');
     await page.screenshot({ path: artifact('mkw-performance-scrolled.png') });
     const hashes = await page.evaluate(async () => {
