@@ -8,6 +8,7 @@
     "static/state.js",
     "static/user-fonts.js",
     "static/layout.js",
+    "static/image-preview.js",
     "static/renderer.js",
     "static/workspace-ui.js",
     "static/studio.js",

@@ -189,6 +189,7 @@ postViewport.addEventListener("click", (event) => {
   postCardState.set(id, button.getAttribute("aria-expanded") !== "true");
   postSyncCards();
   postRestoreAnchor(anchor);
+  draw();
 });
 postViewport.addEventListener(
   "wheel",
@@ -384,6 +385,7 @@ postViewport.addEventListener("scroll", () => {
   postRoomFrame = requestAnimationFrame(() => {
     postRoomFrame = 0;
     if (!postActive()) return;
+    draw();
     const x = postViewport.scrollLeft,
       y = postViewport.scrollTop;
     const addX =
@@ -413,4 +415,5 @@ window.addEventListener("resize", () => {
   postSyncCards();
   postUpdatePadding();
   postRestoreAnchor(anchor);
+  draw();
 });

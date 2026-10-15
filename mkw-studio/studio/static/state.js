@@ -116,9 +116,8 @@ async function image(src) {
       reject(Error("Bild oder Logo kann nicht vollständig dekodiert werden."));
     };
     bitmap.decoding = "sync";
-    bitmap.onload = async () => {
+    bitmap.onload = () => {
       try {
-        if (bitmap.decode) await bitmap.decode();
         if (!bitmap.naturalWidth || !bitmap.naturalHeight) return fail();
         if (cache.get(src) === promise) {
           const bytes = bitmap.naturalWidth * bitmap.naturalHeight * 4;
@@ -147,6 +146,7 @@ async function image(src) {
 }
 function pruneImageCache() {
   const used = new Set([...p.images, ...p.logos].map((item) => item.data));
+  pruneImagePreviews(used);
   for (const key of cache.keys())
     if (key.startsWith("data:") && !used.has(key)) {
       cache.delete(key);
@@ -584,6 +584,7 @@ async function restore(q) {
   }
   for (const l of q.logos) await image(l.data);
   p = q;
+  pruneImageCache();
   selected = p.boards[0]?.id;
   history = [];
   future = [];

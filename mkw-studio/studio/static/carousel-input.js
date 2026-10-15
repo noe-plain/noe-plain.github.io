@@ -27,15 +27,32 @@ function carouselHit(pt) {
 
 function carouselListen(ev, move, finish, cancel = finish) {
   ev.preventDefault();
-  const onMove = (e) => {
-    if (e.pointerId !== ev.pointerId) return;
-    move(e);
+  let pending = null,
+    frame = 0;
+  const flush = () => {
+    frame = 0;
+    if (!pending) return;
+    const event = pending;
+    pending = null;
+    move(event);
   };
-  const onUp = (e) => {
-    if (e.pointerId !== ev.pointerId) return;
+  const stop = () => {
+    cancelAnimationFrame(frame);
+    frame = 0;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
+  };
+  const onMove = (e) => {
+    if (e.pointerId !== ev.pointerId) return;
+    pending = e;
+    if (!frame) frame = requestAnimationFrame(flush);
+  };
+  const onUp = (e) => {
+    if (e.pointerId !== ev.pointerId) return;
+    stop();
+    // A quick release can precede the next frame: never lose the final position.
+    flush();
     carouselUI.drag = null;
     carouselUI.snapLines = [];
     carouselDrawSnap();
@@ -43,9 +60,8 @@ function carouselListen(ev, move, finish, cancel = finish) {
   };
   carouselUI.drag = {
     cancel: () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onUp);
+      stop();
+      pending = null;
       carouselUI.drag = null;
       carouselUI.snapLines = [];
       carouselDrawSnap();

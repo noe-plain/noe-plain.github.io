@@ -33,7 +33,8 @@ function carouselBindTextAlignment(o, panel) {
     };
   });
 }
-function carouselTextLayout(o, ctx = makeCanvas(1, 1).getContext("2d")) {
+const carouselMeasureContext = makeCanvas(1, 1).getContext("2d");
+function carouselTextLayout(o, ctx = carouselMeasureContext) {
   const lines = [];
   let y = 0,
     offset = 0;

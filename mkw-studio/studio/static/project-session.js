@@ -39,8 +39,8 @@ const MKWProjects = (() => {
       return false;
     }
     const perform = async () => {
-      const latest = await MKWProjectStore.open(project.projectId);
-      if (latest.version !== versions.get(project.projectId)) {
+      const latest = await MKWProjectStore.version(project.projectId);
+      if (latest !== versions.get(project.projectId)) {
         notice(
           "Ein anderer Tab hat eine neuere Sicherung erstellt. Die Datei wird erst nach der Konfliktprüfung aktualisiert.",
         );
@@ -75,7 +75,9 @@ const MKWProjects = (() => {
   function autosave(options = {}) {
     clearTimeout(saveTimer);
     saveTimer = null;
-    const document = MKWProjectAssets.compact(p),
+    // Keep immutable asset identities so unchanged photos reuse their SHA-256.
+    // The store compacts this snapshot before persisting; raw originals stay out.
+    const document = MKWProjectAssets.capture(p),
       id = document.projectId,
       saveRevision = revision;
     status("Projekt wird gesichert …");

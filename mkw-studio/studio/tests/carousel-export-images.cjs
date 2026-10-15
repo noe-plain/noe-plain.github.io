@@ -69,17 +69,16 @@ const { launch, artifact } = require('./browser.cjs');
     }
     const failure = await page.evaluate(async () => {
       const im = p.images.find(im => im.name === 'Grosses Foto 2.png'), original = im.data,
-        nativeDecode = HTMLImageElement.prototype.decode, nativeCreate = document.createElement;
+        nativeCreate = document.createElement;
       let target;
-      im.data = im.data + '#decode-test'; revision++;
-      HTMLImageElement.prototype.decode = function () { return this.src === im.data ? Promise.reject(Error('Decoder unavailable')) : nativeDecode.call(this); };
+      im.data = 'data:image/png;base64,YnJva2VuLWltYWdl'; revision++;
       document.createElement = function (name, ...args) { const el = nativeCreate.call(this, name, ...args); if (name === 'canvas' && !target) target = el; return el; };
       try {
         await encodedBoard(clone(p.boards[1]), { format: 'png', quality: 90, transparent: false });
         return { rejected: false };
       } catch (error) {
         return { rejected: /dekodiert/.test(error.message), released: target.width === 1 && target.height === 1 };
-      } finally { im.data = original; HTMLImageElement.prototype.decode = nativeDecode; document.createElement = nativeCreate; }
+      } finally { im.data = original; document.createElement = nativeCreate; }
     });
     assert.deepEqual(failure, { rejected: true, released: true }, 'Decode failures must stop partial exports and release the canvas');
     await page.evaluate(() => openExport());

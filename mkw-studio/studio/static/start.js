@@ -10,7 +10,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
   try {
     await MKWBrowser.init();
     try {
-      saved = await MKWProjectStore.last();
+      saved = await MKWProjectStore.last({ metadataOnly: true });
     } catch (error) {
       restoreError =
         "Letzter Stand konnte nicht geladen werden: " + error.message;
@@ -18,7 +18,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     await loadFonts();
     render();
     $("#startStatus").textContent = saved
-      ? `${saved.title} · ${saved.project.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
+      ? `${saved.title} · ${saved.document.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
       : restoreError || "Noch kein gespeichertes Projekt vorhanden.";
     $("#startContinue").disabled = !saved;
   } catch (error) {

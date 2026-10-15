@@ -190,19 +190,22 @@ function studioPaintSwatch(value) {
   return studioPaintCSS(preview);
 }
 
-async function studioCanvasPaint(ctx, o, channel) {
+async function studioCanvasPaint(ctx, o, channel, loadImage = image) {
   const value = studioPaintRead(o, channel);
   if (value.kind === "solid") return studioPaintRGBA(value.colour, value.alpha);
   if (value.kind === "image") {
     const im = p.images.find((im) => im.id === value.imageId);
     if (!im) return "transparent";
-    const bitmap = await image(im.data),
+    const bitmap = await loadImage(im.data),
       pattern = ctx.createPattern(bitmap, "no-repeat");
     const fit = Math.max(o.w / im.width, o.h / im.height) * value.scale,
       matrix = new DOMMatrix()
         .translate(o.w / 2 + value.panX, o.h / 2 + value.panY)
-        .scale(value.flipX * fit, value.flipY * fit)
-        .translate(-im.width / 2, -im.height / 2);
+        .scale(
+          (value.flipX * fit * im.width) / bitmap.width,
+          (value.flipY * fit * im.height) / bitmap.height,
+        )
+        .translate(-bitmap.width / 2, -bitmap.height / 2);
     pattern.setTransform(matrix);
     return pattern;
   }

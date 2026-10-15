@@ -253,13 +253,20 @@ async function paint(ctx, b, s = 1, opts = {}) {
     ctx.fillRect(0, 0, b.w, b.h);
   }
   if (!opts.only || opts.only === "image") {
-    const im = await image(asset(b).data),
+    const photo = asset(b),
+      im = await (opts.preview ? previewImage : image)(photo.data),
       t = b.image;
     ctx.save();
     ctx.translate(t.x, t.y);
     ctx.rotate((t.angle * Math.PI) / 180);
     ctx.scale(t.scale * t.flipX, t.scale * t.flipY);
-    ctx.drawImage(im, -im.width / 2, -im.height / 2);
+    ctx.drawImage(
+      im,
+      -photo.width / 2,
+      -photo.height / 2,
+      photo.width,
+      photo.height,
+    );
     ctx.restore();
   }
   if (
@@ -293,6 +300,7 @@ async function canvasPNG(b) {
   return c.toDataURL("image/png");
 }
 let postPaintBuffer = null;
+const postPaintStates = new WeakMap();
 let drawing = false,
   drawAgain = false;
 async function draw() {
@@ -306,25 +314,46 @@ async function draw() {
   }
   drawing = true;
   try {
-    for (const b of p.boards) {
+    const project = p,
+      viewport = $("#workspace").getBoundingClientRect();
+    for (const b of project.boards) {
+      if (p !== project) break;
       const c = document.querySelector(`canvas[data-board="${b.id}"]`);
       if (!c) continue;
+      const rect = c.getBoundingClientRect(),
+        margin = 200;
+      // Keep a small scroll-ahead area ready without painting the entire project.
+      if (
+        rect.bottom < viewport.top - margin ||
+        rect.top > viewport.bottom + margin ||
+        rect.right < viewport.left - margin ||
+        rect.left > viewport.right + margin
+      )
+        continue;
       const s = surfaceScale(),
         w = Math.round(b.w * s * devicePixelRatio),
-        h = Math.round(b.h * s * devicePixelRatio);
+        h = Math.round(b.h * s * devicePixelRatio),
+        skip = editingText?.boardId === b.id ? editingText.key : null,
+        editKey = step === "text" && selected === b.id ? layer : null,
+        key = JSON.stringify([revision, b, w, h, skip, editKey]),
+        previous = postPaintStates.get(c);
+      if (previous?.key === key && previous.fonts === fontStatus) continue;
       postPaintBuffer ??= makeCanvas(w, h);
       const buffer = postPaintBuffer;
       if (buffer.width !== w) buffer.width = w;
       if (buffer.height !== h) buffer.height = h;
       buffer.getContext("2d").clearRect(0, 0, w, h);
       await paint(buffer.getContext("2d", { colorSpace: "srgb" }), b, w / b.w, {
-        skip: editingText?.boardId === b.id ? editingText.key : null,
-        editKey: step === "text" && selected === b.id ? layer : null,
+        skip,
+        editKey,
+        preview: true,
       });
-      if (!c.isConnected) continue;
-      c.width = w;
-      c.height = h;
+      if (!c.isConnected || p !== project) continue;
+      if (c.width !== w) c.width = w;
+      if (c.height !== h) c.height = h;
+      c.getContext("2d").clearRect(0, 0, w, h);
       c.getContext("2d").drawImage(buffer, 0, 0);
+      postPaintStates.set(c, { key, fonts: fontStatus });
     }
     syncOverlays();
     updateWarning();

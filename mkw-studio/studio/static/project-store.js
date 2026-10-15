@@ -278,11 +278,14 @@ const MKWProjectStore = (() => {
         reject(transaction.error);
     });
   }
-  async function last() {
+  async function version(id) {
+    return (await read("projects", id))?.version;
+  }
+  async function last({ metadataOnly = false } = {}) {
     const id = await read("meta", "lastProject");
     if (id) {
       const record = await read("projects", id);
-      if (record?.document) return open(id);
+      if (record?.document) return metadataOnly ? record : open(id);
     }
     const legacy = await read("projects", "autosave");
     if (legacy) {
@@ -295,7 +298,7 @@ const MKWProjectStore = (() => {
         tx.oncomplete = resolve;
         tx.onerror = () => reject(tx.error);
       });
-      return open(saved.id);
+      return metadataOnly ? read("projects", saved.id) : open(saved.id);
     }
     return null;
   }
@@ -328,6 +331,7 @@ const MKWProjectStore = (() => {
     list,
     open,
     last,
+    version,
     link,
     remove,
     pack,

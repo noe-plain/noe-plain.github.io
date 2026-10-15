@@ -46,6 +46,16 @@
     }
     return project;
   }
+  function capture(project) {
+    // Clone mutable layout data while sharing immutable asset records. Keeping
+    // asset identity lets the store reuse hashes without retaining deleted data.
+    const metadata = { ...project };
+    for (const name of ["images", "logos", "fonts"]) metadata[name] = [];
+    const result = copy(metadata);
+    for (const name of ["images", "logos", "fonts"])
+      result[name] = [...(project[name] || [])];
+    return result;
+  }
   function compact(project) {
     const refs = references(project),
       collections = {
@@ -77,7 +87,7 @@
       if (!im.original) im.original = im.data;
     return project;
   }
-  const api = { references, prune, compact, hydrate };
+  const api = { references, prune, capture, compact, hydrate };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectAssets = api;
 })(globalThis);

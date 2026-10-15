@@ -168,9 +168,16 @@ function studioToggleSidebar() {
   studioSetSidebar(!studioSidebarOpen);
 }
 
+let studioWarningButton = null,
+  studioWarningSignature = null;
 function studioSetWarnings(items) {
   studioWarningItems = items;
-  const button = $(p.carousel ? "#carouselNotice" : "#postNotice");
+  const button = $(p.carousel ? "#carouselNotice" : "#postNotice"),
+    signature = JSON.stringify(items);
+  if (button === studioWarningButton && signature === studioWarningSignature)
+    return;
+  studioWarningButton = button;
+  studioWarningSignature = signature;
   if (button) {
     const label = `${items.length} Hinweis${items.length === 1 ? "" : "e"} zum Artwork`;
     button.hidden = !items.length;

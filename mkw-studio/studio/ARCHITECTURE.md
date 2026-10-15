@@ -15,6 +15,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `project-session.js` | Session identity, queued saves, file permission and external-change checks, project library. |
 | `file-io.js` | Native file chooser and atomic stream writes. Never download from autosave. |
 | `state.js` | Single-post model, history, bounded decoded-image cache, font-face reuse, image import. |
+| `image-preview.js` | Bounded screen-only rasters for large photos; reference pruning. Never used by exports or persisted. |
 | `bezier.js` | Pure analytical curve extrema and tight path bounds; no handles in selection boxes. |
 | `carousel.js` | Carousel document defaults, validation, creation and selection model. |
 | `carousel-render.js` | Viewport/canvas and overlays. One async paint at a time, reusable buffer, generation cancellation. |
@@ -47,10 +48,18 @@ Carousel text has a `textAlign` default (`left`, `center`, `right`) and optional
 
 ## Export fidelity
 
-All image, PDF and PSD export canvases are created with `exportContext` (sRGB, `willReadFrequently: true`) before their first drawing operation. Firefox's accelerated canvas readback can silently omit large photos even when the editor renders them correctly; the export context uses the CPU readback path. Photo loading waits for `Image.decode()`, and per-slide rendering skips photo frames outside that slide (including custom frame vertices). Original image data and resolution stay unchanged. Temporary image/PDF canvases are released even on encoding or decoding failure.
+All image, PDF and PSD export canvases are created with `exportContext` (sRGB, `willReadFrequently: true`) before their first drawing operation. Firefox's accelerated canvas readback can silently omit large photos even when the editor renders them correctly; the export context uses the CPU readback path. Photo loading validates successful load and nonzero intrinsic dimensions, and per-slide rendering skips photo frames outside that slide (including custom frame vertices). Original image data and resolution stay unchanged. Temporary image/PDF canvases are released even on encoding or decoding failure.
 
 Canvas previews and image downloads share encoded bytes. PDFs use pdf-lib/fontkit: the rendered page preserves the artwork and an invisible embedded-font text layer enables search/selection. This is not an editable vector PDF. PSD preserves editable text, slide slices and native solid-fill/stroke Bézier paths. Complex image/gradient path paints retain exact raster appearance plus a disabled editable vector mask, labelled in the layer name. Photoshop behaviour and font substitution cannot be validated by the ag-psd round trip alone.
 
 ## Validation
 
 `npm test` checks naming, calendar dates, layout, palette, asset references. `npm run test:browser` serves the committed production build on an ephemeral port and runs isolated Chromium suites. `CHROME_PATH` optionally selects a browser; macOS can use installed Chrome, CI installs Playwright Chromium. `MKW_TEST_OUTPUT` selects screenshot/export output. CI runs unit, formatting, reproducible-build and browser checks on pushes/PRs touching the app. Existing legacy Python/Photoshop scripts remain separate manual checks.
+
+## Interactive performance
+
+Single-post previews paint only visible boards plus a 200 px scroll-ahead margin. Their cache keys include document revision, board geometry, view resolution, edit state and loaded fonts; scrolling schedules newly visible work. Exports always render full resolution independently. Carousel pointer bursts are coalesced per animation frame, with the final queued position flushed before release and discarded on cancellation.
+
+The start screen reads only the last project record, not its image blobs. Full assets are loaded when continuing. Linked-file version checks also read metadata only. Autosave captures a model snapshot with shared immutable asset objects; the persistence boundary compacts it and reuses unchanged asset hashes through weak references. Neither original input duplicates nor undo history are persisted.
+
+Large photos have a separate 128 MiB LRU of screen-only rasters with a maximum 2048 px edge. Both editor renderers, including image paints on vectors and gradients, use this loader. Geometry and image patterns still use original image coordinates. Export entry points retain the full-resolution loader. Deleted assets and project switches prune preview references, without resetting canvases still used by an in-flight paint. The warnings UI is rebuilt only when its content or its host button changes; text measurement reuses a dedicated context.

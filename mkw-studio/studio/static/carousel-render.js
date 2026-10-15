@@ -8,6 +8,7 @@ async function carouselPaint(
   editingId = null,
   objects = null,
   isCurrent = () => true,
+  loadImage = image,
 ) {
   const project = p,
     c = project.carousel;
@@ -49,10 +50,10 @@ async function carouselPaint(
         ctx.fillText(line.text, line.x, line.y + offset);
       }
     } else if (carouselIsVector(o)) {
-      await carouselPaintVector(ctx, o);
+      await carouselPaintVector(ctx, o, loadImage);
     } else if (o.type === "gradient") {
       if (o.gradientFillMode === "image") ctx.globalAlpha *= o.startAlpha ?? 1;
-      ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill");
+      ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage);
       ctx.fillRect(0, 0, o.w, o.h);
     } else if (o.type === "logo") {
       const im = await image(
@@ -80,7 +81,7 @@ async function carouselPaint(
       }
       const im = project.images.find((im) => im.id === o.imageId);
       if (im) {
-        const bitmap = await image(im.data),
+        const bitmap = await loadImage(im.data),
           fw = o.w,
           fh = o.h,
           s = Math.max(fw / im.width, fh / im.height) * o.scale;
@@ -371,6 +372,7 @@ async function carouselRunPaint() {
       job.editingId,
       null,
       current,
+      previewImage,
     );
     if (current()) {
       const out = job.canvas.getContext("2d");
@@ -451,9 +453,10 @@ function carouselRefresh() {
       );
   }
   studioSetWarnings(
-    c.objects
-      .filter((o) => carouselWarning(o))
-      .map((o) => ({ id: o.id, title: o.name, message: carouselWarning(o) })),
+    c.objects.flatMap((o) => {
+      const message = carouselWarning(o);
+      return message ? [{ id: o.id, title: o.name, message }] : [];
+    }),
   );
   carouselDrawSelection();
   carouselVectorOverlay();
