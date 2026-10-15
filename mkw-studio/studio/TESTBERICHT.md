@@ -1,10 +1,11 @@
 # Prüfung der Speicher- und Serienüberarbeitung · 15. Oktober 2026
 
 - 27 Unit-Tests erfolgreich: Kalenderdaten/optionales Datum, Dateinamen, Layout, Farbsystem, Asset-Referenzen, CSV/JSON und Vorlagenexpansion.
-- 16 portable Browser-Suites erfolgreich, verteilt über Gesamtlauf und gezielte Wiederholungen nach Korrekturen. Isoliertes Chrome auf macOS; keine persönlichen Browserdaten verwendet.
+- 17 portable Browser-Suites erfolgreich, verteilt über Gesamtlauf und gezielte Wiederholungen nach Korrekturen. Isoliertes Chrome auf macOS; keine persönlichen Browserdaten verwendet.
 - Speicherung: getrennte Projekte, konkurrierende Tabs/Konfliktkopien, echte persistente Dateihandles im isolierten Origin-Speicher, manuelle und automatische Aktualisierung, Schutz vor externen Dateiänderungen und „Speichern unter“ mit neuer Identität.
 - Altdaten: Migration der bisherigen IndexedDB-Einzelsicherung; gemeinsam genutzte Bilddaten bleiben erhalten, nicht mehr referenzierte Binärdaten werden tatsächlich gelöscht. Browser ohne Dateizugriff laden bei Autosave nichts herunter.
 - Serienimport: Spaltenzuordnung, fehlende Bilder, optionale Daten, Vorschau, eigenständige Projekte, Vorlagenerhalt und Bild-ZIP.
+- Farbfeld: vertikal zentriert, 20 px Abstand zur auslösenden Werkzeug-/Kontextleiste, neue Zentrierung bei Moduswechsel und Resize, vollständig sichtbar auf kleinen Fenstern.
 - Editor: Rendering bündelt Eingaben und nutzt Canvas/Griffe weiter; Tool-Standards verändern keine bestehenden/gesperrten Texte. Vorhandene Pfad-, Typografie-, Farb-, Rahmen-, Zoom-, Layout- und Exportabläufe geprüft.
 - PDF: zwei Seiten mit pypdf ausgelesen, Text einschliesslich Umlauten/Gedankenstrich extrahiert und PDF mit Poppler gerendert. CFF-OpenType-Einbettung korrigiert. Rasteransicht plus unsichtbare echte Textebene; kein vollständig vektorbasiertes PDF.
 - PSD: ag-psd-Roundtrip prüft Gesamtpixel, Texte, Slices und native Bézier-Fläche/Kontur. Komplexe Füllungen behalten Rasterdarstellung plus Pfad. Kein erneuter manueller Photoshop-Test in diesem Durchlauf.

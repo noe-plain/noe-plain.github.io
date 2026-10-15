@@ -217,6 +217,7 @@ function studioOpenPicker(o, channel, anchor) {
     value,
     stop: 0,
     anchor,
+    rail: anchor.closest("#carouselSidebar,.tool-sidebar,.carousel-contextbar"),
     rect: anchor.getBoundingClientRect(),
     editing: false,
   };
@@ -276,16 +277,29 @@ function studioPickerSetColour(hex) {
 function studioPositionPicker() {
   if (!studioPicker) return;
   const el = $("#studioPaintPicker"),
-    r = studioPicker.anchor?.isConnected
-      ? studioPicker.anchor.getBoundingClientRect()
-      : studioPicker.rect,
+    rail = studioPicker.rail,
+    anchor = studioPicker.anchor,
+    r =
+      rail?.isConnected && rail.getBoundingClientRect().width > 0
+        ? rail.getBoundingClientRect()
+        : anchor?.isConnected
+          ? anchor.getBoundingClientRect()
+          : studioPicker.rect,
     w = el.offsetWidth,
-    h = el.offsetHeight;
-  let x = r.right + 12;
-  if (x + w > innerWidth - 12) x = r.left - w - 12;
-  if (x < 12) x = Math.max(12, innerWidth - w - 12);
-  el.style.left = x + "px";
-  el.style.top = Math.max(12, Math.min(r.top, innerHeight - h - 12)) + "px";
+    h = el.offsetHeight,
+    gap = 20,
+    margin = 12,
+    onRight = r.left + r.width / 2 > innerWidth / 2;
+  let x = onRight ? r.left - w - gap : r.right + gap;
+  if (x < margin || x + w > innerWidth - margin) {
+    const opposite = onRight ? r.right + gap : r.left - w - gap;
+    x =
+      opposite >= margin && opposite + w <= innerWidth - margin
+        ? opposite
+        : (innerWidth - w) / 2;
+  }
+  el.style.left = Math.max(margin, Math.min(x, innerWidth - w - margin)) + "px";
+  el.style.top = Math.max(margin, (innerHeight - h) / 2) + "px";
 }
 function studioCreatePicker() {
   if ($("#studioPaintPicker")) return;
