@@ -8,7 +8,7 @@ function studioIcon(name,extra=''){
 
 let studioSidebarOpen=!matchMedia('(max-width:760px)').matches,studioWarningItems=[];
 let studioCommandbarFrame=0,studioPostGuides=true;
-function studioSyncFooter(){const carousel=!!p.carousel;$('#footerGuides').setAttribute('aria-pressed',String(carousel?carouselUI.guides:studioPostGuides));$('#footerGuides').setAttribute('aria-label',carousel?'Raster und Schutzzonen':'Schutzzonen');$('#footerSnap').hidden=!carousel;if(carousel)$('#footerSnap').setAttribute('aria-pressed',String(carouselUI.snap));$('#toolsToggle').setAttribute('aria-controls',carousel?'carouselSidebar':'toolsSidebar')}
+function studioSyncFooter(){const carousel=!!p.carousel;$('#footerGuides').setAttribute('aria-pressed',String(carousel?carouselUI.guides:studioPostGuides));$('#footerGuides').setAttribute('aria-label',carousel?'Raster und Schutzzonen':'Schutzzonen');$('#footerSnap').hidden=!carousel;if($('#postHand'))$('#postHand').hidden=carousel;if(carousel)$('#footerSnap').setAttribute('aria-pressed',String(carouselUI.snap));$('#toolsToggle').setAttribute('aria-controls',carousel?'carouselSidebar':'toolsSidebar')}
 function studioFitCommandbars(){
  studioCommandbarFrame=0;
  for(const bar of document.querySelectorAll('.studio-commandbar')){
@@ -21,6 +21,7 @@ function studioFitCommandbars(){
 }
 function studioQueueCommandbarFit(){if(!studioCommandbarFrame)studioCommandbarFrame=requestAnimationFrame(studioFitCommandbars)}
 function studioSetSidebar(open){
+ const postAnchor=typeof postCaptureAnchor==='function'&&!p.carousel?postCaptureAnchor():null;
  const viewport=$('#carouselViewport'),canvas=$('#carouselCanvas');
  const rect=viewport?.getBoundingClientRect(),art=canvas?.getBoundingClientRect();
  const center=rect&&art?{x:(rect.left+viewport.clientWidth/2-art.left)/carouselZoom,y:(rect.top+viewport.clientHeight/2-art.top)/carouselZoom}:null;
@@ -31,6 +32,7 @@ function studioSetSidebar(open){
   button.innerHTML=studioIcon(open?'sidebar':'sidebarOpen')+'<span>Einstellungen</span>';
  }
  if(center&&p.carousel){carouselRefresh();const next=canvas.getBoundingClientRect(),view=viewport.getBoundingClientRect();viewport.scrollLeft+=next.left+center.x*carouselZoom-view.left-viewport.clientWidth/2;viewport.scrollTop+=next.top+center.y*carouselZoom-view.top-viewport.clientHeight/2;}
+ if(postAnchor){postAnchor.x=postViewport.clientWidth/2;postAnchor.y=postViewport.clientHeight/2;postUpdatePadding();postRestoreAnchor(postAnchor)}
  studioQueueCommandbarFit();
  studioSyncFooter();
 }
