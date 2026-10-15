@@ -2,7 +2,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const assert=require('node:assert/strict');
 
 (async()=>{
- const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const browser=await require('./browser.cjs').launch();
  try{
   const page=await browser.newPage({viewport:{width:1600,height:1000}}),errors=[],failed=[];
   page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>dialog.accept());
@@ -27,12 +27,12 @@ const assert=require('node:assert/strict');
    const b=p.boards[0],canvas=makeCanvas(b.w,b.h);await paint(canvas.getContext('2d'),b,1);
    return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',canvas.getContext('2d').getImageData(0,0,b.w,b.h).data))).map(n=>n.toString(16).padStart(2,'0')).join('');
   });
-  require('node:fs').writeFileSync('/private/tmp/mkw-ui-fixture.png',Buffer.from(fixture.split(',')[1],'base64'));
+  require('node:fs').writeFileSync(require('./browser.cjs').artifact('mkw-ui-fixture.png'),Buffer.from(fixture.split(',')[1],'base64'));
   const beforePixels=await pixels(),beforeWorkspace=await page.locator('#workspace').boundingBox();
   await page.locator('#toolsToggle').click();assert.equal(await page.locator('#toolsToggle').getAttribute('aria-expanded'),'false');assert(await page.locator('#toolsSidebar').isHidden());
   assert((await page.locator('#workspace').boundingBox()).width>beforeWorkspace.width+250);assert(await page.locator('#postViewControls').isVisible());
   await page.locator('#toolsToggle').click();assert(await page.locator('#toolsSidebar').isVisible());assert.equal(await pixels(),beforePixels,'Workspace controls must never change artwork pixels');
-  await page.screenshot({path:'/private/tmp/mkw-ui-post.png'});
+  await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-post.png')});
   await page.evaluate(()=>{p.boards[1].image.scale=.01;selectBoard(p.boards[0].id);return draw()});
   await page.locator('#postNotice').click();assert(await page.locator('#studioWarnings').isVisible());
   await page.locator('[data-warning-index]').first().click();
@@ -57,19 +57,19 @@ const assert=require('node:assert/strict');
   assert.equal(sections[0],'Inhalt');assert.equal(sections.at(-1),'Position & Grösse');
   const action=await page.locator('#carouselReplace').boundingBox(),properties=await page.locator('#carouselProperties').boundingBox();assert(action.y<properties.y+100);
   await page.evaluate(()=>{const o=carouselObject('text',{x:200,y:720,w:780,h:400,text:'DER SOMMER\nKLINGT',size:110});carouselPanel()});
-  await page.screenshot({path:'/private/tmp/mkw-ui-carousel.png'});
+  await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-carousel.png')});
   await page.evaluate(()=>carouselObject('text',{x:3*1080+990,y:1160,w:250,h:150,text:'ZU WEIT'}));
   const warningId=await page.evaluate(()=>carouselSelection);await page.evaluate(()=>carouselSelect([]));
   await page.locator('#carouselNotice').click();await page.locator('[data-warning-index]').first().click();assert.equal(await page.evaluate(()=>carouselSelection),warningId);
   assert.equal(await page.locator('button[data-tool=select]').getAttribute('aria-pressed'),'true');
   await page.locator('#footerGuides').click();assert(await page.locator('#carouselGuides').isHidden());await page.locator('#footerGuides').click();
   await page.locator('#footerSnap').click();assert.equal(await page.evaluate(()=>carouselUI.snap),false);await page.locator('#footerSnap').click();
-  await page.setViewportSize({width:1100,height:800});await page.screenshot({path:'/private/tmp/mkw-ui-compact.png'});
+  await page.setViewportSize({width:1100,height:800});await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-compact.png')});
   await page.setViewportSize({width:640,height:900});await page.locator('#carouselSidebar').waitFor({state:'hidden'});
   await page.locator('#toolsToggle').click();assert(await page.locator('#carouselSidebar').isVisible());await page.locator('#toolsToggle').click();
   for(const tool of ['text','image','gradient','angle','hand','select']){await page.locator(`button[data-tool=${tool}]`).click();assert.equal(await page.locator(`button[data-tool=${tool}]`).getAttribute('aria-pressed'),'true')}
   assert.equal(await page.locator('button[data-tool=zoom]').count(),0);assert(await page.locator('#carouselExport').isVisible());assert(await page.locator('footer #carouselZoom').isVisible());assert.equal(await page.locator('footer').count(),1);
-  await page.screenshot({path:'/private/tmp/mkw-ui-mobile.png'});
+  await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-mobile.png')});
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
   console.log('PASS shared command bars, local Google icons, inspector order, hide/show and view preservation, warning navigation, guide/snap feedback, compact/mobile access, unchanged artwork pixels');
  }finally{await browser.close()}

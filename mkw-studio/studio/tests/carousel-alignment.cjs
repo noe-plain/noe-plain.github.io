@@ -1,6 +1,6 @@
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),assert=require('node:assert/strict');
 (async()=>{
- const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const browser=await require('./browser.cjs').launch();
  try{
   const page=await browser.newPage({viewport:{width:1900,height:1200}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8900');await page.locator('#startNew').click();await page.locator('[data-project-mode=carousel]').click();await page.locator('#setupName').fill('Ausrichtung und Transparenz');await page.locator('#cn').fill('2');await page.locator('#createProject').click();await page.locator('#carouselCanvas').waitFor();
@@ -40,8 +40,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),assert=requi
   const zoomBox=await page.locator('#carouselZoom').boundingBox(),editor=await page.locator('#carouselEditor').boundingBox();assert(zoomBox.y>editor.y+editor.height-40&&zoomBox.x>editor.x+editor.width-100,'Zoom must be bottom right');
   const vp=await page.locator('#carouselViewport').boundingBox(),z=await page.evaluate(()=>carouselZoom);await page.mouse.move(vp.x+vp.width/2,vp.y+vp.height/2);await page.keyboard.down('Alt');await page.mouse.wheel(0,-100);await page.keyboard.up('Alt');await page.waitForTimeout(100);assert((await page.evaluate(()=>carouselZoom))>z*1.2,'Option/Alt scroll must zoom');
   const legacy=await page.evaluate(async()=>{const q=snapshot();const angle=q.carousel.objects.find(o=>o.type==='angle');angle.thickness=75;for(const o of q.carousel.objects)delete o.startAlpha;await restore(q);return p.carousel.objects.find(o=>o.type==='angle').thickness});assert.equal(legacy,75,'Existing angles keep their chosen leg width');
-  await page.locator('#carouselFit').click();await page.screenshot({path:'/private/tmp/mkw-alignment-angle.png'});
-  await page.evaluate(()=>carouselSelect([p.carousel.objects.find(o=>o.type==='gradient').id]));await page.screenshot({path:'/private/tmp/mkw-alignment-gradient.png'});assert.deepEqual(errors,[]);
+  await page.locator('#carouselFit').click();await page.screenshot({path:require('./browser.cjs').artifact('mkw-alignment-angle.png')});
+  await page.evaluate(()=>carouselSelect([p.carousel.objects.find(o=>o.type==='gradient').id]));await page.screenshot({path:require('./browser.cjs').artifact('mkw-alignment-gradient.png')});assert.deepEqual(errors,[]);
   console.log('PASS create/move/resize snapping for image, text and gradients; feedback guides; stop transparency and export alpha; opacity beside blend; topmost logo; 150 px default; angle tip alignment and bleed; prominent image action; bottom-right zoom and Alt scroll; legacy restore');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

@@ -1,7 +1,7 @@
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const assert=require('node:assert/strict');
 (async()=>{
- const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const browser=await require('./browser.cjs').launch();
  try{
   const page=await browser.newPage({viewport:{width:1600,height:1000}}),errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('response',r=>{if(r.status()>=400&&!r.url().includes('/api/session'))failed.push(r.url())});
@@ -37,9 +37,9 @@ const assert=require('node:assert/strict');
   const warning=await page.locator('#postNotice').evaluate(el=>{const s=getComputedStyle(el);return{color:s.color,background:s.backgroundColor,border:s.borderColor}});assert.equal(warning.background,'rgb(255, 243, 204)');assert.equal(warning.color,'rgb(143, 75, 0)');
   assert.equal(await canvas.locator('..').evaluate(el=>getComputedStyle(el).outlineColor),'rgb(224, 58, 62)');
   await page.locator('#postNotice').click();assert.equal(await page.locator('.studio-warning-item').first().evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 246, 229)');await page.locator('#closeStudioWarnings').click();
-  await page.evaluate(()=>postFitRow());await page.screenshot({path:'/private/tmp/mkw-cards-light.png'});await page.evaluate(()=>studioSetTheme('dark'));await page.waitForTimeout(200);await page.screenshot({path:'/private/tmp/mkw-cards-dark.png'});
+  await page.evaluate(()=>postFitRow());await page.screenshot({path:require('./browser.cjs').artifact('mkw-cards-light.png')});await page.evaluate(()=>studioSetTheme('dark'));await page.waitForTimeout(200);await page.screenshot({path:require('./browser.cjs').artifact('mkw-cards-dark.png')});
   await page.setViewportSize({width:640,height:900});await page.waitForTimeout(100);assert(await firstCard.locator('.image-card-body').isHidden());await firstCard.locator('[data-card-toggle]').click();assert(await firstCard.locator('[data-copyright]').isVisible());assert.equal((await firstCard.boundingBox()).width,230);assert(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth));
-  await page.screenshot({path:'/private/tmp/mkw-cards-mobile.png'});
+  await page.screenshot({path:require('./browser.cjs').artifact('mkw-cards-mobile.png')});
   await page.locator('.image-info-card').last().locator('[data-card-toggle]').click();await page.locator('.image-info-card').last().locator('[data-action=removeImage]').click();assert.equal(await page.evaluate(()=>p.images.length),1);assert(await page.locator('#addMoreImages').isVisible());
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);console.log('PASS left image cards and all actions, row fit, anchored zoom, pan, pinch, sidebar preservation, saturated warnings, mobile cards, no artwork changes during navigation');
  }finally{await browser.close()}

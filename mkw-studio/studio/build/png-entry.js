@@ -1,1 +1,1 @@
-export {encode,quantize} from 'upng-js';
+export { encode, quantize } from "upng-js";

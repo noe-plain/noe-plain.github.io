@@ -2,7 +2,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 (async()=>{
- const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const browser=await require('./browser.cjs').launch();
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],bad=[],uploads=[];page.setDefaultTimeout(120000);
   await page.addInitScript(()=>window.showSaveFilePicker=undefined);
@@ -10,7 +10,7 @@ const fs=require('node:fs');
   await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8898/');await page.locator('#startNew').click();
   assert.equal(await page.locator('[data-format-enabled]:checked').count(),2);
   await page.locator('#setupName').fill('Klang im Herbst');await page.locator('[data-format-enabled]').nth(2).check();await page.locator('#addFormat').click();const custom=page.locator('[data-format]').last();await custom.locator('[data-format-key="top"]').fill('150');await custom.locator('[data-format-key="bottom"]').fill('250');
-  await page.screenshot({path:'/private/tmp/mkw-project-setup.png'});await page.locator('#createProject').click();
+  await page.screenshot({path:require('./browser.cjs').artifact('mkw-project-setup.png')});await page.locator('#createProject').click();
   const fixture=process.env.FIXTURE||require('node:path').resolve(__dirname,'../testbilder/260831_A1_Probe_c-noe-plain-4.jpg');
   await page.locator('#files').setInputFiles(fixture);await page.waitForFunction(()=>p.boards.length===4&&!busy);
   const imported=await page.evaluate(()=>({people:p.images[0].people,status:p.images[0].subjectStatus,boards:p.boards.map(b=>({w:b.w,h:b.h,safe:MKWLayout.safeRect(b),logo:b.elements.logo,covered:MKW.imageCovers(b,asset(b))}))}));console.log('Import:',JSON.stringify(imported));
@@ -26,13 +26,13 @@ const fs=require('node:fs');
   const firstSize=+(await page.locator('.export-size').first().getAttribute('data-bytes'));assert(firstSize>1000);
   await page.locator('#exportQuality').fill('30');await page.waitForFunction(size=>Number(document.querySelector('.export-size')?.dataset.bytes)<size,firstSize);
   await page.locator('[data-export-format=webp]').click();await page.waitForFunction(()=>document.querySelector('.export-preview img')?.src&&document.querySelector('.export-size')?.dataset.bytes);assert((await page.locator('.export-name').first().innerText()).endsWith('.webp'));
-  await page.locator('[data-export-format=png]').click();await page.locator('#png8').check();await page.locator('#pngColours').selectOption('16');await page.waitForFunction(()=>document.querySelector('.export-size')?.dataset.bytes);await page.screenshot({path:'/private/tmp/mkw-export-desktop.png'});
+  await page.locator('[data-export-format=png]').click();await page.locator('#png8').check();await page.locator('#pngColours').selectOption('16');await page.waitForFunction(()=>document.querySelector('.export-size')?.dataset.bytes);await page.screenshot({path:require('./browser.cjs').artifact('mkw-export-desktop.png')});
   const png8=await page.evaluate(async()=>{const result=await encodedBoard(clone(p.boards[0]),exportSettings()),a=new Uint8Array(await result.blob.arrayBuffer());let count=0;for(let i=8;i<a.length;){const len=new DataView(a.buffer).getUint32(i),name=String.fromCharCode(...a.slice(i+4,i+8));if(name==='PLTE')count=len/3;i+=len+12}return{type:a[25],depth:a[24],count}});assert.equal(png8.type,3);assert(png8.count<=16);assert(png8.depth<=8);
-  await page.locator('#reviewExport').click();await page.locator('#reviewImage').waitFor({state:'visible'});await page.screenshot({path:'/private/tmp/mkw-review.png'});assert.equal(await page.locator('#reviewDialog canvas,.review-stage .safe-zone').count(),0);await page.locator('#closeReview').click();
-  const download=page.waitForEvent('download');await page.locator('#zip').click();const zip=await download;await zip.saveAs('/private/tmp/mkw-new-export.zip');await page.waitForFunction(()=>!busy);assert.equal(await page.locator('#progressPercent').innerText(),'100 %');assert(zip.suggestedFilename().endsWith('_PNG.zip'));
+  await page.locator('#reviewExport').click();await page.locator('#reviewImage').waitFor({state:'visible'});await page.screenshot({path:require('./browser.cjs').artifact('mkw-review.png')});assert.equal(await page.locator('#reviewDialog canvas,.review-stage .safe-zone').count(),0);await page.locator('#closeReview').click();
+  const download=page.waitForEvent('download');await page.locator('#zip').click();const zip=await download;await zip.saveAs(require('./browser.cjs').artifact('mkw-new-export.zip'));await page.waitForFunction(()=>!busy);assert.equal(await page.locator('#progressPercent').innerText(),'100 %');assert(zip.suggestedFilename().endsWith('_PNG.zip'));
   // Transparency removes only the canvas background and retains artwork.
   const transparency=await page.evaluate(async()=>{const b=clone(p.boards[0]);b.image.scale=.05;b.elements.logo.visible=false;for(const key of MKWLayout.keys)b.elements[key].visible=false;const results=[];for(const transparent of [true,false]){const {blob}=await encodedBoard(b,{format:'png',quality:90,png8:false,colours:256,transparent}),bitmap=await createImageBitmap(blob),c=makeCanvas(b.w,b.h);c.getContext('2d').drawImage(bitmap,0,0);results.push(c.getContext('2d').getImageData(0,0,1,1).data[3]);bitmap.close()}return results});assert.deepEqual(transparency,[0,255]);
-  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/mkw-export-mobile.png'});
+  await page.setViewportSize({width:390,height:844});await page.screenshot({path:require('./browser.cjs').artifact('mkw-export-mobile.png')});
   assert.deepEqual(errors,[]);assert.deepEqual(bad,[]);assert.deepEqual(uploads,[]);console.log('PASS format setup, real local detection, logo defaults, text sizes, restore, codecs, PNG palette, transparency, review and ZIP progress');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

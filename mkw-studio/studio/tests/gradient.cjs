@@ -1,7 +1,7 @@
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const assert=require('node:assert/strict');
 (async()=>{
- const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const browser=await require('./browser.cjs').launch();
  try {
  const page=await browser.newPage({viewport:{width:1512,height:982}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));

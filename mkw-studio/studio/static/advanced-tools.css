@@ -1,50 +1,444 @@
-.settings-advanced{margin-top:24px;border-top:1px solid var(--line);padding-top:0}
-.advanced-toggle{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:13px;line-height:1.5;padding:16px;background:#191f29;border:1px solid #414e64;border-radius:12px;cursor:pointer}
-.advanced-toggle strong{display:block;font-weight:500}.advanced-toggle small{margin-top:6px;font-size:11px;color:#a3b2c9}.advanced-toggle input{width:20px;height:20px;flex:none;accent-color:var(--blue)}
-html[data-theme=light] .advanced-toggle{background:#f6f8fb;border-color:#d9dfe7}html[data-theme=light] .advanced-toggle small{color:#647187}
-#carouselViewport[data-tool=path],#carouselViewport[data-tool=shape]{cursor:crosshair}
-.vector-guide{position:absolute;inset:0;overflow:visible;fill:none;stroke:var(--studio-accent);stroke-width:1.4;pointer-events:none}.vector-guide line{stroke-width:1;opacity:.8}
-.vector-node,.vector-control{position:absolute;min-width:0!important;min-height:0!important;width:11px;height:11px;padding:0!important;transform:translate(-50%,-50%);background:#fff;border:1px solid #315bcc;border-radius:2px;pointer-events:auto;touch-action:none;cursor:move}
-.vector-node.is-selected{background:#315bcc}.vector-control{width:9px;height:9px;border-radius:50%}
-#carouselProperties .vector-check{display:flex;flex-direction:row;align-items:center;gap:9px}#carouselProperties .vector-check input{width:16px;height:16px;margin:0}
-.vector-shapes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.vector-shapes [aria-pressed=true]{background:#303f60;border-color:#8fa8ef;color:#edf2ff}
-.vector-end{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
-#carouselProperties .vector-section>button{width:100%}
-html[data-theme=light] .vector-shapes [aria-pressed=true]{background:#eaf0ff;border-color:#b8c9ef;color:#244fab}
-html[data-theme=light] .vector-node,html[data-theme=light] .vector-control{background:#fff;border-color:#315bcc}html[data-theme=light] .vector-node.is-selected{background:#315bcc}
+.settings-advanced {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 0;
+}
+.advanced-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 16px;
+  background: #191f29;
+  border: 1px solid #414e64;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.advanced-toggle strong {
+  display: block;
+  font-weight: 500;
+}
+.advanced-toggle small {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #a3b2c9;
+}
+.advanced-toggle input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--blue);
+}
+html[data-theme="light"] .advanced-toggle {
+  background: #f6f8fb;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] .advanced-toggle small {
+  color: #647187;
+}
+#carouselViewport[data-tool="path"],
+#carouselViewport[data-tool="shape"] {
+  cursor: crosshair;
+}
+.vector-guide {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  fill: none;
+  stroke: var(--studio-accent);
+  stroke-width: 1.4;
+  pointer-events: none;
+}
+.vector-guide line {
+  stroke-width: 1;
+  opacity: 0.8;
+}
+.vector-node,
+.vector-control {
+  position: absolute;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 11px;
+  height: 11px;
+  padding: 0 !important;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border: 1px solid #315bcc;
+  border-radius: 2px;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: move;
+}
+.vector-node.is-selected {
+  background: #315bcc;
+}
+.vector-control {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+#carouselProperties .vector-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+}
+#carouselProperties .vector-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+.vector-shapes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.vector-shapes [aria-pressed="true"] {
+  background: #303f60;
+  border-color: #8fa8ef;
+  color: #edf2ff;
+}
+.vector-end {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 12px;
+}
+#carouselProperties .vector-section > button {
+  width: 100%;
+}
+html[data-theme="light"] .vector-shapes [aria-pressed="true"] {
+  background: #eaf0ff;
+  border-color: #b8c9ef;
+  color: #244fab;
+}
+html[data-theme="light"] .vector-node,
+html[data-theme="light"] .vector-control {
+  background: #fff;
+  border-color: #315bcc;
+}
+html[data-theme="light"] .vector-node.is-selected {
+  background: #315bcc;
+}
 /* Advanced creation tools float in a single vertical pill, leaving the artwork free. */
-.advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar{left:14px;top:calc(var(--studio-header-height) + (100vh - var(--studio-header-height) - var(--studio-footer-height))/2);bottom:auto;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;width:62px;max-width:62px;height:auto;max-height:calc(100dvh - var(--studio-header-height) - var(--studio-footer-height) - 28px);border-radius:30px;padding:10px 8px;overflow-y:auto;scrollbar-width:none}
-.advanced-mode .carousel-contextbar .carousel-toolrail{display:flex;flex-direction:column;overflow:visible;flex:none;gap:3px;width:100%}
-.advanced-mode .carousel-contextbar .studio-tool-group>button{width:42px;min-width:42px;height:40px;padding:9px;gap:0;flex:none}
-.advanced-mode .carousel-contextbar .studio-tool-group>button>span,.advanced-mode .carousel-contextbar .studio-action>span,.advanced-mode .carousel-contextbar .studio-action#carouselExport>span{display:none!important}
-.advanced-mode .carousel-contextbar .studio-bar-actions{display:flex;flex-direction:column;margin:0;padding-top:8px;border-top:1px solid var(--line);width:100%;gap:4px}
-.advanced-mode .carousel-contextbar .studio-action{width:42px;min-width:42px;height:36px;padding:8px;gap:0}
-.advanced-colours{flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;border-top:1px solid var(--line);padding-top:10px;width:100%}
-.paint-wells{position:relative;width:42px;height:43px}
-.paint-wells label{display:block;position:absolute;width:28px;height:28px;border:1px solid #7f8da6;border-radius:6px;background:#fff;overflow:hidden;cursor:pointer}
-.paint-fill{left:0;top:0;z-index:2}.paint-stroke{right:0;bottom:0}
-.paint-wells input{display:block;position:absolute;inset:-6px;width:40px;height:40px;padding:0;border:0;cursor:pointer;background:none}
-.paint-stroke::after{content:'';position:absolute;inset:7px;background:var(--studio-panel);border-radius:1px;pointer-events:none}
-.paint-fill.no-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 45%,#e03a3e 46%,#e03a3e 53%,transparent 54%);pointer-events:none}
-.paint-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
-#advancedColours .paint-actions button{width:20px;min-width:20px;height:24px;min-height:24px;padding:2px;display:grid;place-items:center;border:0;background:transparent;border-radius:5px;color:inherit}
-#advancedColours .paint-actions button svg{width:17px;height:17px}#toolSwapColours svg{transform:rotate(90deg)}
-#advancedColours .paint-actions button:hover,#advancedColours .paint-actions button[aria-pressed=true]{background:#315bcc22;color:var(--blue)}
-@media(max-height:760px){.advanced-mode .carousel-contextbar .studio-tool-group>button{height:34px}.advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar{gap:5px;padding-top:8px;padding-bottom:8px}}
+.advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
+  left: 14px;
+  top: calc(
+    var(--studio-header-height) +
+      (100vh - var(--studio-header-height) - var(--studio-footer-height)) / 2
+  );
+  bottom: auto;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 62px;
+  max-width: 62px;
+  height: auto;
+  max-height: calc(
+    100dvh - var(--studio-header-height) - var(--studio-footer-height) - 28px
+  );
+  border-radius: 30px;
+  padding: 10px 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.advanced-mode .carousel-contextbar .carousel-toolrail {
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  flex: none;
+  gap: 3px;
+  width: 100%;
+}
+.advanced-mode .carousel-contextbar .studio-tool-group > button {
+  width: 42px;
+  min-width: 42px;
+  height: 40px;
+  padding: 9px;
+  gap: 0;
+  flex: none;
+}
+.advanced-mode .carousel-contextbar .studio-tool-group > button > span,
+.advanced-mode .carousel-contextbar .studio-action > span,
+.advanced-mode .carousel-contextbar .studio-action#carouselExport > span {
+  display: none !important;
+}
+.advanced-mode .carousel-contextbar .studio-bar-actions {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  width: 100%;
+  gap: 4px;
+}
+.advanced-mode .carousel-contextbar .studio-action {
+  width: 42px;
+  min-width: 42px;
+  height: 36px;
+  padding: 8px;
+  gap: 0;
+}
+.advanced-colours {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  width: 100%;
+}
+.paint-wells {
+  position: relative;
+  width: 42px;
+  height: 43px;
+}
+.paint-wells label {
+  display: block;
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #7f8da6;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+  cursor: pointer;
+}
+.paint-fill {
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+.paint-stroke {
+  right: 0;
+  bottom: 0;
+}
+.paint-wells input {
+  display: block;
+  position: absolute;
+  inset: -6px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: none;
+}
+.paint-stroke::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  background: var(--studio-panel);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.paint-fill.no-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 45%,
+    #e03a3e 46%,
+    #e03a3e 53%,
+    transparent 54%
+  );
+  pointer-events: none;
+}
+.paint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+#advancedColours .paint-actions button {
+  width: 20px;
+  min-width: 20px;
+  height: 24px;
+  min-height: 24px;
+  padding: 2px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  border-radius: 5px;
+  color: inherit;
+}
+#advancedColours .paint-actions button svg {
+  width: 17px;
+  height: 17px;
+}
+#toolSwapColours svg {
+  transform: rotate(90deg);
+}
+#advancedColours .paint-actions button:hover,
+#advancedColours .paint-actions button[aria-pressed="true"] {
+  background: #315bcc22;
+  color: var(--blue);
+}
+@media (max-height: 760px) {
+  .advanced-mode .carousel-contextbar .studio-tool-group > button {
+    height: 34px;
+  }
+  .advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
+    gap: 5px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
 /* A short settings navigation replaces the long stack of unrelated controls. */
-#settingsDialog{width:min(560px,calc(100vw - 28px));padding:26px;max-height:88dvh}
-.settings-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:20px 0 8px;padding:4px;background:#191f29;border-radius:12px}
-.settings-tabs button{padding:9px 4px;min-width:0;border-color:transparent;background:transparent;color:#a3b2c9;font-size:12px}
-.settings-tabs button[aria-selected=true]{background:#303f60;color:#edf2ff;border-color:#536a91}
-.settings-tab-panel{padding:4px 0 0}.settings-tab-panel>.settings-fonts,.settings-tab-panel>.settings-preferences{border-top:0;margin-top:0;padding-top:0}
-#settingsDialog .settings-tab-panel h3{margin-top:18px}.settings-tab-panel .theme-options button{min-height:80px;padding:14px;gap:8px}
-.settings-tab-panel .settings-snap-distance{margin-top:24px}.settings-tab-panel .settings-export-format{align-items:flex-start;flex-direction:column;gap:8px}.settings-tab-panel .settings-export-format select{width:100%}.settings-tab-panel p{font-size:12px;line-height:1.6}
-html[data-theme=light] .settings-tabs{background:#f0f3f8}html[data-theme=light] .settings-tabs button{color:#647187}html[data-theme=light] .settings-tabs button[aria-selected=true]{background:#fff;border-color:#d9dfe7;color:#244fab}
-.export-preset-field,#pdfExportSettings label{display:flex;flex-direction:column;gap:8px;font-size:12px;margin:14px 0;color:inherit}
-.export-preset-field select,#pdfExportSettings input,#pdfExportSettings select{width:100%;min-width:0;padding:9px;border:1px solid #46536a;border-radius:8px;background:#171d26;color:#edf2ff;font:inherit}
-#pdfExportSettings{padding:14px;background:#191f29;border:1px solid #414e64;border-radius:12px;margin-top:14px}#pdfExportSettings label{margin:0 0 14px}#pdfExportSettings p,#pdfExportSettings small{font-size:11px;line-height:1.6}#pdfExportSettings input[type=color]{height:36px;padding:4px}
-html[data-theme=light] #pdfExportSettings{background:#fff;border-color:#d9dfe7}html[data-theme=light] :is(.export-preset-field select,#pdfExportSettings input,#pdfExportSettings select){background:#fff;color:#1d2838;border-color:#cdd5e1}
-#pdfExportSettings a{color:var(--blue)}
-#carouselViewport[data-tool=builder],#carouselViewport[data-tool=curve]{cursor:crosshair}.vector-node.is-curve{border-radius:50%}
-.vector-guide .vector-extension{stroke:var(--studio-snap-colour);stroke-width:1.5;stroke-dasharray:6 4}
-.constructor-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.constructor-preview{position:absolute;inset:0;overflow:visible;pointer-events:none;fill:#315bcc44;stroke:#315bcc}
+#settingsDialog {
+  width: min(560px, calc(100vw - 28px));
+  padding: 26px;
+  max-height: 88dvh;
+}
+.settings-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin: 20px 0 8px;
+  padding: 4px;
+  background: #191f29;
+  border-radius: 12px;
+}
+.settings-tabs button {
+  padding: 9px 4px;
+  min-width: 0;
+  border-color: transparent;
+  background: transparent;
+  color: #a3b2c9;
+  font-size: 12px;
+}
+.settings-tabs button[aria-selected="true"] {
+  background: #303f60;
+  color: #edf2ff;
+  border-color: #536a91;
+}
+.settings-tab-panel {
+  padding: 4px 0 0;
+}
+.settings-tab-panel > .settings-fonts,
+.settings-tab-panel > .settings-preferences {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+#settingsDialog .settings-tab-panel h3 {
+  margin-top: 18px;
+}
+.settings-tab-panel .theme-options button {
+  min-height: 80px;
+  padding: 14px;
+  gap: 8px;
+}
+.settings-tab-panel .settings-snap-distance {
+  margin-top: 24px;
+}
+.settings-tab-panel .settings-export-format {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-tab-panel .settings-export-format select {
+  width: 100%;
+}
+.settings-tab-panel p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+html[data-theme="light"] .settings-tabs {
+  background: #f0f3f8;
+}
+html[data-theme="light"] .settings-tabs button {
+  color: #647187;
+}
+html[data-theme="light"] .settings-tabs button[aria-selected="true"] {
+  background: #fff;
+  border-color: #d9dfe7;
+  color: #244fab;
+}
+.export-preset-field,
+#pdfExportSettings label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  margin: 14px 0;
+  color: inherit;
+}
+.export-preset-field select,
+#pdfExportSettings input,
+#pdfExportSettings select {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #46536a;
+  border-radius: 8px;
+  background: #171d26;
+  color: #edf2ff;
+  font: inherit;
+}
+#pdfExportSettings {
+  padding: 14px;
+  background: #191f29;
+  border: 1px solid #414e64;
+  border-radius: 12px;
+  margin-top: 14px;
+}
+#pdfExportSettings label {
+  margin: 0 0 14px;
+}
+#pdfExportSettings p,
+#pdfExportSettings small {
+  font-size: 11px;
+  line-height: 1.6;
+}
+#pdfExportSettings input[type="color"] {
+  height: 36px;
+  padding: 4px;
+}
+html[data-theme="light"] #pdfExportSettings {
+  background: #fff;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"]
+  :is(
+    .export-preset-field select,
+    #pdfExportSettings input,
+    #pdfExportSettings select
+  ) {
+  background: #fff;
+  color: #1d2838;
+  border-color: #cdd5e1;
+}
+#pdfExportSettings a {
+  color: var(--blue);
+}
+#carouselViewport[data-tool="builder"],
+#carouselViewport[data-tool="curve"] {
+  cursor: crosshair;
+}
+.vector-node.is-curve {
+  border-radius: 50%;
+}
+.vector-guide .vector-extension {
+  stroke: var(--studio-snap-colour);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.constructor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.constructor-preview {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  fill: #315bcc44;
+  stroke: #315bcc;
+}

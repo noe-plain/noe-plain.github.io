@@ -1,5 +1,5 @@
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),assert=require('node:assert/strict');
-(async()=>{const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});try{
+(async()=>{const browser=await require('./browser.cjs').launch();try{
  const page=await browser.newPage();page.setDefaultTimeout(60000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  // An unavailable detector must never block importing or saving a project.
  await page.route('**/person.tflite',r=>r.abort());await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8898/');await page.locator('#startNew').click();

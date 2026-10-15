@@ -1,28 +1,41 @@
-'use strict';
+"use strict";
 icons();
-busy=true;
-const startDialog=$('#startDialog');
+busy = true;
+const startDialog = $("#startDialog");
 startDialog.showModal();
-startDialog.addEventListener('cancel',ev=>ev.preventDefault());
-(async()=>{
- let saved=null,restoreError='';
- try{
-  await MKWBrowser.init();
-  try{saved=await MKWBrowser.saved();if(saved)validate(saved)}catch(e){saved=null;restoreError=e.message}
-  for(const [role,name] of [['Replica LL','ReplicaLL-Bold.otf'],['Harriet Regular','Harrietv2Text-Regular.otf'],['Harriet','HarrietText-Bold.otf'],['Harriet Italic','HarrietText-BoldItalic.otf']]){
-   const response=await fetch('static/fonts/'+name);if(!response.ok)throw Error('Schrift fehlt: '+name);
-   p.fonts.push({role,name,data:await dataURL(await response.blob())});
+startDialog.addEventListener("cancel", (event) => event.preventDefault());
+(async () => {
+  let saved = null,
+    restoreError = "";
+  try {
+    await MKWBrowser.init();
+    try {
+      saved = await MKWProjectStore.last();
+    } catch (error) {
+      restoreError =
+        "Letzter Stand konnte nicht geladen werden: " + error.message;
+    }
+    await loadFonts();
+    render();
+    $("#startStatus").textContent = saved
+      ? `${saved.title} · ${saved.project.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
+      : restoreError || "Noch kein gespeichertes Projekt vorhanden.";
+    $("#startContinue").disabled = !saved;
+  } catch (error) {
+    $("#startStatus").textContent =
+      "Start nur eingeschränkt möglich: " + error.message;
   }
-  await loadFonts();render();
-  $('#startStatus').textContent=restoreError?'Letzter Stand nicht verfügbar: '+restoreError:saved?`${saved.meta.title||'Unbenanntes Projekt'} · ${saved.images.length} Bilder`:'Noch kein gespeichertes Projekt vorhanden.';
-  $('#startContinue').disabled=!saved;
- }catch(e){$('#startStatus').textContent='Start nur eingeschränkt möglich: '+e.message}
- $('#startNew').disabled=$('#startOpen').disabled=false;
- $('#startOpen').onclick=()=>$('#projectFile').click();
- $('#startNew').onclick=openProjectSetup;
- $('#startContinue').onclick=async()=>{
-  $('#startNew').disabled=$('#startContinue').disabled=$('#startOpen').disabled=true;
-  try{await restore(clone(saved));busy=false;startDialog.close();status('Dein letzter Stand ist wieder da.')}
-  catch(e){$('#startStatus').textContent='Projekt konnte nicht geöffnet werden: '+e.message;$('#startNew').disabled=$('#startContinue').disabled=$('#startOpen').disabled=false}
- };
+  $("#startNew").disabled = $("#startOpen").disabled = false;
+  $("#startOpen").onclick = MKWProjects.chooseOpen;
+  $("#startNew").onclick = openProjectSetup;
+  $("#startContinue").onclick = async () => {
+    $("#startContinue").disabled = true;
+    try {
+      await MKWProjects.open(await MKWProjectStore.open(saved.id));
+    } catch (error) {
+      $("#startStatus").textContent =
+        "Projekt konnte nicht geöffnet werden: " + error.message;
+      $("#startContinue").disabled = false;
+    }
+  };
 })();

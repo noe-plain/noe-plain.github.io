@@ -1,1 +1,1 @@
-export {writePsd, readPsd} from 'ag-psd';
+export { writePsd, readPsd } from "ag-psd";

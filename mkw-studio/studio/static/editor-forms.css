@@ -1,56 +1,316 @@
 /* Compact format choices reveal their safe zone only when included. */
-#formatChoices .format-choice{opacity:1;transition:border-color .2s,background-color .2s}
-#formatChoices .format-row{grid-template-columns:minmax(0,1fr) minmax(0,0fr);column-gap:0;transition:grid-template-columns .28s ease,column-gap .28s ease}
-#formatChoices .is-enabled .format-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:30px}
-.format-reveal{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;min-width:0;transition:grid-template-rows .28s ease,opacity .2s ease,visibility .28s}
-.format-reveal>div{min-height:0;overflow:hidden}
-.is-enabled .format-reveal{grid-template-rows:1fr;opacity:1;visibility:visible}
-#formatChoices .format-dimensions h4{margin:0 0 16px}
-#formatChoices .format-choice legend label{display:flex;align-items:center;cursor:pointer}
-#formatChoices .format-choice legend input{width:16px;height:16px;cursor:pointer}
-#formatChoices .format-choice:not(.is-enabled){padding-top:12px;padding-bottom:14px}
-#formatChoices .format-choice:not(.is-enabled) .format-fields{grid-template-columns:1fr 1fr}
+#formatChoices .format-choice {
+  opacity: 1;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+#formatChoices .format-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0fr);
+  column-gap: 0;
+  transition:
+    grid-template-columns 0.28s ease,
+    column-gap 0.28s ease;
+}
+#formatChoices .is-enabled .format-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 30px;
+}
+.format-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  min-width: 0;
+  transition:
+    grid-template-rows 0.28s ease,
+    opacity 0.2s ease,
+    visibility 0.28s;
+}
+.format-reveal > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.is-enabled .format-reveal {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+#formatChoices .format-dimensions h4 {
+  margin: 0 0 16px;
+}
+#formatChoices .format-choice legend label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+#formatChoices .format-choice legend input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+#formatChoices .format-choice:not(.is-enabled) {
+  padding-top: 12px;
+  padding-bottom: 14px;
+}
+#formatChoices .format-choice:not(.is-enabled) .format-fields {
+  grid-template-columns: 1fr 1fr;
+}
 /* Typography stays readable in a narrow inspector, with one explicit editing scope. */
-#carouselProperties{--type-surface:#191f29;--type-border:#414e64;--type-muted:#a3b2c9;--type-text:#e3ebfa;--type-selected:#303f60;--type-accent:#b5c4ff}
-html[data-theme=light] #carouselProperties{--type-surface:#f6f8fb;--type-border:#d9dfe7;--type-muted:#647187;--type-text:#1d2838;--type-selected:#eaf0ff;--type-accent:#315bcc}
-#carouselProperties.is-text-inspector .carousel-property-section{padding:16px 0}
-#carouselProperties.is-text-inspector>.carousel-section-heading{padding-bottom:0}
-#carouselProperties.is-text-inspector h4{margin:0 0 12px;font-size:13px;color:var(--type-text)}
-#carouselProperties .type-section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-#carouselProperties .type-section-heading h4{margin:0}
-#carouselProperties #carouselTextEdit{display:flex;align-items:center;gap:5px;width:auto;min-height:30px;margin:0;padding:5px 7px;background:var(--type-surface);border-color:var(--type-border);color:var(--type-accent);font-size:11px;white-space:nowrap}
-#carouselTextEdit svg{width:16px;height:16px}
-#carouselProperties .type-content-label{font-size:0;gap:0;margin:0}
-#carouselProperties .type-content textarea{font-family:'MKW UI',sans-serif;font-size:14px;line-height:1.45;min-height:100px;resize:vertical;margin:0}
-#carouselProperties p.type-hint{margin:8px 0 0;font-family:'MKW UI',sans-serif;font-size:10px;line-height:1.5;color:var(--type-muted)}
-#carouselProperties .type-font>label{margin:0 0 12px}
-#carouselProperties .type-basics{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:12px}
-#carouselProperties .type-basics label{margin:0}
-#carouselProperties .type-unit{display:flex;align-items:center;position:relative;min-width:0}
-#carouselProperties .type-unit input{width:100%;padding-right:30px;margin:0;font-variant-numeric:tabular-nums}
-#carouselProperties .type-unit>span{position:absolute;right:10px;pointer-events:none;color:var(--type-muted);font-size:11px}
-#carouselProperties .type-basics input[type=color]{width:100%;height:38px}
-#carouselProperties .type-paragraphs{display:flex;flex-direction:column;gap:4px;max-height:124px;overflow:auto;scrollbar-width:thin;padding:1px}
-#carouselProperties .type-paragraphs>button{display:flex;align-items:center;gap:8px;flex:none;min-width:0;width:100%;min-height:34px;padding:7px 8px;background:var(--type-surface);border:1px solid transparent;color:var(--type-muted);text-align:left;font-size:11px}
-#carouselProperties .type-paragraphs>button:hover{border-color:var(--type-border)}
-#carouselProperties .type-paragraphs>button[aria-pressed=true]{border-color:var(--type-accent);background:var(--type-selected);color:var(--type-accent)}
-.type-paragraph-number{font-variant-numeric:tabular-nums;width:12px;flex:none;opacity:.75}
-.type-paragraph-preview{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-.type-paragraph-size{font-size:10px;white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
-#carouselProperties p.type-context{font-family:'MKW UI',sans-serif;font-size:10px;line-height:1.5;color:var(--type-accent);margin:8px 0 12px}
-#carouselProperties .type-control-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-#carouselProperties .type-control-heading label{margin:0;font-size:12px;flex:1}
-#carouselProperties .type-control-heading button{min-height:26px;font-size:10px;padding:3px 6px;background:transparent;border:1px solid var(--type-border);color:var(--type-muted);border-radius:6px}
-#carouselProperties .type-control-heading button[aria-pressed=true]{color:var(--type-accent);background:var(--type-selected);border-color:var(--type-border)}
-#carouselProperties .type-stepper{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;gap:6px;align-items:center}
-#carouselProperties .type-stepper button{display:grid;place-items:center;min-height:36px;padding:7px;background:var(--type-surface);border:1px solid var(--type-border);color:var(--type-muted)}
-#carouselProperties .type-stepper button:hover{color:var(--type-accent);border-color:var(--type-accent)}
-#carouselProperties .type-stepper svg{width:17px;height:17px}
-#carouselProperties .type-stepper input{text-align:center;appearance:textfield;-moz-appearance:textfield}
-#carouselProperties .type-stepper input::-webkit-inner-spin-button,#carouselProperties .type-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-#carouselProperties .type-leading-heading{margin-top:14px}
-#carouselProperties .type-line-picker{margin:14px 0 0}
-#carouselProperties .carousel-text-anchor button{display:flex;align-items:center;justify-content:center;gap:7px}
-.carousel-text-anchor svg{width:19px;height:19px}
-@media(max-width:760px){#formatChoices .is-enabled .format-row{column-gap:12px}#formatChoices .is-enabled .format-fields{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){#formatChoices .format-choice,#formatChoices .format-row,.format-reveal{transition:none}}
+#carouselProperties {
+  --type-surface: #191f29;
+  --type-border: #414e64;
+  --type-muted: #a3b2c9;
+  --type-text: #e3ebfa;
+  --type-selected: #303f60;
+  --type-accent: #b5c4ff;
+}
+html[data-theme="light"] #carouselProperties {
+  --type-surface: #f6f8fb;
+  --type-border: #d9dfe7;
+  --type-muted: #647187;
+  --type-text: #1d2838;
+  --type-selected: #eaf0ff;
+  --type-accent: #315bcc;
+}
+#carouselProperties.is-text-inspector .carousel-property-section {
+  padding: 16px 0;
+}
+#carouselProperties.is-text-inspector > .carousel-section-heading {
+  padding-bottom: 0;
+}
+#carouselProperties.is-text-inspector h4 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--type-text);
+}
+#carouselProperties .type-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+#carouselProperties .type-section-heading h4 {
+  margin: 0;
+}
+#carouselProperties #carouselTextEdit {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  min-height: 30px;
+  margin: 0;
+  padding: 5px 7px;
+  background: var(--type-surface);
+  border-color: var(--type-border);
+  color: var(--type-accent);
+  font-size: 11px;
+  white-space: nowrap;
+}
+#carouselTextEdit svg {
+  width: 16px;
+  height: 16px;
+}
+#carouselProperties .type-content-label {
+  font-size: 0;
+  gap: 0;
+  margin: 0;
+}
+#carouselProperties .type-content textarea {
+  font-family: "MKW UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  min-height: 100px;
+  resize: vertical;
+  margin: 0;
+}
+#carouselProperties p.type-hint {
+  margin: 8px 0 0;
+  font-family: "MKW UI", sans-serif;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--type-muted);
+}
+#carouselProperties .type-font > label {
+  margin: 0 0 12px;
+}
+#carouselProperties .type-basics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px;
+  gap: 12px;
+}
+#carouselProperties .type-basics label {
+  margin: 0;
+}
+#carouselProperties .type-unit {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+}
+#carouselProperties .type-unit input {
+  width: 100%;
+  padding-right: 30px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+#carouselProperties .type-unit > span {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: var(--type-muted);
+  font-size: 11px;
+}
+#carouselProperties .type-basics input[type="color"] {
+  width: 100%;
+  height: 38px;
+}
+#carouselProperties .type-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 124px;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding: 1px;
+}
+#carouselProperties .type-paragraphs > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-width: 0;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 8px;
+  background: var(--type-surface);
+  border: 1px solid transparent;
+  color: var(--type-muted);
+  text-align: left;
+  font-size: 11px;
+}
+#carouselProperties .type-paragraphs > button:hover {
+  border-color: var(--type-border);
+}
+#carouselProperties .type-paragraphs > button[aria-pressed="true"] {
+  border-color: var(--type-accent);
+  background: var(--type-selected);
+  color: var(--type-accent);
+}
+.type-paragraph-number {
+  font-variant-numeric: tabular-nums;
+  width: 12px;
+  flex: none;
+  opacity: 0.75;
+}
+.type-paragraph-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.type-paragraph-size {
+  font-size: 10px;
+  white-space: nowrap;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+#carouselProperties p.type-context {
+  font-family: "MKW UI", sans-serif;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--type-accent);
+  margin: 8px 0 12px;
+}
+#carouselProperties .type-control-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+#carouselProperties .type-control-heading label {
+  margin: 0;
+  font-size: 12px;
+  flex: 1;
+}
+#carouselProperties .type-control-heading button {
+  min-height: 26px;
+  font-size: 10px;
+  padding: 3px 6px;
+  background: transparent;
+  border: 1px solid var(--type-border);
+  color: var(--type-muted);
+  border-radius: 6px;
+}
+#carouselProperties .type-control-heading button[aria-pressed="true"] {
+  color: var(--type-accent);
+  background: var(--type-selected);
+  border-color: var(--type-border);
+}
+#carouselProperties .type-stepper {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  gap: 6px;
+  align-items: center;
+}
+#carouselProperties .type-stepper button {
+  display: grid;
+  place-items: center;
+  min-height: 36px;
+  padding: 7px;
+  background: var(--type-surface);
+  border: 1px solid var(--type-border);
+  color: var(--type-muted);
+}
+#carouselProperties .type-stepper button:hover {
+  color: var(--type-accent);
+  border-color: var(--type-accent);
+}
+#carouselProperties .type-stepper svg {
+  width: 17px;
+  height: 17px;
+}
+#carouselProperties .type-stepper input {
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+#carouselProperties .type-stepper input::-webkit-inner-spin-button,
+#carouselProperties .type-stepper input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#carouselProperties .type-leading-heading {
+  margin-top: 14px;
+}
+#carouselProperties .type-line-picker {
+  margin: 14px 0 0;
+}
+#carouselProperties .carousel-text-anchor button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.carousel-text-anchor svg {
+  width: 19px;
+  height: 19px;
+}
+@media (max-width: 760px) {
+  #formatChoices .is-enabled .format-row {
+    column-gap: 12px;
+  }
+  #formatChoices .is-enabled .format-fields {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #formatChoices .format-choice,
+  #formatChoices .format-row,
+  .format-reveal {
+    transition: none;
+  }
+}

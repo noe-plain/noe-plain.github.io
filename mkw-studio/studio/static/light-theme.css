@@ -1,94 +1,510 @@
 /* Semantic light palette: neutral workspace, white surfaces, clear selection and warnings. */
-html[data-theme=light]{--blue:#315bcc;--line:#d9dfe7;--cream:#fff6e5;color:#1d2838;background:#eef0f3}
-html[data-theme=light] body{color:#1d2838;background:#eef0f3}
-html[data-theme=light] #workspace,html[data-theme=light] #carouselViewport{background-color:#eef0f3;background-image:radial-gradient(#cdd3dd .7px,transparent .7px);background-size:18px 18px}
-html[data-theme=light] :is(header,footer,.tool-sidebar,#carouselSidebar,.studio-commandbar,dialog,.studio-notices,.group-heading){background:#fff;color:#1d2838;border-color:#d9dfe7;box-shadow:none}
-html[data-theme=light] :is(.step-panel,#carouselProperties,.workspace-info){background:transparent;color:#1d2838}
-html[data-theme=light] :is(.tool-sidebar-heading,.carousel-sidebar-heading,.carousel-section-heading,.carousel-layers-panel,.carousel-property-section,.settings-fonts,.settings-preferences,.settings-section-heading,.custom-font-row,.save-project-naming,.export-fields,.image-settings,.family-picker){border-color:#d9dfe7}
-html[data-theme=light] #settingsDialog>.dialog-heading{background:#fff;border-color:#d9dfe7}
-html[data-theme=light] :is(h1,h2,h3,h4,strong,#carouselProperties h3,.tool-sidebar-heading h2,.studio-notices-heading h2){color:#1d2838}
-html[data-theme=light] :is(p,small,.field,.panel-caption,.image-field-label,.board-label,.board-label small,.settings-grid label,.settings-snap-distance,.settings-export-format,.frame-point-heading,.footer-status,#status,#carouselHint,#carouselCoordinates,.carousel-property-section h4,.carousel-section-heading>span,.carousel-fields label,#carouselProperties label,#carouselSidebar p,dialog p,dialog small){color:#647187}
-html[data-theme=light] button{color:#34445b;background:#f8f9fb;border-color:#d9dfe7}
-html[data-theme=light] button:hover:not(:disabled){background:#edf1f7;color:#244fab;border-color:#afbed9}
-html[data-theme=light] :is(input:not([type=checkbox]):not([type=range]),select,textarea),html[data-theme=light] #carouselProperties :is(input:not([type=checkbox]):not([type=range]),select,textarea),html[data-theme=light] .group-heading .image-copyright input,html[data-theme=light] .save-project-naming .project-fields input{background:#fff;color:#1d2838;border-color:#cdd5e1;accent-color:#315bcc}
-html[data-theme=light] input::placeholder,html[data-theme=light] .group-heading .image-copyright input::placeholder{color:#7b8798}
-html[data-theme=light] input[type=range],html[data-theme=light] input[type=checkbox]{accent-color:#315bcc}
-html[data-theme=light] :is(.primary,#carouselSidebar .carousel-place-image){background:#315bcc;border-color:#315bcc;color:#fff;box-shadow:none}
-html[data-theme=light] :is(.primary,#carouselSidebar .carousel-place-image):hover{background:#244fab;border-color:#244fab;color:#fff}
-html[data-theme=light] :is(.icon-button,.footer-view-controls button,.board-label button,.carousel-layer button){background:transparent;border-color:transparent;color:#647187}
-html[data-theme=light] :is(.studio-commandbar,.carousel-contextbar.studio-commandbar){background:#fff;border-color:#d9dfe7;box-shadow:0 6px 24px #26354d14}
-html[data-theme=light] .studio-commandbar .studio-tool-group>button,html[data-theme=light] .studio-commandbar .studio-action{background:transparent;border-color:transparent;color:#647187}
-html[data-theme=light] .studio-commandbar .studio-tool-group>button:hover,html[data-theme=light] .studio-commandbar .studio-action:hover{background:#f0f3f8;color:#244fab}
-html[data-theme=light] .studio-commandbar .studio-tool-group>button:is(.active,[aria-pressed=true]),html[data-theme=light] :is(button[aria-pressed=true],.carousel-layer.active,.theme-options button[aria-pressed=true],.text-tools .active){background:#eaf0ff;border-color:#b8c9ef;color:#244fab}
-html[data-theme=light] :is(.studio-mode-label,.studio-bar-actions,.footer-view-controls,.divider){border-color:#d9dfe7}
-html[data-theme=light] .divider{background:#d9dfe7}
-html[data-theme=light] .studio-commandbar .studio-action#carouselExport{background:#eaf0ff;color:#244fab}
-html[data-theme=light] footer{background:#fff;border-top-color:#d9dfe7}
-html[data-theme=light] footer .view-control{background:#f8f9fb;border-color:#d9dfe7}
-html[data-theme=light] footer .view-control button{background:transparent;color:#34445b}
-html[data-theme=light] :is(.image-info-card.group-heading,.group-heading .text-type-options){background:#fff;border-color:#d9dfe7;box-shadow:0 3px 15px #26354d08}
-html[data-theme=light] .image-info-card .image-card-summary{background:transparent}
-html[data-theme=light] .image-info-card .image-card-summary:hover{background:#f6f8fb}
-html[data-theme=light] .image-info-card.group-heading .image-caption strong{color:#1d2838}
-html[data-theme=light] .image-info-card.group-heading .image-metadata,html[data-theme=light] .image-card-chevron{color:#647187}
-html[data-theme=light] .image-info-card .image-number{background:#17243bd9;color:#fff;border-color:#ffffff66}
-html[data-theme=light] .image-info-card .group-actions>.image-action{background:#eaf0ff;border-color:#c2d0f0;color:#244fab}
-html[data-theme=light] .image-info-card .group-actions>.image-action:hover{background:#dce7ff;border-color:#a4b9e7}
-html[data-theme=light] .group-heading .text-type-picker summary{background:#f8f9fb;border-color:#d9dfe7;color:#34445b}
-html[data-theme=light] .group-heading .text-type-options label{color:#34445b}
-html[data-theme=light] .group-heading .text-type-options label:hover{background:#f0f3f8}
-html[data-theme=light] .group-heading .text-type-options label:has(input:checked){background:#eaf0ff;color:#244fab}
-html[data-theme=light] .group-heading .text-type-options small{color:#647187;border-color:#d9dfe7}
-html[data-theme=light] :is(.image-field-label,.picker-heading){color:#647187}
-html[data-theme=light] :is(.format-choice,.carousel-format-choice,.setup-project-info,.export-card,.export-settings,.carousel-document-summary),html[data-theme=light] #carouselProperties .carousel-color-stop{background:#f8f9fb;border-color:#d9dfe7}
-html[data-theme=light] :is(.format-choice:has(input:checked),.export-card:has(input:checked)){background:#f0f4ff;border-color:#a6bce9}
-html[data-theme=light] :is(.export-preview,.export-card .export-preview){background:#eef0f3}
-html[data-theme=light] :is(#carouselProperties output,.frame-point-heading strong,.carousel-layer-name){color:#34445b}
-html[data-theme=light] :is(.start-brand,.empty-symbol){color:#315bcc}
-html[data-theme=light] .empty-symbol{background:#eaf0ff}
-html[data-theme=light] dialog::backdrop{background:#27354e55}
-html[data-theme=light] #startDialog::backdrop{background:#eef0f3f5}
+html[data-theme="light"] {
+  --blue: #315bcc;
+  --line: #d9dfe7;
+  --cream: #fff6e5;
+  color: #1d2838;
+  background: #eef0f3;
+}
+html[data-theme="light"] body {
+  color: #1d2838;
+  background: #eef0f3;
+}
+html[data-theme="light"] #workspace,
+html[data-theme="light"] #carouselViewport {
+  background-color: #eef0f3;
+  background-image: radial-gradient(#cdd3dd 0.7px, transparent 0.7px);
+  background-size: 18px 18px;
+}
+html[data-theme="light"]
+  :is(
+    header,
+    footer,
+    .tool-sidebar,
+    #carouselSidebar,
+    .studio-commandbar,
+    dialog,
+    .studio-notices,
+    .group-heading
+  ) {
+  background: #fff;
+  color: #1d2838;
+  border-color: #d9dfe7;
+  box-shadow: none;
+}
+html[data-theme="light"]
+  :is(.step-panel, #carouselProperties, .workspace-info) {
+  background: transparent;
+  color: #1d2838;
+}
+html[data-theme="light"]
+  :is(
+    .tool-sidebar-heading,
+    .carousel-sidebar-heading,
+    .carousel-section-heading,
+    .carousel-layers-panel,
+    .carousel-property-section,
+    .settings-fonts,
+    .settings-preferences,
+    .settings-section-heading,
+    .custom-font-row,
+    .save-project-naming,
+    .export-fields,
+    .image-settings,
+    .family-picker
+  ) {
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] #settingsDialog > .dialog-heading {
+  background: #fff;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"]
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    strong,
+    #carouselProperties h3,
+    .tool-sidebar-heading h2,
+    .studio-notices-heading h2
+  ) {
+  color: #1d2838;
+}
+html[data-theme="light"]
+  :is(
+    p,
+    small,
+    .field,
+    .panel-caption,
+    .image-field-label,
+    .board-label,
+    .board-label small,
+    .settings-grid label,
+    .settings-snap-distance,
+    .settings-export-format,
+    .frame-point-heading,
+    .footer-status,
+    #status,
+    #carouselHint,
+    #carouselCoordinates,
+    .carousel-property-section h4,
+    .carousel-section-heading > span,
+    .carousel-fields label,
+    #carouselProperties label,
+    #carouselSidebar p,
+    dialog p,
+    dialog small
+  ) {
+  color: #647187;
+}
+html[data-theme="light"] button {
+  color: #34445b;
+  background: #f8f9fb;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] button:hover:not(:disabled) {
+  background: #edf1f7;
+  color: #244fab;
+  border-color: #afbed9;
+}
+html[data-theme="light"]
+  :is(input:not([type="checkbox"]):not([type="range"]), select, textarea),
+html[data-theme="light"]
+  #carouselProperties
+  :is(input:not([type="checkbox"]):not([type="range"]), select, textarea),
+html[data-theme="light"] .group-heading .image-copyright input,
+html[data-theme="light"] .save-project-naming .project-fields input {
+  background: #fff;
+  color: #1d2838;
+  border-color: #cdd5e1;
+  accent-color: #315bcc;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] .group-heading .image-copyright input::placeholder {
+  color: #7b8798;
+}
+html[data-theme="light"] input[type="range"],
+html[data-theme="light"] input[type="checkbox"] {
+  accent-color: #315bcc;
+}
+html[data-theme="light"] :is(.primary, #carouselSidebar .carousel-place-image) {
+  background: #315bcc;
+  border-color: #315bcc;
+  color: #fff;
+  box-shadow: none;
+}
+html[data-theme="light"]
+  :is(.primary, #carouselSidebar .carousel-place-image):hover {
+  background: #244fab;
+  border-color: #244fab;
+  color: #fff;
+}
+html[data-theme="light"]
+  :is(
+    .icon-button,
+    .footer-view-controls button,
+    .board-label button,
+    .carousel-layer button
+  ) {
+  background: transparent;
+  border-color: transparent;
+  color: #647187;
+}
+html[data-theme="light"]
+  :is(.studio-commandbar, .carousel-contextbar.studio-commandbar) {
+  background: #fff;
+  border-color: #d9dfe7;
+  box-shadow: 0 6px 24px #26354d14;
+}
+html[data-theme="light"] .studio-commandbar .studio-tool-group > button,
+html[data-theme="light"] .studio-commandbar .studio-action {
+  background: transparent;
+  border-color: transparent;
+  color: #647187;
+}
+html[data-theme="light"] .studio-commandbar .studio-tool-group > button:hover,
+html[data-theme="light"] .studio-commandbar .studio-action:hover {
+  background: #f0f3f8;
+  color: #244fab;
+}
+html[data-theme="light"]
+  .studio-commandbar
+  .studio-tool-group
+  > button:is(.active, [aria-pressed="true"]),
+html[data-theme="light"]
+  :is(
+    button[aria-pressed="true"],
+    .carousel-layer.active,
+    .theme-options button[aria-pressed="true"],
+    .text-tools .active
+  ) {
+  background: #eaf0ff;
+  border-color: #b8c9ef;
+  color: #244fab;
+}
+html[data-theme="light"]
+  :is(
+    .studio-mode-label,
+    .studio-bar-actions,
+    .footer-view-controls,
+    .divider
+  ) {
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] .divider {
+  background: #d9dfe7;
+}
+html[data-theme="light"] .studio-commandbar .studio-action#carouselExport {
+  background: #eaf0ff;
+  color: #244fab;
+}
+html[data-theme="light"] footer {
+  background: #fff;
+  border-top-color: #d9dfe7;
+}
+html[data-theme="light"] footer .view-control {
+  background: #f8f9fb;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] footer .view-control button {
+  background: transparent;
+  color: #34445b;
+}
+html[data-theme="light"]
+  :is(.image-info-card.group-heading, .group-heading .text-type-options) {
+  background: #fff;
+  border-color: #d9dfe7;
+  box-shadow: 0 3px 15px #26354d08;
+}
+html[data-theme="light"] .image-info-card .image-card-summary {
+  background: transparent;
+}
+html[data-theme="light"] .image-info-card .image-card-summary:hover {
+  background: #f6f8fb;
+}
+html[data-theme="light"] .image-info-card.group-heading .image-caption strong {
+  color: #1d2838;
+}
+html[data-theme="light"] .image-info-card.group-heading .image-metadata,
+html[data-theme="light"] .image-card-chevron {
+  color: #647187;
+}
+html[data-theme="light"] .image-info-card .image-number {
+  background: #17243bd9;
+  color: #fff;
+  border-color: #ffffff66;
+}
+html[data-theme="light"] .image-info-card .group-actions > .image-action {
+  background: #eaf0ff;
+  border-color: #c2d0f0;
+  color: #244fab;
+}
+html[data-theme="light"] .image-info-card .group-actions > .image-action:hover {
+  background: #dce7ff;
+  border-color: #a4b9e7;
+}
+html[data-theme="light"] .group-heading .text-type-picker summary {
+  background: #f8f9fb;
+  border-color: #d9dfe7;
+  color: #34445b;
+}
+html[data-theme="light"] .group-heading .text-type-options label {
+  color: #34445b;
+}
+html[data-theme="light"] .group-heading .text-type-options label:hover {
+  background: #f0f3f8;
+}
+html[data-theme="light"]
+  .group-heading
+  .text-type-options
+  label:has(input:checked) {
+  background: #eaf0ff;
+  color: #244fab;
+}
+html[data-theme="light"] .group-heading .text-type-options small {
+  color: #647187;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] :is(.image-field-label, .picker-heading) {
+  color: #647187;
+}
+html[data-theme="light"]
+  :is(
+    .format-choice,
+    .carousel-format-choice,
+    .setup-project-info,
+    .export-card,
+    .export-settings,
+    .carousel-document-summary
+  ),
+html[data-theme="light"] #carouselProperties .carousel-color-stop {
+  background: #f8f9fb;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"]
+  :is(.format-choice:has(input:checked), .export-card:has(input:checked)) {
+  background: #f0f4ff;
+  border-color: #a6bce9;
+}
+html[data-theme="light"] :is(.export-preview, .export-card .export-preview) {
+  background: #eef0f3;
+}
+html[data-theme="light"]
+  :is(
+    #carouselProperties output,
+    .frame-point-heading strong,
+    .carousel-layer-name
+  ) {
+  color: #34445b;
+}
+html[data-theme="light"] :is(.start-brand, .empty-symbol) {
+  color: #315bcc;
+}
+html[data-theme="light"] .empty-symbol {
+  background: #eaf0ff;
+}
+html[data-theme="light"] dialog::backdrop {
+  background: #27354e55;
+}
+html[data-theme="light"] #startDialog::backdrop {
+  background: #eef0f3f5;
+}
 /* Warnings use saturated strokes/icons and soft fills, with dark readable copy. */
-html[data-theme=light] :is(.studio-notice-button,#postNotice,#carouselNotice){color:#8f4b00;background:#fff3cc;border-color:#e7a23c}
-html[data-theme=light] :is(.studio-notice-button,#postNotice,#carouselNotice):hover{color:#783c00;background:#ffe5a2;border-color:#d88b12}
-html[data-theme=light] :is(.studio-notice-button,#postNotice,#carouselNotice) svg{color:#cb7900}
-html[data-theme=light] .studio-inline-warning,html[data-theme=light] #carouselProperties .carousel-warning:not(:empty),html[data-theme=light] .studio-warning-item{color:#834900;background:#fff6e5;border-color:#e8b665}
-html[data-theme=light] :is(.studio-inline-warning,.studio-warning-item):hover{color:#713b00;background:#ffedc6;border-color:#d98b17}
-html[data-theme=light] :is(.studio-inline-warning,.studio-warning-item)>svg,html[data-theme=light] .carousel-layer-name .layer-warning-icon{color:#d48200}
-html[data-theme=light] .studio-warning-item strong{color:#704000}
-html[data-theme=light] .board-card.low-resolution .board-surface{outline-color:#eaa400}
-html[data-theme=light] .board-card.uncovered .board-surface{outline-color:#e03a3e}
-html[data-theme=light] :is(#setupError,.error){color:#bd1f32;background:#fff0f1;border-color:#eb9ca6}
-html[data-theme=light] .image-action-delete:hover:not(:disabled),html[data-theme=light] #carouselSlideDelete{color:#bd1f32;background:#fff0f1;border-color:#eb9ca6}
-html[data-theme=light]{--studio-border:#d9dfe7;--studio-panel:#ffffff;--studio-canvas:#eef0f3;--studio-accent:#315bcc}
-html[data-theme=light] :is(#mainTextInput,#addMoreImages){background:#fff;color:#34445b;border-color:#cdd5e1}
-html[data-theme=light] #addMoreImages:hover{background:#eaf0ff;color:#244fab;border-color:#a6bce9}
-html[data-theme=light] .studio-commandbar .studio-tool-group>button[data-step=export]{background:#eaf0ff;color:#244fab}
-html[data-theme=light] :is(.tool-sidebar .panel-row label,.tool-sidebar .panel-row>span,.tool-sidebar .tool-hint,.tool-sidebar .panel-caption,.sidebar-eyebrow,#toolEmpty){color:#647187}
-html[data-theme=light] .tool-sidebar .tool-section h3{color:#1d2838}
-html[data-theme=light] .tool-sidebar .tool-section+.tool-section{border-color:#d9dfe7}
-html[data-theme=light] .carousel-layer.active button{color:#244fab}
-html[data-theme=light] :is(.tool-sidebar .step-panel,#carouselProperties){scrollbar-color:#bac3d1 transparent}
-html[data-theme=light] .carousel-layer{background:#f6f8fb;border-color:transparent}
-html[data-theme=light] .carousel-layer.active{background:#eaf0ff;border-color:#b8c9ef}
-html[data-theme=light] .carousel-slide-tab{background:#fff;border-color:#d9dfe7;color:#647187}
-html[data-theme=light] .carousel-slide-tab.active{background:#eaf0ff;border-color:#b8c9ef;color:#244fab}
-html[data-theme=light] #carouselAddSlide{background:#fff;border-color:#b8c9ef;color:#315bcc}
-html[data-theme=light] #carouselAddSlide:hover{background:#eaf0ff}
-html[data-theme=light] .carousel-frame{outline-color:#315bcc}
-html[data-theme=light] .carousel-frame-path{stroke:#315bcc}
-html[data-theme=light] :is(.handle,.carousel-handle,.carousel-point-handle){background:#fff;border-color:#315bcc;box-shadow:none}
-html[data-theme=light] .carousel-frame-label{background:#eaf0fff0;color:#244fab}
-html[data-theme=light] .carousel-frame.content-selected{outline-color:#bd6800}
-html[data-theme=light] .carousel-frame.content-selected .carousel-handle{background:#fff6e5;border-color:#bd6800}
-html[data-theme=light] .carousel-frame.content-selected .carousel-frame-label{background:#fff6e5f0;color:#834900}
-html[data-theme=light] .format-choice.invalid{border-color:#e03a3e}
-html[data-theme=light] .export-sidebar{background:#f8f9fb;border-color:#d9dfe7}
-html[data-theme=light] :is(.export-options,.export-download){background:#fff;border-color:#d9dfe7}
-html[data-theme=light] .download-progress{background:#f0f4ff;border-color:#b8c9ef;color:#244fab}
-html[data-theme=light] .export-options output{color:#1d2838}
-html[data-theme=light] .safe-preview{background:#e4eaf3;border-color:#a6b7d2}
-html[data-theme=light] .safe-preview-inner{background:#fff;border-color:#7f99c4}
-html[data-theme=light] .safe-preview-inner span{color:#34445b}
-html[data-theme=light] .safe-input label{background:#f0f4ff}
-html[data-theme=light] .format-choice:not(:has(input:checked)) .safe-input label{background:#f8f9fb}
+html[data-theme="light"]
+  :is(.studio-notice-button, #postNotice, #carouselNotice) {
+  color: #8f4b00;
+  background: #fff3cc;
+  border-color: #e7a23c;
+}
+html[data-theme="light"]
+  :is(.studio-notice-button, #postNotice, #carouselNotice):hover {
+  color: #783c00;
+  background: #ffe5a2;
+  border-color: #d88b12;
+}
+html[data-theme="light"]
+  :is(.studio-notice-button, #postNotice, #carouselNotice)
+  svg {
+  color: #cb7900;
+}
+html[data-theme="light"] .studio-inline-warning,
+html[data-theme="light"] #carouselProperties .carousel-warning:not(:empty),
+html[data-theme="light"] .studio-warning-item {
+  color: #834900;
+  background: #fff6e5;
+  border-color: #e8b665;
+}
+html[data-theme="light"]
+  :is(.studio-inline-warning, .studio-warning-item):hover {
+  color: #713b00;
+  background: #ffedc6;
+  border-color: #d98b17;
+}
+html[data-theme="light"]
+  :is(.studio-inline-warning, .studio-warning-item)
+  > svg,
+html[data-theme="light"] .carousel-layer-name .layer-warning-icon {
+  color: #d48200;
+}
+html[data-theme="light"] .studio-warning-item strong {
+  color: #704000;
+}
+html[data-theme="light"] .board-card.low-resolution .board-surface {
+  outline-color: #eaa400;
+}
+html[data-theme="light"] .board-card.uncovered .board-surface {
+  outline-color: #e03a3e;
+}
+html[data-theme="light"] :is(#setupError, .error) {
+  color: #bd1f32;
+  background: #fff0f1;
+  border-color: #eb9ca6;
+}
+html[data-theme="light"] .image-action-delete:hover:not(:disabled),
+html[data-theme="light"] #carouselSlideDelete {
+  color: #bd1f32;
+  background: #fff0f1;
+  border-color: #eb9ca6;
+}
+html[data-theme="light"] {
+  --studio-border: #d9dfe7;
+  --studio-panel: #ffffff;
+  --studio-canvas: #eef0f3;
+  --studio-accent: #315bcc;
+}
+html[data-theme="light"] :is(#mainTextInput, #addMoreImages) {
+  background: #fff;
+  color: #34445b;
+  border-color: #cdd5e1;
+}
+html[data-theme="light"] #addMoreImages:hover {
+  background: #eaf0ff;
+  color: #244fab;
+  border-color: #a6bce9;
+}
+html[data-theme="light"]
+  .studio-commandbar
+  .studio-tool-group
+  > button[data-step="export"] {
+  background: #eaf0ff;
+  color: #244fab;
+}
+html[data-theme="light"]
+  :is(
+    .tool-sidebar .panel-row label,
+    .tool-sidebar .panel-row > span,
+    .tool-sidebar .tool-hint,
+    .tool-sidebar .panel-caption,
+    .sidebar-eyebrow,
+    #toolEmpty
+  ) {
+  color: #647187;
+}
+html[data-theme="light"] .tool-sidebar .tool-section h3 {
+  color: #1d2838;
+}
+html[data-theme="light"] .tool-sidebar .tool-section + .tool-section {
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] .carousel-layer.active button {
+  color: #244fab;
+}
+html[data-theme="light"] :is(.tool-sidebar .step-panel, #carouselProperties) {
+  scrollbar-color: #bac3d1 transparent;
+}
+html[data-theme="light"] .carousel-layer {
+  background: #f6f8fb;
+  border-color: transparent;
+}
+html[data-theme="light"] .carousel-layer.active {
+  background: #eaf0ff;
+  border-color: #b8c9ef;
+}
+html[data-theme="light"] .carousel-slide-tab {
+  background: #fff;
+  border-color: #d9dfe7;
+  color: #647187;
+}
+html[data-theme="light"] .carousel-slide-tab.active {
+  background: #eaf0ff;
+  border-color: #b8c9ef;
+  color: #244fab;
+}
+html[data-theme="light"] #carouselAddSlide {
+  background: #fff;
+  border-color: #b8c9ef;
+  color: #315bcc;
+}
+html[data-theme="light"] #carouselAddSlide:hover {
+  background: #eaf0ff;
+}
+html[data-theme="light"] .carousel-frame {
+  outline-color: #315bcc;
+}
+html[data-theme="light"] .carousel-frame-path {
+  stroke: #315bcc;
+}
+html[data-theme="light"]
+  :is(.handle, .carousel-handle, .carousel-point-handle) {
+  background: #fff;
+  border-color: #315bcc;
+  box-shadow: none;
+}
+html[data-theme="light"] .carousel-frame-label {
+  background: #eaf0fff0;
+  color: #244fab;
+}
+html[data-theme="light"] .carousel-frame.content-selected {
+  outline-color: #bd6800;
+}
+html[data-theme="light"] .carousel-frame.content-selected .carousel-handle {
+  background: #fff6e5;
+  border-color: #bd6800;
+}
+html[data-theme="light"]
+  .carousel-frame.content-selected
+  .carousel-frame-label {
+  background: #fff6e5f0;
+  color: #834900;
+}
+html[data-theme="light"] .format-choice.invalid {
+  border-color: #e03a3e;
+}
+html[data-theme="light"] .export-sidebar {
+  background: #f8f9fb;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] :is(.export-options, .export-download) {
+  background: #fff;
+  border-color: #d9dfe7;
+}
+html[data-theme="light"] .download-progress {
+  background: #f0f4ff;
+  border-color: #b8c9ef;
+  color: #244fab;
+}
+html[data-theme="light"] .export-options output {
+  color: #1d2838;
+}
+html[data-theme="light"] .safe-preview {
+  background: #e4eaf3;
+  border-color: #a6b7d2;
+}
+html[data-theme="light"] .safe-preview-inner {
+  background: #fff;
+  border-color: #7f99c4;
+}
+html[data-theme="light"] .safe-preview-inner span {
+  color: #34445b;
+}
+html[data-theme="light"] .safe-input label {
+  background: #f0f4ff;
+}
+html[data-theme="light"]
+  .format-choice:not(:has(input:checked))
+  .safe-input
+  label {
+  background: #f8f9fb;
+}
