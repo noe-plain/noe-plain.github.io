@@ -24,9 +24,14 @@ function postUpdatePadding(){
 function postSyncCards(){
  const expandedByDefault=!matchMedia('(max-width:760px)').matches;
  postViewport.querySelectorAll('[data-image-card]').forEach(card=>{const expanded=postCardState.get(card.dataset.imageCard)??expandedByDefault;card.classList.toggle('is-collapsed',!expanded);card.querySelector('[data-card-toggle]').setAttribute('aria-expanded',String(expanded))});
+ postAlignCards();
+}
+function postAlignCards(){
+ postViewport.querySelectorAll('.image-group').forEach(row=>{row.querySelector('.image-info-card').style.marginTop=(row.querySelector('.board-label')?.getBoundingClientRect().height||0)+'px'});
 }
 function postApplyZoomLayout(){
  const scale=surfaceScale();for(const b of p.boards){const card=postViewport.querySelector(`.board-card[data-id="${b.id}"]`);if(!card)continue;card.style.width=b.w*scale+'px';Object.assign(card.querySelector('.board-surface').style,{width:b.w*scale+'px',height:b.h*scale+'px'})}
+ postAlignCards();
 }
 function postFitRow(row=null){
  if(!postActive())return;row??=postViewport.querySelector('.board-card.selected')?.closest('.image-group')||postViewport.querySelector('.image-group');if(!row)return;

@@ -6,6 +6,10 @@ Das Studio läuft direkt unter `https://noe-plain.github.io/mkw-studio/` sobald 
 
 Den Ordner `mkw-studio` mit `index.html`, `static/` und den beiden `mkw-logo-bold-*.svg` in das Website-Repository übernehmen, committen und pushen. Auf Gross-/Kleinschreibung des Ordnernamens achten. Nicht veröffentlichen: `.venv/`, `node_modules/`, `lokale-daten/`, Backups, ZIP-Kopien und alte Referenzprojekte. Für Pages werden nur die oben genannten Laufzeitdateien benötigt.
 
+### Aktualisierungen ohne veraltete Browserdateien
+
+Nach Änderungen an JavaScript oder CSS vor dem Commit im Studio-Ordner `npm run build:assets` ausführen und die aktualisierte `index.html` mit veröffentlichen. Das Skript benötigt nur Node.js und versieht alle eingebundenen Programm- und CSS-Dateien mit einer Versionskennung aus ihrem Inhalt. So lädt der Browser nach einem Update zusammenpassende Dateien. Für die Nutzung der Website ist weiterhin keine Installation erforderlich.
+
 ## Browser-Version
 
 - JPG, PNG und WebP importieren; Bilder werden ausschliesslich auf dem Gerät verarbeitet.
