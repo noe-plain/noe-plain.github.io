@@ -60,7 +60,7 @@ function carouselPanel() {
      ],
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
- ${o.type === "text" ? carouselTextContentPanel(o) + carouselTextFontPanel(o) + carouselTextStylePanel(o) + section("Text im Rahmen", `<div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${o.textAnchor !== "bottom"}">${studioIcon("up")}Oben</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div>`) : ""}
+ ${o.type === "text" ? carouselTextContentPanel(o) + carouselTextFontPanel(o) + carouselTextStylePanel(o) + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
  ${
@@ -95,7 +95,7 @@ function carouselPanel() {
         Text: 0,
         Schrift: 5,
         "Absätze & Abstände": 10,
-        "Text im Rahmen": 15,
+        "Text im Rahmen": 8,
         Form: 0,
         Pfad: 0,
         "Fläche & Kontur": 10,
@@ -215,6 +215,7 @@ function carouselPanel() {
       $("#carouselTextEdit").onclick = () => carouselEditText(o);
     if (o.type === "text") {
       carouselBindTextStyles(o, panel);
+      carouselBindTextAlignment(o, panel);
       const content = panel.querySelector("[data-prop=text]");
       content.onselect =
         content.onkeyup =

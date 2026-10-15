@@ -956,6 +956,9 @@
 }
 .carousel-inline-text .carousel-text-line {
   display: block;
+  position: relative;
+  width: max-content;
+  min-width: 1px;
   white-space: pre;
   overflow: visible;
 }
@@ -964,4 +967,22 @@
   background: #435779;
   border-color: #7891bd;
   color: #f1f6ff;
+}
+
+.type-alignment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 8px 0 14px;
+}
+#carouselProperties .type-alignment button {
+  display: grid;
+  place-items: center;
+  min-height: 36px;
+  padding: 7px;
+}
+#carouselProperties .type-alignment button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--studio-accent) 14%, var(--studio-panel));
+  border-color: var(--studio-accent);
+  color: var(--studio-accent);
 }

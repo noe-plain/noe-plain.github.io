@@ -163,7 +163,7 @@ function carouselPDFText(board, opts) {
       offset = carouselTextOffset(object, layout),
       font = p.fonts.find((font) => font.role === object.font);
     for (const line of layout.lines) {
-      const x = object.x - board.carouselSlide * c.w,
+      const x = object.x + line.x - board.carouselSlide * c.w,
         y = object.y + line.y + offset;
       measure.font = `${line.size}px "${object.font}"`;
       measure.textBaseline = "alphabetic";

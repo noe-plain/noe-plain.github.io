@@ -34,11 +34,12 @@ async function carouselPaint(
     if (o.type === "text") {
       ctx.fillStyle = studioPaintRGBA(o.color, o.textAlpha ?? 1);
       ctx.textBaseline = "top";
+      ctx.textAlign = "left";
       const layout = carouselTextLayout(o, ctx),
         offset = carouselTextOffset(o, layout);
       for (const line of layout.lines) {
         ctx.font = `${line.size}px "${o.font}"`;
-        ctx.fillText(line.text, 0, line.y + offset);
+        ctx.fillText(line.text, line.x, line.y + offset);
       }
     } else if (carouselIsVector(o)) {
       await carouselPaintVector(ctx, o);

@@ -9,16 +9,18 @@ function carouselPSDBounds(o) {
           ? Math.ceil(o.size * 0.4) + 4
           : 2;
   const geometry = carouselObjectBounds(o);
-  let right = geometry.x + geometry.w,
+  let leftEdge = geometry.x,
+    right = geometry.x + geometry.w,
     bottom = geometry.y + geometry.h;
   if (o.type === "text") {
     const ctx = makeCanvas(1, 1).getContext("2d"),
       layout = carouselTextLayout(o, ctx);
     for (const line of layout.lines) {
       ctx.font = `${line.size}px "${o.font}"`;
+      leftEdge = Math.min(leftEdge, o.x + line.x);
       right = Math.max(
         right,
-        o.x + ctx.measureText(line.text).width + line.size * 0.2,
+        o.x + line.x + ctx.measureText(line.text).width + line.size * 0.2,
       );
     }
     bottom = Math.max(
@@ -26,7 +28,7 @@ function carouselPSDBounds(o) {
       o.y + carouselTextOffset(o, layout) + layout.height,
     );
   }
-  const left = Math.max(0, Math.floor(geometry.x - pad)),
+  const left = Math.max(0, Math.floor(leftEdge - pad)),
     top = Math.max(0, Math.floor(geometry.y - pad));
   return {
     left,
@@ -91,6 +93,8 @@ async function buildCarouselPSD(progress = () => {}) {
           textAlpha: 1,
           text: line.text,
           textStyles: undefined,
+          textAlign: "left",
+          x: o.x + line.x,
           size: line.size,
           textAnchor: "top",
           y: o.y + line.y + offset,
@@ -105,12 +109,12 @@ async function buildCarouselPSD(progress = () => {}) {
         layer.text = textLayerData(
           {
             text: line.text,
-            x: o.x,
+            x: o.x + carouselTextAlign(o, line.paragraph).factor * o.w,
             y: record.y,
             size: line.size,
             role: o.font,
             color: o.color,
-            align: "left",
+            align: line.align,
             angle: 0,
           },
           0,

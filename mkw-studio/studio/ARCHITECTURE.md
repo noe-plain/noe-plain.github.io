@@ -43,6 +43,10 @@ A linked local file is updated only after a successful browser save and version 
 
 Stored path frames still define the coordinate system for control points and paints. Selection, sizing fields, snapping and group transforms derive tight geometric bounds with exact cubic extrema. Keeping these separate preserves existing paths and image/gradient fills when opening old projects. Do not replace the stored frame with control-handle extents or re-normalize it on selection.
 
+## Text alignment
+
+Carousel text has a `textAlign` default (`left`, `center`, `right`) and optional per-paragraph `textStyles[].align` overrides. Old documents omit both and remain left aligned. The text layout owns each line's measured width and left origin; canvas, inline editing, PDF selection text and PSD use that same origin. New paragraphs inherit size and alignment, not custom leading. Justification is deliberately not accepted yet: it will need word-space distribution in this shared layout, including correct paragraph-final-line behaviour, rather than a fourth alignment offset.
+
 ## Export fidelity
 
 Canvas previews and image downloads share encoded bytes. PDFs use pdf-lib/fontkit: the rendered page preserves the artwork and an invisible embedded-font text layer enables search/selection. This is not an editable vector PDF. PSD preserves editable text, slide slices and native solid-fill/stroke Bézier paths. Complex image/gradient path paints retain exact raster appearance plus a disabled editable vector mask, labelled in the layer name. Photoshop behaviour and font substitution cannot be validated by the ag-psd round trip alone.

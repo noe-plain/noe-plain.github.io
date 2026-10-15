@@ -316,10 +316,12 @@ function validateCarousel(q) {
         o.textStyles.some(
           (style) =>
             style &&
-            ((style.size !== undefined &&
-              (!Number.isFinite(style.size) ||
-                style.size < 1 ||
-                style.size > 1000)) ||
+            ((style.align !== undefined &&
+              !carouselValidTextAlign(style.align)) ||
+              (style.size !== undefined &&
+                (!Number.isFinite(style.size) ||
+                  style.size < 1 ||
+                  style.size > 1000)) ||
               (style.leading &&
                 (!Array.isArray(style.leading) ||
                   style.leading.length > 10000 ||
@@ -342,6 +344,7 @@ function validateCarousel(q) {
         !Number.isFinite(o.size) ||
         o.size < 1 ||
         o.size > 1000 ||
+        (o.textAlign !== undefined && !carouselValidTextAlign(o.textAlign)) ||
         (o.textAnchor !== undefined &&
           !["top", "bottom"].includes(o.textAnchor)))
     )
@@ -520,6 +523,7 @@ function carouselDefault(type, rect = {}) {
     opacity: 1,
     text: "",
     textAnchor: "top",
+    textAlign: "left",
     lineHeight: (studioPreferences.lineHeight || 95) / 100,
     size: 70,
     font: "Replica LL",

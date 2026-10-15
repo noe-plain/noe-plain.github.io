@@ -1,5 +1,38 @@
 "use strict";
 // Carousel text: see ARCHITECTURE.md for ownership and load order.
+// Justification can later add word spacing here instead of only a line origin.
+const carouselTextAlignments = [
+  { value: "left", label: "Linksbündig", icon: "alignLeft", factor: 0 },
+  { value: "center", label: "Zentriert", icon: "alignCenter", factor: 0.5 },
+  { value: "right", label: "Rechtsbündig", icon: "alignRight", factor: 1 },
+];
+function carouselValidTextAlign(value) {
+  return carouselTextAlignments.some((item) => item.value === value);
+}
+function carouselTextAlign(o, paragraph) {
+  const value = o.textStyles?.[paragraph]?.align ?? o.textAlign;
+  return (
+    carouselTextAlignments.find((item) => item.value === value) ||
+    carouselTextAlignments[0]
+  );
+}
+function carouselTextAlignButtons(value, attribute, label, locked = false) {
+  return `<div class="type-alignment" role="group" aria-label="${label}">${carouselTextAlignments.map((item) => `<button ${attribute}="${item.value}" aria-label="${item.label}" title="${item.label}" aria-pressed="${value === item.value}" ${locked ? "disabled" : ""}>${studioIcon(item.icon)}</button>`).join("")}</div>`;
+}
+function carouselTextFramePanel(o) {
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", o.locked)}<p class="type-hint">Gilt für alle Absätze ohne eigene Ausrichtung.</p><div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${o.textAnchor !== "bottom"}">${studioIcon("up")}Oben</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+}
+function carouselBindTextAlignment(o, panel) {
+  panel.querySelectorAll("[data-text-align]").forEach((button) => {
+    button.onclick = () => {
+      if (o.locked || o.textAlign === button.dataset.textAlign) return;
+      checkpoint();
+      o.textAlign = button.dataset.textAlign;
+      changed(false);
+      carouselPanel();
+    };
+  });
+}
 function carouselTextLayout(o, ctx = makeCanvas(1, 1).getContext("2d")) {
   const lines = [];
   let y = 0,
@@ -15,8 +48,14 @@ function carouselTextLayout(o, ctx = makeCanvas(1, 1).getContext("2d")) {
     );
     wrapped.forEach((part, index) => {
       const leading = style?.leading?.[index] ?? size * (o.lineHeight ?? 0.95);
+      const display = part.raw.trimEnd(),
+        width = ctx.measureText(display).width,
+        alignment = carouselTextAlign(o, paragraph);
       lines.push({
-        text: part.raw.trimEnd(),
+        text: display,
+        width,
+        x: (o.w - width) * alignment.factor,
+        align: alignment.value,
         raw: part.raw,
         start: offset + part.start,
         end: offset + part.end,
@@ -56,7 +95,8 @@ function carouselPositionText(el, o) {
     lineHeight: "1.12",
     color: studioPaintRGBA(o.color, o.textAlpha ?? 1),
   });
-  el.querySelectorAll("[data-text-size]").forEach((line) => {
+  el.querySelectorAll("[data-text-size]").forEach((line, index) => {
+    line.style.left = (layout.lines[index]?.x ?? 0) * carouselZoom + "px";
     line.style.fontSize = line.dataset.textSize * carouselZoom + "px";
     line.style.lineHeight = line.dataset.textSize * 1.12 * carouselZoom + "px";
     line.style.height = line.dataset.textHeight * carouselZoom + "px";
@@ -230,7 +270,7 @@ function carouselTextStylePanel(o) {
     round = (value) => Math.round(value * 100) / 100;
   const stepper = (id, value, min, max, name) =>
     `<div class="type-stepper"><button data-type-target="${id}" data-type-step="-1" aria-label="${name} verkleinern">${studioIcon("minus")}</button><span class="type-unit"><input id="${id}" type="number" aria-label="${name}" min="${min}" max="${max}" step="any" value="${round(value)}"><span>px</span></span><button data-type-target="${id}" data-type-step="1" aria-label="${name} vergrössern">${studioIcon("plus")}</button></div>`;
-  return `<section id="carouselTextStyles" class="carousel-property-section"><h4>Absätze & Abstände</h4><div class="type-paragraphs" role="group" aria-label="Absatz auswählen">${paragraphs.map((text, i) => `<button data-paragraph="${i}" aria-pressed="${i === paragraph}" title="Absatz ${i + 1}: ${esc(text || "Leer")}"><span class="type-paragraph-number">${i + 1}</span><span class="type-paragraph-preview">${esc(label(text))}</span><span class="type-paragraph-size">${round(o.textStyles?.[i]?.size ?? o.size)} px</span></button>`).join("")}</div><p class="type-context" id="carouselTypographyContext">Absatz ${paragraph + 1} von ${paragraphs.length} ausgewählt</p><div class="type-control-heading"><label for="carouselParagraphSize">Schriftgrösse</label><button id="carouselParagraphReset" title="Grundgrösse (${o.size} px) übernehmen" ${!custom ? "disabled" : ""}>Grundgrösse</button></div>${stepper("carouselParagraphSize", style?.size ?? o.size, 1, 1000, "Schriftgrösse des Absatzes")}<label class="type-line-picker" ${lines.length === 1 ? "hidden" : ""}>Zeile im Absatz<select id="carouselTextLine">${options(
+  return `<section id="carouselTextStyles" class="carousel-property-section"><h4>Absätze & Abstände</h4><div class="type-paragraphs" role="group" aria-label="Absatz auswählen">${paragraphs.map((text, i) => `<button data-paragraph="${i}" aria-pressed="${i === paragraph}" title="Absatz ${i + 1}: ${esc(text || "Leer")}"><span class="type-paragraph-number">${i + 1}</span><span class="type-paragraph-preview">${esc(label(text))}</span><span class="type-paragraph-size">${round(o.textStyles?.[i]?.size ?? o.size)} px</span></button>`).join("")}</div><p class="type-context" id="carouselTypographyContext">Absatz ${paragraph + 1} von ${paragraphs.length} ausgewählt</p><div class="type-control-heading"><span>Ausrichtung dieses Absatzes</span><button id="carouselParagraphAlignReset" ${style?.align === undefined ? "disabled" : ""}>Vom Textfeld</button></div>${carouselTextAlignButtons(carouselTextAlign(o, paragraph).value, "data-paragraph-align", "Ausrichtung des ausgewählten Absatzes", o.locked)}<div class="type-control-heading"><label for="carouselParagraphSize">Schriftgrösse</label><button id="carouselParagraphReset" title="Grundgrösse (${o.size} px) übernehmen" ${!custom ? "disabled" : ""}>Grundgrösse</button></div>${stepper("carouselParagraphSize", style?.size ?? o.size, 1, 1000, "Schriftgrösse des Absatzes")}<label class="type-line-picker" ${lines.length === 1 ? "hidden" : ""}>Zeile im Absatz<select id="carouselTextLine">${options(
     lines.map((line, i) => [String(i), `${i + 1} · ${label(line.text)}`]),
     String(carouselUI.textLine),
   )}</select></label><div class="type-control-heading type-leading-heading"><label for="carouselLineLeading">Zeilenabstand</label><button id="carouselLeadingReset" aria-pressed="${auto}" title="Automatisch: Schriftgrösse × ${o.lineHeight ?? 0.95}">Automatisch</button></div>${stepper("carouselLineLeading", line.leading, 1, 3000, "Zeilenabstand")}<p class="type-hint" id="carouselLeadingHint">${auto ? "Automatisch:" : "Eigener Abstand für Zeile " + (carouselUI.textLine + 1) + ". Auto:"} ${round(line.size * (o.lineHeight ?? 0.95))} px · ${Math.round((o.lineHeight ?? 0.95) * 100)} %</p></section>`;
@@ -339,6 +379,29 @@ function carouselBindTextStyles(o, panel) {
         input.oninput();
       }),
   );
+  section.querySelectorAll("[data-paragraph-align]").forEach((button) => {
+    button.onclick = () => {
+      if (o.locked) return;
+      const value = button.dataset.paragraphAlign;
+      if (o.textStyles?.[carouselUI.textParagraph]?.align === value) return;
+      checkpoint();
+      o.textStyles ??= [];
+      (o.textStyles[carouselUI.textParagraph] ??= {}).align = value;
+      changed(false);
+      carouselRefreshTextStyles(o);
+    };
+  });
+  $("#carouselParagraphAlignReset").onclick = () => {
+    if (
+      o.locked ||
+      o.textStyles?.[carouselUI.textParagraph]?.align === undefined
+    )
+      return;
+    checkpoint();
+    delete o.textStyles[carouselUI.textParagraph].align;
+    changed(false);
+    carouselRefreshTextStyles(o);
+  };
   const reset = (key) => {
     if (o.locked) return;
     checkpoint();
@@ -391,7 +454,7 @@ function carouselFormatEditable(el, o) {
           .filter((line) => line.paragraph === paragraph)
           .map(
             (line) =>
-              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? esc(line.raw) : '<br data-placeholder="true">'}</span>`,
+              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-x="${line.x}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? esc(line.raw) : '<br data-placeholder="true">'}</span>`,
           )
           .join("")}</div>`,
     )
@@ -471,8 +534,16 @@ function carouselReplaceTextStyles(o, start, end, text) {
       paragraph + 1,
       0,
       ...Array.from({ length: inserted }, () =>
-        styles[paragraph]?.size !== undefined
-          ? { size: styles[paragraph].size }
+        styles[paragraph]?.size !== undefined ||
+        styles[paragraph]?.align !== undefined
+          ? {
+              ...(styles[paragraph].size !== undefined
+                ? { size: styles[paragraph].size }
+                : {}),
+              ...(styles[paragraph].align !== undefined
+                ? { align: styles[paragraph].align }
+                : {}),
+            }
           : null,
       ),
     );
