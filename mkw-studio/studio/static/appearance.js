@@ -12,7 +12,7 @@ $('#snapDistance').onchange=event=>{studioPreferences.snapDistance=Math.max(1,Ma
 $('#defaultExportFormat').onchange=event=>{studioPreferences.exportFormat=event.target.value;p.exportOptions={...p.exportOptions,format:event.target.value};touchMeta();studioApplyPreferences()};
 studioApplyPreferences();
 function studioSetTheme(theme){
- theme=theme==='light'?'light':'dark';document.documentElement.dataset.theme=theme;
+ theme=theme==='dark'?'dark':'light';document.documentElement.dataset.theme=theme;
  try{localStorage.setItem('mkw-studio-theme',theme)}catch{}
  document.querySelectorAll('[data-theme-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeChoice===theme)));
  document.querySelectorAll('header .brand img,.start-brand img').forEach(logo=>logo.src=theme==='light'?'mkw-logo-bold-pos.svg':'mkw-logo-bold-neg.svg');
