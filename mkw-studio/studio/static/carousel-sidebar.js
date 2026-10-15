@@ -26,7 +26,7 @@ function carouselPanel() {
     return;
   }
   const number = (key, label, min = 0, max = 100000) =>
-    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round(o[key] * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
+    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round((o.type === "path" && ["x", "y", "w", "h"].includes(key) ? carouselObjectBounds(o)[key] : o[key]) * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
   const color = (key, label) =>
     `<label>${label}<input data-prop="${key}" type="color" value="${esc(o[key])}"></label>`;
   const select = (key, label, values) =>
@@ -147,7 +147,12 @@ function carouselPanel() {
         const oldRatio = o.h / o.w;
         if (o.type === "text" && input.dataset.prop === "text")
           o.textStyles = carouselTextStylesForInput(o, value);
-        o[input.dataset.prop] = value;
+        if (
+          o.type === "path" &&
+          ["x", "y", "w", "h"].includes(input.dataset.prop)
+        )
+          carouselSetBoundsValue(o, input.dataset.prop, value);
+        else o[input.dataset.prop] = value;
         if (o.type === "angle") {
           if (input.dataset.prop === "direction") {
             const tall = o.h > o.w;
@@ -181,7 +186,12 @@ function carouselPanel() {
         for (const key of ["x", "y", "w", "h"]) {
           const field = panel.querySelector(`[data-prop="${key}"]`);
           if (field && field !== input)
-            field.value = Math.round(o[key] * 100) / 100;
+            field.value =
+              Math.round(
+                (o.type === "path" && ["x", "y", "w", "h"].includes(key)
+                  ? carouselObjectBounds(o)[key]
+                  : o[key]) * 100,
+              ) / 100;
         }
       };
     });

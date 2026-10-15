@@ -16,6 +16,7 @@
     "static/subject.js",
     "static/export.js",
     "static/psd.js",
+    "static/bezier.js",
     "static/carousel.js",
     "static/carousel-render.js",
     "static/carousel-input.js",

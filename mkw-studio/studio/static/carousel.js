@@ -451,15 +451,37 @@ function carouselTool(tool) {
   carouselRefresh();
 }
 
+function carouselObjectBounds(o) {
+  if (o.type !== "path") return { x: o.x, y: o.y, w: o.w, h: o.h };
+  const bounds = MKWBezier.bounds(o.contours || [o.points], o.closed);
+  return {
+    x: o.x + bounds.x * o.w,
+    y: o.y + bounds.y * o.h,
+    w: Math.max(0.001, bounds.w * o.w),
+    h: Math.max(0.001, bounds.h * o.h),
+  };
+}
+function carouselSetBoundsValue(o, key, value) {
+  const bounds = carouselObjectBounds(o);
+  if (key === "x" || key === "y") {
+    o[key] += value - bounds[key];
+    return;
+  }
+  const axis = key === "w" ? "x" : "y",
+    factor = Math.max(0.001, value) / bounds[key];
+  o[axis] = bounds[axis] + (o[axis] - bounds[axis]) * factor;
+  o[key] *= factor;
+}
 function carouselBounds(objects) {
   if (!objects.length) return null;
-  const x = Math.min(...objects.map((o) => o.x)),
-    y = Math.min(...objects.map((o) => o.y));
+  const bounds = objects.map(carouselObjectBounds),
+    x = Math.min(...bounds.map((o) => o.x)),
+    y = Math.min(...bounds.map((o) => o.y));
   return {
     x,
     y,
-    w: Math.max(...objects.map((o) => o.x + o.w)) - x,
-    h: Math.max(...objects.map((o) => o.y + o.h)) - y,
+    w: Math.max(...bounds.map((o) => o.x + o.w)) - x,
+    h: Math.max(...bounds.map((o) => o.y + o.h)) - y,
   };
 }
 

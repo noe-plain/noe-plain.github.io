@@ -15,6 +15,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `project-session.js` | Session identity, queued saves, file permission and external-change checks, project library. |
 | `file-io.js` | Native file chooser and atomic stream writes. Never download from autosave. |
 | `state.js` | Single-post model, history, bounded decoded-image cache, font-face reuse, image import. |
+| `bezier.js` | Pure analytical curve extrema and tight path bounds; no handles in selection boxes. |
 | `carousel.js` | Carousel document defaults, validation, creation and selection model. |
 | `carousel-render.js` | Viewport/canvas and overlays. One async paint at a time, reusable buffer, generation cancellation. |
 | `carousel-input.js` | Pointer movement, resizing and shared snapping. |
@@ -37,6 +38,10 @@ A document has a stable `projectId`. A browser record has a monotonically increa
 IndexedDB stores image/font/logo bytes once by SHA-256; project records contain references. Saving/deleting a project collects assets unused across **all** records. Undo history and clipboard are session-only and do not enter portable files. Deleting a live object prunes unused live images; undo/clipboard retain what they need separately. Hidden objects still own their assets. MKW JSON remains version 1 with `assetFormat: 2`; old files remain readable. Only one full-resolution normalized lossless PNG is written per used image, not an additional raw input copy. Used fonts are portable; the device font library stays outside the document.
 
 A linked local file is updated only after a successful browser save and version check. File handles are not exported. Permission is requested only during a user action; autosave only checks existing permission. External size/mtime changes block disk writes. `navigator.locks` serializes participating tabs. Browsers without file access use browser autosave plus explicitly initiated downloads; silent overwrites are impossible there.
+
+## Path transform geometry
+
+Stored path frames still define the coordinate system for control points and paints. Selection, sizing fields, snapping and group transforms derive tight geometric bounds with exact cubic extrema. Keeping these separate preserves existing paths and image/gradient fills when opening old projects. Do not replace the stored frame with control-handle extents or re-normalize it on selection.
 
 ## Export fidelity
 

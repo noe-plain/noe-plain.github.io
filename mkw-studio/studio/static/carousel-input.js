@@ -245,15 +245,17 @@ function carouselMarquee(ev, start, add) {
         y = Math.min(start.y, end.y),
         w = Math.abs(end.x - start.x),
         h = Math.abs(end.y - start.y);
-      const found = p.carousel.objects.filter(
-        (o) =>
+      const found = p.carousel.objects.filter((o) => {
+        const bounds = carouselObjectBounds(o);
+        return (
           !o.locked &&
           o.visible !== false &&
-          o.x < x + w &&
-          o.x + o.w > x &&
-          o.y < y + h &&
-          o.y + o.h > y,
-      );
+          bounds.x < x + w &&
+          bounds.x + bounds.w > x &&
+          bounds.y < y + h &&
+          bounds.y + bounds.h > y
+        );
+      });
       carouselSelect([...new Set([...existing, ...found.map((o) => o.id)])]);
     },
     () => sketch.remove(),
@@ -272,8 +274,9 @@ function carouselSnapLines(excluded = [...carouselUI.ids]) {
     ys.push(c.top + (j * (c.h - c.top - c.bottom)) / 6);
   for (const o of c.objects)
     if (o.visible !== false && !excluded.includes(o.id)) {
-      xs.push(o.x, o.x + o.w, o.x + o.w / 2);
-      ys.push(o.y, o.y + o.h, o.y + o.h / 2);
+      const bounds = carouselObjectBounds(o);
+      xs.push(bounds.x, bounds.x + bounds.w, bounds.x + bounds.w / 2);
+      ys.push(bounds.y, bounds.y + bounds.h, bounds.y + bounds.h / 2);
     }
   carouselVectorSnapTargets(xs, ys, excluded);
   return { x: [...new Set(xs)], y: [...new Set(ys)] };

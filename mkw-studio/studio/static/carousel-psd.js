@@ -8,8 +8,9 @@ function carouselPSDBounds(o) {
         : o.type === "text"
           ? Math.ceil(o.size * 0.4) + 4
           : 2;
-  let right = o.x + o.w,
-    bottom = o.y + o.h;
+  const geometry = carouselObjectBounds(o);
+  let right = geometry.x + geometry.w,
+    bottom = geometry.y + geometry.h;
   if (o.type === "text") {
     const ctx = makeCanvas(1, 1).getContext("2d"),
       layout = carouselTextLayout(o, ctx);
@@ -25,8 +26,8 @@ function carouselPSDBounds(o) {
       o.y + carouselTextOffset(o, layout) + layout.height,
     );
   }
-  const left = Math.max(0, Math.floor(o.x - pad)),
-    top = Math.max(0, Math.floor(o.y - pad));
+  const left = Math.max(0, Math.floor(geometry.x - pad)),
+    top = Math.max(0, Math.floor(geometry.y - pad));
   return {
     left,
     top,
