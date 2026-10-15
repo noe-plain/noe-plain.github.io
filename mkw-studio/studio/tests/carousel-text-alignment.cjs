@@ -44,7 +44,7 @@ const { launch, artifact } = require('./browser.cjs');
       const matches = await page.evaluate(async format => {
         const o = p.carousel.objects.find(o => o.id === carouselSelection),
           actual = await encodedBoard(clone(p.boards[0]), { format, quality: 91, png8: false, colours: 256, transparent: false }),
-          expected = makeCanvas(p.carousel.w, p.carousel.h), ctx = expected.getContext('2d');
+          expected = makeCanvas(p.carousel.w, p.carousel.h), ctx = exportContext(expected);
         ctx.fillStyle = p.carousel.bg; ctx.fillRect(0, 0, expected.width, expected.height);
         ctx.fillStyle = o.color; ctx.textBaseline = 'top';
         const layout = carouselTextLayout(o), offset = carouselTextOffset(o, layout);
@@ -66,7 +66,7 @@ const { launch, artifact } = require('./browser.cjs');
     pdf.text.forEach((line, i) => assert(Math.abs(line.x - pdf.expected[i]) < 1e-8, 'PDF selectable text must align with the artwork'));
     const psd = await page.evaluate(async () => {
       const data = agPsd.readPsd(await (await buildPSD()).arrayBuffer()), text = data.children.flatMap(layer => layer.children || []).filter(layer => layer.text).map(layer => layer.text);
-      const expected = makeCanvas(data.width, data.height); await carouselPaint(expected.getContext('2d'));
+      const expected = makeCanvas(data.width, data.height); await carouselPaint(exportContext(expected));
       const a = data.canvas.getContext('2d').getImageData(0, 0, data.width, data.height).data, b = expected.getContext('2d').getImageData(0, 0, data.width, data.height).data;
       return { alignments: text.map(t => t.paragraphStyle.justification), anchors: text.map(t => t.transform[4]), exact: a.every((v, i) => v === b[i]) };
     });

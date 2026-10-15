@@ -1,0 +1,17 @@
+# The website and MKW Studio are static. Keep customer delivery assets and
+# development-only files out of the published site; retain them in Git.
+exclude:
+  - PUBLISHING.md
+  - portfolio/kunden/data
+  - portfolio-manager/node_modules
+  - mkw-studio/.venv
+  - mkw-studio/studio/node_modules
+  - mkw-studio/studio/backups
+  - mkw-studio/studio/tests
+  - mkw-studio/studio/build
+  - mkw-studio/studio/ci
+  - mkw-studio/studio/docs
+  - mkw-studio/studio/vendor
+  - node_modules
+  - Gemfile
+  - Gemfile.lock
