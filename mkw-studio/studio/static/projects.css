@@ -161,3 +161,11 @@ html[data-theme="light"] {
     flex-direction: column;
   }
 }
+
+#projectLibrary .project-library-retention {
+  font-family: "MKW UI", sans-serif;
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--studio-muted);
+}

@@ -33,6 +33,12 @@ const assert=require('node:assert/strict');
   await page.locator('#toolsToggle').click();assert.equal(await page.locator('#toolsToggle').getAttribute('aria-expanded'),'false');assert(await page.locator('#toolsSidebar').isHidden());
   assert((await page.locator('#workspace').boundingBox()).width>beforeWorkspace.width+250);assert(await page.locator('#postViewControls').isVisible());
   await page.locator('#toolsToggle').click();assert(await page.locator('#toolsSidebar').isVisible());assert.equal(await pixels(),beforePixels,'Workspace controls must never change artwork pixels');
+  const postDocument=await page.evaluate(()=>JSON.stringify(p));
+  for(const command of ['Meta','Control']){
+   await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press(command+'+1');assert.equal(await page.evaluate(()=>view),1);assert.equal(await page.locator('#viewValue').textContent(),'100%');
+   await page.keyboard.press(command+'+0');const shortcut=await page.evaluate(()=>view);await page.evaluate(()=>postSetZoom(1));await page.locator('#postFit').click();assert(Math.abs(shortcut-await page.evaluate(()=>view))<.001);
+  }
+  assert.equal(await page.evaluate(()=>JSON.stringify(p)),postDocument,'Zoom shortcuts do not alter single-post artwork');
   await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-post.png')});
   await page.evaluate(()=>{p.boards[1].image.scale=.01;selectBoard(p.boards[0].id);return draw()});
   await page.locator('#postNotice').click();assert(await page.locator('#studioWarnings').isVisible());
@@ -65,6 +71,15 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('button[data-tool=select]').getAttribute('aria-pressed'),'true');
   await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Shift+W');assert(await page.locator('#carouselGuides').isHidden());assert.equal(await page.evaluate(()=>carouselUI.tool),'select');await page.keyboard.press('Shift+W');assert(await page.locator('#carouselGuides').isVisible());await page.keyboard.press('w');assert.equal(await page.evaluate(()=>carouselUI.tool),'angle');await page.locator('button[data-tool=select]').click();
 
+  for(const command of ['Meta','Control']){
+   await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press(command+'+1');assert.equal(await page.evaluate(()=>carouselZoom),1);assert.equal(await page.locator('#carouselZoom').inputValue(),'100');
+   await page.keyboard.press(command+'+0');const shortcut=await page.evaluate(()=>carouselZoom);await page.evaluate(()=>carouselSetZoom(1));await page.locator('#carouselFit').click();assert(Math.abs(shortcut-await page.evaluate(()=>carouselZoom))<.001);
+  }
+  await page.locator('#settings').click();const modalZoom=await page.evaluate(()=>carouselZoom);await page.keyboard.press('Control+1');assert.equal(await page.evaluate(()=>carouselZoom),modalZoom);await page.locator('#closeSettings').click();
+  // 100% display remains possible for long carousels without a huge preview allocation.
+  const wide=await page.evaluate(async()=>{const old=p.carousel.n;p.carousel.n=20;carouselSetZoom(.2);return old});await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Control+1');
+  assert(await page.evaluate(()=>{const c=$('#carouselCanvas');return carouselZoom===1&&Math.abs(c.getBoundingClientRect().width-p.carousel.w*20)<1&&c.width<=16000&&c.width*c.height<=24040000}));
+  await page.evaluate(n=>{p.carousel.n=n;carouselFit()},wide);
   await page.locator('#footerSnap').click();assert.equal(await page.evaluate(()=>carouselUI.snap),false);await page.locator('#footerSnap').click();
   await page.setViewportSize({width:1100,height:800});await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-compact.png')});
   await page.setViewportSize({width:640,height:900});await page.locator('#carouselSidebar').waitFor({state:'hidden'});

@@ -82,6 +82,15 @@ function studioSyncFooter() {
     (carousel ? "Raster und Schutzzonen" : "Schutzzonen") +
     " ein-/ausblenden · Shift + W";
   $("#footerGuides").setAttribute("aria-keyshortcuts", "Shift+W");
+  for (const id of ["postFit", "carouselFit"]) {
+    const button = $("#" + id);
+    if (button) {
+      button.title = "Artwork einpassen · Cmd/Ctrl + 0";
+      button.setAttribute("aria-keyshortcuts", "Meta+0 Control+0");
+    }
+  }
+  $("#viewValue").title = "100 % · Cmd/Ctrl + 1";
+  $("#viewValue").setAttribute("aria-keyshortcuts", "Meta+1 Control+1");
   $("#footerSnap").hidden = !carousel;
   if ($("#postHand")) $("#postHand").hidden = carousel;
   if (carousel)
@@ -277,6 +286,31 @@ $("#footerGuides").onclick = () => {
   }
   studioSyncFooter();
 };
+window.addEventListener(
+  "keydown",
+  (event) => {
+    if (
+      !(event.metaKey || event.ctrlKey) ||
+      event.shiftKey ||
+      event.altKey ||
+      !["0", "1"].includes(event.key) ||
+      event.isComposing ||
+      busy ||
+      (!carouselActive() && !postActive()) ||
+      document.querySelector("dialog[open],[popover]:popover-open")
+    )
+      return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (event.repeat) return;
+    if (p.carousel) {
+      if (event.key === "0") carouselFit();
+      else carouselSetZoom(1);
+    } else if (event.key === "0") postFitRow();
+    else postSetZoom(1);
+  },
+  true,
+);
 window.addEventListener(
   "keydown",
   (event) => {

@@ -315,12 +315,7 @@ function carouselRender() {
 }
 
 function carouselMaxZoom() {
-  const c = p.carousel;
-  return Math.min(
-    2,
-    16000 / (c.w * c.n),
-    Math.sqrt(24000000 / (c.w * c.n * c.h)),
-  );
+  return 2;
 }
 
 function carouselSetZoom(value, event = null) {
@@ -426,23 +421,33 @@ function carouselRefresh() {
   carouselKeepLogosOnTop(c);
   carouselZoom = Math.max(0.05, Math.min(carouselZoom, carouselMaxZoom()));
   const s = carouselZoom,
+    rasterScale = Math.min(
+      s,
+      16000 / (c.w * c.n),
+      Math.sqrt(24000000 / (c.w * c.n * c.h)),
+    ),
     canvas = $("#carouselCanvas"),
     generation = ++carouselDraw;
   c.zoom = s;
-  if (canvas.width !== Math.ceil(c.w * c.n * s))
-    canvas.width = Math.ceil(c.w * c.n * s);
-  if (canvas.height !== Math.ceil(c.h * s)) canvas.height = Math.ceil(c.h * s);
-  $("#carouselArtwork").style.width = canvas.width + "px";
-  $("#carouselArtwork").style.height = canvas.height + "px";
+  if (canvas.width !== Math.ceil(c.w * c.n * rasterScale))
+    canvas.width = Math.ceil(c.w * c.n * rasterScale);
+  if (canvas.height !== Math.ceil(c.h * rasterScale))
+    canvas.height = Math.ceil(c.h * rasterScale);
+  const width = c.w * c.n * s,
+    height = c.h * s;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+  $("#carouselArtwork").style.width = width + "px";
+  $("#carouselArtwork").style.height = height + "px";
   const viewport = $("#carouselViewport"),
     padX = Math.max(400, Math.round(viewport.clientWidth * 0.8)),
     padY = Math.max(250, Math.round(viewport.clientHeight * 0.6));
-  $("#carouselPasteboard").style.width = canvas.width + 2 * padX + "px";
-  $("#carouselPasteboard").style.height = canvas.height + 2 * padY + "px";
+  $("#carouselPasteboard").style.width = width + 2 * padX + "px";
+  $("#carouselPasteboard").style.height = height + 2 * padY + "px";
   $("#carouselArtwork").style.left = padX + "px";
   $("#carouselArtwork").style.top = padY + "px";
   $("#carouselZoom").value = Math.round(s * 100);
-  carouselSchedulePaint(canvas, s, generation);
+  carouselSchedulePaint(canvas, rasterScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
   const guideKey = JSON.stringify([
     c.w,

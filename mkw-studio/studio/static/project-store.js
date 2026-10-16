@@ -1,6 +1,7 @@
 /* IndexedDB owns projects/assets/file links. No UI or editor globals are used here. */
 const MKWProjectStore = (() => {
   "use strict";
+  const projectLimit = 5;
   let connection;
   const hashCache = new Map(),
     itemHashes = new WeakMap();
@@ -26,7 +27,20 @@ const MKWProjectStore = (() => {
           database.close();
           connection = null;
         };
-        resolve(database);
+        const cleanup = database.transaction(
+          ["projects", "assets", "meta"],
+          "readwrite",
+        );
+        maintainProjects(cleanup, { onlyOverflow: true });
+        cleanup.oncomplete = () => resolve(database);
+        cleanup.onerror = cleanup.onabort = () => {
+          database.close();
+          connection = null;
+          reject(
+            cleanup.error ||
+              Error("Browsersicherungen konnten nicht aufgeräumt werden."),
+          );
+        };
       };
       request.onerror = () => {
         connection = null;
@@ -109,6 +123,47 @@ const MKWProjectStore = (() => {
         }
     return MKWProjectAssets.hydrate(project);
   }
+  // Retention and asset collection share the write transaction. A failed save
+  // rolls back both the new project and any removal of older backups.
+  function maintainProjects(
+    transaction,
+    { keepId = null, onlyOverflow = false } = {},
+  ) {
+    const projects = transaction.objectStore("projects"),
+      request = projects.getAll();
+    request.onsuccess = () => {
+      const records = request.result
+          .filter((record) => record.document)
+          .sort(
+            (a, b) =>
+              (b.id === keepId) - (a.id === keepId) ||
+              (b.updatedAt || 0) - (a.updatedAt || 0) ||
+              a.id.localeCompare(b.id),
+          ),
+        retained = records.slice(0, projectLimit),
+        removed = records.slice(projectLimit);
+      for (const record of removed) projects.delete(record.id);
+      if (onlyOverflow && !removed.length) return;
+      transaction
+        .objectStore("meta")
+        .put(retained[0]?.id || null, "lastProject");
+      const refs = new Set(
+        retained.flatMap((record) =>
+          ["images", "logos", "fonts"].flatMap((key) =>
+            (record.document[key] || []).map((item) => item.assetRef),
+          ),
+        ),
+      );
+      const assets = transaction.objectStore("assets"),
+        cursor = assets.openKeyCursor();
+      cursor.onsuccess = () => {
+        const entry = cursor.result;
+        if (!entry) return;
+        if (!refs.has(entry.key)) assets.delete(entry.key);
+        entry.continue();
+      };
+    };
+  }
   async function save(project, expectedVersion = 0, options = {}) {
     const packed = await pack(project),
       database = await db();
@@ -124,15 +179,18 @@ const MKWProjectStore = (() => {
       const current = projects.get(project.projectId);
       current.onsuccess = () => {
         const previous = current.result,
+          missing = !previous?.document && expectedVersion > 0,
           conflict =
-            !!previous?.document && previous.version !== expectedVersion,
+            missing ||
+            (!!previous?.document && previous.version !== expectedVersion),
           id = conflict ? crypto.randomUUID() : project.projectId,
           version = conflict ? 1 : (previous?.version || 0) + 1,
           document = packed.document;
         document.projectId = id;
         if (conflict)
           document.meta.title =
-            (document.meta.title || "Projekt") + " · Konfliktkopie";
+            (document.meta.title || "Projekt") +
+            (missing ? " · Wiederhergestellt" : " · Konfliktkopie");
         const record = {
           id,
           version,
@@ -161,28 +219,8 @@ const MKWProjectStore = (() => {
             }
           };
         }
-        // Garbage collection is atomic with the project update, across all saved projects.
-        const all = projects.getAll();
-        all.onsuccess = () => {
-          const refs = new Set(
-            all.result.flatMap((record) =>
-              record.document
-                ? ["images", "logos", "fonts"].flatMap((key) =>
-                    (record.document[key] || []).map((item) => item.assetRef),
-                  )
-                : [],
-            ),
-          );
-          const cursor = assets.openKeyCursor();
-          cursor.onsuccess = () => {
-            const entry = cursor.result;
-            if (!entry) return;
-            if (!refs.has(entry.key) && !packed.assets.has(entry.key))
-              assets.delete(entry.key);
-            entry.continue();
-          };
-        };
-        outcome = { id, version, conflict, record };
+        maintainProjects(transaction, { keepId: id });
+        outcome = { id, version, conflict, missing, record };
       };
       transaction.oncomplete = () => resolve(outcome);
       transaction.onerror = transaction.onabort = () =>
@@ -244,32 +282,7 @@ const MKWProjectStore = (() => {
         ),
         projects = transaction.objectStore("projects");
       projects.delete(id);
-      const all = projects.getAll();
-      all.onsuccess = () => {
-        const records = all.result.filter((record) => record.document),
-          refs = new Set(
-            records.flatMap((record) =>
-              ["images", "logos", "fonts"].flatMap((key) =>
-                (record.document[key] || []).map((item) => item.assetRef),
-              ),
-            ),
-          );
-        const cursor = transaction.objectStore("assets").openKeyCursor();
-        cursor.onsuccess = () => {
-          const entry = cursor.result;
-          if (entry) {
-            if (!refs.has(entry.key))
-              transaction.objectStore("assets").delete(entry.key);
-            entry.continue();
-          }
-        };
-        transaction
-          .objectStore("meta")
-          .put(
-            records.sort((a, b) => b.updatedAt - a.updatedAt)[0]?.id || null,
-            "lastProject",
-          );
-      };
+      maintainProjects(transaction);
       transaction.oncomplete = () => {
         hashCache.clear();
         resolve();
@@ -327,6 +340,7 @@ const MKWProjectStore = (() => {
     });
   }
   return {
+    projectLimit,
     save,
     list,
     open,
