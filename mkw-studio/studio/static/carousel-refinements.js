@@ -1,0 +1,378 @@
+"use strict";
+function carouselFolder(o, c = p.carousel) {
+  return c?.folders?.find((f) => f.id === o.folderId);
+}
+function carouselObjectVisible(o) {
+  return o.visible !== false && carouselFolder(o)?.visible !== false;
+}
+function carouselObjectLocked(o) {
+  return !!(o.locked || carouselFolder(o)?.locked);
+}
+function carouselValidateRefinements(o, c, q) {
+  if (
+    o.angle !== undefined &&
+    (!Number.isFinite(o.angle) || Math.abs(o.angle) > 360)
+  )
+    throw Error("Ungültiger Drehwinkel.");
+  if (o.uppercase !== undefined && typeof o.uppercase !== "boolean")
+    throw Error("Ungültige Textdarstellung.");
+  if (o.script !== undefined && !["normal", "superscript"].includes(o.script))
+    throw Error("Ungültige Zeichenposition.");
+  if (
+    o.characterStyles &&
+    (!Array.isArray(o.characterStyles) ||
+      o.characterStyles.length > 10000 ||
+      o.characterStyles.some(
+        (s) =>
+          !Number.isInteger(s.start) ||
+          !Number.isInteger(s.end) ||
+          s.start < 0 ||
+          s.end <= s.start ||
+          s.end > o.text?.length ||
+          !["normal", "superscript"].includes(s.script),
+      ))
+  )
+    throw Error("Ungültige Zeichenformatierung.");
+  if (
+    o.effects &&
+    ["blur", "noise"].some(
+      (k) =>
+        !Number.isFinite(o.effects[k] ?? 0) ||
+        (o.effects[k] ?? 0) < 0 ||
+        (o.effects[k] ?? 0) > (k === "blur" ? 100 : 100),
+    )
+  )
+    throw Error("Ungültiger Ebeneneffekt.");
+  if (
+    o.folderId &&
+    (o.type === "logo" || !c.folders?.some((f) => f.id === o.folderId))
+  )
+    throw Error("Ungültiger Ebenenordner.");
+  if (
+    o.type === "logo" &&
+    !["white", "black"].includes(o.source) &&
+    !q.logos.some((l) => l.id === o.source)
+  )
+    throw Error("Logo fehlt.");
+}
+function carouselValidateFolders(c) {
+  if (!c.folders) return;
+  const ids = new Set();
+  if (!Array.isArray(c.folders) || c.folders.length > 500)
+    throw Error("Ungültige Ebenenordner.");
+  for (const f of c.folders) {
+    if (
+      !f ||
+      typeof f.id !== "string" ||
+      ids.has(f.id) ||
+      typeof f.name !== "string" ||
+      f.name.length > 160 ||
+      ["visible", "locked", "collapsed"].some(
+        (k) => f[k] !== undefined && typeof f[k] !== "boolean",
+      )
+    )
+      throw Error("Ungültiger Ebenenordner.");
+    ids.add(f.id);
+  }
+}
+function carouselArrangeFolders(c = p.carousel) {
+  if (!c?.folders?.length) return;
+  const out = [],
+    done = new Set();
+  for (const o of c.objects) {
+    if (o.type === "logo" || !o.folderId) {
+      out.push(o);
+      continue;
+    }
+    if (done.has(o.folderId)) continue;
+    done.add(o.folderId);
+    out.push(...c.objects.filter((v) => v.folderId === o.folderId));
+  }
+  c.objects = out;
+}
+function carouselCreateFolder() {
+  checkpoint();
+  p.carousel.folders ??= [];
+  const folder = {
+    id: uid(),
+    name: `Ordner ${p.carousel.folders.length + 1}`,
+    visible: true,
+    locked: false,
+    collapsed: false,
+  };
+  p.carousel.folders.push(folder);
+  carouselSelected()
+    .filter((o) => o.type !== "logo" && !carouselObjectLocked(o))
+    .forEach((o) => (o.folderId = folder.id));
+  carouselArrangeFolders();
+  carouselUI.folder = folder.id;
+  changed();
+}
+function carouselAssignFolder(o, id) {
+  if (o.type === "logo" || carouselObjectLocked(o)) return;
+  checkpoint();
+  if (id) o.folderId = id;
+  else delete o.folderId;
+  carouselArrangeFolders();
+  changed();
+}
+function carouselLayerPanel() {
+  carouselArrangeFolders();
+  carouselLegacyLayerPanel();
+  const c = p.carousel,
+    root = $("#carouselLayers"),
+    heading = $(".carousel-layers-panel .carousel-section-heading");
+  if (!$("#carouselNewFolder")) {
+    const b = document.createElement("button");
+    b.id = "carouselNewFolder";
+    b.innerHTML = studioIcon("folder") + "<span>Ordner</span>";
+    b.title = "Ordner erstellen · gewählte Ebenen werden einsortiert";
+    b.onclick = carouselCreateFolder;
+    heading.append(b);
+  }
+  const rows = new Map(
+      [...root.children].map((row) => [row.dataset.layer, row]),
+    ),
+    seen = new Set(),
+    fragment = document.createDocumentFragment();
+  const folderRow = (f) => {
+    const row = document.createElement("div");
+    row.className = "carousel-folder";
+    row.dataset.folder = f.id;
+    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button>`;
+    row.querySelectorAll("button").forEach(
+      (b) =>
+        (b.onclick = () => {
+          const action = b.dataset.folderAction;
+          if (action === "select") {
+            carouselSelect(
+              c.objects.filter((o) => o.folderId === f.id).map((o) => o.id),
+            );
+            carouselUI.folder = f.id;
+            carouselPanel();
+            return;
+          }
+          if (action !== "collapse") checkpoint();
+          f[action === "collapse" ? "collapsed" : action] =
+            action === "visible"
+              ? f.visible === false
+              : action === "locked"
+                ? !f.locked
+                : !f.collapsed;
+          if (action === "collapse") carouselLayerPanel();
+          else {
+            changed(false);
+            carouselPanel();
+          }
+        }),
+    );
+    row.ondragover = (e) => {
+      e.preventDefault();
+      row.classList.add("drop-target");
+    };
+    row.ondragleave = () => row.classList.remove("drop-target");
+    row.ondrop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const o = c.objects.find((o) => o.id === carouselUI.layerDrag);
+      if (o) carouselAssignFolder(o, f.id);
+      carouselUI.layerDrag = null;
+    };
+    return row;
+  };
+  for (const o of [...c.objects].reverse()) {
+    if (o.folderId) {
+      if (seen.has(o.folderId)) continue;
+      seen.add(o.folderId);
+      const f = carouselFolder(o);
+      if (!f) continue;
+      fragment.append(folderRow(f));
+      for (const child of [...c.objects]
+        .reverse()
+        .filter((v) => v.folderId === f.id)) {
+        const row = rows.get(child.id);
+        row.classList.add("in-folder");
+        row.hidden = !!f.collapsed;
+        fragment.append(row);
+      }
+    } else fragment.append(rows.get(o.id));
+  }
+  for (const f of c.folders || [])
+    if (!seen.has(f.id)) fragment.append(folderRow(f));
+  root.replaceChildren(fragment);
+}
+function carouselRefinementsPanel(panel, items) {
+  const o = items.at(-1),
+    folder = p.carousel.folders?.find((f) => f.id === carouselUI.folder);
+  if (
+    folder &&
+    (!items.length || items.every((o) => o.folderId === folder.id))
+  ) {
+    const section = document.createElement("section");
+    section.className = "carousel-property-section folder-properties";
+    section.innerHTML = `<h4>Ordner</h4><label>Name<input id="carouselFolderName" maxlength="160" value="${esc(folder.name)}"></label><button id="carouselDissolveFolder">Ordner auflösen · Inhalt behalten</button><button id="carouselRemoveFolder">Ordner mit Inhalt entfernen</button>`;
+    panel.prepend(section);
+    $("#carouselFolderName").onchange = (e) => {
+      if (!e.target.value.trim()) return;
+      checkpoint();
+      folder.name = e.target.value.trim();
+      changed(false);
+      carouselLayerPanel();
+    };
+    $("#carouselDissolveFolder").onclick = () => {
+      checkpoint();
+      p.carousel.objects.forEach((o) => {
+        if (o.folderId === folder.id) delete o.folderId;
+      });
+      p.carousel.folders = p.carousel.folders.filter((f) => f !== folder);
+      carouselUI.folder = null;
+      changed();
+    };
+    const members = p.carousel.objects.filter((o) => o.folderId === folder.id);
+    $("#carouselRemoveFolder").disabled =
+      !!folder.locked || members.some((o) => o.locked);
+    $("#carouselRemoveFolder").onclick = () => {
+      checkpoint();
+      p.carousel.objects = p.carousel.objects.filter(
+        (o) => o.folderId !== folder.id,
+      );
+      p.carousel.folders = p.carousel.folders.filter((f) => f !== folder);
+      carouselUI.folder = null;
+      carouselSelection = null;
+      carouselUI.ids.clear();
+      changed();
+    };
+  }
+  if (!o) return;
+  if (items.length === 1 && o.type !== "logo") {
+    const section = document.createElement("section");
+    section.className = "carousel-property-section";
+    section.innerHTML = `<h4>Ablage</h4><label>Ebenenordner<select id="carouselFolderChoice"><option value="">Ohne Ordner</option>${(p.carousel.folders || []).map((f) => `<option value="${f.id}" ${o.folderId === f.id ? "selected" : ""}>${esc(f.name)}</option>`).join("")}</select></label>`;
+    panel.append(section);
+    $("#carouselFolderChoice").disabled = carouselObjectLocked(o);
+    $("#carouselFolderChoice").onchange = (e) =>
+      carouselAssignFolder(o, e.target.value);
+  }
+  if (studioPreferences.advanced && items.length === 1) {
+    const section = panel.querySelector('[data-prop="w"]')?.closest("section");
+    if (section) {
+      const label = document.createElement("label");
+      label.className = "rotation-value";
+      label.innerHTML = `Drehung <span class="type-unit"><input id="carouselRotation" type="number" min="-180" max="180" step="1" value="${Math.round((o.angle || 0) * 10) / 10}"><span>°</span></span>`;
+      section.append(label);
+      let begun = false;
+      $("#carouselRotation").disabled = carouselObjectLocked(o);
+      $("#carouselRotation").onfocus = () => (begun = false);
+      $("#carouselRotation").oninput = (e) => {
+        const n = Number(e.target.value);
+        if (!Number.isFinite(n) || Math.abs(n) > 180) return;
+        if (!begun) {
+          checkpoint();
+          begun = true;
+        }
+        carouselSetRotation(o, n);
+        changed(false);
+      };
+    }
+  }
+  const fx = document.createElement("section");
+  fx.className = "carousel-property-section layer-effects";
+  fx.innerHTML = `<div class="type-section-heading"><h4>Effekte</h4><button id="carouselResetEffects" title="Effekte zurücksetzen">Zurücksetzen</button></div><p class="type-hint">${items.length > 1 ? "Für alle ausgewählten Elemente" : "Nicht destruktiv · Original bleibt erhalten"}</p>${[
+    ["blur", "Gausssche Unschärfe", "px"],
+    ["noise", "Rauschen · monochrom", "%"],
+  ]
+    .map(
+      ([key, label, unit]) =>
+        `<label class="effect-control"><span>${label}<output data-effect-output="${key}">${o.effects?.[key] || 0} ${unit}</output></span><input data-effect="${key}" type="range" min="0" max="100" step="1" value="${o.effects?.[key] || 0}" ${items.every(carouselObjectLocked) ? "disabled" : ""}></label>`,
+    )
+    .join("")}`;
+  panel.append(fx);
+  fx.querySelectorAll("[data-effect]").forEach((input) => {
+    let begun = false;
+    input.onpointerdown = () => (begun = false);
+    input.onfocus = () => (begun = false);
+    input.oninput = () => {
+      if (!begun) {
+        checkpoint();
+        begun = true;
+      }
+      const value = +input.value;
+      items
+        .filter((o) => !carouselObjectLocked(o))
+        .forEach((o) => {
+          o.effects = {
+            blur: 0,
+            noise: 0,
+            ...o.effects,
+            [input.dataset.effect]: value,
+          };
+        });
+      fx.querySelector(`[data-effect-output="${input.dataset.effect}"]`).value =
+        value + (input.dataset.effect === "blur" ? " px" : " %");
+      changed(false);
+    };
+  });
+  $("#carouselResetEffects").disabled = items.every(carouselObjectLocked);
+  $("#carouselResetEffects").onclick = () => {
+    checkpoint();
+    items
+      .filter((o) => !carouselObjectLocked(o))
+      .forEach((o) => delete o.effects);
+    changed(false);
+    carouselPanel();
+  };
+  const position = [
+    ...panel.querySelectorAll(":scope > .carousel-property-section"),
+  ].find(
+    (section) =>
+      section.querySelector("h4")?.textContent === "Position & Grösse",
+  );
+  if (position) panel.append(position);
+}
+async function carouselLogoImage(o) {
+  return image(
+    o.source === "black"
+      ? "mkw-logo-bold-pos.svg"
+      : o.source === "white"
+        ? "mkw-logo-bold-neg.svg"
+        : p.logos.find((l) => l.id === o.source)?.data ||
+          "mkw-logo-bold-neg.svg",
+  );
+}
+function carouselReplaceLogo(o) {
+  const project = p;
+  let input = $("#carouselLogoFile");
+  if (!input) {
+    input = document.createElement("input");
+    input.id = "carouselLogoFile";
+    input.type = "file";
+    input.accept = ".svg,.png,.jpg,.jpeg,.webp";
+    input.hidden = true;
+    document.body.append(input);
+  }
+  input.value = "";
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file || carouselObjectLocked(o)) return;
+    try {
+      if (file.size > 20 * 1024 * 1024) throw Error("Logo maximal 20 MB.");
+      const data = await dataURL(file),
+        bitmap = await image(data);
+      if (
+        project !== p ||
+        !p.carousel.objects.includes(o) ||
+        carouselObjectLocked(o)
+      )
+        return;
+      checkpoint();
+      const logo = { id: uid(), name: file.name, data };
+      p.logos.push(logo);
+      o.source = logo.id;
+      o.h = (o.w * bitmap.height) / bitmap.width;
+      changed();
+    } catch (e) {
+      status(e.message);
+    }
+  };
+  input.click();
+}

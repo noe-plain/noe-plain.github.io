@@ -9,6 +9,7 @@ function carouselPSDBounds(o) {
           ? Math.ceil(o.size * 0.4) + 4
           : 2;
   const geometry = carouselObjectBounds(o);
+  const effectPad = (o.effects?.blur || 0) * 3;
   let leftEdge = geometry.x,
     right = geometry.x + geometry.w,
     bottom = geometry.y + geometry.h;
@@ -28,13 +29,16 @@ function carouselPSDBounds(o) {
       o.y + carouselTextOffset(o, layout) + layout.height,
     );
   }
-  const left = Math.max(0, Math.floor(leftEdge - pad)),
-    top = Math.max(0, Math.floor(geometry.y - pad));
+  const left = Math.max(0, Math.floor(leftEdge - pad - effectPad)),
+    top = Math.max(0, Math.floor(geometry.y - pad - effectPad));
   return {
     left,
     top,
-    w: Math.max(0, Math.min(c.w * c.n, Math.ceil(right + pad)) - left),
-    h: Math.max(0, Math.min(c.h, Math.ceil(bottom + pad)) - top),
+    w: Math.max(
+      0,
+      Math.min(c.w * c.n, Math.ceil(right + pad + effectPad)) - left,
+    ),
+    h: Math.max(0, Math.min(c.h, Math.ceil(bottom + pad + effectPad)) - top),
   };
 }
 async function carouselPSDLayer(o) {
@@ -44,7 +48,13 @@ async function carouselPSDLayer(o) {
     ctx = exportContext(canvas);
   ctx.translate(-bounds.left, -bounds.top);
   await carouselPaint(ctx, null, 1, true, null, [
-    { ...o, visible: true, opacity: 1, blend: "source-over" },
+    {
+      ...o,
+      folderId: undefined,
+      visible: true,
+      opacity: 1,
+      blend: "source-over",
+    },
   ]);
   return carouselPSDVectorData(o, {
     name: o.name,
@@ -79,6 +89,26 @@ async function buildCarouselPSD(progress = () => {}) {
       { name: "Hintergrund", canvas: background, left: 0, top: 0 },
     ],
     bounds = { left: 0, top: 0, right: width, bottom: height };
+  const folders = new Map();
+  const append = (o, entry) => {
+    const folder = carouselFolder(o);
+    if (!folder) {
+      children.push(entry);
+      return;
+    }
+    let group = folders.get(folder.id);
+    if (!group) {
+      group = {
+        name: folder.name,
+        opened: !folder.collapsed,
+        hidden: folder.visible === false,
+        children: [],
+      };
+      folders.set(folder.id, group);
+      children.push(group);
+    }
+    group.children.push(entry);
+  };
   for (const [index, o] of c.objects.entries()) {
     progress(`Ebene ${index + 1} / ${c.objects.length} vorbereiten …`);
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -86,57 +116,89 @@ async function buildCarouselPSD(progress = () => {}) {
       const layout = carouselTextLayout(o),
         offset = carouselTextOffset(o, layout),
         lines = [];
-      for (const line of layout.lines) {
-        if (!line.text) continue;
-        const record = {
-          ...o,
-          textAlpha: 1,
-          text: line.text,
-          textStyles: undefined,
-          textAlign: "left",
-          x: o.x + line.x,
-          size: line.size,
-          textAnchor: "top",
-          y: o.y + line.y + offset,
-          h: line.size * 1.12,
-          opacity: 1,
-          blend: "source-over",
-          visible: true,
-        };
-        const layer = await carouselPSDLayer(record);
-        if (!layer) continue;
-        layer.name = line.text;
-        layer.text = textLayerData(
-          {
+      for (const originalLine of layout.lines)
+        for (const run of originalLine.runs) {
+          const line = {
+            ...originalLine,
+            text: run.text,
+            size: run.size,
+            x: originalLine.x + run.x,
+            y: originalLine.y + run.dy,
+          };
+          if (!line.text) continue;
+          const record = {
+            ...o,
+            folderId: undefined,
+            effects: undefined,
+            uppercase: false,
+            script: "normal",
+            characterStyles: undefined,
+            textAlpha: 1,
             text: line.text,
-            x: o.x + carouselTextAlign(o, line.paragraph).factor * o.w,
-            y: record.y,
+            textStyles: undefined,
+            textAlign: "left",
+            x: carouselToWorld(o, { x: line.x, y: line.y + offset }).x,
             size: line.size,
-            role: o.font,
-            color: o.color,
-            align: line.align,
-            angle: 0,
-          },
-          0,
-          0,
-        );
-        layer.text.style.leading = line.leading;
-        lines.push(layer);
-      }
-      children.push({
-        name: o.name,
-        opened: true,
-        hidden: o.visible === false,
-        opacity: (o.opacity ?? 1) * (o.textAlpha ?? 1),
-        blendMode:
-          { "source-over": "normal", multiply: "multiply", screen: "screen" }[
-            o.blend
-          ] || "normal",
-        children: lines,
-      });
+            textAnchor: "top",
+            y: carouselToWorld(o, { x: line.x, y: line.y + offset }).y,
+            h: line.size * 1.12,
+            opacity: 1,
+            blend: "source-over",
+            visible: true,
+          };
+          const layer = await carouselPSDLayer(record);
+          if (!layer) continue;
+          layer.name = line.text;
+          layer.text = textLayerData(
+            {
+              text: line.text,
+              x: carouselToWorld(o, {
+                x:
+                  line.x +
+                  carouselTextAlign(o, line.paragraph).factor * run.width,
+                y: line.y + offset,
+              }).x,
+              y: carouselToWorld(o, {
+                x:
+                  line.x +
+                  carouselTextAlign(o, line.paragraph).factor * run.width,
+                y: line.y + offset,
+              }).y,
+              size: line.size,
+              role: o.font,
+              color: o.color,
+              align: line.align,
+              angle: o.angle || 0,
+            },
+            0,
+            0,
+          );
+          layer.text.style.leading = line.leading;
+          lines.push(layer);
+        }
+      if (carouselHasEffects(o)) {
+        const layer = await carouselPSDLayer(o);
+        if (layer) append(o, layer);
+        append(o, {
+          name: o.name + " · editierbarer Text ohne Effekte",
+          hidden: true,
+          children: lines,
+        });
+      } else
+        append(o, {
+          name: o.name,
+          opened: true,
+          hidden: o.visible === false,
+          opacity: (o.opacity ?? 1) * (o.textAlpha ?? 1),
+          blendMode:
+            { "source-over": "normal", multiply: "multiply", screen: "screen" }[
+              o.blend
+            ] || "normal",
+          children: lines,
+        });
     } else {
       const layer = await carouselPSDLayer(o);
-      if (layer) children.push(layer);
+      if (layer) append(o, layer);
     }
   }
   const slices = Array.from({ length: c.n }, (_, i) => ({

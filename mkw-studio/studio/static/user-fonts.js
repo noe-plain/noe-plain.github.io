@@ -18,6 +18,8 @@ function studioIsCustomFont(font) {
   );
 }
 let studioFontDatabase;
+const studioRemovedFonts = new Set();
+let studioLibraryFontRoles = new Set();
 function studioOpenFontDatabase() {
   if (!studioFontDatabase)
     studioFontDatabase = new Promise((resolve, reject) => {
@@ -50,17 +52,28 @@ async function studioStoreFont(font) {
 }
 async function studioMergeUserFonts() {
   try {
-    for (const font of await studioStoredFonts())
+    const stored = await studioStoredFonts();
+    studioLibraryFontRoles = new Set(stored.map((f) => f.role));
+    for (const font of stored)
       if (!p.fonts.some((existing) => existing.role === font.role))
         p.fonts.push(font);
   } catch {}
 }
 function studioFontOptions(value, system = true) {
   const custom = p.fonts
-    .filter(studioIsCustomFont)
+    .filter(
+      (font) =>
+        studioIsCustomFont(font) && studioLibraryFontRoles.has(font.role),
+    )
     .map((font) => [font.role, font.displayName])
     .sort((a, b) => a[1].localeCompare(b[1], "de"));
-  return `<optgroup label="Markenschriften · Musikkollegium">${options(studioBrandFonts, value)}</optgroup>${custom.length ? `<optgroup label="Eigene Schriften">${options(custom, value)}</optgroup>` : ""}${
+  const portable = p.fonts
+    .filter(
+      (font) =>
+        studioIsCustomFont(font) && !studioLibraryFontRoles.has(font.role),
+    )
+    .map((font) => [font.role, font.displayName]);
+  return `<optgroup label="Markenschriften · Musikkollegium">${options(studioBrandFonts, value)}</optgroup>${custom.length ? `<optgroup label="Eigene Schriften">${options(custom, value)}</optgroup>` : ""}${portable.length ? `<optgroup label="Projektschriften">${options(portable, value)}</optgroup>` : ""}${
     system
       ? `<optgroup label="Systemschriften">${options(
           [
@@ -120,15 +133,29 @@ function studioFontMetadata(buffer, fallback) {
 }
 function studioRenderFontSettings() {
   const root = $("#customFontList"),
-    fonts = p.fonts.filter(studioIsCustomFont);
+    fonts = p.fonts.filter(
+      (font) =>
+        studioIsCustomFont(font) && studioLibraryFontRoles.has(font.role),
+    );
   root.innerHTML = fonts.length
     ? fonts
         .map(
           (font) =>
-            `<div class="custom-font-row"><span class="font-sample" style="font-family:${font.role}">Ag</span><span><strong>${esc(font.displayName)}</strong><small>${esc(font.name)}</small></span></div>`,
+            `<div class="custom-font-row"><span class="font-sample" style="font-family:${font.role}">Ag</span><span><strong>${esc(font.displayName)}</strong><small>${esc(font.name)}</small></span><button class="icon-button" data-remove-font="${font.role}" aria-label="Eigene Schrift entfernen: ${esc(font.displayName)}" title="Aus der Schriftbibliothek entfernen">${studioIcon("trash")}</button></div>`,
         )
         .join("")
     : "<p>Noch keine eigenen Schriften hinzugefügt.</p>";
+  root
+    .querySelectorAll("[data-remove-font]")
+    .forEach(
+      (button) =>
+        (button.onclick = () =>
+          studioRemoveFont(button.dataset.removeFont).catch(
+            (error) =>
+              ($("#fontImportStatus").textContent =
+                "Schrift konnte nicht entfernt werden: " + error.message),
+          )),
+    );
 }
 $("#addCustomFonts").onclick = () => $("#customFontFiles").click();
 $("#customFontFiles").onchange = async (event) => {
@@ -155,7 +182,14 @@ $("#customFontFiles").onchange = async (event) => {
             .map((byte) => byte.toString(16).padStart(2, "0"))
             .join(""),
           role = "MKWCustom_" + hash.slice(0, 32);
-        if (p.fonts.some((font) => font.role === role)) continue;
+        if (p.fonts.some((font) => font.role === role)) {
+          if (!studioLibraryFontRoles.has(role)) {
+            await studioStoreFont(p.fonts.find((font) => font.role === role));
+            studioRemovedFonts.delete(role);
+            imported++;
+          }
+          continue;
+        }
         const metadata = studioFontMetadata(
             buffer,
             file.name.replace(/\.[^.]+$/, ""),
@@ -175,6 +209,7 @@ $("#customFontFiles").onchange = async (event) => {
           storageMessage =
             "Schrift bleibt im Projekt erhalten. Die geräteweite Bibliothek ist in diesem Browser nicht verfügbar.";
         }
+        studioRemovedFonts.delete(role);
         p.fonts.push(font);
         imported++;
       } catch (error) {
@@ -205,3 +240,25 @@ $("#customFontFiles").onchange = async (event) => {
     event.target.value = "";
   }
 };
+
+async function studioRemoveFont(role) {
+  if (!p.fonts.some((font) => font.role === role && studioIsCustomFont(font)))
+    return;
+  const db = await studioOpenFontDatabase();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction("fonts", "readwrite");
+    tx.objectStore("fonts").delete(role);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  studioRemovedFonts.add(role);
+  const used = MKWProjectAssets.references(p).fonts.has(role);
+  if (!used) p.fonts = p.fonts.filter((font) => font.role !== role);
+  await loadFonts();
+  studioRenderFontSettings();
+  $("#fontImportStatus").textContent = used
+    ? "Aus der Bibliothek entfernt. Die im aktuellen Projekt verwendete Schrift bleibt für dieses Projekt erhalten."
+    : "Schrift aus der Bibliothek entfernt.";
+  if (p.carousel) carouselPanel();
+  else renderPanel();
+}

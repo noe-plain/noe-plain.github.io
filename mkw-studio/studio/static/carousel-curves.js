@@ -1,7 +1,12 @@
 "use strict";
 // Parametric primitives become ordinary paths when their points are edited.
 function carouselStartPointEditing(o) {
-  if (!studioPreferences.advanced || !carouselIsVector(o) || o.locked) return;
+  if (
+    !studioPreferences.advanced ||
+    !carouselIsVector(o) ||
+    carouselObjectLocked(o)
+  )
+    return;
   if (o.type === "shape") {
     const converted = carouselPaperObject(carouselPaperItem(o), o, o.id);
     if (!converted) return;
@@ -87,11 +92,11 @@ function carouselCurvePointer(ev, pt) {
       .find(
         (v) =>
           v.type === "path" &&
-          !v.locked &&
-          v.visible !== false &&
+          !carouselObjectLocked(v) &&
+          carouselObjectVisible(v) &&
           carouselNearestSegment(v, pt),
       );
-  if (!carouselIsVector(o) || o.locked) return;
+  if (!carouselIsVector(o) || carouselObjectLocked(o)) return;
   carouselSelect([o.id]);
   carouselStartPointEditing(o);
   const segment = carouselNearestSegment(o, pt);
@@ -215,7 +220,7 @@ function carouselClosePathPointer(ev) {
   );
 }
 function carouselInsertPathPointAt(o, segment) {
-  if (o.locked || o.points.length >= 200) return;
+  if (carouselObjectLocked(o) || o.points.length >= 200) return;
   carouselUI.vectorContour = segment.contour;
   const points = carouselPathWorld(o),
     i = segment.index,

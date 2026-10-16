@@ -20,6 +20,10 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel.js` | Carousel document defaults, validation, creation and selection model. |
 | `carousel-render.js` | Viewport/canvas and overlays. One async paint at a time, reusable buffer, generation cancellation. |
 | `carousel-input.js` | Pointer movement, resizing and shared snapping. |
+| `carousel-transform.js` | Origin-based rotation, tight local/world bounds, rotation handles and constrained Shift snapping. |
+| `carousel-refinements.js` | Folder metadata, inherited locks/visibility, effect inspector and custom carousel logos. |
+| `carousel-effects.js` | Bounded, non-persistent local effect rasters; deterministic monochrome noise and Gaussian blur. |
+| `carousel-typography.js`, `carousel-curvature.js` | Non-destructive case/script runs, source character offsets and view-only curvature comb. |
 | `carousel-text.js` | Text layout, paragraphs, leading, direct editing and typography UI. |
 | `carousel-geometry.js` | Angle bleed, image masks/crops, frame points. |
 | `carousel-sidebar.js` | Properties and layer-list UI. |
@@ -63,3 +67,15 @@ Single-post previews paint only visible boards plus a 200 px scroll-ahead margin
 The start screen reads only the last project record, not its image blobs. Full assets are loaded when continuing. Linked-file version checks also read metadata only. Autosave captures a model snapshot with shared immutable asset objects; the persistence boundary compacts it and reuses unchanged asset hashes through weak references. Neither original input duplicates nor undo history are persisted.
 
 Large photos have a separate 128 MiB LRU of screen-only rasters with a maximum 2048 px edge. Both editor renderers, including image paints on vectors and gradients, use this loader. Geometry and image patterns still use original image coordinates. Export entry points retain the full-resolution loader. Deleted assets and project switches prune preview references, without resetting canvases still used by an in-flight paint. The warnings UI is rebuilt only when its content or its host button changes; text measurement reuses a dedicated context.
+
+## Carousel rotations, folders and effects
+
+`angle` rotates an object around its stored local origin; the rotation handle compensates its origin to rotate around the visible selection centre. Exact cubic extrema determine world bounds, while the single-object frame follows tight local bounds and rotates with the object. Geometry caches use weak object keys and exclude translations. Shift move snapping adjusts distance on the constrained 45-degree ray; Ctrl/Command temporarily bypass snapping. Rotation snapping uses 15-degree steps.
+
+Folders are optional document metadata in `carousel.folders`; members refer to a `folderId` and remain ordinary asset-bearing objects in the flat paint order. Folder members stay contiguous. Folder visibility/locking is inherited rather than rewriting each member. Protected logos stay at the top and outside folders. PSD emits matching groups. A custom carousel logo uses the existing `logos` collection and reference traversal; unused replacements are removed from browser/MKW saves. New brand logos are 600 px wide, constrained only if the available safe area is narrower. Existing dimensions remain intact.
+
+`effects` stores only blur/noise parameters. Local raster caching excludes position, rotation and opacity; a 64 MiB LRU is pruned on deletion and project switches. Large one-off rasters are not retained. Preview raster resolution follows view scale; exports use original resolution. Monochrome noise uses a deterministic object-ID seed, preserves alpha and applies the same luminance delta to RGB. PNG/JPG/WebP/PDF and PSD composites use the shared renderer. PSD effect layers preserve exact raster appearance; text without effects remains editable, and effect text keeps an additional hidden editable copy.
+
+`uppercase` affects display only. Optional `script` and source-indexed `characterStyles` support superscript without rewriting `text`. Wrapping, canvas, inline editing, PDF selection text and PSD share measured runs. Text edits shift style ranges; undo retains them. Curvature-comb visibility is a device preference, not document content; its SVG overlay never reaches an export. Removed device-library fonts stay embedded in documents that still use them, under a separate project-font option group.
+
+Typography layout is weakly cached per source object, keyed by text, font metrics, wrap width, paragraph/character settings and loaded font status. Position/opacity changes reuse it. Plain text and whole-frame superscript measure one run directly; mixed script splits at style boundaries, never loops over every character for every width query.

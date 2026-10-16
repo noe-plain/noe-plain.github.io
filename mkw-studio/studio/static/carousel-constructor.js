@@ -5,12 +5,13 @@ let carouselPaperScope = null,
   carouselBuilderChosen = new Set();
 function carouselVectorSnapTargets(xs, ys, excluded) {
   for (const o of p.carousel.objects)
-    if (o.visible !== false && !excluded.includes(o.id)) {
+    if (carouselObjectVisible(o) && !excluded.includes(o.id)) {
       if (o.type === "path")
         for (const points of carouselPathContours(o))
           for (const pt of points) {
-            xs.push(o.x + pt.x * o.w);
-            ys.push(o.y + pt.y * o.h);
+            const world = carouselToWorld(o, { x: pt.x * o.w, y: pt.y * o.h });
+            xs.push(world.x);
+            ys.push(world.y);
           }
       else if (o.type === "image" && o.framePoints)
         for (const pt of o.framePoints) {
@@ -150,6 +151,7 @@ function carouselShapeData(o) {
 function carouselPaperItem(o) {
   const scope = carouselPaper(),
     item = scope.PathItem.create(carouselShapeData(o));
+  if (o.angle) item.rotate(o.angle, new scope.Point(0, 0));
   item.translate(new scope.Point(o.x, o.y));
   return item;
 }
@@ -199,8 +201,8 @@ function carouselConstructorSources() {
     (o) =>
       carouselIsVector(o) &&
       (o.type === "shape" || o.closed) &&
-      !o.locked &&
-      o.visible !== false,
+      !carouselObjectLocked(o) &&
+      carouselObjectVisible(o),
   );
 }
 function carouselConstructorPanel(panel) {

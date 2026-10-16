@@ -6,6 +6,7 @@ const studioPreferenceDefaults = {
   exportFormat: "jpg",
   autoSaveFile: true,
   advanced: false,
+  curvature: false,
   pdfPreset: "linkedin",
   lineHeight: 95,
 };
@@ -26,6 +27,8 @@ try {
     saved.lineHeight <= 300
   )
     studioPreferences.lineHeight = saved.lineHeight;
+  if (typeof saved.curvature === "boolean")
+    studioPreferences.curvature = saved.curvature;
   if (typeof saved.autoSaveFile === "boolean")
     studioPreferences.autoSaveFile = saved.autoSaveFile;
   if (typeof saved.advanced === "boolean")

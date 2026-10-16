@@ -235,7 +235,7 @@
   function constrainLogo(b, aspect) {
     const e = b.elements.logo,
       s = safeRect(b);
-    e.size = Math.min(650, s.w, s.h * aspect);
+    e.size = Math.min(e.size || 600, s.w, s.h * aspect);
     e.angle = 0;
     e.align = "left";
     e.x = s.x + s.w - e.size;

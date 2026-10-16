@@ -145,7 +145,7 @@ function carouselSetup() {
       p.boards.push(b);
     }
     const logo = await image("mkw-logo-bold-neg.svg"),
-      lw = Math.min(650, w - left - right);
+      lw = Math.min(600, w - left - right);
     p.carousel.objects.push({
       id: uid(),
       type: "logo",
@@ -176,23 +176,25 @@ function carouselSetup() {
 
 function carouselWarning(o) {
   const c = p.carousel;
-  if (o.type !== "text" || !o.text.trim() || o.visible === false) return "";
-  const index = Math.floor(o.x / c.w);
+  if (o.type !== "text" || !o.text.trim() || !carouselObjectVisible(o))
+    return "";
+  const bounds = carouselObjectBounds(o),
+    index = Math.floor(bounds.x / c.w);
   if (
     index < 0 ||
     index >= c.n ||
-    o.x + o.w > (index + 1) * c.w ||
-    o.y < 0 ||
-    o.y + o.h > c.h
+    bounds.x + bounds.w > (index + 1) * c.w ||
+    bounds.y < 0 ||
+    bounds.y + bounds.h > c.h
   )
     return "Text überschreitet eine Slide-Grenze.";
   if (
-    o.x < index * c.w + 100 ||
-    o.x + o.w > (index + 1) * c.w - 100 ||
-    o.y < c.top ||
-    o.y + o.h > c.h - c.bottom ||
-    o.x < c.left ||
-    o.x + o.w > c.n * c.w - c.right
+    bounds.x < index * c.w + 100 ||
+    bounds.x + bounds.w > (index + 1) * c.w - 100 ||
+    bounds.y < c.top ||
+    bounds.y + bounds.h > c.h - c.bottom ||
+    bounds.x < c.left ||
+    bounds.x + bounds.w > c.n * c.w - c.right
   )
     return "Text liegt ausserhalb der empfohlenen Safezone.";
   if (carouselTextHeight(o) > o.h + 1)
@@ -241,6 +243,7 @@ function validateCarousel(q) {
   for (const [i, b] of q.boards.entries())
     if (b.carouselSlide !== i || b.w !== c.w || b.h !== c.h)
       throw Error("Ungültige Carousel-Slides.");
+  carouselValidateFolders(c);
   const ids = new Set();
   for (const o of c.objects) {
     if (
@@ -261,6 +264,7 @@ function validateCarousel(q) {
     )
       throw Error("Ungültige Carousel-Ebene.");
     ids.add(o.id);
+    carouselValidateRefinements(o, c, q);
     studioValidatePaint(o);
     if (o.strokeImageId && !q.images.some((im) => im.id === o.strokeImageId))
       throw Error("Konturbild fehlt.");
@@ -420,6 +424,7 @@ function carouselSelected() {
 }
 
 function carouselSelect(ids) {
+  carouselUI.folder = null;
   carouselUI.vectorExtension = null;
   carouselUI.vectorPoints = false;
   carouselUI.vectorNodes = new Set();
@@ -455,14 +460,7 @@ function carouselTool(tool) {
 }
 
 function carouselObjectBounds(o) {
-  if (o.type !== "path") return { x: o.x, y: o.y, w: o.w, h: o.h };
-  const bounds = MKWBezier.bounds(o.contours || [o.points], o.closed);
-  return {
-    x: o.x + bounds.x * o.w,
-    y: o.y + bounds.y * o.h,
-    w: Math.max(0.001, bounds.w * o.w),
-    h: Math.max(0.001, bounds.h * o.h),
-  };
+  return carouselGeometryBounds(o);
 }
 function carouselSetBoundsValue(o, key, value) {
   const bounds = carouselObjectBounds(o);
@@ -470,10 +468,16 @@ function carouselSetBoundsValue(o, key, value) {
     o[key] += value - bounds[key];
     return;
   }
-  const axis = key === "w" ? "x" : "y",
-    factor = Math.max(0.001, value) / bounds[key];
-  o[axis] = bounds[axis] + (o[axis] - bounds[axis]) * factor;
+  const local = carouselLocalBounds(o),
+    factor = Math.max(0.001, value) / local[key],
+    before = carouselToWorld(o, { x: local.x, y: local.y });
   o[key] *= factor;
+  const next = carouselToWorld(o, {
+    x: local.x * (key === "w" ? factor : 1),
+    y: local.y * (key === "h" ? factor : 1),
+  });
+  o.x += before.x - next.x;
+  o.y += before.y - next.y;
 }
 function carouselBounds(objects) {
   if (!objects.length) return null;
@@ -632,7 +636,7 @@ async function carouselImport(files, target) {
 }
 
 function carouselDuplicate() {
-  const objects = carouselSelected().filter((o) => !o.locked);
+  const objects = carouselSelected().filter((o) => !carouselObjectLocked(o));
   if (!objects.length) return;
   checkpoint();
   const copies = objects.map((o) => ({
@@ -649,7 +653,7 @@ function carouselDuplicate() {
 
 function carouselDelete() {
   const ids = carouselSelected()
-    .filter((o) => !o.locked && o.type !== "logo")
+    .filter((o) => !carouselObjectLocked(o) && o.type !== "logo")
     .map((o) => o.id);
   if (!ids.length) return;
   checkpoint();

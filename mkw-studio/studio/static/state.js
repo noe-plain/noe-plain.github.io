@@ -80,6 +80,7 @@ function changed(full = true) {
   $("#redo").disabled = !future.length;
   MKWProjectAssets.prune(p);
   pruneImageCache();
+  pruneCarouselEffects();
   revision++;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => autosave().catch(() => {}), 1200);
@@ -207,7 +208,7 @@ function basicBoard(im, w = 1080, h = 1080) {
       logo: {
         x: 64,
         y: 64,
-        size: 650,
+        size: 600,
         visible: false,
         source: "black",
         angle: 0,
@@ -585,6 +586,7 @@ async function restore(q) {
   for (const l of q.logos) await image(l.data);
   p = q;
   pruneImageCache();
+  pruneCarouselEffects();
   selected = p.boards[0]?.id;
   history = [];
   future = [];

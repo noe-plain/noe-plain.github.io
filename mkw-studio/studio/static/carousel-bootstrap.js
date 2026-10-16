@@ -24,7 +24,7 @@ window.addEventListener(
       ev.preventDefault();
       carouselSelect(
         p.carousel.objects
-          .filter((o) => !o.locked && o.visible !== false)
+          .filter((o) => !carouselObjectLocked(o) && o.visible !== false)
           .map((o) => o.id),
       );
       return;
@@ -105,7 +105,7 @@ window.addEventListener(
       return;
     }
     if (key.startsWith("arrow")) {
-      const chosen = carouselSelected().filter((o) => !o.locked);
+      const chosen = carouselSelected().filter((o) => !carouselObjectLocked(o));
       if (!chosen.length) return;
       ev.preventDefault();
       checkpoint();

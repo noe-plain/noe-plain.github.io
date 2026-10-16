@@ -32,6 +32,8 @@ function carouselPSDVectorData(object, layer) {
     fill = studioPaintRead(object, "fill"),
     stroke = studioPaintRead(object, "stroke");
   const simple =
+    !carouselHasEffects(object) &&
+    !object.angle &&
     fill.kind === "solid" &&
     stroke.kind === "solid" &&
     (!fill.enabled || fill.alpha === 1) &&

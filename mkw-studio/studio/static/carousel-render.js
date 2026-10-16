@@ -27,7 +27,11 @@ async function carouselPaint(
   }
   for (const o of objects || c.objects) {
     if (!isCurrent()) break;
-    if (o.visible === false || o.id === editingId) continue;
+    if (!carouselObjectVisible(o) || o.id === editingId) continue;
+    if (carouselHasEffects(o)) {
+      await carouselPaintEffect(ctx, o, scale, loadImage);
+      continue;
+    }
     // Photos clipped to other slides must not repeatedly decode during each export.
     if (
       slide !== null &&
@@ -39,6 +43,7 @@ async function carouselPaint(
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
     ctx.translate(o.x, o.y);
+    if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
     if (o.type === "text") {
       ctx.fillStyle = studioPaintRGBA(o.color, o.textAlpha ?? 1);
       ctx.textBaseline = "top";
@@ -46,8 +51,10 @@ async function carouselPaint(
       const layout = carouselTextLayout(o, ctx),
         offset = carouselTextOffset(o, layout);
       for (const line of layout.lines) {
-        ctx.font = `${line.size}px "${o.font}"`;
-        ctx.fillText(line.text, line.x, line.y + offset);
+        for (const run of line.runs) {
+          ctx.font = `${run.size}px "${o.font}"`;
+          ctx.fillText(run.text, line.x + run.x, line.y + run.dy + offset);
+        }
       }
     } else if (carouselIsVector(o)) {
       await carouselPaintVector(ctx, o, loadImage);
@@ -56,11 +63,7 @@ async function carouselPaint(
       ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage);
       ctx.fillRect(0, 0, o.w, o.h);
     } else if (o.type === "logo") {
-      const im = await image(
-        o.source === "black"
-          ? "mkw-logo-bold-pos.svg"
-          : "mkw-logo-bold-neg.svg",
-      );
+      const im = await carouselLogoImage(o);
       ctx.drawImage(im, 0, 0, o.w, o.h);
     } else {
       if (o.type === "angle") {
@@ -105,16 +108,13 @@ async function carouselPaint(
 }
 
 function carouselImageOnSlide(o, slide, c = p.carousel) {
-  const points = carouselFramePoints(o),
-    xs = points.map((point) => o.x + point.x * o.w),
-    ys = points.map((point) => o.y + point.y * o.h);
-  // Custom vertices can extend beyond the stored frame. Merely touching an edge
-  // contributes no pixels to that slide.
+  const b = carouselObjectBounds(o),
+    pad = (o.effects?.blur || 0) * 3;
   return (
-    Math.max(...xs) > slide * c.w &&
-    Math.min(...xs) < (slide + 1) * c.w &&
-    Math.max(...ys) > 0 &&
-    Math.min(...ys) < c.h
+    b.x + b.w + pad > slide * c.w &&
+    b.x - pad < (slide + 1) * c.w &&
+    b.y + b.h + pad > 0 &&
+    b.y - pad < c.h
   );
 }
 
@@ -460,6 +460,7 @@ function carouselRefresh() {
   );
   carouselDrawSelection();
   carouselVectorOverlay();
+  carouselCurvatureOverlay();
   carouselConstructorOverlay();
   carouselSyncColourWells();
   carouselDrawSnap();
@@ -473,7 +474,7 @@ function carouselRefresh() {
 function carouselDrawSelection() {
   const root = $("#carouselSelectionOverlay");
   if (!root) return;
-  const items = carouselSelected().filter((o) => o.visible !== false);
+  const items = carouselSelected().filter(carouselObjectVisible);
   let bounds = carouselBounds(items);
   const content =
     carouselUI.content &&
@@ -508,19 +509,15 @@ function carouselDrawSelection() {
       carouselUI.tool === "gradient"
     );
   const key = JSON.stringify([
-    items.map((o) => [o.id, o.locked, o.name]),
+    items.map((o) => [o.id, carouselObjectLocked(o), o.name]),
     carouselUI.content,
     carouselUI.tool,
     ordinary,
+    studioPreferences.advanced,
   ]);
   const previous = root.querySelector(".carousel-frame");
   if (ordinary && root.dataset.selectionKey === key && previous) {
-    Object.assign(previous.style, {
-      left: bounds.x * carouselZoom + "px",
-      top: bounds.y * carouselZoom + "px",
-      width: bounds.w * carouselZoom + "px",
-      height: bounds.h * carouselZoom + "px",
-    });
+    carouselSelectionFrame(previous, items, bounds, content);
     return;
   }
   root.innerHTML = "";
@@ -530,20 +527,15 @@ function carouselDrawSelection() {
   frame.className =
     "carousel-frame" +
     (carouselUI.content ? " content-selected" : "") +
-    (items.every((o) => o.locked) ? " locked" : "");
-  Object.assign(frame.style, {
-    left: bounds.x * s + "px",
-    top: bounds.y * s + "px",
-    width: bounds.w * s + "px",
-    height: bounds.h * s + "px",
-  });
+    (items.every(carouselObjectLocked) ? " locked" : "");
+  carouselSelectionFrame(frame, items, bounds, content);
   frame.innerHTML = `<span class="carousel-frame-label">${items.length === 1 ? esc(items[0].name) : items.length + " Elemente"}${carouselUI.content ? " · Bildinhalt" : ""}</span>`;
   const points =
     items.length === 1 &&
     ((carouselUI.framePoints && items[0].type === "image") ||
       (carouselUI.vectorPoints && items[0].type === "path"));
   if (
-    !items.every((o) => o.locked) &&
+    !items.every(carouselObjectLocked) &&
     carouselUI.tool !== "hand" &&
     !carouselUI.content &&
     !points
@@ -566,7 +558,7 @@ function carouselDrawSelection() {
       ev.stopPropagation();
       carouselMove(ev);
     };
-    if (!items[0].locked)
+    if (!carouselObjectLocked(items[0]))
       for (const corner of ["nw", "n", "ne", "e", "se", "s", "sw", "w"]) {
         const btn = document.createElement("button");
         btn.className = "carousel-handle";
@@ -578,6 +570,20 @@ function carouselDrawSelection() {
         };
         frame.append(btn);
       }
+  }
+  if (
+    studioPreferences.advanced &&
+    !content &&
+    !points &&
+    !items.every((o) => carouselObjectLocked(o))
+  ) {
+    const rotate = document.createElement("button");
+    rotate.className = "carousel-rotate-handle";
+    rotate.title = "Drehen · Shift: 15°";
+    rotate.setAttribute("aria-label", "Auswahl drehen");
+    rotate.innerHTML = studioIcon("undo");
+    rotate.onpointerdown = carouselRotateSelection;
+    frame.append(rotate);
   }
   root.append(frame);
   if (
@@ -604,7 +610,12 @@ function carouselDrawGradient(o, root) {
   svg.classList.add("carousel-gradient-line");
   svg.setAttribute("width", o.w * s);
   svg.setAttribute("height", o.h * s);
-  Object.assign(svg.style, { left: o.x * s + "px", top: o.y * s + "px" });
+  Object.assign(svg.style, {
+    left: o.x * s + "px",
+    top: o.y * s + "px",
+    transformOrigin: "0 0",
+    transform: `rotate(${o.angle || 0}deg)`,
+  });
   svg.innerHTML = `<line x1="${start.x * o.w * s}" y1="${start.y * o.h * s}" x2="${end.x * o.w * s}" y2="${end.y * o.h * s}"/>`;
   root.append(svg);
   for (const [key, point] of [
@@ -612,9 +623,10 @@ function carouselDrawGradient(o, root) {
     ["gradientEnd", end],
   ]) {
     const handle = document.createElement("button");
+    const world = carouselToWorld(o, { x: point.x * o.w, y: point.y * o.h });
     handle.className = "carousel-gradient-stop";
-    handle.style.left = (o.x + point.x * o.w) * s + "px";
-    handle.style.top = (o.y + point.y * o.h) * s + "px";
+    handle.style.left = world.x * s + "px";
+    handle.style.top = world.y * s + "px";
     handle.style.background = key === "gradientStart" ? o.color : o.endColor;
     handle.setAttribute(
       "aria-label",

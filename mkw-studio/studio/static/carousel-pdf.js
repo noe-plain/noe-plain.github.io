@@ -157,7 +157,7 @@ function carouselPDFText(board, opts) {
   for (const object of c.objects) {
     if (
       object.type !== "text" ||
-      object.visible === false ||
+      !carouselObjectVisible(object) ||
       !object.text.trim() ||
       (object.opacity ?? 1) === 0
     )
@@ -165,32 +165,50 @@ function carouselPDFText(board, opts) {
     const layout = carouselTextLayout(object, measure),
       offset = carouselTextOffset(object, layout),
       font = p.fonts.find((font) => font.role === object.font);
-    for (const line of layout.lines) {
-      const x = object.x + line.x - board.carouselSlide * c.w,
-        y = object.y + line.y + offset;
-      measure.font = `${line.size}px "${object.font}"`;
-      measure.textBaseline = "alphabetic";
-      const ascent = measure.measureText("Mg").actualBoundingBoxAscent;
-      measure.textBaseline = "top";
-      const baseline =
-          ascent - measure.measureText("Mg").actualBoundingBoxAscent,
-        width = measure.measureText(line.text).width;
-      if (
-        line.text &&
-        x + width > 0 &&
-        x < board.w &&
-        y + line.size > 0 &&
-        y < board.h
-      )
-        result.push({
-          text: line.text,
-          x: (dx + x * scale) * 0.75,
-          y: (opts.h - dy - (y + baseline) * scale) * 0.75,
-          size: line.size * scale * 0.75,
-          font: object.font,
-          data: font?.data,
-        });
-    }
+    for (const originalLine of layout.lines)
+      for (const run of originalLine.runs) {
+        const line = { ...originalLine, text: run.text, size: run.size },
+          world = carouselToWorld(object, {
+            x: originalLine.x + run.x,
+            y: originalLine.y + run.dy + offset,
+          }),
+          x = world.x - board.carouselSlide * c.w,
+          y = world.y;
+        measure.font = `${line.size}px "${object.font}"`;
+        measure.textBaseline = "alphabetic";
+        const ascent = measure.measureText("Mg").actualBoundingBoxAscent;
+        measure.textBaseline = "top";
+        const baseline =
+            ascent - measure.measureText("Mg").actualBoundingBoxAscent,
+          width = measure.measureText(line.text).width;
+        if (
+          line.text &&
+          x + width > 0 &&
+          x < board.w &&
+          y + line.size > 0 &&
+          y < board.h
+        )
+          result.push({
+            text: line.text,
+            angle: -(object.angle || 0),
+            x:
+              (dx +
+                (x -
+                  Math.sin(((object.angle || 0) * Math.PI) / 180) * baseline) *
+                  scale) *
+              0.75,
+            y:
+              (opts.h -
+                dy -
+                (y +
+                  Math.cos(((object.angle || 0) * Math.PI) / 180) * baseline) *
+                  scale) *
+              0.75,
+            size: line.size * scale * 0.75,
+            font: object.font,
+            data: font?.data,
+          });
+      }
   }
   return result;
 }
@@ -268,7 +286,13 @@ async function carouselBuildPDF(pages, title) {
           : await document.embedFont(StandardFonts.Helvetica);
         fonts.set(line.font, font);
       }
-      page.drawText(line.text, { x: line.x, y: line.y, size: line.size, font });
+      page.drawText(line.text, {
+        x: line.x,
+        y: line.y,
+        size: line.size,
+        font,
+        ...(line.angle ? { rotate: MKWPDF.degrees(line.angle) } : {}),
+      });
     }
     page.pushOperators(popGraphicsState());
   }

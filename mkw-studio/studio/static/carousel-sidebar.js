@@ -26,7 +26,7 @@ function carouselPanel() {
     return;
   }
   const number = (key, label, min = 0, max = 100000) =>
-    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round((o.type === "path" && ["x", "y", "w", "h"].includes(key) ? carouselObjectBounds(o)[key] : o[key]) * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
+    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round((carouselIsVector(o) && ["x", "y", "w", "h"].includes(key) ? (["w", "h"].includes(key) ? carouselLocalBounds(o)[key] : carouselObjectBounds(o)[key]) : o[key]) * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
   const color = (key, label) =>
     `<label>${label}<input data-prop="${key}" type="color" value="${esc(o[key])}"></label>`;
   const select = (key, label, values) =>
@@ -47,7 +47,7 @@ function carouselPanel() {
     $("#carouselDuplicate").onclick = carouselDuplicate;
     $("#carouselDelete").onclick = carouselDelete;
   } else if (o) {
-    panel.innerHTML = `<div class="carousel-section-heading"><h3>${esc(o.name)}</h3><span>${o.locked ? "Gesperrt" : carouselUI.content ? "Bildinhalt" : "Eigenschaften"}</span></div>${carouselHasImage(o) ? '<button id="carouselReplace" class="primary carousel-place-image">Bild platzieren / ersetzen</button>' : ""}${section("Position & Grösse", `<div class="carousel-fields">${number("x", "X", -100000)}${number("y", "Y", -100000)}${number("w", "Breite", 1)}${number("h", "Höhe", 1)}</div>`)}
+    panel.innerHTML = `<div class="carousel-section-heading"><h3>${esc(o.name)}</h3><span>${carouselObjectLocked(o) ? "Gesperrt" : carouselUI.content ? "Bildinhalt" : "Eigenschaften"}</span></div>${carouselHasImage(o) ? '<button id="carouselReplace" class="primary carousel-place-image">Bild platzieren / ersetzen</button>' : ""}${section("Position & Grösse", `<div class="carousel-fields">${number("x", "X", -100000)}${number("y", "Y", -100000)}${number("w", "Breite", 1)}${number("h", "Höhe", 1)}</div>`)}
  ${section(
    "Gestaltung",
    `<div class="carousel-fields carousel-appearance">${select(
@@ -60,7 +60,7 @@ function carouselPanel() {
      ],
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
- ${o.type === "text" ? carouselTextContentPanel(o) + carouselTextFontPanel(o) + carouselTextStylePanel(o) + carouselTextFramePanel(o) : ""}
+ ${o.type === "text" ? carouselTextContentPanel(o) + carouselTextFontPanel(o) + carouselTypePanel(o) + carouselTextStylePanel(o) + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
  ${
@@ -85,7 +85,9 @@ function carouselPanel() {
          select("source", "Farbe", [
            ["white", "Weiss"],
            ["black", "Schwarz"],
-         ]),
+           ...p.logos.map((l) => [l.id, l.name]),
+         ]) +
+           '<button id="carouselLogoReplace" class="carousel-place-image">Logo ersetzen …</button>',
        )
      : ""
  }
@@ -95,6 +97,7 @@ function carouselPanel() {
         Text: 0,
         Schrift: 5,
         "Absätze & Abstände": 10,
+        Zeichen: 6,
         "Text im Rahmen": 8,
         Form: 0,
         Pfad: 0,
@@ -122,7 +125,7 @@ function carouselPanel() {
       panel.querySelector(".carousel-section-heading").after(primary);
     }
     panel.querySelectorAll("[data-prop]").forEach((input) => {
-      input.disabled = !!o.locked || input.disabled;
+      input.disabled = carouselObjectLocked(o) || input.disabled;
       input.onfocus = () => {
         carouselUI.propertyUndo = false;
       };
@@ -145,10 +148,12 @@ function carouselPanel() {
           carouselUI.propertyUndo = true;
         }
         const oldRatio = o.h / o.w;
-        if (o.type === "text" && input.dataset.prop === "text")
+        if (o.type === "text" && input.dataset.prop === "text") {
           o.textStyles = carouselTextStylesForInput(o, value);
+          o.characterStyles = carouselCharacterStylesForInput(o, value);
+        }
         if (
-          o.type === "path" &&
+          carouselIsVector(o) &&
           ["x", "y", "w", "h"].includes(input.dataset.prop)
         )
           carouselSetBoundsValue(o, input.dataset.prop, value);
@@ -163,6 +168,12 @@ function carouselPanel() {
             o.w = o.direction === "right" ? o.h / 2 : o.h * 2;
         }
         if (o.type === "angle") carouselAngleAlign(o);
+        if (o.type === "logo" && input.dataset.prop === "source")
+          carouselLogoImage(o).then((im) => {
+            o.h = (o.w * im.height) / im.width;
+            changed(false);
+            carouselPanel();
+          });
         if (o.type === "logo") {
           if (input.dataset.prop === "w") o.h = o.w * oldRatio;
           if (input.dataset.prop === "h") o.w = o.h / oldRatio;
@@ -188,15 +199,17 @@ function carouselPanel() {
           if (field && field !== input)
             field.value =
               Math.round(
-                (o.type === "path" && ["x", "y", "w", "h"].includes(key)
-                  ? carouselObjectBounds(o)[key]
+                (carouselIsVector(o) && ["x", "y", "w", "h"].includes(key)
+                  ? ["w", "h"].includes(key)
+                    ? carouselLocalBounds(o)[key]
+                    : carouselObjectBounds(o)[key]
                   : o[key]) * 100,
               ) / 100;
         }
       };
     });
     panel.querySelectorAll("[data-transparent]").forEach((input) => {
-      input.disabled = !!o.locked;
+      input.disabled = carouselObjectLocked(o);
       input.onchange = () => {
         checkpoint();
         const key = input.dataset.transparent;
@@ -215,12 +228,15 @@ function carouselPanel() {
       $("#carouselTextEdit").onclick = () => carouselEditText(o);
     if (o.type === "text") {
       carouselBindTextStyles(o, panel);
+      carouselBindTypography(o, panel);
+      carouselTypographyNavigation(panel);
       carouselBindTextAlignment(o, panel);
       const content = panel.querySelector("[data-prop=text]");
       content.onselect =
         content.onkeyup =
         content.onclick =
           () => {
+            carouselTypeRange(o, content.selectionStart, content.selectionEnd);
             if (carouselSetTextContext(o, content.selectionStart))
               carouselRefreshTextStyles(o);
           };
@@ -228,7 +244,11 @@ function carouselPanel() {
     panel.querySelectorAll("[data-text-anchor]").forEach(
       (btn) =>
         (btn.onclick = () => {
-          if (o.locked || o.textAnchor === btn.dataset.textAnchor) return;
+          if (
+            carouselObjectLocked(o) ||
+            o.textAnchor === btn.dataset.textAnchor
+          )
+            return;
           checkpoint();
           o.textAnchor = btn.dataset.textAnchor;
           changed(false);
@@ -284,7 +304,9 @@ function carouselPanel() {
         changed(false);
         carouselPanel();
       };
-    if (o.locked)
+    if ($("#carouselLogoReplace"))
+      $("#carouselLogoReplace").onclick = () => carouselReplaceLogo(o);
+    if (carouselObjectLocked(o))
       panel
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
@@ -302,10 +324,11 @@ function carouselPanel() {
       changed(false);
     };
   }
+  carouselRefinementsPanel(panel, items);
   carouselLayerPanel();
 }
 
-function carouselLayerPanel() {
+function carouselLegacyLayerPanel() {
   const c = p.carousel;
   carouselKeepLogosOnTop(c);
   const ids = new Set(carouselSelected().map((o) => o.id));
@@ -337,11 +360,20 @@ function carouselLayerPanel() {
           target = row.dataset.layer;
         if (!source || source === target) return;
         const index = c.objects.findIndex((o) => o.id === source);
-        if (index < 0 || c.objects[index].type === "logo") return;
+        if (
+          index < 0 ||
+          c.objects[index].type === "logo" ||
+          carouselObjectLocked(c.objects[index])
+        )
+          return;
         checkpoint();
         const [o] = c.objects.splice(index, 1),
           targetIndex = c.objects.findIndex((o) => o.id === target);
+        const targetObject = c.objects[targetIndex];
+        if (targetObject?.folderId) o.folderId = targetObject.folderId;
+        else delete o.folderId;
         c.objects.splice(targetIndex + 1, 0, o);
+        carouselArrangeFolders();
         carouselUI.layerDrag = null;
         changed();
       };

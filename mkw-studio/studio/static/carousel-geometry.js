@@ -73,10 +73,15 @@ function carouselImageBounds(o) {
 }
 
 function carouselImageResize(ev, o, corner) {
-  if (o.locked) return;
-  const start = carouselPoint(ev),
-    b = carouselImageBounds(o),
-    base = clone(o);
+  if (carouselObjectLocked(o)) return;
+  const rotation = o.angle || 0,
+    projectPoint = (event) =>
+      carouselRotatePoint(carouselPoint(event), -rotation),
+    start = projectPoint(ev),
+    base = clone(o),
+    origin = carouselRotatePoint(o, -rotation),
+    virtual = { ...base, x: origin.x, y: origin.y, angle: 0 },
+    b = carouselImageBounds(virtual);
   let begun = false;
   carouselListen(
     ev,
@@ -85,7 +90,7 @@ function carouselImageResize(ev, o, corner) {
         checkpoint();
         begun = true;
       }
-      const pt = carouselPoint(e),
+      const pt = projectPoint(e),
         dx = pt.x - start.x,
         dy = pt.y - start.y;
       let w =
@@ -107,8 +112,8 @@ function carouselImageResize(ev, o, corner) {
         y = b.y + (b.h - h) / 2;
       }
       o.scale = base.scale * ratio;
-      o.panX = x + w / 2 - o.x - o.w / 2;
-      o.panY = y + h / 2 - o.y - o.h / 2;
+      o.panX = x + w / 2 - virtual.x - o.w / 2;
+      o.panY = y + h / 2 - virtual.y - o.h / 2;
       carouselRefresh();
       carouselCoordinates([o]);
     },
@@ -120,11 +125,10 @@ function carouselImageResize(ev, o, corner) {
 }
 
 function carouselAngleTip(o) {
-  return {
-    x: o.x + (o.direction === "right" ? o.w : o.w / 2),
-    y:
-      o.y + (o.direction === "up" ? 0 : o.direction === "down" ? o.h : o.h / 2),
-  };
+  return carouselToWorld(o, {
+    x: o.direction === "right" ? o.w : o.w / 2,
+    y: o.direction === "up" ? 0 : o.direction === "down" ? o.h : o.h / 2,
+  });
 }
 
 function carouselAngleTipSnap(
@@ -145,6 +149,7 @@ function carouselAngleTipSnap(
 }
 
 function carouselAngleAlign(o, c = p.carousel) {
+  if (o.angle) return carouselRotatedAngleAlign(o, c);
   const tip = carouselAngleTip(o),
     candidates = Array.from({ length: c.n }, (_, i) => ({
       axis: "x",
@@ -245,10 +250,10 @@ function carouselFramePicker(o) {
       const active = slots.includes(slot),
         remaining = points.filter((_, index) => slots[index] !== slot),
         disabled =
-          o.locked ||
+          carouselObjectLocked(o) ||
           (active &&
             (slots.length <= 3 || carouselFrameArea(remaining) < 0.00001));
-      return `<button class="frame-point-choice" data-frame-slot="${slot}" style="left:${10 + point.x * 80}%;top:${10 + point.y * 80}%" aria-label="${carouselFrameLabels[slot]}" title="${carouselFrameLabels[slot]}${disabled && !o.locked ? " · mindestens drei Punkte müssen eine Fläche bilden" : ""}" aria-pressed="${active}" ${disabled ? "disabled" : ""}><span></span></button>`;
+      return `<button class="frame-point-choice" data-frame-slot="${slot}" style="left:${10 + point.x * 80}%;top:${10 + point.y * 80}%" aria-label="${carouselFrameLabels[slot]}" title="${carouselFrameLabels[slot]}${disabled && !carouselObjectLocked(o) ? " · mindestens drei Punkte müssen eine Fläche bilden" : ""}" aria-pressed="${active}" ${disabled ? "disabled" : ""}><span></span></button>`;
     })
     .join(
       "",
@@ -256,7 +261,7 @@ function carouselFramePicker(o) {
 }
 
 function carouselToggleFrameSlot(o, slot) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   const slots = carouselFrameSlots(o),
     active = slots.includes(slot);
   if (active && slots.length <= 3) return;
@@ -292,17 +297,24 @@ function carouselDrawFramePoints(o, root, editing) {
   svg.classList.add("carousel-frame-path");
   svg.setAttribute("width", o.w * s);
   svg.setAttribute("height", o.h * s);
-  Object.assign(svg.style, { left: o.x * s + "px", top: o.y * s + "px" });
+  Object.assign(svg.style, {
+    left: o.x * s + "px",
+    top: o.y * s + "px",
+    transformOrigin: "0 0",
+    transform: o.angle ? `rotate(${o.angle}deg)` : "none",
+  });
   svg.innerHTML = `<polygon points="${points.map((point) => `${point.x * o.w * s},${point.y * o.h * s}`).join(" ")}"/>`;
   root.append(svg);
-  if (editing && !o.locked)
+  if (editing && !carouselObjectLocked(o))
     points.forEach((point, index) => {
       const handle = document.createElement("button");
       handle.className = "carousel-point-handle";
       handle.dataset.framePoint = index;
       handle.setAttribute("aria-label", `Rahmenpunkt ${index + 1} verschieben`);
-      handle.style.left = (o.x + point.x * o.w) * s + "px";
-      handle.style.top = (o.y + point.y * o.h) * s + "px";
+      handle.style.left =
+        carouselToWorld(o, { x: point.x * o.w, y: point.y * o.h }).x * s + "px";
+      handle.style.top =
+        carouselToWorld(o, { x: point.x * o.w, y: point.y * o.h }).y * s + "px";
       handle.onpointerdown = (ev) => {
         ev.stopPropagation();
         carouselFramePointDrag(ev, o, index);
@@ -312,13 +324,12 @@ function carouselDrawFramePoints(o, root, editing) {
 }
 
 function carouselFramePointDrag(ev, o, index) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   const start = carouselPoint(ev),
     base = clone(o),
-    original = carouselFramePoints(base).map((point) => ({
-      x: base.x + point.x * base.w,
-      y: base.y + point.y * base.h,
-    }));
+    original = carouselFramePoints(base).map((point) =>
+      carouselToWorld(base, { x: point.x * base.w, y: point.y * base.h }),
+    );
   let begun = false;
   carouselListen(
     ev,
@@ -359,6 +370,9 @@ function carouselFramePointDrag(ev, o, index) {
 }
 
 function carouselSetImageFrame(o, base, points) {
+  if (base.angle)
+    points = points.map((point) => carouselRotatePoint(point, -base.angle));
+  const localBase = carouselRotatePoint(base, -(base.angle || 0));
   const x = Math.min(...points.map((point) => point.x)),
     y = Math.min(...points.map((point) => point.y)),
     w = Math.max(10, Math.max(...points.map((point) => point.x)) - x),
@@ -369,8 +383,8 @@ function carouselSetImageFrame(o, base, points) {
     oldFit = im ? Math.max(base.w / im.width, base.h / im.height) : 1,
     newFit = im ? Math.max(w / im.width, h / im.height) : 1;
   Object.assign(o, {
-    x,
-    y,
+    x: carouselRotatePoint({ x, y }, base.angle || 0).x,
+    y: carouselRotatePoint({ x, y }, base.angle || 0).y,
     w,
     h,
     framePoints: points.map((point) => ({
@@ -378,8 +392,8 @@ function carouselSetImageFrame(o, base, points) {
       y: (point.y - y) / h,
     })),
     scale: (base.scale * oldFit) / newFit,
-    panX: base.x + base.w / 2 + base.panX - x - w / 2,
-    panY: base.y + base.h / 2 + base.panY - y - h / 2,
+    panX: localBase.x + base.w / 2 + base.panX - x - w / 2,
+    panY: localBase.y + base.h / 2 + base.panY - y - h / 2,
   });
   return true;
 }

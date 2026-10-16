@@ -19,8 +19,13 @@
     "static/psd.js",
     "static/bezier.js",
     "static/carousel.js",
+    "static/carousel-refinements.js",
+    "static/carousel-effects.js",
+    "static/carousel-transform.js",
     "static/carousel-render.js",
     "static/carousel-input.js",
+    "static/carousel-typography.js",
+    "static/carousel-curvature.js",
     "static/carousel-text.js",
     "static/carousel-sidebar.js",
     "static/carousel-geometry.js",
@@ -53,6 +58,7 @@
     "static/editor-forms.css",
     "static/advanced-tools.css",
     "static/paint-picker.css",
-    "static/projects.css"
+    "static/projects.css",
+    "static/carousel-refinements.css"
   ]
 }

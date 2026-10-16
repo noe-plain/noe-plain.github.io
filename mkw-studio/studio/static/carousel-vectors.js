@@ -357,13 +357,23 @@ function carouselVectorHit(o, pt) {
 }
 function carouselPathWorld(o, contour = carouselUI.vectorContour || 0) {
   return (carouselPathContours(o)[contour] || o.points).map((p) => {
-    const point = { x: o.x + p.x * o.w, y: o.y + p.y * o.h };
+    const point = carouselToWorld(o, { x: p.x * o.w, y: p.y * o.h });
     for (const k of ["in", "out"])
-      if (p[k]) point[k] = { x: o.x + p[k].x * o.w, y: o.y + p[k].y * o.h };
+      if (p[k])
+        point[k] = carouselToWorld(o, { x: p[k].x * o.w, y: p[k].y * o.h });
     return point;
   });
 }
 function carouselSetPathContours(o, contours) {
+  if (o.angle)
+    contours = contours.map((points) =>
+      points.map((p) => {
+        const q = carouselRotatePoint(p, -o.angle);
+        for (const k of ["in", "out"])
+          if (p[k]) q[k] = carouselRotatePoint(p[k], -o.angle);
+        return q;
+      }),
+    );
   const all = contours.flatMap((points) =>
       points.flatMap((p) => [p, p.in, p.out].filter(Boolean)),
     ),
@@ -379,7 +389,8 @@ function carouselSetPathContours(o, contours) {
         return point;
       }),
     );
-  Object.assign(o, { x, y, w, h, points: normal[0] });
+  const origin = carouselRotatePoint({ x, y }, o.angle || 0);
+  Object.assign(o, { x: origin.x, y: origin.y, w, h, points: normal[0] });
   if (normal.length > 1) o.contours = normal;
   else delete o.contours;
 }
@@ -397,8 +408,10 @@ function carouselKeepVectorImage(o, base) {
   const oldFit = Math.max(base.w / im.width, base.h / im.height),
     newFit = Math.max(o.w / im.width, o.h / im.height);
   o.scale = (base.scale * oldFit) / newFit;
-  o.panX = base.x + base.w / 2 + base.panX - o.x - o.w / 2;
-  o.panY = base.y + base.h / 2 + base.panY - o.y - o.h / 2;
+  const before = carouselRotatePoint(base, -(base.angle || 0)),
+    after = carouselRotatePoint(o, -(o.angle || 0));
+  o.panX = before.x + base.w / 2 + base.panX - after.x - o.w / 2;
+  o.panY = before.y + base.h / 2 + base.panY - after.y - o.h / 2;
 }
 function carouselHasImage(o) {
   return (
@@ -657,32 +670,59 @@ function carouselVectorOverlay() {
     svg.append(line);
   }
   if (draft?.cursor) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line"),
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "path"),
       a = points.at(-1),
-      b = draft.cursor;
-    for (const [k, v] of Object.entries({
-      x1: a.x * s,
-      y1: a.y * s,
-      x2: b.x * s,
-      y2: b.y * s,
-    }))
-      line.setAttribute(k, v);
+      b = draft.cursor,
+      closing =
+        points.length > 2 &&
+        Math.hypot(b.x - points[0].x, b.y - points[0].y) * s < 12,
+      end = closing ? points[0] : b;
+    const data = carouselPathData(
+      { type: "path", w: 1, h: 1, points: [a, end], closed: false },
+      s,
+    );
+    line.setAttribute("d", data);
+    line.classList.add("vector-next-segment");
     line.setAttribute("stroke-dasharray", "4 4");
     svg.append(line);
   }
 }
+let carouselDraftPreviewFrame = 0;
 window.addEventListener("pointermove", (ev) => {
   if (
     carouselPathDraft &&
     !carouselUI.drag &&
     ev.target.closest?.("#carouselViewport")
   ) {
-    carouselPathDraft.cursor = carouselPoint(ev);
-    carouselVectorOverlay();
+    let point = carouselPoint(ev);
+    const last = carouselPathDraft.points.at(-1);
+    if (last && ev.shiftKey) {
+      const a =
+          (Math.round(
+            Math.atan2(point.y - last.y, point.x - last.x) / (Math.PI / 4),
+          ) *
+            Math.PI) /
+          4,
+        d = Math.hypot(point.x - last.x, point.y - last.y);
+      point = { x: last.x + Math.cos(a) * d, y: last.y + Math.sin(a) * d };
+    }
+    const snap = carouselSnapPathPoint(
+      point,
+      carouselPathDraft.points,
+      carouselPathDraft.points.length,
+      ev,
+      [],
+    );
+    carouselPathDraft.cursor = { x: snap.x, y: snap.y };
+    if (!carouselDraftPreviewFrame)
+      carouselDraftPreviewFrame = requestAnimationFrame(() => {
+        carouselDraftPreviewFrame = 0;
+        if (carouselPathDraft) carouselVectorOverlay();
+      });
   }
 });
 function carouselVectorPointDrag(ev, o, index, key = null) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   const start = carouselPoint(ev),
     base = carouselPathWorld(o),
     wasSelected = carouselUI.vectorNodes?.has(index);
@@ -783,7 +823,7 @@ function carouselVectorPointDrag(ev, o, index, key = null) {
   );
 }
 function carouselDeletePathPoint(o) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   const min = o.closed ? 3 : 2,
     points = carouselPathWorld(o),
     ids = carouselUI.vectorNodes?.size
@@ -802,7 +842,7 @@ function carouselDeletePathPoint(o) {
   carouselPanel();
 }
 function carouselSplitPath(o) {
-  if (o.locked || o.points.length >= 200) return;
+  if (carouselObjectLocked(o) || o.points.length >= 200) return;
   const points = carouselPathWorld(o),
     i = Math.min(
       carouselUI.vectorNode ?? 0,
@@ -893,11 +933,11 @@ function carouselVectorPanel(o) {
 }
 function carouselBindVectorPanel(o, panel) {
   panel.querySelectorAll("[data-vector-key]").forEach((input) => {
-    if (o.locked) input.disabled = true;
+    if (carouselObjectLocked(o)) input.disabled = true;
     let begun = false;
     input.onfocus = () => (begun = false);
     const update = () => {
-      if (o.locked) return;
+      if (carouselObjectLocked(o)) return;
       let value =
         input.type === "checkbox"
           ? input.checked
@@ -939,7 +979,7 @@ function carouselBindVectorPanel(o, panel) {
   panel.querySelectorAll("[data-shape-kind]").forEach(
     (button) =>
       (button.onclick = () => {
-        if (o.locked) return;
+        if (carouselObjectLocked(o)) return;
         checkpoint();
         o.shapeKind = carouselUI.shapeKind = button.dataset.shapeKind;
         changed(false);
@@ -948,7 +988,7 @@ function carouselBindVectorPanel(o, panel) {
   );
   if ($("#vectorEditPoints"))
     $("#vectorEditPoints").onclick = () => {
-      if (o.locked || !studioPreferences.advanced) return;
+      if (carouselObjectLocked(o) || !studioPreferences.advanced) return;
       carouselUI.vectorPoints = !carouselUI.vectorPoints;
       carouselUI.vectorNode = 0;
       carouselRefresh();
@@ -964,7 +1004,7 @@ function carouselBindVectorPanel(o, panel) {
   ])
     if ($("#" + id))
       $("#" + id).onclick = () => {
-        if (o.locked) return;
+        if (carouselObjectLocked(o)) return;
         checkpoint();
         const points = carouselPathWorld(o),
           i = carouselUI.vectorNode ?? 0,

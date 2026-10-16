@@ -17,6 +17,12 @@
     }
     for (const object of project.carousel?.objects || []) {
       if (
+        object.type === "logo" &&
+        object.source &&
+        !["white", "black"].includes(object.source)
+      )
+        logos.add(object.source);
+      if (
         ["image", "angle"].includes(object.type) ||
         (object.type === "gradient" && object.gradientFillMode === "image") ||
         (["path", "shape"].includes(object.type) && object.fillMode === "image")

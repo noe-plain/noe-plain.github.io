@@ -50,7 +50,7 @@ function studioBindPaintCards(panel, o) {
     );
 }
 function studioTogglePaint(o, channel) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   const value = studioPaintRead(o, channel);
   if (o !== carouselVectorColours) checkpoint();
   value.enabled = !value.enabled;
@@ -65,7 +65,11 @@ function studioTogglePaint(o, channel) {
   studioSyncPaintControls();
 }
 function studioSwapPaints(o) {
-  if (o.locked || (o !== carouselVectorColours && !carouselIsVector(o))) return;
+  if (
+    carouselObjectLocked(o) ||
+    (o !== carouselVectorColours && !carouselIsVector(o))
+  )
+    return;
   const fill = studioPaintRead(o, "fill"),
     stroke = studioPaintRead(o, "stroke");
   if (o !== carouselVectorColours) checkpoint();
@@ -115,7 +119,7 @@ function studioSyncPaintControls() {
       button.classList.toggle("is-front", studioPaintFront === channel);
       button.classList.toggle("no-paint", !value.enabled);
       button.disabled =
-        !!o.locked ||
+        carouselObjectLocked(o) ||
         (!vector &&
           (channel === "stroke" || !["text", "gradient"].includes(o.type)));
       button.setAttribute(
@@ -123,8 +127,8 @@ function studioSyncPaintControls() {
         String(!!studioPicker && studioPicker.channel === channel),
       );
     }
-    $("#toolSwapColours").disabled = !!o.locked || !vector;
-    $("#toolPaintNone").disabled = !!o.locked || !vector;
+    $("#toolSwapColours").disabled = carouselObjectLocked(o) || !vector;
+    $("#toolPaintNone").disabled = carouselObjectLocked(o) || !vector;
     $("#toolPaintNone").setAttribute(
       "aria-pressed",
       String(!studioPaintRead(o, studioPaintFront).enabled),
@@ -139,7 +143,7 @@ function studioSyncPaintControls() {
         studioPaintSwatch(value);
       button.querySelector(".paint-kind").textContent =
         studioPaintKindName(value);
-      button.disabled = !!o.locked;
+      button.disabled = carouselObjectLocked(o);
       button.setAttribute(
         "aria-expanded",
         String(
@@ -154,7 +158,7 @@ function studioSyncPaintControls() {
       const value = studioPaintRead(o, button.dataset.paintToggle);
       button.setAttribute("aria-pressed", String(value.enabled));
       button.innerHTML = studioIcon(value.enabled ? "visible" : "hidden");
-      button.disabled = !!o.locked;
+      button.disabled = carouselObjectLocked(o);
     });
 }
 function studioRGBToHSV(hex) {
@@ -207,7 +211,7 @@ function studioPickerColour() {
     : state.value;
 }
 function studioOpenPicker(o, channel, anchor) {
-  if (o.locked) return;
+  if (carouselObjectLocked(o)) return;
   if (studioPicker) studioClosePicker(false);
   studioPaintFront = channel;
   const value = studioPaintRead(o, channel);
@@ -312,8 +316,8 @@ function studioCreatePicker() {
   el.setAttribute("aria-labelledby", "paintPickerTitle");
   el.innerHTML = `<div class="picker-heading"><strong id="paintPickerTitle">Fläche</strong><button id="paintClose" class="icon-button" aria-label="Farbfeld schliessen">${studioIcon("close")}</button></div>
  <div class="picker-mode"><label for="paintMode">Füllung</label><select id="paintMode"><option value="solid">Farbe</option><option value="gradient">Verlauf</option><option value="image">Bild</option></select><button id="paintEnabled" class="icon-button" title="Ein- oder ausblenden" aria-label="Farbe ein- oder ausblenden">${studioIcon("visible")}</button></div>
- <div id="paintColourArea"><div class="picker-colour-space"><div id="paintHue" role="slider" tabindex="0" aria-label="Farbton" aria-valuemin="0" aria-valuemax="359" aria-orientation="vertical"><span></span></div><div id="paintSV" role="group" tabindex="0" aria-label="Sättigung und Helligkeit"><span></span></div></div>
- <div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div><input id="paintAlphaSlider" type="range" min="0" max="100" step="1" aria-label="Transparenz anpassen"></div>
+ <div id="paintColourArea"><div class="picker-colour-space"><div id="paintHue" role="slider" tabindex="0" aria-label="Farbton" aria-valuemin="0" aria-valuemax="359" aria-orientation="vertical"><span></span></div><div id="paintSV" role="group" tabindex="0" aria-label="Sättigung und Helligkeit"><span></span></div><div class="picker-opacity"><span aria-hidden="true">100</span><input id="paintAlphaSlider" type="range" min="0" max="100" step="1" aria-label="Deckkraft · oben 100 Prozent, unten 0 Prozent" aria-orientation="vertical"><span aria-hidden="true">0</span></div></div>
+ <div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div></div>
  <div id="paintGradientPanel"><div class="picker-gradient-kind"><button data-gradient-kind="linear">Linear</button><button data-gradient-kind="radial">Radial</button><label>Winkel<span class="picker-unit"><input id="paintAngle" type="number" min="-360" max="360" aria-label="Verlaufswinkel"><span>°</span></span></label></div><div id="paintGradientTrack" aria-label="Verlaufsfarbwerte"><div id="paintGradientBar"></div><div id="paintGradientHandles"></div></div><p class="picker-hint">Kreis: Farbe wählen · Leiste: Farbe hinzufügen<br>Raute: Verlaufsmitte verschieben</p><div class="picker-stop-options"><label>Position<span class="picker-unit"><input id="paintStopPosition" type="number" min="0" max="100" step=".1" aria-label="Position des Farbwertes"><span>%</span></span></label><label>Mitte<span class="picker-unit"><input id="paintMidPosition" type="number" min="5" max="95" step="1" aria-label="Verlaufsmitte"><span>%</span></span></label><button id="paintDeleteStop" class="icon-button" title="Farbwert entfernen" aria-label="Farbwert entfernen">${studioIcon("trash")}</button></div></div>
  <div id="paintImagePanel"><div id="paintImagePreview"></div><button id="paintPlaceImage" class="primary">Bild auswählen / ersetzen</button><p class="picker-hint">Das Bild füllt die Form. Den Ausschnitt bearbeitest du per Doppelklick auf der Fläche.</p></div><p id="paintMessage" role="status"></p>`;
   document.body.append(el);
@@ -441,6 +445,26 @@ function studioCreatePicker() {
       studioPicker.stop = stops.indexOf(stop);
       studioPicker.hsv = studioRGBToHSV(stop.colour);
     });
+  };
+  $("#paintAlphaSlider").onkeydown = (event) => {
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const input = event.currentTarget;
+    input.value =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? 100
+          : Math.max(
+              0,
+              Math.min(
+                100,
+                +input.value +
+                  (event.key === "ArrowUp" ? -1 : 1) *
+                    (event.shiftKey ? 10 : 1),
+              ),
+            );
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   };
   $("#paintPlaceImage").onclick = studioPickerImport;
   studioBindPickerPad($("#paintHue"), (x, y) => {

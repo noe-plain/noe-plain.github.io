@@ -10,17 +10,19 @@ function carouselPoint(ev) {
 
 function carouselHit(pt) {
   return [...p.carousel.objects].reverse().find((o) => {
-    if (o.visible === false || o.locked) return false;
-    if (carouselIsVector(o)) return carouselVectorHit(o, pt);
-    if (pt.x < o.x || pt.x > o.x + o.w || pt.y < o.y || pt.y > o.y + o.h)
+    if (!carouselObjectVisible(o) || carouselObjectLocked(o)) return false;
+    const local = carouselToLocal(o, pt),
+      hit = { x: o.x + local.x, y: o.y + local.y };
+    if (carouselIsVector(o)) return carouselVectorHit(o, hit);
+    if (local.x < 0 || local.x > o.w || local.y < 0 || local.y > o.h)
       return false;
     if (o.type !== "angle" && !(o.type === "image" && o.framePoints))
       return true;
     const ctx = makeCanvas(1, 1).getContext("2d");
     return ctx.isPointInPath(
       o.type === "angle" ? carouselAngleMask(o) : carouselImageMask(o),
-      pt.x - o.x,
-      pt.y - o.y,
+      local.x,
+      local.y,
     );
   });
 }
@@ -264,8 +266,8 @@ function carouselMarquee(ev, start, add) {
       const found = p.carousel.objects.filter((o) => {
         const bounds = carouselObjectBounds(o);
         return (
-          !o.locked &&
-          o.visible !== false &&
+          !carouselObjectLocked(o) &&
+          carouselObjectVisible(o) &&
           bounds.x < x + w &&
           bounds.x + bounds.w > x &&
           bounds.y < y + h &&
@@ -289,7 +291,7 @@ function carouselSnapLines(excluded = [...carouselUI.ids]) {
   for (let j = 0; j <= 6; j++)
     ys.push(c.top + (j * (c.h - c.top - c.bottom)) / 6);
   for (const o of c.objects)
-    if (o.visible !== false && !excluded.includes(o.id)) {
+    if (carouselObjectVisible(o) && !excluded.includes(o.id)) {
       const bounds = carouselObjectBounds(o);
       xs.push(bounds.x, bounds.x + bounds.w, bounds.x + bounds.w / 2);
       ys.push(bounds.y, bounds.y + bounds.h, bounds.y + bounds.h / 2);
@@ -418,7 +420,7 @@ function carouselDrawSnap() {
 }
 
 function carouselMove(ev) {
-  let objects = carouselSelected().filter((o) => !o.locked);
+  let objects = carouselSelected().filter((o) => !carouselObjectLocked(o));
   if (!objects.length) return;
   const start = carouselPoint(ev),
     content =
@@ -462,15 +464,24 @@ function carouselMove(ev) {
       if (content) {
         const o = objects[0],
           base = original[0];
-        o.panX = base.panX + dx;
-        o.panY = base.panY + dy;
+        const delta = carouselRotatePoint({ x: dx, y: dy }, -(o.angle || 0));
+        o.panX = base.panX + delta.x;
+        o.panY = base.panY + delta.y;
       } else {
-        const snap = carouselSnap(
-          bounds.x + dx,
-          bounds.y + dy,
-          bounds,
-          e.ctrlKey || e.metaKey || e.shiftKey,
-        );
+        const snap = e.shiftKey
+          ? carouselSnapConstrained(
+              bounds,
+              dx,
+              dy,
+              bounds,
+              e.ctrlKey || e.metaKey,
+            )
+          : carouselSnap(
+              bounds.x + dx,
+              bounds.y + dy,
+              bounds,
+              e.ctrlKey || e.metaKey,
+            );
         carouselUI.snapLines = snap.guides;
         objects.forEach((o, i) => {
           o.x = original[i].x + snap.x - bounds.x;
@@ -526,10 +537,21 @@ function carouselMove(ev) {
 }
 
 function carouselResize(ev, corner) {
-  const objects = carouselSelected().filter((o) => !o.locked);
+  const objects = carouselSelected().filter((o) => !carouselObjectLocked(o));
   if (!objects.length) return;
-  const start = carouselPoint(ev),
-    base = objects.map(clone),
+  const rotation = objects.length === 1 ? objects[0].angle || 0 : 0,
+    projectPoint = (e) => carouselRotatePoint(carouselPoint(e), -rotation),
+    start = projectPoint(ev),
+    base = objects.map((o) => {
+      const copy = clone(o);
+      if (rotation) {
+        const q = carouselRotatePoint(copy, -rotation);
+        copy.x = q.x;
+        copy.y = q.y;
+        copy.angle = 0;
+      }
+      return copy;
+    }),
     b = carouselBounds(base);
   let begun = false;
   carouselListen(
@@ -539,7 +561,7 @@ function carouselResize(ev, corner) {
         checkpoint();
         begun = true;
       }
-      const pt = carouselPoint(e),
+      const pt = projectPoint(e),
         dx = pt.x - start.x,
         dy = pt.y - start.y;
       let w = Math.max(
@@ -552,7 +574,10 @@ function carouselResize(ev, corner) {
         );
       const preserve =
         e.shiftKey ||
-        objects.some((o) => o.type === "angle" || o.type === "logo");
+        objects.some(
+          (o) =>
+            o.type === "angle" || o.type === "logo" || (!rotation && o.angle),
+        );
       if (preserve) {
         if (corner === "n" || corner === "s") w = (h * b.w) / b.h;
         else if (corner === "e" || corner === "w") h = (w * b.h) / b.w;
@@ -571,7 +596,7 @@ function carouselResize(ev, corner) {
       const snap = carouselSnapResize(
         { x, y, w, h },
         corner,
-        e.ctrlKey || e.metaKey,
+        !!rotation || e.ctrlKey || e.metaKey,
         preserve,
         e.altKey,
       );
@@ -583,6 +608,11 @@ function carouselResize(ev, corner) {
         o.y = y + ((old.y - b.y) * h) / b.h;
         o.w = (old.w * w) / b.w;
         o.h = (old.h * h) / b.h;
+        if (rotation) {
+          const q = carouselRotatePoint(o, rotation);
+          o.x = q.x;
+          o.y = q.y;
+        }
         if (e.shiftKey && o.type === "text") {
           const factor = w / b.w;
           o.size = Math.max(1, Math.min(1000, old.size * factor));
@@ -629,15 +659,15 @@ function carouselCoordinates(objects) {
 function carouselGradientDrag(ev, o, key = null) {
   checkpoint();
   const update = (e) => {
-    const pt = carouselPoint(e),
-      point = { x: (pt.x - o.x) / o.w, y: (pt.y - o.y) / o.h };
+    const pt = carouselToLocal(o, carouselPoint(e)),
+      point = { x: pt.x / o.w, y: pt.y / o.h };
     if (key) o[key] = point;
     else o.gradientEnd = point;
     carouselRefresh();
   };
   if (!key) {
-    const pt = carouselPoint(ev);
-    o.gradientStart = { x: (pt.x - o.x) / o.w, y: (pt.y - o.y) / o.h };
+    const pt = carouselToLocal(o, carouselPoint(ev));
+    o.gradientStart = { x: pt.x / o.w, y: pt.y / o.h };
     o.gradientEnd = { ...o.gradientStart };
   }
   carouselListen(ev, update, () => {

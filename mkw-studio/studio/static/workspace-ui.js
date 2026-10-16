@@ -69,6 +69,7 @@ let studioCommandbarFrame = 0,
   studioPostGuides = true;
 function studioSyncFooter() {
   const carousel = !!p.carousel;
+  if (!carousel) $("#footerCurvature")?.setAttribute("hidden", "");
   $("#footerGuides").setAttribute(
     "aria-pressed",
     String(carousel ? carouselUI.guides : studioPostGuides),
