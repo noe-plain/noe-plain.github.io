@@ -20,6 +20,7 @@ const assert=require('node:assert/strict');
   await page.locator('#files').setInputFiles({name:'Sommer.png',mimeType:'image/png',buffer:Buffer.from(fixture.split(',')[1],'base64')});
   await page.waitForFunction(()=>!busy&&p.boards.length===2);
   await page.locator('#mainTextInput').fill('KONZERTE\nFÜR ALLE');
+  await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Shift+W');assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'false');await page.keyboard.press('Shift+W');assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'true');await page.locator('#mainTextInput').focus();await page.keyboard.press('Shift+W');assert((await page.locator('#mainTextInput').inputValue()).endsWith('W'));assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'true');await page.locator('#mainTextInput').fill('KONZERTE\nFÜR ALLE');
   const postBar=await page.locator('.dock').boundingBox();assert.equal(postBar.height,58);assert.equal(postBar.y,1000-52-14-58);
   assert.equal(await page.locator('.dock [data-step]').count(),5);
   assert.equal(await page.locator('.dock [data-step] svg[data-google-icon]').count(),5);
@@ -62,7 +63,8 @@ const assert=require('node:assert/strict');
   const warningId=await page.evaluate(()=>carouselSelection);await page.evaluate(()=>carouselSelect([]));
   await page.locator('#carouselNotice').click();await page.locator('[data-warning-index]').first().click();assert.equal(await page.evaluate(()=>carouselSelection),warningId);
   assert.equal(await page.locator('button[data-tool=select]').getAttribute('aria-pressed'),'true');
-  await page.locator('#footerGuides').click();assert(await page.locator('#carouselGuides').isHidden());await page.locator('#footerGuides').click();
+  await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Shift+W');assert(await page.locator('#carouselGuides').isHidden());assert.equal(await page.evaluate(()=>carouselUI.tool),'select');await page.keyboard.press('Shift+W');assert(await page.locator('#carouselGuides').isVisible());await page.keyboard.press('w');assert.equal(await page.evaluate(()=>carouselUI.tool),'angle');await page.locator('button[data-tool=select]').click();
+
   await page.locator('#footerSnap').click();assert.equal(await page.evaluate(()=>carouselUI.snap),false);await page.locator('#footerSnap').click();
   await page.setViewportSize({width:1100,height:800});await page.screenshot({path:require('./browser.cjs').artifact('mkw-ui-compact.png')});
   await page.setViewportSize({width:640,height:900});await page.locator('#carouselSidebar').waitFor({state:'hidden'});

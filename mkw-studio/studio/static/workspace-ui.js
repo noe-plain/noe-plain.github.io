@@ -78,6 +78,10 @@ function studioSyncFooter() {
     "aria-label",
     carousel ? "Raster und Schutzzonen" : "Schutzzonen",
   );
+  $("#footerGuides").title =
+    (carousel ? "Raster und Schutzzonen" : "Schutzzonen") +
+    " ein-/ausblenden · Shift + W";
+  $("#footerGuides").setAttribute("aria-keyshortcuts", "Shift+W");
   $("#footerSnap").hidden = !carousel;
   if ($("#postHand")) $("#postHand").hidden = carousel;
   if (carousel)
@@ -273,6 +277,35 @@ $("#footerGuides").onclick = () => {
   }
   studioSyncFooter();
 };
+window.addEventListener(
+  "keydown",
+  (event) => {
+    if (
+      !event.shiftKey ||
+      event.key.toLowerCase() !== "w" ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      event.isComposing ||
+      busy ||
+      (!carouselActive() && !postActive()) ||
+      document.querySelector("dialog[open],[popover]:popover-open")
+    )
+      return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      (target.isContentEditable ||
+        target.closest("input,textarea,select,[role=textbox]"))
+    )
+      return;
+    // Handle Shift+W before carousel shortcuts, where plain W selects the angle tool.
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (!event.repeat) $("#footerGuides").click();
+  },
+  true,
+);
 $("#footerSnap").onclick = () => {
   if (p.carousel) {
     carouselUI.snap = !carouselUI.snap;
