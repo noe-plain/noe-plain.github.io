@@ -5,8 +5,8 @@ function carouselCurvatureSamples(a, b, count = 20) {
     curved = !!(a.out || b.in),
     result = [];
   if (!curved) return result;
-  for (let i = 1; i < count; i++) {
-    const t = i / count,
+  for (let i = 0; i <= count; i++) {
+    const t = Math.max(1e-5, Math.min(1 - 1e-5, i / count)),
       u = 1 - t,
       point = carouselBezierPoint(a, b, t),
       dx =
@@ -49,10 +49,10 @@ function carouselCurvatureOverlay() {
         (o) => o.type === "path" && carouselObjectVisible(o),
       )
     : [];
-  button.hidden = !studioPreferences.advanced || !paths.length;
+  button.hidden = !carouselActive() || !studioPreferences.advanced;
   button.setAttribute("aria-pressed", String(!!studioPreferences.curvature));
   let svg = $("#carouselCurvatureOverlay");
-  if (button.hidden || !studioPreferences.curvature) {
+  if (button.hidden || !studioPreferences.curvature || !paths.length) {
     svg?.remove();
     return;
   }
@@ -81,33 +81,70 @@ function carouselCurvatureOverlay() {
   svg.dataset.key = key;
   svg.setAttribute("width", p.carousel.w * p.carousel.n * carouselZoom);
   svg.setAttribute("height", p.carousel.h * carouselZoom);
-  let d = "",
-    remaining = 600;
+  // A shared scale makes curvature jumps at adjoining segments visible.
+  const segments = [];
+  let remaining = 600,
+    maxCurvature = 0;
   for (const o of paths) {
-    const diag = Math.hypot(o.w, o.h);
     for (let c = 0; c < carouselPathContours(o).length; c++) {
       const points = carouselPathWorld(o, c);
       for (
         let i = 0;
-        i < points.length - (o.closed ? 0 : 1) && remaining > 0;
+        i < points.length - (o.closed ? 0 : 1) && remaining > 3;
         i++
       ) {
-        const samples = carouselCurvatureSamples(
-          points[i],
-          points[(i + 1) % points.length],
-          Math.min(24, remaining + 1),
-        );
-        for (const sample of samples) {
-          const length = Math.max(
-            -70 / carouselZoom,
-            Math.min(70 / carouselZoom, sample.k * diag * diag * 0.12),
+        const a = points[i],
+          b = points[(i + 1) % points.length],
+          length =
+            Math.hypot((a.out || a).x - a.x, (a.out || a).y - a.y) +
+            Math.hypot(
+              (b.in || b).x - (a.out || a).x,
+              (b.in || b).y - (a.out || a).y,
+            ) +
+            Math.hypot(b.x - (b.in || b).x, b.y - (b.in || b).y),
+          samples = carouselCurvatureSamples(
+            a,
+            b,
+            Math.min(
+              remaining - 1,
+              80,
+              Math.max(6, Math.ceil((length * carouselZoom) / 9)),
+            ),
           );
-          if (Math.abs(length) * carouselZoom < 0.2) continue;
-          d += `M${sample.x * carouselZoom},${sample.y * carouselZoom}l${sample.nx * length * carouselZoom},${sample.ny * length * carouselZoom}`;
-          remaining--;
-        }
+        segments.push(samples);
+        remaining -= samples.length;
+        for (const sample of samples)
+          maxCurvature = Math.max(maxCurvature, Math.abs(sample.k));
       }
     }
   }
-  svg.innerHTML = `<path d="${d}"/>`;
+  const gain = Math.min(
+      p.carousel.w ** 2 * 0.02,
+      80 / (carouselZoom * (maxCurvature || 1)),
+    ),
+    z = carouselZoom;
+  let comb = "",
+    envelope = "",
+    bands = "";
+  for (const samples of segments) {
+    if (!samples.length) continue;
+    const tips = samples.map((sample) => ({
+      x: (sample.x - sample.nx * sample.k * gain) * z,
+      y: (sample.y - sample.ny * sample.k * gain) * z,
+    }));
+    for (const [i, sample] of samples.entries())
+      comb += `M${sample.x * z},${sample.y * z}L${tips[i].x},${tips[i].y}`;
+    const edge = tips
+      .map((tip, i) => `${i ? "L" : "M"}${tip.x},${tip.y}`)
+      .join("");
+    envelope += edge;
+    bands +=
+      edge +
+      [...samples]
+        .reverse()
+        .map((sample) => `L${sample.x * z},${sample.y * z}`)
+        .join("") +
+      "Z";
+  }
+  svg.innerHTML = `<path class="curvature-band" d="${bands}"/><path class="curvature-comb" d="${comb}"/><path class="curvature-envelope" d="${envelope}"/>`;
 }

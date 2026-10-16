@@ -44,6 +44,14 @@ function carouselValidateRefinements(o, c, q) {
   )
     throw Error("Ungültiger Ebeneneffekt.");
   if (
+    o.effects &&
+    ["blurEnabled", "noiseEnabled"].some(
+      (key) =>
+        o.effects[key] !== undefined && typeof o.effects[key] !== "boolean",
+    )
+  )
+    throw Error("Ungültige Effektsichtbarkeit.");
+  if (
     o.folderId &&
     (o.type === "logo" || !c.folders?.some((f) => f.id === o.folderId))
   )
@@ -139,11 +147,12 @@ function carouselLayerPanel() {
     const row = document.createElement("div");
     row.className = "carousel-folder";
     row.dataset.folder = f.id;
-    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button>`;
+    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="remove" aria-label="Ordner entfernen" title="Ordner entfernen" ${f.locked ? "disabled" : ""}>${studioIcon("trash")}</button>`;
     row.querySelectorAll("button").forEach(
       (b) =>
         (b.onclick = () => {
           const action = b.dataset.folderAction;
+          if (action === "remove") return carouselRequestDeleteFolder(f);
           if (action === "select") {
             carouselSelect(
               c.objects.filter((o) => o.folderId === f.id).map((o) => o.id),
@@ -200,6 +209,8 @@ function carouselLayerPanel() {
   for (const f of c.folders || [])
     if (!seen.has(f.id)) fragment.append(folderRow(f));
   root.replaceChildren(fragment);
+  carouselLayerEffects(root, heading);
+  carouselLayerActions(root);
 }
 function carouselRefinementsPanel(panel, items) {
   const o = items.at(-1),
@@ -210,7 +221,7 @@ function carouselRefinementsPanel(panel, items) {
   ) {
     const section = document.createElement("section");
     section.className = "carousel-property-section folder-properties";
-    section.innerHTML = `<h4>Ordner</h4><label>Name<input id="carouselFolderName" maxlength="160" value="${esc(folder.name)}"></label><button id="carouselDissolveFolder">Ordner auflösen · Inhalt behalten</button><button id="carouselRemoveFolder">Ordner mit Inhalt entfernen</button>`;
+    section.innerHTML = `<h4>Ordner</h4><label>Name<input id="carouselFolderName" maxlength="160" value="${esc(folder.name)}"></label><button id="carouselRemoveFolder" ${folder.locked ? "disabled" : ""}>Ordner entfernen …</button>`;
     panel.prepend(section);
     $("#carouselFolderName").onchange = (e) => {
       if (!e.target.value.trim()) return;
@@ -219,29 +230,8 @@ function carouselRefinementsPanel(panel, items) {
       changed(false);
       carouselLayerPanel();
     };
-    $("#carouselDissolveFolder").onclick = () => {
-      checkpoint();
-      p.carousel.objects.forEach((o) => {
-        if (o.folderId === folder.id) delete o.folderId;
-      });
-      p.carousel.folders = p.carousel.folders.filter((f) => f !== folder);
-      carouselUI.folder = null;
-      changed();
-    };
-    const members = p.carousel.objects.filter((o) => o.folderId === folder.id);
-    $("#carouselRemoveFolder").disabled =
-      !!folder.locked || members.some((o) => o.locked);
-    $("#carouselRemoveFolder").onclick = () => {
-      checkpoint();
-      p.carousel.objects = p.carousel.objects.filter(
-        (o) => o.folderId !== folder.id,
-      );
-      p.carousel.folders = p.carousel.folders.filter((f) => f !== folder);
-      carouselUI.folder = null;
-      carouselSelection = null;
-      carouselUI.ids.clear();
-      changed();
-    };
+    $("#carouselRemoveFolder").onclick = () =>
+      carouselRequestDeleteFolder(folder);
   }
   if (!o) return;
   if (items.length === 1 && o.type !== "logo") {
@@ -275,52 +265,6 @@ function carouselRefinementsPanel(panel, items) {
       };
     }
   }
-  const fx = document.createElement("section");
-  fx.className = "carousel-property-section layer-effects";
-  fx.innerHTML = `<div class="type-section-heading"><h4>Effekte</h4><button id="carouselResetEffects" title="Effekte zurücksetzen">Zurücksetzen</button></div><p class="type-hint">${items.length > 1 ? "Für alle ausgewählten Elemente" : "Nicht destruktiv · Original bleibt erhalten"}</p>${[
-    ["blur", "Gausssche Unschärfe", "px"],
-    ["noise", "Rauschen · monochrom", "%"],
-  ]
-    .map(
-      ([key, label, unit]) =>
-        `<label class="effect-control"><span>${label}<output data-effect-output="${key}">${o.effects?.[key] || 0} ${unit}</output></span><input data-effect="${key}" type="range" min="0" max="100" step="1" value="${o.effects?.[key] || 0}" ${items.every(carouselObjectLocked) ? "disabled" : ""}></label>`,
-    )
-    .join("")}`;
-  panel.append(fx);
-  fx.querySelectorAll("[data-effect]").forEach((input) => {
-    let begun = false;
-    input.onpointerdown = () => (begun = false);
-    input.onfocus = () => (begun = false);
-    input.oninput = () => {
-      if (!begun) {
-        checkpoint();
-        begun = true;
-      }
-      const value = +input.value;
-      items
-        .filter((o) => !carouselObjectLocked(o))
-        .forEach((o) => {
-          o.effects = {
-            blur: 0,
-            noise: 0,
-            ...o.effects,
-            [input.dataset.effect]: value,
-          };
-        });
-      fx.querySelector(`[data-effect-output="${input.dataset.effect}"]`).value =
-        value + (input.dataset.effect === "blur" ? " px" : " %");
-      changed(false);
-    };
-  });
-  $("#carouselResetEffects").disabled = items.every(carouselObjectLocked);
-  $("#carouselResetEffects").onclick = () => {
-    checkpoint();
-    items
-      .filter((o) => !carouselObjectLocked(o))
-      .forEach((o) => delete o.effects);
-    changed(false);
-    carouselPanel();
-  };
   const position = [
     ...panel.querySelectorAll(":scope > .carousel-property-section"),
   ].find(

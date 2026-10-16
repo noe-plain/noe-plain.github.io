@@ -1,4 +1,21 @@
 "use strict";
+const carouselTypeBaselines = new WeakMap();
+function carouselTypeBaseline(ctx, font, size) {
+  let cache = carouselTypeBaselines.get(fontStatus);
+  if (!cache) carouselTypeBaselines.set(fontStatus, (cache = new Map()));
+  const key = JSON.stringify([font, size, !!fontStatus[font]]);
+  if (cache.has(key)) return cache.get(key);
+  const previous = ctx.textBaseline;
+  ctx.font = `${size}px "${font}"`;
+  ctx.textBaseline = "alphabetic";
+  const ascent = ctx.measureText("Mg").actualBoundingBoxAscent;
+  ctx.textBaseline = "top";
+  const baseline = ascent - ctx.measureText("Mg").actualBoundingBoxAscent;
+  ctx.textBaseline = previous;
+  if (cache.size >= 512) cache.delete(cache.keys().next().value);
+  cache.set(key, baseline);
+  return baseline;
+}
 function carouselCharacterScript(o, index) {
   return (
     o.characterStyles?.find((s) => index >= s.start && index < s.end)?.script ||
@@ -34,7 +51,12 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   for (const run of runs) {
     run.text = o.uppercase ? run.raw.toLocaleUpperCase("de-CH") : run.raw;
     run.size = size * (run.script === "superscript" ? 0.65 : 1);
-    run.dy = run.script === "superscript" ? -size * 0.3 : 0;
+    run.rise = run.script === "superscript" ? size * 0.3 : 0;
+    run.dy = run.rise
+      ? carouselTypeBaseline(ctx, o.font, size) -
+        carouselTypeBaseline(ctx, o.font, run.size) -
+        run.rise
+      : 0;
     run.x = x;
     ctx.font = `${run.size}px "${o.font}"`;
     run.width = ctx.measureText(run.text).width;

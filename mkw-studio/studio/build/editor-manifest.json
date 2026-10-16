@@ -21,6 +21,8 @@
     "static/carousel.js",
     "static/carousel-refinements.js",
     "static/carousel-effects.js",
+    "static/carousel-layer-effects.js",
+    "static/carousel-layer-actions.js",
     "static/carousel-transform.js",
     "static/carousel-render.js",
     "static/carousel-input.js",

@@ -109,7 +109,7 @@ async function carouselPaint(
 
 function carouselImageOnSlide(o, slide, c = p.carousel) {
   const b = carouselObjectBounds(o),
-    pad = (o.effects?.blur || 0) * 3;
+    pad = carouselEffectValue(o, "blur") * 3;
   return (
     b.x + b.w + pad > slide * c.w &&
     b.x - pad < (slide + 1) * c.w &&

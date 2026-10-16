@@ -2,8 +2,22 @@
 // One bounded raster per effect-bearing object. Moving/rotating reuses the pixels.
 const carouselEffectCache = new Map();
 let carouselEffectBytes = 0;
+const carouselEffectValue = (o, key) =>
+  o.effects?.[key + "Enabled"] === false ? 0 : o.effects?.[key] || 0;
 const carouselHasEffects = (o) =>
-  !!((o.effects?.blur || 0) > 0 || (o.effects?.noise || 0) > 0);
+  carouselEffectValue(o, "blur") > 0 || carouselEffectValue(o, "noise") > 0;
+function carouselVisualPadding(o) {
+  if (carouselIsVector(o)) return carouselVectorPadding(o);
+  if (o.type === "angle") return Math.ceil(o.glow * 3) + 3;
+  if (o.type === "text")
+    return (
+      Math.ceil(
+        Math.max(o.size, ...(o.textStyles || []).map((s) => s?.size || 0)) *
+          0.4,
+      ) + 4
+    );
+  return 4;
+}
 function carouselForgetEffect(key) {
   const value = carouselEffectCache.get(key);
   if (value) carouselEffectBytes -= value.bytes;
@@ -17,7 +31,8 @@ function pruneCarouselEffects() {
 async function carouselPaintEffect(ctx, o, scale, loadImage) {
   const project = p,
     local = carouselLocalBounds(o),
-    pad = Math.ceil((o.effects.blur || 0) * 3) + 4,
+    pad =
+      Math.ceil(carouselEffectValue(o, "blur") * 3) + carouselVisualPadding(o),
     rasterScale =
       loadImage === previewImage ? Math.min(1, Math.max(0.1, scale)) : 1,
     shape = {
@@ -38,7 +53,8 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
     !old ||
     old.key !== key ||
     old.project !== p ||
-    old.fonts !== fontStatus
+    old.fonts !== fontStatus ||
+    old.fontReady !== !!fontStatus[o.font]
   ) {
     const w = Math.ceil((local.w + pad * 2) * rasterScale),
       h = Math.ceil((local.h + pad * 2) * rasterScale);
@@ -63,17 +79,17 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
         () => true,
         loadImage,
       );
-      if (o.effects.blur)
-        out.filter = `blur(${o.effects.blur * rasterScale}px)`;
+      if (carouselEffectValue(o, "blur"))
+        out.filter = `blur(${carouselEffectValue(o, "blur") * rasterScale}px)`;
       out.drawImage(raw, 0, 0);
       out.filter = "none";
-      if (o.effects.noise) {
+      if (carouselEffectValue(o, "noise")) {
         const pixels = out.getImageData(0, 0, w, h),
           data = pixels.data;
         let seed = 2166136261;
         for (const char of o.id)
           seed = Math.imul(seed ^ char.charCodeAt(0), 16777619);
-        const amount = (o.effects.noise / 100) * 127;
+        const amount = (carouselEffectValue(o, "noise") / 100) * 127;
         for (let i = 0; i < data.length; i += 4) {
           if (!data[i + 3]) continue;
           seed ^= seed << 13;
@@ -90,6 +106,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
         key,
         project,
         fonts: fontStatus,
+        fontReady: !!fontStatus[o.font],
         canvas: buffer,
         bytes: w * h * 4,
       };

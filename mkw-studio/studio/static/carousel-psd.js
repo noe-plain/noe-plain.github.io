@@ -1,15 +1,9 @@
 "use strict";
 function carouselPSDBounds(o) {
   const c = p.carousel,
-    pad = carouselIsVector(o)
-      ? carouselVectorPadding(o)
-      : o.type === "angle"
-        ? Math.ceil(o.glow * 3) + 3
-        : o.type === "text"
-          ? Math.ceil(o.size * 0.4) + 4
-          : 2;
+    pad = carouselVisualPadding(o);
   const geometry = carouselObjectBounds(o);
-  const effectPad = (o.effects?.blur || 0) * 3;
+  const effectPad = carouselEffectValue(o, "blur") * 3;
   let leftEdge = geometry.x,
     right = geometry.x + geometry.w,
     bottom = geometry.y + geometry.h;

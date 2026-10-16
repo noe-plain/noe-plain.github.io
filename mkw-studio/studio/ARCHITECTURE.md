@@ -22,6 +22,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-input.js` | Pointer movement, resizing and shared snapping. |
 | `carousel-transform.js` | Origin-based rotation, tight local/world bounds, rotation handles and constrained Shift snapping. |
 | `carousel-refinements.js` | Folder metadata, inherited locks/visibility, effect inspector and custom carousel logos. |
+| `carousel-layer-effects.js`, `carousel-layer-actions.js` | Layer tree, FX chooser and pop-up editor, per-effect visibility, action menus and explicit folder deletion choices. |
 | `carousel-effects.js` | Bounded, non-persistent local effect rasters; deterministic monochrome noise and Gaussian blur. |
 | `carousel-typography.js`, `carousel-curvature.js` | Non-destructive case/script runs, source character offsets and view-only curvature comb. |
 | `carousel-text.js` | Text layout, paragraphs, leading, direct editing and typography UI. |
@@ -79,3 +80,7 @@ Folders are optional document metadata in `carousel.folders`; members refer to a
 `uppercase` affects display only. Optional `script` and source-indexed `characterStyles` support superscript without rewriting `text`. Wrapping, canvas, inline editing, PDF selection text and PSD share measured runs. Text edits shift style ranges; undo retains them. Curvature-comb visibility is a device preference, not document content; its SVG overlay never reaches an export. Removed device-library fonts stay embedded in documents that still use them, under a separate project-font option group.
 
 Typography layout is weakly cached per source object, keyed by text, font metrics, wrap width, paragraph/character settings and loaded font status. Position/opacity changes reuse it. Plain text and whole-frame superscript measure one run directly; mixed script splits at style boundaries, never loops over every character for every width query.
+
+The FX button adds effects to selected, unlocked layers. Effect rows live inside the layer card; `blurEnabled` / `noiseEnabled` default to true for old documents, and disabling them preserves strengths without changing layer visibility. Source parameters, not generated rasters, are saved. Superscript shifts a measured font baseline by 30% of the original size; the smaller glyph is 65% of that size. Baseline and text-layout caches account for font readiness.
+
+Layer cards keep the selection, visibility and lock controls immediately available, with additional actions in a menu. Folders offer cancel / retain content / delete content; deletion remains undoable and follows asset pruning. The curvature toggle stays available throughout advanced carousel editing, while its comb/band is limited to selected paths. Analytical curvature includes segment endpoints and a shared display scale, so tangent-continuous curvature jumps remain visible. This is a diagnostic display, not automatic G2 handle snapping. Reference behaviour: https://www.affinity.studio/blog/blend-tool-mask-tool-3d-model-support .

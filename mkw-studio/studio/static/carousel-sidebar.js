@@ -6,6 +6,9 @@ function carouselUpdateWarning(o) {
 }
 
 function carouselPanel() {
+  carouselCloseEffectMenu();
+  carouselCloseEffectEditor();
+  carouselCloseLayerMenu();
   if (!carouselActive() || !$("#carouselProperties")) return;
   const c = p.carousel,
     items = carouselSelected(),

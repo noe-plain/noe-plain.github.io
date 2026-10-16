@@ -40,6 +40,7 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
   const key = JSON.stringify([
       o.text,
       o.font,
+      !!fontStatus[o.font],
       o.size,
       o.w,
       o.lineHeight,
@@ -658,7 +659,7 @@ function carouselEditableRuns(o, line) {
   )
     .runs.map(
       (run) =>
-        `<span data-script="${run.script}" style="font-size:${run.script === "superscript" ? 65 : 100}%;position:relative;top:${run.dy * carouselZoom}px">${esc(run.raw)}</span>`,
+        `<span data-script="${run.script}" style="font-size:${run.script === "superscript" ? 65 : 100}%;position:relative;top:${-run.rise * carouselZoom}px">${esc(run.raw)}</span>`,
     )
     .join("");
 }

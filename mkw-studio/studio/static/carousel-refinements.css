@@ -1,3 +1,11 @@
+:root {
+  --studio-muted: #a5b1c4;
+  --studio-ink: #eef2f7;
+}
+html[data-theme="light"] {
+  --studio-muted: #63728a;
+  --studio-ink: #202631;
+}
 .carousel-rotate-handle {
   position: absolute;
   left: 50%;
@@ -68,26 +76,6 @@
   background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
   border-color: var(--studio-accent);
   color: var(--studio-accent);
-}
-.effect-control {
-  display: block;
-  margin: 12px 0;
-}
-.effect-control > span {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  gap: 8px;
-}
-.effect-control output {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.effect-control input {
-  width: 100%;
-  margin: 10px 0;
-  accent-color: var(--studio-accent);
 }
 #carouselNewFolder {
   display: flex;
@@ -284,4 +272,344 @@
 }
 .carousel-layers-panel .carousel-section-heading > span {
   display: none;
+}
+.carousel-layers-panel .carousel-section-heading h3 {
+  margin-right: auto;
+}
+#carouselAddEffect {
+  height: 30px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+.carousel-layer-box {
+  margin: 5px 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--studio-panel);
+}
+.carousel-layer-box[hidden] {
+  display: none;
+}
+.carousel-layer-box > .carousel-layer {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.carousel-layer-effects {
+  margin: 0 8px 7px 30px;
+  padding-left: 9px;
+  border-left: 1px solid var(--line);
+}
+.carousel-effect-row {
+  padding: 5px 0;
+}
+.carousel-effect-heading {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.carousel-effect-heading > span {
+  flex: 1;
+}
+.carousel-effect-heading button {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 25px;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+  color: var(--studio-muted);
+}
+.carousel-effect-heading .ui-icon {
+  width: 15px;
+  height: 15px;
+}
+.carousel-effect-row.is-disabled .carousel-effect-name > span {
+  color: var(--studio-muted);
+}
+.carousel-effect-menu {
+  position: fixed;
+  margin: 0;
+  padding: 12px;
+  width: 252px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--studio-panel);
+  color: var(--studio-ink);
+  box-shadow: 0 8px 30px #0002;
+  font-size: 12px;
+}
+.carousel-effect-menu p {
+  margin: 5px 0 10px;
+  font-size: 10px;
+  color: var(--studio-muted);
+  overflow-wrap: anywhere;
+}
+.carousel-effect-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 8px;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  background: transparent;
+  color: inherit;
+}
+.carousel-effect-menu button:hover,
+.carousel-effect-menu button:focus-visible {
+  background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
+}
+.carousel-effect-menu .ui-icon {
+  width: 17px;
+  height: 17px;
+}
+
+/* Keep layer controls available while a long tree scrolls. */
+.carousel-layers-panel {
+  padding-top: 0;
+}
+.carousel-layers-panel > .carousel-section-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-top: 12px;
+  background: var(--studio-panel);
+}
+#carouselSidebar .carousel-effect-heading > button {
+  flex: none;
+  width: 25px;
+  min-width: 25px;
+  height: 27px;
+  min-height: 27px;
+  padding: 4px !important;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+}
+#carouselSidebar .carousel-effect-heading > .carousel-effect-name {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  min-height: 36px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  text-align: left;
+  white-space: normal;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--studio-ink);
+}
+.carousel-effect-name small {
+  font-size: 10px;
+  color: var(--studio-muted);
+  font-variant-numeric: tabular-nums;
+}
+.carousel-effect-editor {
+  position: fixed;
+  margin: 0;
+  width: 320px;
+  max-width: calc(100vw - 16px);
+  padding: 20px;
+  background: var(--studio-panel);
+  color: var(--studio-ink);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  box-shadow: 0 12px 42px #0003;
+}
+.carousel-effect-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.carousel-effect-editor h3 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.carousel-effect-editor-heading button {
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.carousel-effect-editor p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--studio-muted);
+  margin: 8px 0 22px;
+  overflow-wrap: anywhere;
+}
+.carousel-effect-strength {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.carousel-effect-strength > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+#carouselEffectNumber {
+  width: 68px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font: inherit;
+  background: var(--studio-panel);
+  color: inherit;
+}
+#carouselEffectStrength {
+  width: 100%;
+  margin: 18px 0 24px;
+  accent-color: var(--studio-accent);
+}
+.carousel-effect-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11px;
+}
+.carousel-effect-editor-footer label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.carousel-effect-editor-footer input {
+  accent-color: var(--studio-accent);
+}
+.carousel-effect-editor-footer button {
+  padding: 9px 15px;
+  border-radius: 8px;
+  font: inherit;
+  background: var(--studio-accent);
+  color: var(--studio-panel);
+  border: 0;
+}
+
+#carouselCurvatureOverlay .curvature-band {
+  fill: currentColor;
+  fill-opacity: 0.08;
+  stroke: none;
+}
+#carouselCurvatureOverlay .curvature-comb {
+  opacity: 0.4;
+}
+#carouselCurvatureOverlay .curvature-envelope {
+  opacity: 0.9;
+  stroke-width: 1.2;
+}
+#carouselSidebar .carousel-layer button[hidden] {
+  display: none !important;
+}
+#carouselSidebar .carousel-layer .carousel-layer-actions {
+  margin-left: auto;
+}
+.carousel-layer-box {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--studio-panel) 94%, var(--studio-accent));
+}
+.carousel-layer-box:has(.active) {
+  border-color: color-mix(in srgb, var(--studio-accent) 45%, var(--line));
+}
+.carousel-layer-box > .carousel-layer {
+  border-radius: 8px;
+  background: transparent;
+}
+.carousel-layer-box > .carousel-layer.active {
+  background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
+  border-color: transparent;
+}
+.carousel-layer-menu button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.carousel-folder-delete {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  background: var(--studio-panel);
+  color: var(--studio-ink);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.carousel-folder-delete h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.carousel-folder-delete p {
+  margin: 12px 0 20px;
+  color: var(--studio-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.carousel-folder-delete > button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--studio-panel);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+}
+.carousel-folder-delete > button small {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--studio-muted);
+}
+.carousel-folder-delete > button:disabled {
+  opacity: 0.4;
+}
+.carousel-folder-delete [data-folder-delete="cancel"] {
+  justify-content: center;
+  margin-top: 18px;
+}
+.carousel-folder-delete::backdrop {
+  background: #101a2f66;
+}
+#carouselSidebar .carousel-folder > button {
+  flex: none;
+  width: 24px;
+  min-width: 24px;
+  height: 28px;
+  min-height: 28px;
+  padding: 3px !important;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+}
+#carouselSidebar .carousel-folder > .carousel-folder-name {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+.carousel-folder > button > .ui-icon {
+  width: 16px;
+  height: 16px;
 }
