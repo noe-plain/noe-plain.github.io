@@ -176,8 +176,15 @@ function carouselSetup() {
 
 function carouselWarning(o) {
   const c = p.carousel;
-  if (o.type !== "text" || !o.text.trim() || !carouselObjectVisible(o))
+  if (!carouselObjectVisible(o)) return "";
+  if (["image", "angle"].includes(o.type)) {
+    if (!o.imageId || !p.images.some((im) => im.id === o.imageId))
+      return "Bild im Rahmen fehlt. Bitte ein Bild auswählen.";
+    if (!carouselPhotoCoversFrame(o))
+      return "Bild füllt den Rahmen nicht vollständig. Bildausschnitt prüfen oder „Rahmen füllen“ wählen.";
     return "";
+  }
+  if (o.type !== "text" || !o.text.trim()) return "";
   const bounds = carouselObjectBounds(o),
     index = Math.floor(bounds.x / c.w);
   if (
@@ -372,6 +379,7 @@ const carouselUI = {
   drag: null,
   clipboard: [],
   layerDrag: null,
+  folderDrag: null,
   propertyUndo: false,
   snapLines: [],
   slide: null,

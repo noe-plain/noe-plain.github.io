@@ -21,6 +21,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-render.js` | Viewport/canvas and overlays. One async paint at a time, reusable buffer, generation cancellation. |
 | `carousel-input.js` | Pointer movement, resizing and shared snapping. |
 | `carousel-transform.js` | Origin-based rotation, tight local/world bounds, rotation handles and constrained Shift snapping. |
+| `carousel-folder-order.js` | Pure root-block ordering, empty-folder anchors and folder drag/drop binding. |
 | `carousel-refinements.js` | Folder metadata, inherited locks/visibility, effect inspector and custom carousel logos. |
 | `carousel-layer-effects.js`, `carousel-layer-actions.js` | Layer tree, FX chooser and pop-up editor, per-effect visibility, action menus and explicit folder deletion choices. |
 | `carousel-effects.js` | Bounded, non-persistent local effect rasters; deterministic monochrome noise and Gaussian blur. |
@@ -88,3 +89,7 @@ Layer cards keep the selection, visibility and lock controls immediately availab
 Folder `colour` is optional hexadecimal document metadata, assigned automatically from the least-used palette colours. Existing folders without a label receive one when their layer tree is first shown; opening old files remains supported. Colours are stored on folders, so member moves and deletion cannot shift the labels of other folders. Folder headers, member cards and effect branches share the colour; artwork rendering never uses it.
 
 Shift+W shares the footer grid/safe-zone toggle in both editors. The shared capture listener precedes the carousel plain-W angle shortcut, ignores repeats, text entry, open dialogs/popovers and command modifiers, and never changes document content.
+
+Folder drag/drop reorders whole root blocks; children retain their internal paint order and coordinates. Empty folders store an optional `before` root key, resolved without recursion or invalid-anchor loops, so their visual position can survive MKW saves even without paint objects. Receiving the first member restores the empty folder position. Protected logos remain above all blocks; locked folders or locked members cannot be reordered.
+
+Photo-frame effects process the unmasked image, then reapply the original crop polygon (including angle frames). Gaussian blur clamps source edge samples and final output remains inside the real image footprint; it cannot manufacture coverage for an undersized or displaced photo. Angle glow is composited separately from photo effects. Coverage warnings compare frame vertices against the image footprint in local coordinates, without pixel readbacks; intentional PNG transparency is not treated as missing coverage. These warnings remain editor-only.

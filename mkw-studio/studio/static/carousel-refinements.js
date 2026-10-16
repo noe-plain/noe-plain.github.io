@@ -102,6 +102,11 @@ function carouselValidateFolders(c) {
       ids.has(f.id) ||
       typeof f.name !== "string" ||
       f.name.length > 160 ||
+      (f.before !== undefined &&
+        f.before !== null &&
+        (typeof f.before !== "string" ||
+          f.before.length > 4000 ||
+          !/^(folder|layer):/.test(f.before))) ||
       (f.colour !== undefined &&
         (typeof f.colour !== "string" || !/^#[0-9a-f]{6}$/i.test(f.colour))) ||
       ["visible", "locked", "collapsed"].some(
@@ -148,10 +153,13 @@ function carouselCreateFolder() {
 }
 function carouselAssignFolder(o, id) {
   if (o.type === "logo" || carouselObjectLocked(o)) return;
+  const folder = p.carousel.folders?.find((f) => f.id === id),
+    wasEmpty = folder && !p.carousel.objects.some((v) => v.folderId === id);
   checkpoint();
   if (id) o.folderId = id;
   else delete o.folderId;
   carouselArrangeFolders();
+  if (wasEmpty) carouselMoveFolder(id, folder.before || null, false, false);
   changed();
 }
 function carouselLayerPanel() {
@@ -173,12 +181,25 @@ function carouselLayerPanel() {
   const rows = new Map(
       [...root.children].map((row) => [row.dataset.layer, row]),
     ),
-    seen = new Set(),
     fragment = document.createDocumentFragment();
   const folderRow = (f) => {
     const row = document.createElement("div");
     row.className = "carousel-folder";
     row.dataset.folder = f.id;
+    row.draggable = carouselFolderCanMove(c, f);
+    row.title = row.draggable
+      ? "Ordner mit Inhalt verschieben"
+      : "Gesperrter Ordner";
+    row.ondragstart = (event) => {
+      if (!carouselFolderCanMove(c, f)) return event.preventDefault();
+      carouselUI.folderDrag = f.id;
+      carouselUI.layerDrag = null;
+      event.dataTransfer.setData("application/x-mkw-folder", f.id);
+      event.dataTransfer.setData("text/plain", f.name);
+      event.dataTransfer.effectAllowed = "move";
+      row.classList.add("is-folder-dragging");
+    };
+    row.ondragend = carouselFolderDragEnd;
     row.style.setProperty("--folder-colour", carouselFolderColour(f));
     row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="remove" aria-label="Ordner entfernen" title="Ordner entfernen" ${f.locked ? "disabled" : ""}>${studioIcon("trash")}</button>`;
     row.querySelectorAll("button").forEach(
@@ -209,11 +230,19 @@ function carouselLayerPanel() {
         }),
     );
     row.ondragover = (e) => {
+      if (carouselUI.folderDrag) return carouselFolderDragOver(e, row);
       e.preventDefault();
       row.classList.add("drop-target");
     };
-    row.ondragleave = () => row.classList.remove("drop-target");
+    row.ondragleave = () =>
+      row.classList.remove(
+        "drop-target",
+        "folder-drop-before",
+        "folder-drop-after",
+      );
     row.ondrop = (e) => {
+      if (carouselUI.folderDrag)
+        return carouselFolderDrop(e, row, "folder:" + f.id);
       e.preventDefault();
       e.stopPropagation();
       const o = c.objects.find((o) => o.id === carouselUI.layerDrag);
@@ -222,28 +251,21 @@ function carouselLayerPanel() {
     };
     return row;
   };
-  for (const o of [...c.objects].reverse()) {
-    if (o.folderId) {
-      if (seen.has(o.folderId)) continue;
-      seen.add(o.folderId);
-      const f = carouselFolder(o);
-      if (!f) continue;
-      fragment.append(folderRow(f));
-      for (const child of [...c.objects]
-        .reverse()
-        .filter((v) => v.folderId === f.id)) {
+  for (const block of carouselLayerBlocks(c)) {
+    if (block.folder) {
+      fragment.append(folderRow(block.folder));
+      for (const child of [...block.objects].reverse()) {
         const row = rows.get(child.id);
         row.classList.add("in-folder");
-        row.hidden = !!f.collapsed;
+        row.hidden = !!block.folder.collapsed;
         fragment.append(row);
       }
-    } else fragment.append(rows.get(o.id));
+    } else fragment.append(rows.get(block.objects[0].id));
   }
-  for (const f of c.folders || [])
-    if (!seen.has(f.id)) fragment.append(folderRow(f));
   root.replaceChildren(fragment);
   carouselLayerEffects(root, heading);
   carouselLayerActions(root);
+  carouselBindFolderDropTargets(root);
 }
 function carouselRefinementsPanel(panel, items) {
   const o = items.at(-1),

@@ -72,6 +72,24 @@ function carouselImageBounds(o) {
   };
 }
 
+function carouselPhotoCoversFrame(o) {
+  const b = carouselImageBounds(o),
+    left = b.x - o.x,
+    top = b.y - o.y,
+    right = left + b.w,
+    bottom = top + b.h;
+  // Every polygon edge is straight, so its vertices completely determine
+  // containment within the rectangular photo footprint. Rotation/flips of the
+  // whole object do not affect this local-space test.
+  return carouselFramePoints(o).every(
+    ({ x, y }) =>
+      x * o.w >= left - 0.01 &&
+      x * o.w <= right + 0.01 &&
+      y * o.h >= top - 0.01 &&
+      y * o.h <= bottom + 0.01,
+  );
+}
+
 function carouselImageResize(ev, o, corner) {
   if (carouselObjectLocked(o)) return;
   const rotation = o.angle || 0,

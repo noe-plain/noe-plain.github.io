@@ -19,6 +19,7 @@
     "static/psd.js",
     "static/bezier.js",
     "static/carousel.js",
+    "static/carousel-folder-order.js",
     "static/carousel-refinements.js",
     "static/carousel-effects.js",
     "static/carousel-layer-effects.js",

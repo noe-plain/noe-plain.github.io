@@ -31,8 +31,10 @@ function pruneCarouselEffects() {
 async function carouselPaintEffect(ctx, o, scale, loadImage) {
   const project = p,
     local = carouselLocalBounds(o),
+    framed = ["image", "angle"].includes(o.type),
     pad =
-      Math.ceil(carouselEffectValue(o, "blur") * 3) + carouselVisualPadding(o),
+      Math.ceil(carouselEffectValue(o, "blur") * 3) +
+      (framed ? 4 : carouselVisualPadding(o)),
     rasterScale =
       loadImage === previewImage ? Math.min(1, Math.max(0.1, scale)) : 1,
     shape = {
@@ -69,16 +71,25 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
         (pad - local.x) * rasterScale,
         (pad - local.y) * rasterScale,
       );
-      await carouselPaint(
-        draw,
-        null,
-        rasterScale,
-        true,
-        null,
-        [shape],
-        () => true,
-        loadImage,
-      );
+      if (framed) {
+        draw.scale(rasterScale, rasterScale);
+        await carouselPaintPhoto(
+          draw,
+          shape,
+          loadImage,
+          Math.ceil(carouselEffectValue(o, "blur") * 3) + 2,
+        );
+      } else
+        await carouselPaint(
+          draw,
+          null,
+          rasterScale,
+          true,
+          null,
+          [shape],
+          () => true,
+          loadImage,
+        );
       if (carouselEffectValue(o, "blur"))
         out.filter = `blur(${carouselEffectValue(o, "blur") * rasterScale}px)`;
       out.drawImage(raw, 0, 0);
@@ -135,6 +146,13 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
   ctx.globalCompositeOperation = o.blend || "source-over";
   ctx.translate(o.x, o.y);
   if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
+  if (framed) {
+    carouselClipPhoto(ctx, o, scale);
+    const bounds = carouselImageBounds(o);
+    ctx.beginPath();
+    ctx.rect(bounds.x - o.x, bounds.y - o.y, bounds.w, bounds.h);
+    ctx.clip();
+  }
   ctx.drawImage(
     entry.canvas,
     local.x - pad,

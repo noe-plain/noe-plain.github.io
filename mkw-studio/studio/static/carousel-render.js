@@ -28,10 +28,6 @@ async function carouselPaint(
   for (const o of objects || c.objects) {
     if (!isCurrent()) break;
     if (!carouselObjectVisible(o) || o.id === editingId) continue;
-    if (carouselHasEffects(o)) {
-      await carouselPaintEffect(ctx, o, scale, loadImage);
-      continue;
-    }
     // Photos clipped to other slides must not repeatedly decode during each export.
     if (
       slide !== null &&
@@ -39,6 +35,10 @@ async function carouselPaint(
       !carouselImageOnSlide(o, slide, c)
     )
       continue;
+    if (carouselHasEffects(o)) {
+      await carouselPaintEffect(ctx, o, scale, loadImage);
+      continue;
+    }
     ctx.save();
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
@@ -66,55 +66,82 @@ async function carouselPaint(
       const im = await carouselLogoImage(o);
       ctx.drawImage(im, 0, 0, o.w, o.h);
     } else {
-      if (o.type === "angle") {
-        const path = carouselAngleMask(o);
-        ctx.save();
-        ctx.shadowColor =
-          o.glowColor +
-          Math.round(o.glowAlpha * 255)
-            .toString(16)
-            .padStart(2, "0");
-        ctx.shadowBlur = o.glow * scale;
-        ctx.fillStyle = "#ffffff";
-        ctx.fill(path);
-        ctx.restore();
-        ctx.clip(path);
-      } else {
-        ctx.clip(carouselImageMask(o));
-      }
-      const im = project.images.find((im) => im.id === o.imageId);
-      if (im) {
-        const bitmap = await loadImage(im.data),
-          fw = o.w,
-          fh = o.h,
-          s = Math.max(fw / im.width, fh / im.height) * o.scale;
-        ctx.translate(fw / 2 + o.panX, fh / 2 + o.panY);
-        ctx.scale(o.flipX, o.flipY);
-        ctx.drawImage(
-          bitmap,
-          (-im.width * s) / 2,
-          (-im.height * s) / 2,
-          im.width * s,
-          im.height * s,
-        );
-      } else {
-        ctx.fillStyle = "#68768b";
-        ctx.fillRect(0, 0, o.w, o.h);
-      }
+      carouselClipPhoto(ctx, o, scale);
+      await carouselPaintPhoto(ctx, o, loadImage);
     }
     ctx.restore();
   }
   ctx.restore();
 }
 
+// Effects process photo pixels before applying the unchanged crop boundary.
+function carouselClipPhoto(ctx, o, scale) {
+  if (o.type === "angle") {
+    const path = carouselAngleMask(o);
+    ctx.save();
+    ctx.shadowColor =
+      o.glowColor +
+      Math.round(o.glowAlpha * 255)
+        .toString(16)
+        .padStart(2, "0");
+    ctx.shadowBlur = o.glow * scale;
+    ctx.fillStyle = "#ffffff";
+    ctx.fill(path);
+    ctx.restore();
+    ctx.clip(path);
+  } else ctx.clip(carouselImageMask(o));
+}
+
+async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0) {
+  const im = p.images.find((im) => im.id === o.imageId);
+  if (!im) {
+    ctx.fillStyle = "#68768b";
+    ctx.fillRect(0, 0, o.w, o.h);
+    return;
+  }
+  const bitmap = await loadImage(im.data),
+    fit = Math.max(o.w / im.width, o.h / im.height) * o.scale,
+    w = im.width * fit,
+    h = im.height * fit,
+    x = -w / 2,
+    y = -h / 2,
+    bw = bitmap.width,
+    bh = bitmap.height;
+  ctx.save();
+  ctx.translate(o.w / 2 + o.panX, o.h / 2 + o.panY);
+  ctx.scale(o.flipX, o.flipY);
+  ctx.drawImage(bitmap, x, y, w, h);
+  if (edgePad) {
+    // Clamp the source edge for the blur kernel. Final compositing still clips
+    // to the actual photo footprint, so uncovered areas never become filled.
+    const columns = [
+        [0, 1, x - edgePad, edgePad],
+        [0, bw, x, w],
+        [bw - 1, 1, x + w, edgePad],
+      ],
+      rows = [
+        [0, 1, y - edgePad, edgePad],
+        [0, bh, y, h],
+        [bh - 1, 1, y + h, edgePad],
+      ];
+    for (let row = 0; row < 3; row++)
+      for (let col = 0; col < 3; col++) {
+        if (row === 1 && col === 1) continue;
+        const [sx, sw, dx, dw] = columns[col],
+          [sy, sh, dy, dh] = rows[row];
+        ctx.drawImage(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+      }
+  }
+  ctx.restore();
+}
+
 function carouselImageOnSlide(o, slide, c = p.carousel) {
-  const b = carouselObjectBounds(o),
-    pad = carouselEffectValue(o, "blur") * 3;
+  const b = carouselObjectBounds(o);
   return (
-    b.x + b.w + pad > slide * c.w &&
-    b.x - pad < (slide + 1) * c.w &&
-    b.y + b.h + pad > 0 &&
-    b.y - pad < c.h
+    b.x + b.w > slide * c.w &&
+    b.x < (slide + 1) * c.w &&
+    b.y + b.h > 0 &&
+    b.y < c.h
   );
 }
 
@@ -458,6 +485,8 @@ function carouselRefresh() {
       return message ? [{ id: o.id, title: o.name, message }] : [];
     }),
   );
+  const selectedPhoto = carouselSelected();
+  if (selectedPhoto.length === 1) carouselUpdateWarning(selectedPhoto[0]);
   carouselDrawSelection();
   carouselVectorOverlay();
   carouselCurvatureOverlay();

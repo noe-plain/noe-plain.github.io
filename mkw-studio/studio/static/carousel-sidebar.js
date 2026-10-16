@@ -122,6 +122,8 @@ function carouselPanel() {
           (order[b.querySelector("h4")?.textContent] ?? 10),
       )
       .forEach((section) => panel.insertBefore(section, warning));
+    if (["image", "angle"].includes(o.type))
+      panel.querySelector("#carouselImageFit")?.after(warning);
     const primary = panel.querySelector("#carouselGradientEdit");
     if (primary) {
       primary.classList.add("carousel-place-image");
@@ -346,6 +348,7 @@ function carouselLegacyLayerPanel() {
     .querySelectorAll("[data-layer]")
     .forEach((row) => {
       row.ondragstart = (ev) => {
+        carouselUI.folderDrag = null;
         carouselUI.layerDrag = row.dataset.layer;
         ev.dataTransfer.setData("text/plain", row.dataset.layer);
         ev.dataTransfer.effectAllowed = "move";
