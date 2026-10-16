@@ -1,4 +1,31 @@
 "use strict";
+const carouselFolderColours = [
+  "#537ae8",
+  "#9170da",
+  "#bf65a3",
+  "#db7456",
+  "#c39739",
+  "#5b9d72",
+  "#459ca4",
+  "#6f8199",
+];
+function carouselFolderColour(folder) {
+  if (/^#[0-9a-f]{6}$/i.test(folder.colour)) return folder.colour;
+  // Stable fallback for older files, including after reordering/deleting folders.
+  let hash = 0;
+  for (const char of folder.id)
+    hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
+  return carouselFolderColours[hash % carouselFolderColours.length];
+}
+function carouselNextFolderColour() {
+  const counts = new Map(carouselFolderColours.map((colour) => [colour, 0]));
+  for (const folder of p.carousel.folders || []) {
+    if (folder.colour === undefined) continue;
+    const colour = folder.colour.toLowerCase();
+    if (counts.has(colour)) counts.set(colour, counts.get(colour) + 1);
+  }
+  return [...counts].sort((a, b) => a[1] - b[1])[0][0];
+}
 function carouselFolder(o, c = p.carousel) {
   return c?.folders?.find((f) => f.id === o.folderId);
 }
@@ -75,6 +102,8 @@ function carouselValidateFolders(c) {
       ids.has(f.id) ||
       typeof f.name !== "string" ||
       f.name.length > 160 ||
+      (f.colour !== undefined &&
+        (typeof f.colour !== "string" || !/^#[0-9a-f]{6}$/i.test(f.colour))) ||
       ["visible", "locked", "collapsed"].some(
         (k) => f[k] !== undefined && typeof f[k] !== "boolean",
       )
@@ -104,6 +133,7 @@ function carouselCreateFolder() {
   const folder = {
     id: uid(),
     name: `Ordner ${p.carousel.folders.length + 1}`,
+    colour: carouselNextFolderColour(),
     visible: true,
     locked: false,
     collapsed: false,
@@ -127,6 +157,8 @@ function carouselAssignFolder(o, id) {
 function carouselLayerPanel() {
   carouselArrangeFolders();
   carouselLegacyLayerPanel();
+  for (const folder of p.carousel.folders || [])
+    if (folder.colour === undefined) folder.colour = carouselNextFolderColour();
   const c = p.carousel,
     root = $("#carouselLayers"),
     heading = $(".carousel-layers-panel .carousel-section-heading");
@@ -147,6 +179,7 @@ function carouselLayerPanel() {
     const row = document.createElement("div");
     row.className = "carousel-folder";
     row.dataset.folder = f.id;
+    row.style.setProperty("--folder-colour", carouselFolderColour(f));
     row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="remove" aria-label="Ordner entfernen" title="Ordner entfernen" ${f.locked ? "disabled" : ""}>${studioIcon("trash")}</button>`;
     row.querySelectorAll("button").forEach(
       (b) =>

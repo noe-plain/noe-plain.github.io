@@ -155,6 +155,11 @@ function carouselLayerEffects(root, heading) {
     const box = document.createElement("div"),
       list = document.createElement("div");
     box.className = "carousel-layer-box";
+    const folder = carouselFolder(o);
+    if (folder) {
+      box.classList.add("in-folder");
+      box.style.setProperty("--folder-colour", carouselFolderColour(folder));
+    }
     box.hidden = layer.hidden;
     box.ondragover = layer.ondragover;
     box.ondragleave = layer.ondragleave;

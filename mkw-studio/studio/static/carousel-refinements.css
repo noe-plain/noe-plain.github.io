@@ -613,3 +613,21 @@ html[data-theme="light"] {
   width: 16px;
   height: 16px;
 }
+.carousel-folder {
+  border-left: 3px solid var(--folder-colour);
+  background: color-mix(in srgb, var(--folder-colour) 8%, var(--studio-panel));
+}
+.carousel-folder-name > .ui-icon {
+  color: var(--folder-colour);
+}
+.carousel-layer-box.in-folder {
+  margin-left: 14px;
+  border-left: 3px solid var(--folder-colour);
+}
+.carousel-layer-box.in-folder > .carousel-layer.in-folder {
+  margin-left: 0;
+  border-left: 0;
+}
+.carousel-layer-box.in-folder .carousel-layer-effects {
+  border-left-color: var(--folder-colour);
+}
