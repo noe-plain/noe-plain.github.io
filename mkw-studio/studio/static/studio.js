@@ -20,7 +20,7 @@ function on(id, event, fn) {
   if (el) el.addEventListener(event, fn);
 }
 function mutate(fn, full = true) {
-  checkpoint();
+  if (!studioPicker?.adapter || !studioPicker.editing) checkpoint();
   fn();
   changed(full);
 }
@@ -44,7 +44,7 @@ function textTypeSummary(b) {
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = textTypeSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Textarten auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length}/3</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Textarten · ${esc(im.name)}"><div class="picker-heading">Texte auf diesem Bild</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<small>Gilt für alle Formate dieses Bildes.</small>${familyPicker(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte auf diesem Bild</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<small>Gilt für alle Formate dieses Bildes.</small>${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
@@ -107,7 +107,7 @@ function imageAction(name, label, title, action, id, disabled = false) {
   return `<button class="image-action ${action === "removeImage" ? "image-action-delete" : ""}" data-action="${action}" data-id="${esc(id)}" title="${title}" aria-label="${title}" ${disabled ? "disabled" : ""}>${icon(name)}${label ? `<span>${label}</span>` : ""}</button>`;
 }
 function imageHeading(im, i) {
-  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><button class="image-card-summary" data-card-toggle="${esc(im.id)}" aria-expanded="true" title="Bildkarte ein- oder ausklappen"><span class="image-preview"><img src="${esc(im.data)}" alt="" loading="lazy" decoding="async"><span class="image-number" aria-label="Bild ${i + 1}">${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong><span class="image-card-chevron">${icon("down")}</span></span></button><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div><p class="template-hint">Text und Textarten werden übernommen. Jedes Bild bleibt einzeln anpassbar.</p>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("plus", "Format", "Zeichenfläche hinzufügen", "addBoard", im.id)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Textarten</span>${textTypePicker(im)}</div></div></div></aside>`;
+  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><button class="image-card-summary" data-card-toggle="${esc(im.id)}" aria-expanded="true" title="Bildkarte ein- oder ausklappen"><span class="image-preview"><img src="${esc(im.data)}" alt="" loading="lazy" decoding="async"><span class="image-number" aria-label="Bild ${i + 1}">${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong><span class="image-card-chevron">${icon("down")}</span></span></button><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div><p class="template-hint">Text und Optionen werden übernommen. Jedes Bild bleibt einzeln anpassbar.</p>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("plus", "Format", "Zeichenfläche hinzufügen", "addBoard", im.id)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Optionen</span>${textTypePicker(im)}</div></div></div></aside>`;
 }
 document.addEventListener("click", (ev) => {
   document.querySelectorAll(".text-type-picker[open]").forEach((picker) => {
@@ -163,7 +163,7 @@ function syncTextTypes() {
     picker.querySelector("[data-text-summary]").textContent =
       active.join(" · ") || "Keine Texte ausgewählt";
     picker.querySelector("[data-text-count]").textContent =
-      active.length + "/3";
+      active.length + " Texte";
   });
 }
 function render() {
@@ -281,7 +281,7 @@ function render() {
 function updateDock() {
   document.querySelectorAll(".dock [data-step]").forEach((b) => {
     b.classList.toggle("active", b.dataset.step === step);
-    b.setAttribute("aria-current", b.dataset.step === step ? "step" : "false");
+    b.setAttribute("aria-current", b.dataset.step === step ? "true" : "false");
   });
   $("#viewValue").textContent = Math.round(view * 100) + "%";
 }
@@ -381,7 +381,7 @@ function renderPanel() {
             MKWFamily.copyrightColor(e.color),
           )}</select></label>`
         : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du bei den Textarten am Bild.</p>' : ""}<label><input id="uppercase" type="checkbox" ${layer === "date" ? "checked disabled" : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel immer in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
+    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du bei den Optionen am Bild.</p>' : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
     if (layer === "copyright") {
       const input = document.createElement("input");
       input.type = "text";
@@ -447,6 +447,17 @@ function renderPanel() {
       );
     on("uppercase", "change", (ev) =>
       mutate(() => {
+        if (layer === "date") {
+          const first = b.imageId === p.images[0]?.id;
+          for (const target of p.boards)
+            if (
+              target.imageId === b.imageId ||
+              (first && target.elements.date.text === e.text)
+            )
+              target.elements.date.uppercase = ev.target.checked;
+          if (first) p.meta.headingUppercase = ev.target.checked;
+          return;
+        }
         p.meta.uppercase = ev.target.checked;
         if (p.meta.uppercase) {
           for (const x of p.boards)
@@ -469,7 +480,16 @@ function renderPanel() {
     );
   } else if (step === "logo") {
     const e = b.elements.logo;
-    panel.innerHTML = `<div class="panel-row"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos.map((l) => `<div class="custom-logo-item"><button class="logo-choice ${e.source === l.id && e.visible ? "active" : ""}" data-logo="${esc(l.id)}" title="${esc(l.name)}"><img src="${esc(l.data)}" alt="${esc(l.name)}"></button><button class="remove-custom-logo" data-remove-logo="${esc(l.id)}" aria-label="Eigenes Logo entfernen: ${esc(l.name)}" title="Eigenes Logo entfernen">×</button></div>`).join("")}<div class="tool-button-grid"><button id="customLogo">Logo hinzufügen</button><button id="noLogo">Logo ausblenden</button></div><section class="tool-section"><h3>Auf weitere Bilder anwenden</h3><button id="allLogos">Logo auf alle Bilder übertragen</button></section></div><p class="panel-caption">Das Logo sitzt oben rechts im geschützten Bildbereich.</p>`;
+    panel.innerHTML = `<div class="panel-row"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos
+      .filter((l) => l.purpose !== "sponsor")
+      .map(
+        (l) =>
+          `<div class="custom-logo-item"><button class="logo-choice ${e.source === l.id && e.visible ? "active" : ""}" data-logo="${esc(l.id)}" title="${esc(l.name)}"><img src="${esc(l.data)}" alt="${esc(l.name)}"></button><button class="remove-custom-logo" data-remove-logo="${esc(l.id)}" aria-label="Eigenes Logo entfernen: ${esc(l.name)}" title="Eigenes Logo entfernen">×</button></div>`,
+      )
+      .join(
+        "",
+      )}<div class="tool-button-grid"><button id="customLogo">Logo hinzufügen</button><button id="noLogo">Logo ausblenden</button></div><section class="tool-section"><h3>Auf weitere Bilder anwenden</h3><button id="allLogos">Logo auf alle Bilder übertragen</button></section></div><p class="panel-caption">Das Logo sitzt oben rechts im geschützten Bildbereich.</p>`;
+    sponsorPanel(b, panel);
     panel.querySelectorAll("[data-remove-logo]").forEach(
       (el) =>
         (el.onclick = () =>
@@ -540,7 +560,6 @@ function beginText(b, key, el) {
   draw();
 }
 function setSharedText(b, key, text) {
-  if (key === "date") text = text.toUpperCase();
   if (key === "copyright") text = MKWLayout.copyrightText(text);
   const first = p.images[0]?.id === b.imageId;
   p.textOverrides ??= {};
@@ -586,14 +605,17 @@ function setSharedTextSize(b, key, size) {
       target.elements[key].size = size;
 }
 function inputText(b, key, el) {
-  const text = el.innerText.replace(/\r/g, "").replace(/\n$/, "");
+  const text = carouselEditableValue(el).replace(/\r/g, "").replace(/\n$/, "");
   setSharedText(
     b,
     key,
     key === "title" && p.meta.uppercase ? text.toUpperCase() : text,
   );
-  if (key === "date" || (key === "title" && p.meta.uppercase))
-    el.style.textTransform = "uppercase";
+  el.style.textTransform =
+    (key === "date" && b.elements.date.uppercase !== false) ||
+    (key === "title" && p.meta.uppercase)
+      ? "uppercase"
+      : "";
   const input = $("#mainTextInput");
   if (input && document.activeElement !== input)
     input.value = b.elements[key].text;

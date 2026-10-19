@@ -79,6 +79,7 @@ function studioSwapPaints(o) {
   studioSyncPaintControls();
 }
 function studioSyncPaintControls() {
+  if (studioPicker?.adapter) return;
   const bar = $(".carousel-contextbar");
   if (!bar) return;
   if (studioPicker && studioPicker.object !== studioPaintTarget()) {
@@ -227,29 +228,85 @@ function studioOpenPicker(o, channel, anchor) {
   };
   studioPicker.hsv = studioRGBToHSV(studioPickerColour().colour);
   studioCreatePicker();
-  $("#studioPaintPicker").hidden = false;
+  studioShowPicker(anchor);
   studioRenderPicker();
   studioPositionPicker();
   studioSyncPaintControls();
   $("#paintMode").focus();
 }
+// Shared view and interaction state; callers own values, mutation and placement.
+function studioOpenColourPicker({
+  anchor,
+  colour,
+  label = "Farbe",
+  onChange,
+  onBegin,
+  isCurrent = () => true,
+  position = null,
+}) {
+  if (studioPicker) studioClosePicker(false);
+  studioPicker = {
+    object: { type: "colour-control" },
+    channel: "fill",
+    value: {
+      kind: "solid",
+      colour,
+      alpha: 1,
+      enabled: true,
+      stops: [],
+      angle: 90,
+    },
+    stop: 0,
+    anchor,
+    rail: anchor.closest(
+      "#carouselSidebar,.tool-sidebar,.carousel-contextbar,dialog",
+    ),
+    rect: anchor.getBoundingClientRect(),
+    editing: false,
+    adapter: { onChange, onBegin, isCurrent, label },
+    position,
+  };
+  studioPicker.hsv = studioRGBToHSV(colour);
+  studioCreatePicker();
+  studioShowPicker(anchor);
+  studioRenderPicker();
+  $("#paintHex").focus();
+}
+function studioShowPicker(anchor) {
+  const el = $("#studioPaintPicker"),
+    owner = anchor.closest("dialog[open]");
+  studioPicker.owner = owner;
+  (owner || document.body).append(el);
+  el.hidden = false;
+  el.showPopover();
+}
 function studioClosePicker(focus = true) {
   if (!studioPicker) return;
   const anchor = studioPicker.anchor;
   studioPicker = null;
-  $("#studioPaintPicker").hidden = true;
+  const el = $("#studioPaintPicker");
+  el.hidePopover();
+  el.hidden = true;
+  document.body.append(el);
   studioSyncPaintControls();
   if (focus && anchor?.isConnected) anchor.focus();
 }
 function studioPickerBegin() {
   if (!studioPicker.editing) {
-    if (studioPicker.object !== carouselVectorColours) checkpoint();
+    if (studioPicker.adapter) studioPicker.adapter.onBegin?.();
+    else if (studioPicker.object !== carouselVectorColours) checkpoint();
     studioPicker.editing = true;
   }
 }
 function studioPickerApply() {
   const state = studioPicker;
   if (!state || state.object.locked) return;
+  if (state.adapter) {
+    if (!state.adapter.isCurrent()) return studioClosePicker(false);
+    state.value.alpha = 1;
+    state.adapter.onChange(state.value.colour);
+    return;
+  }
   const beforeImage = carouselHasImage(state.object);
   studioPaintWrite(state.object, state.channel, state.value);
   if (
@@ -294,6 +351,20 @@ function studioPositionPicker() {
     gap = 20,
     margin = 12,
     onRight = r.left + r.width / 2 > innerWidth / 2;
+  if (studioPicker.position) {
+    const point = studioPicker.position({
+      rect: r,
+      width: w,
+      height: h,
+      viewportWidth: innerWidth,
+      viewportHeight: innerHeight,
+    });
+    el.style.left =
+      Math.max(margin, Math.min(point.x, innerWidth - w - margin)) + "px";
+    el.style.top =
+      Math.max(margin, Math.min(point.y, innerHeight - h - margin)) + "px";
+    return;
+  }
   let x = onRight ? r.left - w - gap : r.right + gap;
   if (x < margin || x + w > innerWidth - margin) {
     const opposite = onRight ? r.right + gap : r.left - w - gap;
@@ -310,6 +381,7 @@ function studioCreatePicker() {
   const el = document.createElement("section");
   el.id = "studioPaintPicker";
   el.className = "studio-paint-picker";
+  el.setAttribute("popover", "manual");
   el.hidden = true;
   el.setAttribute("role", "dialog");
   el.setAttribute("aria-modal", "false");
@@ -548,18 +620,33 @@ function studioBindPickerPad(el, update) {
     studioPicker.editing = false;
     studioPickerBegin();
     const rect = el.getBoundingClientRect(),
-      move = (e) =>
-        update(
-          (e.clientX - rect.left) / rect.width,
-          (e.clientY - rect.top) / rect.height,
-        );
+      state = studioPicker;
+    let pending = null,
+      frame = 0;
+    const flush = () => {
+      frame = 0;
+      if (!pending || studioPicker !== state) return;
+      const point = pending;
+      pending = null;
+      update(
+        (point.x - rect.left) / rect.width,
+        (point.y - rect.top) / rect.height,
+      );
+    };
+    const move = (e) => {
+      pending = { x: e.clientX, y: e.clientY };
+      if (!frame) frame = requestAnimationFrame(flush);
+    };
     el.setPointerCapture(event.pointerId);
-    move(event);
+    pending = { x: event.clientX, y: event.clientY };
+    flush();
     const finish = () => {
+      if (frame) cancelAnimationFrame(frame);
+      flush();
       el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerup", finish);
       el.removeEventListener("pointercancel", finish);
-      if (studioPicker) studioPicker.editing = false;
+      if (studioPicker === state) state.editing = false;
     };
     el.addEventListener("pointermove", move);
     el.addEventListener("pointerup", finish);
@@ -595,7 +682,9 @@ function studioRenderPicker(refreshHandles = true) {
     vector =
       carouselIsVector(state.object) || state.object === carouselVectorColours;
   $("#paintPickerTitle").textContent =
-    state.channel === "stroke" ? "Kontur" : "Fläche";
+    state.adapter?.label || (state.channel === "stroke" ? "Kontur" : "Fläche");
+  $("#studioPaintPicker").classList.toggle("is-opaque-colour", !!state.adapter);
+  $("#paintMode").disabled = !!state.adapter;
   $("#paintMode").value = gradient ? "gradient" : value.kind;
   $("#paintMode").querySelector("[value=gradient]").disabled = $(
     "#paintMode",
@@ -898,10 +987,18 @@ document.addEventListener(
     if (
       studioPicker &&
       !event.target.closest(
-        "#studioPaintPicker,[data-paint-channel],.paint-wells",
+        '#studioPaintPicker,[data-paint-channel],.paint-wells,input[type="color"]',
       )
     )
       studioClosePicker(false);
+  },
+  true,
+);
+
+document.addEventListener(
+  "close",
+  (event) => {
+    if (studioPicker?.owner === event.target) studioClosePicker(false);
   },
   true,
 );

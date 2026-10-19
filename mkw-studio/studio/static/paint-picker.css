@@ -528,3 +528,18 @@ html[data-theme="light"] .studio-paint-picker {
   place-items: center;
   padding: 0;
 }
+
+#studioPaintPicker {
+  margin: 0;
+  inset: auto;
+}
+#studioPaintPicker.is-opaque-colour .picker-opacity,
+#studioPaintPicker.is-opaque-colour .picker-colour-values > label:last-child {
+  display: none;
+}
+#studioPaintPicker.is-opaque-colour .picker-colour-space {
+  grid-template-columns: 18px minmax(0, 1fr);
+}
+#studioPaintPicker.is-opaque-colour .picker-colour-values {
+  grid-template-columns: 35px minmax(0, 1fr);
+}

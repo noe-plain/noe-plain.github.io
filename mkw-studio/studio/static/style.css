@@ -449,13 +449,7 @@ header {
   color: white;
   background: var(--blue);
 }
-.dock-arrow {
-  width: 5px;
-  height: 5px;
-  border-right: 1px solid #c8cfdb;
-  border-top: 1px solid #c8cfdb;
-  transform: rotate(45deg);
-}
+
 .workspace-info {
   position: fixed;
   right: 24px;
@@ -1801,9 +1795,7 @@ header {
   background: #344467;
   color: #d7e3ff;
 }
-.dock-arrow {
-  border-color: #65758e;
-}
+
 footer {
   height: 32px;
   background: #191d24;
@@ -2020,10 +2012,7 @@ dialog small {
   .dock-label {
     font-size: 9px;
   }
-  .dock-arrow {
-    width: 4px;
-    height: 4px;
-  }
+
   footer {
     padding: 9px 12px;
     font-size: 8px;

@@ -529,3 +529,16 @@ footer .view-control {
     min-width: 112px;
   }
 }
+
+.header-actions a.icon-button {
+  flex: none;
+  color: inherit;
+  text-decoration: none;
+}
+.header-actions a.icon-button:hover {
+  background: var(--studio-panel-alt);
+}
+#startHelp {
+  color: inherit;
+  text-underline-offset: 3px;
+}

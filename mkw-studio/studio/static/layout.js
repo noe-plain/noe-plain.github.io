@@ -10,7 +10,12 @@
   const keys = ["date", "title", "subtitle", "copyright"];
   const clamp = (n, a, b) =>
     Math.min(Math.max(a, b), Math.max(a, Number.isFinite(n) ? n : a));
+  const sponsorModel =
+    typeof module !== "undefined"
+      ? require("./sponsor-model.js")
+      : root.MKWSponsors;
   function safeRect(b) {
+    const design = sponsorModel.layout(b)?.content || b;
     const unit = b.w / 1080,
       story = b.w * 16 === b.h * 9,
       left = 100 * unit,
@@ -24,8 +29,8 @@
     return {
       x: left,
       y: top,
-      w: b.w - left - right,
-      h: Math.max(1, b.h - top - bottom),
+      w: Math.max(1, design.w - left - right),
+      h: Math.max(1, design.h - top - bottom),
       left,
       right,
       top,
@@ -78,10 +83,12 @@
       return visible.map((key) => {
         const e = b.elements[key],
           size = Math.max(0.1, e.size * factor),
-          lines = wrap(e.text, safe.w, (t) => measure(t, size, e.role));
+          text = key === "date" && e.uppercase ? e.text.toUpperCase() : e.text,
+          lines = wrap(text, safe.w, (t) => measure(t, size, e.role));
         return {
           key,
           ...e,
+          text,
           size,
           lines,
           maxWidth: Math.max(0, ...lines.map((t) => measure(t, size, e.role))),

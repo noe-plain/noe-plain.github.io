@@ -146,6 +146,7 @@ async function image(src) {
   return promise;
 }
 function pruneImageCache() {
+  pruneSponsorRasters();
   const used = new Set([...p.images, ...p.logos].map((item) => item.data));
   pruneImagePreviews(used);
   for (const key of cache.keys())
@@ -186,7 +187,8 @@ function basicBoard(im, w = 1080, h = 1080) {
     },
     elements: {
       date: {
-        ...item(p.meta.concert.toUpperCase(), 64, h - 300, 52),
+        ...item(p.meta.concert, 64, h - 300, 52),
+        uppercase: p.meta.headingUppercase !== false,
         enabled: true,
         visible: true,
       },
@@ -328,7 +330,8 @@ function fit(b, mode) {
     t = b.image,
     rad = (t.angle * Math.PI) / 180,
     c = Math.abs(Math.cos(rad)),
-    s = Math.abs(Math.sin(rad));
+    s = Math.abs(Math.sin(rad)),
+    design = MKWSponsors.layout(b)?.content || b;
   if (mode === "reset") {
     t.angle = 0;
     t.flipX = t.flipY = 1;
@@ -336,17 +339,17 @@ function fit(b, mode) {
   }
   if (mode === "fill")
     t.scale = Math.max(
-      (c * b.w + s * b.h) / im.width,
-      (s * b.w + c * b.h) / im.height,
+      (c * design.w + s * design.h) / im.width,
+      (s * design.w + c * design.h) / im.height,
     );
   if (mode === "fit")
     t.scale = Math.min(
-      b.w / (c * im.width + s * im.height),
-      b.h / (s * im.width + c * im.height),
+      design.w / (c * im.width + s * im.height),
+      design.h / (s * im.width + c * im.height),
     );
   if (mode === "original") t.scale = 1;
-  t.x = b.w / 2;
-  t.y = b.h / 2;
+  t.x = design.w / 2;
+  t.y = design.h / 2;
 }
 function reorder(arr, id, delta) {
   const n = arr.findIndex((x) => x.id === id),
@@ -504,6 +507,9 @@ function validate(q) {
       if (
         k !== "logo" &&
         (typeof e.text !== "string" ||
+          (k === "date" &&
+            e.uppercase !== undefined &&
+            typeof e.uppercase !== "boolean") ||
           !/^#[0-9a-f]{6}$/i.test(e.color) ||
           (![
             "Replica LL",
@@ -529,6 +535,7 @@ function validate(q) {
       throw Error("Ungültige Schrift.");
   for (const l of q.logos)
     if (!l.data?.startsWith("data:image/")) throw Error("Ungültiges Logo.");
+  MKWSponsors.validate(q);
   return q;
 }
 async function restore(q) {
@@ -536,9 +543,8 @@ async function restore(q) {
   q.projectId ??= uid();
   validate(q);
   validateCarousel(q);
-  q.meta.concert = (q.meta.concert || "").toUpperCase();
   for (const b of q.boards) {
-    b.elements.date.text = b.elements.date.text.toUpperCase();
+    b.elements.date.uppercase ??= true;
     b.elements.copyright.text = MKWLayout.copyrightText(
       b.elements.copyright.text,
     );
@@ -681,10 +687,15 @@ function createBoard(im, w = 1080, h = 1080) {
       b.elements[key].enabled = key !== "subtitle";
       b.elements[key].visible = key !== "subtitle";
     }
+  if (template) {
+    b.elements.date.uppercase = template.elements.date.uppercase !== false;
+    if (template.sponsors) b.sponsors = clone(template.sponsors);
+  }
   applyFamilyBoard(
     b,
     template?.family || p.meta.familyDesign || MKWFamily.defaults(),
   );
+  if (MKWSponsors.layout(b)) fit(b, "fill");
   return b;
 }
 

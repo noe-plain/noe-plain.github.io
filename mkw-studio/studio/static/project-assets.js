@@ -8,6 +8,9 @@
       fonts = new Set();
     for (const board of project.boards || []) {
       images.add(board.imageId);
+      for (const group of board.sponsors?.groups || [])
+        for (const logo of group.logos || []) logos.add(logo.id);
+      if (board.sponsors?.groups?.length) fonts.add("Replica LL");
       for (const [key, element] of Object.entries(board.elements || {})) {
         if (key === "logo") {
           if (element.source && !["white", "black"].includes(element.source))
@@ -42,7 +45,12 @@
     project.logos = (project.logos || []).filter((logo) =>
       refs.logos.has(logo.id),
     );
-    for (const key of ["textOverrides", "textTypeOverrides", "familyOverrides"])
+    for (const key of [
+      "textOverrides",
+      "textTypeOverrides",
+      "familyOverrides",
+      "sponsorOverrides",
+    ])
       if (project[key])
         for (const id of Object.keys(project[key]))
           if (!refs.images.has(id)) delete project[key][id];

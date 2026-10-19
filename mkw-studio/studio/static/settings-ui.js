@@ -9,6 +9,7 @@ function studioSettingsUI() {
       ["general", "Allgemein"],
       ["guides", "Hilfslinien"],
       ["fonts", "Schriften"],
+      ["sponsors", "Sponsoren"],
       ["export", "Export"],
     ],
     panels = {};
@@ -81,6 +82,7 @@ function studioSettingsUI() {
     for (const [key, panel] of Object.entries(panels))
       panel.hidden = key !== id;
     dialog.scrollTop = 0;
+    if (id === "sponsors") sponsorRenderSettings();
   };
   select("general");
   tabs.querySelectorAll("button").forEach((button) => {
@@ -91,13 +93,13 @@ function studioSettingsUI() {
         ),
         next =
           event.key === "ArrowRight"
-            ? (index + 1) % 4
+            ? (index + 1) % definitions.length
             : event.key === "ArrowLeft"
-              ? (index + 3) % 4
+              ? (index + definitions.length - 1) % definitions.length
               : event.key === "Home"
                 ? 0
                 : event.key === "End"
-                  ? 3
+                  ? definitions.length - 1
                   : null;
       if (next !== null) {
         event.preventDefault();

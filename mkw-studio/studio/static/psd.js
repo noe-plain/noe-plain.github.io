@@ -28,7 +28,7 @@ async function layerBitmap(b, key) {
     top = 0,
     w = b.w,
     h = b.h;
-  if (!["image", "background", "textShadow"].includes(key)) {
+  if (!["image", "background", "textShadow", "sponsors"].includes(key)) {
     let r;
     if (key === "textShadow") r = MKWLayout.recordsRect(block.records);
     else if (key === "logoShadow" || key === "logo")
@@ -205,6 +205,7 @@ async function buildPSD(progress = () => {}) {
     await paint(ctx, b);
     ctx.restore();
     for (const key of [
+      "sponsors",
       "logo",
       "logoShadow",
       "copyright",
@@ -215,6 +216,7 @@ async function buildPSD(progress = () => {}) {
       "image",
       "background",
     ]) {
+      if (key === "sponsors" && !MKWSponsors.layout(b)) continue;
       if (b.family?.enabled && key === "logoShadow") continue;
       if (b.family?.enabled && key === "textShadow") {
         if (textChildren.length)
@@ -240,13 +242,15 @@ async function buildPSD(progress = () => {}) {
       const bitmap = await layerBitmap(b, key),
         l = {
           name:
-            key === "image"
-              ? im.name
-              : key === "background"
-                ? "Hintergrund"
-                : shadow
-                  ? "Schatten · Kontur · 28 %"
-                  : elementNames[key],
+            key === "sponsors"
+              ? "Sponsorleiste · gerastert"
+              : key === "image"
+                ? im.name
+                : key === "background"
+                  ? "Hintergrund"
+                  : shadow
+                    ? "Schatten · Kontur · 28 %"
+                    : elementNames[key],
           left: left + bitmap.left,
           top: top + bitmap.top,
           canvas: bitmap.canvas,
@@ -259,6 +263,26 @@ async function buildPSD(progress = () => {}) {
       } else if (e && key !== "logo")
         l.text = textLayerData(e, left, top, b.family, block);
       if (key === "image") {
+        const content = MKWSponsors.layout(b)?.content;
+        if (content)
+          l.vectorMask = {
+            paths: [
+              {
+                open: false,
+                operation: "combine",
+                fillRule: "non-zero",
+                knots: [
+                  [left, top],
+                  [left + content.w, top],
+                  [left + content.w, top + content.h],
+                  [left, top + content.h],
+                ].map(([x, y]) => ({
+                  linked: false,
+                  points: [x, y, x, y, x, y],
+                })),
+              },
+            ],
+          };
         if (!linked.has(im.id)) {
           const id = uid();
           linked.set(im.id, id);

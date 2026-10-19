@@ -243,11 +243,18 @@ function drawLogo(ctx, b, logo, opts = {}) {
 async function paint(ctx, b, s = 1, opts = {}) {
   if (p.carousel && Number.isInteger(b.carouselSlide))
     return carouselPaint(ctx, b.carouselSlide, s, opts.transparent);
+  const sponsors = MKWSponsors.layout(b);
   const layout = textBlock(b, opts.editKey),
     logo = await prepareLogo(b),
     safe = layout.safe;
   ctx.save();
   ctx.scale(s, s);
+  ctx.save();
+  if (sponsors) {
+    ctx.beginPath();
+    ctx.rect(0, 0, sponsors.content.w, sponsors.content.h);
+    ctx.clip();
+  }
   if (!opts.transparent && (!opts.only || opts.only === "background")) {
     ctx.fillStyle = b.family?.enabled ? b.family.background : b.bg;
     ctx.fillRect(0, 0, b.w, b.h);
@@ -291,6 +298,8 @@ async function paint(ctx, b, s = 1, opts = {}) {
   drawLogo(ctx, b, logo, opts);
   ctx.restore();
   drawText(ctx, layout, { ...opts, family: b.family, includeKey: "copyright" });
+  ctx.restore();
+  await paintSponsors(ctx, b, opts);
   ctx.restore();
 }
 async function canvasPNG(b) {
@@ -371,7 +380,13 @@ function updateWarning() {
   const warnings = [];
   for (const b of p.boards) {
     const im = asset(b),
-      uncovered = !b.family?.enabled && !MKW.imageCovers(b, im),
+      sponsorLayout = MKWSponsors.layout(b),
+      uncovered =
+        !b.family?.enabled &&
+        !MKW.imageCovers(
+          sponsorLayout ? { ...b, ...sponsorLayout.content } : b,
+          im,
+        ),
       low = b.image.scale > 1.001,
       card = document.querySelector(`.board-card[data-id="${b.id}"]`);
     if (card) {
@@ -390,6 +405,7 @@ function updateWarning() {
     if (uncovered)
       add("Bild deckt die Zeichenfläche nicht vollständig ab.", "crop");
     if (low) add("Bildauflösung gering – Export ist möglich.", "crop");
+    if (sponsorLayout?.warning) add(sponsorLayout.warning, "logo");
     const fonts = [
       ...new Set(
         Object.values(b.elements)
@@ -602,6 +618,10 @@ function syncOverlays(force = false) {
         height: e.h * s + "px",
         lineHeight: e.size * MKWLayout.lineHeight(e) * s + "px",
         textAlign: e.align,
+        textTransform:
+          e.key === "date" && b.elements.date.uppercase !== false
+            ? "uppercase"
+            : "",
         transform: copyright ? "rotate(-90deg)" : "none",
         transformOrigin: "0 0",
         color:
@@ -748,7 +768,14 @@ window.addEventListener("pointerup", finishMovement);
 window.addEventListener("pointercancel", finishMovement);
 
 function activateAtPoint(ev, b) {
-  const pt = positionInBoard(ev, b),
+  const point = positionInBoard(ev, b),
+    sponsorHit = MKWSponsors.hit(b, point);
+  if (sponsorHit) {
+    ev.preventDefault();
+    sponsorOpenProperties(b.imageId, { ...sponsorHit, boardId: b.id });
+    return;
+  }
+  const pt = point,
     block = textBlock(b, step === "text" ? layer : null);
   let hit = null;
   for (const e of [...block.records].reverse()) {
