@@ -1,34 +1,545 @@
-const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),assert=require('node:assert/strict');
-(async()=>{const browser=await require('./browser.cjs').launch();try{
- const page=await browser.newPage({viewport:{width:1900,height:1200}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8900');await page.locator('#startNew').click();await page.locator('[data-project-mode=carousel]').click();await page.locator('#setupName').fill('Rahmen und Typografie');await page.locator('#cn').fill('2');await page.locator('#createProject').click();await page.locator('#carouselCanvas').waitFor();
- const point=async(x,y)=>page.evaluate(([x,y])=>{const r=document.querySelector('#carouselCanvas').getBoundingClientRect();return{x:r.left+x*carouselZoom,y:r.top+y*carouselZoom}},[x,y]),drag=async(a,b)=>{await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps:5});await page.mouse.up()},chosen=()=>page.evaluate(()=>({...p.carousel.objects.find(o=>o.id===carouselSelection)}));
- await page.evaluate(()=>{carouselUI.tool='select';carouselObject('image',{x:150,y:300,w:600,h:400})});const imageId=await page.evaluate(()=>carouselSelection),png=await page.evaluate(()=>{const c=makeCanvas(600,400),ctx=c.getContext('2d');ctx.fillStyle='#f00';ctx.fillRect(0,0,300,400);ctx.fillStyle='#00f';ctx.fillRect(300,0,300,400);return c.toDataURL().split(',')[1]});await page.locator('#carouselReplace').click();await page.locator('#carouselFile').setInputFiles({name:'Rahmen.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.waitForFunction(()=>!busy);
- const pixel=async(x,y)=>page.evaluate(async([x,y])=>{const c=makeCanvas(1080,1350);await carouselPaint(c.getContext('2d'),0,1,true);return Array.from(c.getContext('2d').getImageData(x,y,1,1).data)},[x,y]);const original=await pixel(550,550);
- await page.locator('#carouselFrameEdit').click();assert.equal(await page.locator('.carousel-point-handle').count(),4);await drag(await point(150,300),await point(260,350));assert.equal((await pixel(180,315))[3],0,'Four-point frame must clip outside the moved corner');assert.deepEqual(await pixel(550,550),original,'Changing a corner must keep the image content fixed');assert(await page.evaluate(id=>carouselHit({x:180,y:315})?.id!==id,imageId),'Hit testing must follow the shape');
- await page.locator('[data-frame-slot="3"]').click();assert.equal(await page.locator('.carousel-point-handle').count(),5);await drag(await point(750,500),await point(600,500));assert.equal((await pixel(710,500))[3],0,'Fifth point can make a notch behind the angle');assert.deepEqual(await pixel(550,550),original);
- const frameBefore=await chosen();await drag(await point(600,500),await point(900,500));const enlarged=await chosen();assert(enlarged.w>frameBefore.w,'Corners may be moved outside the previous rectangle');assert.deepEqual(await pixel(550,550),original,'Changing the frame bounds must keep the image content fixed');
- for(const slot of [1,7,5,3]){await page.locator('#carouselFrameReset').click();await page.locator(`[data-frame-slot="${slot}"]`).click();const o=await chosen();assert(o.framePointSlots.includes(slot));assert.equal(o.framePoints.length,5)}
- await page.locator('#carouselFrameReset').click();for(const slot of [1,3,5,7])await page.locator(`[data-frame-slot="${slot}"]`).click();assert.equal(await page.locator('.frame-point-choice[aria-pressed=true]').count(),8);assert.equal(await page.locator('.carousel-point-handle').count(),8);
- for(const slot of [1,3,5,7,0])await page.locator(`[data-frame-slot="${slot}"]`).click();assert.equal((await chosen()).framePoints.length,3);assert.equal(await page.locator('.frame-point-choice[aria-pressed=true]:disabled').count(),3,'At least three vertices must stay active');
- await page.locator('[data-frame-slot="0"]').click();for(const slot of [1,3,5,7])await page.locator(`[data-frame-slot="${slot}"]`).click();const savedFrame=await chosen();await page.locator('#carouselFrameEdit').click();assert.equal(await page.locator('.carousel-point-handle').count(),0);assert.equal(await page.locator('.carousel-handle').count(),8);
- const legacy=await page.evaluate(async id=>{const current=clone(snapshot()),old=clone(snapshot()),o=old.carousel.objects.find(o=>o.id===id);o.framePoints=[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:0,y:1},{x:0,y:.5}];o.framePointSide='left';delete o.framePointSlots;await restore(old);const unchanged=JSON.stringify(p.carousel.objects.find(o=>o.id===id).framePoints)===JSON.stringify(o.framePoints),slots=carouselFrameSlots(p.carousel.objects.find(o=>o.id===id));await restore(current);return {unchanged,slots}},imageId);assert.deepEqual(legacy,{unchanged:true,slots:[0,2,4,6,7]});
- await page.screenshot({path:require('./browser.cjs').artifact('mkw-frame-point-picker.png')});
- await page.evaluate(()=>carouselObject('text',{x:1200,y:350,w:800,h:650,size:40,text:'RÜCKBLICK\nDIE VERWANDLUNG\nDANKE!'}));const textId=await page.evaluate(()=>carouselSelection);const defaultLines=await page.evaluate(()=>carouselTextLayout(p.carousel.objects.find(o=>o.id===carouselSelection)).lines);assert.deepEqual(defaultLines.map(line=>line.y),[0,38,76],'Default leading must be 0.95 × the font size');assert.equal(await page.locator('#carouselLineLeading').inputValue(),'38');
- for(const [paragraph,size,leading] of [[0,80,130],[1,45,75],[2,28,null]]){await page.locator(`[data-paragraph="${paragraph}"]`).click();await page.locator('#carouselParagraphSize').fill(String(size));if(leading!==null)await page.locator('#carouselLineLeading').fill(String(leading))}
- let layout=await page.evaluate(()=>carouselTextLayout(p.carousel.objects.find(o=>o.id===carouselSelection)));assert.deepEqual(layout.lines.map(line=>line.size),[80,45,28]);assert.deepEqual(layout.lines.map(line=>line.y),[0,130,205]);assert(Math.abs(layout.lines[2].leading-26.6)<1e-8,'Automatic leading must follow the paragraph size');assert.equal(await page.locator('#carouselLineLeading').inputValue(),'26.6');
- const exported=await page.evaluate(async()=>{const entry=await encodedBoard(clone(p.boards[1]),{format:'png',quality:90,png8:false,colours:256,transparent:false}),bitmap=await createImageBitmap(entry.blob),actual=makeCanvas(1080,1350),expected=makeCanvas(1080,1350);actual.getContext('2d').drawImage(bitmap,0,0);const ctx=exportContext(expected);ctx.fillStyle=p.carousel.bg;ctx.fillRect(0,0,1080,1350);ctx.fillStyle='#ffffff';ctx.textBaseline='top';for(const [text,size,y] of [['RÜCKBLICK',80,350],['DIE VERWANDLUNG',45,480],['DANKE!',28,555]]){ctx.font=`${size}px "Replica LL"`;ctx.fillText(text,120,y)}const a=actual.getContext('2d').getImageData(0,0,1080,1350).data,b=ctx.getImageData(0,0,1080,1350).data;return a.every((value,i)=>value===b[i])});assert(exported,'PNG export must match the paragraph sizes and individual line positions exactly');
- await page.locator('[data-text-anchor=bottom]').click();assert.equal(await page.locator('[data-text-anchor=bottom]').getAttribute('aria-pressed'),'true');const overlapping=await page.evaluate(()=>{const o={...p.carousel.objects.find(o=>o.id===carouselSelection),text:'GROSS\nklein',textStyles:[{size:100,leading:[1]},{size:10}]},layout=carouselTextLayout(o);return {height:layout.height,bottom:carouselTextOffset(o,layout)+layout.height}});assert(Math.abs(overlapping.height-112)<.01&&overlapping.bottom===650,'Bottom anchoring must include tall earlier lines when custom spacing makes lines overlap');
- const bottomExport=await page.evaluate(async()=>{const entry=await encodedBoard(clone(p.boards[1]),{format:'png',quality:90,png8:false,colours:256,transparent:false}),bitmap=await createImageBitmap(entry.blob),actual=makeCanvas(1080,1350),expected=makeCanvas(1080,1350);actual.getContext('2d').drawImage(bitmap,0,0);const ctx=exportContext(expected);ctx.fillStyle=p.carousel.bg;ctx.fillRect(0,0,1080,1350);ctx.fillStyle='#ffffff';ctx.textBaseline='top';const offset=650-(205+28*1.12);for(const [text,size,y] of [['RÜCKBLICK',80,350],['DIE VERWANDLUNG',45,480],['DANKE!',28,555]]){ctx.font=`${size}px "Replica LL"`;ctx.fillText(text,120,y+offset)}const a=actual.getContext('2d').getImageData(0,0,1080,1350).data,b=ctx.getImageData(0,0,1080,1350).data;return a.every((value,i)=>value===b[i])});assert(bottomExport,'Bottom-anchored text must also export in the correct position');
- await page.locator('#carouselTextEdit').click();assert(await page.evaluate(()=>{const o=p.carousel.objects.find(o=>o.id===carouselSelection),el=document.querySelector('.carousel-inline-text'),top=parseFloat(el.style.top),height=parseFloat(el.style.height);return Math.abs((top+height)/carouselZoom-(o.y+o.h))<.01}),'Direct editing must stay anchored to the frame bottom');await page.keyboard.press('Escape');
- const beforeOffset=await page.evaluate(()=>carouselTextOffset(p.carousel.objects.find(o=>o.id===carouselSelection)));await page.locator('[data-prop=h]').fill('700');assert(Math.abs((await page.evaluate(()=>carouselTextOffset(p.carousel.objects.find(o=>o.id===carouselSelection))))-beforeOffset-50)<.01,'Resizing the frame must preserve the bottom anchor');
- await page.locator('[data-paragraph="0"]').click();await page.locator('#carouselLineLeading').fill('140');assert(Math.abs((await page.evaluate(()=>carouselTextOffset(p.carousel.objects.find(o=>o.id===carouselSelection))))-beforeOffset-40)<.01,'Changing a line gap must keep the bottom fixed');await page.locator('#carouselLineLeading').fill('130');await page.locator('[data-prop=h]').fill('650');await page.locator('[data-text-anchor=top]').click();assert.equal(await page.evaluate(()=>carouselTextOffset(p.carousel.objects.find(o=>o.id===carouselSelection))),0,'Top anchor must restore the original position');
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
+  assert = require("node:assert/strict");
+(async () => {
+  const browser = await require("./browser.cjs").launch();
+  try {
+    const page = await browser.newPage({
+        viewport: { width: 1900, height: 1200 },
+      }),
+      errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto(process.env.STUDIO_URL || "http://127.0.0.1:8900");
+    await page.locator("#startNew").click();
+    await page.locator("[data-project-mode=carousel]").click();
+    await page.locator("#setupName").fill("Rahmen und Typografie");
+    await page.locator("#cn").fill("2");
+    await page.locator("#createProject").click();
+    await page.locator("#carouselCanvas").waitFor();
+    const point = async (x, y) =>
+        page.evaluate(
+          ([x, y]) => {
+            const r = document
+              .querySelector("#carouselCanvas")
+              .getBoundingClientRect();
+            return {
+              x: r.left + x * carouselZoom,
+              y: r.top + y * carouselZoom,
+            };
+          },
+          [x, y],
+        ),
+      drag = async (a, b) => {
+        await page.mouse.move(a.x, a.y);
+        await page.mouse.down();
+        await page.mouse.move(b.x, b.y, { steps: 5 });
+        await page.mouse.up();
+      },
+      chosen = () =>
+        page.evaluate(() => ({
+          ...p.carousel.objects.find((o) => o.id === carouselSelection),
+        }));
+    await page.evaluate(() => {
+      carouselUI.tool = "select";
+      carouselObject("image", { x: 150, y: 300, w: 600, h: 400 });
+    });
+    const imageId = await page.evaluate(() => carouselSelection),
+      png = await page.evaluate(() => {
+        const c = makeCanvas(600, 400),
+          ctx = c.getContext("2d");
+        ctx.fillStyle = "#f00";
+        ctx.fillRect(0, 0, 300, 400);
+        ctx.fillStyle = "#00f";
+        ctx.fillRect(300, 0, 300, 400);
+        return c.toDataURL().split(",")[1];
+      });
+    await page.locator("#carouselReplace").click();
+    await page
+      .locator("#carouselFile")
+      .setInputFiles({
+        name: "Rahmen.png",
+        mimeType: "image/png",
+        buffer: Buffer.from(png, "base64"),
+      });
+    await page.waitForFunction(() => !busy);
+    const pixel = async (x, y) =>
+      page.evaluate(
+        async ([x, y]) => {
+          const c = makeCanvas(1080, 1350);
+          await carouselPaint(c.getContext("2d"), 0, 1, true);
+          return Array.from(c.getContext("2d").getImageData(x, y, 1, 1).data);
+        },
+        [x, y],
+      );
+    const original = await pixel(550, 550);
+    await page.locator("#carouselFrameEdit").click();
+    assert.equal(await page.locator(".carousel-point-handle").count(), 4);
+    await drag(await point(150, 300), await point(260, 350));
+    assert.equal(
+      (await pixel(180, 315))[3],
+      0,
+      "Four-point frame must clip outside the moved corner",
+    );
+    assert.deepEqual(
+      await pixel(550, 550),
+      original,
+      "Changing a corner must keep the image content fixed",
+    );
+    assert(
+      await page.evaluate(
+        (id) => carouselHit({ x: 180, y: 315 })?.id !== id,
+        imageId,
+      ),
+      "Hit testing must follow the shape",
+    );
+    await page.locator('[data-frame-slot="3"]').click();
+    assert.equal(await page.locator(".carousel-point-handle").count(), 5);
+    await drag(await point(750, 500), await point(600, 500));
+    assert.equal(
+      (await pixel(710, 500))[3],
+      0,
+      "Fifth point can make a notch behind the angle",
+    );
+    assert.deepEqual(await pixel(550, 550), original);
+    const frameBefore = await chosen();
+    await drag(await point(600, 500), await point(900, 500));
+    const enlarged = await chosen();
+    assert(
+      enlarged.w > frameBefore.w,
+      "Corners may be moved outside the previous rectangle",
+    );
+    assert.deepEqual(
+      await pixel(550, 550),
+      original,
+      "Changing the frame bounds must keep the image content fixed",
+    );
+    for (const slot of [1, 7, 5, 3]) {
+      await page.locator("#carouselFrameReset").click();
+      await page.locator(`[data-frame-slot="${slot}"]`).click();
+      const o = await chosen();
+      assert(o.framePointSlots.includes(slot));
+      assert.equal(o.framePoints.length, 5);
+    }
+    await page.locator("#carouselFrameReset").click();
+    for (const slot of [1, 3, 5, 7])
+      await page.locator(`[data-frame-slot="${slot}"]`).click();
+    assert.equal(
+      await page.locator(".frame-point-choice[aria-pressed=true]").count(),
+      8,
+    );
+    assert.equal(await page.locator(".carousel-point-handle").count(), 8);
+    for (const slot of [1, 3, 5, 7, 0])
+      await page.locator(`[data-frame-slot="${slot}"]`).click();
+    assert.equal((await chosen()).framePoints.length, 3);
+    assert.equal(
+      await page
+        .locator(".frame-point-choice[aria-pressed=true]:disabled")
+        .count(),
+      3,
+      "At least three vertices must stay active",
+    );
+    await page.locator('[data-frame-slot="0"]').click();
+    for (const slot of [1, 3, 5, 7])
+      await page.locator(`[data-frame-slot="${slot}"]`).click();
+    const savedFrame = await chosen();
+    await page.locator("#carouselFrameEdit").click();
+    assert.equal(await page.locator(".carousel-point-handle").count(), 0);
+    assert.equal(await page.locator(".carousel-handle").count(), 8);
+    const legacy = await page.evaluate(async (id) => {
+      const current = clone(snapshot()),
+        old = clone(snapshot()),
+        o = old.carousel.objects.find((o) => o.id === id);
+      o.framePoints = [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 1, y: 1 },
+        { x: 0, y: 1 },
+        { x: 0, y: 0.5 },
+      ];
+      o.framePointSide = "left";
+      delete o.framePointSlots;
+      await restore(old);
+      const unchanged =
+          JSON.stringify(
+            p.carousel.objects.find((o) => o.id === id).framePoints,
+          ) === JSON.stringify(o.framePoints),
+        slots = carouselFrameSlots(p.carousel.objects.find((o) => o.id === id));
+      await restore(current);
+      return { unchanged, slots };
+    }, imageId);
+    assert.deepEqual(legacy, { unchanged: true, slots: [0, 2, 4, 6, 7] });
+    await page.screenshot({
+      path: require("./browser.cjs").artifact("mkw-frame-point-picker.png"),
+    });
+    await page.evaluate(() =>
+      carouselObject("text", {
+        x: 1200,
+        y: 350,
+        w: 800,
+        h: 650,
+        size: 40,
+        text: "RÜCKBLICK\nDIE VERWANDLUNG\nDANKE!",
+      }),
+    );
+    const textId = await page.evaluate(() => carouselSelection);
+    const defaultLines = await page.evaluate(
+      () =>
+        carouselTextLayout(
+          p.carousel.objects.find((o) => o.id === carouselSelection),
+        ).lines,
+    );
+    assert.deepEqual(
+      defaultLines.map((line) => line.y),
+      [0, 38, 76],
+      "Default leading must be 0.95 × the font size",
+    );
+    assert.equal(await page.locator("#carouselLineLeading").inputValue(), "38");
+    for (const [paragraph, size, leading] of [
+      [0, 80, 130],
+      [1, 45, 75],
+      [2, 28, null],
+    ]) {
+      await page.locator(`[data-paragraph="${paragraph}"]`).click();
+      await page.locator("#carouselParagraphSize").fill(String(size));
+      if (leading !== null)
+        await page.locator("#carouselLineLeading").fill(String(leading));
+    }
+    let layout = await page.evaluate(() =>
+      carouselTextLayout(
+        p.carousel.objects.find((o) => o.id === carouselSelection),
+      ),
+    );
+    assert.deepEqual(
+      layout.lines.map((line) => line.size),
+      [80, 45, 28],
+    );
+    assert.deepEqual(
+      layout.lines.map((line) => line.y),
+      [0, 130, 205],
+    );
+    assert(
+      Math.abs(layout.lines[2].leading - 26.6) < 1e-8,
+      "Automatic leading must follow the paragraph size",
+    );
+    assert.equal(
+      await page.locator("#carouselLineLeading").inputValue(),
+      "26.6",
+    );
+    const exported = await page.evaluate(async () => {
+      const entry = await encodedBoard(clone(p.boards[1]), {
+          format: "png",
+          quality: 90,
+          png8: false,
+          colours: 256,
+          transparent: false,
+        }),
+        bitmap = await createImageBitmap(entry.blob),
+        actual = makeCanvas(1080, 1350),
+        expected = makeCanvas(1080, 1350);
+      actual.getContext("2d").drawImage(bitmap, 0, 0);
+      const ctx = exportContext(expected);
+      ctx.fillStyle = p.carousel.bg;
+      ctx.fillRect(0, 0, 1080, 1350);
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "top";
+      for (const [text, size, y] of [
+        ["RÜCKBLICK", 80, 350],
+        ["DIE VERWANDLUNG", 45, 480],
+        ["DANKE!", 28, 555],
+      ]) {
+        ctx.font = `${size}px "Replica LL"`;
+        ctx.fillText(text, 120, y);
+      }
+      const a = actual.getContext("2d").getImageData(0, 0, 1080, 1350).data,
+        b = ctx.getImageData(0, 0, 1080, 1350).data;
+      return a.every((value, i) => value === b[i]);
+    });
+    assert(
+      exported,
+      "PNG export must match the paragraph sizes and individual line positions exactly",
+    );
+    await page.locator("[data-text-anchor=bottom]").click();
+    assert.equal(
+      await page
+        .locator("[data-text-anchor=bottom]")
+        .getAttribute("aria-pressed"),
+      "true",
+    );
+    const overlapping = await page.evaluate(() => {
+      const o = {
+          ...p.carousel.objects.find((o) => o.id === carouselSelection),
+          text: "GROSS\nklein",
+          textStyles: [{ size: 100, leading: [1] }, { size: 10 }],
+        },
+        layout = carouselTextLayout(o);
+      return {
+        height: layout.height,
+        bottom: carouselTextOffset(o, layout) + layout.height,
+      };
+    });
+    assert(
+      Math.abs(overlapping.height - 112) < 0.01 && overlapping.bottom === 650,
+      "Bottom anchoring must include tall earlier lines when custom spacing makes lines overlap",
+    );
+    const bottomExport = await page.evaluate(async () => {
+      const entry = await encodedBoard(clone(p.boards[1]), {
+          format: "png",
+          quality: 90,
+          png8: false,
+          colours: 256,
+          transparent: false,
+        }),
+        bitmap = await createImageBitmap(entry.blob),
+        actual = makeCanvas(1080, 1350),
+        expected = makeCanvas(1080, 1350);
+      actual.getContext("2d").drawImage(bitmap, 0, 0);
+      const ctx = exportContext(expected);
+      ctx.fillStyle = p.carousel.bg;
+      ctx.fillRect(0, 0, 1080, 1350);
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "top";
+      const offset = 650 - (205 + 28 * 1.12);
+      for (const [text, size, y] of [
+        ["RÜCKBLICK", 80, 350],
+        ["DIE VERWANDLUNG", 45, 480],
+        ["DANKE!", 28, 555],
+      ]) {
+        ctx.font = `${size}px "Replica LL"`;
+        ctx.fillText(text, 120, y + offset);
+      }
+      const a = actual.getContext("2d").getImageData(0, 0, 1080, 1350).data,
+        b = ctx.getImageData(0, 0, 1080, 1350).data;
+      return a.every((value, i) => value === b[i]);
+    });
+    assert(
+      bottomExport,
+      "Bottom-anchored text must also export in the correct position",
+    );
+    await page.locator("#carouselTextEdit").click();
+    assert(
+      await page.evaluate(() => {
+        const o = p.carousel.objects.find((o) => o.id === carouselSelection),
+          el = document.querySelector(".carousel-inline-text"),
+          top = parseFloat(el.style.top),
+          height = parseFloat(el.style.height);
+        return Math.abs((top + height) / carouselZoom - (o.y + o.h)) < 0.01;
+      }),
+      "Direct editing must stay anchored to the frame bottom",
+    );
+    await page.keyboard.press("Escape");
+    const beforeOffset = await page.evaluate(() =>
+      carouselTextOffset(
+        p.carousel.objects.find((o) => o.id === carouselSelection),
+      ),
+    );
+    await page.locator("[data-prop=h]").fill("700");
+    assert(
+      Math.abs(
+        (await page.evaluate(() =>
+          carouselTextOffset(
+            p.carousel.objects.find((o) => o.id === carouselSelection),
+          ),
+        )) -
+          beforeOffset -
+          50,
+      ) < 0.01,
+      "Resizing the frame must preserve the bottom anchor",
+    );
+    await page.locator('[data-paragraph="0"]').click();
+    await page.locator("#carouselLineLeading").fill("140");
+    assert(
+      Math.abs(
+        (await page.evaluate(() =>
+          carouselTextOffset(
+            p.carousel.objects.find((o) => o.id === carouselSelection),
+          ),
+        )) -
+          beforeOffset -
+          40,
+      ) < 0.01,
+      "Changing a line gap must keep the bottom fixed",
+    );
+    await page.locator("#carouselLineLeading").fill("130");
+    await page.locator("[data-prop=h]").fill("650");
+    await page.locator("[data-text-anchor=top]").click();
+    assert.equal(
+      await page.evaluate(() =>
+        carouselTextOffset(
+          p.carousel.objects.find((o) => o.id === carouselSelection),
+        ),
+      ),
+      0,
+      "Top anchor must restore the original position",
+    );
 
-
- await page.locator('#carouselTextEdit').click();const inline=page.locator('.carousel-inline-text');assert.equal(await inline.getAttribute('contenteditable'),'true');const editorMetrics=await page.evaluate(()=>[...document.querySelectorAll('.carousel-text-line')].map(line=>({size:parseFloat(line.style.fontSize)/carouselZoom,height:parseFloat(line.style.height)/carouselZoom})));assert.deepEqual(editorMetrics.map(line=>Math.round(line.size)),[80,45,28]);assert.equal(Math.round(editorMetrics[0].height),130);
- await page.keyboard.type('X');assert((await chosen()).text.endsWith('DANKE!X'));await page.keyboard.press('Backspace');assert((await chosen()).text.endsWith('DANKE!'));await page.keyboard.press('Enter');await page.keyboard.type('NEU');assert((await chosen()).text.endsWith('DANKE!\nNEU'));assert.equal(await page.locator('#carouselTextStyles [data-paragraph]').count(),4,'New paragraphs must be selectable immediately');layout=await page.evaluate(()=>carouselTextLayout(p.carousel.objects.find(o=>o.id===carouselSelection)));assert.equal(layout.lines.at(-1).size,28,'New paragraphs inherit the current size');for(let i=0;i<4;i++)await page.keyboard.press('Meta+z');assert((await chosen()).text.endsWith('DANKE!'));for(let i=0;i<4;i++)await page.keyboard.press('Meta+Shift+z');assert((await chosen()).text.endsWith('DANKE!\nNEU'));await page.keyboard.press('Escape');
- await page.locator('[data-prop=w]').fill('250');await page.locator('[data-paragraph="1"]').click();assert((await page.locator('#carouselTextLine option').count())>=2);await page.locator('#carouselTextLine').selectOption('1');await page.locator('#carouselLineLeading').fill('90');layout=await page.evaluate(()=>carouselTextLayout(p.carousel.objects.find(o=>o.id===carouselSelection)));assert.equal(layout.lines.find(line=>line.paragraph===1&&line.index===1).leading,90,'Automatic wrapped lines have individual spacing');
- await page.locator('#carouselTextEdit').click();await page.evaluate(()=>{const line=document.querySelectorAll('[data-text-paragraph="1"] .carousel-text-line')[1],range=document.createRange();range.setStart(line.firstChild,0);range.collapse(true);const selection=getSelection();selection.removeAllRanges();selection.addRange(range)});const copied=await page.evaluate(()=>{const el=document.querySelector('.carousel-inline-text'),paragraph=el.querySelector('[data-text-paragraph="1"]'),range=document.createRange();range.selectNodeContents(paragraph);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);const data=new DataTransfer();el.dispatchEvent(new ClipboardEvent('copy',{clipboardData:data,bubbles:true,cancelable:true}));const value=data.getData('text/plain'),line=paragraph.querySelectorAll('.carousel-text-line')[1],caret=document.createRange();caret.setStart(line.firstChild,0);caret.collapse(true);selection.removeAllRanges();selection.addRange(caret);return value});assert.equal(copied,'DIE VERWANDLUNG','Copying wrapped text must preserve the real paragraph content');await page.keyboard.press('Backspace');assert((await chosen()).text.includes('DIEVERWANDLUNG'),'Backspace at a visual wrap must delete the preceding character');await page.keyboard.press('Meta+z');assert((await chosen()).text.includes('DIE VERWANDLUNG'));await page.keyboard.press('Escape');
- await page.locator('[data-text-anchor=bottom]').click();const expectedStyles=(await chosen()).textStyles;await page.evaluate(()=>autosave());await page.reload();await page.locator('#startContinue').click();await page.locator('#carouselCanvas').waitFor();assert.deepEqual(await page.evaluate(id=>p.carousel.objects.find(o=>o.id===id).textStyles,textId),expectedStyles);assert.equal(await page.evaluate(id=>p.carousel.objects.find(o=>o.id===id).textAnchor,textId),'bottom','The anchor must survive project restore');assert.deepEqual(await page.evaluate(id=>p.carousel.objects.find(o=>o.id===id).framePoints,imageId),savedFrame.framePoints);assert.deepEqual(await page.evaluate(id=>p.carousel.objects.find(o=>o.id===id).framePointSlots,imageId),savedFrame.framePointSlots);
- await page.locator(`[data-layer="${textId}"] [data-action=select]`).click();const content=(await chosen()).text;await page.locator('[data-prop=text]').fill(content+'\nZUSATZ');assert.equal(await page.locator('#carouselTextStyles [data-paragraph]').count(),5,'Sidebar text changes must update paragraph choices');await page.locator('[data-prop=text]').fill(content);assert.deepEqual((await chosen()).textStyles,expectedStyles);await page.screenshot({path:require('./browser.cjs').artifact('mkw-text-styles.png')});await page.locator(`[data-layer="${imageId}"] [data-action=select]`).click();await page.locator('#carouselFrameEdit').click();await page.screenshot({path:require('./browser.cjs').artifact('mkw-frame-points.png')});assert.deepEqual(errors,[]);
- console.log('PASS three to eight selectable frame vertices, minimum count, legacy shapes, polygon clipping and hit testing, fixed image content, free frame bounds, per-paragraph font size, per-line leading, styled direct editing, paragraph inheritance, local undo/redo, backspace at wraps, save and restore');
-}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
+    await page.locator("#carouselTextEdit").click();
+    const inline = page.locator(".carousel-inline-text");
+    assert.equal(await inline.getAttribute("contenteditable"), "true");
+    const editorMetrics = await page.evaluate(() =>
+      [...document.querySelectorAll(".carousel-text-line")].map((line) => ({
+        size: parseFloat(line.style.fontSize) / carouselZoom,
+        height: parseFloat(line.style.height) / carouselZoom,
+      })),
+    );
+    assert.deepEqual(
+      editorMetrics.map((line) => Math.round(line.size)),
+      [80, 45, 28],
+    );
+    assert.equal(Math.round(editorMetrics[0].height), 130);
+    await page.keyboard.type("X");
+    assert((await chosen()).text.endsWith("DANKE!X"));
+    await page.keyboard.press("Backspace");
+    assert((await chosen()).text.endsWith("DANKE!"));
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("NEU");
+    assert((await chosen()).text.endsWith("DANKE!\nNEU"));
+    assert.equal(
+      await page.locator("#carouselTextStyles [data-paragraph]").count(),
+      4,
+      "New paragraphs must be selectable immediately",
+    );
+    layout = await page.evaluate(() =>
+      carouselTextLayout(
+        p.carousel.objects.find((o) => o.id === carouselSelection),
+      ),
+    );
+    assert.equal(
+      layout.lines.at(-1).size,
+      28,
+      "New paragraphs inherit the current size",
+    );
+    for (let i = 0; i < 4; i++) await page.keyboard.press("Meta+z");
+    assert((await chosen()).text.endsWith("DANKE!"));
+    for (let i = 0; i < 4; i++) await page.keyboard.press("Meta+Shift+z");
+    assert((await chosen()).text.endsWith("DANKE!\nNEU"));
+    await page.keyboard.press("Escape");
+    await page.locator("[data-prop=w]").fill("250");
+    await page.locator('[data-paragraph="1"]').click();
+    assert((await page.locator("#carouselTextLine option").count()) >= 2);
+    await page.locator("#carouselTextLine").selectOption("1");
+    await page.locator("#carouselLineLeading").fill("90");
+    layout = await page.evaluate(() =>
+      carouselTextLayout(
+        p.carousel.objects.find((o) => o.id === carouselSelection),
+      ),
+    );
+    assert.equal(
+      layout.lines.find((line) => line.paragraph === 1 && line.index === 1)
+        .leading,
+      90,
+      "Automatic wrapped lines have individual spacing",
+    );
+    await page.locator("#carouselTextEdit").click();
+    await page.evaluate(() => {
+      const line = document.querySelectorAll(
+          '[data-text-paragraph="1"] .carousel-text-line',
+        )[1],
+        range = document.createRange();
+      range.setStart(line.firstChild, 0);
+      range.collapse(true);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+    const copied = await page.evaluate(() => {
+      const el = document.querySelector(".carousel-inline-text"),
+        paragraph = el.querySelector('[data-text-paragraph="1"]'),
+        range = document.createRange();
+      range.selectNodeContents(paragraph);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const data = new DataTransfer();
+      const event = new ClipboardEvent("copy", {
+        clipboardData: data,
+        bubbles: true,
+        cancelable: true,
+      });
+      el.dispatchEvent(event);
+      const value = event.clipboardData.getData("text/plain"),
+        line = paragraph.querySelectorAll(".carousel-text-line")[1],
+        caret = document.createRange();
+      caret.setStart(line.firstChild, 0);
+      caret.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(caret);
+      return value;
+    });
+    assert.equal(
+      copied,
+      "DIE VERWANDLUNG",
+      "Copying wrapped text must preserve the real paragraph content",
+    );
+    await page.keyboard.press("Backspace");
+    assert(
+      (await chosen()).text.includes("DIEVERWANDLUNG"),
+      "Backspace at a visual wrap must delete the preceding character",
+    );
+    await page.keyboard.press("Meta+z");
+    assert((await chosen()).text.includes("DIE VERWANDLUNG"));
+    await page.keyboard.press("Escape");
+    await page.locator("[data-text-anchor=bottom]").click();
+    const expectedStyles = (await chosen()).textStyles;
+    await page.evaluate(() => autosave());
+    await page.reload();
+    await page.locator("#startContinue").click();
+    await page.locator("#carouselCanvas").waitFor();
+    assert.deepEqual(
+      await page.evaluate(
+        (id) => p.carousel.objects.find((o) => o.id === id).textStyles,
+        textId,
+      ),
+      expectedStyles,
+    );
+    assert.equal(
+      await page.evaluate(
+        (id) => p.carousel.objects.find((o) => o.id === id).textAnchor,
+        textId,
+      ),
+      "bottom",
+      "The anchor must survive project restore",
+    );
+    assert.deepEqual(
+      await page.evaluate(
+        (id) => p.carousel.objects.find((o) => o.id === id).framePoints,
+        imageId,
+      ),
+      savedFrame.framePoints,
+    );
+    assert.deepEqual(
+      await page.evaluate(
+        (id) => p.carousel.objects.find((o) => o.id === id).framePointSlots,
+        imageId,
+      ),
+      savedFrame.framePointSlots,
+    );
+    await page.locator(`[data-layer="${textId}"] [data-action=select]`).click();
+    const content = (await chosen()).text;
+    await page.locator("[data-prop=text]").fill(content + "\nZUSATZ");
+    assert.equal(
+      await page.locator("#carouselTextStyles [data-paragraph]").count(),
+      5,
+      "Sidebar text changes must update paragraph choices",
+    );
+    await page.locator("[data-prop=text]").fill(content);
+    assert.deepEqual((await chosen()).textStyles, expectedStyles);
+    await page.screenshot({
+      path: require("./browser.cjs").artifact("mkw-text-styles.png"),
+    });
+    await page
+      .locator(`[data-layer="${imageId}"] [data-action=select]`)
+      .click();
+    await page.locator("#carouselFrameEdit").click();
+    await page.screenshot({
+      path: require("./browser.cjs").artifact("mkw-frame-points.png"),
+    });
+    assert.deepEqual(errors, []);
+    console.log(
+      "PASS three to eight selectable frame vertices, minimum count, legacy shapes, polygon clipping and hit testing, fixed image content, free frame bounds, per-paragraph font size, per-line leading, styled direct editing, paragraph inheritance, local undo/redo, backspace at wraps, save and restore",
+    );
+  } finally {
+    await browser.close();
+  }
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

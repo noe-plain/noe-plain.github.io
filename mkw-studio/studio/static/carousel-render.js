@@ -231,7 +231,7 @@ function carouselRender() {
      "",
    )}</div><div class="studio-bar-actions"><button id="carouselNotice" class="studio-action studio-notice-button" aria-controls="studioWarnings" aria-expanded="false" hidden></button><button id="carouselExport" class="studio-action">${studioIcon("export")}<span>Export</span></button></div></nav>
  <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div></div>
- <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3><span>Oben liegt vorne</span></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom * 100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
+ <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom * 100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
   host
@@ -355,11 +355,35 @@ let carouselPaintBuffer = null,
   carouselPaintRunning = false,
   carouselPaintFrame = 0;
 
+const carouselPaintStates = new WeakMap();
 function carouselSchedulePaint(canvas, scale, generation) {
+  const key = JSON.stringify([
+      p.carousel.w,
+      p.carousel.h,
+      p.carousel.n,
+      p.carousel.bg,
+      p.carousel.objects,
+      scale,
+      carouselUI.editing?.id,
+      fontStatus,
+    ]),
+    sources = [...p.images, ...p.logos].map((a) => a.data),
+    old = carouselPaintStates.get(canvas);
+  if (
+    old?.key === key &&
+    old.project === p &&
+    old.fonts === fontStatus &&
+    sources.length === old.sources.length &&
+    sources.every((src, i) => src === old.sources[i])
+  )
+    return;
   carouselPaintPending = {
     canvas,
     scale,
     generation,
+    key,
+    sources,
+    fonts: fontStatus,
     project: p,
     editingId: carouselUI.editing?.id,
   };
@@ -400,6 +424,12 @@ async function carouselRunPaint() {
       const out = job.canvas.getContext("2d");
       out.clearRect(0, 0, job.canvas.width, job.canvas.height);
       out.drawImage(carouselPaintBuffer, 0, 0);
+      carouselPaintStates.set(job.canvas, {
+        key: job.key,
+        project: job.project,
+        fonts: job.fonts,
+        sources: job.sources,
+      });
     }
   } catch (error) {
     status(error.message);

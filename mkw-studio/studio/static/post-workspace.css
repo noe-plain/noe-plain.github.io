@@ -52,9 +52,6 @@
   text-align: left;
   overflow: hidden;
 }
-.image-info-card .image-card-summary:hover {
-  background: #2c3442;
-}
 .image-preview {
   display: block;
   position: relative;
@@ -95,15 +92,6 @@
   line-height: 1.5;
   white-space: normal;
   overflow-wrap: anywhere;
-}
-.image-card-chevron {
-  flex: none;
-  color: #9baac2;
-}
-.image-card-chevron svg {
-  width: 16px;
-  height: 16px;
-  transform: rotate(180deg);
 }
 .image-card-body {
   padding: 10px 15px 15px;
@@ -185,39 +173,6 @@
 }
 .image-info-card .text-type-options small {
   white-space: normal;
-}
-.image-info-card.is-collapsed {
-  width: 64px;
-}
-.image-info-card.is-collapsed .image-preview {
-  height: 62px;
-  border-radius: 13px 13px 0 0;
-}
-.image-info-card.is-collapsed .image-number {
-  left: 8px;
-  top: 8px;
-  padding: 3px 6px;
-}
-.image-info-card.is-collapsed .image-card-body,
-.image-info-card.is-collapsed .image-caption strong {
-  display: none;
-}
-.image-info-card.is-collapsed .image-caption {
-  justify-content: center;
-  padding: 8px;
-}
-.image-info-card.is-collapsed .image-card-chevron svg {
-  transform: none;
-}
-#postPasteboard #addMoreImages {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  width: 230px;
-  min-height: 44px;
-  margin: 32px 0 0;
-  border-radius: 12px;
 }
 .post-hand-active #workspace,
 .post-hand-active #workspace .board-surface * {

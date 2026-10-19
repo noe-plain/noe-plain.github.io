@@ -198,7 +198,7 @@ function studioSetWarnings(items) {
     button.hidden = !items.length;
     button.innerHTML =
       studioIcon("warning") +
-      `<span>${items.length} Hinweis${items.length === 1 ? "" : "e"}</span>`;
+      `<span class="studio-warning-count" aria-hidden="true">${items.length}</span>`;
     button.setAttribute("aria-label", label);
     button.title = label;
     button.setAttribute("aria-expanded", String(!$("#studioWarnings").hidden));
@@ -272,7 +272,7 @@ studioWarnings.id = "studioWarnings";
 studioWarnings.className = "studio-notices";
 studioWarnings.hidden = true;
 studioWarnings.setAttribute("aria-labelledby", "studioWarningsTitle");
-studioWarnings.innerHTML = `<div class="studio-notices-heading"><h2 id="studioWarningsTitle">Hinweise zum Artwork</h2><button id="closeStudioWarnings" class="icon-button" aria-label="Hinweise schliessen">${studioIcon("close")}</button></div><p>Klicke auf einen Hinweis, um das Element zu prüfen.</p><div id="studioWarningList"></div>`;
+studioWarnings.innerHTML = `<div class="studio-notices-heading"><h2 id="studioWarningsTitle">Hinweise zum Artwork</h2><button id="closeStudioWarnings" class="icon-button" aria-label="Hinweise schliessen">${studioIcon("close")}</button></div><div id="studioWarningList"></div>`;
 document.body.append(studioWarnings);
 $("#closeStudioWarnings").onclick = studioCloseWarnings;
 $("#postNotice").onclick = studioToggleWarnings;

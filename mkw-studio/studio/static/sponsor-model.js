@@ -21,9 +21,9 @@
   function mode(logo, colour) {
     return logo.mode && logo.mode !== "auto"
       ? logo.mode
-      : (logo.gray && !logo.monochrome) || logo.complex
-        ? "gray"
-        : foreground(colour);
+      : foreground(colour) === "black"
+        ? "multiply"
+        : "screen";
   }
   function composite(renderedMode, colour) {
     if (renderedMode === "original") return "source-over";
@@ -39,13 +39,15 @@
     const ink = inkBounds(logo),
       aspect = logo.width / logo.height,
       renderedMode = mode(logo, colour),
-      density = ["gray", "original", "multiply", "screen"].includes(
-        renderedMode,
-      )
-        ? ((foreground(colour) === "black"
-            ? logo.darkDensity
-            : logo.lightDensity) ?? logo.density)
-        : logo.density,
+      density =
+        (logo.mode !== "auto" ||
+          (logo.gray && !logo.monochrome) ||
+          logo.complex) &&
+        ["gray", "original", "multiply", "screen"].includes(renderedMode)
+          ? ((foreground(colour) === "black"
+              ? logo.darkDensity
+              : logo.lightDensity) ?? logo.density)
+          : logo.density,
       // One optical ink-area target for the entire strip, regardless of group.
       // Height/width limits keep very thin wordmarks and dense emblems usable.
       targetArea = 1728 * unit * unit,

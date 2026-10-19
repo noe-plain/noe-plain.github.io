@@ -16,8 +16,7 @@ let postProject = null,
   postRoomFrame = 0,
   postPinch = null,
   postTouchNavigation = false;
-const postCardState = new Map(),
-  postTouches = new Map();
+const postTouches = new Map();
 const postActive = () => !p.carousel && p.images.length > 0;
 function postCaptureAnchor(point = null) {
   if (p.carousel || !p.images.length) return null;
@@ -60,17 +59,98 @@ function postUpdatePadding() {
   postPasteboard.style.setProperty("--post-pad-x", postPadX + "px");
   postPasteboard.style.setProperty("--post-pad-y", postPadY + "px");
 }
-function postSyncCards() {
-  const expandedByDefault = !matchMedia("(max-width:760px)").matches;
-  postViewport.querySelectorAll("[data-image-card]").forEach((card) => {
-    const expanded =
-      postCardState.get(card.dataset.imageCard) ?? expandedByDefault;
-    card.classList.toggle("is-collapsed", !expanded);
-    card
-      .querySelector("[data-card-toggle]")
-      .setAttribute("aria-expanded", String(expanded));
-  });
-  postAlignCards();
+// Cards decode a small, shared display raster only when approaching the viewport.
+const postThumbnailCache = new WeakMap();
+let postThumbnailGeneration = 0,
+  postThumbnailPending = [],
+  postThumbnailRunning = false;
+const postThumbnailObserver = new IntersectionObserver(
+  (entries) => {
+    for (const { isIntersecting, target } of entries)
+      if (isIntersecting) {
+        postThumbnailObserver.unobserve(target);
+        const im = p.images.find((im) => im.id === target.dataset.imagePreview);
+        if (im)
+          postThumbnailPending.push({
+            target,
+            im,
+            data: im.data,
+            project: p,
+            generation: postThumbnailGeneration,
+          });
+      }
+    postRunThumbnails();
+  },
+  { root: postViewport, rootMargin: "200px" },
+);
+function postObserveThumbnails() {
+  postThumbnailGeneration++;
+  postThumbnailPending = [];
+  postThumbnailObserver.disconnect();
+  for (const target of postViewport.querySelectorAll("[data-image-preview]"))
+    postThumbnailObserver.observe(target);
+}
+async function postThumbnail(im) {
+  const old = postThumbnailCache.get(im);
+  if (old?.data === im.data) return old.promise;
+  const data = im.data,
+    promise = (async () => {
+      const source = await previewImage(data),
+        canvas = makeCanvas(460, 220),
+        scale = Math.max(
+          canvas.width / source.width,
+          canvas.height / source.height,
+        );
+      canvas
+        .getContext("2d")
+        .drawImage(
+          source,
+          (canvas.width - source.width * scale) / 2,
+          (canvas.height - source.height * scale) / 2,
+          source.width * scale,
+          source.height * scale,
+        );
+      const result = canvas.toDataURL("image/png");
+      canvas.width = canvas.height = 1;
+      return result;
+    })();
+  postThumbnailCache.set(im, { data, promise });
+  try {
+    return await promise;
+  } catch (error) {
+    if (postThumbnailCache.get(im)?.promise === promise)
+      postThumbnailCache.delete(im);
+    throw error;
+  }
+}
+async function postRunThumbnails() {
+  if (postThumbnailRunning) return;
+  postThumbnailRunning = true;
+  try {
+    while (postThumbnailPending.length) {
+      const job = postThumbnailPending.shift();
+      if (
+        job.project !== p ||
+        job.generation !== postThumbnailGeneration ||
+        !job.target.isConnected
+      )
+        continue;
+      try {
+        const src = await postThumbnail(job.im);
+        if (
+          job.project === p &&
+          job.generation === postThumbnailGeneration &&
+          job.target.isConnected &&
+          job.im.data === job.data
+        )
+          job.target.src = src;
+      } catch {
+        job.target.alt = "Vorschau nicht verfügbar";
+      }
+    }
+  } finally {
+    postThumbnailRunning = false;
+  }
 }
 function postAlignCards() {
   postViewport.querySelectorAll(".image-group").forEach((row) => {
@@ -140,6 +220,7 @@ function postAfterRender(anchor) {
   postProject = p;
   postImages = new Set(p.images.map((im) => im.id));
   postPasteboard.hidden = !p.images.length;
+  postObserveThumbnails();
   $("#postFit").disabled = $("#postHand").disabled = !p.images.length;
   if (!p.images.length) {
     postPadX = postPadY = 0;
@@ -148,7 +229,7 @@ function postAfterRender(anchor) {
     postViewport.scrollLeft = postViewport.scrollTop = 0;
     return;
   }
-  postSyncCards();
+  postAlignCards();
   postUpdatePadding();
   if (!sameProject || !hadImages)
     postFitRow(postViewport.querySelector(".image-group"));
@@ -181,16 +262,6 @@ $("#postHand").onclick = () => {
   postViewport.focus({ preventScroll: true });
 };
 $("#postFit").onclick = () => postFitRow();
-postViewport.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-card-toggle]");
-  if (!button) return;
-  const anchor = postCaptureAnchor(),
-    id = button.dataset.cardToggle;
-  postCardState.set(id, button.getAttribute("aria-expanded") !== "true");
-  postSyncCards();
-  postRestoreAnchor(anchor);
-  draw();
-});
 postViewport.addEventListener(
   "wheel",
   (event) => {
@@ -412,7 +483,7 @@ postViewport.addEventListener("scroll", () => {
 window.addEventListener("resize", () => {
   if (!postActive()) return;
   const anchor = postCaptureAnchor();
-  postSyncCards();
+  postAlignCards();
   postUpdatePadding();
   postRestoreAnchor(anchor);
   draw();

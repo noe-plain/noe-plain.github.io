@@ -30,7 +30,23 @@ function measureTextWidth(text, size, role, family = false) {
       )
     : measureContext.measureText(text).width;
 }
+const postTextLayouts = new WeakMap();
 function textBlock(b, key) {
+  const signature = JSON.stringify([
+      b.w,
+      b.h,
+      b.safe,
+      b.sponsors,
+      b.textBox,
+      MKWLayout.keys.map((k) => b.elements[k]),
+      !!b.family?.enabled,
+      key ?? null,
+      fontStatus,
+    ]),
+    cached = postTextLayouts.get(b);
+  if (cached?.fonts === fontStatus && cached.entries.has(signature))
+    return cached.entries.get(signature);
+  const entries = cached?.fonts === fontStatus ? cached.entries : new Map();
   const layout = MKWLayout.textLayout(
       b,
       (text, size, role) =>
@@ -49,6 +65,9 @@ function textBlock(b, key) {
       (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
     e.y = layout.safe.y + layout.safe.h - m.actualBoundingBoxLeft;
   }
+  if (entries.size >= 2) entries.delete(entries.keys().next().value);
+  entries.set(signature, layout);
+  postTextLayouts.set(b, { fonts: fontStatus, entries });
   return layout;
 }
 const textMetrics = (e) => ({
@@ -324,7 +343,8 @@ async function draw() {
   drawing = true;
   try {
     const project = p,
-      viewport = $("#workspace").getBoundingClientRect();
+      viewport = $("#workspace").getBoundingClientRect(),
+      logos = new Map(project.logos.map((a) => [a.id, a.data]));
     for (const b of project.boards) {
       if (p !== project) break;
       const c = document.querySelector(`canvas[data-board="${b.id}"]`);
@@ -344,9 +364,21 @@ async function draw() {
         h = Math.round(b.h * s * devicePixelRatio),
         skip = editingText?.boardId === b.id ? editingText.key : null,
         editKey = step === "text" && selected === b.id ? layer : null,
-        key = JSON.stringify([revision, b, w, h, skip, editKey]),
+        key = JSON.stringify([b, w, h, skip, editKey, fontStatus]),
+        sources = [
+          asset(b).data,
+          logos.get(b.elements.logo.source),
+          ...(b.sponsors?.groups || []).flatMap((g) =>
+            g.logos.map((l) => logos.get(l.id)),
+          ),
+        ],
         previous = postPaintStates.get(c);
-      if (previous?.key === key && previous.fonts === fontStatus) continue;
+      if (
+        previous?.key === key &&
+        previous.fonts === fontStatus &&
+        sources.every((src, i) => src === previous.sources[i])
+      )
+        continue;
       postPaintBuffer ??= makeCanvas(w, h);
       const buffer = postPaintBuffer;
       if (buffer.width !== w) buffer.width = w;
@@ -362,7 +394,7 @@ async function draw() {
       if (c.height !== h) c.height = h;
       c.getContext("2d").clearRect(0, 0, w, h);
       c.getContext("2d").drawImage(buffer, 0, 0);
-      postPaintStates.set(c, { key, fonts: fontStatus });
+      postPaintStates.set(c, { key, fonts: fontStatus, sources });
     }
     syncOverlays();
     updateWarning();
@@ -376,6 +408,7 @@ async function draw() {
     }
   }
 }
+let postInlineWarningSignature = null;
 function updateWarning() {
   const warnings = [];
   for (const b of p.boards) {
@@ -435,7 +468,10 @@ function updateWarning() {
   }
   studioSetWarnings(warnings);
   const current = warnings.filter((item) => item.id === selected),
-    root = $("#warning");
+    root = $("#warning"),
+    signature = JSON.stringify(current);
+  if (postInlineWarningSignature === signature) return;
+  postInlineWarningSignature = signature;
   root.innerHTML = current
     .map(
       (item, index) =>
@@ -486,6 +522,7 @@ function selectBoard(id) {
   renderPanel();
   updateWarning();
 }
+const postOverlayStates = new WeakMap();
 function syncOverlays(force = false) {
   const s = surfaceScale();
   for (const b of p.boards) {
@@ -494,7 +531,20 @@ function syncOverlays(force = false) {
     const activeKey = step === "text" && selected === b.id ? layer : null,
       block = textBlock(b, activeKey),
       safe = block.safe;
-    const signature = `${step}:${selected === b.id}:${layer}:${!!b.family?.enabled}`;
+    const signature = `${step}:${selected === b.id}:${selected === b.id ? layer : ""}:${!!b.family?.enabled}`,
+      transform = JSON.stringify([b.image, b.elements.logo]),
+      previous = postOverlayStates.get(root);
+    if (
+      !force &&
+      previous?.block === block &&
+      previous.scale === s &&
+      previous.signature === signature &&
+      previous.transform === transform &&
+      editingText?.boardId !== b.id
+    )
+      continue;
+    const overlayState = { block, scale: s, signature, transform };
+    postOverlayStates.set(root, overlayState);
     if (
       (root.dataset.signature !== signature || force) &&
       editingText?.boardId !== b.id
@@ -640,6 +690,8 @@ function syncOverlays(force = false) {
     if (frame) {
       const e = b.elements.logo;
       logoImage(e).then((im) => {
+        if (!root.isConnected || postOverlayStates.get(root) !== overlayState)
+          return;
         MKWLayout.constrainLogo(b, im.width / im.height);
         const w = e.size,
           h = (w * im.height) / im.width,

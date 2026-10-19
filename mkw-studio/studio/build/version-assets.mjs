@@ -14,6 +14,32 @@ const spriteHash = createHash("sha256")
     `const studioIconSprite = "static/icons/material-symbols.svg?v=${spriteHash}";`,
   );
 if (ui !== nextUI) await writeFile(uiFile, nextUI);
+// Version the lazily loaded handbook independently from the editor's startup assets.
+const helpIndex = new URL("hilfe/index.html", root),
+  helpSource = await readFile(helpIndex, "utf8"),
+  helpHashes = {};
+for (const name of ["hilfe.css", "hilfe.js"])
+  helpHashes[name] = createHash("sha256")
+    .update(await readFile(new URL("hilfe/" + name, root)))
+    .digest("hex")
+    .slice(0, 12);
+const helpVersioned = helpSource.replace(
+  /((?:src|href)=")(hilfe\.(?:css|js))(?:\?[^"#]*)?("[\s>])/g,
+  (_, prefix, name, suffix) =>
+    `${prefix}${name}?v=${helpHashes[name]}${suffix}`,
+);
+if (helpSource !== helpVersioned) await writeFile(helpIndex, helpVersioned);
+const helpHash = createHash("sha256")
+    .update(helpVersioned)
+    .digest("hex")
+    .slice(0, 12),
+  launcherFile = new URL("static/help-popup.js", root),
+  launcher = await readFile(launcherFile, "utf8"),
+  nextLauncher = launcher.replace(
+    /const studioHelpURL = "[^"]+";/,
+    `const studioHelpURL = "hilfe/?v=${helpHash}";`,
+  );
+if (launcher !== nextLauncher) await writeFile(launcherFile, nextLauncher);
 const source = await readFile(file, "utf8"),
   assets = new Map();
 for (const match of source.matchAll(

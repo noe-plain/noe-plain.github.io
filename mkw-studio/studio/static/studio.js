@@ -44,7 +44,7 @@ function textTypeSummary(b) {
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = textTypeSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<hr class="option-divider">${familyPicker(im)}<hr class="option-divider">${sponsorOptions(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<hr class="option-divider">${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
@@ -54,7 +54,7 @@ function familyPicker(im) {
 }
 function familyTools(b) {
   const custom = !!Object.keys(p.familyOverrides?.[b.imageId] || {}).length;
-  return `<section class="tool-section family-tools" data-family-settings="${esc(b.imageId)}"><h3>Familienkonzert</h3><div class="family-palette" data-family-palette="${esc(b.imageId)}" aria-label="Acht Buchstabenfarben"></div><button type="button" data-family-shift="${esc(b.imageId)}">Farbreihenfolge wechseln</button><p class="tool-hint">Bunte Schrift mit 2 px Kontur. Die Zeichenflächenfarbe findest du im Bildausschnitt.</p><button type="button" data-family-reset="${esc(b.imageId)}" ${b.imageId !== p.images[0]?.id && custom ? "" : "hidden"}>Design vom ersten Bild übernehmen</button></section>`;
+  return `<section class="tool-section family-tools" data-family-settings="${esc(b.imageId)}"><h3>Familienkonzert</h3><div class="family-palette" data-family-palette="${esc(b.imageId)}" aria-label="Acht Buchstabenfarben"></div><button type="button" data-family-shift="${esc(b.imageId)}">Farbreihenfolge wechseln</button><button type="button" data-family-reset="${esc(b.imageId)}" ${b.imageId !== p.images[0]?.id && custom ? "" : "hidden"}>Design vom ersten Bild übernehmen</button></section>`;
 }
 function setFamilyDesign(imageId, changes) {
   const first = imageId === p.images[0]?.id;
@@ -112,7 +112,7 @@ function imageAction(name, label, title, action, id, disabled = false) {
   return `<button class="image-action ${action === "removeImage" ? "image-action-delete" : ""}" data-action="${action}" data-id="${esc(id)}" title="${title}" aria-label="${title}" ${disabled ? "disabled" : ""}>${icon(name)}${label ? `<span>${label}</span>` : ""}</button>`;
 }
 function imageHeading(im, i) {
-  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><button class="image-card-summary" data-card-toggle="${esc(im.id)}" aria-expanded="true" title="Bildkarte ein- oder ausklappen"><span class="image-preview"><img src="${esc(im.data)}" alt="" loading="lazy" decoding="async"><span class="image-number" aria-label="Bild ${i + 1}">${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong><span class="image-card-chevron">${icon("down")}</span></span></button><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div><p class="template-hint">Text und Optionen werden übernommen. Jedes Bild bleibt einzeln anpassbar.</p>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("plus", "Format", "Zeichenfläche hinzufügen", "addBoard", im.id)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Optionen</span>${textTypePicker(im)}</div></div></div></aside>`;
+  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><div class="image-card-summary"><span class="image-preview"><img data-image-preview="${esc(im.id)}" alt="" decoding="async"><span class="image-number" aria-label="Bild ${i + 1}">${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong></span></div><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("plus", "Format", "Zeichenfläche hinzufügen", "addBoard", im.id)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Optionen</span>${textTypePicker(im)}</div></div></div></aside>`;
 }
 document.addEventListener("click", (ev) => {
   document.querySelectorAll(".text-type-picker[open]").forEach((picker) => {
@@ -328,7 +328,7 @@ function renderPanel() {
       : "Wähle ein Bild und ein Werkzeug in der Leiste.";
   if (!b) return;
   if (step === "crop") {
-    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bildausschnitt</h3><div class="tool-button-grid"><button data-fit="fill" title="Bild so vergrössern, dass es die ganze Fläche bedeckt">Fläche füllen</button><button data-fit="fit" title="Das gesamte Bild innerhalb der Zeichenfläche zeigen">Ganzes Bild</button></div><label>Bildgrösse (%) <input id="scale" aria-label="Bildskalierung in Prozent" type="number" min="0.1" step="0.1" value="${(b.image.scale * 100).toFixed(1)}"></label><div class="tool-button-grid"><button data-fit="center">Zentrieren</button><button data-fit="original">Originalgrösse</button></div></section><section class="tool-section"><h3>Gestaltung</h3><label>Drehung (°) <input id="angle" type="number" value="${b.image.angle}"></label><div class="tool-button-grid"><button id="flipX" title="Links und rechts tauschen">↔ Horizontal</button><button id="flipY" title="Oben und unten tauschen">↕ Vertikal</button></div><button data-fit="reset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Hintergrund</h3><label>Zeichenflächenfarbe <input id="bg" aria-label="Zeichenflächenfarbe" type="color" value="${b.family?.enabled ? b.family.background : b.bg}"></label></section></div><p class="panel-caption">Bild direkt verschieben oder an den Ecken skalieren. Umschalttaste beim Verschieben gedrückt halten: Bewegung in 45°-Schritten.</p>`;
+    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bildausschnitt</h3><div class="tool-button-grid"><button data-fit="fill" title="Bild so vergrössern, dass es die ganze Fläche bedeckt">Fläche füllen</button><button data-fit="fit" title="Das gesamte Bild innerhalb der Zeichenfläche zeigen">Ganzes Bild</button></div><label>Bildgrösse (%) <input id="scale" aria-label="Bildskalierung in Prozent" type="number" min="0.1" step="0.1" value="${(b.image.scale * 100).toFixed(1)}"></label><div class="tool-button-grid"><button data-fit="center">Zentrieren</button><button data-fit="original">Originalgrösse</button></div></section><section class="tool-section"><h3>Gestaltung</h3><label>Drehung (°) <input id="angle" type="number" value="${b.image.angle}"></label><div class="tool-button-grid"><button id="flipX" title="Links und rechts tauschen">${studioIcon("flip")}Horizontal</button><button id="flipY" title="Oben und unten tauschen">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button data-fit="reset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Hintergrund</h3><label>Zeichenflächenfarbe <input id="bg" aria-label="Zeichenflächenfarbe" type="color" value="${b.family?.enabled ? b.family.background : b.bg}"></label></section></div>`;
     panel.querySelectorAll("[data-fit]").forEach(
       (el) =>
         (el.onclick = () => {
@@ -358,14 +358,6 @@ function renderPanel() {
         else b.bg = ev.target.value;
       }, false),
     );
-    if (asset(b).subjectStatus) {
-      const note = document.createElement("p");
-      note.className = "panel-caption";
-      note.textContent = b.family?.enabled
-        ? "Familienkonzert · Illustration frei platzieren."
-        : asset(b).subjectStatus;
-      panel.append(note);
-    }
   } else if (step === "text") {
     const e = b.elements[layer] || b.elements.title,
       first = p.images[0]?.id === b.imageId,
@@ -373,7 +365,7 @@ function renderPanel() {
     panel.innerHTML = `<div class="panel-row text-tools"><section class="tool-section"><h3>Inhalt</h3><select id="textLayer" aria-label="Text auswählen">${options(
       Object.entries(elementNames).filter(([k]) => k !== "logo"),
       layer,
-    )}</select><div id="textContentField"></div><label><input id="textVisible" type="checkbox" ${e.visible ? "checked" : ""}> Auf dem Bild anzeigen</label><p class="tool-hint">${first ? "Texteingaben gelten für alle Bilder ohne eigenen Text." : "Texteingaben gelten für dieses Bild in allen Formaten."}</p>${!first && custom ? '<button id="resetText">Text vom ersten Bild übernehmen</button>' : ""}</section><section class="tool-section"><h3>Gestaltung</h3><label class="tool-stacked">Schrift<select id="fontRole" aria-label="Schrift">${studioFontOptions(e.role)}</select></label><label>Schriftgrösse (px) <input id="textSize" type="number" min="1" max="5000" value="${Math.round(e.size)}"></label><label class="tool-stacked">Ausrichtung<select id="textAlign" aria-label="Textausrichtung" ${layer === "copyright" ? "disabled" : ""}>${options(
+    )}</select><div id="textContentField"></div><label><input id="textVisible" type="checkbox" ${e.visible ? "checked" : ""}> Auf dem Bild anzeigen</label>${!first && custom ? '<button id="resetText">Text vom ersten Bild übernehmen</button>' : ""}</section><section class="tool-section"><h3>Gestaltung</h3><label class="tool-stacked">Schrift<select id="fontRole" aria-label="Schrift">${studioFontOptions(e.role)}</select></label><label>Schriftgrösse (px) <input id="textSize" type="number" min="1" max="5000" value="${Math.round(e.size)}"></label><label class="tool-stacked">Ausrichtung<select id="textAlign" aria-label="Textausrichtung" ${layer === "copyright" ? "disabled" : ""}>${options(
       [
         ["left", "Links"],
         ["center", "Zentriert"],
@@ -390,7 +382,7 @@ function renderPanel() {
             MKWFamily.copyrightColor(e.color),
           )}</select></label>`
         : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du unten in diesem Werkzeug.</p>' : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
+    }${b.family?.enabled && layer !== "copyright" ? "" : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div>`;
     if (layer === "copyright") {
       const input = document.createElement("input");
       input.type = "text";
@@ -504,7 +496,7 @@ function renderPanel() {
       )
       .join(
         "",
-      )}<div class="tool-button-grid"><button id="customLogo">Logo hinzufügen</button><button id="noLogo">Logo ausblenden</button></div><section class="tool-section"><h3>Auf weitere Bilder anwenden</h3><button id="allLogos">Logo auf alle Bilder übertragen</button></section></div><p class="panel-caption">Das Logo sitzt oben rechts im geschützten Bildbereich.</p>`;
+      )}<div class="tool-button-grid"><button id="customLogo">Logo hinzufügen</button><button id="noLogo">Logo ausblenden</button></div><section class="tool-section"><h3>Auf weitere Bilder anwenden</h3><button id="allLogos">Logo auf alle Bilder übertragen</button></section></div>`;
     panel.querySelectorAll("[data-remove-logo]").forEach(
       (el) =>
         (el.onclick = () =>

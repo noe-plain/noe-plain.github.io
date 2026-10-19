@@ -221,14 +221,10 @@ html[data-theme="light"]
 html[data-theme="light"] .image-info-card .image-card-summary {
   background: transparent;
 }
-html[data-theme="light"] .image-info-card .image-card-summary:hover {
-  background: #f6f8fb;
-}
 html[data-theme="light"] .image-info-card.group-heading .image-caption strong {
   color: #1d2838;
 }
-html[data-theme="light"] .image-info-card.group-heading .image-metadata,
-html[data-theme="light"] .image-card-chevron {
+html[data-theme="light"] .image-info-card.group-heading .image-metadata {
   color: #647187;
 }
 html[data-theme="light"] .image-info-card .image-number {

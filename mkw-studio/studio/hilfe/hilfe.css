@@ -339,3 +339,53 @@ html[data-theme="dark"] td,
 html[data-theme="dark"] th {
   border-color: #3b4657;
 }
+/* The same handbook can open independently or inside the Studio dialog. */
+.help-embedded body > header {
+  display: none;
+}
+.help-embedded .layout {
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 32px;
+  padding: 28px;
+}
+.help-embedded aside {
+  top: 20px;
+}
+:root[data-theme="dark"] {
+  color: #e3e8f1;
+  background: #20252e;
+  color-scheme: dark;
+}
+html[data-theme="dark"] :is(a, h1, h2, h3, nav a[aria-current]) {
+  color: #bdcaff;
+}
+html[data-theme="dark"] input {
+  background: #171d26;
+  color: #e3e8f1;
+  border-color: #414b5b;
+}
+html[data-theme="dark"] :is(.search-ready, .eyebrow) {
+  color: #a5b1c4;
+}
+html[data-theme="dark"] :is(section, th, td) {
+  border-color: #414b5b;
+}
+html[data-theme="dark"] :is(.note, kbd) {
+  background: #2e3745;
+  color: #e3e8f1;
+  border-color: #414b5b;
+}
+@media (max-width: 760px) {
+  .help-embedded .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 20px;
+  }
+}
+html[data-theme="dark"] :is(.intro > p:last-child, footer, #helpResults, th) {
+  color: #a5b1c4;
+}
+html[data-theme="dark"] :is(nav a:hover, nav a[aria-current]) {
+  background: #303c54;
+  color: #dce5ff;
+}

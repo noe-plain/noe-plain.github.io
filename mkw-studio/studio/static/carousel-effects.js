@@ -49,6 +49,13 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
       effects: undefined,
     },
     key = JSON.stringify([shape, o.effects, rasterScale]),
+    sources = [
+      p.images.find((im) => im.id === o.imageId)?.data,
+      p.images.find((im) => im.id === o.strokeImageId)?.data,
+      o.type === "logo"
+        ? p.logos.find((logo) => logo.id === o.source)?.data
+        : null,
+    ],
     old = carouselEffectCache.get(o);
   let entry = old;
   if (
@@ -56,7 +63,9 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
     old.key !== key ||
     old.project !== p ||
     old.fonts !== fontStatus ||
-    old.fontReady !== !!fontStatus[o.font]
+    old.fontReady !== !!fontStatus[o.font] ||
+    old.loader !== loadImage ||
+    sources.some((src, i) => src !== old.sources[i])
   ) {
     const w = Math.ceil((local.w + pad * 2) * rasterScale),
       h = Math.ceil((local.h + pad * 2) * rasterScale);
@@ -118,6 +127,8 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
         project,
         fonts: fontStatus,
         fontReady: !!fontStatus[o.font],
+        loader: loadImage,
+        sources,
         canvas: buffer,
         bytes: w * h * 4,
       };

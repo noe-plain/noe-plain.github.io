@@ -1,0 +1,309 @@
+/* Shared control rhythm. This stylesheet never changes artwork geometry. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+:root {
+  --studio-control-height: 36px;
+  --studio-control-radius: 8px;
+  --studio-field-gap: 8px;
+}
+:is(#toolsSidebar, #carouselSidebar) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+:is(.tool-sidebar-heading, #carouselProperties > .carousel-section-heading) {
+  padding: 20px 20px 16px;
+}
+.tool-sidebar-heading .sidebar-eyebrow {
+  display: none;
+}
+.tool-sidebar-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+}
+#toolsSidebar .step-panel,
+#carouselProperties {
+  padding: 0 20px 20px;
+}
+#carouselProperties > .carousel-section-heading {
+  padding: 20px 0 4px;
+}
+#carouselProperties > h3 {
+  margin: 20px 0 16px;
+  font-size: 18px;
+}
+#toolsSidebar .tool-section,
+#carouselProperties .carousel-property-section,
+#carouselProperties.is-text-inspector .carousel-property-section {
+  margin: 0;
+  padding: 16px 0;
+}
+#toolsSidebar .tool-section:first-child {
+  padding-top: 16px;
+}
+:is(#toolsSidebar, #carouselSidebar) :is(h3, h4) {
+  line-height: 1.35;
+}
+#toolsSidebar .tool-section > h3,
+#carouselProperties .carousel-property-section > h4 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--studio-ink);
+}
+#toolsSidebar .tool-section > label {
+  margin: 10px 0;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+:is(#toolsSidebar, #carouselSidebar)
+  :is(input[type="number"], input[type="text"], select) {
+  min-height: var(--studio-control-height);
+  border-radius: var(--studio-control-radius);
+  font-size: 12px;
+}
+:is(#toolsSidebar, #carouselSidebar) :is(textarea, #mainTextInput) {
+  border-radius: var(--studio-control-radius);
+  font-size: 14px;
+  line-height: 1.45;
+  min-height: 96px;
+}
+:is(#toolsSidebar, #carouselSidebar) input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  accent-color: var(--blue);
+}
+:is(#toolsSidebar, #carouselSidebar) label:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+#toolsSidebar .tool-button-grid {
+  gap: 8px;
+}
+#toolsSidebar .tool-button-grid button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 6px;
+  font-size: 11px;
+  border-radius: 8px;
+}
+#toolsSidebar .tool-button-grid .ui-icon {
+  width: 18px;
+  height: 18px;
+}
+#toolsSidebar :is(.family-tools, .sponsor-inspector) > button {
+  margin-top: 8px;
+}
+:is(#toolsSidebar, #carouselSidebar)
+  :is(.carousel-warning, #sponsorMatteStatus):empty {
+  display: none;
+}
+.image-info-card .image-card-summary {
+  cursor: default;
+}
+.image-info-card .image-card-body {
+  padding-top: 12px;
+}
+.image-info-card .template-badge {
+  margin: 0 0 10px;
+  font-size: 10px;
+}
+.image-info-card .image-settings {
+  border-top: 1px solid var(--line);
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) {
+  min-height: 40px;
+  padding: 9px 12px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) > span {
+  display: inline;
+}
+.studio-commandbar .studio-action#export {
+  background: #303c58;
+  color: #dae4ff;
+  border-color: #4b5e87;
+}
+html[data-theme="light"] .studio-commandbar .studio-action#export {
+  background: #eaf0ff;
+  color: #315bcc;
+  border-color: #d2ddfb;
+}
+.studio-commandbar .studio-notice-button {
+  height: 40px;
+  gap: 6px;
+  padding: 8px 10px;
+}
+.studio-commandbar .studio-action.studio-notice-button .studio-warning-count,
+.studio-commandbar.studio-icons-only
+  .studio-action.studio-notice-button
+  .studio-warning-count {
+  display: inline;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.studio-commandbar.studio-icons-only
+  .studio-action:is(#export, #carouselExport)
+  > span {
+  display: none;
+}
+.studio-commandbar.studio-icons-only
+  .studio-action:is(#export, #carouselExport) {
+  padding: 8px;
+  min-width: 40px;
+}
+.vector-point-count {
+  display: block;
+  margin: 8px 0 12px;
+  color: var(--studio-muted);
+  font-size: 11px;
+}
+#settingsDialog .settings-tab-panel h3 {
+  margin-bottom: 14px;
+}
+#settingsDialog .settings-tab-panel > section {
+  padding-top: 20px;
+  margin-top: 20px;
+}
+#settingsDialog .settings-tab-panel > section:first-child {
+  padding-top: 0;
+  margin-top: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+  .format-choice,
+  .format-reveal,
+  .format-row {
+    transition: none !important;
+  }
+}
+/* Sidebar sections use their own gap, without stacking label margins on top. */
+#toolsSidebar .panel-row {
+  gap: 0;
+}
+#toolsSidebar .tool-section {
+  gap: 12px;
+}
+#toolsSidebar .tool-section > label {
+  margin: 0;
+}
+#toolsSidebar .tool-section > h3 {
+  margin-bottom: 0;
+}
+:is(#toolsSidebar, #carouselSidebar) textarea {
+  font-family: "MKW UI", sans-serif;
+}
+@media (pointer: coarse) {
+  :is(#toolsSidebar, #carouselSidebar)
+    :is(input[type="number"], input[type="text"], select) {
+    min-height: 40px;
+  }
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) > span {
+  font-size: 12px;
+  line-height: 1.2;
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) > .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+html[data-theme="light"]
+  .studio-commandbar
+  .studio-action:is(#export, #carouselExport) {
+  background: #eaf0ff;
+  color: #315bcc;
+  border-color: #d2ddfb;
+}
+#studioHelpDialog {
+  width: min(1120px, calc(100vw - 32px));
+  height: min(860px, calc(100dvh - 40px));
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+}
+#studioHelpDialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+#studioHelpDialog .dialog-heading {
+  flex: none;
+  margin: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+#studioHelpDialog h2 {
+  margin: 0;
+  font-size: 18px;
+}
+#studioHelpFrame {
+  display: block;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  background: var(--studio-panel);
+}
+#studioHelpFrame[hidden] {
+  display: none;
+}
+#studioHelpStatus {
+  padding: 24px;
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  #studioHelpDialog {
+    width: calc(100vw - 16px);
+    height: calc(100dvh - 16px);
+    border-radius: 12px;
+  }
+}
+@media (max-width: 520px) {
+  :root {
+    --studio-header-height: 104px;
+  }
+  header {
+    height: var(--studio-header-height);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 10px 16px;
+  }
+  .brand img {
+    width: 150px;
+  }
+  .header-actions {
+    margin: 0;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .header-actions .icon-button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+}

@@ -20,7 +20,7 @@ function carouselSetup() {
   options.hidden = true;
   options.innerHTML = `
  <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Carousel</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Texthilfslinien: 100 px vom Slide-Rand</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone für das gesamte Artwork</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
- <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="2" max="20" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>2–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><p>Bilder dürfen über die Slide-Grenzen laufen. Für Texte erscheinen Hinweise beim Überschreiten. Safezone und Sechstelraster helfen beim Ausrichten.</p></fieldset>`;
+ <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="2" max="20" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>2–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
   $("#formatChoices").before(options);
   const refresh = () => {
     const w = +$("#cw").value,
@@ -57,10 +57,7 @@ function carouselSetup() {
   };
   options.querySelectorAll("input").forEach((el) => (el.oninput = refresh));
   refresh();
-  const intro =
-    $("#formatChoices").previousElementSibling === options
-      ? options.previousElementSibling
-      : null;
+  const intro = $("#setupInstructions");
   const postIntro = intro?.textContent;
   host.querySelectorAll("button").forEach(
     (btn) =>

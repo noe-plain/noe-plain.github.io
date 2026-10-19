@@ -54,6 +54,7 @@
     "static/settings-ui.js",
     "static/post-workspace.js",
     "static/project-session.js",
+    "static/help-popup.js",
     "static/start.js"
   ],
   "styles": [
@@ -70,6 +71,7 @@
     "static/advanced-tools.css",
     "static/paint-picker.css",
     "static/projects.css",
-    "static/carousel-refinements.css"
+    "static/carousel-refinements.css",
+    "static/editor-polish.css"
   ]
 }

@@ -99,7 +99,7 @@ function carouselTypeRange(o, start, end) {
   carouselUI.typeRange = { id: o.id, start, end };
 }
 function carouselTypePanel(o) {
-  return `<section class="carousel-property-section type-character"><h4>Zeichen</h4><div class="type-format-buttons" role="group" aria-label="Zeichenformatierung"><button id="carouselUppercase" aria-pressed="${!!o.uppercase}" title="Gesamten Text in Grossbuchstaben anzeigen"><span class="type-symbol">AA</span><span>Grossbuchstaben</span></button><button id="carouselSuperscript" aria-pressed="${o.script === "superscript"}" title="Markierte Zeichen hochstellen · ohne Markierung: gesamtes Textfeld"><span class="type-symbol">x²</span><span>Hochgestellt</span></button></div><p class="type-hint">Hochstellen gilt für die markierten Zeichen, sonst für das ganze Textfeld. Der eingegebene Text bleibt erhalten.</p></section>`;
+  return `<section class="carousel-property-section type-character"><h4>Zeichen</h4><div class="type-format-buttons" role="group" aria-label="Zeichenformatierung"><button id="carouselUppercase" aria-pressed="${!!o.uppercase}" title="Gesamten Text in Grossbuchstaben anzeigen"><span class="type-symbol">AA</span><span>Grossbuchstaben</span></button><button id="carouselSuperscript" aria-pressed="${o.script === "superscript"}" title="Markierte Zeichen hochstellen · ohne Markierung: gesamtes Textfeld"><span class="type-symbol">x²</span><span>Hochgestellt</span></button></div></section>`;
 }
 function carouselBindTypography(o, panel) {
   carouselSyncTypeControls(o);

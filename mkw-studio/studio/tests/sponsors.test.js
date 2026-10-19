@@ -73,10 +73,10 @@ test("groups wrap as intact units before logos get crowded, with bounded optical
   assert.equal(S.layout(b), null);
 });
 test("automatic modes retain grayscale/complex detail and select contrast for simple marks", () => {
-  assert.equal(S.mode(logo("a"), "#ffffff"), "black");
-  assert.equal(S.mode(logo("a"), "#15243a"), "white");
-  assert.equal(S.mode({ ...logo("a"), gray: true }, "#15243a"), "gray");
-  assert.equal(S.mode({ ...logo("a"), complex: true }, "#fff000"), "gray");
+  assert.equal(S.mode(logo("a"), "#ffffff"), "multiply");
+  assert.equal(S.mode(logo("a"), "#15243a"), "screen");
+  assert.equal(S.mode({ ...logo("a"), gray: true }, "#15243a"), "screen");
+  assert.equal(S.mode({ ...logo("a"), complex: true }, "#fff000"), "multiply");
   assert.equal(
     S.mode({ ...logo("a"), gray: true, mode: "white" }, "#15243a"),
     "white",
@@ -239,15 +239,15 @@ test("portrait sponsor height is included in the original bottom safe zone with 
 test("binary black/white marks adapt to strip contrast while real gray tones remain", () => {
   assert.equal(
     S.mode({ ...logo("a"), gray: true, monochrome: true }, "#14283c"),
-    "white",
+    "screen",
   );
   assert.equal(
     S.mode({ ...logo("a"), gray: true, monochrome: true }, "#ffffff"),
-    "black",
+    "multiply",
   );
   assert.equal(
     S.mode({ ...logo("a"), gray: true, monochrome: false }, "#14283c"),
-    "gray",
+    "screen",
   );
 });
 

@@ -36,20 +36,23 @@ function studioSettingsUI() {
   panels.general.append(
     heading,
     theme,
-    hint,
     dialog.querySelector(".settings-advanced"),
   );
+  hint.remove();
   const preferences = dialog.querySelector(".settings-preferences"),
     exportLabel = preferences.querySelector(".settings-export-format"),
     exportHeading = exportLabel.previousElementSibling,
     exportHint = exportLabel.nextElementSibling;
-  panels.export.append(exportHeading, exportLabel, exportHint);
+  panels.export.append(exportHeading, exportLabel);
+  exportHint.remove();
+  preferences.querySelector("small")?.remove();
+  dialog.querySelector(".settings-fonts > small")?.remove();
   panels.guides.append(preferences);
   panels.fonts.append(dialog.querySelector(".settings-fonts"));
   const leading = document.createElement("section");
   leading.className = "settings-leading";
   leading.innerHTML =
-    '<h3>Zeilenabstand im Carousel</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label><p>95 % entspricht Schriftgrösse × 0,95. Gilt für künftig erstellte Texte. Bestehende Texte und MKW-Dateien werden nicht geändert.</p>';
+    '<h3>Zeilenabstand im Carousel</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
   panels.fonts.prepend(leading);
   const pdf = document.createElement("section");
   pdf.className = "settings-pdf";
@@ -57,13 +60,11 @@ function studioSettingsUI() {
     carouselPDFPresets,
   )
     .map(([key, v]) => `<option value="${key}">${v.name}</option>`)
-    .join(
-      "",
-    )}</select></label><p>Eine PDF mit einer Seite pro Slide. Grösse, Komprimierung und Einpassung lassen sich im Export ändern.</p>`;
+    .join("")}</select></label>`;
   panels.export.append(pdf);
   const saving = document.createElement("section");
   saving.innerHTML =
-    '<h3>Projektsicherung</h3><label class="check"><input id="autoSaveFile" type="checkbox">Verknüpfte MKW-Datei automatisch aktualisieren</label><p>Die Browsersicherung bleibt immer aktiv. Lokale Dateien werden nur mit erteiltem Dateizugriff aktualisiert.</p>';
+    '<h3>Projektsicherung</h3><label class="check"><input id="autoSaveFile" type="checkbox">Verknüpfte MKW-Datei automatisch aktualisieren</label>';
   panels.general.append(saving);
   saving.querySelector("#autoSaveFile").checked =
     studioPreferences.autoSaveFile;

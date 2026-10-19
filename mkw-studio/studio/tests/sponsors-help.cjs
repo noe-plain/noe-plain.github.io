@@ -15,16 +15,31 @@ const { launch, artifact } = require("./browser.cjs");
     page.on("request", (r) => requests.push(r.url()));
     await page.goto(process.env.STUDIO_URL);
     await page.waitForFunction(() => !$("#startNew").disabled);
+    const wikiRequests = () =>
+      requests.filter((u) => new URL(u).pathname.includes("/hilfe/"));
     assert.equal(
-      requests.filter((u) => /hilfe\/(?:hilfe|index)/.test(u)).length,
+      wikiRequests().length,
       0,
-      "Wiki must not load inside editor",
+      "No wiki resources before the first explicit request",
     );
-    const opening = page.waitForEvent("popup");
+    assert.equal(
+      await page.locator("#studioHelpDialog,#studioHelpFrame").count(),
+      0,
+    );
     await page.locator("#startHelp").click();
-    const help = await opening;
-    await help.waitForLoadState();
+    await page.locator("#studioHelpDialog[open]").waitFor();
+    await page
+      .frameLocator("#studioHelpFrame")
+      .locator("#helpSearch")
+      .waitFor();
+    const help = page.frame({ name: "mkwHelp" });
+    assert.equal(
+      context.pages().length,
+      1,
+      "Wiki opens inside the current Studio window",
+    );
     assert.equal(await help.locator("main section").count(), 8);
+    assert(await help.locator("body>header").isHidden());
     await help.locator("#helpSearch").fill("Firefox");
     assert(await help.locator("#speichern").isVisible());
     assert(await help.locator("#schnellstart").isHidden());
@@ -34,14 +49,36 @@ const { launch, artifact } = require("./browser.cjs");
       /Keine passenden/,
     );
     await help.locator("#helpSearch").fill("");
-    await help.setViewportSize({ width: 360, height: 850 });
+    await page.setViewportSize({ width: 360, height: 850 });
     assert(
       await help.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     );
-    await help.screenshot({ path: artifact("mkw-how-to-mobile.png") });
-    await help.close();
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      JSON.stringify(await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:[...document.body.children].filter(el=>el.getBoundingClientRect().right>innerWidth+1).map(el=>el.id||el.tagName)}))),
+    );
+    await page
+      .locator("#studioHelpDialog")
+      .screenshot({ path: artifact("mkw-how-to-mobile.png") });
+    await help.locator("#helpSearch").focus();
+    await page.keyboard.press("Escape");
+    assert(await page.locator("#studioHelpDialog").isHidden());
+    assert(await page.locator("#startDialog").isVisible());
+    await page.waitForFunction(() => document.activeElement.id === "startHelp");
+    const loaded = wikiRequests().length;
+    await page.locator("#startHelp").click();
+    assert(await page.locator("#studioHelpFrame").isVisible());
+    assert.equal(
+      wikiRequests().length,
+      loaded,
+      "Reopening reuses the loaded handbook",
+    );
+    await page.locator("#closeStudioHelp").click();
+    await page.setViewportSize({ width: 1650, height: 1150 });
     const noJS = await browser.newContext({ javaScriptEnabled: false });
     const staticHelp = await noJS.newPage();
     await staticHelp.goto(new URL("hilfe/", process.env.STUDIO_URL).href);
@@ -190,7 +227,7 @@ const { launch, artifact } = require("./browser.cjs");
       };
     });
     assert(
-      jpg.matte && jpg.alpha < 10 && jpg.monochrome && jpg.mode === "black",
+      jpg.matte && jpg.alpha < 10 && jpg.monochrome && jpg.mode === "multiply",
       JSON.stringify(jpg),
     );
     assert(jpg.width < 260);
@@ -280,7 +317,7 @@ const { launch, artifact } = require("./browser.cjs");
         "Sponsorenleiste",
       ],
     );
-    assert.equal(await first.locator("hr").count(), 2);
+    assert.equal(await first.locator("hr").count(), 1);
     assert.match(
       (await first.getAttribute("aria-label")) ||
         (await first.locator("summary").getAttribute("aria-label")),
@@ -454,6 +491,12 @@ const { launch, artifact } = require("./browser.cjs");
         .evaluate((el) => el.classList.contains("active")),
     );
     assert.equal(await page.evaluate(() => selected), square);
+    assert.deepEqual(
+      await page
+        .locator("#sponsorLogoMode option")
+        .evaluateAll((nodes) => nodes.map((n) => n.value)),
+      ["auto", "gray", "multiply", "screen", "original"],
+    );
     await page.locator("#sponsorLogoSize").fill("140");
     await page.locator("#sponsorLogoSize").press("Tab");
     assert.equal(
@@ -472,7 +515,7 @@ const { launch, artifact } = require("./browser.cjs");
           board().sponsors.colour,
         ),
       ),
-      "white",
+      "screen",
     );
     await page.locator("#paintClose").click();
     for (const mode of ["multiply", "screen", "auto"]) {
@@ -768,6 +811,23 @@ const { launch, artifact } = require("./browser.cjs");
     }
     assert.deepEqual(compositing.cache, { reused: true, separate: true });
     assert.deepEqual(compositing.flat, [136, 119]);
+    const beforeHelp = await page.evaluate(() => JSON.stringify(p));
+    await page.evaluate(() => studioSetTheme("dark"));
+    await page.locator("#help").click();
+    assert.equal(
+      await help.evaluate(() => document.documentElement.dataset.theme),
+      "dark",
+    );
+    await page
+      .locator("#studioHelpDialog")
+      .screenshot({ path: artifact("mkw-how-to-dark.png") });
+    await page.locator("#closeStudioHelp").click();
+    assert.equal(
+      await page.evaluate(() => JSON.stringify(p)),
+      beforeHelp,
+      "Help never changes the artwork",
+    );
+    await page.evaluate(() => studioSetTheme("light"));
     // Full export pixels are shared with preview. PSD also includes a named strip layer.
     const exports = await page.evaluate(async () => {
       p.boards = p.boards.filter(

@@ -129,12 +129,6 @@ html[data-theme="light"] {
   border-radius: 6px;
   margin-bottom: 8px;
 }
-.template-hint {
-  font-size: 11px;
-  line-height: 1.5;
-  opacity: 0.75;
-  margin: 0 0 14px;
-}
 .save-as-button {
   width: 100%;
   margin: 10px 0;

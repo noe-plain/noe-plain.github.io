@@ -1,0 +1,77 @@
+"use strict";
+const studioHelpURL = "hilfe/?v=0bb9c8cf8e99";
+let studioHelpPopup = null;
+function studioOpenHelp(trigger) {
+  if (!studioHelpPopup) {
+    const dialog = document.createElement("dialog");
+    dialog.id = "studioHelpDialog";
+    dialog.setAttribute("aria-labelledby", "studioHelpTitle");
+    dialog.innerHTML = `<div class="dialog-heading"><h2 id="studioHelpTitle">Hilfe &amp; How-to</h2><button id="closeStudioHelp" class="icon-button" aria-label="Wiki schliessen" autofocus>${studioIcon("close")}</button></div><p id="studioHelpStatus" role="status">Wiki wird geladen …</p>`;
+    const frame = document.createElement("iframe");
+    frame.id = "studioHelpFrame";
+    frame.name = "mkwHelp";
+    frame.title = "MKW Studio: Hilfe und How-to";
+    frame.hidden = true;
+    const state = { dialog, frame, trigger: null, ready: false };
+    studioHelpPopup = state;
+    frame.addEventListener("load", () => {
+      try {
+        const doc = frame.contentDocument;
+        if (!doc?.querySelector("#helpContent"))
+          throw Error("Wiki nicht verfügbar");
+        doc.documentElement.classList.add("help-embedded");
+        doc.documentElement.dataset.theme =
+          document.documentElement.dataset.theme;
+        doc.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            dialog.close();
+          }
+        });
+        doc
+          .querySelector('footer a[href="../"]')
+          ?.addEventListener("click", (event) => {
+            event.preventDefault();
+            dialog.close();
+          });
+        state.ready = true;
+        frame.hidden = false;
+        dialog.querySelector("#studioHelpStatus").hidden = true;
+      } catch {
+        dialog.querySelector("#studioHelpStatus").innerHTML =
+          `Wiki konnte nicht geladen werden. <a href="${studioHelpURL}" target="_blank" rel="noopener">Wiki in einem neuen Tab öffnen</a>`;
+      }
+    });
+    dialog.querySelector("#closeStudioHelp").onclick = () => dialog.close();
+    dialog.addEventListener(
+      "close",
+      () =>
+        state.trigger?.isConnected &&
+        state.trigger.focus({ preventScroll: true }),
+    );
+    // Assign a URL only after the first explicit request. No iframe or wiki assets at startup.
+    frame.src = studioHelpURL;
+    dialog.append(frame);
+    document.body.append(dialog);
+  }
+  const state = studioHelpPopup;
+  state.trigger = trigger;
+  if (state.ready)
+    state.frame.contentDocument.documentElement.dataset.theme =
+      document.documentElement.dataset.theme;
+  if (!state.dialog.open) state.dialog.showModal();
+}
+document.addEventListener("click", (event) => {
+  const trigger = event.target.closest?.("#help,#startHelp");
+  if (
+    !trigger ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  )
+    return;
+  event.preventDefault();
+  studioOpenHelp(trigger);
+});

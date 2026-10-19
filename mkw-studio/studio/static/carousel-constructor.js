@@ -217,9 +217,7 @@ function carouselConstructorPanel(panel) {
       ([key, name]) =>
         `<button data-boolean="${key}" ${sources.length < 2 ? "disabled" : ""}>${name}</button>`,
     )
-    .join(
-      "",
-    )}</div><p>Abziehen entfernt die oberen Formen aus der untersten. Kurven und Aussparungen bleiben als bearbeitbare Pfade erhalten.</p>`;
+    .join("")}</div>`;
   panel
     .querySelectorAll("[data-boolean]")
     .forEach(

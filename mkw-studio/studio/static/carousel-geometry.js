@@ -273,9 +273,7 @@ function carouselFramePicker(o) {
             (slots.length <= 3 || carouselFrameArea(remaining) < 0.00001));
       return `<button class="frame-point-choice" data-frame-slot="${slot}" style="left:${10 + point.x * 80}%;top:${10 + point.y * 80}%" aria-label="${carouselFrameLabels[slot]}" title="${carouselFrameLabels[slot]}${disabled && !carouselObjectLocked(o) ? " · mindestens drei Punkte müssen eine Fläche bilden" : ""}" aria-pressed="${active}" ${disabled ? "disabled" : ""}><span></span></button>`;
     })
-    .join(
-      "",
-    )}</div><p id="framePointHint">3–8 Punkte einzeln an- oder abwählen. Mehrere Punkte sind gleichzeitig auswählbar.</p></div>`;
+    .join("")}</div></div>`;
 }
 
 function carouselToggleFrameSlot(o, slot) {

@@ -518,7 +518,7 @@ function carouselPathPointer(ev, pt) {
   );
 }
 function carouselDraftPanel(panel) {
-  panel.innerHTML = `<h3>Pfad zeichnen</h3><p>Klicken setzt einen Eckpunkt. Ziehen erzeugt eine Kurve. Shift hält die Richtung in 45°-Schritten.</p><p>${carouselPathDraft.points.length} Punkte · Ersten Punkt anklicken zum Schliessen; dabei ziehen bestimmt die Kurve.</p><div class="carousel-fields"><button id="finishVectorPath" ${carouselPathDraft.points.length < 2 ? "disabled" : ""}>Pfad abschliessen</button><button id="cancelVectorPath">Abbrechen</button></div><p>Enter oder Doppelklick: fertig<br>Rücktaste: letzten Punkt entfernen<br>Escape: abbrechen</p>`;
+  panel.innerHTML = `<h3>Pfad zeichnen</h3><output class="vector-point-count">${carouselPathDraft.points.length} Punkte</output><div class="carousel-fields"><button id="finishVectorPath" ${carouselPathDraft.points.length < 2 ? "disabled" : ""}>Pfad abschliessen</button><button id="cancelVectorPath">Abbrechen</button></div>`;
   $("#finishVectorPath").onclick = () => carouselFinishPath();
   $("#cancelVectorPath").onclick = () => {
     carouselPathDraft = null;
@@ -897,7 +897,7 @@ function carouselVectorPanel(o) {
         )
       : section(
           "Pfad",
-          `<button id="vectorEditPoints" aria-pressed="${!!carouselUI.vectorPoints}" ${!studioPreferences.advanced ? "disabled" : ""}>${carouselUI.vectorPoints ? "Punktbearbeitung beenden" : "Punkte & Kurven bearbeiten"}</button><label class="vector-check"><input data-vector-key="closed" type="checkbox" ${o.closed ? "checked" : ""} ${o.points.length < 3 ? "disabled" : ""}> Geschlossener Pfad</label>${o.contours ? `<label>Teilpfad<select id="vectorContour">${o.contours.map((_, i) => `<option value="${i}" ${i === (carouselUI.vectorContour || 0) ? "selected" : ""}>Teilpfad ${i + 1}</option>`).join("")}</select></label>` : ""}${carouselUI.vectorPoints ? `<p>${carouselUI.vectorNodes?.size || 1} Punkte ausgewählt · Shift-Klick oder Auswahlrahmen.</p><p>Punkt ${(carouselUI.vectorNode ?? 0) + 1} von ${o.points.length} · Shift: 45° · Control: unabhängige Grifflängen · Alt: Richtung lösen.</p><div class="carousel-fields"><button id="vectorCorner">Eckpunkt</button><button id="vectorSmooth">Kurvenpunkt</button><button id="vectorAddPoint">Punkt hinzufügen</button><button id="vectorRemovePoint">Punkt entfernen</button></div>` : ""}<p>${o.fillMode === "image" ? "Doppelklick bearbeitet den Bildausschnitt. Punkte und Kurven über den Button oben bearbeiten." : "Doppelklick bearbeitet Punkte und Kurvengriffe."} P: Klick auf ein Segment fügt einen Punkt hinzu. Option/Alt-Klick auf einen Punkt entfernt ihn. Shift: 45° · Control: unabhängige Grifflängen.</p>`,
+          `<button id="vectorEditPoints" aria-pressed="${!!carouselUI.vectorPoints}" ${!studioPreferences.advanced ? "disabled" : ""}>${carouselUI.vectorPoints ? "Punktbearbeitung beenden" : "Punkte & Kurven bearbeiten"}</button><label class="vector-check"><input data-vector-key="closed" type="checkbox" ${o.closed ? "checked" : ""} ${o.points.length < 3 ? "disabled" : ""}> Geschlossener Pfad</label>${o.contours ? `<label>Teilpfad<select id="vectorContour">${o.contours.map((_, i) => `<option value="${i}" ${i === (carouselUI.vectorContour || 0) ? "selected" : ""}>Teilpfad ${i + 1}</option>`).join("")}</select></label>` : ""}${carouselUI.vectorPoints ? `<output class="vector-point-count">${carouselUI.vectorNodes?.size || 1} Punkte ausgewählt</output><output class="vector-point-count">Punkt ${(carouselUI.vectorNode ?? 0) + 1} von ${o.points.length}</output><div class="carousel-fields"><button id="vectorCorner">Eckpunkt</button><button id="vectorSmooth">Kurvenpunkt</button><button id="vectorAddPoint">Punkt hinzufügen</button><button id="vectorRemovePoint">Punkt entfernen</button></div>` : ""}`,
         );
   body += section(
     "Fläche & Kontur",
@@ -927,7 +927,7 @@ function carouselVectorPanel(o) {
   if (o.type === "path" && !o.closed)
     body += section(
       "Linienenden",
-      `<div class="vector-end">${pick("startEnd", "Anfang", carouselEndKinds)}${num("startSize", "Grösse · px", 1, 500)}</div><div class="vector-end">${pick("endEnd", "Ende", carouselEndKinds)}${num("endSize", "Grösse · px", 1, 500)}</div><p>Die Endformen folgen der Pfadrichtung. Ihre Grössen sind unabhängig einstellbar.</p>`,
+      `<div class="vector-end">${pick("startEnd", "Anfang", carouselEndKinds)}${num("startSize", "Grösse · px", 1, 500)}</div><div class="vector-end">${pick("endEnd", "Ende", carouselEndKinds)}${num("endSize", "Grösse · px", 1, 500)}</div>`,
     );
   return body;
 }

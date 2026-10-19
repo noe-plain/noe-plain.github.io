@@ -74,6 +74,18 @@ for (const id of ["guideColour", "snapColour"])
     studioPreferences[id] = event.target.value;
     studioApplyPreferences();
   };
+$("#snapDistance").oninput = (event) => {
+  const value = Number(event.target.value);
+  if (
+    !event.target.value ||
+    !Number.isInteger(value) ||
+    value < 1 ||
+    value > 40
+  )
+    return;
+  studioPreferences.snapDistance = value;
+  studioApplyPreferences();
+};
 $("#snapDistance").onchange = (event) => {
   studioPreferences.snapDistance = Math.max(
     1,

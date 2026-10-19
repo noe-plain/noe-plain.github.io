@@ -20,7 +20,7 @@ function carouselTextAlignButtons(value, attribute, label, locked = false) {
   return `<div class="type-alignment" role="group" aria-label="${label}">${carouselTextAlignments.map((item) => `<button ${attribute}="${item.value}" aria-label="${item.label}" title="${item.label}" aria-pressed="${value === item.value}" ${locked ? "disabled" : ""}>${studioIcon(item.icon)}</button>`).join("")}</div>`;
 }
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}<p class="type-hint">Gilt für alle Absätze ohne eigene Ausrichtung.</p><div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${o.textAnchor !== "bottom"}">${studioIcon("up")}Oben</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${o.textAnchor !== "bottom"}">${studioIcon("up")}Oben</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
 }
 function carouselBindTextAlignment(o, panel) {
   panel.querySelectorAll("[data-text-align]").forEach((button) => {
@@ -282,11 +282,11 @@ function carouselEndText(preservePanel = false) {
 }
 
 function carouselTextContentPanel(o) {
-  return `<section class="carousel-property-section type-content"><div class="type-section-heading"><h4>Text</h4><button id="carouselTextEdit" title="Text direkt auf der Zeichenfläche bearbeiten">${studioIcon("text")}<span>Auf der Fläche</span></button></div><label class="type-content-label">Textinhalt<textarea data-prop="text" aria-label="Carousel-Text eingeben" placeholder="Dein Text …" rows="3">${esc(o.text)}</textarea></label><p class="type-hint">Enter beginnt einen neuen Absatz.</p></section>`;
+  return `<section class="carousel-property-section type-content"><div class="type-section-heading"><h4>Text</h4><button id="carouselTextEdit" title="Text direkt auf der Zeichenfläche bearbeiten">${studioIcon("text")}<span>Auf der Fläche</span></button></div><label class="type-content-label">Textinhalt<textarea data-prop="text" aria-label="Carousel-Text eingeben" placeholder="Dein Text …" rows="3">${esc(o.text)}</textarea></label></section>`;
 }
 
 function carouselTextFontPanel(o) {
-  return `<section class="carousel-property-section type-font"><h4>Schrift</h4><label>Schriftfamilie<select data-prop="font">${studioFontOptions(o.font, false)}</select></label><div class="type-basics"><label>Grundgrösse<span class="type-unit"><input data-prop="size" type="number" aria-label="Grundgrösse des Textes" value="${o.size}" min="1" max="1000" step="any"><span>px</span></span></label></div>${studioPaintCards(o)}<p class="type-hint">Grundgrösse für Absätze ohne eigene Grösse.</p></section>`;
+  return `<section class="carousel-property-section type-font"><h4>Schrift</h4><label>Schriftfamilie<select data-prop="font">${studioFontOptions(o.font, false)}</select></label><div class="type-basics"><label>Grundgrösse<span class="type-unit"><input data-prop="size" type="number" aria-label="Grundgrösse des Textes" value="${o.size}" min="1" max="1000" step="any"><span>px</span></span></label></div>${studioPaintCards(o)}</section>`;
 }
 
 function carouselTextStylePanel(o) {
@@ -314,7 +314,7 @@ function carouselTextStylePanel(o) {
   return `<section id="carouselTextStyles" class="carousel-property-section"><h4>Absätze & Abstände</h4><div class="type-paragraphs" role="group" aria-label="Absatz auswählen">${paragraphs.map((text, i) => `<button data-paragraph="${i}" aria-pressed="${i === paragraph}" title="Absatz ${i + 1}: ${esc(text || "Leer")}"><span class="type-paragraph-number">${i + 1}</span><span class="type-paragraph-preview">${esc(label(text))}</span><span class="type-paragraph-size">${round(o.textStyles?.[i]?.size ?? o.size)} px</span></button>`).join("")}</div><p class="type-context" id="carouselTypographyContext">Absatz ${paragraph + 1} von ${paragraphs.length} ausgewählt</p><div class="type-control-heading"><span>Ausrichtung dieses Absatzes</span><button id="carouselParagraphAlignReset" ${style?.align === undefined ? "disabled" : ""}>Vom Textfeld</button></div>${carouselTextAlignButtons(carouselTextAlign(o, paragraph).value, "data-paragraph-align", "Ausrichtung des ausgewählten Absatzes", carouselObjectLocked(o))}<div class="type-control-heading"><label for="carouselParagraphSize">Schriftgrösse</label><button id="carouselParagraphReset" title="Grundgrösse (${o.size} px) übernehmen" ${!custom ? "disabled" : ""}>Grundgrösse</button></div>${stepper("carouselParagraphSize", style?.size ?? o.size, 1, 1000, "Schriftgrösse des Absatzes")}<label class="type-line-picker" ${lines.length === 1 ? "hidden" : ""}>Zeile im Absatz<select id="carouselTextLine">${options(
     lines.map((line, i) => [String(i), `${i + 1} · ${label(line.text)}`]),
     String(carouselUI.textLine),
-  )}</select></label><div class="type-control-heading type-leading-heading"><label for="carouselLineLeading">Zeilenabstand</label><button id="carouselLeadingReset" aria-pressed="${auto}" title="Automatisch: Schriftgrösse × ${o.lineHeight ?? 0.95}">Automatisch</button></div>${stepper("carouselLineLeading", line.leading, 1, 3000, "Zeilenabstand")}<p class="type-hint" id="carouselLeadingHint">${auto ? "Automatisch:" : "Eigener Abstand für Zeile " + (carouselUI.textLine + 1) + ". Auto:"} ${round(line.size * (o.lineHeight ?? 0.95))} px · ${Math.round((o.lineHeight ?? 0.95) * 100)} %</p></section>`;
+  )}</select></label><div class="type-control-heading type-leading-heading"><label for="carouselLineLeading">Zeilenabstand</label><button id="carouselLeadingReset" aria-pressed="${auto}" title="Automatisch: Schriftgrösse × ${o.lineHeight ?? 0.95}">Automatisch</button></div>${stepper("carouselLineLeading", line.leading, 1, 3000, "Zeilenabstand")}<p class="type-hint type-leading-summary" id="carouselLeadingHint">Standard: ${round(line.size * (o.lineHeight ?? 0.95))} px · ${Math.round((o.lineHeight ?? 0.95) * 100)} %</p></section>`;
 }
 
 function carouselTextStyleValues(o) {
@@ -338,7 +338,7 @@ function carouselTextStyleValues(o) {
     carouselObjectLocked(o) || style?.size === undefined;
   $("#carouselLeadingReset").setAttribute("aria-pressed", String(auto));
   $("#carouselLeadingHint").textContent =
-    `${auto ? "Automatisch:" : "Eigener Abstand für Zeile " + (carouselUI.textLine + 1) + ". Auto:"} ${Math.round(line.size * (o.lineHeight ?? 0.95) * 100) / 100} px · ${Math.round((o.lineHeight ?? 0.95) * 100)} %`;
+    `Standard: ${Math.round(line.size * (o.lineHeight ?? 0.95) * 100) / 100} px · ${Math.round((o.lineHeight ?? 0.95) * 100)} %`;
   document
     .querySelectorAll("#carouselTextStyles [data-paragraph]")
     .forEach(

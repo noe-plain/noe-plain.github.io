@@ -46,7 +46,7 @@ function carouselPanel() {
     return;
   }
   if (items.length > 1) {
-    panel.innerHTML = `<h3>${items.length} Elemente ausgewählt</h3><p>Gemeinsam verschieben und an den Griffen skalieren.</p><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></div>`;
+    panel.innerHTML = `<h3>${items.length} Elemente ausgewählt</h3><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></div>`;
     $("#carouselDuplicate").onclick = carouselDuplicate;
     $("#carouselDelete").onclick = carouselDelete;
   } else if (o) {
@@ -75,11 +75,11 @@ function carouselPanel() {
            ["right", "Rechts"],
            ["down", "Unten"],
          ]) +
-           `<div class="carousel-fields">${number("thickness", "Schenkelbreite", 1)}${number("glow", "Schein · px", 0, 200)}${color("glowColor", "Scheinfarbe")}${number("glowAlpha", "Intensität", 0, 1)}</div><p>Die Spitze sitzt auf einer Slide-Mittellinie. Der Winkel überragt eine Artwork-Kante um mindestens 1 px.</p>`,
+           `<div class="carousel-fields">${number("thickness", "Schenkelbreite", 1)}${number("glow", "Schein · px", 0, 200)}${color("glowColor", "Scheinfarbe")}${number("glowAlpha", "Intensität", 0, 1)}</div>`,
        )
      : ""
  }
- ${o.type === "image" ? section("Rahmenform", carouselFramePicker(o) + `<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints ? "Punktbearbeitung beenden" : "Rahmenpunkte bearbeiten"}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button><p>Eckpunkte direkt auf der Fläche ziehen. Der Bildinhalt bleibt an seiner Position.</p>`) : ""}
+ ${o.type === "image" ? section("Rahmenform", carouselFramePicker(o) + `<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints ? "Punktbearbeitung beenden" : "Rahmenpunkte bearbeiten"}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button>`) : ""}
  ${carouselHasImage(o) ? section("Inhalt", '<div class="carousel-fields">' + number("panX", "Ausschnitt X", -100000) + number("panY", "Ausschnitt Y", -100000) + `</div><div class="carousel-flip-controls" role="group" aria-label="Bild spiegeln">${["flipX", "flipY"].map((key, i) => `<button data-flip="${key}" aria-pressed="${o[key] === -1}" title="${i ? "Vertikal" : "Horizontal"} spiegeln">${studioIcon("flip", i ? "flip-vertical" : "")}<span>${i ? "Vertikal" : "Horizontal"}</span></button>`).join("")}</div><button id="carouselContentEdit">${carouselUI.content ? "Zurück zum Rahmen" : "Bildausschnitt bearbeiten"}</button>` + '<button id="carouselImageFit">Rahmen füllen</button>') : ""}
  ${
    o.type === "logo"
@@ -316,7 +316,7 @@ function carouselPanel() {
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
   } else {
-    panel.innerHTML = `<h3>Dein Carousel gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}<p>Rahmen mit gedrückter Maustaste aufziehen. Doppelklick auf Text zum Schreiben oder auf ein Bild für den Ausschnitt.</p><p>Leertaste: Fläche verschieben<br>Alt / Option + Scrollen: Zoom<br>Shift: Mehrfachauswahl / 45°</p>`;
+    panel.innerHTML = `<h3>Dein Carousel gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
     panel
       .querySelectorAll("[data-quick-tool]")
       .forEach(
