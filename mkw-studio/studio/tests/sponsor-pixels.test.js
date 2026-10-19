@@ -69,3 +69,64 @@ test("nonuniform photographic edges are not mistaken for a flat background", () 
   assert.equal(P.separate(d, w, h), null);
   assert.deepEqual(d, original);
 });
+
+function tones(values, alpha = 255) {
+  return new Uint8ClampedArray(values.flatMap((v) => [v, v, v, alpha]));
+}
+test("tonal normalization reaches pure endpoints while retaining intermediate gray and alpha", () => {
+  const d = tones([40, 120, 200]);
+  P.tones(d, false);
+  assert.deepEqual(
+    [...d],
+    [0, 0, 0, 255, 128, 128, 128, 255, 255, 255, 255, 255],
+  );
+  const translucent = tones([40, 120, 200], 100);
+  P.tones(translucent, false);
+  assert.deepEqual(
+    [...translucent].filter((_, i) => i % 4 === 3),
+    [100, 100, 100],
+  );
+  assert.deepEqual(
+    [translucent[0], translucent[4], translucent[8]],
+    [0, 128, 255],
+  );
+});
+
+test("screen inverts dark source ink and known dark mattes keep their light source polarity", () => {
+  const lightMatte = tones([40, 120, 200]);
+  P.tones(lightMatte, true, [255, 255, 255]);
+  assert.deepEqual(
+    [lightMatte[0], lightMatte[4], lightMatte[8]],
+    [255, 128, 0],
+  );
+  const darkMatte = tones([40, 120, 200]);
+  P.tones(darkMatte, true, [0, 0, 0]);
+  assert.deepEqual([darkMatte[0], darkMatte[4], darkMatte[8]], [0, 128, 255]);
+});
+test("uniform noisy ink becomes solid without amplifying compression noise or restoring holes", () => {
+  for (const light of [false, true]) {
+    const d = tones([90, 91, 92]);
+    d[7] = 0;
+    P.tones(d, light);
+    assert.deepEqual([d[0], d[4], d[8]], Array(3).fill(light ? 255 : 0));
+    assert.equal(d[7], 0);
+  }
+});
+test("transparent fringe colour cannot move the black and white endpoints", () => {
+  const d = new Uint8ClampedArray([
+    40, 40, 40, 255, 120, 120, 120, 255, 200, 200, 200, 255, 255, 255, 255, 30,
+    0, 0, 0, 0,
+  ]);
+  P.tones(d, false);
+  assert.deepEqual([d[0], d[4], d[8]], [0, 128, 255]);
+  assert.equal(d[15], 30);
+  assert.equal(d[19], 0);
+});
+
+test("a genuine flat gray mark retains its gray value instead of becoming a black silhouette", () => {
+  const d = tones([136, 136, 136]);
+  P.tones(d, false, null, true);
+  assert.deepEqual([d[0], d[4], d[8]], [136, 136, 136]);
+  P.tones(d, true, null, true);
+  assert.deepEqual([d[0], d[4], d[8]], [119, 119, 119]);
+});

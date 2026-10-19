@@ -250,3 +250,33 @@ test("binary black/white marks adapt to strip contrast while real gray tones rem
     "gray",
   );
 });
+
+test("sponsor blend modes select real multiply/screen and survive portable validation", () => {
+  assert.equal(S.composite("black", "#ffffff"), "multiply");
+  assert.equal(S.composite("white", "#ffffff"), "screen");
+  assert.equal(S.composite("gray", "#ffffff"), "multiply");
+  assert.equal(S.composite("gray", "#14283c"), "screen");
+  assert.equal(S.composite("multiply", "#14283c"), "multiply");
+  assert.equal(S.composite("screen", "#ffffff"), "screen");
+  assert.equal(S.composite("original", "#14283c"), "source-over");
+  for (const mode of ["multiply", "screen"]) {
+    const b = board();
+    b.sponsors.groups[0].logos[0].mode = mode;
+    const project = JSON.parse(
+      JSON.stringify(
+        A.compact({
+          boards: [b],
+          logos: [
+            { id: "zkb", data: "logo" },
+            { id: "one", data: "one" },
+            { id: "two", data: "two" },
+          ],
+          images: [],
+          fonts: [],
+        }),
+      ),
+    );
+    S.validate(project);
+    assert.equal(project.boards[0].sponsors.groups[0].logos[0].mode, mode);
+  }
+});

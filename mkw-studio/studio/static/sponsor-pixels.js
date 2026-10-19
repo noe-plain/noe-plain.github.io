@@ -76,7 +76,54 @@
     }
     return colour;
   }
-  const api = { separate };
+  // Stretch real ink tones to absolute black/white once per cached raster.
+  // Alpha is retained: antialiasing and already-separated matte stay intact.
+  function tones(data, lightInk, matte = null, preserveFlat = false) {
+    const luminance = (k) =>
+      0.2126 * data[k] + 0.7152 * data[k + 1] + 0.0722 * data[k + 2];
+    let low = 255,
+      high = 0,
+      sum = 0,
+      weight = 0;
+    // Ignore translucent edge colour when finding the endpoints.
+    for (let k = 0; k < data.length; k += 4)
+      if (data[k + 3] >= 224) {
+        const v = luminance(k);
+        low = Math.min(low, v);
+        high = Math.max(high, v);
+        sum += v;
+        weight++;
+      }
+    if (!weight)
+      for (let k = 0; k < data.length; k += 4)
+        if (data[k + 3] > 8) {
+          const v = luminance(k),
+            a = data[k + 3] / 255;
+          low = Math.min(low, v);
+          high = Math.max(high, v);
+          sum += v * a;
+          weight += a;
+        }
+    const range = high - low,
+      sourceLight = matte
+        ? 0.2126 * matte[0] + 0.7152 * matte[1] + 0.0722 * matte[2] <
+          sum / Math.max(weight, 1)
+        : false,
+      invert = sourceLight !== lightInk;
+    for (let k = 0; k < data.length; k += 4) {
+      let v =
+        range > 8
+          ? Math.max(0, Math.min(255, ((luminance(k) - low) * 255) / range))
+          : preserveFlat
+            ? luminance(k)
+            : lightInk
+              ? 255
+              : 0;
+      if ((range > 8 || preserveFlat) && invert) v = 255 - v;
+      data[k] = data[k + 1] = data[k + 2] = v;
+    }
+  }
+  const api = { separate, tones };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWSponsorPixels = api;
 })(globalThis);

@@ -21,6 +21,8 @@ function sponsorLogoCaption(logo, colour) {
     black: "Schwarz",
     white: "Weiss",
     gray: "Graustufen",
+    multiply: "Multiplizieren",
+    screen: "Negativ multiplizieren",
     original: "Original",
   }[MKWSponsors.mode(logo, colour)];
   return `${logo.mode === "auto" ? "Automatisch · " : ""}${name} · ${Math.round(logo.scale * 100)} %`;
@@ -244,13 +246,15 @@ function sponsorPanel(b, panel) {
               original: "Original",
             }[MKWSponsors.mode({ ...logo, mode: "auto" }, s.colour)],
         ],
-        ["black", "Schwarz"],
-        ["white", "Weiss"],
+        ["black", "Schwarz · Multiplizieren"],
+        ["white", "Weiss · Screen"],
         ["gray", "Graustufen"],
+        ["multiply", "Multiplizieren"],
+        ["screen", "Negativ multiplizieren (Screen)"],
         ["original", "Originalfarben"],
       ],
       logo.mode,
-    )}</select></label><label>Grösse · %<input id="sponsorLogoSize" type="number" min="25" max="200" step="5" value="${Math.round(logo.scale * 100)}"></label><button id="sponsorLogoReset">Optische Grösse zurücksetzen</button><button id="sponsorLogoMatte">Hintergrund prüfen &amp; entfernen</button><p class="tool-hint">Erkennt einfarbige JPG-Hintergründe. Gilt für diese Projektleiste; die Bibliothek bleibt unverändert.</p><p id="sponsorMatteStatus" role="status"></p>`;
+    )}</select></label><p class="tool-hint">Automatisch: Multiplizieren auf hellen Balken, Screen auf dunklen. Schwarz- und Weisspunkt werden angepasst; Graustufen und Transparenz bleiben erhalten.</p><label>Grösse · %<input id="sponsorLogoSize" type="number" min="25" max="200" step="5" value="${Math.round(logo.scale * 100)}"></label><button id="sponsorLogoReset">Optische Grösse zurücksetzen</button><button id="sponsorLogoMatte">Hintergrund prüfen &amp; entfernen</button><p class="tool-hint">Erkennt einfarbige JPG-Hintergründe. Gilt für diese Projektleiste; die Bibliothek bleibt unverändert.</p><p id="sponsorMatteStatus" role="status"></p>`;
     properties.querySelector("#sponsorLogoMatte").onclick = async (event) => {
       const button = event.currentTarget,
         project = p,

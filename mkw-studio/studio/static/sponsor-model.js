@@ -1,7 +1,15 @@
 /* Pure sponsor geometry/validation. No editor state, image decoding or persistence. */
 (function (root) {
   "use strict";
-  const modes = ["auto", "black", "white", "gray", "original"],
+  const modes = [
+      "auto",
+      "black",
+      "white",
+      "gray",
+      "multiply",
+      "screen",
+      "original",
+    ],
     clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   function foreground(hex) {
     const c = [1, 3, 5]
@@ -17,6 +25,13 @@
         ? "gray"
         : foreground(colour);
   }
+  function composite(renderedMode, colour) {
+    if (renderedMode === "original") return "source-over";
+    if (renderedMode === "black" || renderedMode === "multiply")
+      return "multiply";
+    if (renderedMode === "white" || renderedMode === "screen") return "screen";
+    return foreground(colour) === "black" ? "multiply" : "screen";
+  }
   function inkBounds(logo) {
     return logo.ink || { x: 0, y: 0, w: 1, h: 1 };
   }
@@ -24,12 +39,13 @@
     const ink = inkBounds(logo),
       aspect = logo.width / logo.height,
       renderedMode = mode(logo, colour),
-      density =
-        renderedMode === "gray" || renderedMode === "original"
-          ? ((foreground(colour) === "black"
-              ? logo.darkDensity
-              : logo.lightDensity) ?? logo.density)
-          : logo.density,
+      density = ["gray", "original", "multiply", "screen"].includes(
+        renderedMode,
+      )
+        ? ((foreground(colour) === "black"
+            ? logo.darkDensity
+            : logo.lightDensity) ?? logo.density)
+        : logo.density,
       // One optical ink-area target for the entire strip, regardless of group.
       // Height/width limits keep very thin wordmarks and dense emblems usable.
       targetArea = 1728 * unit * unit,
@@ -262,7 +278,7 @@
     }
     return project;
   }
-  const api = { layout, hit, mode, foreground, validate, moveLogo };
+  const api = { layout, hit, mode, composite, foreground, validate, moveLogo };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWSponsors = api;
 })(globalThis);

@@ -475,6 +475,21 @@ const { launch, artifact } = require("./browser.cjs");
       "white",
     );
     await page.locator("#paintClose").click();
+    for (const mode of ["multiply", "screen", "auto"]) {
+      await page.locator("#sponsorLogoMode").selectOption(mode);
+      assert.equal(
+        await page.evaluate(() => board().sponsors.groups[0].logos[0].mode),
+        mode,
+      );
+      assert.equal(
+        await page.evaluate(
+          () =>
+            MKWProjectAssets.compact(p).boards.find((b) => b.id === selected)
+              .sponsors.groups[0].logos[0].mode,
+        ),
+        mode,
+      );
+    }
     // Explicit template refresh keeps manual edits when a logo moves between groups.
     const zkbId = ids[0].logos[0];
     for (const target of [1, 0]) {
@@ -623,6 +638,136 @@ const { launch, artifact } = require("./browser.cjs");
       await page.evaluate(() => board().sponsors.groups[0].logos[0].scale),
       1.4,
     );
+    // Real multiply/screen must blend gray pixels with the bar, not paint an opaque gray rectangle.
+    const compositing = await page.evaluate(async () => {
+      const source = makeCanvas(90, 30),
+        sc = exportContext(source);
+      for (const [i, v] of [40, 120, 200].entries()) {
+        sc.fillStyle = `rgb(${v},${v},${v})`;
+        sc.fillRect(i * 30, 0, 30, 30);
+      }
+      const id = uid(),
+        asset = {
+          id,
+          width: 90,
+          height: 30,
+          data: source.toDataURL(),
+          purpose: "sponsor",
+        };
+      p.logos.push(asset);
+      try {
+        const samples = {};
+        for (const mode of ["multiply", "screen", "original"]) {
+          const b = {
+              w: 1080,
+              h: 1350,
+              sponsors: {
+                enabled: true,
+                colour: "#80c0a0",
+                height: 180,
+                groups: [
+                  {
+                    id: "test",
+                    name: "",
+                    enabled: true,
+                    logos: [
+                      {
+                        id,
+                        name: "Tonal test",
+                        width: 90,
+                        height: 30,
+                        density: 1,
+                        gray: true,
+                        complex: false,
+                        mode,
+                        scale: 1,
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            canvas = makeCanvas(b.w, b.h),
+            ctx = exportContext(canvas);
+          await paintSponsors(ctx, b);
+          const r = MKWSponsors.layout(b),
+            l = r.groups[0].logos[0];
+          samples[mode] = [1 / 6, 1 / 2, 5 / 6].map((t) => [
+            ...ctx.getImageData(
+              Math.floor(l.x + l.w * t),
+              Math.floor(r.content.h + l.y + l.h / 2),
+              1,
+              1,
+            ).data,
+          ]);
+          if (ctx.globalCompositeOperation !== "source-over")
+            throw Error("Blend state leaked");
+          canvas.width = canvas.height = 1;
+        }
+        const a = await sponsorBitmap(asset, "gray", "#ffffff"),
+          again = await sponsorBitmap(asset, "gray", "#f0e0d0"),
+          inverse = await sponsorBitmap(asset, "gray", "#14283c");
+        samples.cache = { reused: a === again, separate: a !== inverse };
+        const flat = makeCanvas(4, 4),
+          fc = exportContext(flat);
+        fc.fillStyle = "#888888";
+        fc.fillRect(0, 0, 4, 4);
+        const flatAsset = {
+          id: uid(),
+          width: 4,
+          height: 4,
+          gray: true,
+          monochrome: false,
+          data: flat.toDataURL(),
+        };
+        p.logos.push(flatAsset);
+        try {
+          const gray = await sponsorBitmap(flatAsset, "gray", "#ffffff"),
+            grayInverse = await sponsorBitmap(flatAsset, "gray", "#14283c");
+          samples.flat = [
+            exportContext(gray).getImageData(1, 1, 1, 1).data[0],
+            exportContext(grayInverse).getImageData(1, 1, 1, 1).data[0],
+          ];
+        } finally {
+          p.logos = p.logos.filter((l) => l.id !== flatAsset.id);
+          flat.width = flat.height = 1;
+        }
+        return samples;
+      } finally {
+        p.logos = p.logos.filter((l) => l.id !== id);
+        pruneSponsorRasters();
+        source.width = source.height = 1;
+      }
+    });
+    for (const [mode, expected] of Object.entries({
+      multiply: [
+        [0, 0, 0],
+        [64, 96, 80],
+        [128, 192, 160],
+      ],
+      screen: [
+        [255, 255, 255],
+        [192, 224, 208],
+        [128, 192, 160],
+      ],
+      original: [
+        [40, 40, 40],
+        [120, 120, 120],
+        [200, 200, 200],
+      ],
+    })) {
+      compositing[mode].forEach((pixel, i) => {
+        assert.equal(pixel[3], 255);
+        expected[i].forEach((value, c) =>
+          assert(
+            Math.abs(pixel[c] - value) <= 1,
+            `${mode} pixel ${i}: ${pixel}`,
+          ),
+        );
+      });
+    }
+    assert.deepEqual(compositing.cache, { reused: true, separate: true });
+    assert.deepEqual(compositing.flat, [136, 119]);
     // Full export pixels are shared with preview. PSD also includes a named strip layer.
     const exports = await page.evaluate(async () => {
       p.boards = p.boards.filter(
