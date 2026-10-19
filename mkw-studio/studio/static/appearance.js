@@ -1,6 +1,7 @@
 "use strict";
 const studioPreferenceDefaults = {
   guideColour: "#93a8ef",
+  sponsorColour: "#ffffff",
   snapColour: "#f5a8e8",
   snapDistance: 6,
   exportFormat: "jpg",
@@ -33,7 +34,7 @@ try {
     studioPreferences.autoSaveFile = saved.autoSaveFile;
   if (typeof saved.advanced === "boolean")
     studioPreferences.advanced = saved.advanced;
-  for (const key of ["guideColour", "snapColour"])
+  for (const key of ["guideColour", "snapColour", "sponsorColour"])
     if (/^#[0-9a-f]{6}$/i.test(saved[key])) studioPreferences[key] = saved[key];
   if (
     Number.isInteger(saved.snapDistance) &&

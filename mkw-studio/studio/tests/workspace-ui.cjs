@@ -22,8 +22,8 @@ const assert=require('node:assert/strict');
   await page.locator('#mainTextInput').fill('KONZERTE\nFÜR ALLE');
   await page.evaluate(()=>document.activeElement.blur());await page.keyboard.press('Shift+W');assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'false');await page.keyboard.press('Shift+W');assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'true');await page.locator('#mainTextInput').focus();await page.keyboard.press('Shift+W');assert((await page.locator('#mainTextInput').inputValue()).endsWith('W'));assert.equal(await page.locator('#footerGuides').getAttribute('aria-pressed'),'true');await page.locator('#mainTextInput').fill('KONZERTE\nFÜR ALLE');
   const postBar=await page.locator('.dock').boundingBox();assert.equal(postBar.height,58);assert.equal(postBar.y,1000-52-14-58);
-  assert.equal(await page.locator('.dock [data-step]').count(),5);
-  assert.equal(await page.locator('.dock [data-step] svg[data-google-icon]').count(),5);
+  assert.equal(await page.locator('.dock [data-step]').count(),6);
+  assert.equal(await page.locator('.dock [data-step] svg[data-google-icon]').count(),6);
   const pixels=()=>page.evaluate(async()=>{
    const b=p.boards[0],canvas=makeCanvas(b.w,b.h);await paint(canvas.getContext('2d'),b,1);
    return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',canvas.getContext('2d').getImageData(0,0,b.w,b.h).data))).map(n=>n.toString(16).padStart(2,'0')).join('');

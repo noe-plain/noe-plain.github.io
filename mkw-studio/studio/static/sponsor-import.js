@@ -55,69 +55,9 @@ async function sponsorImport(file) {
     d = pixels.data,
     w = canvas.width,
     h = canvas.height;
-  // Locate the visible rectangle before testing its corners: a transparent
-  // outer margin must not prevent removal of a uniform white/black matte.
-  let ax0 = w,
-    ay0 = h,
-    ax1 = -1,
-    ay1 = -1;
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++)
-      if (d[(y * w + x) * 4 + 3] > 8) {
-        ax0 = Math.min(ax0, x);
-        ay0 = Math.min(ay0, y);
-        ax1 = Math.max(ax1, x);
-        ay1 = Math.max(ay1, y);
-      }
-  if (ax1 < ax0) throw Error("Im Logo ist kein sichtbarer Inhalt vorhanden.");
-  const corner = [
-      ay0 * w + ax0,
-      ay0 * w + ax1,
-      ay1 * w + ax0,
-      ay1 * w + ax1,
-    ].map((i) => [d[i * 4], d[i * 4 + 1], d[i * 4 + 2], d[i * 4 + 3]]),
-    light = corner.every((c) => c[3] > 250 && Math.min(...c.slice(0, 3)) > 240),
-    dark = corner.every((c) => c[3] > 250 && Math.max(...c.slice(0, 3)) < 15),
-    background = light ? "light" : dark ? "dark" : null;
-  // Remove only background connected to an edge; enclosed artwork stays intact.
-  if (background) {
-    const seen = new Uint8Array(w * h),
-      queue = new Int32Array(w * h);
-    let head = 0,
-      tail = 0;
-    const add = (i) => {
-      if (seen[i]) return;
-      seen[i] = 1;
-      const k = i * 4,
-        match =
-          d[k + 3] < 8 ||
-          (light
-            ? Math.min(d[k], d[k + 1], d[k + 2]) > 235
-            : Math.max(d[k], d[k + 1], d[k + 2]) < 20);
-      if (match) {
-        d[k + 3] = 0;
-        queue[tail++] = i;
-      }
-    };
-    for (let x = 0; x < w; x++) {
-      add(x);
-      add((h - 1) * w + x);
-    }
-    for (let y = 0; y < h; y++) {
-      add(y * w);
-      add(y * w + w - 1);
-    }
-    while (head < tail) {
-      const i = queue[head++],
-        x = i % w,
-        y = Math.floor(i / w);
-      if (x) add(i - 1);
-      if (x < w - 1) add(i + 1);
-      if (y) add(i - w);
-      if (y < h - 1) add(i + w);
-    }
-    ctx.putImageData(pixels, 0, 0);
-  }
+  const matte = MKWSponsorPixels.separate(d, w, h),
+    background = null;
+  if (matte) ctx.putImageData(pixels, 0, 0);
   let x0 = w,
     y0 = h,
     x1 = -1,
@@ -185,7 +125,11 @@ async function sponsorImport(file) {
     cx = 0,
     cy = 0,
     colour = 0,
-    visible = 0;
+    visible = 0,
+    solid = 0,
+    opaquePixels = 0,
+    darkSolid = 0,
+    lightSolid = 0;
   for (let i = 0; i < sd.length; i += 4) {
     const a = sd[i + 3] / 255;
     if (a < 0.1) continue;
@@ -200,6 +144,12 @@ async function sponsorImport(file) {
     cx += ((i / 4) % sample.width) * mass;
     cy += Math.floor(i / 4 / sample.width) * mass;
     visible++;
+    if (a >= 0.98) opaquePixels++;
+    if (a > 0.85) {
+      solid++;
+      if (Math.max(sd[i], sd[i + 1], sd[i + 2]) < 26) darkSolid++;
+      if (Math.min(sd[i], sd[i + 1], sd[i + 2]) > 229) lightSolid++;
+    }
     if (
       Math.max(sd[i], sd[i + 1], sd[i + 2]) -
         Math.min(sd[i], sd[i + 1], sd[i + 2]) >
@@ -209,6 +159,8 @@ async function sponsorImport(file) {
     const key = [sd[i] >> 4, sd[i + 1] >> 4, sd[i + 2] >> 4].join();
     bins.set(key, (bins.get(key) || 0) + 1);
   }
+  const monochrome =
+    solid > 0 && Math.max(darkSolid, lightSolid) / solid > 0.95;
   const meta = {
     width: cropped.width,
     height: cropped.height,
@@ -236,8 +188,12 @@ async function sponsorImport(file) {
           .slice(0, 8)
           .reduce((a, b) => a + b, 0) /
           Math.max(1, visible) <
-          0.88),
+          0.88) ||
+      (!matte && opaquePixels === sample.width * sample.height && !monochrome),
     background,
+    matte,
+    analysisVersion: 2,
+    monochrome,
   };
   const logo = {
     id: uid(),

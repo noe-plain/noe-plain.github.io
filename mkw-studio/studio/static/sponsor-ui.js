@@ -26,16 +26,18 @@ function sponsorLogoCaption(logo, colour) {
   return `${logo.mode === "auto" ? "Automatisch · " : ""}${name} · ${Math.round(logo.scale * 100)} %`;
 }
 function sponsorDefaults() {
-  return { enabled: false, colour: "#ffffff", height: 180, groups: [] };
+  return {
+    enabled: false,
+    colour: studioPreferences.sponsorColour,
+    height: 180,
+    groups: [],
+  };
 }
 function sponsorOptions(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     s = b?.sponsors || sponsorDefaults(),
-    groups = [
-      ...sponsorGroups,
-      ...s.groups.filter((g) => !sponsorGroups.some((l) => l.id === g.id)),
-    ];
-  return `<div class="sponsor-options" data-sponsor-options="${esc(im.id)}"><div class="picker-heading">Sponsoren</div><label><input type="checkbox" data-sponsor-enable="${esc(im.id)}" ${s.enabled ? "checked" : ""}> Sponsorleiste anzeigen</label>${groups.map((g) => `<label><input type="checkbox" data-sponsor-group="${esc(g.id)}" data-sponsor-image="${esc(im.id)}" ${s.groups.some((a) => a.id === g.id && a.enabled) ? "checked" : ""}> ${esc(g.name)}</label>`).join("")}<button type="button" data-sponsor-edit="${esc(im.id)}">Leiste und Logos bearbeiten</button><button type="button" data-sponsor-settings>Sponsorgruppen verwalten</button><small>${s.enabled && !s.groups.some((g) => g.enabled) ? "Bitte mindestens eine Sponsorgruppe auswählen." : "Erstes Bild: Vorlage für weitere Bilder."}</small></div>`;
+    enabled = s.enabled;
+  return `<div data-sponsor-options="${esc(im.id)}"><label><input type="checkbox" data-sponsor-enable="${esc(im.id)}" ${enabled ? "checked" : ""}><span>Sponsorenleiste</span></label></div>`;
 }
 function sponsorRefreshOptions() {
   for (const im of p.images) {
@@ -116,7 +118,7 @@ function sponsorOpenProperties(imageId, hit = null) {
   if (!b) return;
   if (editingText) editingText.el.blur();
   selected = b.id;
-  step = "logo";
+  step = "sponsors";
   sponsorSelection = hit?.logoId || null;
   updateDock();
   renderPanel();
@@ -130,11 +132,22 @@ function sponsorOpenProperties(imageId, hit = null) {
 }
 function sponsorPanel(b, panel) {
   const s = b.sponsors || sponsorDefaults(),
+    groups = [
+      ...sponsorGroups,
+      ...s.groups.filter((g) => !sponsorGroups.some((l) => l.id === g.id)),
+    ],
     root = document.createElement("section");
   root.id = "postSponsors";
   root.className = "tool-section sponsor-inspector";
-  root.innerHTML = `<h3>Sponsorleiste</h3><label><input type="checkbox" id="postSponsorEnabled" ${s.enabled ? "checked" : ""}> Auf diesem Bild anzeigen</label><label>Balkenfarbe<input id="sponsorColour" type="color" aria-label="Balkenfarbe" value="${s.colour}"></label><label>Mindesthöhe bei 1080 px<input id="sponsorHeight" type="number" min="120" max="600" step="10" value="${s.height}"></label><p>180 px empfohlen. Gruppen stehen nebeneinander und brechen bei Platzmangel um. Quadrat und Querformat: Leiste rechts um −90°.</p>${s.groups.map((g) => `<div class="sponsor-project-group"><div class="sponsor-project-heading"><strong>${esc(g.name)}</strong><button data-sponsor-remove-group="${esc(g.id)}" class="icon-button" aria-label="Gruppe aus diesem Bild entfernen: ${esc(g.name)}">${studioIcon("trash")}</button></div>${g.logos.map((l) => `<button class="sponsor-logo-button" data-sponsor-select="${esc(l.id)}" aria-pressed="${sponsorSelection === l.id}">${esc(l.name)}<small>${sponsorLogoCaption(l, s.colour)}</small></button>`).join("")}</div>`).join("")}<button id="sponsorRefreshTemplates">Gruppen aus Bibliothek aktualisieren</button><div id="sponsorLogoProperties"></div><p class="carousel-warning">${esc(MKWSponsors.layout(b)?.warning || "")}</p><button type="button" data-sponsor-settings>Sponsorgruppen verwalten</button>`;
+  root.innerHTML = `<h3>Leiste gestalten</h3><label><input type="checkbox" id="postSponsorEnabled" ${s.enabled ? "checked" : ""}> Auf diesem Bild anzeigen</label><div class="sponsor-group-choices"><h4>Gruppen auf diesem Bild</h4>${groups.map((g) => `<label><input type="checkbox" data-sponsor-group="${esc(g.id)}" data-sponsor-image="${esc(b.imageId)}" ${s.groups.some((a) => a.id === g.id && a.enabled) ? "checked" : ""}>${esc(g.name)}</label>`).join("") || "<p>Noch keine Sponsorgruppen. Lege sie in den Einstellungen an.</p>"}</div><label>Balkenfarbe<input id="sponsorColour" type="color" aria-label="Balkenfarbe" value="${s.colour}"></label><label>Mindesthöhe bei 1080 px<input id="sponsorHeight" type="number" min="120" max="600" step="10" value="${s.height}"></label><p>180 px empfohlen. Gruppen stehen nebeneinander und brechen bei Platzmangel um. Quadrat und Querformat: Leiste rechts um −90°. Im Hochformat wird ihre Höhe vom unteren Schutzabstand abgezogen; mindestens 100 px bleiben frei.</p>${s.groups.map((g) => `<div class="sponsor-project-group"><div class="sponsor-project-heading"><strong>${esc(g.name)}</strong><button data-sponsor-remove-group="${esc(g.id)}" class="icon-button" aria-label="Gruppe aus diesem Bild entfernen: ${esc(g.name)}">${studioIcon("trash")}</button></div>${g.logos.map((l) => `<button class="sponsor-logo-button" data-sponsor-select="${esc(l.id)}" aria-pressed="${sponsorSelection === l.id}">${esc(l.name)}<small>${sponsorLogoCaption(l, s.colour)}</small></button>`).join("")}</div>`).join("")}<button id="sponsorRefreshTemplates">Gruppen aus Bibliothek aktualisieren</button><div id="sponsorLogoProperties"></div><p class="carousel-warning">${esc(MKWSponsors.layout(b)?.warning || "")}</p><button type="button" data-sponsor-settings>Sponsorgruppen verwalten</button>`;
   panel.append(root);
+  if (!sponsorGroupsLoaded)
+    sponsorLoadGroups()
+      .then(() => {
+        if (step === "sponsors" && selected === b.id && root.isConnected)
+          renderPanel();
+      })
+      .catch((error) => status(error.message));
   const apply = (fn) => {
     const config = clone(b.sponsors || sponsorDefaults());
     fn(config);
@@ -237,7 +250,54 @@ function sponsorPanel(b, panel) {
         ["original", "Originalfarben"],
       ],
       logo.mode,
-    )}</select></label><label>Grösse · %<input id="sponsorLogoSize" type="number" min="25" max="200" step="5" value="${Math.round(logo.scale * 100)}"></label><button id="sponsorLogoReset">Optische Grösse zurücksetzen</button>`;
+    )}</select></label><label>Grösse · %<input id="sponsorLogoSize" type="number" min="25" max="200" step="5" value="${Math.round(logo.scale * 100)}"></label><button id="sponsorLogoReset">Optische Grösse zurücksetzen</button><button id="sponsorLogoMatte">Hintergrund prüfen &amp; entfernen</button><p class="tool-hint">Erkennt einfarbige JPG-Hintergründe. Gilt für diese Projektleiste; die Bibliothek bleibt unverändert.</p><p id="sponsorMatteStatus" role="status"></p>`;
+    properties.querySelector("#sponsorLogoMatte").onclick = async (event) => {
+      const button = event.currentTarget,
+        project = p,
+        currentRevision = revision,
+        asset = p.logos.find((a) => a.id === logo.id);
+      button.disabled = true;
+      properties.querySelector("#sponsorMatteStatus").textContent =
+        "Hintergrund wird untersucht …";
+      try {
+        const blob = await (await fetch(asset.data)).blob(),
+          type = blob.type || "image/png",
+          name =
+            type === "image/jpeg"
+              ? "Logo.jpg"
+              : type === "image/webp"
+                ? "Logo.webp"
+                : "Logo.png",
+          prepared = await sponsorImport(new File([blob], name, { type }));
+        if (p !== project || revision !== currentRevision) return;
+        if (!prepared.matte) {
+          properties.querySelector("#sponsorMatteStatus").textContent =
+            "Kein eindeutig einfarbiger Hintergrund erkannt. Das Logo bleibt unverändert.";
+          return;
+        }
+        const config = clone(b.sponsors),
+          { thumb, ...portable } = prepared,
+          { data, purpose, background, ...metadata } = portable;
+        checkpoint();
+        portable.name = logo.name;
+        p.logos.push(portable);
+        for (const group of config.groups)
+          group.logos = group.logos.map((l) =>
+            l.id === logo.id
+              ? { ...metadata, name: logo.name, mode: l.mode, scale: l.scale }
+              : l,
+          );
+        sponsorSelection = prepared.id;
+        sponsorApply(b.imageId, config);
+        renderPanel();
+      } catch (error) {
+        if (properties.isConnected)
+          properties.querySelector("#sponsorMatteStatus").textContent =
+            error.message;
+      } finally {
+        button.disabled = false;
+      }
+    };
     properties.querySelector("#sponsorLogoMode").onchange = (e) => {
       checkpoint();
       apply(
@@ -278,7 +338,11 @@ async function sponsorRenderSettings() {
   root.innerHTML = '<p role="status">Sponsorgruppen werden geladen …</p>';
   try {
     await sponsorLoadGroups(true);
-    root.innerHTML = `<h3>Sponsorgruppen</h3><p>Hier verwaltest du Vorlagen für dieses Gerät. Verwendete Logos werden in MKW-Dateien eingebettet. Änderungen und Löschungen hier verändern bestehende Projektleisten nicht.</p><button id="newSponsorGroup">Gruppe hinzufügen</button><p class="sponsor-order-help" id="sponsorOrderHelp">Logos ziehen, um sie zu sortieren oder in eine andere Gruppe zu verschieben. Tastatur: Alt + Pfeiltasten.</p><div id="sponsorLibraryGroups">${sponsorGroups.map((g) => `<section class="sponsor-library-group" data-library-group="${esc(g.id)}"><div class="sponsor-project-heading"><label>Gruppenname<input data-sponsor-name="${esc(g.id)}" value="${esc(g.name)}" maxlength="80"></label><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="-1" aria-label="Gruppe nach vorne: ${esc(g.name)}">${studioIcon("up")}</button><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="1" aria-label="Gruppe nach hinten: ${esc(g.name)}">${studioIcon("down")}</button><button class="icon-button" data-sponsor-delete="${esc(g.id)}" aria-label="Gruppe löschen: ${esc(g.name)}">${studioIcon("trash")}</button></div><div class="sponsor-library-logos" data-sponsor-drop-group="${esc(g.id)}">${g.logos.map((l) => `<div class="sponsor-library-logo" draggable="true" tabindex="0" data-sponsor-drag="${esc(l.id)}" data-source-group="${esc(g.id)}" aria-label="${esc(l.name)} · Logo verschieben" aria-describedby="sponsorOrderHelp" aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"><i class="sponsor-drag-handle" aria-hidden="true">${studioIcon("move")}</i><img src="${esc(l.thumb || "")}" alt="" draggable="false"><span>${esc(l.name)}</span><button class="icon-button" data-library-logo="${esc(l.id)}" data-library-group="${esc(g.id)}" aria-label="Logo aus Bibliothek entfernen: ${esc(l.name)}">${studioIcon("trash")}</button></div>`).join("")}</div><button data-sponsor-upload="${esc(g.id)}">Logos hinzufügen</button></section>`).join("")}</div><p id="sponsorLibraryStatus" role="status"></p>`;
+    root.innerHTML = `<section class="sponsor-default-colour"><h3>Neue Sponsorenleisten</h3><label>Standard-Balkenfarbe<input id="defaultSponsorColour" type="color" aria-label="Standard-Balkenfarbe" value="${studioPreferences.sponsorColour}"></label><p>Gilt für neu angelegte Leisten. Bestehende Projektfarben bleiben erhalten.</p></section><h3>Sponsorgruppen</h3><p>Hier verwaltest du Vorlagen für dieses Gerät. Verwendete Logos werden in MKW-Dateien eingebettet. Änderungen und Löschungen hier verändern bestehende Projektleisten nicht.</p><button id="newSponsorGroup">Gruppe hinzufügen</button><p class="sponsor-order-help" id="sponsorOrderHelp">Logos ziehen, um sie zu sortieren oder in eine andere Gruppe zu verschieben. Tastatur: Alt + Pfeiltasten.</p><div id="sponsorLibraryGroups">${sponsorGroups.map((g) => `<section class="sponsor-library-group" data-library-group="${esc(g.id)}"><div class="sponsor-project-heading"><label>Gruppenname<input data-sponsor-name="${esc(g.id)}" value="${esc(g.name)}" maxlength="80"></label><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="-1" aria-label="Gruppe nach vorne: ${esc(g.name)}">${studioIcon("up")}</button><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="1" aria-label="Gruppe nach hinten: ${esc(g.name)}">${studioIcon("down")}</button><button class="icon-button" data-sponsor-delete="${esc(g.id)}" aria-label="Gruppe löschen: ${esc(g.name)}">${studioIcon("trash")}</button></div><div class="sponsor-library-logos" data-sponsor-drop-group="${esc(g.id)}">${g.logos.map((l) => `<div class="sponsor-library-logo" draggable="true" tabindex="0" data-sponsor-drag="${esc(l.id)}" data-source-group="${esc(g.id)}" aria-label="${esc(l.name)} · Logo verschieben" aria-describedby="sponsorOrderHelp" aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"><i class="sponsor-drag-handle" aria-hidden="true">${studioIcon("move")}</i><img src="${esc(l.thumb || "")}" alt="" draggable="false"><span>${esc(l.name)}</span><button class="icon-button" data-library-logo="${esc(l.id)}" data-library-group="${esc(g.id)}" aria-label="Logo aus Bibliothek entfernen: ${esc(l.name)}">${studioIcon("trash")}</button></div>`).join("")}</div><button data-sponsor-upload="${esc(g.id)}">Logos hinzufügen</button></section>`).join("")}</div><p id="sponsorLibraryStatus" role="status"></p>`;
+    root.querySelector("#defaultSponsorColour").oninput = (event) => {
+      studioPreferences.sponsorColour = event.target.value;
+      studioApplyPreferences();
+    };
     const save = async (assets) => {
       await MKWSponsorLibrary.save(sponsorGroups, assets);
       sponsorRefreshOptions();

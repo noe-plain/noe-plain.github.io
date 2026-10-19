@@ -170,19 +170,6 @@ html[data-theme="light"] {
   color: var(--studio-muted);
 }
 
-.sponsor-options {
-  border-top: 1px solid var(--line);
-  margin-top: 12px;
-  padding-top: 12px;
-}
-.sponsor-options > button {
-  width: 100%;
-  margin: 5px 0;
-}
-.sponsor-options > small {
-  display: block;
-  margin-top: 8px;
-}
 .sponsor-library-group,
 .sponsor-project-group {
   border-top: 1px solid var(--line);
@@ -420,4 +407,55 @@ html[data-theme="light"] {
   outline: 2px solid var(--studio-accent);
   outline-offset: 4px;
   border-radius: 8px;
+}
+
+/* A compact options menu; detailed controls live in their own inspector. */
+.group-heading .text-type-options .option-divider {
+  height: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 10px 0;
+}
+.group-heading .family-picker {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.sponsor-inspector {
+  border: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+.sponsor-inspector label:has([data-sponsor-group]) {
+  display: flex;
+  color: var(--studio-ink);
+}
+.sponsor-group-choices {
+  border-block: 1px solid var(--line);
+  padding: 8px 0;
+  margin: 18px 0;
+}
+.sponsor-group-choices h4 {
+  font-size: 12px;
+  margin: 8px 0 12px;
+}
+.sponsor-default-colour {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+}
+.sponsor-default-colour label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+}
+.sponsor-default-colour input[type="color"] {
+  width: 60px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--studio-panel);
+  padding: 4px;
 }

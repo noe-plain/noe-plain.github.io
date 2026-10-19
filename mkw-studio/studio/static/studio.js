@@ -9,7 +9,7 @@ function icons() {
   document.querySelectorAll("[data-icon]").forEach((el) => {
     el.innerHTML = icon(el.dataset.icon);
     if (el.dataset.step)
-      el.innerHTML += `<span class="dock-label">${{ import: "Bilder", text: "Text", logo: "Logo", crop: "Ausschnitt", export: "Export" }[el.dataset.step]}</span>`;
+      el.innerHTML += `<span class="dock-label">${{ import: "Bilder", text: "Text", logo: "Logo", sponsors: "Sponsoren", crop: "Ausschnitt", export: "Export" }[el.dataset.step]}</span>`;
   });
 }
 function smallButton(name, title, action, id) {
@@ -44,14 +44,17 @@ function textTypeSummary(b) {
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = textTypeSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte auf diesem Bild</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<small>Gilt für alle Formate dieses Bildes.</small>${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<hr class="option-divider">${familyPicker(im)}<hr class="option-divider">${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
-      p.boards.find((b) => b.imageId === im.id)?.family,
-    ),
-    custom = !!Object.keys(p.familyOverrides?.[im.id] || {}).length;
-  return `<div class="family-picker"><label><input type="checkbox" data-family-mode="${esc(im.id)}" ${config.enabled ? "checked" : ""}><span>Familienkonzert</span></label><div class="family-settings" data-family-settings="${esc(im.id)}" ${config.enabled ? "" : "hidden"}><div class="family-palette" data-family-palette="${esc(im.id)}" aria-label="Acht Buchstabenfarben"></div><button type="button" data-family-shift="${esc(im.id)}">Farbreihenfolge wechseln</button><small>Illustration als PNG/WebP mit transparentem Hintergrund hinzufügen. Bunte Schrift mit 2 px Kontur.</small></div><button type="button" data-family-reset="${esc(im.id)}" ${im.id !== p.images[0]?.id && custom ? "" : "hidden"}>Design vom ersten Bild übernehmen</button></div>`;
+    p.boards.find((b) => b.imageId === im.id)?.family,
+  );
+  return `<div class="family-picker"><label><input type="checkbox" data-family-mode="${esc(im.id)}" ${config.enabled ? "checked" : ""}><span>Familienkonzert</span></label></div>`;
+}
+function familyTools(b) {
+  const custom = !!Object.keys(p.familyOverrides?.[b.imageId] || {}).length;
+  return `<section class="tool-section family-tools" data-family-settings="${esc(b.imageId)}"><h3>Familienkonzert</h3><div class="family-palette" data-family-palette="${esc(b.imageId)}" aria-label="Acht Buchstabenfarben"></div><button type="button" data-family-shift="${esc(b.imageId)}">Farbreihenfolge wechseln</button><p class="tool-hint">Bunte Schrift mit 2 px Kontur. Die Zeichenflächenfarbe findest du im Bildausschnitt.</p><button type="button" data-family-reset="${esc(b.imageId)}" ${b.imageId !== p.images[0]?.id && custom ? "" : "hidden"}>Design vom ersten Bild übernehmen</button></section>`;
 }
 function setFamilyDesign(imageId, changes) {
   const first = imageId === p.images[0]?.id;
@@ -86,21 +89,23 @@ function setFamilyDesign(imageId, changes) {
 function refreshFamilyControls() {
   for (const im of p.images) {
     const f = familyConfig(p.boards.find((b) => b.imageId === im.id)?.family),
-      picker = document.querySelector(`[data-text-picker="${im.id}"]`);
-    if (!picker) continue;
-    picker.querySelector("[data-family-mode]").checked = f.enabled;
-    picker.querySelector("[data-family-settings]").hidden = !f.enabled;
-    picker.querySelector("[data-family-palette]").innerHTML = MKWFamily.runs(
-      "12345678",
-      f.offset,
-    )
-      .map(
-        (r) => `<span style="background:${r.color}" title="${r.color}"></span>`,
-      )
-      .join("");
-    picker.querySelector("[data-family-reset]").hidden =
-      im.id === p.images[0]?.id ||
-      !Object.keys(p.familyOverrides?.[im.id] || {}).length;
+      input = document.querySelector(`[data-family-mode="${im.id}"]`);
+    if (input) input.checked = f.enabled;
+    for (const palette of document.querySelectorAll(
+      `[data-family-palette="${im.id}"]`,
+    ))
+      palette.innerHTML = MKWFamily.runs("12345678", f.offset)
+        .map(
+          (r) =>
+            `<span style="background:${r.color}" title="${r.color}"></span>`,
+        )
+        .join("");
+    for (const reset of document.querySelectorAll(
+      `[data-family-reset="${im.id}"]`,
+    ))
+      reset.hidden =
+        im.id === p.images[0]?.id ||
+        !Object.keys(p.familyOverrides?.[im.id] || {}).length;
   }
 }
 function imageAction(name, label, title, action, id, disabled = false) {
@@ -166,6 +171,47 @@ function syncTextTypes() {
       active.length + " Texte";
   });
 }
+function bindFamilyTools(root) {
+  root.querySelectorAll("[data-family-mode]").forEach(
+    (input) =>
+      (input.onchange = () =>
+        mutate(
+          () =>
+            setFamilyDesign(input.dataset.familyMode, {
+              enabled: input.checked,
+            }),
+          false,
+        )),
+  );
+  root.querySelectorAll("[data-family-shift]").forEach(
+    (button) =>
+      (button.onclick = () =>
+        mutate(() => {
+          const b = p.boards.find(
+            (b) => b.imageId === button.dataset.familyShift,
+          );
+          setFamilyDesign(button.dataset.familyShift, {
+            offset: ((b.family?.offset || 0) + 1) % 8,
+          });
+        }, false)),
+  );
+  root.querySelectorAll("[data-family-reset]").forEach(
+    (button) =>
+      (button.onclick = () =>
+        mutate(() => {
+          const id = button.dataset.familyReset;
+          delete p.familyOverrides[id];
+          const config = familyConfig(
+            p.boards.find((b) => b.imageId === p.images[0]?.id)?.family,
+          );
+          for (const b of p.boards.filter((b) => b.imageId === id))
+            applyFamilyBoard(b, config);
+          refreshFamilyControls();
+          renderPanel();
+        }, false)),
+  );
+  refreshFamilyControls();
+}
 function render() {
   if (carouselRender()) return;
   const postAnchor = postCaptureAnchor();
@@ -192,45 +238,7 @@ function render() {
           .join("")}</div></section>`,
     )
     .join("");
-  document.querySelectorAll("[data-family-mode]").forEach(
-    (input) =>
-      (input.onchange = () =>
-        mutate(
-          () =>
-            setFamilyDesign(input.dataset.familyMode, {
-              enabled: input.checked,
-            }),
-          false,
-        )),
-  );
-  document.querySelectorAll("[data-family-shift]").forEach(
-    (button) =>
-      (button.onclick = () =>
-        mutate(() => {
-          const b = p.boards.find(
-            (b) => b.imageId === button.dataset.familyShift,
-          );
-          setFamilyDesign(button.dataset.familyShift, {
-            offset: ((b.family?.offset || 0) + 1) % 8,
-          });
-        }, false)),
-  );
-  document.querySelectorAll("[data-family-reset]").forEach(
-    (button) =>
-      (button.onclick = () =>
-        mutate(() => {
-          const id = button.dataset.familyReset;
-          delete p.familyOverrides[id];
-          const config = familyConfig(
-            p.boards.find((b) => b.imageId === p.images[0]?.id)?.family,
-          );
-          for (const b of p.boards.filter((b) => b.imageId === id))
-            applyFamilyBoard(b, config);
-          refreshFamilyControls();
-          renderPanel();
-        }, false)),
-  );
-  refreshFamilyControls();
+  bindFamilyTools(document);
   document
     .querySelectorAll("[data-text-type]")
     .forEach(
@@ -309,6 +317,7 @@ function renderPanel() {
     : {
         text: "Text gestalten",
         logo: "Logo auswählen",
+        sponsors: "Sponsorenleiste",
         crop: "Bildausschnitt",
         export: "Vorschau & Export",
       }[step] || "Dein Bild gestalten";
@@ -316,7 +325,7 @@ function renderPanel() {
   $("#toolEmpty").textContent =
     step === "export"
       ? "Wähle im Exportfenster deine Formate und Dateinamen."
-      : "Wähle ein Bild und einen Schritt in der Prozessleiste.";
+      : "Wähle ein Bild und ein Werkzeug in der Leiste.";
   if (!b) return;
   if (step === "crop") {
     panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bildausschnitt</h3><div class="tool-button-grid"><button data-fit="fill" title="Bild so vergrössern, dass es die ganze Fläche bedeckt">Fläche füllen</button><button data-fit="fit" title="Das gesamte Bild innerhalb der Zeichenfläche zeigen">Ganzes Bild</button></div><label>Bildgrösse (%) <input id="scale" aria-label="Bildskalierung in Prozent" type="number" min="0.1" step="0.1" value="${(b.image.scale * 100).toFixed(1)}"></label><div class="tool-button-grid"><button data-fit="center">Zentrieren</button><button data-fit="original">Originalgrösse</button></div></section><section class="tool-section"><h3>Gestaltung</h3><label>Drehung (°) <input id="angle" type="number" value="${b.image.angle}"></label><div class="tool-button-grid"><button id="flipX" title="Links und rechts tauschen">↔ Horizontal</button><button id="flipY" title="Oben und unten tauschen">↕ Vertikal</button></div><button data-fit="reset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Hintergrund</h3><label>Zeichenflächenfarbe <input id="bg" aria-label="Zeichenflächenfarbe" type="color" value="${b.family?.enabled ? b.family.background : b.bg}"></label></section></div><p class="panel-caption">Bild direkt verschieben oder an den Ecken skalieren. Umschalttaste beim Verschieben gedrückt halten: Bewegung in 45°-Schritten.</p>`;
@@ -381,7 +390,7 @@ function renderPanel() {
             MKWFamily.copyrightColor(e.color),
           )}</select></label>`
         : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du bei den Optionen am Bild.</p>' : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
+    }${b.family?.enabled && layer !== "copyright" ? '<p class="tool-hint">Familienkonzert: acht Buchstabenfarben mit Kontur. Die Farbreihenfolge findest du unten in diesem Werkzeug.</p>' : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div><p class="panel-caption">${layer === "copyright" ? "Copyright steht im rechten Bildrand." : "Text direkt auf dem Bild bearbeiten. Übertitel und Untertitel sind unabhängig einstellbar. Beim ersten Bild folgen Bilder mit demselben Text."}</p>`;
     if (layer === "copyright") {
       const input = document.createElement("input");
       input.type = "text";
@@ -478,6 +487,13 @@ function renderPanel() {
         }
       }, false),
     );
+    if (b.family?.enabled)
+      panel
+        .querySelector(".panel-row")
+        .insertAdjacentHTML("beforeend", familyTools(b));
+  } else if (step === "sponsors") {
+    panel.innerHTML = "";
+    sponsorPanel(b, panel);
   } else if (step === "logo") {
     const e = b.elements.logo;
     panel.innerHTML = `<div class="panel-row"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos
@@ -489,7 +505,6 @@ function renderPanel() {
       .join(
         "",
       )}<div class="tool-button-grid"><button id="customLogo">Logo hinzufügen</button><button id="noLogo">Logo ausblenden</button></div><section class="tool-section"><h3>Auf weitere Bilder anwenden</h3><button id="allLogos">Logo auf alle Bilder übertragen</button></section></div><p class="panel-caption">Das Logo sitzt oben rechts im geschützten Bildbereich.</p>`;
-    sponsorPanel(b, panel);
     panel.querySelectorAll("[data-remove-logo]").forEach(
       (el) =>
         (el.onclick = () =>
@@ -540,6 +555,7 @@ function renderPanel() {
       }),
     );
   }
+  bindFamilyTools(panel);
 }
 function beginText(b, key, el) {
   selected = b.id;

@@ -44,6 +44,7 @@
     "static/paint-picker.js",
     "static/colour-inputs.js",
     "static/sponsor-library.js",
+    "static/sponsor-pixels.js",
     "static/sponsor-import.js",
     "static/sponsor-render.js",
     "static/sponsor-order.js",

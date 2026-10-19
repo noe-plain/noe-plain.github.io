@@ -9,6 +9,7 @@ const studioIconNames = {
   alignCenter: "format_align_center",
   alignRight: "format_align_right",
   logo: "branding_watermark",
+  sponsors: "layers",
   export: "download",
   undo: "undo",
   redo: "redo",

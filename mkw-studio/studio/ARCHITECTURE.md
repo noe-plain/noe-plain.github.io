@@ -105,3 +105,13 @@ Sponsor assets reuse the existing project `logos` collection, tagged `purpose: s
 Sponsor sizing uses one shared optical ink-area target across all groups, including aspect ratio and density; groups never set their own relative logo weight. Bounded physical height/width constraints and explicit manual scales take precedence for extreme proportions. Import records normalized visible-ink bounds after matte removal, so each group label aligns to the first visible logo edge rather than transparent padding. Canvas label drawing compensates the initial glyph side bearing. No pixel scanning occurs during layout or dragging.
 
 `sponsor-order.js` binds native desktop drag/drop plus Alt+arrow keyboard reordering in the device library. Pure `moveLogo` updates only metadata arrays and preserves asset identity. Cross-group moves commit once on drop, never during pointer movement; project template refresh preserves manual mode/scale by logo ID across groups.
+
+The single-post `sponsors` tool owns strip/groups/logo controls independently from the brand-logo tool. The Options menu contains only three text toggles, family mode and sponsor-strip visibility; family palette controls live in the text inspector. Portrait bottom safety is `max(100, originalBottom - stripHeight)` within the reduced content area; square/landscape retain the original bottom inset. Stored format safety values are never rewritten.
+
+`sponsor-pixels.js` performs conservative uniform-matte detection from four sampled edges, tolerating JPEG noise and removing matching enclosed background regions. Transparent silhouettes, swatches and nonuniform backgrounds remain untouched. This bounded analysis runs only on import or the explicit background-repair action. Prepared PNGs store the separated alpha, so monochrome paint never colours an opaque matte rectangle. Legacy light/dark-matte rendering remains readable. Binary black/white logos follow automatic strip contrast; real grayscale and complex artwork retain grayscale detail. Background repair creates a new asset ID and checkpoints before replacement; stale async results are discarded and normal asset traversal releases replaced pixels while undo retains them.
+
+The default `sponsorColour` is validated device preference metadata. It initializes only new strip configurations; changing settings never recolours existing project strips or injects the preference into MKW files.
+
+Sponsor override metadata is cloned in undo snapshots, preserving first-image inheritance correctly when an independent sponsor edit is undone.
+
+Undo/redo return their font-registry refresh promise, allowing programmatic callers to wait for a complete refresh before starting an export.

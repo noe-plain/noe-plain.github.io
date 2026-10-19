@@ -405,7 +405,7 @@ function updateWarning() {
     if (uncovered)
       add("Bild deckt die Zeichenfläche nicht vollständig ab.", "crop");
     if (low) add("Bildauflösung gering – Export ist möglich.", "crop");
-    if (sponsorLayout?.warning) add(sponsorLayout.warning, "logo");
+    if (sponsorLayout?.warning) add(sponsorLayout.warning, "sponsors");
     const fonts = [
       ...new Set(
         Object.values(b.elements)

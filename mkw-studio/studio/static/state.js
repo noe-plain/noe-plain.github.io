@@ -64,6 +64,7 @@ function snapshot() {
     textOverrides: clone(p.textOverrides || {}),
     textTypeOverrides: clone(p.textTypeOverrides || {}),
     familyOverrides: clone(p.familyOverrides || {}),
+    sponsorOverrides: clone(p.sponsorOverrides || {}),
     boards: clone(p.boards),
     images: [...p.images],
     fonts: [...p.fonts],
@@ -654,7 +655,7 @@ function undo() {
   selected = p.boards.some((b) => b.id === selected)
     ? selected
     : p.boards[0]?.id;
-  loadFonts().then(() => changed());
+  return loadFonts().then(() => changed());
 }
 function redo() {
   if (!future.length) return;
@@ -663,7 +664,7 @@ function redo() {
   selected = p.boards.some((b) => b.id === selected)
     ? selected
     : p.boards[0]?.id;
-  loadFonts().then(() => changed());
+  return loadFonts().then(() => changed());
 }
 
 function createBoard(im, w = 1080, h = 1080) {

@@ -15,7 +15,8 @@
       ? require("./sponsor-model.js")
       : root.MKWSponsors;
   function safeRect(b) {
-    const design = sponsorModel.layout(b)?.content || b;
+    const strip = sponsorModel.layout(b),
+      design = strip?.content || b;
     const unit = b.w / 1080,
       story = b.w * 16 === b.h * 9,
       left = 100 * unit,
@@ -23,9 +24,13 @@
       top = b.safe
         ? b.safe.top
         : Math.min((story ? 200 : 100) * unit, b.h * 0.4),
-      bottom = b.safe
+      originalBottom = b.safe
         ? b.safe.bottom
-        : Math.min((story ? 500 : 200) * unit, b.h * 0.4);
+        : Math.min((story ? 500 : 200) * unit, b.h * 0.4),
+      bottom =
+        strip && !strip.vertical
+          ? Math.max(100, originalBottom - strip.thickness)
+          : originalBottom;
     return {
       x: left,
       y: top,

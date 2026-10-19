@@ -13,7 +13,7 @@
   function mode(logo, colour) {
     return logo.mode && logo.mode !== "auto"
       ? logo.mode
-      : logo.gray || logo.complex
+      : (logo.gray && !logo.monochrome) || logo.complex
         ? "gray"
         : foreground(colour);
   }
@@ -248,6 +248,7 @@
                 (!Number.isFinite(l[k]) || l[k] < 0 || l[k] > 1),
             ) ||
             !modes.includes(l.mode) ||
+            (l.monochrome !== undefined && typeof l.monochrome !== "boolean") ||
             ["gray", "complex"].some((k) => typeof l[k] !== "boolean") ||
             !Number.isFinite(l.scale) ||
             l.scale < 0.25 ||
