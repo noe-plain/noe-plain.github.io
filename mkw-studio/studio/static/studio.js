@@ -44,7 +44,7 @@ function textTypeSummary(b) {
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = textTypeSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}<hr class="option-divider">${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
@@ -488,7 +488,7 @@ function renderPanel() {
     sponsorPanel(b, panel);
   } else if (step === "logo") {
     const e = b.elements.logo;
-    panel.innerHTML = `<div class="panel-row"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos
+    panel.innerHTML = `<div class="panel-row logo-panel"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos
       .filter((l) => l.purpose !== "sponsor")
       .map(
         (l) =>
@@ -778,7 +778,8 @@ $("#redo").onclick = () => {
   redo();
 };
 window.addEventListener("keydown", (ev) => {
-  if (busy || document.querySelector("dialog[open]")) return;
+  if (carouselActive() || busy || document.querySelector("dialog[open]"))
+    return;
   if (
     (ev.metaKey || ev.ctrlKey) &&
     ev.key.toLowerCase() === "z" &&

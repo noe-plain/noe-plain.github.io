@@ -16,7 +16,10 @@ function carouselHit(pt) {
     if (carouselIsVector(o)) return carouselVectorHit(o, hit);
     if (local.x < 0 || local.x > o.w || local.y < 0 || local.y > o.h)
       return false;
-    if (o.type !== "angle" && !(o.type === "image" && o.framePoints))
+    if (
+      o.type !== "angle" &&
+      !(["image", "gradient"].includes(o.type) && o.framePoints)
+    )
       return true;
     const ctx = makeCanvas(1, 1).getContext("2d");
     return ctx.isPointInPath(
@@ -232,7 +235,7 @@ function carouselCreateDrag(ev, type, start) {
         w: rect.w,
         h: rect.h,
       });
-      carouselUI.tool = "select";
+      carouselUI.tool = type === "shape" ? "shape" : "select";
       carouselToolUI();
       if (type === "text") carouselEditText(o);
       else if (type === "image") carouselFile(o.id);

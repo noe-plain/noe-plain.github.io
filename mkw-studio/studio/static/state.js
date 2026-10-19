@@ -650,21 +650,29 @@ async function loadFonts() {
 
 function undo() {
   if (!history.length) return;
+  const pointEditing = carouselCapturePointEditing();
   future.push(snapshot());
   p = history.pop();
   selected = p.boards.some((b) => b.id === selected)
     ? selected
     : p.boards[0]?.id;
-  return loadFonts().then(() => changed());
+  return loadFonts().then(() => {
+    changed();
+    carouselRestorePointEditing(pointEditing);
+  });
 }
 function redo() {
   if (!future.length) return;
+  const pointEditing = carouselCapturePointEditing();
   history.push(snapshot());
   p = future.pop();
   selected = p.boards.some((b) => b.id === selected)
     ? selected
     : p.boards[0]?.id;
-  return loadFonts().then(() => changed());
+  return loadFonts().then(() => {
+    changed();
+    carouselRestorePointEditing(pointEditing);
+  });
 }
 
 function createBoard(im, w = 1080, h = 1080) {

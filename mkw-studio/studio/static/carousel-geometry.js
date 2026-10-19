@@ -289,7 +289,7 @@ function carouselToggleFrameSlot(o, slot) {
   const points = next.map((value) => {
     const index = slots.indexOf(value),
       point = index >= 0 ? current[index] : carouselFrameCandidates[value];
-    return { x: base.x + point.x * base.w, y: base.y + point.y * base.h };
+    return carouselToWorld(base, { x: point.x * base.w, y: point.y * base.h });
   });
   if (carouselFrameArea(points) < 1) return;
   const result = clone(o);
@@ -407,9 +407,24 @@ function carouselSetImageFrame(o, base, points) {
       x: (point.x - x) / w,
       y: (point.y - y) / h,
     })),
-    scale: (base.scale * oldFit) / newFit,
-    panX: localBase.x + base.w / 2 + base.panX - x - w / 2,
-    panY: localBase.y + base.h / 2 + base.panY - y - h / 2,
+    ...(o.type === "image"
+      ? {
+          scale: (base.scale * oldFit) / newFit,
+          panX: localBase.x + base.w / 2 + base.panX - x - w / 2,
+          panY: localBase.y + base.h / 2 + base.panY - y - h / 2,
+        }
+      : {}),
   });
+  if (o.type === "gradient") {
+    const stops = carouselGradientPoints(base);
+    for (const [key, point] of [
+      ["gradientStart", stops.start],
+      ["gradientEnd", stops.end],
+    ])
+      o[key] = {
+        x: (localBase.x + point.x - x) / w,
+        y: (localBase.y + point.y - y) / h,
+      };
+  }
   return true;
 }

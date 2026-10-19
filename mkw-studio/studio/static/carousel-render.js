@@ -61,7 +61,7 @@ async function carouselPaint(
     } else if (o.type === "gradient") {
       if (o.gradientFillMode === "image") ctx.globalAlpha *= o.startAlpha ?? 1;
       ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage);
-      ctx.fillRect(0, 0, o.w, o.h);
+      ctx.fill(carouselImageMask(o));
     } else if (o.type === "logo") {
       const im = await carouselLogoImage(o);
       ctx.drawImage(im, 0, 0, o.w, o.h);
@@ -230,7 +230,7 @@ function carouselRender() {
    .join(
      "",
    )}</div><div class="studio-bar-actions"><button id="carouselNotice" class="studio-action studio-notice-button" aria-controls="studioWarnings" aria-expanded="false" hidden></button><button id="carouselExport" class="studio-action">${studioIcon("export")}<span>Export</span></button></div></nav>
- <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div></div>
+ <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
  <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom * 100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
@@ -261,6 +261,7 @@ function carouselRender() {
   viewport.onscroll = () => {
     c.scrollX = viewport.scrollLeft;
     c.scrollY = viewport.scrollTop;
+    carouselScheduleOutside();
   };
   viewport.onpointerdown = carouselPointer;
   viewport.ondblclick = (ev) => {
@@ -469,13 +470,9 @@ function carouselRefresh() {
   canvas.style.height = height + "px";
   $("#carouselArtwork").style.width = width + "px";
   $("#carouselArtwork").style.height = height + "px";
-  const viewport = $("#carouselViewport"),
-    padX = Math.max(400, Math.round(viewport.clientWidth * 0.8)),
-    padY = Math.max(250, Math.round(viewport.clientHeight * 0.6));
-  $("#carouselPasteboard").style.width = width + 2 * padX + "px";
-  $("#carouselPasteboard").style.height = height + 2 * padY + "px";
-  $("#carouselArtwork").style.left = padX + "px";
-  $("#carouselArtwork").style.top = padY + "px";
+  const viewport = $("#carouselViewport");
+  carouselPasteboardSpace(viewport, width, height);
+  carouselScheduleOutside();
   $("#carouselZoom").value = Math.round(s * 100);
   carouselSchedulePaint(canvas, rasterScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
@@ -596,7 +593,8 @@ function carouselDrawSelection() {
   frame.innerHTML = `<span class="carousel-frame-label">${items.length === 1 ? esc(items[0].name) : items.length + " Elemente"}${carouselUI.content ? " · Bildinhalt" : ""}</span>`;
   const points =
     items.length === 1 &&
-    ((carouselUI.framePoints && items[0].type === "image") ||
+    ((carouselUI.framePoints &&
+      ["image", "gradient"].includes(items[0].type)) ||
       (carouselUI.vectorPoints && items[0].type === "path"));
   if (
     !items.every(carouselObjectLocked) &&
@@ -636,7 +634,8 @@ function carouselDrawSelection() {
       }
   }
   if (
-    studioPreferences.advanced &&
+    (studioPreferences.advanced ||
+      (items.length === 1 && items[0].type === "angle")) &&
     !content &&
     !points &&
     !items.every((o) => carouselObjectLocked(o))
@@ -658,7 +657,7 @@ function carouselDrawSelection() {
     carouselDrawGradient(items[0], root);
   if (
     items.length === 1 &&
-    items[0].type === "image" &&
+    ["image", "gradient"].includes(items[0].type) &&
     !carouselUI.content &&
     (items[0].framePoints || points)
   )

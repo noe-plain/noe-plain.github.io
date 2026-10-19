@@ -169,7 +169,7 @@ html[data-theme="light"] .dock button:last-child.active {
 }
 html[data-theme="light"] .dock-arrow {
   border-right: 1px solid #272c34;
-  border-top: 1px solid #272c34;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] #warning {
   color: #b7a37e;
@@ -291,7 +291,7 @@ html[data-theme="light"] .project-fields label {
 }
 html[data-theme="light"] .project-fields input {
   border: 0;
-  border-bottom: 1px solid #15181e;
+  border-bottom: 1px solid var(--line);
   background: transparent;
   color: #a3afc4;
   outline: 0;
@@ -369,7 +369,7 @@ html[data-theme="light"] .action-separator {
   background: #0e1115;
 }
 html[data-theme="light"] .image-settings {
-  border-top: 1px solid #0e1115;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .image-field-label {
   color: #6c7687;
@@ -427,7 +427,7 @@ html[data-theme="light"]
   color: #4e6fc5;
 }
 html[data-theme="light"] .group-heading .text-type-options small {
-  border-top: 1px solid #0e1115;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] {
   --blue: #3659c6;
@@ -611,7 +611,7 @@ html[data-theme="light"] .tool-sidebar {
   border-left: 1px solid #b8bdc5;
 }
 html[data-theme="light"] .tool-sidebar-heading {
-  border-bottom: 1px solid #bbc0c8;
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .sidebar-eyebrow {
   color: #4c5566;
@@ -640,7 +640,7 @@ html[data-theme="light"] .tool-sidebar .panel-row input[type="color"] {
   background: #dde0e6;
 }
 html[data-theme="light"] .tool-sidebar .panel-row details {
-  border-top: 1px solid #b2b9c3;
+  border-top: 1px solid var(--line);
   color: #1a202b;
 }
 html[data-theme="light"] .tool-sidebar .panel-caption {
@@ -650,7 +650,7 @@ html[data-theme="light"] .tool-sidebar .panel-caption strong {
   color: #0a153a;
 }
 html[data-theme="light"] .tool-sidebar .workspace-info {
-  border-top: 1px solid #bbc0c8;
+  border-top: 1px solid var(--line);
   background: #ffffff;
 }
 html[data-theme="light"] .zoom-heading {
@@ -699,7 +699,7 @@ html[data-theme="light"] .dock-arrow {
 }
 html[data-theme="light"] footer {
   background: #dddfe4;
-  border-top: 1px solid #bcc2cb;
+  border-top: 1px solid var(--line);
   color: #454f5f;
 }
 html[data-theme="light"] #empty {
@@ -812,7 +812,7 @@ html[data-theme="light"] .add-more-images:hover {
   color: #182b49;
 }
 html[data-theme="light"] .group-heading .family-picker {
-  border-top: 1px solid #9aa2b2;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .group-heading .family-settings input[type="color"] {
   border: 1px solid #858e9e;
@@ -827,14 +827,14 @@ html[data-theme="light"] .family-palette span {
   }
 }
 html[data-theme="light"] .tool-sidebar .tool-details {
-  border-top: 1px solid #b2b9c3;
+  border-top: 1px solid var(--line);
   color: #1a202b;
 }
 html[data-theme="light"] .tool-sidebar .tool-details h3 {
   color: #1a202b;
 }
 html[data-theme="light"] .tool-sidebar .tool-section + .tool-section {
-  border-top: 1px solid #b2b9c3;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .tool-sidebar .tool-section h3 {
   color: #0b0f19;
@@ -928,7 +928,7 @@ html[data-theme="light"] .export-card .export-preview.checkerboard {
 }
 html[data-theme="light"] #exportDialog > .dialog-actions {
   background: #ffffff;
-  border-top: 1px solid #9ba4b4;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .export-size {
   color: #222d40;
@@ -953,7 +953,7 @@ html[data-theme="light"] .review-controls {
   color: #242d3c;
 }
 html[data-theme="light"] #exportDialog > .dialog-heading {
-  border-bottom: 1px solid #a3aab9;
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .export-selection span {
   color: #2d3542;
@@ -971,7 +971,7 @@ html[data-theme="light"] #exportFields {
   border: 0;
 }
 html[data-theme="light"] .export-download {
-  border-top: 1px solid #a3aab9;
+  border-top: 1px solid var(--line);
   background: #c8cfd9;
 }
 html[data-theme="light"] .export-download #exportTotal {
@@ -1051,7 +1051,7 @@ html[data-theme="light"] .text-editor.is-empty::before {
 @media (max-width: 760px) {
   html[data-theme="light"] .export-sidebar {
     border-left: 0;
-    border-top: 1px solid #a3aab9;
+    border-top: 1px solid var(--line);
   }
 }
 html[data-theme="light"] #mainTextInput {
@@ -1083,7 +1083,7 @@ html[data-theme="light"] #carouselEditor {
   color: #0e131a;
 }
 html[data-theme="light"] .carousel-contextbar {
-  border-bottom: 1px solid #acb2be;
+  border-bottom: 1px solid var(--line);
   background: #f7f9fc;
 }
 html[data-theme="light"] .carousel-document span {
@@ -1215,7 +1215,7 @@ html[data-theme="light"] #carouselSidebar .carousel-warning {
   color: #674312;
 }
 html[data-theme="light"] .carousel-property-section {
-  border-bottom: 1px solid #acb2be;
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .carousel-property-section h4 {
   color: #4a5669;
@@ -1224,7 +1224,7 @@ html[data-theme="light"] .carousel-section-heading > span {
   color: #495463;
 }
 html[data-theme="light"] .carousel-layers-panel {
-  border-top: 1px solid #a4abb9;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .carousel-layer {
   border: 1px solid transparent;
@@ -1248,11 +1248,11 @@ html[data-theme="light"] .carousel-layer.drop-target {
 }
 html[data-theme="light"] .carousel-statusbar {
   background: #f7f9fc;
-  border-top: 1px solid #acb2be;
+  border-top: 1px solid var(--line);
   color: #394556;
 }
 html[data-theme="light"] .carousel-outer-margins {
-  border-top: 1px solid #9faabb;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .carousel-outer-margins > span {
   color: #364154;
@@ -1814,7 +1814,7 @@ html[data-theme="light"]
 }
 html[data-theme="light"] #settingsDialog > .dialog-heading {
   background: #ffffff;
-  border-bottom: 1px solid #a3aab9;
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .theme-options button[aria-pressed="true"] {
   background: #e8eefc;
@@ -1823,13 +1823,13 @@ html[data-theme="light"] .theme-options button[aria-pressed="true"] {
   color: #182b49;
 }
 html[data-theme="light"] .settings-fonts {
-  border-top: 1px solid #a3aab9;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .custom-font-row {
-  border-bottom: 1px solid #bbc0c8;
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .settings-preferences {
-  border-top: 1px solid #a3aab9;
+  border-top: 1px solid var(--line);
 }
 html[data-theme="light"] .settings-grid label {
   color: #28303d;
@@ -1853,8 +1853,8 @@ html[data-theme="light"] .settings-export-format select {
   color: #182b49;
 }
 html[data-theme="light"] .save-project-naming {
-  border-top: 1px solid #a3aab9;
-  border-bottom: 1px solid #a3aab9;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 html[data-theme="light"] .save-project-naming .project-fields label {
   color: #2f3949;

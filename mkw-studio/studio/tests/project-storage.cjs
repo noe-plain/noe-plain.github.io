@@ -86,7 +86,7 @@ const assert = require("node:assert/strict");
         window.showSaveFilePicker = async () => handle;
         await MKWProjects.saveFile();
         const file = await handle.getFile(),
-          project = JSON.parse(await file.text());
+          project = await MKWProjectFile.decode(file);
         return {
           project,
           stamp: file.lastModified,
@@ -105,9 +105,7 @@ const assert = require("node:assert/strict");
         await autosave();
       });
       const saved = await page.evaluate(async () =>
-        JSON.parse(
-          await (await MKWProjects.fileLink().handle.getFile()).text(),
-        ),
+        await MKWProjectFile.decode(await MKWProjects.fileLink().handle.getFile()),
       );
       assert.equal(saved.meta.subtitle, "Automatisch in derselben Datei");
       assert.equal(downloads, 0);
@@ -148,7 +146,7 @@ const assert = require("node:assert/strict");
         await MKWProjects.saveFile(true);
         return {
           id: p.projectId,
-          file: JSON.parse(await (await handle.getFile()).text()),
+          file: await MKWProjectFile.decode(await handle.getFile()),
         };
       });
       assert.notEqual(copy.id, id);
@@ -171,9 +169,7 @@ const assert = require("node:assert/strict");
       const downloading = page.waitForEvent("download");
       await page.locator("#saveProjectAs").click();
       const file = await downloading,
-        project = JSON.parse(
-          require("node:fs").readFileSync(await file.path(), "utf8"),
-        );
+        project = await require("../static/project-file.js").decode(new Blob([require("node:fs").readFileSync(await file.path())]));
       assert(file.suggestedFilename().endsWith(".mkw"));
       assert.equal(project.projectId, id);
       assert.equal(project.meta.subtitle, "Firefox-Browsersicherung");

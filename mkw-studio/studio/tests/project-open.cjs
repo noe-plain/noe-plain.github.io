@@ -124,12 +124,13 @@ const { launch, artifact } = require("./browser.cjs");
       const downloading = page.waitForEvent("download");
       await page.locator("#saveProjectAs").click();
       const downloaded = await downloading,
-        text = require("node:fs").readFileSync(await downloaded.path(), "utf8");
+        text = require("node:fs").readFileSync(await downloaded.path());
+      const decoded = await require("../static/project-file.js").decode(new Blob([text]));
       assert.equal(downloaded.suggestedFilename(), "Gewählter_Name.mkw");
       first = { id: await page.evaluate(() => p.projectId), text };
-      assert.equal(JSON.parse(text).projectId, first.id);
+      assert.equal(decoded.projectId, first.id);
       assert.equal(await page.evaluate(() => !!MKWProjects.fileLink()), false);
-      const copy = JSON.parse(text);
+      const copy = decoded;
       copy.projectId = await page.evaluate(() => uid());
       copy.meta.title = "Projekt Zwei";
       await page.locator("#open").click();

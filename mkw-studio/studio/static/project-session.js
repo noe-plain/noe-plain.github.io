@@ -6,11 +6,18 @@ const MKWProjects = (() => {
     aliases = new Map();
   let queue = Promise.resolve();
   const stamp = (file) => ({ size: file.size, modified: file.lastModified });
-  function notice(message) {
+  function notice(message, error = false) {
     const el = $("#projectStorageNotice");
     if (el) {
       el.textContent = message;
       el.hidden = !message;
+      el.classList.toggle("is-error", error);
+      el.setAttribute("role", error ? "alert" : "status");
+      if (error) {
+        el.classList.remove("notice-attention");
+        void el.offsetWidth;
+        el.classList.add("notice-attention");
+      }
     }
   }
   function fileLink(id = p.projectId) {
@@ -39,8 +46,9 @@ const MKWProjects = (() => {
       return false;
     }
     const perform = async () => {
+      const blob = await MKWProjectFile.encode(project);
       const latest = await MKWProjectStore.version(project.projectId);
-      if (latest !== versions.get(project.projectId)) {
+      if ((latest || 0) !== (versions.get(project.projectId) || 0)) {
         notice(
           "Ein anderer Tab hat eine neuere Sicherung erstellt. Die Datei wird erst nach der Konfliktprüfung aktualisiert.",
         );
@@ -57,13 +65,7 @@ const MKWProjects = (() => {
         );
         return false;
       }
-      await writeSaveFile(
-        link.handle,
-        new Blob([JSON.stringify(MKWProjectAssets.compact(project))], {
-          type: "application/json",
-        }),
-        link.handle.name,
-      );
+      await writeSaveFile(link.handle, blob, link.handle.name);
       link.stamp = stamp(await link.handle.getFile());
       await MKWProjectStore.link(project.projectId, link.handle, link.stamp);
       return true;
@@ -113,7 +115,8 @@ const MKWProjects = (() => {
       if (
         options.writeFile !== false &&
         !outcome.conflict &&
-        studioPreferences.autoSaveFile !== false
+        studioPreferences.autoSaveFile !== false &&
+        (p.projectId !== document.projectId || saveRevision === revision)
       )
         try {
           fileSaved = await writeLinked(document);
@@ -121,6 +124,7 @@ const MKWProjects = (() => {
           notice(
             "Im Browser gesichert. Die MKW-Datei konnte nicht aktualisiert werden: " +
               error.message,
+            true,
           );
         }
       if (p.projectId === document.projectId) {
@@ -141,7 +145,7 @@ const MKWProjects = (() => {
     const task = queue.catch(() => {}).then(operation);
     queue = task;
     task.catch((error) => {
-      notice("Sicherung fehlgeschlagen: " + error.message);
+      notice("Sicherung fehlgeschlagen: " + error.message, true);
       status("Projekt nicht gesichert. Bitte „Projekt speichern“ verwenden.");
     });
     return task;
@@ -162,7 +166,9 @@ const MKWProjects = (() => {
     );
   }
   async function openFile(file, handle = null) {
-    const document = MKWProjectAssets.hydrate(JSON.parse(await file.text()));
+    const document = MKWProjectAssets.hydrate(
+      await MKWProjectFile.decode(file),
+    );
     validate(document);
     validateCarousel(document);
     if (savedRevision < revision) await autosave();
@@ -226,6 +232,8 @@ const MKWProjects = (() => {
       )
         throw Error("Dateizugriff wurde nicht freigegeben.");
       setSaveBusy(true);
+      $("#psdStatus").classList.remove("save-error");
+      $("#psdStatus").textContent = "Projektdatei wird vorbereitet …";
       if (
         asNew &&
         fileLink() &&
@@ -244,8 +252,12 @@ const MKWProjects = (() => {
         });
       }
       // Persist browser state first; concurrent edits fork before a file is touched.
-      const result = await autosave({ writeFile: false });
-      if (result.conflict)
+      let backupError = null;
+      const result = await autosave({ writeFile: false }).catch((error) => {
+        backupError = error;
+        return null;
+      });
+      if (result?.conflict)
         throw Error(
           "Konfliktkopie gesichert. Bitte für diese Kopie „Speichern unter …“ verwenden.",
         );
@@ -264,23 +276,28 @@ const MKWProjects = (() => {
         status("Browser und MKW-Datei aktualisiert.");
         notice("");
       } else {
-        download(
-          new Blob([JSON.stringify(MKWProjectAssets.compact(p))], {
-            type: "application/json",
-          }),
-          saveFileName("mkw"),
-        );
+        download(await MKWProjectFile.encode(p), saveFileName("mkw"));
         status("MKW-Datei heruntergeladen · Browsersicherung bleibt aktiv.");
         notice(
           "Dieser Browser erlaubt keine direkte Aktualisierung lokaler Dateien. Automatisch wird im Browser gesichert. Für direktes Überschreiben bitte einen Browser mit Dateizugriff verwenden.",
         );
+      }
+      if (backupError) {
+        notice(
+          "MKW-Datei gespeichert. Die Browsersicherung ist fehlgeschlagen; bitte Speicherplatz freigeben oder ältere Browserprojekte entfernen. " +
+            backupError.message,
+          true,
+        );
+        status("MKW-Datei gespeichert · Browsersicherung fehlgeschlagen.");
       }
       $("#saveDialog").close();
     } catch (error) {
       if (error.name !== "AbortError") {
         const message = "Speichern nicht abgeschlossen: " + error.message;
         $("#psdStatus").textContent = message;
-        notice(message);
+        notice(message, true);
+        $("#psdStatus").classList.add("save-error");
+        $("#psdStatus").setAttribute("role", "alert");
       }
     } finally {
       setSaveBusy(false);

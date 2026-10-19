@@ -891,7 +891,7 @@ input:focus-visible {
 .project-fields input {
   display: block;
   border: 0;
-  border-bottom: 1px solid #dfe4ec;
+  border-bottom: 1px solid var(--line);
   background: transparent;
   color: #344563;
   padding: 3px 2px 4px;
@@ -1174,7 +1174,7 @@ input:focus-visible {
   gap: 18px;
   margin-top: 16px;
   padding-top: 15px;
-  border-top: 1px solid #edf0f5;
+  border-top: 1px solid var(--line);
 }
 .group-heading .image-copyright,
 .image-text-field {
@@ -1304,7 +1304,7 @@ input:focus-visible {
 .group-heading .text-type-options small {
   margin-top: 8px;
   padding: 10px 8px 3px;
-  border-top: 1px solid #edf0f5;
+  border-top: 1px solid var(--line);
   font-size: 10px;
 }
 @media (max-width: 900px) {
@@ -1565,7 +1565,7 @@ header {
 }
 .tool-sidebar-heading {
   padding: 26px 22px 18px;
-  border-bottom: 1px solid #343b47;
+  border-bottom: 1px solid var(--line);
 }
 .sidebar-eyebrow {
   font-size: 9px;
@@ -1654,7 +1654,7 @@ header {
 .tool-sidebar .panel-row details {
   width: 100%;
   padding-top: 15px;
-  border-top: 1px solid #394250;
+  border-top: 1px solid var(--line);
   font-size: 12px;
   color: #d0d9e9;
 }
@@ -1717,7 +1717,7 @@ header {
   max-width: none;
   margin-top: auto;
   padding: 20px 22px;
-  border-top: 1px solid #343b47;
+  border-top: 1px solid var(--line);
   background: #20242b;
   pointer-events: auto;
 }
@@ -1799,7 +1799,7 @@ header {
 footer {
   height: 32px;
   background: #191d24;
-  border-top: 1px solid #313946;
+  border-top: 1px solid var(--line);
   color: #9ba9bf;
   padding: 9px 22px;
 }
@@ -2145,7 +2145,7 @@ dialog > p {
   font-family: "MKW Editorial", Georgia, serif;
 }
 .group-heading .family-picker {
-  border-top: 1px solid #48536a;
+  border-top: 1px solid var(--line);
   margin-top: 12px;
   padding-top: 10px;
 }
@@ -2181,7 +2181,7 @@ dialog > p {
 .tool-sidebar .tool-details {
   width: 100%;
   padding-top: 15px;
-  border-top: 1px solid #394250;
+  border-top: 1px solid var(--line);
   font-size: 12px;
   color: #d0d9e9;
 }
@@ -2206,7 +2206,7 @@ dialog > p {
 .tool-sidebar .tool-section + .tool-section {
   padding-top: 20px;
   margin-top: 4px;
-  border-top: 1px solid #394250;
+  border-top: 1px solid var(--line);
 }
 .tool-sidebar .tool-section h3 {
   margin: 0 0 2px;

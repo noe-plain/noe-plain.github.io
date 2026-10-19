@@ -203,6 +203,9 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
 #toolsSidebar .panel-row {
   gap: 0;
 }
+#toolsSidebar .panel-row.logo-panel {
+  gap: 12px;
+}
 #toolsSidebar .tool-section {
   gap: 12px;
 }
@@ -306,4 +309,76 @@ html[data-theme="light"]
     height: 32px;
     padding: 6px;
   }
+}
+
+/* A single quiet separator between related sections, in either theme. */
+:is(
+  #toolsSidebar .tool-section,
+  #carouselProperties .carousel-property-section
+) {
+  border: 0;
+}
+#toolsSidebar .tool-section + .tool-section,
+#carouselProperties .carousel-property-section + .carousel-property-section {
+  border-top: 1px solid var(--line);
+}
+:is(
+  #settingsDialog > .dialog-heading,
+  .settings-fonts,
+  .save-project-naming,
+  #carouselProperties + .carousel-layers-panel
+) {
+  border-color: var(--line);
+}
+.group-heading .text-type-options hr {
+  display: none;
+}
+html[data-theme]
+  .group-heading
+  .text-type-options
+  :is(.family-picker, .sponsor-options) {
+  border: 0;
+}
+#projectStorageNotice.is-error,
+#psdStatus.save-error {
+  color: light-dark(#a52020, #ffb4b0);
+  background: light-dark(#fff0ef, #48262b);
+  border: 1px solid light-dark(#eeaaa5, #a4545a);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+#projectStorageNotice.notice-attention,
+#psdStatus.save-error {
+  animation: save-notice-attention 400ms ease-out 2;
+}
+@keyframes save-notice-attention {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  70% {
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #projectStorageNotice.notice-attention,
+  #psdStatus.save-error {
+    animation: none;
+  }
+}
+
+#carouselOutsideCanvas {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+}
+#carouselPasteboard {
+  position: relative;
+  z-index: 1;
 }

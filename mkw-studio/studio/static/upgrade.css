@@ -163,7 +163,7 @@
   margin-bottom: -28px;
   padding: 18px 0;
   background: #242a34;
-  border-top: 1px solid #465269;
+  border-top: 1px solid var(--line);
   z-index: 2;
 }
 .export-preview > span {
@@ -309,7 +309,7 @@
 #exportDialog > .dialog-heading {
   padding: 22px 26px;
   margin: 0;
-  border-bottom: 1px solid #414c61;
+  border-bottom: 1px solid var(--line);
   flex: none;
 }
 .export-layout {
@@ -404,7 +404,7 @@
 .export-download {
   flex: none;
   padding: 16px 22px;
-  border-top: 1px solid #414c61;
+  border-top: 1px solid var(--line);
   background: #222c3b;
 }
 .export-download #exportTotal {
@@ -653,7 +653,7 @@
   .export-sidebar {
     flex: 1.4;
     border-left: 0;
-    border-top: 1px solid #414c61;
+    border-top: 1px solid var(--line);
   }
   .export-settings-scroll {
     padding: 14px;

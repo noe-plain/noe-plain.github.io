@@ -79,7 +79,7 @@ function carouselPanel() {
        )
      : ""
  }
- ${o.type === "image" ? section("Rahmenform", carouselFramePicker(o) + `<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints ? "Punktbearbeitung beenden" : "Rahmenpunkte bearbeiten"}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button>`) : ""}
+ ${["image", "gradient"].includes(o.type) ? section("Rahmenform", carouselFramePicker(o) + `<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints ? "Punktbearbeitung beenden" : "Rahmenpunkte bearbeiten"}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button>`) : ""}
  ${carouselHasImage(o) ? section("Inhalt", '<div class="carousel-fields">' + number("panX", "Ausschnitt X", -100000) + number("panY", "Ausschnitt Y", -100000) + `</div><div class="carousel-flip-controls" role="group" aria-label="Bild spiegeln">${["flipX", "flipY"].map((key, i) => `<button data-flip="${key}" aria-pressed="${o[key] === -1}" title="${i ? "Vertikal" : "Horizontal"} spiegeln">${studioIcon("flip", i ? "flip-vertical" : "")}<span>${i ? "Vertikal" : "Horizontal"}</span></button>`).join("")}</div><button id="carouselContentEdit">${carouselUI.content ? "Zurück zum Rahmen" : "Bildausschnitt bearbeiten"}</button>` + '<button id="carouselImageFit">Rahmen füllen</button>') : ""}
  ${
    o.type === "logo"

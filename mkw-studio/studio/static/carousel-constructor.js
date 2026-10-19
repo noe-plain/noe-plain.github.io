@@ -13,7 +13,7 @@ function carouselVectorSnapTargets(xs, ys, excluded) {
             xs.push(world.x);
             ys.push(world.y);
           }
-      else if (o.type === "image" && o.framePoints)
+      else if (["image", "gradient"].includes(o.type) && o.framePoints)
         for (const pt of o.framePoints) {
           xs.push(o.x + pt.x * o.w);
           ys.push(o.y + pt.y * o.h);

@@ -1,5 +1,38 @@
 "use strict";
 // Parametric primitives become ordinary paths when their points are edited.
+function carouselCapturePointEditing() {
+  if (!carouselActive() || !studioPreferences.advanced) return null;
+  const items = carouselSelected(),
+    object = items[0];
+  if (
+    items.length !== 1 ||
+    object.type !== "path" ||
+    !(carouselUI.vectorPoints || ["path", "curve"].includes(carouselUI.tool))
+  )
+    return null;
+  return {
+    id: object.id,
+    contour: carouselUI.vectorContour || 0,
+    node: carouselUI.vectorNode || 0,
+    nodes: [...(carouselUI.vectorNodes || [])],
+  };
+}
+function carouselRestorePointEditing(state) {
+  const object = carouselSelected()[0];
+  if (!state || object?.id !== state.id || object.type !== "path") return;
+  const contours = carouselPathContours(object),
+    contour = Math.min(state.contour, contours.length - 1),
+    count = contours[contour].length;
+  carouselUI.vectorPoints = true;
+  carouselUI.content = false;
+  carouselUI.vectorContour = contour;
+  carouselUI.vectorNode = Math.min(state.node, count - 1);
+  carouselUI.vectorNodes = new Set(
+    state.nodes.filter((index) => index < count),
+  );
+  carouselRefresh();
+  carouselPanel();
+}
 function carouselStartPointEditing(o) {
   if (
     !studioPreferences.advanced ||

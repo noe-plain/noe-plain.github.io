@@ -275,7 +275,7 @@ function validateCarousel(q) {
     if (carouselIsVector(o)) carouselValidateVector(o);
     if (
       o.framePoints &&
-      (o.type !== "image" ||
+      (!["image", "gradient"].includes(o.type) ||
         !Array.isArray(o.framePoints) ||
         o.framePoints.length < 3 ||
         o.framePoints.length > 8 ||
@@ -292,7 +292,7 @@ function validateCarousel(q) {
         (o.framePointSide &&
           !["left", "right", "top", "bottom"].includes(o.framePointSide)))
     )
-      throw Error("Ungültige Bildrahmenpunkte.");
+      throw Error("Ungültige Rahmenpunkte.");
     if (
       o.framePointSlots &&
       (!o.framePoints ||

@@ -317,7 +317,7 @@ const { launch, artifact } = require("./browser.cjs");
         "Sponsorenleiste",
       ],
     );
-    assert.equal(await first.locator("hr").count(), 1);
+    assert.equal(await first.locator("hr").count(), 0);
     assert.match(
       (await first.getAttribute("aria-label")) ||
         (await first.locator("summary").getAttribute("aria-label")),

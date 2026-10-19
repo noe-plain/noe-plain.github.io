@@ -26,7 +26,7 @@ function carouselLocalBounds(o) {
       h: Math.max(0.001, b.h * o.h),
     };
   }
-  if (o.type === "image" && o.framePoints) {
+  if (["image", "gradient"].includes(o.type) && o.framePoints) {
     const xs = o.framePoints.map((p) => p.x * o.w),
       ys = o.framePoints.map((p) => p.y * o.h);
     return {
