@@ -9,11 +9,11 @@ function pruneSponsorRasters() {
       sponsorRasterBytes -= v.bytes;
     }
 }
-async function sponsorBitmap(asset, mode, colour = "#ffffff", solid = false) {
+async function sponsorBitmap(asset, mode, colour = "#ffffff") {
   const source = await image(asset.data);
   if (mode === "original") return source;
   const blend = MKWSponsors.composite(mode, colour),
-    key = asset.id + ":" + mode + ":" + blend + ":" + solid,
+    key = asset.id + ":" + mode + ":" + blend,
     old = sponsorRasters.get(key);
   if (old && old.data === asset.data) {
     sponsorRasters.delete(key);
@@ -29,7 +29,7 @@ async function sponsorBitmap(asset, mode, colour = "#ffffff", solid = false) {
   ctx.drawImage(source, 0, 0, c.width, c.height);
   const pixels = ctx.getImageData(0, 0, c.width, c.height),
     d = pixels.data;
-  if (!solid && ["gray", "multiply", "screen"].includes(mode)) {
+  if (["gray", "multiply", "screen"].includes(mode)) {
     MKWSponsorPixels.tones(
       d,
       blend === "screen",
@@ -95,13 +95,7 @@ async function paintSponsors(ctx, b, opts = {}) {
       const asset = p.logos.find((a) => a.id === logo.id);
       if (!asset) continue;
       const mode = MKWSponsors.mode(logo, r.colour),
-        bitmap = await sponsorBitmap(
-          asset,
-          mode,
-          r.colour,
-          logo.mode === "auto" &&
-            !((logo.gray && !logo.monochrome) || logo.complex),
-        );
+        bitmap = await sponsorBitmap(asset, mode, r.colour);
       ctx.globalCompositeOperation = MKWSponsors.composite(mode, r.colour);
       ctx.drawImage(bitmap, logo.x, logo.y, logo.w, logo.h);
       ctx.globalCompositeOperation = "source-over";

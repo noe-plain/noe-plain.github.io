@@ -34,7 +34,7 @@ jobs:
         run: git diff --exit-code -- index.html static/editor.bundle.js static/editor.bundle.css static/editor.bundle.js.map
       - run: npm run test:browser
       - name: Firefox export regression checks
-        run: node tests/run-browser.mjs post-text-stack advanced-typography post-safezones angle-axis post-angle native-incremental-save setup-file large-project-frames project-storage project-open sponsors-help project-retention carousel-photo-effects carousel-refinements workspace-ui interactive-performance carousel-export-images carousel-pdf
+        run: node tests/run-browser.mjs text-hyphenation post-text-size-scope text-justification sponsor-auto post-text-stack advanced-typography post-safezones angle-axis post-angle native-incremental-save setup-file large-project-frames project-storage project-open sponsors-help project-retention carousel-photo-effects carousel-refinements workspace-ui interactive-performance carousel-export-images carousel-pdf
         env:
           MKW_TEST_BROWSER: firefox
       - uses: actions/upload-artifact@v4

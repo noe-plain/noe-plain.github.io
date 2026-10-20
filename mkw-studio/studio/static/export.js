@@ -27,7 +27,7 @@ function exportBytes(n) {
       : `${(n / 1048576).toFixed(1)} MB`;
 }
 function exportKey(b, settings) {
-  return JSON.stringify([revision, b, settings]);
+  return JSON.stringify([revision, b, settings, MKWTextHyphen.version]);
 }
 function exportSettings() {
   return {

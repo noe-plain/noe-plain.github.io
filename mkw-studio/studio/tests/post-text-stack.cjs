@@ -79,6 +79,8 @@ const { launch, artifact } = require("./browser.cjs");
       ["date", "title", "subtitle", "angle", "family", "sponsors"],
     );
     assert.equal(await options.locator("hr").count(), 2);
+    assert(await options.locator("hr").first().isVisible());
+    assert(await options.locator("hr").last().isVisible());
     assert.equal(
       await options.locator(".post-options-heading").textContent(),
       "Textoptionen",

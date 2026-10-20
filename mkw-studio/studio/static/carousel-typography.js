@@ -66,6 +66,13 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   return { runs, width: x };
 }
 function carouselPaintTextRun(ctx, run, x, y, color) {
+  const horizontal = run.glyphScale ?? 1;
+  if (horizontal !== 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(horizontal, 1);
+    x = y = 0;
+  }
   ctx.font = `${run.size}px ${fontFamily(run.font)}`;
   if ("letterSpacing" in ctx) ctx.letterSpacing = run.letterSpacing + "px";
   if (color || run.color) ctx.fillStyle = color || run.color;
@@ -74,16 +81,17 @@ function carouselPaintTextRun(ctx, run, x, y, color) {
     ctx.fillRect(
       x,
       y + carouselTypeBaseline(ctx, run.font, run.size) + run.size * 0.08,
-      run.width,
+      run.width / horizontal,
       Math.max(1, run.size / 18),
     );
   if (run.strike)
     ctx.fillRect(
       x,
       y + carouselTypeBaseline(ctx, run.font, run.size) - run.size * 0.3,
-      run.width,
+      run.width / horizontal,
       Math.max(1, run.size / 18),
     );
+  if (horizontal !== 1) ctx.restore();
 }
 function carouselCharacterStylesForInput(o, value) {
   return MKWText.forInput(o, value, MKWTypography.pending(o));
@@ -177,4 +185,71 @@ function carouselTypographyNavigation(panel) {
           .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
       }),
   );
+}
+
+function carouselJustifyRuns(o, raw, start, size, ctx, trailingHyphen = false) {
+  const runs = [];
+  let width = 0,
+    spaces = 0,
+    letters = 0;
+  function append(run) {
+    if (!run) return;
+    const blank = /^[ \t]+$/.test(run.raw),
+      spacing = ctx.letterSpacing;
+    ctx.font = `${run.size}px ${fontFamily(run.font)}`;
+    if (spacing !== undefined) ctx.letterSpacing = "0px";
+    const spaceWidth = blank ? ctx.measureText(run.text).width : 0;
+    if (spacing !== undefined) ctx.letterSpacing = spacing;
+    run.naturalWidth = run.width;
+    run.spaceWidth = spaceWidth;
+    run.letterUnits = blank
+      ? 0
+      : MKWJustify.graphemes(run.text).length * run.size;
+    width += run.width;
+    spaces += spaceWidth;
+    letters += run.letterUnits;
+    runs.push(run);
+  }
+  for (const style of MKWText.segments(o, start, start + raw.length)) {
+    const text = raw.slice(style.start - start, style.end - start);
+    for (const match of text.matchAll(/[ \t]+|[^ \t]+/gu))
+      append(
+        carouselTypeRuns(o, match[0], style.start + match.index, size, ctx)
+          .runs[0],
+      );
+  }
+  if (trailingHyphen && raw.length) {
+    const end = start + raw.length,
+      run = carouselTypeRuns(o, "-", end - 1, size, ctx).runs[0];
+    Object.assign(run, { raw: "", start: end, end, virtualHyphen: true });
+    append(run);
+  }
+  return { runs, width, spaces, letters };
+}
+function carouselApplyJustification(measured, settings) {
+  let x = 0;
+  const runs = measured.runs.map((source) => {
+    const extra = source.letterUnits * settings.letter,
+      width =
+        (source.naturalWidth +
+          source.spaceWidth * (settings.word - 1) +
+          extra) *
+        settings.glyph,
+      run = {
+        ...source,
+        x,
+        width,
+        glyphScale: settings.glyph,
+        letterSpacing:
+          source.letterSpacing +
+          (source.letterUnits ? settings.letter * source.size : 0),
+      };
+    run.tracking = (run.letterSpacing / run.size) * 1000;
+    x += width;
+    return run;
+  });
+  return {
+    runs,
+    width: Math.abs(x - settings.width) < 1e-7 ? settings.width : x,
+  };
 }

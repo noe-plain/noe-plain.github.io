@@ -9,7 +9,7 @@
       content="Schnellstart und Handbuch für MKW Studio: Einzelposts, Carousels, Speichern, Export und häufige Fragen."
     />
     <link rel="stylesheet" href="hilfe.css?v=525120b1c831" />
-    <script src="hilfe.js?v=8b99030dac8f" defer></script>
+    <script src="hilfe.js?v=719184701874" defer></script>
   </head>
   <body>
     <header>
@@ -225,9 +225,16 @@
             <strong>Absatz → Einzelne Absätze &amp; Zeilen</strong> erreichbar.
             „Textfeldfarbe &amp; Deckkraft“ verändert ausdrücklich den gesamten
             Textrahmen; die Textfarbe darüber berücksichtigt die
-            Zeichenmarkierung. Beim Einzelpost folgen weitere Formate desselben
-            Bildes sowie Bilder mit demselben Text den Formatänderungen am
-            ersten Bild. Eigene Texte bleiben unabhängig. Die Familienpalette
+            Zeichenmarkierung. Bei Einzelposts werden
+            <strong>Schriftgrössen pro Format</strong> geführt. Änderungen an
+            Textfeld-, Absatz- oder Zeichengrössen am ersten Bild folgen nur
+            andere Bilder mit demselben Text und derselben Zeichenflächengrösse.
+            Andere Formate, etwa 1:1 neben 9:16, behalten ihre Grössen. Bei
+            einem späteren Bild bleibt eine Grössenänderung individuell. Im
+            Advanced-Modus folgen andere Zeichen- und Absatzeigenschaften, etwa
+            Schriftfamilie oder Ausrichtung, weiterhin auch den anderen Formaten
+            desselben Bildes; Änderungen am ersten Bild gelten für Bilder mit
+            gleichem Text. Eigene Texte bleiben unabhängig. Die Familienpalette
             bleibt erhalten; Copyright bleibt dabei schwarz oder weiss und ohne
             Kontur.
           </p>
@@ -238,10 +245,11 @@
             <strong>Typografie (gerastert)</strong> benannte Ebene die genaue
             Darstellung; eine ausgeblendete Gruppe enthält separat editierbare
             Textläufe. Das ist kein vollständiger InDesign-/Affinity-Textrahmen.
-            Carousel-PSD enthält einzelne editierbare Textläufe.
+            Carousel-PSD enthält einzelne editierbare Textläufe; bei Blocksatz
+            sichert eine Rasterebene die genaue Darstellung.
             Schriftverfügbarkeit und das Verhalten externer Programme können das
-            spätere Editieren beeinflussen. Blocksatz und verkettete Textrahmen
-            sind noch nicht enthalten.
+            spätere Editieren beeinflussen. Verkettete Textrahmen sind
+            noch nicht enthalten.
           </p>
           <p>
             Das Bedienprinzip orientiert sich an den offiziellen Beschreibungen
@@ -265,6 +273,75 @@
               rel="noopener"
               >Affinity Designer</a
             >.
+          </p>
+          <h3 id="blocksatz">Blocksatz in beiden Editoren</h3>
+          <p>
+            <strong>Blocksatz</strong> steht neben Links-, Mittel- und
+            Rechtsausrichtung zur Verfügung. Im einfachen Einzelpost-Modus
+            findest du ihn unter <strong>Ausrichtung</strong>, im Carousel als
+            vierten Ausrichtungsbutton. Im Advanced-Modus wählst du unter
+            <strong>Absatz</strong>, welche Absätze betroffen sind. Die letzte
+            Zeile jedes Absatzes bleibt linksbündig; der Originaltext wird nicht
+            verändert.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Satzwert</th>
+                <th>Minimum</th>
+                <th>Optimal</th>
+                <th>Maximum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Wortabstand</th>
+                <td>80 %</td>
+                <td>100 %</td>
+                <td>120 %</td>
+              </tr>
+              <tr>
+                <th>Zeichenabstand</th>
+                <td>−2 %</td>
+                <td>0 %</td>
+                <td>+2 %</td>
+              </tr>
+              <tr>
+                <th>Glyphenskalierung</th>
+                <td>98 %</td>
+                <td>100 %</td>
+                <td>102 %</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Das Studio verändert zuerst den Wortabstand, danach bei Bedarf den
+            zusätzlichen Zeichenabstand und zuletzt die Glyphenbreite. Der
+            Zeichenabstand wird relativ zur jeweiligen Schriftgrösse berechnet
+            und zur vorhandenen Laufweite addiert; Glyphenskalierung verändert
+            nur die Breite. Die Werte sind feste Satzvorgaben und unter
+            <strong>Blocksatz · Satzwerte</strong> einsehbar. Die Umbrüche
+            berücksichtigen die erlaubte Kompression und standardmässig die
+            automatische Silbentrennung für Deutsch (Schweiz) nach der
+            reformierten Rechtschreibung von 2006. Unter
+            <strong>Automatische Silbentrennung</strong> kannst du sie für das
+            Textfeld ausschalten; im Advanced-Modus gilt die Auswahl für die
+            betroffenen Absätze. Die Trennmuster werden erst beim ersten Einsatz
+            geladen und anschliessend wiederverwendet. Wörter ab sechs Buchstaben
+            werden mit mindestens zwei Buchstaben vor und nach der Trennstelle
+            berücksichtigt. Der eingegebene Text bleibt unverändert:
+            Trennstriche erscheinen nur beim Umbruch in Ansicht und Export.
+            Falls eine Zeile innerhalb
+            dieser Grenzen die Rahmenbreite nicht erreicht, erscheint ein
+            Hinweis. Passe dann Text, Schriftgrösse oder Rahmenbreite an.
+          </p>
+          <p>
+            Bearbeitungsansicht, Bildexporte und PDF-Seiten verwenden dieselben
+            berechneten Wortpositionen. Der PDF-Text bleibt suchbar. PSD sichert
+            die genaue Blocksatzdarstellung als gekennzeichnete Rasterebene und
+            enthält zusätzlich ausgeblendete, editierbare Textläufe. Diese sind
+            kein verketteter oder automatisch neu umbrechender
+            Layout-Textrahmen.
           </p>
           <h3>Winkel bei Einzelposts</h3>
           <ol>
@@ -330,19 +407,22 @@
             bekommt entsprechend weniger Platz. Bei Hochformaten wird die
             Balkenhöhe vom unteren Schutzabstand abgezogen; oberhalb der Leiste
             bleiben mindestens 100 px frei. Bei Quadrat und Querformat bleiben
-            die Schutzabstände unverändert. Vorhandene Graustufen bleiben
-            erhalten; einfache Farblogos werden automatisch zu kontrastreichen,
-            einfarbigen Zeichen, komplexere Logos behalten ihre Tonabstufungen.
-            Die Automatik verwendet auf hellen Balken Multiplizieren, auf
-            dunklen Negativ multiplizieren (Screen). Beide Mischmodi lassen sich
-            auch pro Logo wählen. Schwarz- und Weisspunkt werden auf reines
-            Schwarz und Weiss angepasst; echte Graustufen und Transparenz
-            bleiben erhalten. „Originalfarben“ verwendet die unveränderten
-            Farben ohne Mischmodus. Gleichmässige JPG-Hintergründe werden beim
-            Import erkannt und freigestellt. Für ältere Projektlogos gibt es
-            nach dem Anklicken „Hintergrund prüfen &amp; entfernen“. Bei
-            uneindeutigen Hintergründen bleibt das Bild unverändert; jede
-            Änderung lässt sich rückgängig machen.
+            die Schutzabstände unverändert. Vorhandene Graustufen und
+            Transparenzen bleiben erhalten; Farblogos werden für die Mischmodi
+            in kontrastreiche Tonwerte umgewandelt. Die Automatik wählt den
+            passenden Mischmodus und verwendet dieselbe Bildumwandlung und
+            Grössengewichtung wie die entsprechende manuelle Auswahl. Sie färbt
+            den rechteckigen Bildhintergrund nicht als Logofläche ein. Die
+            Automatik verwendet auf hellen Balken Multiplizieren, auf dunklen
+            Negativ multiplizieren (Screen). Beide Mischmodi lassen sich auch
+            pro Logo wählen. Schwarz- und Weisspunkt werden auf reines Schwarz
+            und Weiss angepasst; echte Graustufen und Transparenz bleiben
+            erhalten. „Originalfarben“ verwendet die unveränderten Farben ohne
+            Mischmodus. Gleichmässige JPG-Hintergründe werden beim Import
+            erkannt und freigestellt. Für ältere Projektlogos gibt es nach dem
+            Anklicken „Hintergrund prüfen &amp; entfernen“. Bei uneindeutigen
+            Hintergründen bleibt das Bild unverändert; jede Änderung lässt sich
+            rückgängig machen.
           </p>
           <p>
             Die Bibliothek in den Einstellungen ist gerätebezogen. Löschen dort
@@ -537,10 +617,11 @@
             Unter <strong>Einstellungen → Schriften</strong> kannst du
             Startgrössen für Übertitel, Konzerttitel, Untertitel und Copyright
             festlegen. Die Werte gelten in Pixeln für neue Einzelposts; weitere
-            Bilder übernehmen weiterhin die Textvorlage des ersten Bildes. Im
-            aktuellen Projekt verwendete Schriften und Sponsorlogos bleiben
-            erhalten, auch wenn eine neue Setup-Datei sie nicht mehr in der
-            Werkzeugbibliothek enthält.
+            Bilder übernehmen die Schriftgrössen der passenden Formate des
+            ersten Bildes. Für neue Formate ohne passende Vorlage gelten die
+            eingestellten Standardgrössen. Im aktuellen Projekt verwendete
+            Schriften und Sponsorlogos bleiben erhalten, auch wenn eine neue
+            Setup-Datei sie nicht mehr in der Werkzeugbibliothek enthält.
           </p>
           <p>
             Setup-Dateien sind verlustfrei komprimiert. Beim Einlesen werden

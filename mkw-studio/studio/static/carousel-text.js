@@ -1,10 +1,10 @@
 "use strict";
 // Carousel text: see ARCHITECTURE.md for ownership and load order.
-// Justification can later add word spacing here instead of only a line origin.
 const carouselTextAlignments = [
   { value: "left", label: "Linksbündig", icon: "alignLeft", factor: 0 },
   { value: "center", label: "Zentriert", icon: "alignCenter", factor: 0.5 },
   { value: "right", label: "Rechtsbündig", icon: "alignRight", factor: 1 },
+  { value: "justify", label: "Blocksatz", icon: "alignJustify", factor: 0 },
 ];
 function carouselValidTextAlign(value) {
   return carouselTextAlignments.some((item) => item.value === value);
@@ -19,10 +19,34 @@ function carouselTextAlign(o, paragraph) {
 function carouselTextAlignButtons(value, attribute, label, locked = false) {
   return `<div class="type-alignment" role="group" aria-label="${label}">${carouselTextAlignments.map((item) => `<button ${attribute}="${item.value}" aria-label="${item.label}" title="${item.label}" aria-pressed="${value === item.value}" ${locked ? "disabled" : ""}>${studioIcon(item.icon)}</button>`).join("")}</div>`;
 }
+const MKWJustificationWarning =
+  "Blocksatz erreicht die Rahmenbreite innerhalb der Satzgrenzen nicht. Text, Schriftgrösse oder Rahmenbreite anpassen.";
+function carouselJustificationHint(
+  hidden = false,
+  attribute = "data-text-hyphenate",
+  enabled = true,
+) {
+  return `<details class="typo-details justification-settings" ${hidden ? "hidden" : ""}><summary>Blocksatz · Satzwerte</summary><label class="justification-hyphen"><input type="checkbox" ${attribute} ${enabled ? "checked" : ""}>Automatische Silbentrennung</label><p>Deutsch (Schweiz) · reformierte Rechtschreibung 2006</p><table><thead><tr><th></th><th>Min.</th><th>Optimal</th><th>Max.</th></tr></thead><tbody><tr><th>Wortabstand</th><td>80 %</td><td>100 %</td><td>120 %</td></tr><tr><th>Zeichenabstand</th><td>−2 %</td><td>0 %</td><td>+2 %</td></tr><tr><th>Glyphenbreite</th><td>98 %</td><td>100 %</td><td>102 %</td></tr></tbody></table><p>Letzte Absatzzeile linksbündig. Bei zu schmalen Zeilen werden die Grenzen eingehalten; ein Hinweis zeigt unvollständig ausgeglichene Zeilen.</p></details>`;
+}
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button>${studioPreferences.advanced ? `<button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button>` : ""}<button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}${carouselJustificationHint(o.textAlign !== "justify" && !o.textStyles?.some((s) => s?.align === "justify"), "data-text-hyphenate", o.hyphenate !== false)}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button>${studioPreferences.advanced ? `<button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button>` : ""}<button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
 }
 function carouselBindTextAlignment(o, panel) {
+  const hyphen = panel.querySelector("[data-text-hyphenate]");
+  if (hyphen) {
+    hyphen.disabled = carouselObjectLocked(o);
+    hyphen.onchange = () => {
+      if (carouselObjectLocked(o)) return;
+      checkpoint();
+      o.hyphenate = hyphen.checked;
+      if (hyphen.checked)
+        MKWTextHyphen.ensure(true).catch((error) =>
+          MKWProjects.notice(error.message),
+        );
+      changed(false);
+      carouselPanel();
+    };
+  }
   panel.querySelectorAll("[data-text-align]").forEach((button) => {
     button.onclick = () => {
       if (carouselObjectLocked(o) || o.textAlign === button.dataset.textAlign)
@@ -37,6 +61,7 @@ function carouselBindTextAlignment(o, panel) {
 const carouselMeasureContext = makeCanvas(1, 1).getContext("2d"),
   carouselTextLayouts = new WeakMap();
 function carouselTextLayout(o, ctx = carouselMeasureContext) {
+  if (MKWTextHyphen.requires(o)) MKWTextHyphen.ensure().catch(() => {});
   const key = JSON.stringify([
       o.text,
       o.font,
@@ -45,6 +70,8 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       o.w,
       o.lineHeight,
       o.textAlign,
+      o.hyphenate,
+      MKWTextHyphen.version,
       o.textStyles,
       o.uppercase,
       o.script,
@@ -69,19 +96,45 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       size = style?.size ?? o.size;
     y += style?.spaceBefore || 0;
     ctx.font = `${size}px "${o.font}"`;
-    const wrapped = carouselWrapText(
-      text,
-      o.w,
-      (t, start) =>
-        carouselTypeRuns(o, t, offset + (start || 0), size, ctx).width,
-    );
+    const alignment = carouselTextAlign(o, paragraph),
+      justified = alignment.value === "justify",
+      measurements = new Map(),
+      measure = (t, start = 0, hyphen = false) => {
+        const key = start + ":" + t + ":" + hyphen;
+        if (!measurements.has(key))
+          measurements.set(
+            key,
+            carouselJustifyRuns(o, t, offset + start, size, ctx, hyphen),
+          );
+        return measurements.get(key);
+      },
+      wrapped = justified
+        ? MKWJustify.wrap(
+            text,
+            o.w,
+            measure,
+            (style?.hyphenate ?? o.hyphenate) !== false
+              ? MKWTextHyphen.points
+              : null,
+          )
+        : carouselWrapText(
+            text,
+            o.w,
+            (t, start) =>
+              carouselTypeRuns(o, t, offset + (start || 0), size, ctx).width,
+          );
     wrapped.forEach((part, index) => {
       const automatic = style?.lineHeight ?? o.lineHeight ?? 0.95;
       const raw = part.raw.trimEnd(),
         display = o.uppercase ? raw.toLocaleUpperCase("de-CH") : raw,
-        styled = carouselTypeRuns(o, raw, offset + part.start, size, ctx),
+        natural = justified ? measure(raw, part.start, !!part.hyphen) : null,
+        justification = justified
+          ? MKWJustify.fit(natural, o.w, index === wrapped.length - 1)
+          : null,
+        styled = justified
+          ? carouselApplyJustification(natural, justification)
+          : carouselTypeRuns(o, raw, offset + part.start, size, ctx),
         width = styled.width,
-        alignment = carouselTextAlign(o, paragraph),
         extent = Math.max(
           size * 1.12,
           ...styled.runs.map((run) => run.dy + run.size * 1.12),
@@ -92,10 +145,12 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       lines.push({
         text: styled.runs.map((run) => run.text).join(""),
         runs: styled.runs,
+        ...(justification ? { justification } : {}),
         width,
-        x: (o.w - width) * alignment.factor,
+        x: alignment.factor ? (o.w - width) * alignment.factor : 0,
         align: alignment.value,
         raw: part.raw,
+        hyphen: !!part.hyphen,
         start: offset + part.start,
         end: offset + part.end,
         paragraph,
@@ -669,6 +724,25 @@ function carouselTrackTextCaret(o, el) {
 }
 
 function carouselEditableRuns(o, line, zoom = carouselZoom) {
+  if (line.justification) {
+    const composed = carouselApplyJustification(
+      carouselJustifyRuns(
+        o,
+        line.raw,
+        line.start,
+        line.size,
+        carouselMeasureContext,
+        line.hyphen,
+      ),
+      line.justification,
+    );
+    return composed.runs
+      .map(
+        (run) =>
+          `<span data-script="${run.script}" ${run.virtualHyphen ? 'class="discretionary-hyphen" aria-hidden="true" contenteditable="false"' : ""} style="position:absolute;white-space:pre;left:${run.x * zoom}px;top:${(run.dy - (carouselTypeBaseline(carouselMeasureContext, o.font, line.size) - carouselTypeBaseline(carouselMeasureContext, run.font, run.size))) * zoom}px;font-family:${esc(fontFamily(run.font).replaceAll('"', "'"))};font-size:${run.size * zoom}px;letter-spacing:${run.letterSpacing * zoom}px;transform:scaleX(${run.glyphScale});transform-origin:0 0;text-transform:${run.uppercase ? "uppercase" : "none"};color:${esc(run.color || o.color)};text-decoration:${[run.underline ? "underline" : "", run.strike ? "line-through" : ""].filter(Boolean).join(" ") || "none"}">${esc(run.raw)}</span>`,
+      )
+      .join("");
+  }
   return carouselTypeRuns(
     o,
     line.raw,

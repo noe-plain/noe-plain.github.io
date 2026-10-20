@@ -42,6 +42,7 @@ function textBlock(b, key) {
       !!b.family?.enabled,
       key ?? null,
       fontStatus,
+      MKWTextHyphen.version,
     ]),
     cached = postTextLayouts.get(b);
   if (cached?.fonts === fontStatus && cached.entries.has(signature))
@@ -191,7 +192,18 @@ function textGradient(ctx, b, layout, opacity = 0.42) {
 function familyTextOffset(layout, key, offset = 0) {
   for (const e of layout.records) {
     if (e.key === key) break;
-    if (e.visible) offset += MKWFamily.count(e.lines.join("\n"));
+    if (e.visible)
+      offset += MKWFamily.count(
+        e.styled
+          ? e.styled.lines
+              .flatMap((line) =>
+                line.runs
+                  .filter((run) => !run.virtualHyphen)
+                  .map((run) => run.text),
+              )
+              .join("")
+          : e.lines.join("\n"),
+      );
   }
   return offset;
 }
@@ -238,12 +250,22 @@ function drawText(ctx, layout, opts = {}) {
               ctx.strokeStyle = MKWFamily.outline;
               ctx.lineWidth = MKWFamily.outlineWidth;
               ctx.lineJoin = "round";
-              ctx.strokeText(glyph.text, glyphX, line.y + run.dy);
-              glyphX += ctx.measureText(glyph.text).width;
+              ctx.save();
+              ctx.translate(glyphX, line.y + run.dy);
+              ctx.scale(run.glyphScale || 1, 1);
+              ctx.font = `${run.size}px ${fontFamily(run.font)}`;
+              if ("letterSpacing" in ctx)
+                ctx.letterSpacing = run.letterSpacing + "px";
+              ctx.strokeText(glyph.text, 0, 0);
+              const advance =
+                ctx.measureText(glyph.text).width * (run.glyphScale || 1);
+              ctx.restore();
+              glyphX += advance;
             }
-            paletteOffset += MKWFamily.runs(run.text).filter(
-              (g) => g.visible,
-            ).length;
+            if (!run.virtualHyphen)
+              paletteOffset += MKWFamily.runs(run.text).filter(
+                (g) => g.visible,
+              ).length;
           } else
             carouselPaintTextRun(
               ctx,
@@ -300,6 +322,11 @@ function drawLogo(ctx, b, logo, opts = {}) {
   ctx.restore();
 }
 async function paint(ctx, b, s = 1, opts = {}) {
+  if (
+    b.carouselSlide === undefined &&
+    Object.values(b.elements || {}).some((e) => MKWTextHyphen.requires(e))
+  )
+    await MKWTextHyphen.ensure();
   if (p.carousel && Number.isInteger(b.carouselSlide))
     return carouselPaint(ctx, b.carouselSlide, s, opts.transparent);
   const sponsors = MKWSponsors.layout(b);
@@ -405,7 +432,15 @@ async function draw() {
         h = Math.round(b.h * s * devicePixelRatio),
         skip = editingText?.boardId === b.id ? editingText.key : null,
         editKey = step === "text" && selected === b.id ? layer : null,
-        key = JSON.stringify([b, w, h, skip, editKey, fontStatus]),
+        key = JSON.stringify([
+          b,
+          w,
+          h,
+          skip,
+          editKey,
+          fontStatus,
+          MKWTextHyphen.version,
+        ]),
         sources = [
           asset(b).data,
           logos.get(b.elements.logo.source),
@@ -500,6 +535,26 @@ function updateWarning() {
           "postAngle",
         );
     }
+    if (
+      textTypes.some(([key]) => {
+        const e = b.elements[key];
+        return (
+          e.visible &&
+          (e.align === "justify" ||
+            e.textStyles?.some((s) => s?.align === "justify"))
+        );
+      })
+    )
+      for (const record of textBlock(b).mainRecords)
+        if (
+          record.visible &&
+          record.styled?.lines.some((line) => line.justification?.limited)
+        )
+          add(
+            elementNames[record.key] + ": " + MKWJustificationWarning,
+            "text",
+            record.key,
+          );
     const fonts = [
       ...new Set(
         Object.values(b.elements)

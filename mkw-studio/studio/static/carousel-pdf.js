@@ -181,7 +181,7 @@ function carouselPDFText(board, opts) {
         measure.textBaseline = "top";
         const baseline =
             ascent - measure.measureText("Mg").actualBoundingBoxAscent,
-          width = measure.measureText(line.text).width;
+          width = run.width;
         if (
           line.text &&
           x + width > 0 &&
@@ -209,6 +209,7 @@ function carouselPDFText(board, opts) {
             font: run.font,
             data: runFont?.data,
             tracking: run.letterSpacing * scale * 0.75,
+            glyphScale: run.glyphScale || 1,
           });
       }
   }
@@ -288,7 +289,13 @@ async function carouselBuildPDF(pages, title) {
           : await document.embedFont(StandardFonts.Helvetica);
         fonts.set(line.font, font);
       }
-      page.pushOperators(MKWPDF.setCharacterSpacing(line.tracking || 0));
+      page.pushOperators(
+        MKWPDF.setCharacterSpacing(line.tracking || 0),
+        MKWPDF.PDFOperator.of(
+          MKWPDF.PDFOperatorNames.SetTextHorizontalScaling,
+          [MKWPDF.PDFNumber.of((line.glyphScale || 1) * 100)],
+        ),
+      );
       page.drawText(line.text, {
         x: line.x,
         y: line.y,

@@ -39,15 +39,13 @@
     const ink = inkBounds(logo),
       aspect = logo.width / logo.height,
       renderedMode = mode(logo, colour),
-      density =
-        (logo.mode !== "auto" ||
-          (logo.gray && !logo.monochrome) ||
-          logo.complex) &&
-        ["gray", "original", "multiply", "screen"].includes(renderedMode)
-          ? ((foreground(colour) === "black"
-              ? logo.darkDensity
-              : logo.lightDensity) ?? logo.density)
-          : logo.density,
+      density = ["gray", "original", "multiply", "screen"].includes(
+        renderedMode,
+      )
+        ? ((foreground(colour) === "black"
+            ? logo.darkDensity
+            : logo.lightDensity) ?? logo.density)
+        : logo.density,
       // One optical ink-area target for the entire strip, regardless of group.
       // Height/width limits keep very thin wordmarks and dense emblems usable.
       targetArea = 1728 * unit * unit,

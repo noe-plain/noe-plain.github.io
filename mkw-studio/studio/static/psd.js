@@ -90,13 +90,16 @@ function textLayerData(e, left, top, family, layout) {
       font: { name },
       fontSize: e.size,
       tracking: e.tracking || 0,
+      horizontalScale: e.glyphScale || 1,
       underline: !!e.underline,
       strikethrough: !!e.strike,
       fillColor: rgb(e.color),
       autoLeading: false,
       leading: e.size * MKWLayout.lineHeight(e),
     },
-    paragraphStyle: { justification: e.align },
+    paragraphStyle: {
+      justification: e.align === "justify" ? "justify-left" : e.align,
+    },
     orientation: "horizontal",
   };
   if (family?.enabled && e.key === "copyright")
@@ -303,6 +306,7 @@ async function buildPSD(progress = () => {}) {
                     color: run.color || e.color,
                     align: "left",
                     tracking: run.tracking,
+                    glyphScale: run.glyphScale || 1,
                     underline: run.underline,
                     strike: run.strike,
                   },

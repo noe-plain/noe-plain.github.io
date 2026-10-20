@@ -229,3 +229,65 @@ html[data-theme="light"] :is(.typography-inspector, .typo-content) {
   border-bottom: 0;
   padding-top: 18px;
 }
+
+.type-alignment {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.justification-settings {
+  font-size: 11px;
+  color: var(--studio-muted);
+  margin: 8px 0 14px;
+}
+.justification-settings[hidden] {
+  display: none !important;
+}
+.justification-settings table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.justification-settings th,
+.justification-settings td {
+  padding: 6px 3px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.justification-settings th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.justification-settings p {
+  line-height: 1.5;
+  margin: 12px 0 0;
+  font-size: 11px;
+}
+#stepPanel > .justification-settings {
+  margin-top: 16px;
+}
+.typography-inspector .type-alignment,
+.typography-inspector .justification-settings {
+  margin: 0;
+}
+.discretionary-hyphen {
+  user-select: none;
+  pointer-events: none;
+}
+.discretionary-hyphen::before {
+  content: "-";
+}
+
+.justification-hyphen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+}
+.justification-hyphen input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+}

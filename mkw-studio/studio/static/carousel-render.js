@@ -12,6 +12,14 @@ async function carouselPaint(
 ) {
   const project = p,
     c = project.carousel;
+  if (
+    (objects || c.objects).some(
+      (o) => o.type === "text" && MKWTextHyphen.requires(o),
+    )
+  ) {
+    await MKWTextHyphen.ensure();
+    if (!isCurrent()) return;
+  }
   carouselKeepLogosOnTop(c);
   ctx.save();
   ctx.scale(scale, scale);

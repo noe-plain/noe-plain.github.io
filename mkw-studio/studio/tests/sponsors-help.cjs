@@ -54,6 +54,10 @@ const { launch, artifact } = require("./browser.cjs");
     assert(await help.locator("#advanced-typografie").isVisible());
     assert.equal(await help.locator("#helpSearch").inputValue(), "");
     assert.equal(await help.locator('nav [aria-current="location"]').getAttribute("href"), "#einzelposts");
+    await help.locator("#helpSearch").fill("Rahmenpunkte");
+    await help.locator('a[href="#advanced-typografie"]').click();
+    assert(await help.locator("#advanced-typografie").isVisible());
+    assert.equal(await help.locator("#helpSearch").inputValue(), "");
     await help.locator("#helpSearch").fill("");
     await page.setViewportSize({ width: 360, height: 850 });
     assert(

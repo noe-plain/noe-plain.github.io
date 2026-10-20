@@ -93,7 +93,7 @@ const { launch, artifact } = require('./browser.cjs');
       validate(data); validateCarousel(data); const old = clone(data); const legacy = old.carousel.objects.find(x => x.id === o.id); delete legacy.textAlign; delete legacy.textStyles; validate(old); validateCarousel(old);
       return [rejects(x => x.textAlign = 'justify'), rejects(x => x.textStyles = [{ align: 'invalid' }])];
     });
-    assert.deepEqual(validation, [true, true], 'Future justification is not silently accepted before implementation');
+    assert.deepEqual(validation, [false, true], 'Justification is supported; invalid paragraph alignment still rejects');
     const saved = await object();
     await page.evaluate(() => autosave());
     await page.reload();

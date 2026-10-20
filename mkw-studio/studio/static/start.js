@@ -41,3 +41,23 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     }
   };
 })();
+
+MKWTextHyphen.onChange(() => {
+  if (MKWTextHyphen.error) {
+    MKWProjects.notice(MKWTextHyphen.error.message);
+    return;
+  }
+  if (p.carousel) {
+    const edit = carouselUI.editing,
+      o = edit && p.carousel.objects.find((o) => o.id === edit.id),
+      range = o ? carouselEditableSelection(edit.el) : null;
+    if (o) {
+      carouselFormatEditable(edit.el, o);
+      if (range) MKWTypography.restoreSelection(edit.el, range);
+    }
+    carouselRefresh();
+  } else {
+    draw();
+    syncOverlays();
+  }
+});

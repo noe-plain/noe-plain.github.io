@@ -29,8 +29,8 @@ search.addEventListener("input", () => {
     ? `${count} ${count === 1 ? "passendes Kapitel" : "passende Kapitel"}`
     : "Keine passenden Kapitel. Versuche einen anderen Suchbegriff.";
 });
-function markSection() {
-  const target = document.getElementById(location.hash.slice(1)),
+function markSection(hash = location.hash) {
+  const target = document.getElementById(hash.slice(1)),
     section = target?.closest("main section");
   if (section?.hidden) {
     search.value = "";
@@ -43,5 +43,17 @@ function markSection() {
     else link.removeAttribute("aria-current");
   }
 }
-window.addEventListener("hashchange", markSection);
+document.addEventListener("click", (event) => {
+  const link = event.target.closest?.('a[href^="#"]');
+  if (
+    link &&
+    !event.defaultPrevented &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  )
+    markSection(link.hash);
+});
+window.addEventListener("hashchange", () => markSection());
 markSection();

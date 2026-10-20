@@ -399,6 +399,7 @@ function renderPanel() {
         ["left", "Links"],
         ["center", "Zentriert"],
         ["right", "Rechts"],
+        ["justify", "Blocksatz"],
       ],
       e.align,
     )}</select></label>${
@@ -466,7 +467,12 @@ function renderPanel() {
         mutate(() => {
           if (key === "visible" && textTypes.some(([k]) => k === layer))
             setImageTextType(b.imageId, layer, ev.target.checked);
-          else e[key] = key === "visible" ? ev.target.checked : ev.target.value;
+          else {
+            e[key] = key === "visible" ? ev.target.checked : ev.target.value;
+            if (key === "align" && e.textStyles)
+              for (const style of e.textStyles) if (style) delete style.align;
+          }
+          if (key === "align") renderPanel();
         }, false),
       );
     on("uppercase", "change", (ev) =>
@@ -571,7 +577,29 @@ function renderPanel() {
       }),
     );
   }
-  if (step === "text") MKWPostTextStack.panel(b, panel);
+  if (step === "text") {
+    if (!studioPreferences.advanced && b.elements[layer]?.align === "justify") {
+      panel.insertAdjacentHTML(
+        "beforeend",
+        carouselJustificationHint(
+          false,
+          "data-post-hyphenate",
+          b.elements[layer].hyphenate !== false,
+        ),
+      );
+      panel.querySelector("[data-post-hyphenate]").onchange = (ev) => {
+        const enabled = ev.target.checked;
+        mutate(() => {
+          b.elements[layer].hyphenate = enabled;
+        });
+        if (enabled)
+          MKWTextHyphen.ensure(true).catch((error) =>
+            MKWProjects.notice(error.message),
+          );
+      };
+    }
+    MKWPostTextStack.panel(b, panel);
+  }
   bindFamilyTools(panel);
 }
 function beginText(b, key, el) {
@@ -613,7 +641,13 @@ function setSharedText(b, key, text) {
       targetText.characterStyles = MKWText.forInput(
         targetText,
         text,
-        MKWTypography.pending(b.elements[key]),
+        target.w === b.w && target.h === b.h
+          ? MKWTypography.pending(b.elements[key])
+          : Object.fromEntries(
+              Object.entries(
+                MKWTypography.pending(b.elements[key]) || {},
+              ).filter(([key]) => key !== "size"),
+            ),
       );
       targetText.textStyles = carouselTextStylesForInput(targetText, text);
       targetText.text = text;
@@ -641,8 +675,10 @@ function setSharedTextSize(b, key, size) {
     first = b.imageId === p.images[0]?.id;
   for (const target of p.boards)
     if (
-      target.imageId === b.imageId ||
-      (first && target.elements[key].text === source.text)
+      target.w === b.w &&
+      target.h === b.h &&
+      (target.imageId === b.imageId ||
+        (first && target.elements[key].text === source.text))
     )
       target.elements[key].size = size;
 }

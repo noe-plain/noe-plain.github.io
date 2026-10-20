@@ -11,3 +11,11 @@ test('logo move, resize and rotation stay inside zone',()=>{const b=board();b.el
 test('copyright preserves symbol after description and adds it only when absent',()=>{assert.equal(L.copyrightText('Generalprobe © Noé Plain'),'Generalprobe © Noé Plain');assert.equal(L.copyrightText('Noé Plain'),'© Noé Plain');assert.equal(L.copyrightText('  © Noé Plain  '),'© Noé Plain');assert.equal(L.copyrightText(''),'')});
 test('concert title has a 2.5px optical offset between heading and subtitle',()=>{const b=board();for(const key of ['date','title','subtitle']){b.elements[key].visible=true;b.elements[key].text='Text'}const [heading,title,subtitle]=L.textLayout(b,measure).mainRecords;assert.equal(title.y-heading.y-heading.h,10.5);assert.equal(subtitle.y-title.y-title.h,5.5)});
 test('independent left/right safe zones preserve legacy defaults and move text/logo/copyright together',()=>{const b=board();b.safe={top:100,bottom:200,left:160,right:70};b.elements.copyright.text='© Name';b.elements.copyright.visible=true;const s=L.safeRect(b);assert.deepEqual([s.x,s.w,s.left,s.right],[160,850,160,70]);const layout=L.textLayout(b,measure);assert.equal(layout.x,160);assert.equal(layout.w,850);L.constrainLogo(b,3);assert.equal(b.elements.logo.x+b.elements.logo.size,1010);assert.equal(layout.copyright.x+layout.copyright.h/2,1045);b.safe.right=0;assert(L.textLayout(b,measure).copyright.size>0)});
+
+test('justified line width roundoff cannot trigger accidental whole-stack shrinking',()=>{
+ const b=board(),w=L.safeRect(b).w;
+ const layout=L.textLayout(b,measure,undefined,()=>({height:150,lines:[{text:'Text',width:w+1e-10}]}));
+ assert.equal(layout.factor,1);assert.equal(layout.h,150);
+ const tooWide=L.textLayout(b,measure,undefined,(e,width,factor)=>({height:150*factor,lines:[{text:'Text',width:(w+2)*factor}]}));
+ assert(tooWide.factor<1);
+});

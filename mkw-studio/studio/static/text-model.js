@@ -86,6 +86,74 @@
     }
     return merge(out);
   }
+  function changeCharacters(o, range, values, fontKey = "font") {
+    if (range && range.end > range.start)
+      o.characterStyles = patch(o, range.start, range.end, values);
+    else {
+      for (const [key, value] of Object.entries(values)) {
+        const target = key === "font" ? fontKey : key;
+        if (
+          value === null &&
+          !["role", "font", "size", "color"].includes(target)
+        )
+          delete o[target];
+        else if (value !== null) o[target] = value;
+      }
+      if (Number.isFinite(values.size))
+        for (const style of o.textStyles || []) if (style) delete style.size;
+      o.characterStyles = patch(
+        o,
+        0,
+        o.text.length,
+        Object.fromEntries(Object.keys(values).map((k) => [k, null])),
+      );
+    }
+  }
+  function changeParagraphs(o, indices, values) {
+    o.textStyles ??= [];
+    for (const i of indices) {
+      const style = (o.textStyles[i] ??= {});
+      Object.assign(style, values);
+      if (values.lineHeight !== undefined) delete style.leading;
+    }
+  }
+  function keepSizes(o, reference) {
+    const boundaries = [
+      ...new Set([
+        0,
+        o.text.length,
+        ...(o.characterStyles || []).flatMap((s) => [s.start, s.end]),
+        ...(reference.characterStyles || []).flatMap((s) => [s.start, s.end]),
+      ]),
+    ]
+      .filter((n) => n >= 0 && n <= o.text.length)
+      .sort((a, b) => a - b);
+    o.characterStyles = merge(
+      boundaries.slice(0, -1).map((start, i) => {
+        const style = at(o, start);
+        delete style.size;
+        const size = at(reference, start).size;
+        return {
+          start,
+          end: boundaries[i + 1],
+          ...style,
+          ...(size === undefined ? {} : { size }),
+        };
+      }),
+    );
+    const next = o.textStyles || [],
+      previous = reference.textStyles || [];
+    o.textStyles = Array.from(
+      { length: Math.max(next.length, previous.length) },
+      (_, i) => {
+        const style = { ...next[i] };
+        delete style.size;
+        if (previous[i]?.size !== undefined) style.size = previous[i].size;
+        return Object.keys(style).length ? style : null;
+      },
+    );
+    o.size = reference.size;
+  }
   function diff(before, after) {
     let start = 0,
       end = before.length,
@@ -129,6 +197,8 @@
   function rich(o) {
     return !!(
       o.typographyVersion ||
+      o.align === "justify" ||
+      o.textAlign === "justify" ||
       o.characterStyles?.length ||
       o.textStyles?.some(Boolean) ||
       keys.some(
@@ -160,6 +230,8 @@
         throw Error("Ungültige Zeichenformatierung.");
     };
     check(o);
+    if (o.hyphenate !== undefined && typeof o.hyphenate !== "boolean")
+      throw Error("Ungültige Silbentrennung.");
     if (o.characterStyles !== undefined) {
       if (!Array.isArray(o.characterStyles) || o.characterStyles.length > 10000)
         throw Error("Zu viele Zeichenformate.");
@@ -186,7 +258,8 @@
         if (s) {
           if (
             (s.align !== undefined &&
-              !["left", "center", "right"].includes(s.align)) ||
+              !["left", "center", "right", "justify"].includes(s.align)) ||
+            (s.hyphenate !== undefined && typeof s.hyphenate !== "boolean") ||
             (s.size !== undefined && !finite(s.size, 0.1, 5000)) ||
             (s.lineHeight !== undefined && !finite(s.lineHeight, 0.2, 5)) ||
             ["spaceBefore", "spaceAfter"].some(
@@ -207,6 +280,9 @@
     at,
     segments,
     merge,
+    changeCharacters,
+    changeParagraphs,
+    keepSizes,
     patch,
     diff,
     forInput,

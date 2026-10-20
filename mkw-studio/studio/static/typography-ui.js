@@ -54,7 +54,7 @@ const MKWTypography = (() => {
       )
       .join(
         "",
-      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div id="typo-paragraph" role="tabpanel" aria-labelledby="typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}<div class="typo-grid">${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
+      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div id="typo-paragraph" role="tabpanel" aria-labelledby="typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("paragraphSize", "Schriftgrösse des Absatzes", "px", 1, 5000)}${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-size-auto>Grundgrösse</button><button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
   }
   function values(key) {
     const { o } = current,
@@ -116,14 +116,21 @@ const MKWTypography = (() => {
         : `${indices.length} Absätze`;
     host.querySelectorAll("[data-typo]").forEach((input) => {
       const key = input.dataset.typo,
-        para = ["lineHeight", "spaceBefore", "spaceAfter"].includes(key),
+        para = [
+          "paragraphSize",
+          "lineHeight",
+          "spaceBefore",
+          "spaceAfter",
+        ].includes(key),
         list = para
           ? indices.map(
               (i) =>
-                o.textStyles?.[i]?.[key] ??
-                (key === "lineHeight"
-                  ? (o.lineHeight ?? (current.post ? 1 : 0.95))
-                  : 0),
+                o.textStyles?.[i]?.[key === "paragraphSize" ? "size" : key] ??
+                (key === "paragraphSize"
+                  ? o.size
+                  : key === "lineHeight"
+                    ? (o.lineHeight ?? (current.post ? 1 : 0.95))
+                    : 0),
             )
           : values(key);
       let value = common(list);
@@ -166,6 +173,19 @@ const MKWTypography = (() => {
     const align = common(
       indices.map((i) => o.textStyles?.[i]?.align || base.textAlign),
     );
+    host.querySelector(".justification-settings").hidden = align !== "justify";
+    const hyphen = host.querySelector("[data-typo-hyphenate]"),
+      hyphenValue = common(
+        indices.map(
+          (i) => (o.textStyles?.[i]?.hyphenate ?? o.hyphenate) !== false,
+        ),
+      );
+    hyphen.checked = hyphenValue !== false;
+    hyphen.indeterminate = hyphenValue === null;
+    hyphen.disabled = locked || copyright;
+
+    host.querySelector("[data-typo-size-auto]").disabled =
+      locked || !indices.some((i) => o.textStyles?.[i]?.size !== undefined);
     host.querySelectorAll("[data-typo-align]").forEach((b) => {
       b.setAttribute("aria-pressed", String(b.dataset.typoAlign === align));
       b.disabled = locked || copyright;
@@ -213,28 +233,8 @@ const MKWTypography = (() => {
     }
     if (!checkpointed) remember();
     if (current.post) o.typographyVersion = 1;
-    if (r && r.end > r.start)
-      o.characterStyles = MKWText.patch(o, r.start, r.end, values);
-    else {
-      for (const [key, value] of Object.entries(values)) {
-        const target = current.post && key === "font" ? "role" : key;
-        if (
-          value === null &&
-          !["role", "font", "size", "color"].includes(target)
-        )
-          delete o[target];
-        else if (value !== null) o[target] = value;
-      }
-      if (values.size !== undefined)
-        for (const style of o.textStyles || []) if (style) delete style.size;
-      o.characterStyles = MKWText.patch(
-        o,
-        0,
-        o.text.length,
-        Object.fromEntries(Object.keys(values).map((key) => [key, null])),
-      );
-    }
-    current.commit();
+    MKWText.changeCharacters(o, r, values, current.post ? "role" : "font");
+    current.commit({ kind: "character", range: r, values });
     sync();
   }
   function paragraph(values) {
@@ -242,18 +242,17 @@ const MKWTypography = (() => {
     remember();
     const { o } = current;
     if (current.post) o.typographyVersion = 1;
-    o.textStyles ??= [];
-    for (const i of paragraphIndices()) {
-      const style = (o.textStyles[i] ??= {});
-      Object.assign(style, values);
-      if (values.lineHeight !== undefined) delete style.leading;
-    }
-    current.commit();
+    const indices = paragraphIndices();
+    MKWText.changeParagraphs(o, indices, values);
+    current.commit({ kind: "paragraph", indices, values });
     sync();
   }
   function bind(host, options) {
     current = { ...options, host };
     host.querySelector("[data-typo=size]").max = options.post ? 5000 : 1000;
+    host.querySelector("[data-typo=paragraphSize]").max = options.post
+      ? 5000
+      : 1000;
     host.querySelectorAll("[data-typo-tab]").forEach((button) => {
       button.onclick = () => {
         session(current.o).tab = button.dataset.typoTab;
@@ -295,8 +294,15 @@ const MKWTypography = (() => {
               value > +input.max))
         )
           return;
-        if (["lineHeight", "spaceBefore", "spaceAfter"].includes(key)) {
-          paragraph({ [key]: key === "lineHeight" ? value / 100 : value });
+        if (
+          ["paragraphSize", "lineHeight", "spaceBefore", "spaceAfter"].includes(
+            key,
+          )
+        ) {
+          paragraph({
+            [key === "paragraphSize" ? "size" : key]:
+              key === "lineHeight" ? value / 100 : value,
+          });
           return;
         }
         if (!began) {
@@ -328,6 +334,15 @@ const MKWTypography = (() => {
           (button.onclick = () =>
             paragraph({ align: button.dataset.typoAlign })),
       );
+    host.querySelector("[data-typo-hyphenate]").onchange = (ev) => {
+      paragraph({ hyphenate: ev.target.checked });
+      if (ev.target.checked)
+        MKWTextHyphen.ensure(true).catch((error) =>
+          MKWProjects.notice(error.message),
+        );
+    };
+    host.querySelector("[data-typo-size-auto]").onclick = () =>
+      paragraph({ size: undefined });
     host.querySelector("[data-typo-leading-auto]").onclick = () =>
       paragraph({ lineHeight: 0.95 });
     host.querySelector("[data-typo-reset]").onclick = () =>
@@ -422,10 +437,19 @@ const MKWTypography = (() => {
             target.elements[key].text = source.text;
             if (source.typographyVersion)
               target.elements[key].typographyVersion = source.typographyVersion;
+            const matching = p.boards.find(
+                (t) =>
+                  t.imageId === p.images[0]?.id &&
+                  t.w === target.w &&
+                  t.h === target.h,
+              )?.elements[key],
+              previous = clone(target.elements[key]),
+              from = matching || source;
             target.elements[key].characterStyles = clone(
-              source.characterStyles || [],
+              from.characterStyles || [],
             );
-            target.elements[key].textStyles = clone(source.textStyles || []);
+            target.elements[key].textStyles = clone(from.textStyles || []);
+            if (!matching) MKWText.keepSizes(target.elements[key], previous);
           }
         }, false);
         renderPanel();
@@ -471,27 +495,27 @@ const MKWTypography = (() => {
       post: true,
       family: !!b.family?.enabled,
       copyright: key === "copyright",
-      commit: () => {
+      commit: (change) => {
         const first = b.imageId === p.images[0]?.id;
-        for (const target of p.boards)
+        for (const target of p.boards) {
           if (
-            target !== b &&
-            (target.imageId === b.imageId ||
-              (first && target.elements[key].text === o.text))
-          ) {
-            const e = target.elements[key];
-            for (const attr of [
-              ...MKWText.keys.filter((k) => k !== "font"),
-              "role",
-              "textStyles",
-              "characterStyles",
-              "lineHeight",
-              "typographyVersion",
-            ]) {
-              if (o[attr] === undefined) delete e[attr];
-              else e[attr] = clone(o[attr]);
-            }
-          }
+            target === b ||
+            !(
+              target.imageId === b.imageId ||
+              (first && target.elements[key].text === o.text)
+            )
+          )
+            continue;
+          const sameFormat = target.w === b.w && target.h === b.h,
+            values = { ...change.values };
+          if (!sameFormat) delete values.size;
+          if (!Object.keys(values).length) continue;
+          const e = target.elements[key];
+          e.typographyVersion = 1;
+          if (change.kind === "character")
+            MKWText.changeCharacters(e, change.range, values, "role");
+          else MKWText.changeParagraphs(e, change.indices, values);
+        }
         changed(false);
         if (
           editingText?.el &&

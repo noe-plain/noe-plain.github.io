@@ -203,7 +203,9 @@ function carouselWarning(o) {
     return "Text liegt ausserhalb der empfohlenen Safezone.";
   if (carouselTextHeight(o) > o.h + 1)
     return "Text passt nicht vollständig in den Textrahmen.";
-  return "";
+  return carouselTextLayout(o).lines.some((line) => line.justification?.limited)
+    ? MKWJustificationWarning
+    : "";
 }
 
 function carouselGradientPoints(o) {

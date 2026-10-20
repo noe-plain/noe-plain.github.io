@@ -9,6 +9,8 @@
     "static/project-store.js",
     "static/post-angle-model.js",
     "static/text-model.js",
+    "static/text-justify.js",
+    "static/text-hyphen.js",
     "static/state.js",
     "static/user-fonts.js",
     "static/sponsor-model.js",

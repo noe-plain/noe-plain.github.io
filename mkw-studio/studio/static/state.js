@@ -550,7 +550,7 @@ function validate(q) {
         !["x", "y", "size"].every((k) => Number.isFinite(e[k])) ||
         e.size <= 0 ||
         e.size > 5000 ||
-        !["left", "center", "right"].includes(e.align) ||
+        !["left", "center", "right", "justify"].includes(e.align) ||
         !Number.isFinite(e.angle || 0)
       )
         throw Error("Ungültiges Gestaltungselement.");
@@ -741,7 +741,11 @@ function redo() {
 function createBoard(im, w = 1080, h = 1080) {
   const b = basicBoard(im, w, h),
     template =
+      p.boards.find((b) => b.imageId === im.id && b.w === w && b.h === h) ||
       p.boards.find((b) => b.imageId === im.id) ||
+      p.boards.find(
+        (b) => b.imageId === p.images[0]?.id && b.w === w && b.h === h,
+      ) ||
       p.boards.find((b) => b.imageId === p.images[0]?.id);
   const format = p.formats?.find((f) => f.w === w && f.h === h);
   if (format) b.safe = MKWFormats.safe(format);
@@ -752,17 +756,31 @@ function createBoard(im, w = 1080, h = 1080) {
       b.elements[key].text = template.elements[key].text;
       b.elements[key].visible = template.elements[key].visible;
       b.elements[key].enabled = template.elements[key].enabled;
+      const defaultSize = b.elements[key].size;
       b.elements[key].size = template.elements[key].size;
       for (const attr of [
         ...MKWText.keys.filter((k) => !["font", "size"].includes(k)),
         "role",
+        "align",
         "characterStyles",
         "textStyles",
         "lineHeight",
         "typographyVersion",
+        "hyphenate",
       ])
         if (template.elements[key][attr] !== undefined)
           b.elements[key][attr] = clone(template.elements[key][attr]);
+      if (template.w !== w || template.h !== h) {
+        const matching = p.boards.find(
+          (t) => t.imageId === p.images[0]?.id && t.w === w && t.h === h,
+        )?.elements[key];
+        MKWText.keepSizes(
+          b.elements[key],
+          matching?.text === b.elements[key].text
+            ? matching
+            : { text: b.elements[key].text, size: defaultSize },
+        );
+      }
     }
   if (!template)
     for (const key of ["date", "title", "subtitle"]) {

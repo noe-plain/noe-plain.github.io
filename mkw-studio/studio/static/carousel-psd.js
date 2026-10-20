@@ -170,7 +170,8 @@ async function buildCarouselPSD(progress = () => {}) {
               underline: run.underline,
               strike: run.strike,
               color: run.color || o.color,
-              align: line.align,
+              align: line.justification ? "left" : line.align,
+              glyphScale: run.glyphScale || 1,
               angle: o.angle || 0,
             },
             0,
@@ -179,11 +180,18 @@ async function buildCarouselPSD(progress = () => {}) {
           layer.text.style.leading = line.leading;
           lines.push(layer);
         }
-      if (carouselHasEffects(o)) {
+      if (
+        carouselHasEffects(o) ||
+        layout.lines.some((line) => line.justification)
+      ) {
         const layer = await carouselPSDLayer(o);
-        if (layer) append(o, layer);
+        if (layer) {
+          if (layout.lines.some((line) => line.justification))
+            layer.name += " · Blocksatz (gerastert)";
+          append(o, layer);
+        }
         append(o, {
-          name: o.name + " · editierbarer Text ohne Effekte",
+          name: o.name + " · editierbare Textläufe",
           hidden: true,
           children: lines,
         });

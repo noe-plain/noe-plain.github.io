@@ -139,14 +139,14 @@
     let records = rows(1),
       height = records.reduce((n, r) => n + r.h, 0) + gapTotal,
       factor = 1;
-    if (height > safe.h || records.some((r) => r.maxWidth > safe.w)) {
+    if (height > safe.h || records.some((r) => r.maxWidth > safe.w + 0.001)) {
       let lo = 0.00001,
         hi = 1;
       for (let i = 0; i < 22; i++) {
         const mid = (lo + hi) / 2,
           r = rows(mid),
           h = r.reduce((n, r) => n + r.h, 0) + gapTotal * mid;
-        if (h > safe.h || r.some((r) => r.maxWidth > safe.w)) hi = mid;
+        if (h > safe.h || r.some((r) => r.maxWidth > safe.w + 0.001)) hi = mid;
         else lo = mid;
       }
       factor = lo;

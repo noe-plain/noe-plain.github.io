@@ -14,6 +14,18 @@ const spriteHash = createHash("sha256")
     `const studioIconSprite = "static/icons/material-symbols.svg?v=${spriteHash}";`,
   );
 if (ui !== nextUI) await writeFile(uiFile, nextUI);
+const patternPath = "static/hyphenation/hyph-de-1996.tex",
+  patternHash = createHash("sha256")
+    .update(await readFile(new URL(patternPath, root)))
+    .digest("hex")
+    .slice(0, 12),
+  hyphenFile = new URL("static/text-hyphen.js", root),
+  hyphenSource = await readFile(hyphenFile, "utf8"),
+  nextHyphen = hyphenSource.replace(
+    /const patternURL = "[^"]+";/,
+    `const patternURL = "${patternPath}?v=${patternHash}";`,
+  );
+if (hyphenSource !== nextHyphen) await writeFile(hyphenFile, nextHyphen);
 // Version the lazily loaded handbook independently from the editor's startup assets.
 const helpIndex = new URL("hilfe/index.html", root),
   helpSource = await readFile(helpIndex, "utf8"),
