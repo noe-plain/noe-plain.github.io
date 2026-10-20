@@ -609,9 +609,8 @@ function beginText(b, key, el) {
   updateDock();
   checkpoint();
   editingText = { boardId: b.id, key, el };
-  if (studioPreferences.advanced) b.elements[key].typographyVersion = 1;
   el.classList.add("editing");
-  if (studioPreferences.advanced) MKWTypography.postInline(b, key, el);
+  MKWTypography.postInline(b, key, el);
   el.style.color =
     b.family?.enabled && key === "copyright"
       ? MKWFamily.copyrightColor(b.elements[key].color)

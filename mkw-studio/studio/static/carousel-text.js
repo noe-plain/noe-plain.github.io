@@ -225,7 +225,9 @@ function carouselEditText(o) {
   carouselSelection = o.id;
   checkpoint();
   const el = document.createElement("div");
-  el.className = "carousel-inline-text";
+  el.className = "carousel-inline-text mkw-inline-input";
+  el.dataset.canvasText = String(carouselObjectVisible(o));
+  el.onpointerdown = () => MKWInlineText.holdView(el);
   el.contentEditable = "true";
   el.setAttribute("role", "textbox");
   el.setAttribute("aria-multiline", "true");
@@ -265,12 +267,18 @@ function carouselEditText(o) {
     const caret = carouselEditableSelection(el).end;
     apply(carouselEditableValue(el), caret);
   };
-  el.oncompositionstart = () => (edit.composing = true);
-  el.oncompositionend = () => {
+  el.addEventListener("compositionstart", () => {
+    edit.composing = true;
+    el.classList.add("mkw-composing");
+    carouselRefresh();
+  });
+  el.addEventListener("compositionend", () => {
     edit.composing = false;
+    el.classList.remove("mkw-composing");
     apply(carouselEditableValue(el), carouselEditableSelection(el).end);
-  };
+  });
   el.onbeforeinput = (ev) => {
+    MKWInlineText.holdView(el);
     if (ev.isComposing || edit.composing) return;
     const { start, end } = carouselEditableSelection(el);
     let a = start,
@@ -335,14 +343,14 @@ function carouselEditText(o) {
     if (ev.key === "Escape") {
       ev.preventDefault();
       carouselEndText();
-      $("#carouselViewport").focus();
+      $("#carouselViewport").focus({ preventScroll: true });
     }
   };
   el.onblur = (event) =>
     carouselEndText(!!event.relatedTarget?.closest("#carouselProperties"));
   carouselPanel();
   carouselRefresh();
-  el.focus();
+  MKWInlineText.focus(el);
   carouselEditableCaret(el, o.text.length);
 }
 
@@ -580,7 +588,7 @@ function carouselFormatEditable(el, o) {
           .filter((line) => line.paragraph === paragraph)
           .map(
             (line) =>
-              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-x="${line.x}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? carouselEditableRuns(o, line) : '<br data-placeholder="true">'}</span>`,
+              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-x="${line.x}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? carouselEditableRuns(o, line) : MKWInlineText.empty(o, line, carouselZoom)}</span>`,
           )
           .join("")}</div>`,
     )
@@ -625,6 +633,7 @@ function carouselEditableSelection(el) {
 }
 
 function carouselEditableCaret(el, offset) {
+  MKWInlineText.holdView(el);
   const lines = [...el.querySelectorAll("[data-text-start]")],
     line =
       lines.find(
@@ -642,7 +651,7 @@ function carouselEditableCaret(el, offset) {
     remaining -= target.length;
   }
   if (target) range.setStart(target, Math.min(remaining, target.length));
-  else range.setStart(line, 0);
+  else range.setStart(line.querySelector("[data-empty-run]") || line, 0);
   range.collapse(true);
   const selection = window.getSelection();
   selection.removeAllRanges();
@@ -724,35 +733,24 @@ function carouselTrackTextCaret(o, el) {
 }
 
 function carouselEditableRuns(o, line, zoom = carouselZoom) {
-  if (line.justification) {
-    const composed = carouselApplyJustification(
-      carouselJustifyRuns(
+  const composed = line.justification
+    ? carouselApplyJustification(
+        carouselJustifyRuns(
+          o,
+          line.raw,
+          line.start,
+          line.size,
+          carouselMeasureContext,
+          line.hyphen,
+        ),
+        line.justification,
+      )
+    : carouselTypeRuns(
         o,
         line.raw,
         line.start,
         line.size,
         carouselMeasureContext,
-        line.hyphen,
-      ),
-      line.justification,
-    );
-    return composed.runs
-      .map(
-        (run) =>
-          `<span data-script="${run.script}" ${run.virtualHyphen ? 'class="discretionary-hyphen" aria-hidden="true" contenteditable="false"' : ""} style="position:absolute;white-space:pre;left:${run.x * zoom}px;top:${(run.dy - (carouselTypeBaseline(carouselMeasureContext, o.font, line.size) - carouselTypeBaseline(carouselMeasureContext, run.font, run.size))) * zoom}px;font-family:${esc(fontFamily(run.font).replaceAll('"', "'"))};font-size:${run.size * zoom}px;letter-spacing:${run.letterSpacing * zoom}px;transform:scaleX(${run.glyphScale});transform-origin:0 0;text-transform:${run.uppercase ? "uppercase" : "none"};color:${esc(run.color || o.color)};text-decoration:${[run.underline ? "underline" : "", run.strike ? "line-through" : ""].filter(Boolean).join(" ") || "none"}">${esc(run.raw)}</span>`,
-      )
-      .join("");
-  }
-  return carouselTypeRuns(
-    o,
-    line.raw,
-    line.start,
-    line.size,
-    carouselMeasureContext,
-  )
-    .runs.map(
-      (run) =>
-        `<span data-script="${run.script}" style="font-family:${esc(fontFamily(run.font).replaceAll('"', "'"))};font-size:${run.size * zoom}px;letter-spacing:${run.letterSpacing * zoom}px;text-transform:${run.uppercase ? "uppercase" : "none"};color:${esc(run.color || o.color)};text-decoration:${[run.underline ? "underline" : "", run.strike ? "line-through" : ""].filter(Boolean).join(" ") || "none"};position:relative;top:${(run.dy - (carouselTypeBaseline(carouselMeasureContext, o.font, line.size) - carouselTypeBaseline(carouselMeasureContext, run.font, run.size))) * zoom}px">${esc(run.raw)}</span>`,
-    )
-    .join("");
+      );
+  return MKWInlineText.runs(o, composed.runs, zoom);
 }

@@ -79,7 +79,7 @@ function carouselScheduleOutside() {
       width,
       height,
       carouselZoom,
-      carouselUI.editing?.id,
+      carouselUI.editing?.composing ? carouselUI.editing.id : null,
       fontStatus,
     ]);
   if (
@@ -104,8 +104,8 @@ function carouselScheduleOutside() {
     key,
     zoom: carouselZoom,
     project: p,
+    editingId: carouselUI.editing?.composing ? carouselUI.editing.id : null,
     generation: ++carouselOutsideGeneration,
-    editingId: carouselUI.editing?.id,
   };
   if (!carouselOutsideRunning && !carouselOutsideFrame)
     carouselOutsideFrame = requestAnimationFrame(carouselPaintOutside);

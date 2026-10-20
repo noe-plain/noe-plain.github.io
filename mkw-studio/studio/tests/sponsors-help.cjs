@@ -137,8 +137,8 @@ const { launch, artifact } = require("./browser.cjs");
     await page.waitForFunction(
       () =>
         sponsorGroups[0].logos.length === 1 &&
-        $("#sponsorLibraryStatus").textContent === "" &&
-        !document.querySelector("[data-sponsor-upload]").disabled,
+        $("#sponsorLibraryStatus")?.textContent === "" &&
+        document.querySelector("[data-sponsor-upload]")?.disabled === false,
     );
     await page.locator("#newSponsorGroup").click();
     await page.locator("[data-sponsor-name]").nth(1).fill("Projektpartner");
@@ -177,8 +177,8 @@ const { launch, artifact } = require("./browser.cjs");
     await page.waitForFunction(
       () =>
         sponsorGroups[1].logos.length === 2 &&
-        $("#sponsorLibraryStatus").textContent === "" &&
-        !document.querySelector("[data-sponsor-upload]").disabled,
+        $("#sponsorLibraryStatus")?.textContent === "" &&
+        document.querySelector("[data-sponsor-upload]")?.disabled === false,
     );
     const matte = await page.evaluate(async () => {
       const c = makeCanvas(180, 100),

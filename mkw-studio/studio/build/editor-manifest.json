@@ -38,6 +38,7 @@
     "static/carousel-input.js",
     "static/carousel-typography.js",
     "static/carousel-curvature.js",
+    "static/inline-text.js",
     "static/carousel-text.js",
     "static/carousel-sidebar.js",
     "static/carousel-geometry.js",

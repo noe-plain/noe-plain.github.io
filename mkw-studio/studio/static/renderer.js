@@ -430,14 +430,17 @@ async function draw() {
       const s = surfaceScale(),
         w = Math.round(b.w * s * devicePixelRatio),
         h = Math.round(b.h * s * devicePixelRatio),
-        skip = editingText?.boardId === b.id ? editingText.key : null,
+        skip =
+          editingText?.boardId === b.id && editingText.composing
+            ? editingText.key
+            : null,
         editKey = step === "text" && selected === b.id ? layer : null,
         key = JSON.stringify([
           b,
           w,
           h,
-          skip,
           editKey,
+          skip,
           fontStatus,
           MKWTextHyphen.version,
         ]),
@@ -461,8 +464,8 @@ async function draw() {
       if (buffer.height !== h) buffer.height = h;
       buffer.getContext("2d").clearRect(0, 0, w, h);
       await paint(buffer.getContext("2d", { colorSpace: "srgb" }), b, w / b.w, {
-        skip,
         editKey,
+        skip,
         preview: true,
       });
       if (!c.isConnected || p !== project) continue;
@@ -711,6 +714,7 @@ function syncOverlays(force = false) {
           el.className =
             "text-editor" + (key === "copyright" ? " copyright-editor" : "");
           el.contentEditable = "true";
+          el.onpointerdown = () => MKWInlineText.holdView(el);
           el.spellcheck = false;
           el.dataset.key = key;
           el.dataset.placeholder = placeholders[key];
@@ -721,10 +725,8 @@ function syncOverlays(force = false) {
           );
           el.onfocus = () => beginText(b, key, el);
           el.onmouseup = el.onkeyup = () => {
-            if (studioPreferences.advanced) {
-              const r = carouselEditableSelection(el);
-              MKWTypography.track(b.elements[key], r.start, r.end);
-            }
+            const r = carouselEditableSelection(el);
+            MKWTypography.track(b.elements[key], r.start, r.end);
           };
           MKWTypography.bindPostInline(b, key, el);
           el.oninput = () => inputText(b, key, el);
@@ -782,6 +784,8 @@ function syncOverlays(force = false) {
       if (!e) continue;
       if (!editing) el.textContent = b.elements[e.key].text;
       el.classList.toggle("is-empty", !b.elements[e.key].text.trim());
+      el.classList.add("mkw-inline-input");
+      el.dataset.canvasText = String(!!e.visible);
       const copyright = e.key === "copyright";
       Object.assign(el.style, {
         left: (copyright ? e.x * s : 0) + "px",
@@ -808,11 +812,7 @@ function syncOverlays(force = false) {
         opacity: "1",
       });
     }
-    if (
-      editingText?.boardId === b.id &&
-      !editingText.composing &&
-      (MKWText.rich(b.elements[editingText.key]) || studioPreferences.advanced)
-    )
+    if (editingText?.boardId === b.id && !editingText.composing)
       MKWTypography.postInline(b, editingText.key, editingText.el, true);
     MKWPostTextStack.overlay(b, root, block, s);
     const frame = root.querySelector(".element-frame");
@@ -1014,6 +1014,6 @@ function activateAtPoint(ev, b) {
     const el = document.querySelector(
       `.interaction[data-board="${b.id}"] .text-editor[data-key="${hit}"]`,
     );
-    el?.focus();
+    MKWInlineText.focus(el);
   }
 }

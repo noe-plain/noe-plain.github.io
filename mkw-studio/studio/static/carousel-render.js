@@ -378,7 +378,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
       p.carousel.bg,
       p.carousel.objects,
       scale,
-      carouselUI.editing?.id,
+      carouselUI.editing?.composing ? carouselUI.editing.id : null,
       fontStatus,
     ]),
     sources = [...p.images, ...p.logos].map((a) => a.data),
@@ -399,7 +399,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
     sources,
     fonts: fontStatus,
     project: p,
-    editingId: carouselUI.editing?.id,
+    editingId: carouselUI.editing?.composing ? carouselUI.editing.id : null,
   };
   if (!carouselPaintRunning && !carouselPaintFrame)
     carouselPaintFrame = requestAnimationFrame(carouselRunPaint);

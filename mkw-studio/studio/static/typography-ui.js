@@ -462,7 +462,6 @@ const MKWTypography = (() => {
         checkpoint();
         began = true;
       }
-      o.typographyVersion = 1;
       setSharedText(
         b,
         key,
@@ -488,7 +487,7 @@ const MKWTypography = (() => {
       const el = document.querySelector(
         `.interaction[data-board="${b.id}"] [data-key="${key}"]`,
       );
-      el?.focus();
+      MKWInlineText.focus(el);
     };
     bind(panel.querySelector(".typography-inspector"), {
       o,
@@ -586,17 +585,22 @@ const MKWTypography = (() => {
     const e = b.elements[key],
       r = keepSelection ? range(e) : null,
       layout = textBlock(b, key).records.find((item) => item.key === key);
-    if (!layout?.styled) return;
-    const o = layout.styled.source;
+    if (!layout) return;
+    const styled =
+        layout.styled ||
+        postLayout({ ...e, key }, layout.w, layout.size / e.size),
+      o = styled.source;
+    el.classList.add("mkw-inline-input");
+    el.dataset.canvasText = String(!!layout.visible);
     el.innerHTML = e.text
       .split("\n")
       .map(
         (_, paragraph) =>
-          `<div>${layout.styled.lines
+          `<div>${styled.lines
             .filter((line) => line.paragraph === paragraph)
             .map(
               (line) =>
-                `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" style="position:absolute;left:${line.x * surfaceScale()}px;top:${line.y * surfaceScale()}px;font-size:${line.size * surfaceScale()}px;line-height:1.12">${line.raw ? carouselEditableRuns(o, line, surfaceScale()) : '<br data-placeholder="true">'}</span>`,
+                `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" style="position:absolute;left:${line.x * surfaceScale()}px;top:${line.y * surfaceScale()}px;font-size:${line.size * surfaceScale()}px;line-height:1.12">${line.raw ? carouselEditableRuns(o, line, surfaceScale()) : MKWInlineText.empty(o, line, surfaceScale())}</span>`,
             )
             .join("")}</div>`,
       )
@@ -608,6 +612,7 @@ const MKWTypography = (() => {
     const o = b.elements[key],
       undo = [],
       redo = [];
+    let nativeRemembered = false;
     const rememberText = () => {
       undo.push({
         text: o.text,
@@ -630,36 +635,42 @@ const MKWTypography = (() => {
       changed(false);
       postInline(b, key, el, true);
     };
+    el.addEventListener("input", () => {
+      if (
+        !nativeRemembered &&
+        !editingText?.composing &&
+        carouselEditableValue(el) !== o.text
+      )
+        rememberText();
+      nativeRemembered = false;
+    });
     el.onpaste = (ev) => {
       ev.preventDefault();
       replace(ev.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n"));
     };
-    el.oncompositionstart = () => {
+    el.addEventListener("compositionstart", () => {
       rememberText();
       if (editingText?.el === el) editingText.composing = true;
-    };
-    el.oncompositionend = () => {
+      el.classList.add("mkw-composing");
+      draw();
+    });
+    el.addEventListener("compositionend", () => {
       if (editingText?.el === el) editingText.composing = false;
+      el.classList.remove("mkw-composing");
       inputText(b, key, el);
-    };
+    });
     el.onbeforeinput = (ev) => {
+      MKWInlineText.holdView(el);
       if (ev.isComposing || editingText?.composing) return;
       const r = carouselEditableSelection(el);
       if (["insertParagraph", "insertLineBreak"].includes(ev.inputType)) {
         ev.preventDefault();
         replace(key === "copyright" ? " " : "\n");
-      } else if (
-        ev.inputType === "insertText" &&
-        ev.data != null &&
-        MKWText.rich(o)
-      ) {
+      } else if (ev.inputType === "insertText" && ev.data != null) {
         ev.preventDefault();
         replace(ev.data);
       } else if (
-        ["deleteContentBackward", "deleteContentForward"].includes(
-          ev.inputType,
-        ) &&
-        MKWText.rich(o)
+        ["deleteContentBackward", "deleteContentForward"].includes(ev.inputType)
       ) {
         ev.preventDefault();
         if (r.start === r.end) {
@@ -670,15 +681,13 @@ const MKWTypography = (() => {
         }
         restoreSelection(el, r);
         replace("");
-      } else rememberText();
+      } else {
+        rememberText();
+        nativeRemembered = true;
+      }
     };
     el.addEventListener("keydown", (ev) => {
-      if (
-        !(ev.metaKey || ev.ctrlKey) ||
-        ev.key.toLowerCase() !== "z" ||
-        !MKWText.rich(o)
-      )
-        return;
+      if (!(ev.metaKey || ev.ctrlKey) || ev.key.toLowerCase() !== "z") return;
       ev.preventDefault();
       ev.stopPropagation();
       const from = ev.shiftKey ? redo : undo,
