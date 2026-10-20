@@ -28,7 +28,11 @@ async function layerBitmap(b, key) {
     top = 0,
     w = b.w,
     h = b.h;
-  if (!["image", "background", "textShadow", "sponsors"].includes(key)) {
+  if (
+    !["image", "postAngle", "background", "textShadow", "sponsors"].includes(
+      key,
+    )
+  ) {
     let r;
     if (key === "textShadow") r = MKWLayout.recordsRect(block.records);
     else if (key === "logoShadow" || key === "logo")
@@ -213,10 +217,12 @@ async function buildPSD(progress = () => {}) {
       "title",
       "date",
       "textShadow",
+      "postAngle",
       "image",
       "background",
     ]) {
       if (key === "sponsors" && !MKWSponsors.layout(b)) continue;
+      if (key === "postAngle" && !b.angle?.enabled) continue;
       if (b.family?.enabled && key === "logoShadow") continue;
       if (b.family?.enabled && key === "textShadow") {
         if (textChildren.length)
@@ -242,15 +248,17 @@ async function buildPSD(progress = () => {}) {
       const bitmap = await layerBitmap(b, key),
         l = {
           name:
-            key === "sponsors"
-              ? "Sponsorleiste · gerastert"
-              : key === "image"
-                ? im.name
-                : key === "background"
-                  ? "Hintergrund"
-                  : shadow
-                    ? "Schatten · Kontur · 28 %"
-                    : elementNames[key],
+            key === "postAngle"
+              ? "Winkel · Bildausschnitt (gerastert)"
+              : key === "sponsors"
+                ? "Sponsorleiste · gerastert"
+                : key === "image"
+                  ? im.name
+                  : key === "background"
+                    ? "Hintergrund"
+                    : shadow
+                      ? "Schatten · Kontur · 28 %"
+                      : elementNames[key],
           left: left + bitmap.left,
           top: top + bitmap.top,
           canvas: bitmap.canvas,
@@ -331,7 +339,10 @@ async function buildPSD(progress = () => {}) {
     if (shadowIndex >= 0) {
       const shadow = children.splice(shadowIndex, 1)[0];
       children.splice(
-        children.findIndex((l) => l.placedLayer),
+        children.findIndex(
+          (l) =>
+            l.placedLayer || l.name === "Winkel · Bildausschnitt (gerastert)",
+        ),
         0,
         shadow,
       );

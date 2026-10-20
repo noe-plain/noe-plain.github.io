@@ -262,6 +262,8 @@ function studioFocusWarning(item) {
     selectBoard(item.id);
     if (item.key) layer = item.key;
     chooseStep(item.step);
+    if (item.key === "postAngle" && board()?.angle?.enabled)
+      MKWPostAngleEditor.select(board(), true);
     document
       .querySelector(`.board-card[data-id="${item.id}"]`)
       ?.scrollIntoView({ block: "center", inline: "center" });

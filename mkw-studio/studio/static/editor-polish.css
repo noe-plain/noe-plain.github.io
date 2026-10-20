@@ -528,3 +528,104 @@ html[data-theme]
   height: 17px;
   accent-color: var(--accent);
 }
+/* Every single-post option uses the same full-width selection row. */
+html[data-theme]
+  .image-info-card
+  .text-type-options
+  :is(.post-option-row, label.post-option-row) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--studio-ink);
+  background: transparent;
+}
+html[data-theme]
+  .image-info-card
+  .text-type-options
+  .post-option-row:has(input:checked) {
+  color: var(--studio-accent);
+  background: color-mix(in srgb, var(--studio-accent) 10%, transparent);
+}
+html[data-theme] .image-info-card .text-type-options .post-option-row:hover {
+  background: color-mix(in srgb, var(--studio-accent) 7%, transparent);
+}
+.image-info-card .text-type-options {
+  display: grid;
+  gap: 4px;
+}
+html[data-theme]
+  .image-info-card
+  .text-type-options
+  :is(.family-picker, [data-sponsor-options]) {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.image-info-card .text-type-options .post-option-row input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--studio-accent);
+}
+.image-info-card .post-angle-option .post-option-label {
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+html[data-theme] .image-info-card .post-angle-option select {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0 18px 0 0;
+  cursor: pointer;
+}
+.post-angle-outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.post-angle-outline polygon {
+  stroke: var(--studio-accent);
+  stroke-width: 1.5;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.post-angle-hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--studio-muted);
+  line-height: 1.5;
+}
+.post-angle-mode button[aria-pressed="true"] {
+  color: var(--studio-accent);
+  border-color: var(--studio-accent);
+  background: color-mix(in srgb, var(--studio-accent) 10%, transparent);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

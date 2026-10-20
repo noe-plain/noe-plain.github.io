@@ -315,6 +315,7 @@ window.addEventListener("blur", () => {
   postUpdateHand();
 });
 function postCancelEditMovement() {
+  MKWPostAngleEditor.cancelMotion();
   if (typeof movement === "undefined" || !movement) return;
   const { b, key, initial } = movement;
   Object.assign(

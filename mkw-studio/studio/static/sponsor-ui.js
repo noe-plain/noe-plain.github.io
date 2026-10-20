@@ -39,13 +39,14 @@ function sponsorOptions(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     s = b?.sponsors || sponsorDefaults(),
     enabled = s.enabled;
-  return `<div data-sponsor-options="${esc(im.id)}"><label><input type="checkbox" data-sponsor-enable="${esc(im.id)}" ${enabled ? "checked" : ""}><span>Sponsorenleiste</span></label></div>`;
+  return `<div data-sponsor-options="${esc(im.id)}"><label class="post-option-row"><input type="checkbox" data-sponsor-enable="${esc(im.id)}" ${enabled ? "checked" : ""}><span>Sponsorenleiste</span></label></div>`;
 }
 function sponsorRefreshOptions() {
   for (const im of p.images) {
     const old = document.querySelector(`[data-sponsor-options="${im.id}"]`);
     if (old) old.outerHTML = sponsorOptions(im);
   }
+  syncTextTypes();
 }
 function sponsorApply(imageId, config) {
   const first = imageId === p.images[0]?.id;

@@ -41,16 +41,24 @@ function textTypeSummary(b) {
     )
     .map(([, label]) => label);
 }
+function postOptionSummary(b) {
+  return [
+    ...textTypeSummary(b),
+    ...(b?.family?.enabled ? ["Familienkonzert"] : []),
+    ...(b?.sponsors?.enabled ? ["Sponsorenleiste"] : []),
+    ...(b?.angle?.enabled ? ["Winkel"] : []),
+  ];
+}
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
-    active = textTypeSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Texte ausgewählt"}</span><span class="text-count" data-text-count>${active.length} Texte</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="picker-heading">Texte</div>${textTypes.map(([key, label]) => `<label><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}${familyPicker(im)}${sponsorOptions(im)}</div></details>`;
+    active = postOptionSummary(b);
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Optionen gewählt"}</span><span class="text-count" data-text-count>${active.length} Optionen</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}">${textTypes.map(([key, label]) => `<label class="post-option-row"><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}${familyPicker(im)}${sponsorOptions(im)}${MKWPostAngleEditor.options(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
     p.boards.find((b) => b.imageId === im.id)?.family,
   );
-  return `<div class="family-picker"><label><input type="checkbox" data-family-mode="${esc(im.id)}" ${config.enabled ? "checked" : ""}><span>Familienkonzert</span></label></div>`;
+  return `<div class="family-picker"><label class="post-option-row"><input type="checkbox" data-family-mode="${esc(im.id)}" ${config.enabled ? "checked" : ""}><span>Familienkonzert</span></label></div>`;
 }
 function familyTools(b) {
   const custom = !!Object.keys(p.familyOverrides?.[b.imageId] || {}).length;
@@ -107,6 +115,7 @@ function refreshFamilyControls() {
         im.id === p.images[0]?.id ||
         !Object.keys(p.familyOverrides?.[im.id] || {}).length;
   }
+  syncTextTypes();
 }
 function imageAction(name, label, title, action, id, disabled = false) {
   return `<button class="image-action ${action === "removeImage" ? "image-action-delete" : ""}" data-action="${action}" data-id="${esc(id)}" title="${title}" aria-label="${title}" ${disabled ? "disabled" : ""}>${icon(name)}${label ? `<span>${label}</span>` : ""}</button>`;
@@ -162,13 +171,13 @@ function syncTextTypes() {
     input.checked = !!e && (e.enabled ?? e.visible);
   });
   document.querySelectorAll("[data-text-picker]").forEach((picker) => {
-    const active = textTypeSummary(
+    const active = postOptionSummary(
       p.boards.find((b) => b.imageId === picker.dataset.textPicker),
     );
     picker.querySelector("[data-text-summary]").textContent =
-      active.join(" · ") || "Keine Texte ausgewählt";
+      active.join(" · ") || "Keine Optionen gewählt";
     picker.querySelector("[data-text-count]").textContent =
-      active.length + " Texte";
+      active.length + " Optionen";
   });
 }
 function bindFamilyTools(root) {
@@ -281,6 +290,14 @@ function render() {
         activateAtPoint(ev, b);
       }),
   );
+  for (const canvas of document.querySelectorAll("canvas[data-board]"))
+    canvas.ondblclick = (ev) => {
+      const b = p.boards.find((b) => b.id === canvas.dataset.board);
+      if (MKWPostAngleEditor.active(b)) {
+        ev.preventDefault();
+        MKWPostAngleEditor.select(b, true);
+      }
+    };
   postAfterRender(postAnchor);
   renderPanel();
   updateDock();
@@ -300,6 +317,10 @@ function chooseStep(value) {
     return;
   }
   step = value;
+  if (value === "crop") {
+    layer = "image";
+    MKWPostAngleEditor.resetContent();
+  }
   if (value === "text" && !MKWLayout.keys.includes(layer)) layer = "title";
   if (value === "logo") layer = "logo";
   updateDock();
@@ -327,6 +348,11 @@ function renderPanel() {
       ? "Wähle im Exportfenster deine Formate und Dateinamen."
       : "Wähle ein Bild und ein Werkzeug in der Leiste.";
   if (!b) return;
+  if (layer === "postAngle" && !b.angle?.enabled) layer = "image";
+  if (step === "crop" && layer === "postAngle") {
+    MKWPostAngleEditor.panel(b, panel);
+    return;
+  }
   if (step === "crop") {
     panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bildausschnitt</h3><div class="tool-button-grid"><button data-fit="fill" title="Bild so vergrössern, dass es die ganze Fläche bedeckt">Fläche füllen</button><button data-fit="fit" title="Das gesamte Bild innerhalb der Zeichenfläche zeigen">Ganzes Bild</button></div><label>Bildgrösse (%) <input id="scale" aria-label="Bildskalierung in Prozent" type="number" min="0.1" step="0.1" value="${(b.image.scale * 100).toFixed(1)}"></label><div class="tool-button-grid"><button data-fit="center">Zentrieren</button><button data-fit="original">Originalgrösse</button></div></section><section class="tool-section"><h3>Gestaltung</h3><label>Drehung (°) <input id="angle" type="number" value="${b.image.angle}"></label><div class="tool-button-grid"><button id="flipX" title="Links und rechts tauschen">${studioIcon("flip")}Horizontal</button><button id="flipY" title="Oben und unten tauschen">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button data-fit="reset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Hintergrund</h3><label>Zeichenflächenfarbe <input id="bg" aria-label="Zeichenflächenfarbe" type="color" value="${b.family?.enabled ? b.family.background : b.bg}"></label></section></div>`;
     panel.querySelectorAll("[data-fit]").forEach(

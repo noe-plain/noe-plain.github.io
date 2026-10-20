@@ -295,6 +295,7 @@ async function paint(ctx, b, s = 1, opts = {}) {
     );
     ctx.restore();
   }
+  await MKWPostAngleEditor.paint(ctx, b, s, opts);
   if (
     !opts.transparent &&
     !b.family?.enabled &&
@@ -420,14 +421,20 @@ function updateWarning() {
           sponsorLayout ? { ...b, ...sponsorLayout.content } : b,
           im,
         ),
+      angleUncovered =
+        b.angle?.enabled &&
+        !MKWPostAngle.covers(b, im, MKWPostAngleEditor.area(b)),
+      angleLow = b.angle?.enabled && b.angle.image.scale > 1.001,
       low = b.image.scale > 1.001,
       card = document.querySelector(`.board-card[data-id="${b.id}"]`);
     if (card) {
-      card.classList.toggle("uncovered", uncovered);
-      card.classList.toggle("low-resolution", low);
+      card.classList.toggle("uncovered", !!(uncovered || angleUncovered));
+      card.classList.toggle("low-resolution", !!(low || angleLow));
       card.title = [
         uncovered ? "Bild deckt die Zeichenfläche nicht vollständig ab." : "",
         low ? "Bildauflösung gering." : "",
+        angleUncovered ? "Bild füllt den Winkel nicht vollständig." : "",
+        angleLow ? "Bildauflösung im Winkel gering." : "",
       ]
         .filter(Boolean)
         .join(" ");
@@ -439,6 +446,20 @@ function updateWarning() {
       add("Bild deckt die Zeichenfläche nicht vollständig ab.", "crop");
     if (low) add("Bildauflösung gering – Export ist möglich.", "crop");
     if (sponsorLayout?.warning) add(sponsorLayout.warning, "sponsors");
+    if (b.angle?.enabled) {
+      if (angleUncovered)
+        add(
+          "Bild füllt den Winkel nicht vollständig. Bildinhalt prüfen oder „Winkel vollständig füllen“ wählen.",
+          "crop",
+          "postAngle",
+        );
+      if (angleLow)
+        add(
+          "Bildauflösung im Winkel gering – Export ist möglich.",
+          "crop",
+          "postAngle",
+        );
+    }
     const fonts = [
       ...new Set(
         Object.values(b.elements)
@@ -531,8 +552,8 @@ function syncOverlays(force = false) {
     const activeKey = step === "text" && selected === b.id ? layer : null,
       block = textBlock(b, activeKey),
       safe = block.safe;
-    const signature = `${step}:${selected === b.id}:${selected === b.id ? layer : ""}:${!!b.family?.enabled}`,
-      transform = JSON.stringify([b.image, b.elements.logo]),
+    const signature = `${step}:${selected === b.id}:${selected === b.id ? layer : ""}:${!!b.family?.enabled}:${MKWPostAngleEditor.editing(b)}`,
+      transform = JSON.stringify([b.image, b.elements.logo, b.angle]),
       previous = postOverlayStates.get(root);
     if (
       !force &&
@@ -560,7 +581,7 @@ function syncOverlays(force = false) {
         );
         root.append(zone);
       }
-      if (step === "crop" && selected === b.id) {
+      if (step === "crop" && selected === b.id && layer !== "postAngle") {
         const box = document.createElement("div");
         box.className = "image-transform";
         for (let n = 0; n < 4; n++) {
@@ -630,7 +651,9 @@ function syncOverlays(force = false) {
         width: safe.w * s + "px",
         height: safe.h * s + "px",
       });
-    const rect = root.querySelector(".image-transform");
+    const rect = root.querySelector(
+      ".image-transform:not(.post-angle-transform)",
+    );
     if (rect) {
       const r = transformRect(b);
       Object.assign(rect.style, {
@@ -705,6 +728,7 @@ function syncOverlays(force = false) {
         });
       });
     }
+    MKWPostAngleEditor.overlay(b, root, s);
   }
 }
 let movement = null;
@@ -851,6 +875,12 @@ function activateAtPoint(ev, b) {
       off =
         e.align === "center" ? -e.size / 2 : e.align === "right" ? -e.size : 0;
     if (q.x >= off && q.x <= off + e.size && q.y >= 0 && q.y <= h) hit = "logo";
+  }
+  if (!hit && MKWPostAngle.contains(b, point, MKWPostAngleEditor.area(b))) {
+    const content = MKWPostAngleEditor.editing(b);
+    MKWPostAngleEditor.select(b, content);
+    MKWPostAngleEditor.begin(ev, b, content ? "content" : "frame");
+    return;
   }
   // Selecting an empty board in text mode must not also start cropping it.
   const emptyText = !["date", "title", "subtitle"].some((key) => {

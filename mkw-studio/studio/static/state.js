@@ -65,6 +65,7 @@ function snapshot() {
     textTypeOverrides: clone(p.textTypeOverrides || {}),
     familyOverrides: clone(p.familyOverrides || {}),
     sponsorOverrides: clone(p.sponsorOverrides || {}),
+    angleOverrides: clone(p.angleOverrides || {}),
     boards: clone(p.boards),
     images: [...p.images],
     fonts: [...p.fonts],
@@ -426,6 +427,19 @@ function resize(w, h, mode) {
       b.safe.top *= f;
       b.safe.bottom *= f;
     }
+    if (b.angle) {
+      const t = b.angle.image;
+      if (mode === "layout") {
+        t.x = t.x * s + (w - ow * s) / 2;
+        t.y = t.y * s + (h - oh * s) / 2;
+        t.scale = Math.min(100, t.scale * s);
+        b.angle.thickness = Math.max(1, Math.min(1000, b.angle.thickness * s));
+        b.angle.glow = Math.min(300, b.angle.glow * s);
+      } else {
+        t.x += (w - ow) / 2;
+        t.y += (h - oh) / 2;
+      }
+    }
     b.w = w;
     b.h = h;
   });
@@ -499,6 +513,7 @@ function validate(q) {
     )
       throw Error("Ungültige Zeichenfläche.");
     bids.add(b.id);
+    MKWPostAngle.validate(b);
     for (const k of ["x", "y", "scale", "angle", "flipX", "flipY"])
       if (!Number.isFinite(b.image[k])) throw Error("Ungültiger Ausschnitt.");
     if (
@@ -719,6 +734,7 @@ function createBoard(im, w = 1080, h = 1080) {
     template?.family || p.meta.familyDesign || MKWFamily.defaults(),
   );
   if (MKWSponsors.layout(b)) fit(b, "fill");
+  if (template?.angle) MKWPostAngleEditor.create(b, template.angle);
   return b;
 }
 

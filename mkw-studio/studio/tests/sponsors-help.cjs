@@ -315,6 +315,7 @@ const { launch, artifact } = require("./browser.cjs");
         "Untertitel",
         "Familienkonzert",
         "Sponsorenleiste",
+        "Winkel anzeigen",
       ],
     );
     assert.equal(await first.locator("hr").count(), 0);

@@ -50,6 +50,7 @@
       "textTypeOverrides",
       "familyOverrides",
       "sponsorOverrides",
+      "angleOverrides",
     ])
       if (project[key])
         for (const id of Object.keys(project[key]))
