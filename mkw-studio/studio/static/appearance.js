@@ -1,49 +1,10 @@
 "use strict";
-const studioPreferenceDefaults = {
-  guideColour: "#93a8ef",
-  sponsorColour: "#ffffff",
-  snapColour: "#f5a8e8",
-  snapDistance: 6,
-  exportFormat: "jpg",
-  autoSaveFile: true,
-  advanced: false,
-  curvature: false,
-  pdfPreset: "linkedin",
-  lineHeight: 95,
-};
-let studioPreferences = { ...studioPreferenceDefaults };
+const studioPreferenceDefaults = MKWSetupModel.defaults;
+let studioPreferences = MKWSetupModel.preferences();
 try {
-  const saved = JSON.parse(
-    localStorage.getItem("mkw-studio-preferences") || "{}",
+  studioPreferences = MKWSetupModel.preferences(
+    JSON.parse(localStorage.getItem("mkw-studio-preferences") || "{}"),
   );
-  if (
-    ["linkedin", "linkedin-square", "original", "compact"].includes(
-      saved.pdfPreset,
-    )
-  )
-    studioPreferences.pdfPreset = saved.pdfPreset;
-  if (
-    Number.isFinite(saved.lineHeight) &&
-    saved.lineHeight >= 20 &&
-    saved.lineHeight <= 300
-  )
-    studioPreferences.lineHeight = saved.lineHeight;
-  if (typeof saved.curvature === "boolean")
-    studioPreferences.curvature = saved.curvature;
-  if (typeof saved.autoSaveFile === "boolean")
-    studioPreferences.autoSaveFile = saved.autoSaveFile;
-  if (typeof saved.advanced === "boolean")
-    studioPreferences.advanced = saved.advanced;
-  for (const key of ["guideColour", "snapColour", "sponsorColour"])
-    if (/^#[0-9a-f]{6}$/i.test(saved[key])) studioPreferences[key] = saved[key];
-  if (
-    Number.isInteger(saved.snapDistance) &&
-    saved.snapDistance >= 1 &&
-    saved.snapDistance <= 40
-  )
-    studioPreferences.snapDistance = saved.snapDistance;
-  if (["jpg", "png", "webp"].includes(saved.exportFormat))
-    studioPreferences.exportFormat = saved.exportFormat;
 } catch {}
 function studioApplyPreferences() {
   const style = document.documentElement.style;
@@ -61,6 +22,17 @@ function studioApplyPreferences() {
     $("#" + id).value = studioPreferences[id];
   $("#defaultExportFormat").value = studioPreferences.exportFormat;
   $("#advancedMode").checked = studioPreferences.advanced;
+  for (const key of Object.keys(studioPreferences.textSizes)) {
+    const input = document.querySelector(`[data-default-text-size="${key}"]`);
+    if (input) input.value = studioPreferences.textSizes[key];
+  }
+  for (const [id, key] of [
+    ["defaultLineHeight", "lineHeight"],
+    ["defaultPDFPreset", "pdfPreset"],
+  ])
+    if ($("#" + id)) $("#" + id).value = studioPreferences[key];
+  if ($("#autoSaveFile"))
+    $("#autoSaveFile").checked = studioPreferences.autoSaveFile;
   carouselSyncAdvancedTools();
   try {
     localStorage.setItem(

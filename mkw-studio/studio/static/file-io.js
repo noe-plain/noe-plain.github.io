@@ -51,3 +51,26 @@ function setSaveBusy(value) {
     .querySelectorAll("input,button")
     .forEach((el) => (el.disabled = value));
 }
+
+async function writeFilePlan(handle, plan) {
+  if (plan.unchanged) return;
+  const stream = await handle.createWritable({
+    keepExistingData: plan.keepExistingData,
+    mode: "exclusive",
+  });
+  try {
+    for (const write of plan.writes)
+      await stream.write({
+        type: "write",
+        position: write.position,
+        data: write.data,
+      });
+    await stream.truncate(plan.size);
+    await stream.close();
+  } catch (error) {
+    try {
+      await stream.abort();
+    } catch {}
+    throw error;
+  }
+}

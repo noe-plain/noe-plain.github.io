@@ -33,7 +33,11 @@ const MKWProjects = (() => {
       });
     else links.delete(record.id);
   }
-  async function writeLinked(project, interactive = false) {
+  async function writeLinked(
+    project,
+    interactive = false,
+    isCurrent = () => true,
+  ) {
     const link = fileLink(project.projectId);
     if (!link) return false;
     let permission = await link.handle.queryPermission({ mode: "readwrite" });
@@ -46,26 +50,38 @@ const MKWProjects = (() => {
       return false;
     }
     const perform = async () => {
-      const blob = await MKWProjectFile.encode(project);
-      const latest = await MKWProjectStore.version(project.projectId);
-      if ((latest || 0) !== (versions.get(project.projectId) || 0)) {
-        notice(
-          "Ein anderer Tab hat eine neuere Sicherung erstellt. Die Datei wird erst nach der Konfliktprüfung aktualisiert.",
-        );
-        return false;
-      }
-      const current = await link.handle.getFile();
-      if (
-        link.stamp &&
-        (current.size !== link.stamp.size ||
-          current.lastModified !== link.stamp.modified)
-      ) {
-        notice(
-          "Die verknüpfte MKW-Datei wurde ausserhalb dieses Tabs geändert. Dein Stand bleibt im Browser erhalten. Bitte die andere Datei prüfen oder „Speichern unter …“ verwenden.",
-        );
-        return false;
-      }
-      await writeSaveFile(link.handle, blob, link.handle.name);
+      const check = async () => {
+        if (!isCurrent()) return false;
+        const latest = await MKWProjectStore.version(project.projectId);
+        if ((latest || 0) !== (versions.get(project.projectId) || 0)) {
+          notice(
+            "Ein anderer Tab hat eine neuere Sicherung erstellt. Die Datei wird erst nach der Konfliktprüfung aktualisiert.",
+          );
+          return false;
+        }
+        const current = await link.handle.getFile();
+        if (
+          link.stamp &&
+          (current.size !== link.stamp.size ||
+            current.lastModified !== link.stamp.modified)
+        ) {
+          notice(
+            "Die verknüpfte MKW-Datei wurde ausserhalb dieses Tabs geändert. Dein Stand bleibt im Browser erhalten. Bitte die andere Datei prüfen oder „Speichern unter …“ verwenden.",
+          );
+          return false;
+        }
+        return current;
+      };
+      const current = await check();
+      if (!current) return false;
+      const packed = await MKWProjectStore.pack(project),
+        plan = await MKWProjectBlocks.prepare(packed, current, {
+          readAsset: MKWProjectStore.asset,
+        });
+      // Serialization can take time for new photos. Recheck before touching the file.
+      if (!(await check())) return false;
+      if (plan.unchanged) return true;
+      await writeFilePlan(link.handle, plan);
       link.stamp = stamp(await link.handle.getFile());
       await MKWProjectStore.link(project.projectId, link.handle, link.stamp);
       return true;
@@ -119,7 +135,12 @@ const MKWProjects = (() => {
         (p.projectId !== document.projectId || saveRevision === revision)
       )
         try {
-          fileSaved = await writeLinked(document);
+          fileSaved = await writeLinked(
+            document,
+            false,
+            () =>
+              p.projectId !== document.projectId || saveRevision === revision,
+          );
         } catch (error) {
           notice(
             "Im Browser gesichert. Die MKW-Datei konnte nicht aktualisiert werden: " +
@@ -268,7 +289,7 @@ const MKWProjects = (() => {
             stamp: stamp(await handle.getFile()),
           });
         }
-        const ok = await writeLinked(MKWProjectAssets.compact(p), true);
+        const ok = await writeLinked(MKWProjectAssets.capture(p), true);
         if (!ok)
           throw Error(
             "Datei nicht überschrieben. Bitte den Hinweis oberhalb der Arbeitsfläche beachten.",

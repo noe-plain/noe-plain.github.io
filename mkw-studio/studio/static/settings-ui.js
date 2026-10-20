@@ -54,6 +54,39 @@ function studioSettingsUI() {
   leading.innerHTML =
     '<h3>Zeilenabstand im Carousel</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
   panels.fonts.prepend(leading);
+  const textSizes = document.createElement("section");
+  textSizes.className = "settings-text-sizes";
+  textSizes.innerHTML = `<h3>Standard-Schriftgrössen</h3><p>Startwerte für neue Einzelposts · in Pixeln</p><div class="settings-size-grid">${[
+    ["date", "Übertitel"],
+    ["title", "Konzerttitel"],
+    ["subtitle", "Untertitel"],
+    ["copyright", "Copyright"],
+  ]
+    .map(
+      ([key, label]) =>
+        `<label>${label}<span class="settings-size-value"><input type="number" data-default-text-size="${key}" aria-label="Standard-Schriftgrösse ${label}" min="1" max="5000" step="1" value="${studioPreferences.textSizes[key]}"><span>px</span></span></label>`,
+    )
+    .join("")}</div>`;
+  panels.fonts.prepend(textSizes);
+  for (const input of textSizes.querySelectorAll("input"))
+    input.onchange = () => {
+      const value = Number(input.value),
+        key = input.dataset.defaultTextSize;
+      if (
+        !input.value ||
+        !Number.isFinite(value) ||
+        value < 1 ||
+        value > 5000
+      ) {
+        input.value = studioPreferences.textSizes[key];
+        return;
+      }
+      studioPreferences.textSizes = {
+        ...studioPreferences.textSizes,
+        [key]: value,
+      };
+      studioApplyPreferences();
+    };
   const pdf = document.createElement("section");
   pdf.className = "settings-pdf";
   pdf.innerHTML = `<h3>Carousel-PDF</h3><label class="settings-export-format">Standard-Preset<select id="defaultPDFPreset">${Object.entries(

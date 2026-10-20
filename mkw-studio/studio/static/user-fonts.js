@@ -50,6 +50,17 @@ async function studioStoreFont(font) {
     transaction.onerror = () => reject(transaction.error);
   });
 }
+async function studioReplaceStoredFonts(fonts) {
+  const db = await studioOpenFontDatabase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("fonts", "readwrite"),
+      store = tx.objectStore("fonts");
+    store.clear();
+    for (const font of fonts) store.put(font);
+    tx.oncomplete = resolve;
+    tx.onerror = tx.onabort = () => reject(tx.error);
+  });
+}
 async function studioMergeUserFonts() {
   try {
     const stored = await studioStoredFonts();

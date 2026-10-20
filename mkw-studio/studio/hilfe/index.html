@@ -292,6 +292,16 @@
         <section id="speichern">
           <h2>Speichern & übergeben</h2>
           <p>Neue MKW-Dateien werden verlustfrei komprimiert und Bild für Bild verarbeitet. Alte MKW-Dateien bleiben lesbar. Gelöschte, nicht mehr verwendete Bilder werden beim Speichern entfernt; ausgeblendete Elemente bleiben erhalten.</p>
+          <h3>MKW-Setup: Einstellungen im Team teilen</h3>
+          <p>Unter <strong>Einstellungen → Allgemein → MKW-Setup</strong> stehen drei Aktionen zur Verfügung:</p>
+          <ol>
+            <li><strong>Exportieren:</strong> Erstellt eine .mkwsetup-Datei mit allen Werkzeugeinstellungen: Hell/Dunkel, Advanced-Modus, automatischer Dateiaktualisierung, Hilfslinienfarben, Einrastabstand, Export-Vorgaben, Standard-Schriftgrössen, Zeilenhöhe sowie eigenen Schriften und Sponsorgruppen mit Logos, Gruppennamen und Reihenfolge.</li>
+            <li><strong>Verknüpfen:</strong> Wähle eine Setup-Datei. Ihre Einstellungen und Bibliotheken ersetzen die bisherigen Werkzeugeinstellungen. Die Datei wird gemerkt; bereits gestaltete Projekte bleiben unverändert.</li>
+            <li><strong>Aktualisieren:</strong> Prüft die gewählte Datei erneut und übernimmt ihren aktuellen Inhalt. So lassen sich zentral geänderte Team-Einstellungen abrufen. Lokale Änderungen werden dabei durch die Werte der Setup-Datei ersetzt.</li>
+          </ol>
+          <p>Firefox merkt sich den Dateinamen, erlaubt Websites jedoch keinen dauerhaften Zugriff auf lokale Dateien. Beim Aktualisieren musst du die Setup-Datei dort erneut auswählen. Browser mit direktem Dateizugriff merken sich die Dateiverknüpfung; nach einem Neustart kann erneut eine Leseberechtigung nötig sein. Das Studio liest die Datei nur nach deiner Aktion und überschreibt sie beim Aktualisieren nicht.</p>
+          <p>Unter <strong>Einstellungen → Schriften</strong> kannst du Startgrössen für Übertitel, Konzerttitel, Untertitel und Copyright festlegen. Die Werte gelten in Pixeln für neue Einzelposts; weitere Bilder übernehmen weiterhin die Textvorlage des ersten Bildes. Im aktuellen Projekt verwendete Schriften und Sponsorlogos bleiben erhalten, auch wenn eine neue Setup-Datei sie nicht mehr in der Werkzeugbibliothek enthält.</p>
+          <p>Setup-Dateien sind verlustfrei komprimiert. Beim Einlesen werden Format, Schriften und Logos geprüft. Ungültige Dateien ändern keine Einstellungen. Bei einem Speicherfehler werden die bisherigen Einstellungen wiederhergestellt; eine unterbrochene Übernahme wird beim nächsten Start zurückgesetzt. Projekte, Projektbilder und lokale Dateipfade werden nicht mit einer Setup-Datei weitergegeben.</p>
           <h3>Browsersicherung</h3>
           <p>
             Änderungen werden automatisch in diesem Browserprofil gesichert.
@@ -314,6 +324,9 @@
             synchronisiert. Das Löschen von Websitedaten kann die
             Browsersicherungen entfernen.
           </p>
+          <h3>Schnelles Speichern in Chrome</h3>
+          <p>Nach dem Verknüpfen einer .mkw-Datei aktualisiert Chrome sie automatisch, sofern die Dateiaktualisierung in den Einstellungen aktiviert und der Dateizugriff freigegeben ist. Bilder werden einmal als getrennte Datenblöcke abgelegt. Änderungen an Text, Position oder Gestaltung schreiben nur den kleinen Projektteil neu; neue Bilder werden ergänzt. Unveränderte Stände werden nicht erneut geschrieben. Gelöschte, nicht mehr verwendete Bilder werden beim nächsten Speichern entfernt; ausgeblendete Inhalte bleiben erhalten.</p>
+          <p>Alte MKW-Dateien bleiben lesbar und werden beim ersten direkten Speichern einmalig auf das neue Speicherformat umgestellt. Auch Firefox kann die neuen Dateien öffnen. Chrome nutzt intern eine temporäre Kopie für sichere Dateiaktualisierungen; deshalb kann das Speichern sehr grosser Dateien weiterhin kurz dauern. Währenddessen kannst du weiterarbeiten. Die Browsersicherung bleibt zusätzlich aktiv.</p>
           <h3>Firefox und lokale Dateien</h3>
           <p>
             In Firefox erfolgt die Dateisicherung per Download. Bereits

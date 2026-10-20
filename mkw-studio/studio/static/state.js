@@ -188,7 +188,7 @@ function basicBoard(im, w = 1080, h = 1080) {
     },
     elements: {
       date: {
-        ...item(p.meta.concert, 64, h - 300, 52),
+        ...item(p.meta.concert, 64, h - 300, studioPreferences.textSizes.date),
         uppercase: p.meta.headingUppercase !== false,
         enabled: true,
         visible: true,
@@ -198,14 +198,28 @@ function basicBoard(im, w = 1080, h = 1080) {
           p.meta.uppercase ? p.meta.headline.toUpperCase() : p.meta.headline,
           64,
           h - 240,
-          104,
+          studioPreferences.textSizes.title,
         ),
         enabled: true,
         visible: true,
       },
-      subtitle: { ...item(p.meta.subtitle, 64, h - 120, 52), enabled: false },
+      subtitle: {
+        ...item(
+          p.meta.subtitle,
+          64,
+          h - 120,
+          studioPreferences.textSizes.subtitle,
+        ),
+        enabled: false,
+      },
       copyright: {
-        ...item("", w - 35, h - 35, 32, "Harriet Regular"),
+        ...item(
+          "",
+          w - 35,
+          h - 35,
+          studioPreferences.textSizes.copyright,
+          "Harriet Regular",
+        ),
         align: "right",
       },
       logo: {

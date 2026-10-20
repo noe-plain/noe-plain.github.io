@@ -350,6 +350,7 @@ const MKWProjectStore = (() => {
     remove,
     pack,
     unpack,
+    asset: (key) => read("assets", key),
     clearHashCache: () => hashCache.clear(),
   };
 })();

@@ -9,6 +9,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     restoreError = "";
   try {
     await MKWBrowser.init();
+    await MKWSetupSession.recover();
     try {
       saved = await MKWProjectStore.last({ metadataOnly: true });
     } catch (error) {

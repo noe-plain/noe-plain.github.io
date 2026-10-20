@@ -1,14 +1,23 @@
 /* MKW remains JSON, but no operation assembles the complete asset payload as a string. */
 (function (root) {
   "use strict";
-  const collections = ["images", "logos", "fonts"];
-  async function encode(project, { compress = true } = {}) {
-    const document = MKWProjectAssets.compact(project),
-      metadata = { ...document };
-    for (const key of collections) delete metadata[key];
+  const collections = ["images", "logos", "fonts"],
+    blocks =
+      typeof module !== "undefined"
+        ? require("./project-blocks.js")
+        : root.MKWProjectBlocks;
+  async function encode(project, options) {
+    return encodeDocument(MKWProjectAssets.compact(project), options);
+  }
+  async function encodeDocument(
+    document,
+    { compress = true, assetCollections = collections } = {},
+  ) {
+    const metadata = { ...document };
+    for (const key of assetCollections) delete metadata[key];
     async function* values() {
       yield JSON.stringify(metadata).slice(0, -1);
-      for (const key of collections) {
+      for (const key of assetCollections) {
         yield `,${JSON.stringify(key)}:[`;
         for (let i = 0; i < document[key].length; i++) {
           if (i) yield ",";
@@ -53,7 +62,10 @@
       type: compressed ? "application/gzip" : "application/json",
     });
   }
-  async function decode(file) {
+  async function decode(file, { maxBytes = Infinity } = {}) {
+    if (file.size > maxBytes) throw Error("Die Datei ist zu gross.");
+    if (file.slice && (await blocks.isBlockFile(file)))
+      return blocks.decode(file, { maxBytes });
     const header = file.slice
       ? new Uint8Array(await file.slice(0, 2).arrayBuffer())
       : [];
@@ -63,6 +75,21 @@
     let stream = file.stream();
     if (compressed)
       stream = stream.pipeThrough(new DecompressionStream("gzip"));
+    if (Number.isFinite(maxBytes)) {
+      let bytes = 0;
+      stream = stream.pipeThrough(
+        new TransformStream({
+          transform(chunk, controller) {
+            bytes += chunk.byteLength;
+            if (bytes > maxBytes)
+              throw Error(
+                "Die entpackte Setup-Datei ist zu gross (maximal 256 MB).",
+              );
+            controller.enqueue(chunk);
+          },
+        }),
+      );
+    }
     const reader = stream.pipeThrough(new TextDecoderStream()).getReader();
     let chunk = "",
       pos = 0,
@@ -169,7 +196,7 @@
       reader.releaseLock();
     }
   }
-  const api = { encode, decode };
+  const api = { encode, encodeDocument, decode };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectFile = api;
 })(globalThis);

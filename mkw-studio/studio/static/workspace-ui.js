@@ -1,6 +1,6 @@
 "use strict";
 // Google Fonts Material Symbols Rounded, bundled locally for GitHub Pages.
-const studioIconSprite = "static/icons/material-symbols.svg?v=a57df80e597a";
+const studioIconSprite = "static/icons/material-symbols.svg?v=d7962e8657e6";
 const studioIconNames = {
   image: "image",
   crop: "crop",
@@ -23,6 +23,7 @@ const studioIconNames = {
   down: "expand_more",
   trash: "delete",
   replace: "swap_vert",
+  refresh: "refresh",
   move: "open_with",
   layers: "layers",
   duplicate: "content_copy",
