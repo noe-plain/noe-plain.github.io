@@ -20,7 +20,7 @@ function carouselTextAlignButtons(value, attribute, label, locked = false) {
   return `<div class="type-alignment" role="group" aria-label="${label}">${carouselTextAlignments.map((item) => `<button ${attribute}="${item.value}" aria-label="${item.label}" title="${item.label}" aria-pressed="${value === item.value}" ${locked ? "disabled" : ""}>${studioIcon(item.icon)}</button>`).join("")}</div>`;
 }
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${o.textAnchor !== "bottom"}">${studioIcon("up")}Oben</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button>${studioPreferences.advanced ? `<button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button>` : ""}<button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
 }
 function carouselBindTextAlignment(o, panel) {
   panel.querySelectorAll("[data-text-align]").forEach((button) => {
@@ -40,7 +40,7 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
   const key = JSON.stringify([
       o.text,
       o.font,
-      !!fontStatus[o.font],
+      fontStatus,
       o.size,
       o.w,
       o.lineHeight,
@@ -49,10 +49,14 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       o.uppercase,
       o.script,
       o.characterStyles,
+      o.tracking,
+      o.baselineShift,
+      o.underline,
+      o.strike,
       ctx.fontKerning,
       ctx.fontStretch,
       ctx.fontVariantCaps,
-      ctx.letterSpacing,
+
       ctx.wordSpacing,
     ]),
     cached = carouselTextLayouts.get(o);
@@ -63,6 +67,7 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
   for (const [paragraph, text] of o.text.split("\n").entries()) {
     const style = o.textStyles?.[paragraph],
       size = style?.size ?? o.size;
+    y += style?.spaceBefore || 0;
     ctx.font = `${size}px "${o.font}"`;
     const wrapped = carouselWrapText(
       text,
@@ -71,14 +76,21 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
         carouselTypeRuns(o, t, offset + (start || 0), size, ctx).width,
     );
     wrapped.forEach((part, index) => {
-      const leading = style?.leading?.[index] ?? size * (o.lineHeight ?? 0.95);
+      const automatic = style?.lineHeight ?? o.lineHeight ?? 0.95;
       const raw = part.raw.trimEnd(),
         display = o.uppercase ? raw.toLocaleUpperCase("de-CH") : raw,
         styled = carouselTypeRuns(o, raw, offset + part.start, size, ctx),
         width = styled.width,
-        alignment = carouselTextAlign(o, paragraph);
+        alignment = carouselTextAlign(o, paragraph),
+        extent = Math.max(
+          size * 1.12,
+          ...styled.runs.map((run) => run.dy + run.size * 1.12),
+        ),
+        leading =
+          style?.leading?.[index] ??
+          Math.max(size, ...styled.runs.map((run) => run.size)) * automatic;
       lines.push({
-        text: display,
+        text: styled.runs.map((run) => run.text).join(""),
         runs: styled.runs,
         width,
         x: (o.w - width) * alignment.factor,
@@ -90,15 +102,19 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
         index,
         size,
         leading,
+        extent,
         y,
       });
       y += leading;
     });
+    y += style?.spaceAfter || 0;
     offset += text.length + 1;
   }
   const layout = {
     lines,
-    height: Math.max(0, ...lines.map((line) => line.y + line.size * 1.12)),
+    height:
+      Math.max(0, ...lines.map((line) => line.y + line.extent)) +
+      (o.textStyles?.[o.text.split("\n").length - 1]?.spaceAfter || 0),
   };
   carouselTextLayouts.set(o, { key, fonts: fontStatus, layout });
   return layout;
@@ -109,7 +125,11 @@ function carouselTextHeight(o) {
 }
 
 function carouselTextOffset(o, layout = carouselTextLayout(o)) {
-  return o.textAnchor === "bottom" ? o.h - layout.height : 0;
+  return o.textAnchor === "bottom"
+    ? o.h - layout.height
+    : o.textAnchor === "center"
+      ? (o.h - layout.height) / 2
+      : 0;
 }
 
 function carouselPositionText(el, o) {
@@ -134,6 +154,8 @@ function carouselPositionText(el, o) {
     transform: o.angle ? `rotate(${o.angle}deg)` : "none",
   });
   el.querySelectorAll("[data-text-size]").forEach((line, index) => {
+    line.style.position = "absolute";
+    line.style.top = (layout.lines[index]?.y ?? 0) * carouselZoom + "px";
     line.style.left = (layout.lines[index]?.x ?? 0) * carouselZoom + "px";
     line.style.fontSize = line.dataset.textSize * carouselZoom + "px";
     line.style.lineHeight = line.dataset.textSize * 1.12 * carouselZoom + "px";
@@ -273,6 +295,11 @@ function carouselEndText(preservePanel = false) {
   const edit = carouselUI.editing;
   if (!edit) return;
   carouselUI.editing = null;
+  if (!preservePanel) {
+    const o = p.carousel?.objects.find((o) => o.id === edit.id);
+    if (o) MKWTypography.clear(o);
+    carouselUI.typeRange = null;
+  }
   edit.el.onblur = null;
   edit.el.remove();
   if (carouselActive() && $("#carouselProperties")) {
@@ -578,19 +605,10 @@ function carouselReplaceTextStyles(o, start, end, text) {
     styles.splice(
       paragraph + 1,
       0,
-      ...Array.from({ length: inserted }, () =>
-        styles[paragraph]?.size !== undefined ||
-        styles[paragraph]?.align !== undefined
-          ? {
-              ...(styles[paragraph].size !== undefined
-                ? { size: styles[paragraph].size }
-                : {}),
-              ...(styles[paragraph].align !== undefined
-                ? { align: styles[paragraph].align }
-                : {}),
-            }
-          : null,
-      ),
+      ...Array.from({ length: inserted }, () => {
+        const { leading, ...inherited } = styles[paragraph] || {};
+        return Object.keys(inherited).length ? { ...inherited } : null;
+      }),
     );
   return styles;
 }
@@ -614,7 +632,10 @@ function carouselTextStylesForInput(o, value) {
 
 function carouselRefreshTextStyles(o) {
   const section = $("#carouselTextStyles");
-  if (!section) return;
+  if (!section) {
+    MKWTypography.sync();
+    return;
+  }
   const panel = $("#carouselProperties"),
     scroll = panel.scrollTop;
   section.outerHTML = carouselTextStylePanel(o);
@@ -647,9 +668,7 @@ function carouselTrackTextCaret(o, el) {
     carouselRefreshTextStyles(o);
 }
 
-function carouselEditableRuns(o, line) {
-  if (!o.characterStyles?.length && o.script !== "superscript")
-    return esc(line.raw);
+function carouselEditableRuns(o, line, zoom = carouselZoom) {
   return carouselTypeRuns(
     o,
     line.raw,
@@ -659,7 +678,7 @@ function carouselEditableRuns(o, line) {
   )
     .runs.map(
       (run) =>
-        `<span data-script="${run.script}" style="font-size:${run.script === "superscript" ? 65 : 100}%;position:relative;top:${-run.rise * carouselZoom}px">${esc(run.raw)}</span>`,
+        `<span data-script="${run.script}" style="font-family:${esc(fontFamily(run.font).replaceAll('"', "'"))};font-size:${run.size * zoom}px;letter-spacing:${run.letterSpacing * zoom}px;text-transform:${run.uppercase ? "uppercase" : "none"};color:${esc(run.color || o.color)};text-decoration:${[run.underline ? "underline" : "", run.strike ? "line-through" : ""].filter(Boolean).join(" ") || "none"};position:relative;top:${(run.dy - (carouselTypeBaseline(carouselMeasureContext, o.font, line.size) - carouselTypeBaseline(carouselMeasureContext, run.font, run.size))) * zoom}px">${esc(run.raw)}</span>`,
     )
     .join("");
 }

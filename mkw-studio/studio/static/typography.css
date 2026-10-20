@@ -1,0 +1,231 @@
+.typography-inspector {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.typo-scope {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.typo-scope > span {
+  color: var(--typo-accent, var(--blue));
+  font-weight: 600;
+}
+.typo-scope button {
+  font-size: 11px;
+  padding: 5px 7px;
+}
+.typo-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  gap: 3px;
+  border-radius: 10px;
+  background: #8080800c;
+  border: 1px solid var(--line);
+}
+.typo-tabs button {
+  border: 0;
+  background: transparent;
+  border-radius: 7px;
+  min-height: 32px;
+}
+.typo-tabs button[aria-selected="true"] {
+  background: #80808014;
+  color: var(--typo-accent, var(--blue));
+  box-shadow: 0 1px 4px #00000013;
+}
+.typography-inspector [role="tabpanel"] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.typography-inspector [hidden] {
+  display: none !important;
+}
+.typography-inspector label,
+.typo-content label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  font-size: 12px;
+}
+.typo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+.typo-grid > * {
+  min-width: 0;
+}
+.typography-inspector input,
+.typography-inspector select,
+.typo-content select,
+.typo-content textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.typo-format {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.typo-format button {
+  padding: 0;
+  display: grid;
+  place-items: center;
+  height: 36px;
+}
+.typo-format button[aria-pressed="true"],
+.typo-format button[aria-pressed="mixed"] {
+  color: var(--typo-accent, var(--blue));
+  background: var(--accent-soft, #315bd81a);
+  border-color: var(--typo-accent, var(--blue));
+}
+.typo-format button[aria-pressed="mixed"] {
+  border-style: dashed;
+}
+.typo-symbol {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1;
+}
+.typo-underline {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.typo-strike {
+  text-decoration: line-through;
+}
+.typo-colour-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+.typo-colour-row button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+}
+.typo-colour-row i {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 0 1px #ffffff30;
+}
+.typo-details {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.typo-details summary {
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.typo-details[open] label {
+  margin-top: 14px;
+}
+.typo-details > button {
+  width: 100%;
+  margin-top: 14px;
+}
+.typo-paragraph-scope {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.typo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#stepPanel > .typography-inspector {
+  margin-top: 18px;
+}
+.text-editor .carousel-text-line {
+  white-space: pre;
+  display: block;
+}
+
+.advanced-mode .carousel-text-anchor {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.advanced-mode .carousel-text-anchor button {
+  padding-inline: 5px;
+  gap: 4px;
+}
+.typo-visible {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+.typo-visible input {
+  width: 16px !important;
+  height: 16px;
+  margin: 0;
+}
+.typography-inspector .typo-details .carousel-property-section {
+  padding: 12px 0 0;
+  margin: 0;
+  border: 0;
+}
+.typography-inspector,
+.typo-content {
+  --typo-surface: #191f29;
+  --typo-border: #414e64;
+  --typo-muted: #a3b2c9;
+  --typo-text: #e3ebfa;
+  --typo-accent: #b5c4ff;
+}
+html[data-theme="light"] :is(.typography-inspector, .typo-content) {
+  --typo-surface: #ffffff;
+  --typo-border: #d9dfe7;
+  --typo-muted: #647187;
+  --typo-text: #1d2838;
+  --typo-accent: #315bcc;
+}
+.typography-inspector :is(input, select),
+.typo-content :is(select, textarea) {
+  padding: 8px 10px;
+  border: 1px solid var(--typo-border);
+  border-radius: 8px;
+  background: var(--typo-surface);
+  color: var(--typo-text);
+  min-height: 36px;
+  font-size: 12px;
+}
+.typography-inspector .type-unit {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+}
+.typography-inspector .type-unit input {
+  padding-right: 30px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.typography-inspector .type-unit > span {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: var(--typo-muted);
+  font-size: 11px;
+}
+#stepPanel > .typography-inspector {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  padding-top: 18px;
+}

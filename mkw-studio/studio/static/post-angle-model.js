@@ -23,9 +23,13 @@
       h = content.h,
       t = Math.min(a.thickness * Math.SQRT2, w * 0.45, h * 0.45),
       clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
-      x = clamp(a.tip.x * w, a.direction === "right" ? t + 1 : 1, w - 1),
+      x = clamp(
+        (a.direction === "right" ? a.tip.x : 0.5) * w,
+        a.direction === "right" ? t + 1 : 1,
+        w - 1,
+      ),
       y = clamp(
-        a.tip.y * h,
+        (a.direction === "right" ? 0.5 : a.tip.y) * h,
         a.direction === "down" ? t + 1 : 1,
         a.direction === "up" ? h - t - 1 : h - 1,
       ),

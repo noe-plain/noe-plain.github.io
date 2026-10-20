@@ -96,6 +96,9 @@
         </section>
         <section id="einzelposts">
           <h2>Einzelposts gestalten</h2>
+          <h3>Schutzzonen an allen vier Seiten</h3>
+          <p>Beim Einrichten eines Einzelpost-Projekts kannst du für jedes ausgewählte Format die Abstände <strong>oben, unten, links und rechts</strong> in Pixeln festlegen. Die Zeichenflächen-Grafik zeigt die nutzbare Fläche direkt. Nicht ausgewählte Formate bleiben kompakt. Links und rechts sind bei neuen Standardformaten je 100 px voreingestellt.</p>
+          <p>Später öffnest du bei der Zeichenfläche <strong>Format anpassen</strong>. Dort lassen sich alle vier Abstände für diese Zeichenfläche ändern. Text, MKW-Logo und Hilfslinien verwenden dieselben Werte; der Bildausschnitt bleibt unverändert. Ungültige Kombinationen werden angezeigt und nicht gespeichert. Dateien ohne seitliche Werte behalten ihre bisherigen, mit der Breite skalierten Standardränder. Die Copyright-Grösse passt sich dem rechten Rand an.</p>
           <h3>Die Bildkarte links</h3>
           <p>
             Die Bildkarten bleiben auch auf kleinen Bildschirmen geöffnet. Jede
@@ -107,7 +110,7 @@
           <h3>Das erste Bild als Vorlage</h3>
           <p>
             Das erste Bild gibt Texte und Optionen für die weiteren Bilder vor.
-            Andere Bilder können anschliessend einzeln angepasst werden. Eigene
+            Der Winkel wird für jedes Bild separat eingeschaltet und eingerichtet. Andere Bilder können anschliessend einzeln angepasst werden. Eigene
             Texte bleiben unabhängig; mit „Text vom ersten Bild übernehmen“
             lässt sich diese Abweichung zurücksetzen.
           </p>
@@ -123,14 +126,26 @@
             sich ausschalten. Der eingegebene Text bleibt erhalten. Übertitel
             und Untertitel haben eigene Schriftgrössen.
           </p>
+          <h3>Advanced-Typografie · in beiden Editoren</h3>
+          <p>Aktiviere den <strong>Advanced-Modus</strong> in den Einstellungen. Einzelposts und Carousels verwenden dann denselben Textinspektor mit den Reitern <strong>Zeichen</strong> und <strong>Absatz</strong>. Bei Einzelposts bleibt die gemeinsame MKW-Textanordnung innerhalb der Schutzzone erhalten.</p>
+          <ol>
+            <li>Wähle ein Textfeld. Ohne Textmarkierung beziehen sich Änderungen auf den <strong>gesamten Text</strong>.</li>
+            <li>Markiere im Eingabefeld oder direkt auf der Fläche einen Textbereich. Schriftfamilie und Schriftschnitt, Grösse, Farbe, Laufweite, Grossbuchstaben, Unterstreichen, Durchstreichen, Hoch- und Tiefstellen gelten dann nur für die <strong>markierten Zeichen</strong>.</li>
+            <li>Mit einer einzelnen Einfügemarke gelten Zeichenänderungen für <strong>neu eingegebene Zeichen</strong>. Die Anzeige über den Reitern zeigt den Wirkungsbereich. <strong>Gesamter Text</strong> hebt diese Begrenzung auf.</li>
+            <li>Unter <strong>Absatz</strong> stellst du Links-/Mittel-/Rechtsausrichtung, Zeilenabstand in Prozent und Abstände davor und danach ein. Eine Markierung betrifft die berührten Absätze; eine Einfügemarke den aktuellen Absatz. Ohne Markierung gelten Absatzänderungen für alle Absätze.</li>
+          </ol>
+          <p>Die <strong>Laufweite</strong> wird in Tausendsteln der Schriftgrösse angegeben: 20 ‰ entspricht bei 50 px Schriftgrösse 1 px zusätzlichem Zeichenabstand. Unter „Weitere Zeichenoptionen“ findest du den Grundlinienversatz und das Zurücksetzen der Zeichenformate. Grossbuchstaben sowie Hoch-/Tiefstellung bleiben reine Darstellungen: Der ursprüngliche Text wird unverändert gespeichert.</p>
+          <p>Beim Carousel bleiben eigene Absatzgrössen und Zeilenabstände unter <strong>Absatz → Einzelne Absätze &amp; Zeilen</strong> erreichbar. „Textfeldfarbe &amp; Deckkraft“ verändert ausdrücklich den gesamten Textrahmen; die Textfarbe darüber berücksichtigt die Zeichenmarkierung. Beim Einzelpost folgen weitere Formate desselben Bildes sowie Bilder mit demselben Text den Formatänderungen am ersten Bild. Eigene Texte bleiben unabhängig. Die Familienpalette bleibt erhalten; Copyright bleibt dabei schwarz oder weiss und ohne Kontur.</p>
+          <p>Formate bleiben nach dem Ausschalten des Advanced-Modus und in MKW-Dateien erhalten. Bildexporte und PDF-Seiten verwenden den gemeinsamen Renderer. Bei Einzelpost-PSD sichert eine als <strong>Typografie (gerastert)</strong> benannte Ebene die genaue Darstellung; eine ausgeblendete Gruppe enthält separat editierbare Textläufe. Das ist kein vollständiger InDesign-/Affinity-Textrahmen. Carousel-PSD enthält einzelne editierbare Textläufe. Schriftverfügbarkeit und das Verhalten externer Programme können das spätere Editieren beeinflussen. Blocksatz und verkettete Textrahmen sind noch nicht enthalten.</p>
+          <p>Das Bedienprinzip orientiert sich an den offiziellen Beschreibungen von <a href="https://help.figma.com/hc/en-us/articles/360039956634-Explore-text-properties" target="_blank" rel="noopener">Figma</a>, <a href="https://helpx.adobe.com/indesign/desktop/format-and-style-text/composition-and-text-wrapping/apply-and-manage-text-formatting.html" target="_blank" rel="noopener">InDesign</a> und <a href="https://affinity.help/designer2/English.lproj/pages/Panels/characterPanel.html" target="_blank" rel="noopener">Affinity Designer</a>.</p>
           <h3>Winkel bei Einzelposts</h3>
           <ol>
             <li>In der Bildkarte <strong>Optionen</strong> öffnen und das Kästchen neben <strong>Winkel</strong> aktivieren. Im Dropdown wählst du <strong>Oben, Rechts oder Unten</strong>.</li>
-            <li>Den sichtbaren Winkel <strong>anklicken und ziehen</strong>, um ihn zu verschieben. Die hinteren Schenkelenden bleiben automatisch ausserhalb der Bildfläche; die beiden vorderen Ecken bilden die Spitze.</li>
+            <li>Den sichtbaren Winkel <strong>anklicken und ziehen</strong>: Bei „Oben“ und „Unten“ bewegt er sich nur nach oben und unten und bleibt horizontal zentriert; bei „Rechts“ bewegt er sich nur seitlich und bleibt vertikal zentriert. Die hinteren Schenkelenden bleiben automatisch ausserhalb der Bildfläche; die beiden vorderen Ecken bilden die Spitze.</li>
             <li>Mit einem <strong>Doppelklick</strong> den Bildinhalt öffnen. Ziehen verschiebt das Foto innerhalb des Winkels, die Eckgriffe skalieren es proportional. <strong>Escape</strong> oder der Button „Winkel“ in der Seitenleiste beendet die Inhaltsbearbeitung.</li>
           </ol>
           <p>Der Winkel verwendet dasselbe Foto wie der Hintergrund, anfangs leicht vergrössert und versetzt. Der Hintergrund bleibt beim Bearbeiten des Winkelbilds unverändert. In der Seitenleiste kannst du auch spiegeln, den Ausschnitt zurücksetzen, die Schenkelbreite und den Schein ändern. „Winkel vollständig füllen“ behebt freie Stellen. Die Voreinstellung ist 150 px Schenkelbreite und 50 px Schein. Der Bildinhalt dreht sich beim Richtungswechsel nicht mit.</p>
-          <p>Aktivierung und Richtung des ersten Bildes werden für die weiteren Bilder übernommen; eigene Einstellungen bleiben möglich. Jeder Bildausschnitt und jede Winkelposition sind pro Zeichenfläche unabhängig. Das Foto wird nur einmal in der MKW-Datei gespeichert. Vorschau und Bildexport nutzen dieselbe Darstellung; PSD enthält den Winkel als benannte Rasterebene.</p>
+          <p>Jedes Bild hat eine unabhängige Aktivierung und Richtung. Das erste Bild verändert die Winkel anderer Bilder nicht. Neue Formate desselben Bildes übernehmen seine Winkel-Einstellung; neue Bilder starten ohne Winkel. Jeder Bildausschnitt und jede Winkelposition sind pro Zeichenfläche unabhängig. Das Foto wird nur einmal in der MKW-Datei gespeichert. Vorschau und Bildexport nutzen dieselbe Darstellung; PSD enthält den Winkel als benannte Rasterebene.</p>
           <h3>Sponsorleisten</h3>
           <p>
             Unter Einstellungen → Sponsoren legst du Gruppen mit Namen und Logos
@@ -219,13 +234,14 @@
             passend zurück. Das gilt auch für Bildwinkel.
           </p>
           <h3>Typografie</h3>
+          <p>Die gemeinsame Advanced-Textbearbeitung ist im Abschnitt „Einzelposts gestalten → Advanced-Typografie“ beschrieben. Die folgenden Bedienelemente gelten für den einfachen Modus.</p>
           <p>
             Enter beginnt einen neuen Absatz. Die Grundgrösse und
             Textfeldausrichtung gelten für Absätze ohne eigene Einstellung.
             Unter „Absätze &amp; Abstände“ wählst du einen Absatz und bei Bedarf
             eine einzelne Zeile. Die automatische Zeilenhöhe ist standardmässig
             95 % der Schriftgrösse; „Automatisch“ stellt sie wieder her. Der
-            Text kann oben oder unten im Rahmen stehen.
+            Text kann oben oder unten, im Advanced-Modus auch mittig im Rahmen stehen.
           </p>
           <p>
             Grossbuchstaben und Hochstellen verändern die Darstellung, nicht den
@@ -234,8 +250,7 @@
           </p>
           <h3>Winkel und Rahmenpunkte</h3>
           <p>
-            Die Winkelspitze rastet auf der horizontalen oder vertikalen
-            Slide-Mitte ein. Mindestens eine Artwork-Kante wird um 1 px
+            Bei „Oben“ und „Unten“ bleibt die Winkelspitze horizontal auf der Slide-Mitte: Verschieben ist nur nach oben und unten möglich. Bei „Rechts“ bleibt sie vertikal in der Mitte und lässt sich nur seitlich verschieben. Das gilt auch bei ausgeschalteten magnetischen Hilfslinien. Der Bildinhalt bleibt frei anpassbar. Mindestens eine Artwork-Kante wird um 1 px
             überragt. Der Bildinhalt bleibt unabhängig von der Winkelrichtung
             ausgerichtet. In „Rahmenform“ wählst du 3 bis 8 Punkte. Ziehen der
             Rahmenpunkte verändert den Beschnitt, nicht die Position des

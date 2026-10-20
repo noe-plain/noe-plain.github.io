@@ -1,11 +1,12 @@
 "use strict";
 const MKWFormats = (() => {
-  const defaults = () => [
-    { w: 1080, h: 1920, top: 200, bottom: 500 },
-    { w: 1080, h: 1080, top: 100, bottom: 200 },
-    { w: 1080, h: 1350, top: 100, bottom: 200 },
-    { w: 1080, h: 1440, top: 100, bottom: 200 },
-  ];
+  const defaults = () =>
+    [
+      { w: 1080, h: 1920, top: 200, bottom: 500 },
+      { w: 1080, h: 1080, top: 100, bottom: 200 },
+      { w: 1080, h: 1350, top: 100, bottom: 200 },
+      { w: 1080, h: 1440, top: 100, bottom: 200 },
+    ].map((f) => ({ ...f, left: 100, right: 100 }));
   function validate(f) {
     return (
       f &&
@@ -17,14 +18,49 @@ const MKWFormats = (() => {
       f.w * f.h <= 40000000 &&
       f.top >= 0 &&
       f.bottom >= 0 &&
-      f.top + f.bottom < f.h
+      f.top + f.bottom < f.h &&
+      ["left", "right"].every(
+        (key) =>
+          f[key] === undefined || (Number.isInteger(f[key]) && f[key] >= 0),
+      ) &&
+      (f.left ?? (100 * f.w) / 1080) + (f.right ?? (100 * f.w) / 1080) < f.w
     );
   }
   const legacy = () => [
     { w: 1080, h: 1080, top: 100, bottom: 200 },
     { w: 1080, h: 1920, top: 200, bottom: 500 },
   ];
-  return { defaults, validate, legacy };
+  const safe = (f) => ({
+    top: f.top,
+    bottom: f.bottom,
+    ...(f.left !== undefined ? { left: f.left } : {}),
+    ...(f.right !== undefined ? { right: f.right } : {}),
+  });
+  const editor = (f, input) =>
+    `<div class="safezone-editor post-safezone-editor"><div class="safe-preview"><div class="safe-preview-inner"><span>Safezone</span></div></div>${[
+      ["top", "Oben"],
+      ["bottom", "Unten"],
+      ["left", "Links"],
+      ["right", "Rechts"],
+    ]
+      .map(
+        ([key, label]) =>
+          `<div class="safe-input safe-${key}">${input(f, key, label)}</div>`,
+      )
+      .join("")}</div>`;
+  function preview(box, f) {
+    box.style.aspectRatio = `${Math.max(1, f.w)}/${Math.max(1, f.h)}`;
+    box.style.width = `min(100%, ${(Math.max(1, f.w) / Math.max(1, f.h)) * 160}px)`;
+    for (const key of ["top", "bottom", "left", "right"]) {
+      const span = key === "top" || key === "bottom" ? f.h : f.w;
+      const value = f[key] ?? (100 * f.w) / 1080;
+      box.style.setProperty(
+        "--" + key,
+        Math.min(100, Math.max(0, (value / Math.max(1, span)) * 100)) + "%",
+      );
+    }
+  }
+  return { defaults, validate, legacy, safe, editor, preview };
 })();
 let formatDraft = [],
   setupWasBusy = false,
@@ -42,11 +78,11 @@ function openProjectSetup() {
 }
 function renderFormatSetup() {
   const input = (f, key, label) =>
-    `<label>${label} (px)<input type="number" data-format-key="${key}" min="${key === "w" || key === "h" ? 240 : 0}" max="10000" step="1" value="${f[key]}"></label>`;
+    `<label>${label} (px)<input type="number" data-format-key="${key}" min="${key === "w" || key === "h" ? 240 : 0}" max="10000" step="1" value="${f[key] ?? Math.round((100 * f.w) / 1080)}"></label>`;
   $("#formatChoices").innerHTML = formatDraft
     .map(
       (f, i) =>
-        `<fieldset class="format-choice ${f.enabled ? "is-enabled" : ""}" data-format="${i}"><legend><label><input type="checkbox" data-format-enabled aria-expanded="${f.enabled}" aria-controls="format-safezone-${i}" ${f.enabled ? "checked" : ""}> <span data-format-label>${MKW.ratio(f.w, f.h).replace("x", ":")}</span></label></legend><div class="format-row"><div class="format-dimensions"><div class="format-reveal" data-format-reveal><div><h4>Arbeitsfläche</h4></div></div><div class="format-fields">${input(f, "w", "Breite")}${input(f, "h", "Höhe")}</div><div class="format-reveal" data-format-reveal><div><small>Links & rechts: 9,26 %</small></div></div></div><div class="format-reveal format-safezone" id="format-safezone-${i}" data-format-reveal><div><div class="safezone-editor"><div class="safe-preview"><div class="safe-preview-inner"><span>Safezone</span></div></div><div class="safe-input safe-top">${input(f, "top", "Oben")}</div><div class="safe-input safe-bottom">${input(f, "bottom", "Unten")}</div></div></div></div></div></fieldset>`,
+        `<fieldset class="format-choice ${f.enabled ? "is-enabled" : ""}" data-format="${i}"><legend><label><input type="checkbox" data-format-enabled aria-expanded="${f.enabled}" aria-controls="format-safezone-${i}" ${f.enabled ? "checked" : ""}> <span data-format-label>${MKW.ratio(f.w, f.h).replace("x", ":")}</span></label></legend><div class="format-row"><div class="format-dimensions"><div class="format-reveal" data-format-reveal><div><h4>Arbeitsfläche</h4></div></div><div class="format-fields">${input(f, "w", "Breite")}${input(f, "h", "Höhe")}</div><div class="format-reveal" data-format-reveal><div><small>Schutzzone für Text und Logo</small></div></div></div><div class="format-reveal format-safezone" id="format-safezone-${i}" data-format-reveal><div>${MKWFormats.editor(f, input)}</div></div></div></fieldset>`,
     )
     .join("");
   $("#formatChoices")
@@ -69,15 +105,7 @@ function renderFormatSetup() {
       expand();
       const preview = () => {
         const box = row.querySelector(".safe-preview");
-        box.style.aspectRatio = `${Math.max(1, f.w)}/${Math.max(1, f.h)}`;
-        box.style.setProperty(
-          "--top",
-          Math.min(95, (f.top / Math.max(1, f.h)) * 100) + "%",
-        );
-        box.style.setProperty(
-          "--bottom",
-          Math.min(95, (f.bottom / Math.max(1, f.h)) * 100) + "%",
-        );
+        MKWFormats.preview(box, f);
         row.classList.toggle("invalid", !MKWFormats.validate(f));
       };
       preview();
@@ -95,7 +123,15 @@ function renderFormatSetup() {
     });
 }
 $("#addFormat").onclick = () => {
-  formatDraft.push({ w: 1080, h: 1440, top: 100, bottom: 200, enabled: true });
+  formatDraft.push({
+    w: 1080,
+    h: 1440,
+    top: 100,
+    bottom: 200,
+    left: 100,
+    right: 100,
+    enabled: true,
+  });
   renderFormatSetup();
   $("#formatChoices").lastElementChild.scrollIntoView({ block: "nearest" });
 };
@@ -111,10 +147,17 @@ $("#createProject").onclick = async () => {
   }
   const formats = formatDraft
     .filter((f) => f.enabled)
-    .map(({ w, h, top, bottom }) => ({ w, h, top, bottom }));
+    .map(({ w, h, top, bottom, left, right }) => ({
+      w,
+      h,
+      top,
+      bottom,
+      left,
+      right,
+    }));
   if (!formats.length || formats.some((f) => !MKWFormats.validate(f))) {
     $("#setupError").textContent =
-      "Wähle mindestens ein Format. Breite/Höhe: 240–10000 px, maximal 40 Mio. Pixel. Obere und untere Schutzzone müssen zusammen kleiner als die Bildhöhe sein.";
+      "Wähle mindestens ein Format. Breite/Höhe: 240–10000 px, maximal 40 Mio. Pixel. Oben + unten müssen kleiner als die Höhe sein, links + rechts kleiner als die Breite.";
     return;
   }
   if (new Set(formats.map((f) => `${f.w}x${f.h}`)).size !== formats.length) {

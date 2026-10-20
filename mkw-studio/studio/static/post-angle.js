@@ -40,22 +40,9 @@ const MKWPostAngleEditor = (() => {
     }
   }
   function postAngleSetOption(imageId, changes) {
-    const first = imageId === p.images[0]?.id;
-    p.angleOverrides ??= {};
-    if (!first) {
-      p.angleOverrides[imageId] ??= {};
-      for (const key of Object.keys(changes))
-        p.angleOverrides[imageId][key] = true;
-    }
     for (const b of p.boards) {
-      const values = Object.fromEntries(
-        Object.entries(changes).filter(
-          ([key]) =>
-            b.imageId === imageId ||
-            (first && !p.angleOverrides[b.imageId]?.[key]),
-        ),
-      );
-      if (!Object.keys(values).length) continue;
+      if (b.imageId !== imageId) continue;
+      const values = changes;
       if (!b.angle) postAngleCreate(b);
       Object.assign(b.angle, values);
       MKWPostAngle.cover(b, asset(b), postAngleArea(b));
@@ -105,7 +92,7 @@ const MKWPostAngleEditor = (() => {
     $("#toolTitle").textContent = editing
       ? "Winkel · Bildinhalt"
       : "Winkel gestalten";
-    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bearbeiten</h3><div class="tool-button-grid post-angle-mode"><button data-angle-mode="frame" aria-pressed="${!editing}">${studioIcon("move")}Winkel</button><button data-angle-mode="content" aria-pressed="${editing}">${studioIcon("image")}Bildinhalt</button></div><p class="post-angle-hint">${editing ? "Bild ziehen oder an den Eckgriffen skalieren. Escape beendet die Bildbearbeitung." : "Winkel ziehen. Doppelklick öffnet den Bildinhalt."}</p></section><section class="tool-section"><h3>Winkel</h3><label>Ausrichtung<select id="postAngleDirection">${options(
+    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bearbeiten</h3><div class="tool-button-grid post-angle-mode"><button data-angle-mode="frame" aria-pressed="${!editing}">${studioIcon("move")}Winkel</button><button data-angle-mode="content" aria-pressed="${editing}">${studioIcon("image")}Bildinhalt</button></div><p class="post-angle-hint">${editing ? "Bild ziehen oder an den Eckgriffen skalieren. Escape beendet die Bildbearbeitung." : "Winkel entlang der Mittelachse ziehen. Doppelklick öffnet den Bildinhalt."}</p></section><section class="tool-section"><h3>Winkel</h3><label>Ausrichtung<select id="postAngleDirection">${options(
       [
         ["up", "Oben"],
         ["right", "Rechts"],
@@ -296,8 +283,14 @@ const MKWPostAngleEditor = (() => {
     } else {
       const original = MKWPostAngle.geometry({ ...b, angle: base }, area).tip;
       a.tip = {
-        x: Math.max(0, Math.min(1, (original.x + dx) / area.w)),
-        y: Math.max(0, Math.min(1, (original.y + dy) / area.h)),
+        x:
+          a.direction === "right"
+            ? Math.max(0, Math.min(1, (original.x + dx) / area.w))
+            : 0.5,
+        y:
+          a.direction === "right"
+            ? 0.5
+            : Math.max(0, Math.min(1, (original.y + dy) / area.h)),
       };
       const tip = MKWPostAngle.geometry(b, area).tip;
       Object.assign(t, {

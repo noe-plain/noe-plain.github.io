@@ -491,38 +491,20 @@ function carouselMove(ev) {
           o.y = original[i].y + snap.y - bounds.y;
         });
       }
-      if (
-        !content &&
-        objects.length === 1 &&
-        objects[0].type === "angle" &&
-        carouselUI.snap &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.shiftKey
-      ) {
-        const o = objects[0],
-          raw = { ...o, x: original[0].x + dx, y: original[0].y + dy },
-          snap = carouselAngleTipSnap(raw);
-        if (snap.x !== null) {
-          o.x = snap.x;
+      if (!content) {
+        objects.forEach((o, i) => {
+          if (o.type !== "angle") return;
+          const locked = o.direction === "right" ? "y" : "x";
+          o[locked] = original[i][locked];
+          carouselAngleAlign(o);
           carouselUI.snapLines = carouselUI.snapLines.filter(
-            (line) => line.axis !== "x",
+            (line) => line.axis !== locked,
           );
           carouselUI.snapLines.push({
-            axis: "x",
-            value: carouselAngleTip(o).x,
+            axis: locked,
+            value: carouselAngleTip(o)[locked],
           });
-        }
-        if (snap.y !== null) {
-          o.y = snap.y;
-          carouselUI.snapLines = carouselUI.snapLines.filter(
-            (line) => line.axis !== "y",
-          );
-          carouselUI.snapLines.push({
-            axis: "y",
-            value: carouselAngleTip(o).y,
-          });
-        }
+        });
       }
       carouselRefresh();
       carouselCoordinates(objects);

@@ -169,24 +169,13 @@ function carouselAngleTipSnap(
 function carouselAngleAlign(o, c = p.carousel) {
   if (o.angle) return carouselRotatedAngleAlign(o, c);
   const tip = carouselAngleTip(o),
-    candidates = Array.from({ length: c.n }, (_, i) => ({
-      axis: "x",
-      value: (i + 0.5) * c.w - tip.x + o.x,
-    }));
-  candidates.push({ axis: "y", value: c.h / 2 - tip.y + o.y });
-  let best = null,
-    distance = Infinity;
-  for (const { axis, value } of candidates) {
-    const candidate = { ...o, [axis]: value };
-    carouselAngleBleed(candidate, c, axis);
-    const score = Math.hypot(candidate.x - o.x, candidate.y - o.y);
-    if (score < distance) {
-      best = candidate;
-      distance = score;
-    }
-  }
-  o.x = best.x;
-  o.y = best.y;
+    axis = o.direction === "right" ? "y" : "x";
+  const target =
+    axis === "y"
+      ? c.h / 2
+      : (Math.max(0, Math.min(c.n - 1, Math.floor(tip.x / c.w))) + 0.5) * c.w;
+  o[axis] += target - tip[axis];
+  carouselAngleBleed(o, c, axis);
 }
 
 function carouselFramePoints(o) {

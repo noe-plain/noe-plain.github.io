@@ -343,7 +343,7 @@ function validateCarousel(q) {
       throw Error("Ungültige Absatzformatierung.");
     if (
       o.lineHeight !== undefined &&
-      (!Number.isFinite(o.lineHeight) || o.lineHeight < 0.2 || o.lineHeight > 3)
+      (!Number.isFinite(o.lineHeight) || o.lineHeight < 0.2 || o.lineHeight > 5)
     )
       throw Error("Ungültige Zeilenhöhe.");
     if (
@@ -354,7 +354,7 @@ function validateCarousel(q) {
         o.size > 1000 ||
         (o.textAlign !== undefined && !carouselValidTextAlign(o.textAlign)) ||
         (o.textAnchor !== undefined &&
-          !["top", "bottom"].includes(o.textAnchor)))
+          !["top", "center", "bottom"].includes(o.textAnchor)))
     )
       throw Error("Ungültiger Carousel-Text.");
     if (o.imageId && !q.images.some((im) => im.id === o.imageId))
@@ -436,6 +436,8 @@ function carouselSelect(ids) {
   carouselUI.vectorContour = 0;
   const same = carouselSelection === ids.at(-1);
   carouselUI.slide = null;
+  for (const o of p.carousel.objects)
+    if (ids.includes(o.id)) MKWTypography.clear(o);
   carouselUI.ids = new Set(ids);
   carouselSelection = ids.at(-1) || null;
   carouselUI.content = false;

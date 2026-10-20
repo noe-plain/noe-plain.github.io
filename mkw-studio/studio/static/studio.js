@@ -384,6 +384,9 @@ function renderPanel() {
         else b.bg = ev.target.value;
       }, false),
     );
+  } else if (step === "text" && studioPreferences.advanced) {
+    if (!MKWLayout.keys.includes(layer)) layer = "title";
+    MKWTypography.post(b, layer, panel);
   } else if (step === "text") {
     const e = b.elements[layer] || b.elements.title,
       first = p.images[0]?.id === b.imageId,
@@ -408,7 +411,7 @@ function renderPanel() {
             MKWFamily.copyrightColor(e.color),
           )}</select></label>`
         : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-    }${b.family?.enabled && layer !== "copyright" ? "" : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : p.meta.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div>`;
+    }${b.family?.enabled && layer !== "copyright" ? "" : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : e.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div>`;
     if (layer === "copyright") {
       const input = document.createElement("input");
       input.type = "text";
@@ -431,13 +434,7 @@ function renderPanel() {
       input.value = e.text;
       input.onfocus = () => checkpoint();
       input.oninput = () => {
-        setSharedText(
-          b,
-          layer,
-          layer === "title" && p.meta.uppercase
-            ? input.value.toUpperCase()
-            : input.value,
-        );
+        setSharedText(b, layer, input.value);
         changed(false);
       };
       panel.querySelector("#textContentField").append(input);
@@ -486,11 +483,12 @@ function renderPanel() {
           return;
         }
         p.meta.uppercase = ev.target.checked;
-        if (p.meta.uppercase) {
-          for (const x of p.boards)
-            x.elements.title.text = x.elements.title.text.toUpperCase();
-          p.meta.headline = p.meta.headline.toUpperCase();
-        }
+        for (const x of p.boards)
+          if (
+            x.imageId === b.imageId ||
+            (b.imageId === p.images[0]?.id && x.elements.title.text === e.text)
+          )
+            x.elements.title.uppercase = ev.target.checked;
       }, false),
     );
     on("resetText", "click", () =>
@@ -582,7 +580,9 @@ function beginText(b, key, el) {
   updateDock();
   checkpoint();
   editingText = { boardId: b.id, key, el };
+  if (studioPreferences.advanced) b.elements[key].typographyVersion = 1;
   el.classList.add("editing");
+  if (studioPreferences.advanced) MKWTypography.postInline(b, key, el);
   el.style.color =
     b.family?.enabled && key === "copyright"
       ? MKWFamily.copyrightColor(b.elements[key].color)
@@ -608,7 +608,14 @@ function setSharedText(b, key, text) {
           target.imageId === b.imageId
         : target.imageId === b.imageId
     ) {
-      target.elements[key].text = text;
+      const targetText = target.elements[key];
+      targetText.characterStyles = MKWText.forInput(
+        targetText,
+        text,
+        MKWTypography.pending(b.elements[key]),
+      );
+      targetText.textStyles = carouselTextStylesForInput(targetText, text);
+      targetText.text = text;
       target.elements[key].visible = target.elements[key].enabled ?? !!text;
     }
   }
@@ -639,23 +646,21 @@ function setSharedTextSize(b, key, size) {
       target.elements[key].size = size;
 }
 function inputText(b, key, el) {
-  const text = carouselEditableValue(el).replace(/\r/g, "").replace(/\n$/, "");
-  setSharedText(
-    b,
-    key,
-    key === "title" && p.meta.uppercase ? text.toUpperCase() : text,
-  );
+  const text = carouselEditableValue(el).replace(/\r/g, "").replace(/\n$/, ""),
+    range = carouselEditableSelection(el);
+  setSharedText(b, key, text);
   el.style.textTransform =
     (key === "date" && b.elements.date.uppercase !== false) ||
-    (key === "title" && p.meta.uppercase)
+    (key === "title" && b.elements.title.uppercase)
       ? "uppercase"
       : "";
   const input = $("#mainTextInput");
   if (input && document.activeElement !== input)
     input.value = b.elements[key].text;
+  MKWTypography.track(b.elements[key], range.start, range.end);
   changed(false);
 }
-function endText(b, key, el) {
+function endText(b, key, el, ev) {
   syncTextTypes();
   if (!editingText) return;
   editingText = null;
@@ -663,7 +668,8 @@ function endText(b, key, el) {
   el.style.textTransform = "";
   syncOverlays(true);
   draw();
-  renderPanel();
+  if (!ev?.relatedTarget?.closest("#stepPanel, #studioPaintPicker"))
+    renderPanel();
 }
 function add() {
   if (busy) return;
@@ -688,6 +694,7 @@ function editBoardOptions(b) {
   const panel = $("#stepPanel");
   panel.hidden = false;
   panel.innerHTML = `<div class="panel-row"><label>Breite <input id="width" type="number" value="${b.w}"></label><label>Höhe <input id="height" type="number" value="${b.h}"></label><select id="resizeMode"><option value="canvas">Fläche ändern</option><option value="layout">Layout proportional skalieren</option></select><button id="resize">Anwenden</button><button data-size="1080,1080">1:1</button><button data-size="1080,1920">9:16</button><button data-size="1080,1350">4:5</button><button id="duplicate">Duplizieren</button><button id="boardUp">←</button><button id="boardDown">→</button><button id="deleteBoard">Löschen</button></div>`;
+  MKWPostSafezone.bind(b, panel);
   on("resize", "click", () =>
     resize(+$("#width").value, +$("#height").value, $("#resizeMode").value),
   );

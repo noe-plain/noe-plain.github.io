@@ -63,7 +63,7 @@ function carouselPanel() {
      ],
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
- ${o.type === "text" ? carouselTextContentPanel(o) + carouselTextFontPanel(o) + carouselTypePanel(o) + carouselTextStylePanel(o) + carouselTextFramePanel(o) : ""}
+ ${o.type === "text" ? carouselTextContentPanel(o) + (studioPreferences.advanced ? MKWTypography.panel() : carouselTextFontPanel(o) + carouselTypePanel(o) + carouselTextStylePanel(o)) + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
  ${
@@ -118,8 +118,12 @@ function carouselPanel() {
       .filter((el) => el.classList.contains("carousel-property-section"))
       .sort(
         (a, b) =>
-          (order[a.querySelector("h4")?.textContent] ?? 10) -
-          (order[b.querySelector("h4")?.textContent] ?? 10),
+          (a.classList.contains("typography-inspector")
+            ? 5
+            : (order[a.querySelector("h4")?.textContent] ?? 10)) -
+          (b.classList.contains("typography-inspector")
+            ? 5
+            : (order[b.querySelector("h4")?.textContent] ?? 10)),
       )
       .forEach((section) => panel.insertBefore(section, warning));
     if (["image", "angle"].includes(o.type))
@@ -234,7 +238,8 @@ function carouselPanel() {
     if (o.type === "text") {
       carouselBindTextStyles(o, panel);
       carouselBindTypography(o, panel);
-      carouselTypographyNavigation(panel);
+      if (studioPreferences.advanced) MKWTypography.carousel(o, panel);
+      else carouselTypographyNavigation(panel);
       carouselBindTextAlignment(o, panel);
       const content = panel.querySelector("[data-prop=text]");
       content.onselect =

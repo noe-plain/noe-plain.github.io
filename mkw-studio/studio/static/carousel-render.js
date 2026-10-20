@@ -52,8 +52,13 @@ async function carouselPaint(
         offset = carouselTextOffset(o, layout);
       for (const line of layout.lines) {
         for (const run of line.runs) {
-          ctx.font = `${run.size}px "${o.font}"`;
-          ctx.fillText(run.text, line.x + run.x, line.y + run.dy + offset);
+          carouselPaintTextRun(
+            ctx,
+            run,
+            line.x + run.x,
+            line.y + run.dy + offset,
+            studioPaintRGBA(run.color || o.color, o.textAlpha ?? 1),
+          );
         }
       }
     } else if (carouselIsVector(o)) {

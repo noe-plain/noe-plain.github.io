@@ -1,0 +1,102 @@
+.post-safezone-editor {
+  display: grid;
+  grid-template-columns: minmax(54px, 1fr) minmax(65px, 1.15fr) minmax(
+      54px,
+      1fr
+    );
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  gap: 10px 8px;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+}
+.post-safezone-editor .safe-preview {
+  grid-area: 2 / 2;
+  justify-self: center;
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  min-width: 0;
+}
+.post-safezone-editor .safe-preview-inner {
+  left: var(--left, 9.26%);
+  right: var(--right, 9.26%);
+  top: var(--top, 10%);
+  bottom: var(--bottom, 20%);
+}
+.post-safezone-editor .safe-preview-inner span {
+  font-size: 9px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.post-safezone-editor .safe-top {
+  grid-area: 1 / 2;
+}
+.post-safezone-editor .safe-bottom {
+  grid-area: 3 / 2;
+}
+.post-safezone-editor .safe-left {
+  grid-area: 2 / 1;
+}
+.post-safezone-editor .safe-right {
+  grid-area: 2 / 3;
+}
+.post-safezone-editor .safe-input {
+  position: static;
+  width: auto;
+  min-width: 0;
+}
+.post-safezone-editor .safe-input label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  font-size: 10px;
+}
+.post-safezone-editor .safe-input input {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 6px;
+  font-size: 12px;
+}
+.post-safezone-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.post-safezone-section h3 {
+  margin: 0 0 16px;
+}
+.post-safezone-error {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d13838;
+}
+.post-safezone-error:empty {
+  display: none;
+}
+.post-safezone-section.invalid .safe-preview {
+  outline: 2px solid #e34848;
+  outline-offset: 2px;
+}
+html[data-theme="dark"] .post-safezone-error {
+  color: #ff9696;
+}
+@media (max-width: 650px) {
+  #formatChoices .is-enabled .format-row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 20px;
+  }
+}
+
+.post-safezone-editor .safe-input label {
+  padding: 0;
+  background: transparent;
+}
+html[data-theme="light"] .post-safezone-editor .safe-input label {
+  background: transparent;
+  color: #65758c;
+}

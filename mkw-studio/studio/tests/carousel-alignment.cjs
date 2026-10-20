@@ -34,9 +34,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),assert=requi
    await page.locator('[data-prop=direction]').selectOption(direction);await page.locator('[data-prop=x]').fill('430');await page.locator('[data-prop=y]').fill('325');
    assert(await page.evaluate(()=>{const c=p.carousel,o=c.objects.find(o=>o.id===carouselSelection),tip=carouselAngleTip(o),axis=Math.abs(tip.y-c.h/2)<.01||Array.from({length:c.n},(_,i)=>(i+.5)*c.w).some(x=>Math.abs(tip.x-x)<.01),bleed=o.x<=-1||o.y<=-1||o.x+o.w>=c.w*c.n+1||o.y+o.h>=c.h+1;return axis&&bleed}),`${direction} angle must retain centre alignment and bleed`);
   }
-  // A right-facing tip (not its frame centre) is attracted to x=540 while dragging.
-  await page.evaluate(()=>{const o=p.carousel.objects.find(o=>o.id===carouselSelection);Object.assign(o,{direction:'right',x:180,y:-1,w:300,h:600});carouselRefresh()});
-  await drag(await point(470,299),await point(528,299),async()=>{const tip=await page.evaluate(()=>carouselAngleTip(p.carousel.objects.find(o=>o.id===carouselSelection)));close(tip.x,540,'Actual angle tip snap')});
+  // The right-facing frame is always vertically centred, independent of magnetic snapping.
+  await page.evaluate(()=>{const o=p.carousel.objects.find(o=>o.id===carouselSelection);Object.assign(o,{direction:'right',x:180,y:-1,w:700,h:1400});carouselAngleAlign(o);carouselRefresh()});
+  const anglePoint=await page.evaluate(()=>{const o=carouselSelected()[0],tip=carouselAngleTip(o);return{x:tip.x-50,y:tip.y}});
+  await drag(await point(anglePoint.x,anglePoint.y),await point(anglePoint.x+58,anglePoint.y+25),async()=>{const tip=await page.evaluate(()=>carouselAngleTip(p.carousel.objects.find(o=>o.id===carouselSelection)));close(tip.y,675,'Right angle remains vertically centred')});
   const zoomBox=await page.locator('#carouselZoom').boundingBox(),editor=await page.locator('#carouselEditor').boundingBox();assert(zoomBox.y>editor.y+editor.height-40&&zoomBox.x>editor.x+editor.width-100,'Zoom must be bottom right');
   const vp=await page.locator('#carouselViewport').boundingBox(),z=await page.evaluate(()=>carouselZoom);await page.mouse.move(vp.x+vp.width/2,vp.y+vp.height/2);await page.keyboard.down('Alt');await page.mouse.wheel(0,-100);await page.keyboard.up('Alt');await page.waitForTimeout(100);assert((await page.evaluate(()=>carouselZoom))>z*1.2,'Option/Alt scroll must zoom');
   const legacy=await page.evaluate(async()=>{const q=snapshot();const angle=q.carousel.objects.find(o=>o.type==='angle');angle.thickness=75;for(const o of q.carousel.objects)delete o.startAlpha;await restore(q);return p.carousel.objects.find(o=>o.type==='angle').thickness});assert.equal(legacy,75,'Existing angles keep their chosen leg width');

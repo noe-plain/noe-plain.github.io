@@ -53,7 +53,7 @@ async function layerBitmap(b, key) {
     h = Math.max(1, Math.min(b.h, Math.ceil(r.y + r.h + fade)) - top);
   }
   const canvas = makeCanvas(w, h),
-    ctx = canvas.getContext("2d", { colorSpace: "srgb" });
+    ctx = exportContext(canvas);
   ctx.translate(-left, -top);
   await paint(ctx, b, 1, { only: key });
   return { canvas, left, top };
@@ -89,6 +89,9 @@ function textLayerData(e, left, top, family, layout) {
     style: {
       font: { name },
       fontSize: e.size,
+      tracking: e.tracking || 0,
+      underline: !!e.underline,
+      strikethrough: !!e.strike,
       fillColor: rgb(e.color),
       autoLeading: false,
       leading: e.size * MKWLayout.lineHeight(e),
@@ -161,7 +164,7 @@ async function buildPSD(progress = () => {}) {
     );
   await document.fonts.ready;
   const composite = makeCanvas(layout.width, layout.height),
-    ctx = composite.getContext("2d", { colorSpace: "srgb" });
+    ctx = exportContext(composite);
   const psd = {
     width: layout.width,
     height: layout.height,
@@ -191,7 +194,8 @@ async function buildPSD(progress = () => {}) {
       },
     },
   };
-  const linked = new Map();
+  const linked = new Map(),
+    boardCanvas = makeCanvas(1, 1);
   for (const [index, { b, left, top }] of layout.boards.entries()) {
     progress(
       `Zeichenfläche ${index + 1} / ${layout.boards.length} vorbereiten …`,
@@ -201,13 +205,12 @@ async function buildPSD(progress = () => {}) {
       children = [],
       textChildren = [],
       block = textBlock(b);
-    ctx.save();
-    ctx.translate(left, top);
-    ctx.beginPath();
-    ctx.rect(0, 0, b.w, b.h);
-    ctx.clip();
-    await paint(ctx, b);
-    ctx.restore();
+    if (boardCanvas.width !== b.w) boardCanvas.width = b.w;
+    if (boardCanvas.height !== b.h) boardCanvas.height = b.h;
+    const boardContext = exportContext(boardCanvas);
+    boardContext.clearRect(0, 0, b.w, b.h);
+    await paint(boardContext, b);
+    ctx.drawImage(boardCanvas, left, top);
     for (const key of [
       "sponsors",
       "logo",
@@ -268,8 +271,49 @@ async function buildPSD(progress = () => {}) {
         l.blendMode = "multiply";
         l.opacity = key === "textShadow" ? 0.42 : 0.28;
         if (key === "textShadow") l.name = "Textkontrast · Verlauf · 42 %";
-      } else if (e && key !== "logo")
-        l.text = textLayerData(e, left, top, b.family, block);
+      } else if (e && key !== "logo") {
+        if (e.styled) {
+          l.name += " · Typografie (gerastert)";
+          const editable = {
+            name: elementNames[key] + " · editierbare Textläufe",
+            opened: false,
+            hidden: true,
+            children: [],
+          };
+          const x =
+            e.x -
+            (e.align === "right" ? e.w : e.align === "center" ? e.w / 2 : 0);
+          for (const line of e.styled.lines)
+            for (const run of line.runs) {
+              const a = ((e.angle || 0) * Math.PI) / 180,
+                lx = line.x + run.x,
+                ly = line.y + run.dy;
+              editable.children.push({
+                name: run.text,
+                text: textLayerData(
+                  {
+                    ...e,
+                    styled: undefined,
+                    text: run.text,
+                    lines: [run.text],
+                    x: x + lx * Math.cos(a) - ly * Math.sin(a),
+                    y: e.y + lx * Math.sin(a) + ly * Math.cos(a),
+                    size: run.size,
+                    role: run.font,
+                    color: run.color || e.color,
+                    align: "left",
+                    tracking: run.tracking,
+                    underline: run.underline,
+                    strike: run.strike,
+                  },
+                  left,
+                  top,
+                ),
+              });
+            }
+          children.push(editable);
+        } else l.text = textLayerData(e, left, top, b.family, block);
+      }
       if (key === "image") {
         const content = MKWSponsors.layout(b)?.content;
         if (content)

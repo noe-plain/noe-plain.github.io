@@ -71,10 +71,11 @@ const { launch, artifact } = require("./browser.cjs");
       JSON.stringify(rows),
     );
     await page.locator(`[data-post-angle="${ids[0]}"]`).check();
-    assert(await page.evaluate(() => p.boards.every((b) => b.angle.enabled)));
+    assert(await page.evaluate(() => p.boards.filter((b) => b.imageId === p.images[0].id).every((b) => b.angle.enabled)));
+    assert(await page.evaluate(() => p.boards.filter((b) => b.imageId === p.images[1].id).every((b) => !b.angle?.enabled)));
     assert(
       await page.evaluate(() =>
-        p.boards.every((b) =>
+        p.boards.filter((b) => b.angle?.enabled).every((b) =>
           MKWPostAngle.covers(b, asset(b), MKWPostAngleEditor.area(b)),
         ),
       ),
@@ -92,7 +93,7 @@ const { launch, artifact } = require("./browser.cjs");
       .selectOption("up");
     assert(
       await page.evaluate(() =>
-        p.boards.every((b) => b.angle.direction === "up"),
+        p.boards.filter((b) => b.imageId === p.images[0].id).every((b) => b.angle.direction === "up"),
       ),
     );
     await page.locator(`[data-text-picker="${ids[1]}"] summary`).click();
@@ -107,6 +108,7 @@ const { launch, artifact } = require("./browser.cjs");
       await page.evaluate(() => p.boards.map((b) => b.angle.direction)),
       ["right", "right", "down", "down"],
     );
+    assert(await page.evaluate(() => !createBoard({ ...p.images[0], id: "new-photo" }, 1080, 1350).angle), "New images never inherit an angle from the first image");
     // Geometry is backed by the same Path2D mask as the carousel, for every direction.
     const masks = await page.evaluate(() => {
       const b = p.boards[0],
@@ -159,6 +161,7 @@ const { launch, artifact } = require("./browser.cjs");
     await drag(await point(), 18, -12);
     const moved = await page.evaluate(() => clone(p.boards[0].angle));
     assert.notDeepEqual(moved.tip, initial.angle.tip);
+    assert.equal(moved.tip.y, .5);
     assert.deepEqual(
       await page.evaluate(() => p.boards[0].image),
       initial.background,
@@ -354,8 +357,8 @@ const { launch, artifact } = require("./browser.cjs");
         p.boards
           .filter((b) => b.imageId === p.images[1].id)
           .every((b) => b.angle.enabled),
-      )) === false,
-      "First-image enabled default propagates unless overridden",
+      )) === true,
+      "Other images stay enabled independently of the first image",
     );
     await page.locator(`[data-text-picker="${ids[1]}"] summary`).click();
     await page.locator(`[data-post-angle="${ids[1]}"]`).check();
@@ -376,7 +379,7 @@ const { launch, artifact } = require("./browser.cjs");
     });
     assert.deepEqual(errors, []);
     console.log(
-      "PASS single-post angle options/consistency/inheritance, three masks and hidden rear ends, frame drag vs double-click crop/handles, undo/redo, fill/flip/glow, lossless MKW without image duplication, new formats, PNG/PSD parity and browser restore",
+      "PASS single-post angle options/consistency/independent images, three masks and hidden rear ends, frame drag vs double-click crop/handles, undo/redo, fill/flip/glow, lossless MKW without image duplication, new formats, PNG/PSD parity and browser restore",
     );
   } finally {
     await browser.close();

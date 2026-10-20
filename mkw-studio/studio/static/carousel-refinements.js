@@ -43,23 +43,19 @@ function carouselValidateRefinements(o, c, q) {
     throw Error("Ungültiger Drehwinkel.");
   if (o.uppercase !== undefined && typeof o.uppercase !== "boolean")
     throw Error("Ungültige Textdarstellung.");
-  if (o.script !== undefined && !["normal", "superscript"].includes(o.script))
-    throw Error("Ungültige Zeichenposition.");
-  if (
-    o.characterStyles &&
-    (!Array.isArray(o.characterStyles) ||
-      o.characterStyles.length > 10000 ||
-      o.characterStyles.some(
-        (s) =>
-          !Number.isInteger(s.start) ||
-          !Number.isInteger(s.end) ||
-          s.start < 0 ||
-          s.end <= s.start ||
-          s.end > o.text?.length ||
-          !["normal", "superscript"].includes(s.script),
-      ))
-  )
-    throw Error("Ungültige Zeichenformatierung.");
+  if (o.type === "text")
+    MKWText.validate(
+      o,
+      new Set([
+        "Arial",
+        "Georgia",
+        "Replica LL",
+        "Harriet",
+        "Harriet Regular",
+        "Harriet Italic",
+        ...q.fonts.map((f) => f.role),
+      ]),
+    );
   if (
     o.effects &&
     ["blur", "noise"].some(

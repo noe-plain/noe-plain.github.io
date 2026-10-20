@@ -8,6 +8,7 @@
     "static/project-file.js",
     "static/project-store.js",
     "static/post-angle-model.js",
+    "static/text-model.js",
     "static/state.js",
     "static/user-fonts.js",
     "static/sponsor-model.js",
@@ -55,12 +56,14 @@
     "static/sponsor-order.js",
     "static/sponsor-ui.js",
     "static/post-angle.js",
+    "static/typography-ui.js",
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",
     "static/setup-store.js",
     "static/setup-session.js",
     "static/setup-ui.js",
+    "static/post-safezone.js",
     "static/post-workspace.js",
     "static/project-session.js",
     "static/help-popup.js",
@@ -81,6 +84,8 @@
     "static/paint-picker.css",
     "static/projects.css",
     "static/carousel-refinements.css",
-    "static/editor-polish.css"
+    "static/editor-polish.css",
+    "static/typography.css",
+    "static/post-safezone.css"
   ]
 }

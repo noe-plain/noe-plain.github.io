@@ -72,6 +72,8 @@ $("#defaultExportFormat").onchange = (event) => {
 $("#advancedMode").onchange = (event) => {
   studioPreferences.advanced = event.target.checked;
   studioApplyPreferences();
+  if (carouselActive()) carouselPanel();
+  else renderPanel();
 };
 studioApplyPreferences();
 function studioSetTheme(theme) {

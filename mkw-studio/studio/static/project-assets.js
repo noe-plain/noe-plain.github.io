@@ -15,7 +15,11 @@
         if (key === "logo") {
           if (element.source && !["white", "black"].includes(element.source))
             logos.add(element.source);
-        } else if (element.role) fonts.add(element.role);
+        } else {
+          if (element.role) fonts.add(element.role);
+          for (const s of element.characterStyles || [])
+            if (s.font) fonts.add(s.font);
+        }
       }
     }
     for (const object of project.carousel?.objects || []) {
@@ -33,7 +37,11 @@
         if (object.imageId) images.add(object.imageId);
       if (object.strokeMode === "image" && object.strokeImageId)
         images.add(object.strokeImageId);
-      if (object.type === "text" && object.font) fonts.add(object.font);
+      if (object.type === "text") {
+        if (object.font) fonts.add(object.font);
+        for (const s of object.characterStyles || [])
+          if (s.font) fonts.add(s.font);
+      }
     }
     return { images, logos, fonts };
   }

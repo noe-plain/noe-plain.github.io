@@ -19,8 +19,8 @@
       design = strip?.content || b;
     const unit = b.w / 1080,
       story = b.w * 16 === b.h * 9,
-      left = 100 * unit,
-      right = 100 * unit,
+      left = b.safe?.left ?? 100 * unit,
+      right = b.safe?.right ?? 100 * unit,
       top = b.safe
         ? b.safe.top
         : Math.min((story ? 200 : 100) * unit, b.h * 0.4),
@@ -72,7 +72,7 @@
     }
     return lines;
   }
-  function textLayout(b, measure, activeKey) {
+  function textLayout(b, measure, activeKey, styleLayout) {
     const safe = safeRect(b),
       visible = keys.filter(
         (k) =>
@@ -88,7 +88,8 @@
       return visible.map((key) => {
         const e = b.elements[key],
           size = Math.max(0.1, e.size * factor),
-          text = key === "date" && e.uppercase ? e.text.toUpperCase() : e.text,
+          styled = styleLayout?.(e, safe.w, factor),
+          text = e.uppercase ? e.text.toUpperCase() : e.text,
           lines = wrap(text, safe.w, (t) => measure(t, size, e.role));
         return {
           key,
@@ -97,7 +98,17 @@
           size,
           lines,
           maxWidth: Math.max(0, ...lines.map((t) => measure(t, size, e.role))),
-          h: lines.length * size * lineHeight({ key }),
+          h: styled ? styled.height : lines.length * size * lineHeight({ key }),
+          ...(styled
+            ? {
+                styled,
+                lines: styled.lines.map((line) => line.text),
+                maxWidth: Math.max(
+                  0,
+                  ...styled.lines.map((line) => line.width),
+                ),
+              }
+            : {}),
         };
       });
     }
@@ -152,13 +163,40 @@
     let copyright = null;
     if (showCopyright) {
       const text = copyrightText(ce.text);
-      let size = Math.min(Math.max(0.1, ce.size), safe.right / 1.15),
-        width = measure(text, size, ce.role);
-      if (width > safe.h) {
-        size *= safe.h / width;
-        width = measure(text, size, ce.role);
+      let size = Math.min(
+          Math.max(0.1, ce.size),
+          Math.max(0.1, safe.right) / 1.15,
+        ),
+        styled = null,
+        width;
+      const copyrightSource = {
+        ...ce,
+        key: "copyright",
+        align: "left",
+        textAlign: "left",
+        text,
+        textStyles: ce.textStyles?.map((s) =>
+          s ? { ...s, align: "left", spaceBefore: 0, spaceAfter: 0 } : s,
+        ),
+      };
+      const calculate = () => {
+        styled = styleLayout?.(copyrightSource, 1000000, size / ce.size);
+        width = styled ? styled.lines[0].width : measure(text, size, ce.role);
+      };
+      calculate();
+      for (let i = 0; i < 3; i++) {
+        const fit = Math.min(
+          1,
+          safe.h / Math.max(0.001, width),
+          Math.max(0.1, safe.right) /
+            Math.max(0.001, styled?.height || size * 1.15),
+        );
+        if (fit >= 1) break;
+        size *= fit;
+        calculate();
       }
-      const h = size * 1.15,
+      if (styled) styled.lines.forEach((line) => (line.x = 0));
+      const h = styled?.height || size * 1.15,
         displayWidth = ce.text ? width : Math.max(width, (160 * b.w) / 1080);
       copyright = {
         key: "copyright",
@@ -174,6 +212,7 @@
         angle: -90,
         align: "left",
         fixed: true,
+        ...(styled ? { styled } : {}),
       };
     }
     return {

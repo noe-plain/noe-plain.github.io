@@ -195,8 +195,9 @@ function basicBoard(im, w = 1080, h = 1080) {
         visible: true,
       },
       title: {
+        uppercase: !!p.meta.uppercase,
         ...item(
-          p.meta.uppercase ? p.meta.headline.toUpperCase() : p.meta.headline,
+          p.meta.headline,
           64,
           h - 240,
           studioPreferences.textSizes.title,
@@ -311,7 +312,7 @@ async function importFiles(files) {
           p.images.push(im);
           const boards = (p.formats || MKWFormats.legacy()).map((f) => {
             const b = createBoard(im, f.w, f.h);
-            b.safe = { top: f.top, bottom: f.bottom };
+            b.safe = MKWFormats.safe(f);
             if (!b.family?.enabled) MKWSubject.crop(b, im);
             return b;
           });
@@ -416,6 +417,20 @@ function resize(w, h, mode) {
         e.x = e.x * s + dx;
         e.y = e.y * s + dy;
         e.size *= s;
+        for (const style of [
+          ...(e.characterStyles || []),
+          ...(e.textStyles || []),
+          e,
+        ]) {
+          if (!style) continue;
+          for (const attr of ["baselineShift", "spaceBefore", "spaceAfter"])
+            if (style[attr] !== undefined) style[attr] *= s;
+          if (style !== e && style.size !== undefined) style.size *= s;
+          if (style.leading)
+            style.leading = style.leading.map((v) =>
+              v === null ? null : v * s,
+            );
+        }
       });
     } else {
       b.image.x += (w - ow) / 2;
@@ -426,6 +441,8 @@ function resize(w, h, mode) {
       const f = h / oh;
       b.safe.top *= f;
       b.safe.bottom *= f;
+      for (const key of ["left", "right"])
+        if (b.safe[key] !== undefined) b.safe[key] *= w / ow;
     }
     if (b.angle) {
       const t = b.angle.image;
@@ -445,7 +462,7 @@ function resize(w, h, mode) {
   });
 }
 function fontFamily(role) {
-  return fontStatus[role]
+  return fontStatus[role] || ["Arial", "Georgia"].includes(role)
     ? `"${role}"`
     : role.startsWith("Harriet")
       ? "Georgia"
@@ -534,6 +551,19 @@ function validate(q) {
         !Number.isFinite(e.angle || 0)
       )
         throw Error("Ungültiges Gestaltungselement.");
+      if (k !== "logo")
+        MKWText.validate(
+          e,
+          new Set([
+            "Arial",
+            "Georgia",
+            "Replica LL",
+            "Harriet",
+            "Harriet Regular",
+            "Harriet Italic",
+            ...q.fonts.map((f) => f.role),
+          ]),
+        );
       if (
         k !== "logo" &&
         (typeof e.text !== "string" ||
@@ -575,6 +605,7 @@ async function restore(q) {
   validateCarousel(q);
   for (const b of q.boards) {
     b.elements.date.uppercase ??= true;
+    b.elements.title.uppercase ??= !!q.meta.uppercase;
     b.elements.copyright.text = MKWLayout.copyrightText(
       b.elements.copyright.text,
     );
@@ -710,7 +741,7 @@ function createBoard(im, w = 1080, h = 1080) {
       p.boards.find((b) => b.imageId === im.id) ||
       p.boards.find((b) => b.imageId === p.images[0]?.id);
   const format = p.formats?.find((f) => f.w === w && f.h === h);
-  if (format) b.safe = { top: format.top, bottom: format.bottom };
+  if (format) b.safe = MKWFormats.safe(format);
   b.elements.logo.visible = true;
   b.elements.logo.source = "white";
   if (template)
@@ -719,6 +750,16 @@ function createBoard(im, w = 1080, h = 1080) {
       b.elements[key].visible = template.elements[key].visible;
       b.elements[key].enabled = template.elements[key].enabled;
       b.elements[key].size = template.elements[key].size;
+      for (const attr of [
+        ...MKWText.keys.filter((k) => !["font", "size"].includes(k)),
+        "role",
+        "characterStyles",
+        "textStyles",
+        "lineHeight",
+        "typographyVersion",
+      ])
+        if (template.elements[key][attr] !== undefined)
+          b.elements[key][attr] = clone(template.elements[key][attr]);
     }
   if (!template)
     for (const key of ["date", "title", "subtitle"]) {
@@ -734,7 +775,8 @@ function createBoard(im, w = 1080, h = 1080) {
     template?.family || p.meta.familyDesign || MKWFamily.defaults(),
   );
   if (MKWSponsors.layout(b)) fit(b, "fill");
-  if (template?.angle) MKWPostAngleEditor.create(b, template.angle);
+  if (template?.imageId === im.id && template.angle)
+    MKWPostAngleEditor.create(b, template.angle);
   return b;
 }
 
@@ -778,7 +820,15 @@ function validateFamilyProject(q) {
       (!["top", "bottom"].every(
         (k) => Number.isFinite(b.safe[k]) && b.safe[k] >= 0,
       ) ||
-        b.safe.top + b.safe.bottom >= b.h)
+        b.safe.top + b.safe.bottom >= b.h ||
+        ["left", "right"].some(
+          (key) =>
+            b.safe[key] !== undefined &&
+            (!Number.isFinite(b.safe[key]) || b.safe[key] < 0),
+        ) ||
+        (b.safe.left ?? (100 * b.w) / 1080) +
+          (b.safe.right ?? (100 * b.w) / 1080) >=
+          b.w)
     )
       throw Error("Ungültige Schutzzone.");
   const valid = (config) => {

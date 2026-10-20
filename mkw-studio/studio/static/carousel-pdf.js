@@ -163,8 +163,7 @@ function carouselPDFText(board, opts) {
     )
       continue;
     const layout = carouselTextLayout(object, measure),
-      offset = carouselTextOffset(object, layout),
-      font = p.fonts.find((font) => font.role === object.font);
+      offset = carouselTextOffset(object, layout);
     for (const originalLine of layout.lines)
       for (const run of originalLine.runs) {
         const line = { ...originalLine, text: run.text, size: run.size },
@@ -174,7 +173,9 @@ function carouselPDFText(board, opts) {
           }),
           x = world.x - board.carouselSlide * c.w,
           y = world.y;
-        measure.font = `${line.size}px "${object.font}"`;
+        const runFont = p.fonts.find((font) => font.role === run.font);
+        measure.font = `${line.size}px ${fontFamily(run.font)}`;
+        measure.letterSpacing = run.letterSpacing + "px";
         measure.textBaseline = "alphabetic";
         const ascent = measure.measureText("Mg").actualBoundingBoxAscent;
         measure.textBaseline = "top";
@@ -205,8 +206,9 @@ function carouselPDFText(board, opts) {
                   scale) *
               0.75,
             size: line.size * scale * 0.75,
-            font: object.font,
-            data: font?.data,
+            font: run.font,
+            data: runFont?.data,
+            tracking: run.letterSpacing * scale * 0.75,
           });
       }
   }
@@ -286,6 +288,7 @@ async function carouselBuildPDF(pages, title) {
           : await document.embedFont(StandardFonts.Helvetica);
         fonts.set(line.font, font);
       }
+      page.pushOperators(MKWPDF.setCharacterSpacing(line.tracking || 0));
       page.drawText(line.text, {
         x: line.x,
         y: line.y,

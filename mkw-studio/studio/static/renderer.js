@@ -52,9 +52,11 @@ function textBlock(b, key) {
       (text, size, role) =>
         measureTextWidth(text, size, role, b.family?.enabled),
       key,
+      (e, width, factor) =>
+        MKWText.rich(e) ? MKWTypography.postLayout(e, width, factor) : null,
     ),
     e = layout.copyright;
-  if (e && e.text) {
+  if (e && e.text && !e.styled) {
     measureContext.font = `${e.size}px ${fontFamily(e.role)}`;
     measureContext.textBaseline = "top";
     const m = measureContext.measureText(e.text);
@@ -215,7 +217,45 @@ function drawText(ctx, layout, opts = {}) {
         : opts.color || e.color;
     ctx.textAlign = e.align;
     ctx.fontKerning = opts.family?.enabled ? "none" : "auto";
-    if (opts.family?.enabled && e.key !== "copyright") {
+    if (e.styled) {
+      const x =
+        e.align === "right" ? -e.w : e.align === "center" ? -e.w / 2 : 0;
+      ctx.textAlign = "left";
+      let paletteOffset = familyTextOffset(layout, e.key, opts.family?.offset);
+      for (const line of e.styled.lines)
+        for (const run of line.runs) {
+          if (opts.family?.enabled && e.key !== "copyright") {
+            let glyphX = x + line.x + run.x;
+            for (const glyph of MKWFamily.runs(run.text, paletteOffset)) {
+              const part = { ...run, text: glyph.text, width: 0 };
+              carouselPaintTextRun(
+                ctx,
+                part,
+                glyphX,
+                line.y + run.dy,
+                opts.color || glyph.color,
+              );
+              ctx.strokeStyle = MKWFamily.outline;
+              ctx.lineWidth = MKWFamily.outlineWidth;
+              ctx.lineJoin = "round";
+              ctx.strokeText(glyph.text, glyphX, line.y + run.dy);
+              glyphX += ctx.measureText(glyph.text).width;
+            }
+            paletteOffset += MKWFamily.runs(run.text).filter(
+              (g) => g.visible,
+            ).length;
+          } else
+            carouselPaintTextRun(
+              ctx,
+              run,
+              x + line.x + run.x,
+              line.y + run.dy,
+              opts.family?.enabled && e.key === "copyright"
+                ? MKWFamily.copyrightColor(e.color)
+                : opts.color || run.color || e.color,
+            );
+        }
+    } else if (opts.family?.enabled && e.key !== "copyright") {
       let offset = familyTextOffset(layout, e.key, opts.family.offset);
       ctx.strokeStyle = MKWFamily.outline;
       ctx.lineWidth = MKWFamily.outlineWidth;
@@ -615,7 +655,7 @@ function syncOverlays(force = false) {
           const el = document.createElement("div");
           el.className =
             "text-editor" + (key === "copyright" ? " copyright-editor" : "");
-          el.contentEditable = "plaintext-only";
+          el.contentEditable = "true";
           el.spellcheck = false;
           el.dataset.key = key;
           el.dataset.placeholder = placeholders[key];
@@ -625,8 +665,15 @@ function syncOverlays(force = false) {
             `${elementNames[key]} · ${asset(b).name} · ${MKW.ratio(b.w, b.h)}`,
           );
           el.onfocus = () => beginText(b, key, el);
+          el.onmouseup = el.onkeyup = () => {
+            if (studioPreferences.advanced) {
+              const r = carouselEditableSelection(el);
+              MKWTypography.track(b.elements[key], r.start, r.end);
+            }
+          };
+          MKWTypography.bindPostInline(b, key, el);
           el.oninput = () => inputText(b, key, el);
-          el.onblur = () => endText(b, key, el);
+          el.onblur = (ev) => endText(b, key, el, ev);
           el.onkeydown = (ev) => {
             if (ev.key === "Escape") {
               el.blur();
@@ -691,10 +738,7 @@ function syncOverlays(force = false) {
         height: e.h * s + "px",
         lineHeight: e.size * MKWLayout.lineHeight(e) * s + "px",
         textAlign: e.align,
-        textTransform:
-          e.key === "date" && b.elements.date.uppercase !== false
-            ? "uppercase"
-            : "",
+        textTransform: e.uppercase ? "uppercase" : "",
         transform: copyright ? "rotate(-90deg)" : "none",
         transformOrigin: "0 0",
         color:
@@ -709,6 +753,12 @@ function syncOverlays(force = false) {
         opacity: "1",
       });
     }
+    if (
+      editingText?.boardId === b.id &&
+      !editingText.composing &&
+      (MKWText.rich(b.elements[editingText.key]) || studioPreferences.advanced)
+    )
+      MKWTypography.postInline(b, editingText.key, editingText.el, true);
     const frame = root.querySelector(".element-frame");
     if (frame) {
       const e = b.elements.logo;

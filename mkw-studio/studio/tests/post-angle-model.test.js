@@ -98,3 +98,12 @@ test("MKW keeps one photo for an enabled or hidden angle, isolates undo metadata
   assert.equal(assets.compact(p).images.length, 0);
   assert.deepEqual(assets.compact(p).angleOverrides, {});
 });
+
+test("direction fixes the perpendicular tip axis at the content centre", () => {
+  const b = board();
+  for (const direction of A.directions) {
+    b.angle = A.defaults(b, { direction, tip: { x: .3, y: .7 } });
+    const area = { w: 900, h: 1200 }, tip = A.geometry(b, area).tip;
+    assert.equal(direction === 'right' ? tip.y : tip.x, direction === 'right' ? area.h / 2 : area.w / 2);
+  }
+});
