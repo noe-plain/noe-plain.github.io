@@ -759,6 +759,7 @@ function syncOverlays(force = false) {
       (MKWText.rich(b.elements[editingText.key]) || studioPreferences.advanced)
     )
       MKWTypography.postInline(b, editingText.key, editingText.el, true);
+    MKWPostTextStack.overlay(b, root, block, s);
     const frame = root.querySelector(".element-frame");
     if (frame) {
       const e = b.elements.logo;
@@ -790,7 +791,8 @@ function beginMove(ev, b, key, corner = null) {
   selected = b.id;
   if (key !== "textBox") layer = key;
   checkpoint();
-  if (key === "textBox") b.textBox = { offset: textBlock(b).offset };
+  if (key === "textBox")
+    b.textBox = { ...b.textBox, offset: textBlock(b).offset };
   const initial = clone(
     key === "image" ? b.image : key === "textBox" ? b.textBox : b.elements[key],
   );

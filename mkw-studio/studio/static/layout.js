@@ -72,6 +72,29 @@
     }
     return lines;
   }
+  const stackPairs = ["date:title", "title:subtitle", "date:subtitle"];
+  const maxStackGap = 10000;
+  const stackGap = (b, before, after) =>
+    b.textBox?.gaps?.[before + ":" + after] ?? (8 * b.w) / 1080;
+  function validateTextBox(box) {
+    if (!box) return;
+    if (!Number.isFinite(box.offset) || box.offset < 0)
+      throw Error("Ungültige Textbox-Position.");
+    if (
+      box.gaps !== undefined &&
+      (!box.gaps ||
+        typeof box.gaps !== "object" ||
+        Array.isArray(box.gaps) ||
+        Object.entries(box.gaps).some(
+          ([key, value]) =>
+            !stackPairs.includes(key) ||
+            !Number.isFinite(value) ||
+            value < 0 ||
+            value > maxStackGap,
+        ))
+    )
+      throw Error("Ungültige Abstände im Textstapel.");
+  }
   function textLayout(b, measure, activeKey, styleLayout) {
     const safe = safeRect(b),
       visible = keys.filter(
@@ -82,8 +105,9 @@
             (b.elements[k].text || b.elements[k].enabled)) ||
             k === activeKey ||
             (activeKey && !b.elements[k].text.trim())),
-      ),
-      gap = (8 * b.w) / 1080;
+      );
+    const gaps = visible.slice(1).map((key, i) => stackGap(b, visible[i], key)),
+      gapTotal = gaps.reduce((sum, value) => sum + value, 0);
     function rows(factor) {
       return visible.map((key) => {
         const e = b.elements[key],
@@ -113,9 +137,7 @@
       });
     }
     let records = rows(1),
-      height =
-        records.reduce((n, r) => n + r.h, 0) +
-        Math.max(0, records.length - 1) * gap,
+      height = records.reduce((n, r) => n + r.h, 0) + gapTotal,
       factor = 1;
     if (height > safe.h || records.some((r) => r.maxWidth > safe.w)) {
       let lo = 0.00001,
@@ -123,22 +145,18 @@
       for (let i = 0; i < 22; i++) {
         const mid = (lo + hi) / 2,
           r = rows(mid),
-          h =
-            r.reduce((n, r) => n + r.h, 0) +
-            Math.max(0, r.length - 1) * gap * mid;
+          h = r.reduce((n, r) => n + r.h, 0) + gapTotal * mid;
         if (h > safe.h || r.some((r) => r.maxWidth > safe.w)) hi = mid;
         else lo = mid;
       }
       factor = lo;
       records = rows(factor);
-      height =
-        records.reduce((n, r) => n + r.h, 0) +
-        Math.max(0, records.length - 1) * gap * factor;
+      height = records.reduce((n, r) => n + r.h, 0) + gapTotal * factor;
     }
     const offset = clamp(b.textBox?.offset || 0, 0, safe.h - height),
       y = safe.y + safe.h - offset - height;
     let cursor = y;
-    records = records.map((e) => {
+    records = records.map((e, index) => {
       const row = {
         ...e,
         x:
@@ -155,7 +173,7 @@
         w: safe.w,
         angle: 0,
       };
-      cursor += e.h + gap * factor;
+      cursor += e.h + (gaps[index] || 0) * factor;
       return row;
     });
     const ce = b.elements.copyright,
@@ -295,6 +313,10 @@
   }
   const api = {
     copyrightText,
+    stackPairs,
+    maxStackGap,
+    stackGap,
+    validateTextBox,
     lineHeight,
     keys,
     clamp,

@@ -30,8 +30,15 @@ search.addEventListener("input", () => {
     : "Keine passenden Kapitel. Versuche einen anderen Suchbegriff.";
 });
 function markSection() {
+  const target = document.getElementById(location.hash.slice(1)),
+    section = target?.closest("main section");
+  if (section?.hidden) {
+    search.value = "";
+    search.dispatchEvent(new Event("input"));
+    target.scrollIntoView();
+  }
   for (const link of links) {
-    if (link.hash === location.hash)
+    if (link.hash === "#" + section?.id)
       link.setAttribute("aria-current", "location");
     else link.removeAttribute("aria-current");
   }

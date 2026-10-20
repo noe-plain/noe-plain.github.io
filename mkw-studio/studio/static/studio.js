@@ -44,15 +44,15 @@ function textTypeSummary(b) {
 function postOptionSummary(b) {
   return [
     ...textTypeSummary(b),
+    ...(b?.angle?.enabled ? ["Winkel"] : []),
     ...(b?.family?.enabled ? ["Familienkonzert"] : []),
     ...(b?.sponsors?.enabled ? ["Sponsorenleiste"] : []),
-    ...(b?.angle?.enabled ? ["Winkel"] : []),
   ];
 }
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = postOptionSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Optionen gewählt"}</span><span class="text-count" data-text-count>${active.length} Optionen</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}">${textTypes.map(([key, label]) => `<label class="post-option-row"><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}${familyPicker(im)}${sponsorOptions(im)}${MKWPostAngleEditor.options(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Optionen gewählt"}</span><span class="text-count" data-text-count>${active.length} Optionen</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="post-text-options" role="group" aria-label="Textoptionen"><span class="post-options-heading">Textoptionen</span>${textTypes.map(([key, label]) => `<label class="post-option-row"><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}</div><hr class="post-options-divider">${MKWPostAngleEditor.options(im)}${familyPicker(im)}<hr class="post-options-divider">${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
@@ -571,6 +571,7 @@ function renderPanel() {
       }),
     );
   }
+  if (step === "text") MKWPostTextStack.panel(b, panel);
   bindFamilyTools(panel);
 }
 function beginText(b, key, el) {

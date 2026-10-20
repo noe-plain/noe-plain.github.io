@@ -436,7 +436,14 @@ function resize(w, h, mode) {
       b.image.x += (w - ow) / 2;
       b.image.y += (h - oh) / 2;
     }
-    if (b.textBox && mode === "layout") b.textBox.offset *= s;
+    if (b.textBox && mode === "layout") {
+      b.textBox.offset *= s;
+      for (const key of Object.keys(b.textBox.gaps || {}))
+        b.textBox.gaps[key] = Math.min(
+          MKWLayout.maxStackGap,
+          b.textBox.gaps[key] * s,
+        );
+    }
     if (b.safe) {
       const f = h / oh;
       b.safe.top *= f;
@@ -513,11 +520,7 @@ function validate(q) {
   validateFamilyProject(q);
   const bids = new Set();
   for (const b of q.boards) {
-    if (
-      b.textBox &&
-      (!Number.isFinite(b.textBox.offset) || b.textBox.offset < 0)
-    )
-      throw Error("Ungültige Textbox-Position.");
+    MKWLayout.validateTextBox(b.textBox);
     if (
       bids.has(b.id) ||
       typeof b.id !== "string" ||
@@ -775,6 +778,8 @@ function createBoard(im, w = 1080, h = 1080) {
     template?.family || p.meta.familyDesign || MKWFamily.defaults(),
   );
   if (MKWSponsors.layout(b)) fit(b, "fill");
+  if (template?.textBox?.gaps)
+    b.textBox = { offset: 0, gaps: clone(template.textBox.gaps) };
   if (template?.imageId === im.id && template.angle)
     MKWPostAngleEditor.create(b, template.angle);
   return b;

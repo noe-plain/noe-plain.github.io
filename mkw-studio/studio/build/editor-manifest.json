@@ -63,6 +63,7 @@
     "static/setup-store.js",
     "static/setup-session.js",
     "static/setup-ui.js",
+    "static/post-text-stack.js",
     "static/post-safezone.js",
     "static/post-workspace.js",
     "static/project-session.js",
@@ -86,6 +87,7 @@
     "static/carousel-refinements.css",
     "static/editor-polish.css",
     "static/typography.css",
-    "static/post-safezone.css"
+    "static/post-safezone.css",
+    "static/post-text-stack.css"
   ]
 }

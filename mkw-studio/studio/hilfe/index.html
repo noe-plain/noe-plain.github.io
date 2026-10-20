@@ -9,7 +9,7 @@
       content="Schnellstart und Handbuch für MKW Studio: Einzelposts, Carousels, Speichern, Export und häufige Fragen."
     />
     <link rel="stylesheet" href="hilfe.css?v=525120b1c831" />
-    <script src="hilfe.js?v=a974bd594935" defer></script>
+    <script src="hilfe.js?v=8b99030dac8f" defer></script>
   </head>
   <body>
     <header>
@@ -63,7 +63,7 @@
           <ol>
             <li>
               <strong>Projekt erstellen:</strong> Auf dem Startscreen „Neues
-              Projekt“ wählen, einen Namen vergeben und Einzelposts oder
+              Projekt starten“ wählen, einen Namen vergeben und Einzelposts oder
               Carousel auswählen.
             </li>
             <li>
@@ -80,7 +80,7 @@
             <li>
               <strong>Gestalten:</strong> Text eingeben, Logo prüfen und den
               Bildausschnitt einstellen. Die Leiste unten führt zu den
-              Werkzeugen.
+              Werkzeugen; im Advanced-Carousel liegt sie links.
             </li>
             <li>
               <strong>Sichern und exportieren:</strong> Das Projekt als
@@ -90,29 +90,49 @@
           </ol>
           <p class="note">
             Für die meisten Aufgaben reicht der normale Modus. Den
-            Advanced-Modus brauchst du für freie Pfade, Formen und weitere
-            Gestaltungswerkzeuge im Carousel.
+            Advanced-Modus brauchst du für freie Pfade und Formen im Carousel
+            sowie für die zeichenweise Typografie in beiden Editoren.
           </p>
         </section>
         <section id="einzelposts">
           <h2>Einzelposts gestalten</h2>
           <h3>Schutzzonen an allen vier Seiten</h3>
-          <p>Beim Einrichten eines Einzelpost-Projekts kannst du für jedes ausgewählte Format die Abstände <strong>oben, unten, links und rechts</strong> in Pixeln festlegen. Die Zeichenflächen-Grafik zeigt die nutzbare Fläche direkt. Nicht ausgewählte Formate bleiben kompakt. Links und rechts sind bei neuen Standardformaten je 100 px voreingestellt.</p>
-          <p>Später öffnest du bei der Zeichenfläche <strong>Format anpassen</strong>. Dort lassen sich alle vier Abstände für diese Zeichenfläche ändern. Text, MKW-Logo und Hilfslinien verwenden dieselben Werte; der Bildausschnitt bleibt unverändert. Ungültige Kombinationen werden angezeigt und nicht gespeichert. Dateien ohne seitliche Werte behalten ihre bisherigen, mit der Breite skalierten Standardränder. Die Copyright-Grösse passt sich dem rechten Rand an.</p>
+          <p>
+            Beim Einrichten eines Einzelpost-Projekts kannst du für jedes
+            ausgewählte Format die Abstände
+            <strong>oben, unten, links und rechts</strong> in Pixeln festlegen.
+            Die Zeichenflächen-Grafik zeigt die nutzbare Fläche direkt. Nicht
+            ausgewählte Formate bleiben kompakt. Links und rechts sind bei neuen
+            Standardformaten je 100 px voreingestellt.
+          </p>
+          <p>
+            Später öffnest du bei der Zeichenfläche
+            <strong>Format anpassen</strong>. Dort lassen sich alle vier
+            Abstände für diese Zeichenfläche ändern. Text, MKW-Logo und
+            Hilfslinien verwenden dieselben Werte; der Bildausschnitt bleibt
+            unverändert. Ungültige Kombinationen werden angezeigt und nicht
+            gespeichert. Dateien ohne seitliche Werte behalten ihre bisherigen,
+            mit der Breite skalierten Standardränder. Die Copyright-Grösse passt
+            sich dem rechten Rand an.
+          </p>
           <h3>Die Bildkarte links</h3>
           <p>
             Die Bildkarten bleiben auch auf kleinen Bildschirmen geöffnet. Jede
             Bildreihe hat eine Karte mit Dateiname, Copyright, Format- und
             Bildaktionen. Über <strong>„Optionen“</strong> wählst du Übertitel,
             Konzerttitel und Untertitel an oder ab. Hier aktivierst du auch das
-            Familienkonzert-Design, die Sponsorenleiste und den Winkel. Alle Optionen haben gleich gestaltete Auswahlzeilen.
+            Familienkonzert-Design, die Sponsorenleiste und den Winkel. Unter
+            <strong>Textoptionen</strong> stehen die drei Texte, nach dem ersten
+            Trennstrich folgen Winkel und Familienkonzert, nach dem zweiten die
+            Sponsorenleiste.
           </p>
           <h3>Das erste Bild als Vorlage</h3>
           <p>
             Das erste Bild gibt Texte und Optionen für die weiteren Bilder vor.
-            Der Winkel wird für jedes Bild separat eingeschaltet und eingerichtet. Andere Bilder können anschliessend einzeln angepasst werden. Eigene
-            Texte bleiben unabhängig; mit „Text vom ersten Bild übernehmen“
-            lässt sich diese Abweichung zurücksetzen.
+            Der Winkel wird für jedes Bild separat eingeschaltet und
+            eingerichtet. Andere Bilder können anschliessend einzeln angepasst
+            werden. Eigene Texte bleiben unabhängig; mit „Text vom ersten Bild
+            übernehmen“ lässt sich diese Abweichung zurücksetzen.
           </p>
           <h3>Text, Logo und Ausschnitt</h3>
           <p>
@@ -126,26 +146,166 @@
             sich ausschalten. Der eingegebene Text bleibt erhalten. Übertitel
             und Untertitel haben eigene Schriftgrössen.
           </p>
-          <h3>Advanced-Typografie · in beiden Editoren</h3>
-          <p>Aktiviere den <strong>Advanced-Modus</strong> in den Einstellungen. Einzelposts und Carousels verwenden dann denselben Textinspektor mit den Reitern <strong>Zeichen</strong> und <strong>Absatz</strong>. Bei Einzelposts bleibt die gemeinsame MKW-Textanordnung innerhalb der Schutzzone erhalten.</p>
+          <h3 id="textstapel">Abstände zwischen den Titeln</h3>
+          <p>
+            Im Textwerkzeug findest du <strong>Abstände im Textstapel</strong>.
+            Für zwei aufeinanderfolgende sichtbare Titel kannst du den Abstand
+            in Pixeln eingeben oder den kleinen Zahlengriff links zwischen den
+            Titeln ziehen: nach oben vergrössert den Abstand, nach unten
+            verkleinert ihn. Ein Doppelklick auf den Griff öffnet das
+            Zahlenfeld. Mit den Pfeiltasten am Griff änderst du den Wert um 1
+            px, mit Shift um 10 px.
+          </p>
+          <p>
+            <strong>Standard</strong> setzt den jeweiligen Abstand auf die
+            bisherige MKW-Vorgabe zurück. Ohne Anpassung bleibt das Layout
+            unverändert, einschliesslich der optischen Verschiebung des
+            Konzerttitels. Der Abstandswert beschreibt den Stapelabstand vor
+            dieser optischen Korrektur. Der Textblock lässt sich am bisherigen
+            Verschiebegriff weiterhin gemeinsam vertikal bewegen. Sehr grosse
+            Texte und Abstände werden zusammen in die Schutzzone eingepasst.
+          </p>
+          <p>
+            Änderst du einen Abstand am ersten Bild, folgen dessen Formate und
+            weitere Bilder, bei denen beide beteiligten Titel denselben Text
+            haben. Bei anderen Bildern kannst du die Abstände separat
+            einstellen. Das Copyright gehört nicht zum Textstapel.
+          </p>
+          <h3 id="advanced-typografie">
+            Advanced-Typografie · in beiden Editoren
+          </h3>
+          <p>
+            Aktiviere den <strong>Advanced-Modus</strong> in den Einstellungen.
+            Einzelposts und Carousels verwenden dann denselben Textinspektor mit
+            den Reitern <strong>Zeichen</strong> und <strong>Absatz</strong>.
+            Bei Einzelposts bleibt die gemeinsame MKW-Textanordnung innerhalb
+            der Schutzzone erhalten.
+          </p>
           <ol>
-            <li>Wähle ein Textfeld. Ohne Textmarkierung beziehen sich Änderungen auf den <strong>gesamten Text</strong>.</li>
-            <li>Markiere im Eingabefeld oder direkt auf der Fläche einen Textbereich. Schriftfamilie und Schriftschnitt, Grösse, Farbe, Laufweite, Grossbuchstaben, Unterstreichen, Durchstreichen, Hoch- und Tiefstellen gelten dann nur für die <strong>markierten Zeichen</strong>.</li>
-            <li>Mit einer einzelnen Einfügemarke gelten Zeichenänderungen für <strong>neu eingegebene Zeichen</strong>. Die Anzeige über den Reitern zeigt den Wirkungsbereich. <strong>Gesamter Text</strong> hebt diese Begrenzung auf.</li>
-            <li>Unter <strong>Absatz</strong> stellst du Links-/Mittel-/Rechtsausrichtung, Zeilenabstand in Prozent und Abstände davor und danach ein. Eine Markierung betrifft die berührten Absätze; eine Einfügemarke den aktuellen Absatz. Ohne Markierung gelten Absatzänderungen für alle Absätze.</li>
+            <li>
+              Wähle ein Textfeld. Solange kein Zeichenbereich und keine
+              Einfügemarke aktiv ist, beziehen sich Änderungen auf den
+              <strong>gesamten Text</strong>. Mit
+              <strong>Gesamter Text</strong> kannst du diesen Wirkungsbereich
+              jederzeit wählen.
+            </li>
+            <li>
+              Markiere im Eingabefeld oder direkt auf der Fläche einen
+              Textbereich. Schriftfamilie und Schriftschnitt, Grösse, Farbe,
+              Laufweite, Grossbuchstaben, Unterstreichen, Durchstreichen, Hoch-
+              und Tiefstellen gelten dann nur für die
+              <strong>markierten Zeichen</strong>.
+            </li>
+            <li>
+              Mit einer einzelnen Einfügemarke gelten Zeichenänderungen für
+              <strong>neu eingegebene Zeichen</strong>. Die Anzeige über den
+              Reitern zeigt den Wirkungsbereich.
+              <strong>Gesamter Text</strong> hebt diese Begrenzung auf.
+            </li>
+            <li>
+              Unter <strong>Absatz</strong> stellst du
+              Links-/Mittel-/Rechtsausrichtung, Zeilenabstand in Prozent und
+              Abstände davor und danach ein. Eine Markierung betrifft die
+              berührten Absätze; eine Einfügemarke den aktuellen Absatz. Im
+              Wirkungsbereich <strong>Gesamter Text</strong> gelten
+              Absatzänderungen für alle Absätze.
+            </li>
           </ol>
-          <p>Die <strong>Laufweite</strong> wird in Tausendsteln der Schriftgrösse angegeben: 20 ‰ entspricht bei 50 px Schriftgrösse 1 px zusätzlichem Zeichenabstand. Unter „Weitere Zeichenoptionen“ findest du den Grundlinienversatz und das Zurücksetzen der Zeichenformate. Grossbuchstaben sowie Hoch-/Tiefstellung bleiben reine Darstellungen: Der ursprüngliche Text wird unverändert gespeichert.</p>
-          <p>Beim Carousel bleiben eigene Absatzgrössen und Zeilenabstände unter <strong>Absatz → Einzelne Absätze &amp; Zeilen</strong> erreichbar. „Textfeldfarbe &amp; Deckkraft“ verändert ausdrücklich den gesamten Textrahmen; die Textfarbe darüber berücksichtigt die Zeichenmarkierung. Beim Einzelpost folgen weitere Formate desselben Bildes sowie Bilder mit demselben Text den Formatänderungen am ersten Bild. Eigene Texte bleiben unabhängig. Die Familienpalette bleibt erhalten; Copyright bleibt dabei schwarz oder weiss und ohne Kontur.</p>
-          <p>Formate bleiben nach dem Ausschalten des Advanced-Modus und in MKW-Dateien erhalten. Bildexporte und PDF-Seiten verwenden den gemeinsamen Renderer. Bei Einzelpost-PSD sichert eine als <strong>Typografie (gerastert)</strong> benannte Ebene die genaue Darstellung; eine ausgeblendete Gruppe enthält separat editierbare Textläufe. Das ist kein vollständiger InDesign-/Affinity-Textrahmen. Carousel-PSD enthält einzelne editierbare Textläufe. Schriftverfügbarkeit und das Verhalten externer Programme können das spätere Editieren beeinflussen. Blocksatz und verkettete Textrahmen sind noch nicht enthalten.</p>
-          <p>Das Bedienprinzip orientiert sich an den offiziellen Beschreibungen von <a href="https://help.figma.com/hc/en-us/articles/360039956634-Explore-text-properties" target="_blank" rel="noopener">Figma</a>, <a href="https://helpx.adobe.com/indesign/desktop/format-and-style-text/composition-and-text-wrapping/apply-and-manage-text-formatting.html" target="_blank" rel="noopener">InDesign</a> und <a href="https://affinity.help/designer2/English.lproj/pages/Panels/characterPanel.html" target="_blank" rel="noopener">Affinity Designer</a>.</p>
+          <p>
+            Die <strong>Laufweite</strong> wird in Tausendsteln der
+            Schriftgrösse angegeben: 20 ‰ entspricht bei 50 px Schriftgrösse 1
+            px zusätzlichem Zeichenabstand. Unter „Weitere Zeichenoptionen“
+            findest du den Grundlinienversatz und das Zurücksetzen der
+            Zeichenformate. Grossbuchstaben sowie Hoch-/Tiefstellung bleiben
+            reine Darstellungen: Der ursprüngliche Text wird unverändert
+            gespeichert.
+          </p>
+          <p>
+            Beim Carousel bleiben eigene Absatzgrössen und Zeilenabstände unter
+            <strong>Absatz → Einzelne Absätze &amp; Zeilen</strong> erreichbar.
+            „Textfeldfarbe &amp; Deckkraft“ verändert ausdrücklich den gesamten
+            Textrahmen; die Textfarbe darüber berücksichtigt die
+            Zeichenmarkierung. Beim Einzelpost folgen weitere Formate desselben
+            Bildes sowie Bilder mit demselben Text den Formatänderungen am
+            ersten Bild. Eigene Texte bleiben unabhängig. Die Familienpalette
+            bleibt erhalten; Copyright bleibt dabei schwarz oder weiss und ohne
+            Kontur.
+          </p>
+          <p>
+            Formate bleiben nach dem Ausschalten des Advanced-Modus und in
+            MKW-Dateien erhalten. Bildexporte und PDF-Seiten verwenden den
+            gemeinsamen Renderer. Bei Einzelpost-PSD sichert eine als
+            <strong>Typografie (gerastert)</strong> benannte Ebene die genaue
+            Darstellung; eine ausgeblendete Gruppe enthält separat editierbare
+            Textläufe. Das ist kein vollständiger InDesign-/Affinity-Textrahmen.
+            Carousel-PSD enthält einzelne editierbare Textläufe.
+            Schriftverfügbarkeit und das Verhalten externer Programme können das
+            spätere Editieren beeinflussen. Blocksatz und verkettete Textrahmen
+            sind noch nicht enthalten.
+          </p>
+          <p>
+            Das Bedienprinzip orientiert sich an den offiziellen Beschreibungen
+            von
+            <a
+              href="https://help.figma.com/hc/en-us/articles/360039956634-Explore-text-properties"
+              target="_blank"
+              rel="noopener"
+              >Figma</a
+            >,
+            <a
+              href="https://helpx.adobe.com/indesign/desktop/format-and-style-text/composition-and-text-wrapping/apply-and-manage-text-formatting.html"
+              target="_blank"
+              rel="noopener"
+              >InDesign</a
+            >
+            und
+            <a
+              href="https://affinity.help/designer2/English.lproj/pages/Panels/characterPanel.html"
+              target="_blank"
+              rel="noopener"
+              >Affinity Designer</a
+            >.
+          </p>
           <h3>Winkel bei Einzelposts</h3>
           <ol>
-            <li>In der Bildkarte <strong>Optionen</strong> öffnen und das Kästchen neben <strong>Winkel</strong> aktivieren. Im Dropdown wählst du <strong>Oben, Rechts oder Unten</strong>.</li>
-            <li>Den sichtbaren Winkel <strong>anklicken und ziehen</strong>: Bei „Oben“ und „Unten“ bewegt er sich nur nach oben und unten und bleibt horizontal zentriert; bei „Rechts“ bewegt er sich nur seitlich und bleibt vertikal zentriert. Die hinteren Schenkelenden bleiben automatisch ausserhalb der Bildfläche; die beiden vorderen Ecken bilden die Spitze.</li>
-            <li>Mit einem <strong>Doppelklick</strong> den Bildinhalt öffnen. Ziehen verschiebt das Foto innerhalb des Winkels, die Eckgriffe skalieren es proportional. <strong>Escape</strong> oder der Button „Winkel“ in der Seitenleiste beendet die Inhaltsbearbeitung.</li>
+            <li>
+              In der Bildkarte <strong>Optionen</strong> öffnen und das Kästchen
+              neben <strong>Winkel</strong> aktivieren. Im Dropdown wählst du
+              <strong>Oben, Rechts oder Unten</strong>.
+            </li>
+            <li>
+              Den sichtbaren Winkel <strong>anklicken und ziehen</strong>: Bei
+              „Oben“ und „Unten“ bewegt er sich nur nach oben und unten und
+              bleibt horizontal zentriert; bei „Rechts“ bewegt er sich nur
+              seitlich und bleibt vertikal zentriert. Die hinteren Schenkelenden
+              bleiben automatisch ausserhalb der Bildfläche; die beiden vorderen
+              Ecken bilden die Spitze.
+            </li>
+            <li>
+              Mit einem <strong>Doppelklick</strong> den Bildinhalt öffnen.
+              Ziehen verschiebt das Foto innerhalb des Winkels, die Eckgriffe
+              skalieren es proportional. <strong>Escape</strong> oder der Button
+              „Winkel“ in der Seitenleiste beendet die Inhaltsbearbeitung.
+            </li>
           </ol>
-          <p>Der Winkel verwendet dasselbe Foto wie der Hintergrund, anfangs leicht vergrössert und versetzt. Der Hintergrund bleibt beim Bearbeiten des Winkelbilds unverändert. In der Seitenleiste kannst du auch spiegeln, den Ausschnitt zurücksetzen, die Schenkelbreite und den Schein ändern. „Winkel vollständig füllen“ behebt freie Stellen. Die Voreinstellung ist 150 px Schenkelbreite und 50 px Schein. Der Bildinhalt dreht sich beim Richtungswechsel nicht mit.</p>
-          <p>Jedes Bild hat eine unabhängige Aktivierung und Richtung. Das erste Bild verändert die Winkel anderer Bilder nicht. Neue Formate desselben Bildes übernehmen seine Winkel-Einstellung; neue Bilder starten ohne Winkel. Jeder Bildausschnitt und jede Winkelposition sind pro Zeichenfläche unabhängig. Das Foto wird nur einmal in der MKW-Datei gespeichert. Vorschau und Bildexport nutzen dieselbe Darstellung; PSD enthält den Winkel als benannte Rasterebene.</p>
+          <p>
+            Der Winkel verwendet dasselbe Foto wie der Hintergrund, anfangs
+            leicht vergrössert und versetzt. Der Hintergrund bleibt beim
+            Bearbeiten des Winkelbilds unverändert. In der Seitenleiste kannst
+            du auch spiegeln, den Ausschnitt zurücksetzen, die Schenkelbreite
+            und den Schein ändern. „Winkel vollständig füllen“ behebt freie
+            Stellen. Die Voreinstellung ist 150 px Schenkelbreite und 50 px
+            Schein. Der Bildinhalt dreht sich beim Richtungswechsel nicht mit.
+          </p>
+          <p>
+            Jedes Bild hat eine unabhängige Aktivierung und Richtung. Das erste
+            Bild verändert die Winkel anderer Bilder nicht. Neue Formate
+            desselben Bildes übernehmen seine Winkel-Einstellung; neue Bilder
+            starten ohne Winkel. Jeder Bildausschnitt und jede Winkelposition
+            sind pro Zeichenfläche unabhängig. Das Foto wird nur einmal in der
+            MKW-Datei gespeichert. Vorschau und Bildexport nutzen dieselbe
+            Darstellung; PSD enthält den Winkel als benannte Rasterebene.
+          </p>
           <h3>Sponsorleisten</h3>
           <p>
             Unter Einstellungen → Sponsoren legst du Gruppen mit Namen und Logos
@@ -234,14 +394,19 @@
             passend zurück. Das gilt auch für Bildwinkel.
           </p>
           <h3>Typografie</h3>
-          <p>Die gemeinsame Advanced-Textbearbeitung ist im Abschnitt „Einzelposts gestalten → Advanced-Typografie“ beschrieben. Die folgenden Bedienelemente gelten für den einfachen Modus.</p>
+          <p>
+            Die gemeinsame Advanced-Textbearbeitung ist unter
+            <a href="#advanced-typografie">Advanced-Typografie</a> beschrieben.
+            Die folgenden Bedienelemente gelten für den einfachen Modus.
+          </p>
           <p>
             Enter beginnt einen neuen Absatz. Die Grundgrösse und
             Textfeldausrichtung gelten für Absätze ohne eigene Einstellung.
             Unter „Absätze &amp; Abstände“ wählst du einen Absatz und bei Bedarf
             eine einzelne Zeile. Die automatische Zeilenhöhe ist standardmässig
             95 % der Schriftgrösse; „Automatisch“ stellt sie wieder her. Der
-            Text kann oben oder unten, im Advanced-Modus auch mittig im Rahmen stehen.
+            Text kann oben oder unten, im Advanced-Modus auch mittig im Rahmen
+            stehen.
           </p>
           <p>
             Grossbuchstaben und Hochstellen verändern die Darstellung, nicht den
@@ -250,11 +415,19 @@
           </p>
           <h3>Winkel und Rahmenpunkte</h3>
           <p>
-            Bei „Oben“ und „Unten“ bleibt die Winkelspitze horizontal auf der Slide-Mitte: Verschieben ist nur nach oben und unten möglich. Bei „Rechts“ bleibt sie vertikal in der Mitte und lässt sich nur seitlich verschieben. Das gilt auch bei ausgeschalteten magnetischen Hilfslinien. Der Bildinhalt bleibt frei anpassbar. Mindestens eine Artwork-Kante wird um 1 px
-            überragt. Der Bildinhalt bleibt unabhängig von der Winkelrichtung
-            ausgerichtet. In „Rahmenform“ wählst du 3 bis 8 Punkte. Ziehen der
-            Rahmenpunkte verändert den Beschnitt, nicht die Position des
-            Bildinhalts.
+            Bei „Oben“ und „Unten“ bleibt die Winkelspitze horizontal auf der
+            Slide-Mitte: Verschieben ist nur nach oben und unten möglich. Bei
+            „Rechts“ bleibt sie vertikal in der Mitte und lässt sich nur
+            seitlich verschieben. Das gilt auch bei ausgeschalteten magnetischen
+            Hilfslinien. Der Bildinhalt bleibt frei anpassbar. Mindestens eine
+            Artwork-Kante wird um 1 px überragt. Der Bildinhalt bleibt
+            unabhängig von der Winkelrichtung ausgerichtet.
+          </p>
+          <p>
+            Für Bild- und Verlaufsrahmen wählst du in
+            <strong>Rahmenform</strong> 3 bis 8 Punkte. Ziehen der Rahmenpunkte
+            verändert die Rahmenform; der Bildinhalt bleibt an seiner bisherigen
+            Position. Diese Punktwahl gilt nicht für die festgelegte Winkelform.
           </p>
           <h3>Farben, Verläufe und Bildfüllungen</h3>
           <p>
@@ -314,17 +487,69 @@
         </section>
         <section id="speichern">
           <h2>Speichern & übergeben</h2>
-          <p>Neue MKW-Dateien werden verlustfrei komprimiert und Bild für Bild verarbeitet. Alte MKW-Dateien bleiben lesbar. Gelöschte, nicht mehr verwendete Bilder werden beim Speichern entfernt; ausgeblendete Elemente bleiben erhalten.</p>
+          <p>
+            MKW-Dateien enthalten den Projektstand und nur die noch benötigten
+            Bilder, Logos und Schriften. Downloads werden verlustfrei
+            komprimiert und Bild für Bild verarbeitet. Bei direktem
+            Dateizugriff, etwa in Chrome, verwendet das Studio stattdessen
+            getrennte Datenblöcke für schnelle Aktualisierungen. Beide Varianten
+            lassen sich in Firefox und Chrome öffnen; alte MKW-Dateien bleiben
+            lesbar. Gelöschte, nicht mehr verwendete Bilder werden beim
+            Speichern entfernt; ausgeblendete Elemente bleiben erhalten.
+          </p>
           <h3>MKW-Setup: Einstellungen im Team teilen</h3>
-          <p>Unter <strong>Einstellungen → Allgemein → MKW-Setup</strong> stehen drei Aktionen zur Verfügung:</p>
+          <p>
+            Unter <strong>Einstellungen → Allgemein → MKW-Setup</strong> stehen
+            drei Aktionen zur Verfügung:
+          </p>
           <ol>
-            <li><strong>Exportieren:</strong> Erstellt eine .mkwsetup-Datei mit allen Werkzeugeinstellungen: Hell/Dunkel, Advanced-Modus, automatischer Dateiaktualisierung, Hilfslinienfarben, Einrastabstand, Export-Vorgaben, Standard-Schriftgrössen, Zeilenhöhe sowie eigenen Schriften und Sponsorgruppen mit Logos, Gruppennamen und Reihenfolge.</li>
-            <li><strong>Verknüpfen:</strong> Wähle eine Setup-Datei. Ihre Einstellungen und Bibliotheken ersetzen die bisherigen Werkzeugeinstellungen. Die Datei wird gemerkt; bereits gestaltete Projekte bleiben unverändert.</li>
-            <li><strong>Aktualisieren:</strong> Prüft die gewählte Datei erneut und übernimmt ihren aktuellen Inhalt. So lassen sich zentral geänderte Team-Einstellungen abrufen. Lokale Änderungen werden dabei durch die Werte der Setup-Datei ersetzt.</li>
+            <li>
+              <strong>Exportieren:</strong> Erstellt eine .mkwsetup-Datei mit
+              allen Werkzeugeinstellungen: Hell/Dunkel, Advanced-Modus,
+              automatischer Dateiaktualisierung, Hilfslinienfarben,
+              Einrastabstand, Export-Vorgaben, Standard-Schriftgrössen,
+              Zeilenhöhe sowie eigenen Schriften und Sponsorgruppen mit Logos,
+              Gruppennamen und Reihenfolge.
+            </li>
+            <li>
+              <strong>Verknüpfen:</strong> Wähle eine Setup-Datei. Ihre
+              Einstellungen und Bibliotheken ersetzen die bisherigen
+              Werkzeugeinstellungen. Die Datei wird gemerkt; bereits gestaltete
+              Projekte bleiben unverändert.
+            </li>
+            <li>
+              <strong>Aktualisieren:</strong> Prüft die gewählte Datei erneut
+              und übernimmt ihren aktuellen Inhalt. So lassen sich zentral
+              geänderte Team-Einstellungen abrufen. Lokale Änderungen werden
+              dabei durch die Werte der Setup-Datei ersetzt.
+            </li>
           </ol>
-          <p>Firefox merkt sich den Dateinamen, erlaubt Websites jedoch keinen dauerhaften Zugriff auf lokale Dateien. Beim Aktualisieren musst du die Setup-Datei dort erneut auswählen. Browser mit direktem Dateizugriff merken sich die Dateiverknüpfung; nach einem Neustart kann erneut eine Leseberechtigung nötig sein. Das Studio liest die Datei nur nach deiner Aktion und überschreibt sie beim Aktualisieren nicht.</p>
-          <p>Unter <strong>Einstellungen → Schriften</strong> kannst du Startgrössen für Übertitel, Konzerttitel, Untertitel und Copyright festlegen. Die Werte gelten in Pixeln für neue Einzelposts; weitere Bilder übernehmen weiterhin die Textvorlage des ersten Bildes. Im aktuellen Projekt verwendete Schriften und Sponsorlogos bleiben erhalten, auch wenn eine neue Setup-Datei sie nicht mehr in der Werkzeugbibliothek enthält.</p>
-          <p>Setup-Dateien sind verlustfrei komprimiert. Beim Einlesen werden Format, Schriften und Logos geprüft. Ungültige Dateien ändern keine Einstellungen. Bei einem Speicherfehler werden die bisherigen Einstellungen wiederhergestellt; eine unterbrochene Übernahme wird beim nächsten Start zurückgesetzt. Projekte, Projektbilder und lokale Dateipfade werden nicht mit einer Setup-Datei weitergegeben.</p>
+          <p>
+            Firefox merkt sich den Dateinamen, erlaubt Websites jedoch keinen
+            dauerhaften Zugriff auf lokale Dateien. Beim Aktualisieren musst du
+            die Setup-Datei dort erneut auswählen. Browser mit direktem
+            Dateizugriff merken sich die Dateiverknüpfung; nach einem Neustart
+            kann erneut eine Leseberechtigung nötig sein. Das Studio liest die
+            Datei nur nach deiner Aktion und überschreibt sie beim Aktualisieren
+            nicht.
+          </p>
+          <p>
+            Unter <strong>Einstellungen → Schriften</strong> kannst du
+            Startgrössen für Übertitel, Konzerttitel, Untertitel und Copyright
+            festlegen. Die Werte gelten in Pixeln für neue Einzelposts; weitere
+            Bilder übernehmen weiterhin die Textvorlage des ersten Bildes. Im
+            aktuellen Projekt verwendete Schriften und Sponsorlogos bleiben
+            erhalten, auch wenn eine neue Setup-Datei sie nicht mehr in der
+            Werkzeugbibliothek enthält.
+          </p>
+          <p>
+            Setup-Dateien sind verlustfrei komprimiert. Beim Einlesen werden
+            Format, Schriften und Logos geprüft. Ungültige Dateien ändern keine
+            Einstellungen. Bei einem Speicherfehler werden die bisherigen
+            Einstellungen wiederhergestellt; eine unterbrochene Übernahme wird
+            beim nächsten Start zurückgesetzt. Projekte, Projektbilder und
+            lokale Dateipfade werden nicht mit einer Setup-Datei weitergegeben.
+          </p>
           <h3>Browsersicherung</h3>
           <p>
             Änderungen werden automatisch in diesem Browserprofil gesichert.
@@ -348,8 +573,25 @@
             Browsersicherungen entfernen.
           </p>
           <h3>Schnelles Speichern in Chrome</h3>
-          <p>Nach dem Verknüpfen einer .mkw-Datei aktualisiert Chrome sie automatisch, sofern die Dateiaktualisierung in den Einstellungen aktiviert und der Dateizugriff freigegeben ist. Bilder werden einmal als getrennte Datenblöcke abgelegt. Änderungen an Text, Position oder Gestaltung schreiben nur den kleinen Projektteil neu; neue Bilder werden ergänzt. Unveränderte Stände werden nicht erneut geschrieben. Gelöschte, nicht mehr verwendete Bilder werden beim nächsten Speichern entfernt; ausgeblendete Inhalte bleiben erhalten.</p>
-          <p>Alte MKW-Dateien bleiben lesbar und werden beim ersten direkten Speichern einmalig auf das neue Speicherformat umgestellt. Auch Firefox kann die neuen Dateien öffnen. Chrome nutzt intern eine temporäre Kopie für sichere Dateiaktualisierungen; deshalb kann das Speichern sehr grosser Dateien weiterhin kurz dauern. Währenddessen kannst du weiterarbeiten. Die Browsersicherung bleibt zusätzlich aktiv.</p>
+          <p>
+            Nach dem Verknüpfen einer .mkw-Datei aktualisiert Chrome sie
+            automatisch, sofern die Dateiaktualisierung in den Einstellungen
+            aktiviert und der Dateizugriff freigegeben ist. Bilder werden einmal
+            als getrennte Datenblöcke abgelegt. Änderungen an Text, Position
+            oder Gestaltung schreiben nur den kleinen Projektteil neu; neue
+            Bilder werden ergänzt. Unveränderte Stände werden nicht erneut
+            geschrieben. Gelöschte, nicht mehr verwendete Bilder werden beim
+            nächsten Speichern entfernt; ausgeblendete Inhalte bleiben erhalten.
+          </p>
+          <p>
+            Alte MKW-Dateien bleiben lesbar und werden beim ersten direkten
+            Speichern einmalig auf das neue Speicherformat umgestellt. Auch
+            Firefox kann die neuen Dateien öffnen. Chrome nutzt intern eine
+            temporäre Kopie für sichere Dateiaktualisierungen; deshalb kann das
+            Speichern sehr grosser Dateien weiterhin kurz dauern. Währenddessen
+            kannst du weiterarbeiten. Die Browsersicherung bleibt zusätzlich
+            aktiv.
+          </p>
           <h3>Firefox und lokale Dateien</h3>
           <p>
             In Firefox erfolgt die Dateisicherung per Download. Bereits
@@ -361,8 +603,11 @@
           <p>
             Unterstützt dein Browser direkten Dateizugriff, kann das Studio eine
             gewählte .mkw-Datei mit deiner Berechtigung aktualisieren. Bei
-            externen Änderungen oder konkurrierenden Tabs wird der Stand
-            geschützt und bei Bedarf als separate Kopie gesichert.
+            externen Dateiänderungen wird die verknüpfte Datei nicht
+            überschrieben; dein Stand bleibt im Browser erhalten. Prüfe den
+            Hinweis und wähle bei Bedarf „Speichern unter …“. Bei
+            konkurrierenden Änderungen aus einem anderen Tab entsteht eine
+            separate Browsersicherung.
           </p>
           <p class="note">
             Vor der Übergabe die aktuelle .mkw-Datei speichern und probeweise
@@ -376,8 +621,9 @@
           <ol>
             <li>
               Warnungen findest du in beiden Editoren direkt links neben
-              „Export“. Ein Klick auf einen Hinweis führt zum betroffenen
-              Element. In der Exportansicht links die gewünschten Bilder oder
+              „Export“. Hinweise zu einem Element führen beim Anklicken direkt
+              dorthin; allgemeine Hinweise, etwa zum Datum, betreffen das ganze
+              Projekt. In der Exportansicht links die gewünschten Bilder oder
               Slides auswählen. „Alle auswählen“ und „Alle abwählen“ helfen bei
               grossen Projekten.
             </li>
@@ -387,9 +633,10 @@
               festlegen.
             </li>
             <li>
-              Die Dateinamen prüfen. Ein erkanntes Datum im Übertitel kann für
-              die Benennung übernommen werden. Ein fehlendes Datum erzeugt einen
-              Hinweis, verhindert den Export aber nicht.
+              Die Dateinamen prüfen. Ein erkanntes Datum im Übertitel, zum
+              Beispiel „DO 19. NOV 2026“, wird für die Benennung vorgeschlagen;
+              die Datumsangabe bleibt anpassbar. Ein fehlendes Datum erzeugt
+              einen Hinweis, verhindert den Export aber nicht.
             </li>
             <li>
               Mit „Exportvorschau öffnen“ die Ergebnisse ansehen. Die
@@ -400,11 +647,15 @@
           </ol>
           <p>
             Carousels können zusätzlich als PDF mit einer Slide pro Seite
-            exportiert werden. Für LinkedIn das entsprechende Preset wählen; die
-            Einstellungen bleiben manuell anpassbar. PSD ist eine weitere
-            Option, mit Slide-Slices beim Carousel. Komplexe Effekte und manche
-            Füllungen werden dort gerastert; nicht jede Ebene bleibt vollständig
-            bearbeitbar.
+            exportiert werden. Für LinkedIn zum Beispiel
+            <strong>LinkedIn · Hochformat</strong> wählen (1080 × 1350,
+            verlustfreie Komprimierung und Einpassen des gesamten Artworks).
+            Seitengrösse, Komprimierung, Qualität und Einpassen/Füllen bleiben
+            manuell anpassbar. Eine PDF enthält die ausgewählten Slides als
+            einzelne Seiten. PSD findest du im
+            <strong>Speichern-Dialog</strong>, mit Slide-Slices beim Carousel.
+            Komplexe Effekte und manche Füllungen werden dort gerastert; nicht
+            jede Ebene bleibt vollständig bearbeitbar.
           </p>
         </section>
         <section id="einstellungen">
@@ -418,17 +669,23 @@
             Diese Einstellungen gelten auf deinem Gerät. Sie verändern beim
             Wechsel nicht automatisch die Gestaltung vorhandener Objekte. Der
             Einrastabstand wird in Bildschirmpixeln gemessen und bleibt bei
-            jedem Zoom gleich. 95 % Standard-Zeilenhöhe entspricht Schriftgrösse
-            × 0,95 und gilt nur für neue Carousel-Texte. PDF-Vorgaben können
-            beim Export angepasst werden. Importierte Schriften stehen unter
-            „Eigene Schriften“ und können aus der Gerätebibliothek entfernt
-            werden; in bestehenden Projekten verwendete Schriften bleiben dort
-            erhalten.
+            jedem Zoom gleich. Die Standard-Zeilenhöhe wird in Prozent
+            angegeben; 95 % entspricht Schriftgrösse × 0,95. Die Einstellung
+            gilt für neue Carousel-Texte. Die vier Standard-Schriftgrössen
+            gelten für neue Einzelpost-Texte. PDF-Vorgaben können beim Export
+            angepasst werden. Importierte Schriften stehen unter „Eigene
+            Schriften“ und können aus der Gerätebibliothek entfernt werden; in
+            bestehenden Projekten verwendete Schriften bleiben dort erhalten.
           </p>
         </section>
         <section id="tastatur">
           <h2>Tastenkürzel</h2>
-          <p>Auf dem Mac Cmd, unter Windows und Linux Ctrl verwenden.</p>
+          <p>
+            Auf dem Mac Cmd, unter Windows und Linux Ctrl verwenden.
+            Werkzeugkürzel wie M, L oder Shift + W gelten ausserhalb von
+            Texteingaben. Beim Schreiben bearbeitet Rückgängig zunächst den
+            Text.
+          </p>
           <table>
             <thead>
               <tr>
@@ -481,10 +738,10 @@
           </table>
           <h3>Zusätzlich im Advanced-Carousel</h3>
           <p>
-            <kbd>M</kbd>: Rechteck · <kbd>L</kbd>: Ellipse · <kbd>Shift</kbd> +
-            <kbd>C</kbd>: Kurvenwerkzeug. Im Pfadwerkzeug fügt ein Klick auf den
-            Pfad einen Punkt hinzu; Alt/Option + Klick auf einen Punkt entfernt
-            ihn.
+            <kbd>P</kbd>: Pfad · <kbd>M</kbd>: Rechteck · <kbd>L</kbd>: Ellipse
+            · <kbd>Shift</kbd> + <kbd>C</kbd>: Kurvenwerkzeug. Im Pfadwerkzeug
+            fügt ein Klick auf den Pfad einen Punkt hinzu; Alt/Option + Klick
+            auf einen Punkt entfernt ihn.
           </p>
         </section>
         <section id="fragen">
