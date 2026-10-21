@@ -20,6 +20,45 @@ const { launch, artifact } = require("./browser.cjs");
       !requests.some((r) => r.includes("/static/templates/")),
       "No template downloads on startup",
     );
+    await page.locator("#startNew").click();
+    assert.equal(await page.locator("[data-project-mode]").count(), 2);
+    assert.deepEqual(
+      await page
+        .locator("[data-project-mode] svg")
+        .evaluateAll((nodes) => nodes.map((el) => el.dataset.googleIcon)),
+      ["image", "shapes"],
+    );
+    await page.locator('[data-project-mode="carousel"]').click();
+    await page.locator("#setupName").fill("Designer-Vorlage");
+    await page.screenshot({
+      path: artifact("designer-setup-icons.png"),
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: 500, height: 950 });
+    assert(
+      await page
+        .locator("#projectSetup")
+        .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+    );
+    await page.screenshot({
+      path: artifact("designer-setup-mobile.png"),
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: 1450, height: 1050 });
+    await page.locator("#designerTemplateStart").click();
+    await page.locator("[data-template-id=mkw-winkel-slidepost]").click();
+    await page.waitForFunction(
+      () => document.querySelectorAll("[data-template-layer]").length === 11,
+    );
+    assert.equal(
+      await page.locator("#templateProjectName").inputValue(),
+      "Designer-Vorlage",
+    );
+    await page.locator("#closeTemplateGallery").click();
+    assert(await page.locator("#projectSetup").isVisible());
+    await page.locator('[data-project-mode="post"]').click();
+    assert(!(await page.locator("#designerTemplateStart").isVisible()));
+    await page.locator("#cancelSetup").click();
     await page.locator("#startTemplates").click();
     await page.locator("[data-template-id=mkw-winkel-slidepost]").click();
     await page.waitForFunction(
@@ -175,6 +214,11 @@ const { launch, artifact } = require("./browser.cjs");
       text: "Ein neuer Titel",
       roundtrip: 11,
     });
+    const projectBeforeBrowse = await page.evaluate(() => p.projectId);
+    await page.locator("#carouselTemplates").click();
+    assert(await page.locator("#templateGallery").isVisible());
+    await page.locator("#closeTemplateGallery").click();
+    assert.equal(await page.evaluate(() => p.projectId), projectBeforeBrowse);
     const parity = await page.evaluate(async (src) => {
       const c = p.carousel,
         scale = Math.min(420 / c.w, 520 / c.h),

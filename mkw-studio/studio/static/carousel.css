@@ -6,6 +6,11 @@
 .mode-buttons button {
   flex: 1;
   padding: 15px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 .mode-buttons [aria-pressed="true"] {
   background: #b4c5ff;
@@ -985,4 +990,12 @@
   background: color-mix(in srgb, var(--studio-accent) 14%, var(--studio-panel));
   border-color: var(--studio-accent);
   color: var(--studio-accent);
+}
+
+@media (max-width: 520px) {
+  .mode-buttons button {
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 8px;
+  }
 }

@@ -10,8 +10,7 @@ const carouselActive = () => !!p.carousel;
 function carouselSetup() {
   const host = document.createElement("div");
   host.className = "mode-buttons";
-  host.innerHTML =
-    '<button data-project-mode="post" aria-pressed="true">FD-Kampagnen</button><button data-project-mode="carousel" aria-pressed="false">Designer</button>';
+  host.innerHTML = `<button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button>`;
   $("#projectSetup .dialog-heading").after(host);
   const input = (id, label, value, min = 0, max = 4000) =>
     `<label>${label} (px)<input id="${id}" type="number" value="${value}" min="${min}" max="${max}" step="1"></label>`;

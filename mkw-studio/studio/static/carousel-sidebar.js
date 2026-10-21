@@ -330,13 +330,14 @@ function carouselPanel() {
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
   } else {
-    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
+    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><section class="designer-template-shortcut"><button type="button" id="carouselTemplates">${studioIcon("layers")}<span>Aus Vorlage starten</span></button><small>Erstellt ein neues Designer-Projekt.</small></section><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
     panel
       .querySelectorAll("[data-quick-tool]")
       .forEach(
         (button) =>
           (button.onclick = () => carouselTool(button.dataset.quickTool)),
       );
+    $("#carouselTemplates").onclick = () => MKWTemplateGallery.open();
     $("#carouselBackground").onchange = (e) => {
       checkpoint();
       c.bg = e.target.value;

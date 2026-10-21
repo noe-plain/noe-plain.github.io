@@ -507,3 +507,71 @@ html[data-theme="dark"] .template-instagram-header img {
   opacity: 0.75;
   padding: 0 14px;
 }
+
+.designer-template-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  margin-bottom: 0;
+  border: 1px solid var(--project-border);
+  border-radius: 12px;
+  background: color-mix(
+    in srgb,
+    var(--project-accent) 5%,
+    var(--project-surface)
+  );
+}
+.designer-template-description {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.designer-template-description > .ui-icon {
+  flex-shrink: 0;
+  color: var(--project-accent);
+}
+#projectSetup .designer-template-description h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.designer-template-description p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+#designerTemplateStart,
+.designer-template-shortcut button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+#designerTemplateStart {
+  flex-shrink: 0;
+  min-height: 42px;
+}
+.designer-template-shortcut {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.designer-template-shortcut button {
+  width: 100%;
+  min-height: 42px;
+}
+.designer-template-shortcut small {
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+@media (max-width: 600px) {
+  .designer-template-entry {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+}
