@@ -28,9 +28,8 @@ function pruneCarouselEffects() {
     if (value.project !== p || !p.carousel?.objects.includes(key))
       carouselForgetEffect(key);
 }
-async function carouselPaintEffect(ctx, o, scale, loadImage) {
-  const project = p,
-    local = carouselLocalBounds(o),
+async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
+  const local = carouselLocalBounds(o),
     framed = ["image", "angle"].includes(o.type),
     pad =
       Math.ceil(carouselEffectValue(o, "blur") * 3) +
@@ -50,10 +49,10 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
     },
     key = JSON.stringify([shape, o.effects, rasterScale]),
     sources = [
-      p.images.find((im) => im.id === o.imageId)?.data,
-      p.images.find((im) => im.id === o.strokeImageId)?.data,
+      project.images.find((im) => im.id === o.imageId)?.data,
+      project.images.find((im) => im.id === o.strokeImageId)?.data,
       o.type === "logo"
-        ? p.logos.find((logo) => logo.id === o.source)?.data
+        ? project.logos.find((logo) => logo.id === o.source)?.data
         : null,
     ],
     old = carouselEffectCache.get(o);
@@ -61,7 +60,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
   if (
     !old ||
     old.key !== key ||
-    old.project !== p ||
+    old.project !== project ||
     old.fonts !== fontStatus ||
     old.fontReady !== !!fontStatus[o.font] ||
     old.loader !== loadImage ||
@@ -87,6 +86,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
           shape,
           loadImage,
           Math.ceil(carouselEffectValue(o, "blur") * 3) + 2,
+          project,
         );
       } else
         await carouselPaint(
@@ -98,6 +98,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
           [shape],
           () => true,
           loadImage,
+          project,
         );
       if (carouselEffectValue(o, "blur"))
         out.filter = `blur(${carouselEffectValue(o, "blur") * rasterScale}px)`;
@@ -159,7 +160,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage) {
   if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
   if (framed) {
     carouselClipPhoto(ctx, o, scale);
-    const bounds = carouselImageBounds(o);
+    const bounds = carouselImageBounds(o, project);
     ctx.beginPath();
     ctx.rect(bounds.x - o.x, bounds.y - o.y, bounds.w, bounds.h);
     ctx.clip();

@@ -181,6 +181,20 @@
       result.groups.flatMap((group) => group.logos.map((logo) => logo.id)),
     );
     result.logos = result.logos.filter((logo) => refs.has(logo.id));
+    if (Object.hasOwn(input, "templates")) {
+      if (!Array.isArray(input.templates) || input.templates.length > 100)
+        throw Error("Maximal 100 Designvorlagen pro Setup.");
+      const model =
+        typeof module !== "undefined"
+          ? require("./template-model.js")
+          : root.MKWTemplateModel;
+      result.templates = input.templates.map(model.validate);
+      if (
+        new Set(result.templates.map((t) => t.id)).size !==
+        result.templates.length
+      )
+        throw Error("Doppelte Vorlagenkennung im Setup.");
+    }
     const metadata = {
       ...result,
       fonts: result.fonts.map((font) => ({ ...font, data: "" })),

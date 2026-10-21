@@ -183,7 +183,7 @@
       a.image.scale > 100 ||
       ![a.image.flipX, a.image.flipY].every((n) => n === 1 || n === -1)
     )
-      throw Error("Ungültiger Einzelpost-Winkel.");
+      throw Error("Ungültiger FD-Kampagnen-Winkel.");
   }
   const api = {
     directions,

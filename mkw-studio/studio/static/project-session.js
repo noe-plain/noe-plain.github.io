@@ -365,7 +365,7 @@ const MKWProjects = (() => {
       ? records
           .map(
             (record) =>
-              `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}"><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Carousel" : "Einzelposts"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></button><button data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
+              `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}"><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></button><button data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
           )
           .join("")
       : '<p class="project-library-empty">Noch keine Projekte in diesem Browser.<br>Öffne eine MKW-Datei oder starte ein neues Projekt.</p>';
@@ -469,8 +469,20 @@ const MKWProjects = (() => {
           : "Automatische Sicherung im Browser. Lokale Dateien können hier nur heruntergeladen werden.";
     };
   }
+  async function startDocument(document) {
+    validate(document);
+    validateCarousel(document);
+    if (savedRevision < revision) await autosave();
+    await restore(document);
+    revision = 1;
+    savedRevision = 0;
+    busy = false;
+    await autosave({ writeFile: false });
+    return document;
+  }
   return {
     autosave,
+    startDocument,
     attach,
     open,
     openFile,

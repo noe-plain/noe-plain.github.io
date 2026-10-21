@@ -12,8 +12,8 @@ function forgetImagePreview(src) {
   // Do not reset a canvas still held by an in-flight paint. GC releases it once
   // the last paint reference is gone, rather than blanking a pending frame.
 }
-async function previewImage(src) {
-  const asset = p.images.find((im) => im.data === src);
+async function previewImage(src, project = p) {
+  const asset = project.images.find((im) => im.data === src);
   if (!asset || Math.max(asset.width, asset.height) <= imagePreviewMaxEdge)
     return image(src);
   if (imagePreviewCache.has(src)) {

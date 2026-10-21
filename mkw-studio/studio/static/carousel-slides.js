@@ -1,5 +1,5 @@
 "use strict";
-// Carousel slides: see ARCHITECTURE.md for ownership and load order.
+// Designer slides: see ARCHITECTURE.md for ownership and load order.
 function carouselSlideControls() {
   const root = $("#carouselSlideControls"),
     c = p.carousel,
@@ -69,6 +69,13 @@ function carouselSlideInsert(index, duplicate = null) {
             id: uid(),
             x: o.x + (index - duplicate) * c.w,
           }));
+  if (duplicate !== null)
+    MKWTemplateModel.remapLinks(
+      c.objects.filter(
+        (o) => o.x >= duplicate * c.w && o.x + o.w <= (duplicate + 1) * c.w,
+      ),
+      copies,
+    );
   c.objects.forEach((o) => {
     if (o.x >= index * c.w) o.x += c.w;
   });

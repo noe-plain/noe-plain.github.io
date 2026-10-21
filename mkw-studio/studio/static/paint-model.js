@@ -190,13 +190,19 @@ function studioPaintSwatch(value) {
   return studioPaintCSS(preview);
 }
 
-async function studioCanvasPaint(ctx, o, channel, loadImage = image) {
+async function studioCanvasPaint(
+  ctx,
+  o,
+  channel,
+  loadImage = image,
+  project = p,
+) {
   const value = studioPaintRead(o, channel);
   if (value.kind === "solid") return studioPaintRGBA(value.colour, value.alpha);
   if (value.kind === "image") {
-    const im = p.images.find((im) => im.id === value.imageId);
+    const im = project.images.find((im) => im.id === value.imageId);
     if (!im) return "transparent";
-    const bitmap = await loadImage(im.data),
+    const bitmap = await loadImage(im.data, project),
       pattern = ctx.createPattern(bitmap, "no-repeat");
     const fit = Math.max(o.w / im.width, o.h / im.height) * value.scale,
       matrix = new DOMMatrix()

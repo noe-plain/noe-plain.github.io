@@ -10,6 +10,7 @@ function studioSettingsUI() {
       ["guides", "Hilfslinien"],
       ["fonts", "Schriften"],
       ["sponsors", "Sponsoren"],
+      ["templates", "Vorlagen"],
       ["export", "Export"],
     ],
     panels = {};
@@ -52,11 +53,11 @@ function studioSettingsUI() {
   const leading = document.createElement("section");
   leading.className = "settings-leading";
   leading.innerHTML =
-    '<h3>Zeilenabstand im Carousel</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
+    '<h3>Zeilenabstand im Designer</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
   panels.fonts.prepend(leading);
   const textSizes = document.createElement("section");
   textSizes.className = "settings-text-sizes";
-  textSizes.innerHTML = `<h3>Standard-Schriftgrössen</h3><p>Startwerte für neue Einzelposts · in Pixeln</p><div class="settings-size-grid">${[
+  textSizes.innerHTML = `<h3>Standard-Schriftgrössen</h3><p>Startwerte für neue FD-Kampagnen · in Pixeln</p><div class="settings-size-grid">${[
     ["date", "Übertitel"],
     ["title", "Konzerttitel"],
     ["subtitle", "Untertitel"],
@@ -89,7 +90,7 @@ function studioSettingsUI() {
     };
   const pdf = document.createElement("section");
   pdf.className = "settings-pdf";
-  pdf.innerHTML = `<h3>Carousel-PDF</h3><label class="settings-export-format">Standard-Preset<select id="defaultPDFPreset">${Object.entries(
+  pdf.innerHTML = `<h3>Designer-PDF</h3><label class="settings-export-format">Standard-Preset<select id="defaultPDFPreset">${Object.entries(
     carouselPDFPresets,
   )
     .map(([key, v]) => `<option value="${key}">${v.name}</option>`)

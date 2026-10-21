@@ -1,5 +1,5 @@
 "use strict";
-// Carousel bootstrap: see ARCHITECTURE.md for ownership and load order.
+// Designer bootstrap: see ARCHITECTURE.md for ownership and load order.
 window.addEventListener(
   "keydown",
   (ev) => {
@@ -57,6 +57,7 @@ window.addEventListener(
           x: o.x + 30,
           y: o.y + 30,
         }));
+        MKWTemplateModel.remapLinks(carouselUI.clipboard, copies);
         p.carousel.objects.push(...copies);
         carouselUI.ids = new Set(copies.map((o) => o.id));
         carouselSelection = copies.at(-1).id;

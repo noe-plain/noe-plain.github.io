@@ -1,5 +1,5 @@
 "use strict";
-// Carousel input: see ARCHITECTURE.md for ownership and load order.
+// Designer input: see ARCHITECTURE.md for ownership and load order.
 function carouselPoint(ev) {
   const rect = $("#carouselCanvas").getBoundingClientRect();
   return {

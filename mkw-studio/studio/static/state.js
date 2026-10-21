@@ -80,6 +80,7 @@ function checkpoint() {
 function changed(full = true) {
   $("#undo").disabled = !history.length;
   $("#redo").disabled = !future.length;
+  MKWTemplateModel.syncLinks(p.carousel);
   MKWProjectAssets.prune(p);
   pruneImageCache();
   pruneCarouselEffects();
@@ -171,7 +172,7 @@ function item(text, x, y, size, role = "Replica LL") {
     angle: 0,
   };
 }
-function basicBoard(im, w = 1080, h = 1080) {
+function basicBoard(im, w = 1080, h = 1080, metadata = p.meta) {
   return {
     id: uid(),
     imageId: im.id,
@@ -189,15 +190,20 @@ function basicBoard(im, w = 1080, h = 1080) {
     },
     elements: {
       date: {
-        ...item(p.meta.concert, 64, h - 300, studioPreferences.textSizes.date),
-        uppercase: p.meta.headingUppercase !== false,
+        ...item(
+          metadata.concert,
+          64,
+          h - 300,
+          studioPreferences.textSizes.date,
+        ),
+        uppercase: metadata.headingUppercase !== false,
         enabled: true,
         visible: true,
       },
       title: {
-        uppercase: !!p.meta.uppercase,
+        uppercase: !!metadata.uppercase,
         ...item(
-          p.meta.headline,
+          metadata.headline,
           64,
           h - 240,
           studioPreferences.textSizes.title,
@@ -207,7 +213,7 @@ function basicBoard(im, w = 1080, h = 1080) {
       },
       subtitle: {
         ...item(
-          p.meta.subtitle,
+          metadata.subtitle,
           64,
           h - 120,
           studioPreferences.textSizes.subtitle,

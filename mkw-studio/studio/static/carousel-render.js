@@ -1,5 +1,5 @@
 "use strict";
-// Carousel render: see ARCHITECTURE.md for ownership and load order.
+// Designer render: see ARCHITECTURE.md for ownership and load order.
 async function carouselPaint(
   ctx,
   slide = null,
@@ -9,9 +9,9 @@ async function carouselPaint(
   objects = null,
   isCurrent = () => true,
   loadImage = image,
+  project = p,
 ) {
-  const project = p,
-    c = project.carousel;
+  const c = project.carousel;
   if (
     (objects || c.objects).some(
       (o) => o.type === "text" && MKWTextHyphen.requires(o),
@@ -35,7 +35,7 @@ async function carouselPaint(
   }
   for (const o of objects || c.objects) {
     if (!isCurrent()) break;
-    if (!carouselObjectVisible(o) || o.id === editingId) continue;
+    if (!carouselObjectVisible(o, c) || o.id === editingId) continue;
     // Photos clipped to other slides must not repeatedly decode during each export.
     if (
       slide !== null &&
@@ -44,7 +44,7 @@ async function carouselPaint(
     )
       continue;
     if (carouselHasEffects(o)) {
-      await carouselPaintEffect(ctx, o, scale, loadImage);
+      await carouselPaintEffect(ctx, o, scale, loadImage, project);
       continue;
     }
     ctx.save();
@@ -70,17 +70,23 @@ async function carouselPaint(
         }
       }
     } else if (carouselIsVector(o)) {
-      await carouselPaintVector(ctx, o, loadImage);
+      await carouselPaintVector(ctx, o, loadImage, project);
     } else if (o.type === "gradient") {
       if (o.gradientFillMode === "image") ctx.globalAlpha *= o.startAlpha ?? 1;
-      ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage);
+      ctx.fillStyle = await studioCanvasPaint(
+        ctx,
+        o,
+        "fill",
+        loadImage,
+        project,
+      );
       ctx.fill(carouselImageMask(o));
     } else if (o.type === "logo") {
-      const im = await carouselLogoImage(o);
+      const im = await carouselLogoImage(o, project);
       ctx.drawImage(im, 0, 0, o.w, o.h);
     } else {
       carouselClipPhoto(ctx, o, scale);
-      await carouselPaintPhoto(ctx, o, loadImage);
+      await carouselPaintPhoto(ctx, o, loadImage, 0, project);
     }
     ctx.restore();
   }
@@ -105,14 +111,14 @@ function carouselClipPhoto(ctx, o, scale) {
   } else ctx.clip(carouselImageMask(o));
 }
 
-async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0) {
-  const im = p.images.find((im) => im.id === o.imageId);
+async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0, project = p) {
+  const im = project.images.find((im) => im.id === o.imageId);
   if (!im) {
     ctx.fillStyle = "#68768b";
     ctx.fillRect(0, 0, o.w, o.h);
     return;
   }
-  const bitmap = await loadImage(im.data),
+  const bitmap = await loadImage(im.data, project),
     fit = Math.max(o.w / im.width, o.h / im.height) * o.scale,
     w = im.width * fit,
     h = im.height * fit,
@@ -218,7 +224,7 @@ function carouselRender() {
   const host = document.createElement("section");
   host.id = "carouselEditor";
   host.innerHTML = `
- <nav class="carousel-contextbar studio-commandbar" aria-label="Gestaltungswerkzeuge"><span class="studio-mode-label">Carousel</span><span id="carouselToolName"></span><div class="carousel-toolrail studio-tool-group">${Object.entries(
+ <nav class="carousel-contextbar studio-commandbar" aria-label="Gestaltungswerkzeuge"><span class="studio-mode-label">Designer</span><span id="carouselToolName"></span><div class="carousel-toolrail studio-tool-group">${Object.entries(
    carouselToolNames,
  )
    .filter(
@@ -240,7 +246,7 @@ function carouselRender() {
    .join(
      "",
    )}</div><div class="studio-bar-actions"><button id="carouselNotice" class="studio-action studio-notice-button" aria-controls="studioWarnings" aria-expanded="false" hidden></button><button id="carouselExport" class="studio-action">${studioIcon("export")}<span>Export</span></button></div></nav>
- <div id="carouselViewport" tabindex="0" aria-label="Carousel-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Carousel-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
+ <div id="carouselViewport" tabindex="0" aria-label="Designer-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Designer-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
  <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom * 100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
@@ -545,7 +551,7 @@ function carouselRefresh() {
 function carouselDrawSelection() {
   const root = $("#carouselSelectionOverlay");
   if (!root) return;
-  const items = carouselSelected().filter(carouselObjectVisible);
+  const items = carouselSelected().filter((o) => carouselObjectVisible(o));
   let bounds = carouselBounds(items);
   const content =
     carouselUI.content &&

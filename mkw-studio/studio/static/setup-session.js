@@ -3,9 +3,10 @@
 const MKWSetupSession = (() => {
   const maxBytes = 256 * 1024 * 1024;
   async function capture() {
-    const [fonts, groups] = await Promise.all([
+    const [fonts, groups, templates] = await Promise.all([
       studioStoredFonts(),
       MKWSponsorLibrary.groups(),
+      MKWTemplateStore.all(),
     ]);
     const ids = [
         ...new Set(
@@ -29,6 +30,7 @@ const MKWSetupSession = (() => {
       fonts,
       groups,
       logos,
+      templates,
     });
   }
   function persistPreferences(setup) {
@@ -41,6 +43,7 @@ const MKWSetupSession = (() => {
   }
   async function replaceLibraries(setup) {
     await studioReplaceStoredFonts(setup.fonts);
+    if (setup.templates) await MKWTemplateStore.replace(setup.templates);
     const assets = new Map(setup.logos.map((logo) => [logo.id, logo]));
     await MKWSponsorLibrary.save(
       setup.groups.map((group) => ({
@@ -68,6 +71,7 @@ const MKWSetupSession = (() => {
     studioRenderFontSettings();
     $("#fontImportStatus").textContent = "";
     if (!$("#settings-panel-sponsors").hidden) await sponsorRenderSettings();
+    document.dispatchEvent(new Event("mkw-templates-changed"));
     if (p.carousel) carouselPanel();
     else renderPanel();
   }
@@ -84,30 +88,23 @@ const MKWSetupSession = (() => {
     return true;
   }
   async function validateResources(setup) {
+    for (const template of setup.templates || []) {
+      MKWTemplates.validateDesign(template, setup.fonts);
+      for (const font of template.fonts || [])
+        if (!setup.fonts.some((f) => f.role === font.role))
+          throw Error(
+            "Die Vorlage „" +
+              template.name +
+              "“ benötigt „" +
+              font.displayName +
+              "“. Bitte die Schrift unter Einstellungen → Schriften hinzufügen oder die Vorlage entfernen.",
+          );
+    }
     const existingFonts = new Map(
       (await studioStoredFonts()).map((font) => [font.role, font.data]),
     );
-    for (const font of setup.fonts) {
-      if (existingFonts.get(font.role) === font.data) continue;
-      const bytes = await (await fetch(font.data)).arrayBuffer(),
-        digest = [
-          ...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
-        ]
-          .map((n) => n.toString(16).padStart(2, "0"))
-          .join("");
-      if ("MKWCustom_" + digest.slice(0, 32) !== font.role)
-        throw Error(
-          "Die Schriftdatei stimmt nicht mit ihrer Kennung überein: " +
-            font.displayName,
-        );
-      try {
-        await new FontFace(font.role, bytes).load();
-      } catch {
-        throw Error(
-          "Diese Setup-Schrift kann nicht gelesen werden: " + font.displayName,
-        );
-      }
-    }
+    for (const font of setup.fonts)
+      await studioValidateCustomFont(font, existingFonts.get(font.role));
     for (const logo of setup.logos) {
       let bitmap;
       try {
@@ -168,6 +165,7 @@ const MKWSetupSession = (() => {
   }
   async function exportFile(handle) {
     const setup = await capture();
+    await validateResources(setup);
     await writeSaveFile(
       handle,
       await MKWProjectFile.encodeDocument(setup, {

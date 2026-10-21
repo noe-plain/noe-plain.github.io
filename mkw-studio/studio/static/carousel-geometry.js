@@ -1,5 +1,5 @@
 "use strict";
-// Carousel geometry: see ARCHITECTURE.md for ownership and load order.
+// Designer geometry: see ARCHITECTURE.md for ownership and load order.
 function carouselAnglePath(o) {
   const path = new Path2D(),
     w = o.w,
@@ -60,8 +60,8 @@ function carouselAngleMask(o) {
   return result;
 }
 
-function carouselImageBounds(o) {
-  const im = p.images.find((im) => im.id === o.imageId);
+function carouselImageBounds(o, project = p) {
+  const im = project.images.find((im) => im.id === o.imageId);
   if (!im) return { x: o.x, y: o.y, w: o.w, h: o.h };
   const scale = Math.max(o.w / im.width, o.h / im.height) * o.scale,
     w = im.width * scale,

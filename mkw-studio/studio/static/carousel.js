@@ -1,5 +1,5 @@
 "use strict";
-// Carousel model: see ARCHITECTURE.md for ownership and load order.
+// Designer model: see ARCHITECTURE.md for ownership and load order.
 let carouselSelection = null,
   carouselZoom = 0.35,
   carouselDraw = 0,
@@ -11,7 +11,7 @@ function carouselSetup() {
   const host = document.createElement("div");
   host.className = "mode-buttons";
   host.innerHTML =
-    '<button data-project-mode="post" aria-pressed="true">Einzelposts</button><button data-project-mode="carousel" aria-pressed="false">Carousel</button>';
+    '<button data-project-mode="post" aria-pressed="true">FD-Kampagnen</button><button data-project-mode="carousel" aria-pressed="false">Designer</button>';
   $("#projectSetup .dialog-heading").after(host);
   const input = (id, label, value, min = 0, max = 4000) =>
     `<label>${label} (px)<input id="${id}" type="number" value="${value}" min="${min}" max="${max}" step="1"></label>`;
@@ -19,7 +19,7 @@ function carouselSetup() {
   options.id = "carouselSetup";
   options.hidden = true;
   options.innerHTML = `
- <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Carousel</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Texthilfslinien: 100 px vom Slide-Rand</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone für das gesamte Artwork</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
+ <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Texthilfslinien: 100 px vom Slide-Rand</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone für das gesamte Artwork</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
  <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
   $("#formatChoices").before(options);
   const refresh = () => {
@@ -128,7 +128,7 @@ function carouselSetup() {
       data = c.toDataURL();
     const im = {
       id: uid(),
-      name: "Carousel",
+      name: "Designer",
       data,
       original: data,
       width: w,
@@ -243,10 +243,10 @@ function validateCarousel(q) {
     c.objects.length > 500 ||
     q.boards.length !== c.n
   )
-    throw Error("Ungültiges Carousel-Projekt.");
+    throw Error("Ungültiges Designer-Projekt.");
   for (const [i, b] of q.boards.entries())
     if (b.carouselSlide !== i || b.w !== c.w || b.h !== c.h)
-      throw Error("Ungültige Carousel-Slides.");
+      throw Error("Ungültige Designer-Slides.");
   carouselValidateFolders(c);
   const ids = new Set();
   for (const o of c.objects) {
@@ -266,7 +266,7 @@ function validateCarousel(q) {
       o.opacity < 0 ||
       o.opacity > 1
     )
-      throw Error("Ungültige Carousel-Ebene.");
+      throw Error("Ungültige Designer-Ebene.");
     ids.add(o.id);
     carouselValidateRefinements(o, c, q);
     if (o.type === "angle" && !MKWAnglePolicy.accepts(o.direction))
@@ -358,9 +358,17 @@ function validateCarousel(q) {
         (o.textAnchor !== undefined &&
           !["top", "center", "bottom"].includes(o.textAnchor)))
     )
-      throw Error("Ungültiger Carousel-Text.");
+      throw Error("Ungültiger Designer-Text.");
+    if (
+      o.imageSourceId !== undefined &&
+      (o.type !== "angle" ||
+        typeof o.imageSourceId !== "string" ||
+        o.imageSourceId === o.id ||
+        o.imageSourceId.length > 4000)
+    )
+      throw Error("Ungültige Hintergrund-Verknüpfung.");
     if (o.imageId && !q.images.some((im) => im.id === o.imageId))
-      throw Error("Carousel-Bild fehlt.");
+      throw Error("Designer-Bild fehlt.");
   }
 }
 
@@ -601,7 +609,7 @@ async function carouselImport(files, target) {
     for (const [index, file] of [...files].entries()) {
       showImportStage(index, files.length, file.name, 0);
       $("#importExplanation").textContent =
-        "Dein Bild wird geladen und in den Carousel-Rahmen eingesetzt.";
+        "Dein Bild wird geladen und in den Designer-Rahmen eingesetzt.";
       if (file.size > 100 * 1024 * 1024)
         throw Error("Maximal 100 MB pro Bild.");
       const normalized = await (await api("/api/import", file)).json(),
@@ -622,6 +630,7 @@ async function carouselImport(files, target) {
         });
         p.carousel.objects.unshift(o);
       }
+      delete o.imageSourceId;
       o.imageId = im.id;
       if (carouselIsVector(o)) {
         o.fillMode = "image";
@@ -634,7 +643,7 @@ async function carouselImport(files, target) {
       imported++;
     }
     changed();
-    status(`${imported} Bilder im Carousel platziert.`);
+    status(`${imported} Bilder im Designer platziert.`);
   } catch (e) {
     if (imported) changed();
     status(e.message);
@@ -655,6 +664,7 @@ function carouselDuplicate() {
     x: o.x + 30,
     y: o.y + 30,
   }));
+  MKWTemplateModel.remapLinks(objects, copies);
   p.carousel.objects.push(...copies);
   carouselUI.ids = new Set(copies.map((o) => o.id));
   carouselSelection = copies.at(-1).id;

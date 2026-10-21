@@ -29,8 +29,8 @@ function carouselNextFolderColour() {
 function carouselFolder(o, c = p.carousel) {
   return c?.folders?.find((f) => f.id === o.folderId);
 }
-function carouselObjectVisible(o) {
-  return o.visible !== false && carouselFolder(o)?.visible !== false;
+function carouselObjectVisible(o, c = p.carousel) {
+  return o.visible !== false && carouselFolder(o, c)?.visible !== false;
 }
 function carouselObjectLocked(o) {
   return !!(o.locked || carouselFolder(o)?.locked);
@@ -324,13 +324,13 @@ function carouselRefinementsPanel(panel, items) {
   );
   if (position) panel.append(position);
 }
-async function carouselLogoImage(o) {
+async function carouselLogoImage(o, project = p) {
   return image(
     o.source === "black"
       ? "mkw-logo-bold-pos.svg"
       : o.source === "white"
         ? "mkw-logo-bold-neg.svg"
-        : p.logos.find((l) => l.id === o.source)?.data ||
+        : project.logos.find((l) => l.id === o.source)?.data ||
           "mkw-logo-bold-neg.svg",
   );
 }

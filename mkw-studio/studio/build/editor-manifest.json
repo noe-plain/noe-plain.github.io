@@ -13,6 +13,7 @@
     "static/text-justify.js",
     "static/text-hyphen.js",
     "static/project-validation.js",
+    "static/template-model.js",
     "static/state.js",
     "static/user-fonts.js",
     "static/sponsor-model.js",
@@ -67,6 +68,7 @@
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",
+    "static/template-store.js",
     "static/setup-store.js",
     "static/setup-session.js",
     "static/setup-ui.js",
@@ -75,6 +77,12 @@
     "static/post-workspace.js",
     "static/project-session.js",
     "static/help-popup.js",
+    "static/template-session.js",
+    "static/template-preview.js",
+    "static/template-fill-preview.js",
+    "static/template-gallery.js",
+    "static/template-save.js",
+    "static/template-ui.js",
     "static/start.js"
   ],
   "styles": [
@@ -95,6 +103,7 @@
     "static/editor-polish.css",
     "static/typography.css",
     "static/post-safezone.css",
-    "static/post-text-stack.css"
+    "static/post-text-stack.css",
+    "static/templates.css"
   ]
 }

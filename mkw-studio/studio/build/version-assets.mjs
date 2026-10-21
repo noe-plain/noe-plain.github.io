@@ -14,6 +14,19 @@ const spriteHash = createHash("sha256")
     `const studioIconSprite = "static/icons/material-symbols.svg?v=${spriteHash}";`,
   );
 if (ui !== nextUI) await writeFile(uiFile, nextUI);
+const templatePath = "static/templates/mkw-winkel-slidepost.json",
+  templateHash = createHash("sha256")
+    .update(await readFile(new URL(templatePath, root)))
+    .digest("hex")
+    .slice(0, 12),
+  templateFile = new URL("static/template-session.js", root),
+  templateSource = await readFile(templateFile, "utf8"),
+  nextTemplate = templateSource.replace(
+    /const builtInURL\s*=\s*"[^"]+";/,
+    `const builtInURL =\n    "${templatePath}?v=${templateHash}";`,
+  );
+if (templateSource !== nextTemplate)
+  await writeFile(templateFile, nextTemplate);
 const patternPath = "static/hyphenation/hyph-de-1996.tex",
   patternHash = createHash("sha256")
     .update(await readFile(new URL(patternPath, root)))

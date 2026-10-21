@@ -1,5 +1,5 @@
 "use strict";
-// Carousel text: see ARCHITECTURE.md for ownership and load order.
+// Designer text: see ARCHITECTURE.md for ownership and load order.
 const carouselTextAlignments = [
   { value: "left", label: "Linksbündig", icon: "alignLeft", factor: 0 },
   { value: "center", label: "Zentriert", icon: "alignCenter", factor: 0.5 },
@@ -372,7 +372,7 @@ function carouselEndText(preservePanel = false) {
 }
 
 function carouselTextContentPanel(o) {
-  return `<section class="carousel-property-section type-content"><div class="type-section-heading"><h4>Text</h4><button id="carouselTextEdit" title="Text direkt auf der Zeichenfläche bearbeiten">${studioIcon("text")}<span>Auf der Fläche</span></button></div><label class="type-content-label">Textinhalt<textarea data-prop="text" aria-label="Carousel-Text eingeben" placeholder="Dein Text …" rows="3">${esc(o.text)}</textarea></label></section>`;
+  return `<section class="carousel-property-section type-content"><div class="type-section-heading"><h4>Text</h4><button id="carouselTextEdit" title="Text direkt auf der Zeichenfläche bearbeiten">${studioIcon("text")}<span>Auf der Fläche</span></button></div><label class="type-content-label">Textinhalt<textarea data-prop="text" aria-label="Designer-Text eingeben" placeholder="Dein Text …" rows="3">${esc(o.text)}</textarea></label></section>`;
 }
 
 function carouselTextFontPanel(o) {

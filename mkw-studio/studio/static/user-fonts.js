@@ -41,6 +41,23 @@ async function studioStoredFonts() {
     request.onerror = () => reject(request.error);
   });
 }
+async function studioValidateCustomFont(font, existing) {
+  if (existing === font.data) return;
+  const bytes = await (await fetch(font.data)).arrayBuffer(),
+    digest = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
+      .map((n) => n.toString(16).padStart(2, "0"))
+      .join("");
+  if ("MKWCustom_" + digest.slice(0, 32) !== font.role)
+    throw Error(
+      "Die Schriftdatei stimmt nicht mit ihrer Kennung überein: " +
+        font.displayName,
+    );
+  try {
+    await new FontFace(font.role, bytes).load();
+  } catch {
+    throw Error("Diese Schrift kann nicht gelesen werden: " + font.displayName);
+  }
+}
 async function studioStoreFont(font) {
   const db = await studioOpenFontDatabase();
   return new Promise((resolve, reject) => {

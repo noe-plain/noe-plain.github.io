@@ -1,5 +1,5 @@
 "use strict";
-// Carousel sidebar: see ARCHITECTURE.md for ownership and load order.
+// Designer sidebar: see ARCHITECTURE.md for ownership and load order.
 function carouselUpdateWarning(o) {
   const warning = $("#carouselProperties .carousel-warning");
   if (warning) warning.textContent = carouselWarning(o);
@@ -63,6 +63,7 @@ function carouselPanel() {
      ],
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
+ ${o.imageSourceId ? `<p class="carousel-linked-source">Bild aus ${esc(c.objects.find((s) => s.id === o.imageSourceId)?.name || "Hintergrund")} · Ersetzen macht das Winkelbild unabhängig.</p>` : ""}
  ${o.type === "text" ? carouselTextContentPanel(o) + (studioPreferences.advanced ? MKWTypography.panel() : carouselTextFontPanel(o) + carouselTypePanel(o) + carouselTextStylePanel(o)) + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
@@ -329,7 +330,7 @@ function carouselPanel() {
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
   } else {
-    panel.innerHTML = `<h3>Dein Carousel gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
+    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
     panel
       .querySelectorAll("[data-quick-tool]")
       .forEach(

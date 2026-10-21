@@ -296,12 +296,12 @@ function carouselPaintEnd(ctx, o, start, hit = null, style = null) {
   ctx.restore();
   return false;
 }
-async function carouselPaintVector(ctx, o, loadImage = image) {
+async function carouselPaintVector(ctx, o, loadImage = image, project = p) {
   const path = carouselVectorPath(o);
   if (o.fillEnabled && (o.type === "shape" || o.closed)) {
     ctx.save();
     if (o.fillMode === "image") ctx.globalAlpha *= o.fillAlpha ?? 1;
-    ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage);
+    ctx.fillStyle = await studioCanvasPaint(ctx, o, "fill", loadImage, project);
     ctx.fill(path);
     ctx.restore();
   }
@@ -309,7 +309,7 @@ async function carouselPaintVector(ctx, o, loadImage = image) {
     ctx.save();
     carouselVectorStroke(ctx, o);
     if (o.strokeMode === "image") ctx.globalAlpha *= o.strokeAlpha ?? 1;
-    const style = await studioCanvasPaint(ctx, o, "stroke", loadImage);
+    const style = await studioCanvasPaint(ctx, o, "stroke", loadImage, project);
     ctx.strokeStyle = style;
     ctx.stroke(path);
     if (o.type === "path" && !o.closed) {

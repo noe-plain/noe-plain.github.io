@@ -26,7 +26,10 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     $("#startStatus").textContent =
       "Start nur eingeschränkt möglich: " + error.message;
   }
-  $("#startNew").disabled = $("#startOpen").disabled = false;
+  $("#startNew").disabled =
+    $("#startOpen").disabled =
+    $("#startTemplates").disabled =
+      false;
   $("#startOpen").onclick = () =>
     MKWProjects.library().catch((error) => MKWProjects.notice(error.message));
   $("#startNew").onclick = openProjectSetup;

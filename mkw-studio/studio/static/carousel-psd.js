@@ -69,7 +69,7 @@ async function buildCarouselPSD(progress = () => {}) {
     height = c.h;
   if (width > 30000 || height > 30000 || width * height > 80000000)
     throw Error(
-      "Dieses Carousel ist für PSD zu gross (max. 30 000 px je Seite / 80 Mio. Gesamtpixel). Bitte kleinere Slides oder weniger Slides verwenden.",
+      "Dieses Design ist für PSD zu gross (max. 30 000 px je Seite / 80 Mio. Gesamtpixel). Bitte kleinere Slides oder weniger Slides verwenden.",
     );
   await document.fonts.ready;
   carouselKeepLogosOnTop(c);
@@ -241,7 +241,7 @@ async function buildCarouselPSD(progress = () => {}) {
         canvas: composite,
         children,
         imageResources: {
-          slices: [{ bounds, groupName: p.meta.title || "Carousel", slices }],
+          slices: [{ bounds, groupName: p.meta.title || "Designer", slices }],
           versionInfo: {
             hasRealMergedData: true,
             writerName: "MKW Studio",

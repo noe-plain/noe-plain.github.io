@@ -404,7 +404,7 @@ async function carouselRunPDF() {
       plan.length + 1,
       "PDF wird zusammengestellt …",
     );
-    const blob = await carouselBuildPDF(pages, p.meta.title || "Carousel");
+    const blob = await carouselBuildPDF(pages, p.meta.title || "Designer");
     if (blob.size > 100000000)
       throw Error("PDF zu gross für LinkedIn. Bitte stärker komprimieren.");
     download(blob, MKW.projectName(p.meta) + ".pdf");
@@ -415,7 +415,7 @@ async function carouselRunPDF() {
     );
     $("#exportStatus").textContent =
       `PDF mit ${pages.length} Einzelseiten heruntergeladen · ${exportBytes(blob.size)}`;
-    status("Carousel als PDF exportiert");
+    status("Designer als PDF exportiert");
   } catch (e) {
     $("#exportStatus").textContent = e.message;
     $("#exportProgress").classList.remove("is-running");
@@ -432,7 +432,7 @@ function carouselInitPDF() {
   $(".export-options").after(host);
   const label = document.createElement("label");
   label.className = "export-preset-field";
-  label.innerHTML = `Preset<select id="exportPreset"><option value="custom">Eigene Einstellungen</option><optgroup label="PDF · Carousel" data-pdf-presets>${Object.entries(
+  label.innerHTML = `Preset<select id="exportPreset"><option value="custom">Eigene Einstellungen</option><optgroup label="PDF · Designer" data-pdf-presets>${Object.entries(
     carouselPDFPresets,
   )
     .map(([key, v]) => `<option value="${key}">${v.name}</option>`)
