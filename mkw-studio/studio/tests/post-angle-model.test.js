@@ -63,7 +63,7 @@ test("independent lossless image transform, rotated photo coverage and repair, a
     A.validate(b);
   }
   for (const change of [
-    { direction: "left" },
+    { direction: "diagonal" },
     { thickness: -1 },
     { glow: NaN },
     { enabled: 1 },
@@ -102,8 +102,12 @@ test("MKW keeps one photo for an enabled or hidden angle, isolates undo metadata
 test("direction fixes the perpendicular tip axis at the content centre", () => {
   const b = board();
   for (const direction of A.directions) {
-    b.angle = A.defaults(b, { direction, tip: { x: .3, y: .7 } });
-    const area = { w: 900, h: 1200 }, tip = A.geometry(b, area).tip;
-    assert.equal(direction === 'right' ? tip.y : tip.x, direction === 'right' ? area.h / 2 : area.w / 2);
+    b.angle = A.defaults(b, { direction, tip: { x: 0.3, y: 0.7 } });
+    const area = { w: 900, h: 1200 },
+      tip = A.geometry(b, area).tip;
+    assert.equal(
+      ["right", "left"].includes(direction) ? tip.y : tip.x,
+      ["right", "left"].includes(direction) ? area.h / 2 : area.w / 2,
+    );
   }
 });

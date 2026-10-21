@@ -17,14 +17,18 @@ const MKWPostAngleEditor = (() => {
   function postAngleOption(im) {
     const b = p.boards.find((b) => b.imageId === im.id),
       a = b?.angle;
-    return `<div class="post-option-row post-angle-option"><label class="post-option-label"><input type="checkbox" data-post-angle="${esc(im.id)}" ${a?.enabled ? "checked" : ""}><span class="visually-hidden">Winkel anzeigen</span></label><select data-post-angle-direction="${esc(im.id)}" aria-label="Winkel · Ausrichtung">${[
-      ["up", "Oben"],
-      ["right", "Rechts"],
-      ["down", "Unten"],
-    ]
+    return `<div class="post-option-row post-angle-option"><label class="post-option-label"><input type="checkbox" data-post-angle="${esc(im.id)}" ${a?.enabled ? "checked" : ""}><span class="visually-hidden">Winkel anzeigen</span></label><select data-post-angle-direction="${esc(im.id)}" aria-label="Winkel · Ausrichtung">${MKWAnglePolicy.choices(
+      a?.direction,
+    )
+      .map((key) => [
+        key,
+        { up: "Oben", left: "Links", down: "Unten", right: "Rechts (bisher)" }[
+          key
+        ],
+      ])
       .map(
         ([key, label]) =>
-          `<option value="${key}" ${(a?.direction || "right") === key ? "selected" : ""}>Winkel · ${label}</option>`,
+          `<option value="${key}" ${(a?.direction || "left") === key ? "selected" : ""}>Winkel · ${label}</option>`,
       )
       .join("")}</select></div>`;
   }
@@ -36,7 +40,7 @@ const MKWPostAngleEditor = (() => {
           `[data-post-angle-direction="${im.id}"]`,
         );
       if (input) input.checked = !!a?.enabled;
-      if (select) select.value = a?.direction || "right";
+      if (select) select.value = a?.direction || "left";
     }
   }
   function postAngleSetOption(imageId, changes) {
@@ -93,11 +97,12 @@ const MKWPostAngleEditor = (() => {
       ? "Winkel · Bildinhalt"
       : "Winkel gestalten";
     panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bearbeiten</h3><div class="tool-button-grid post-angle-mode"><button data-angle-mode="frame" aria-pressed="${!editing}">${studioIcon("move")}Winkel</button><button data-angle-mode="content" aria-pressed="${editing}">${studioIcon("image")}Bildinhalt</button></div><p class="post-angle-hint">${editing ? "Bild ziehen oder an den Eckgriffen skalieren. Escape beendet die Bildbearbeitung." : "Winkel entlang der Mittelachse ziehen. Doppelklick öffnet den Bildinhalt."}</p></section><section class="tool-section"><h3>Winkel</h3><label>Ausrichtung<select id="postAngleDirection">${options(
-      [
-        ["up", "Oben"],
-        ["right", "Rechts"],
-        ["down", "Unten"],
-      ],
+      MKWAnglePolicy.choices(a.direction).map((key) => [
+        key,
+        { up: "Oben", left: "Links", down: "Unten", right: "Rechts (bisher)" }[
+          key
+        ],
+      ]),
       a.direction,
     )}</select></label><label>Schenkelbreite (px)<input id="postAngleThickness" type="number" min="1" max="1000" value="${a.thickness}"></label></section><section class="tool-section"><h3>Bildinhalt</h3><div class="tool-button-grid"><button data-angle-flip="flipX">${studioIcon("flip")}Horizontal</button><button data-angle-flip="flipY">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button id="postAngleFill">Winkel vollständig füllen</button><button id="postAngleReset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Schein</h3><label>Weichheit (px)<input id="postAngleGlow" type="number" min="0" max="300" value="${a.glow}"></label><label>Deckkraft (%)<input id="postAngleGlowAlpha" type="number" min="0" max="100" value="${Math.round(a.glowAlpha * 100)}"></label><label>Farbe<input id="postAngleGlowColor" type="color" value="${a.glowColor}"></label></section></div>`;
     panel
@@ -283,14 +288,12 @@ const MKWPostAngleEditor = (() => {
     } else {
       const original = MKWPostAngle.geometry({ ...b, angle: base }, area).tip;
       a.tip = {
-        x:
-          a.direction === "right"
-            ? Math.max(0, Math.min(1, (original.x + dx) / area.w))
-            : 0.5,
-        y:
-          a.direction === "right"
-            ? 0.5
-            : Math.max(0, Math.min(1, (original.y + dy) / area.h)),
+        x: MKWAnglePolicy.horizontal(a.direction)
+          ? Math.max(0, Math.min(1, (original.x + dx) / area.w))
+          : 0.5,
+        y: MKWAnglePolicy.horizontal(a.direction)
+          ? 0.5
+          : Math.max(0, Math.min(1, (original.y + dy) / area.h)),
       };
       const tip = MKWPostAngle.geometry(b, area).tip;
       Object.assign(t, {

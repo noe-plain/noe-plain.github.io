@@ -15,7 +15,10 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `project-store.js` | IndexedDB transactions, project versions, conflict forks, shared binary assets, garbage collection, persistent file handles. No editor globals/UI. |
 | `project-session.js` | Session identity, queued saves, file permission and external-change checks, project library. |
 | `file-io.js` | Native file chooser and atomic stream writes. Never download from autosave. |
-| `state.js` | Single-post model, history, bounded decoded-image cache, font-face reuse, image import. |
+| `state.js` | Single-post model, history, bounded decoded-image cache, font-face reuse, image import; compatibility adapter to pure project validation. |
+| `project-validation.js` | Portable project validation with explicitly injected family/text/font/angle/sponsor validators; no DOM or editor globals. |
+| `post-inspector.js` | Single-post inspector with injected state reader, commands and view collaborators; separate crop/text/logo handlers, scoped DOM bindings. |
+| `angle-policy.js`, `carousel-policy.js` | Shared direction choices/legacy interpretation and inclusive integer slide count (1–20). |
 | `image-preview.js` | Bounded screen-only rasters for large photos; reference pruning. Never used by exports or persisted. |
 | `bezier.js` | Pure analytical curve extrema and tight path bounds; no handles in selection boxes. |
 | `carousel.js` | Carousel document defaults, validation, creation and selection model. |
@@ -176,3 +179,14 @@ Single-post typography size propagation is format-specific: `setSharedTextSize`,
 `inline-text.js` owns shared input-only run positioning, cached DOM baseline measurement and one-frame viewport focus protection. Regular editing keeps the original canvas text visible, including family colours/outlines, opacity, blend and effects; the transparent contenteditable carries source text, selection and the caret at the measured positions. This avoids browser-native wrapping or font line-box metrics replacing the final artwork. Focusing must never set `typographyVersion` or modify document styles. Plain legacy post fields derive input runs without converting stored typography. The line/paragraph source offsets, discretionary hyphens and raw copy/paste semantics remain unchanged. IME pre-edit temporarily displays the DOM input and excludes only that text from the preview; committed text returns to the shared renderer. Entering/leaving regular text input no longer invalidates full artwork paint caches. Native input that bypasses beforeinput records a local undo snapshot before applying its change.
 
 Sponsor geometry uses the existing dark-on-light density as a fixed reference for automatic, multiply/screen, grayscale and original modes. Changing strip brightness must not change logo bounds, spacing, group wrapping, strip thickness or safe-zone content bounds. Rendering still changes polarity/compositing normally. Legacy solid black/white modes retain their original density baseline; manual scales remain metadata multipliers. No source pixels are read or converted during layout.
+
+
+## Inspector and validation boundaries
+
+`studio.js` owns the single-post session integration; `MKWPostInspector.create({read, actions, views})` owns inspector rendering and binding. It reads one fresh state snapshot when rendering, passes selection changes through a command and binds controls inside the inspector panel. Crop, simple text and logo controls are private tool handlers. Advanced typography, sponsor controls, angle controls and text-stack controls remain their existing services. Do not reach directly into `p`, `layer`, `step`, preferences or editor globals from the inspector module. Existing global `renderPanel` is a compatibility adapter, not a second implementation.
+
+`MKWProjectValidation.create` takes explicit model validators. It can validate portable documents without loading a DOM, UI, image decoder or editor session. Keep restoration and mutation in the session layer. New document validators belong in this service's injected dependency list, not in implicit UI globals.
+
+`MKWCarouselPolicy` defines an inclusive range of 1–20 integer slides across setup, validation and add/delete/duplicate controls. The last slide cannot be removed. Per-page image/PDF exports retain the same limits; PSD retains its independent total-pixel/dimension limits.
+
+New angle directions are up/left/down in both editors. `MKWAnglePolicy` keeps legacy right-facing saved objects readable without mirroring or moving an existing design; only such objects expose a labelled legacy right choice. Left-facing geometry mirrors the clipping mask only, never the photo transform. Single-post left angles remain centred vertically and move only horizontally; carousel left angles remain freely movable/rotatable with ordinary snapping.

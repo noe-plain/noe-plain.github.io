@@ -70,11 +70,19 @@ function carouselPanel() {
    o.type === "angle"
      ? section(
          "Winkel",
-         select("direction", "Richtung", [
-           ["up", "Oben"],
-           ["right", "Rechts"],
-           ["down", "Unten"],
-         ]) +
+         select(
+           "direction",
+           "Richtung",
+           MKWAnglePolicy.choices(o.direction).map((key) => [
+             key,
+             {
+               up: "Oben",
+               left: "Links",
+               down: "Unten",
+               right: "Rechts (bisher)",
+             }[key],
+           ]),
+         ) +
            `<div class="carousel-fields">${number("thickness", "Schenkelbreite", 1)}${number("glow", "Schein · px", 0, 200)}${color("glowColor", "Scheinfarbe")}${number("glowAlpha", "Intensität", 0, 1)}</div>`,
        )
      : ""
@@ -170,11 +178,12 @@ function carouselPanel() {
         if (o.type === "angle") {
           if (input.dataset.prop === "direction") {
             const tall = o.h > o.w;
-            if ((value === "right") !== tall) [o.w, o.h] = [o.h, o.w];
+            if (MKWAnglePolicy.horizontal(value) !== tall)
+              [o.w, o.h] = [o.h, o.w];
           } else if (input.dataset.prop === "w")
-            o.h = o.direction === "right" ? o.w * 2 : o.w / 2;
+            o.h = MKWAnglePolicy.horizontal(o.direction) ? o.w * 2 : o.w / 2;
           else if (input.dataset.prop === "h")
-            o.w = o.direction === "right" ? o.h / 2 : o.h * 2;
+            o.w = MKWAnglePolicy.horizontal(o.direction) ? o.h / 2 : o.h * 2;
         }
         if (o.type === "logo" && input.dataset.prop === "source")
           carouselLogoImage(o).then((im) => {

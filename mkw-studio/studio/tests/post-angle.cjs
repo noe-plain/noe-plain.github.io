@@ -103,10 +103,10 @@ const { launch, artifact } = require("./browser.cjs");
     await first().locator("summary").click();
     await page
       .locator(`[data-post-angle-direction="${ids[0]}"]`)
-      .selectOption("right");
+      .selectOption("left");
     assert.deepEqual(
       await page.evaluate(() => p.boards.map((b) => b.angle.direction)),
-      ["right", "right", "down", "down"],
+      ["left", "left", "down", "down"],
     );
     assert(await page.evaluate(() => !createBoard({ ...p.images[0], id: "new-photo" }, 1080, 1350).angle), "New images never inherit an angle from the first image");
     // Geometry is backed by the same Path2D mask as the carousel, for every direction.
@@ -340,7 +340,7 @@ const { launch, artifact } = require("./browser.cjs");
     });
     assert.deepEqual(inherited, {
       enabled: true,
-      direction: "right",
+      direction: "left",
       covered: true,
     });
     await page.locator(`[data-text-picker="${ids[0]}"] summary`).click();

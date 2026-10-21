@@ -12,7 +12,7 @@ function carouselSlideControls() {
       (_, i) =>
         `<button class="carousel-slide-tab ${carouselUI.slide === i ? "active" : ""}" data-slide="${i}" style="left:${i * c.w * s}px" aria-label="Slide ${i + 1} auswählen" aria-pressed="${carouselUI.slide === i}">Slide ${i + 1}</button>`,
     ).join("") +
-    `<button id="carouselAddSlide" style="left:${c.w * c.n * s + 24}px;top:${(c.h * s) / 2 - 20}px" aria-label="Slide hinzufügen" title="Slide hinzufügen" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}</button>`;
+    `<button id="carouselAddSlide" style="left:${c.w * c.n * s + 24}px;top:${(c.h * s) / 2 - 20}px" aria-label="Slide hinzufügen" title="Slide hinzufügen" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>${studioIcon("plus")}</button>`;
   root.querySelectorAll("[data-slide]").forEach(
     (btn) =>
       (btn.onclick = (ev) => {
@@ -38,7 +38,7 @@ function carouselSlideSelect(index) {
 function carouselSlidePanel(panel) {
   const c = p.carousel,
     index = carouselUI.slide;
-  panel.innerHTML = `<div class="carousel-section-heading"><h3>Slide ${index + 1}</h3><span>Zeichenfläche</span></div><section class="carousel-property-section"><h4>Format</h4><p>${c.w} × ${c.h} px · ${index + 1} von ${c.n} Slides</p></section><section class="carousel-property-section"><h4>Anordnung</h4><div class="carousel-fields"><button id="carouselSlideBefore" ${c.n >= 20 ? "disabled" : ""}>Davor hinzufügen</button><button id="carouselSlideAfter" ${c.n >= 20 ? "disabled" : ""}>Danach hinzufügen</button><button id="carouselSlideLeft" ${index === 0 ? "disabled" : ""}>← Nach links</button><button id="carouselSlideRight" ${index === c.n - 1 ? "disabled" : ""}>Nach rechts →</button></div></section><section class="carousel-property-section"><h4>Slide bearbeiten</h4><button id="carouselSlideDuplicate" ${c.n >= 20 ? "disabled" : ""}>Slide duplizieren</button><button id="carouselSlideDelete" ${c.n <= 2 ? "disabled" : ""}>Slide entfernen</button><p>Beim Entfernen werden vollständig enthaltene Elemente mit entfernt. Übergreifende Elemente bleiben auf der Montagefläche. Das MKW-Logo bleibt erhalten.</p></section>`;
+  panel.innerHTML = `<div class="carousel-section-heading"><h3>Slide ${index + 1}</h3><span>Zeichenfläche</span></div><section class="carousel-property-section"><h4>Format</h4><p>${c.w} × ${c.h} px · ${index + 1} von ${c.n} Slides</p></section><section class="carousel-property-section"><h4>Anordnung</h4><div class="carousel-fields"><button id="carouselSlideBefore" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Davor hinzufügen</button><button id="carouselSlideAfter" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Danach hinzufügen</button><button id="carouselSlideLeft" ${index === 0 ? "disabled" : ""}>← Nach links</button><button id="carouselSlideRight" ${index === c.n - 1 ? "disabled" : ""}>Nach rechts →</button></div></section><section class="carousel-property-section"><h4>Slide bearbeiten</h4><button id="carouselSlideDuplicate" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Slide duplizieren</button><button id="carouselSlideDelete" ${c.n <= MKWCarouselPolicy.minSlides ? "disabled" : ""}>Slide entfernen</button><p>Beim Entfernen werden vollständig enthaltene Elemente mit entfernt. Übergreifende Elemente bleiben auf der Montagefläche. Das MKW-Logo bleibt erhalten.</p></section>`;
   $("#carouselSlideBefore").onclick = () => carouselSlideInsert(index);
   $("#carouselSlideAfter").onclick = () => carouselSlideInsert(index + 1);
   $("#carouselSlideLeft").onclick = () => carouselSlideMove(-1);
@@ -54,7 +54,7 @@ function carouselBoardIndexes() {
 
 function carouselSlideInsert(index, duplicate = null) {
   const c = p.carousel;
-  if (c.n >= 20) return;
+  if (c.n >= MKWCarouselPolicy.maxSlides) return;
   carouselEndText();
   checkpoint();
   const copies =
@@ -87,7 +87,7 @@ function carouselSlideInsert(index, duplicate = null) {
 function carouselSlideDelete() {
   const c = p.carousel,
     index = carouselUI.slide;
-  if (index === null || c.n <= 2) return;
+  if (index === null || c.n <= MKWCarouselPolicy.minSlides) return;
   carouselEndText();
   checkpoint();
   const start = index * c.w,

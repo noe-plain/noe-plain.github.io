@@ -1,11 +1,17 @@
 /* Single-post angle metadata and clipped geometry; pixels belong to the board photo. */
 (function (root) {
   "use strict";
-  const directions = ["up", "right", "down"];
+  const policy =
+    typeof module !== "undefined"
+      ? require("./angle-policy.js")
+      : root.MKWAnglePolicy;
+  const directions = policy.directions;
   const defaults = (b, source = {}) => ({
     enabled: source.enabled ?? true,
-    direction: source.direction || "right",
-    tip: source.tip ? { ...source.tip } : { x: 0.72, y: 0.5 },
+    direction: source.direction || "left",
+    tip: source.tip
+      ? { ...source.tip }
+      : { x: source.direction === "right" ? 0.72 : 0.28, y: 0.5 },
     thickness: source.thickness ?? 150,
     glow: source.glow ?? 50,
     glowColor: source.glowColor || "#ffffff",
@@ -24,12 +30,12 @@
       t = Math.min(a.thickness * Math.SQRT2, w * 0.45, h * 0.45),
       clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
       x = clamp(
-        (a.direction === "right" ? a.tip.x : 0.5) * w,
+        (policy.horizontal(a.direction) ? a.tip.x : 0.5) * w,
         a.direction === "right" ? t + 1 : 1,
-        w - 1,
+        a.direction === "left" ? w - t - 1 : w - 1,
       ),
       y = clamp(
-        (a.direction === "right" ? 0.5 : a.tip.y) * h,
+        (policy.horizontal(a.direction) ? 0.5 : a.tip.y) * h,
         a.direction === "down" ? t + 1 : 1,
         a.direction === "up" ? h - t - 1 : h - 1,
       ),
@@ -43,9 +49,11 @@
         glowAlpha: a.glowAlpha,
         ...(a.direction === "right"
           ? { x: x - length, y: y - length, w: length, h: 2 * length }
-          : a.direction === "up"
-            ? { x: x - length, y, w: 2 * length, h: length }
-            : { x: x - length, y: y - length, w: 2 * length, h: length }),
+          : a.direction === "left"
+            ? { x, y: y - length, w: length, h: 2 * length }
+            : a.direction === "up"
+              ? { x: x - length, y, w: 2 * length, h: length }
+              : { x: x - length, y: y - length, w: 2 * length, h: length }),
       };
     const canonical = [
       { x: 0, y: 0 },
@@ -58,9 +66,11 @@
     const points = canonical.map((p) =>
       a.direction === "right"
         ? { x: o.x + p.x, y: o.y + p.y }
-        : a.direction === "up"
-          ? { x: o.x + p.y, y: o.y + length - p.x }
-          : { x: o.x + 2 * length - p.y, y: o.y + p.x },
+        : a.direction === "left"
+          ? { x: o.x + length - p.x, y: o.y + 2 * length - p.y }
+          : a.direction === "up"
+            ? { x: o.x + p.y, y: o.y + length - p.x }
+            : { x: o.x + 2 * length - p.y, y: o.y + p.x },
     );
     return { o, points, tip: { x, y }, inner: points[4] };
   }
@@ -150,7 +160,7 @@
     if (
       !a ||
       typeof a.enabled !== "boolean" ||
-      !directions.includes(a.direction) ||
+      !policy.accepts(a.direction) ||
       !a.tip ||
       ![a.tip.x, a.tip.y].every(
         (n) => Number.isFinite(n) && n >= 0 && n <= 1,

@@ -20,7 +20,7 @@ function carouselSetup() {
   options.hidden = true;
   options.innerHTML = `
  <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Carousel</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Texthilfslinien: 100 px vom Slide-Rand</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone für das gesamte Artwork</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
- <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="2" max="20" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>2–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
+ <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
   $("#formatChoices").before(options);
   const refresh = () => {
     const w = +$("#cw").value,
@@ -44,7 +44,7 @@ function carouselSetup() {
       w > 0 && h > 0 ? MKW.ratio(w, h).replace("x", ":") : "Eigenes Format";
     $("#carouselArtworkSize").textContent = `${w * n} × ${h} px gesamt`;
     $("#carouselSetupStrip").innerHTML = Array.from(
-      { length: Math.max(0, Math.min(20, n || 0)) },
+      { length: Math.max(0, Math.min(MKWCarouselPolicy.maxSlides, n || 0)) },
       (_, i) =>
         `<div style="aspect-ratio:${Math.max(1, w)}/${Math.max(1, h)}"><span>${i + 1}</span><i style="top:${Math.min(95, (top / Math.max(1, h)) * 100)}%;bottom:${Math.min(95, (bottom / Math.max(1, h)) * 100)}%;left:${((i === 0 ? left : 100) / Math.max(1, w)) * 100}%;right:${((i === n - 1 ? right : 100) / Math.max(1, w)) * 100}%"></i></div>`,
     ).join("");
@@ -98,14 +98,13 @@ function carouselSetup() {
       h < 240 ||
       w > 4000 ||
       h > 4000 ||
-      n < 2 ||
-      n > 20 ||
+      !MKWCarouselPolicy.validCount(n) ||
       Math.min(top, bottom, left, right) < 0 ||
       top + bottom >= h ||
       left + right >= w
     ) {
       $("#setupError").textContent =
-        "Bitte Projektname, 2–20 Slides (240–4000 px) und passende Safezones angeben.";
+        "Bitte Projektname, 1–20 Slides (240–4000 px) und passende Safezones angeben.";
       return;
     }
     if (savedRevision < revision) await autosave();
@@ -235,8 +234,7 @@ function validateCarousel(q) {
     c.h < 240 ||
     c.w > 4000 ||
     c.h > 4000 ||
-    c.n < 2 ||
-    c.n > 20 ||
+    !MKWCarouselPolicy.validCount(c.n) ||
     Math.min(c.top, c.bottom, c.left, c.right) < 0 ||
     c.top + c.bottom >= c.h ||
     c.left + c.right >= c.w ||
@@ -271,6 +269,8 @@ function validateCarousel(q) {
       throw Error("Ungültige Carousel-Ebene.");
     ids.add(o.id);
     carouselValidateRefinements(o, c, q);
+    if (o.type === "angle" && !MKWAnglePolicy.accepts(o.direction))
+      throw Error("Ungültige Winkelrichtung.");
     studioValidatePaint(o);
     if (o.strokeImageId && !q.images.some((im) => im.id === o.strokeImageId))
       throw Error("Konturbild fehlt.");
@@ -547,7 +547,7 @@ function carouselDefault(type, rect = {}) {
     blend: "source-over",
     kind: "linear",
     rotation: 0,
-    direction: "right",
+    direction: "left",
     thickness: 150,
     glow: 50,
     glowColor: "#ffffff",

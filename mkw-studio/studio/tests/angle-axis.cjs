@@ -25,16 +25,18 @@ const assert = require("node:assert/strict"),
         const o = carouselSelected()[0],
           t = Math.min(
             o.thickness * Math.SQRT2,
-            (o.direction === "right" ? o.w : o.h) * 0.9,
-            (o.direction === "right" ? o.h : o.w) * 0.44,
+            (MKWAnglePolicy.horizontal(o.direction) ? o.w : o.h) * 0.9,
+            (MKWAnglePolicy.horizontal(o.direction) ? o.h : o.w) * 0.44,
           ),
           point = carouselToWorld(
             o,
-            o.direction === "right"
-              ? { x: o.w - t / 2, y: o.h / 2 }
-              : o.direction === "up"
-                ? { x: o.w / 2, y: t / 2 }
-                : { x: o.w / 2, y: o.h - t / 2 },
+            o.direction === "left"
+              ? { x: t / 2, y: o.h / 2 }
+              : o.direction === "right"
+                ? { x: o.w - t / 2, y: o.h / 2 }
+                : o.direction === "up"
+                  ? { x: o.w / 2, y: t / 2 }
+                  : { x: o.w / 2, y: o.h - t / 2 },
           ),
           r = document.querySelector("#carouselCanvas").getBoundingClientRect();
         return {
@@ -53,7 +55,7 @@ const assert = require("node:assert/strict"),
       if (modifier) await page.keyboard.up(modifier);
     };
     for (const advanced of [false, true])
-      for (const direction of ["up", "down", "right"]) {
+      for (const direction of ["up", "down", "left", "right"]) {
         await page.evaluate(
           ({ advanced, direction }) => {
             studioPreferences.advanced = advanced;
@@ -64,8 +66,8 @@ const assert = require("node:assert/strict"),
             carouselObject("angle", {
               x: 220,
               y: 210,
-              w: direction === "right" ? 200 : 400,
-              h: direction === "right" ? 400 : 200,
+              w: MKWAnglePolicy.horizontal(direction) ? 200 : 400,
+              h: MKWAnglePolicy.horizontal(direction) ? 400 : 200,
               direction,
               panX: 35,
               panY: -20,
@@ -142,6 +144,71 @@ const assert = require("node:assert/strict"),
     assert((await page.locator(".carousel-snap-line.vertical").count()) > 0);
     await page.mouse.up();
     assert.equal(await page.locator(".carousel-snap-line").count(), 0);
+    const leftPhoto = await page.evaluate(async () => {
+      const photo = makeCanvas(1080, 1350),
+        source = exportContext(photo);
+      source.fillStyle = "#ff0000";
+      source.fillRect(0, 0, 540, 1350);
+      source.fillStyle = "#0000ff";
+      source.fillRect(540, 0, 540, 1350);
+      const data = photo.toDataURL(),
+        im = {
+          id: uid(),
+          name: "Photo direction",
+          data,
+          original: data,
+          width: 1080,
+          height: 1350,
+        };
+      p.images.push(im);
+      const o = carouselSelected()[0];
+      Object.assign(o, {
+        direction: "left",
+        x: 0,
+        y: 0,
+        w: 600,
+        h: 1200,
+        imageId: im.id,
+        scale: 1,
+        panX: 0,
+        panY: 0,
+        glow: 0,
+        angle: 0,
+      });
+      const canvas = makeCanvas(1080, 1350),
+        ctx = exportContext(canvas);
+      await carouselPaint(ctx, 0);
+      const at = (x, y) => Array.from(ctx.getImageData(x, y, 1, 1).data);
+      const carousel = [at(106, 600), at(540, 120)];
+      const b = basicBoard(im, 1080, 1350);
+      b.angle = MKWPostAngle.defaults(b, { direction: "left" });
+      Object.assign(b.angle, { glow: 0 });
+      Object.assign(b.angle.image, {
+        x: 540,
+        y: 675,
+        scale: 1,
+        angle: 0,
+        flipX: 1,
+        flipY: 1,
+      });
+      ctx.clearRect(0, 0, 1080, 1350);
+      await MKWPostAngleEditor.paint(ctx, b, 1, {});
+      const { tip, inner } = MKWPostAngle.geometry(b);
+      return {
+        carousel,
+        post: [at((tip.x + inner.x) / 2, 675), at(1000, 100)],
+      };
+    });
+    for (const [red, blue] of [leftPhoto.carousel, leftPhoto.post]) {
+      assert(
+        red[0] > 245 && red[2] < 10,
+        "Left angle keeps the left photo region red",
+      );
+      assert(
+        blue[2] > 245 && blue[0] < 10,
+        "Left angle keeps the right photo region blue",
+      );
+    }
     const stable = await page.evaluate(async () => {
       const o = carouselSelected()[0];
       Object.assign(o, { x: 319, y: 271, angle: 25 });

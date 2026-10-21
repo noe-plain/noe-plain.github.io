@@ -46,13 +46,15 @@ function carouselAngleBleed(o, c = p.carousel, lockedAxis = null) {
 }
 
 function carouselAngleMask(o) {
-  const canonical = o.direction === "right" ? o : { ...o, w: o.h, h: o.w },
+  const canonical = MKWAnglePolicy.horizontal(o.direction)
+      ? o
+      : { ...o, w: o.h, h: o.w },
     path = carouselAnglePath(canonical);
   if (o.direction === "right") return path;
   const result = new Path2D(),
     matrix = new DOMMatrix()
       .translate(o.w / 2, o.h / 2)
-      .rotate(o.direction === "up" ? -90 : 90)
+      .rotate(o.direction === "left" ? 180 : o.direction === "up" ? -90 : 90)
       .translate(-canonical.w / 2, -canonical.h / 2);
   result.addPath(path, matrix);
   return result;
@@ -144,7 +146,7 @@ function carouselImageResize(ev, o, corner) {
 
 function carouselAngleTip(o) {
   return carouselToWorld(o, {
-    x: o.direction === "right" ? o.w : o.w / 2,
+    x: o.direction === "left" ? 0 : o.direction === "right" ? o.w : o.w / 2,
     y: o.direction === "up" ? 0 : o.direction === "down" ? o.h : o.h / 2,
   });
 }
@@ -152,7 +154,7 @@ function carouselAngleTip(o) {
 function carouselInitialAngle(o, c = p.carousel) {
   if (o.angle) return carouselRotatedAngleAlign(o, c);
   const tip = carouselAngleTip(o),
-    axis = o.direction === "right" ? "y" : "x";
+    axis = MKWAnglePolicy.horizontal(o.direction) ? "y" : "x";
   const target =
     axis === "y"
       ? c.h / 2

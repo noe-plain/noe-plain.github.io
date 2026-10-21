@@ -256,7 +256,7 @@ function carouselRotatedAngleAlign(o, c = p.carousel) {
   const tip = carouselAngleTip(o),
     xs = Array.from({ length: c.n }, (_, i) => (i + 0.5) * c.w),
     candidates = [];
-  for (const [axis, target] of o.direction === "right"
+  for (const [axis, target] of MKWAnglePolicy.horizontal(o.direction)
     ? [["y", c.h / 2]]
     : xs.map((x) => ["x", x])) {
     const candidate = { ...o, [axis]: o[axis] + target - tip[axis] },
