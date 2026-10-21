@@ -149,24 +149,7 @@ function carouselAngleTip(o) {
   });
 }
 
-function carouselAngleTipSnap(
-  o,
-  c = p.carousel,
-  tolerance = studioPreferences.snapDistance / carouselZoom,
-) {
-  const tip = carouselAngleTip(o),
-    centers = Array.from({ length: c.n }, (_, i) => (i + 0.5) * c.w),
-    nearest = centers.reduce((a, b) =>
-      Math.abs(a - tip.x) <= Math.abs(b - tip.x) ? a : b,
-    ),
-    dy = c.h / 2 - tip.y;
-  return {
-    x: Math.abs(nearest - tip.x) <= tolerance ? o.x + nearest - tip.x : null,
-    y: Math.abs(dy) <= tolerance ? o.y + dy : null,
-  };
-}
-
-function carouselAngleAlign(o, c = p.carousel) {
+function carouselInitialAngle(o, c = p.carousel) {
   if (o.angle) return carouselRotatedAngleAlign(o, c);
   const tip = carouselAngleTip(o),
     axis = o.direction === "right" ? "y" : "x";

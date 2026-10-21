@@ -35,16 +35,13 @@
   function inkBounds(logo) {
     return logo.ink || { x: 0, y: 0, w: 1, h: 1 };
   }
-  function logoSize(logo, unit, available, colour) {
+  function logoSize(logo, unit, available) {
     const ink = inkBounds(logo),
       aspect = logo.width / logo.height,
-      renderedMode = mode(logo, colour),
-      density = ["gray", "original", "multiply", "screen"].includes(
-        renderedMode,
+      density = ["gray", "original", "multiply", "screen", "auto"].includes(
+        logo.mode || "auto",
       )
-        ? ((foreground(colour) === "black"
-            ? logo.darkDensity
-            : logo.lightDensity) ?? logo.density)
+        ? (logo.darkDensity ?? logo.density)
         : logo.density,
       // One optical ink-area target for the entire strip, regardless of group.
       // Height/width limits keep very thin wordmarks and dense emblems usable.
@@ -80,7 +77,7 @@
     for (const group of groups) {
       const logos = group.logos
         .filter((l) => l.enabled !== false)
-        .map((l) => logoSize(l, u, available, s.colour || "#ffffff"));
+        .map((l) => logoSize(l, u, available));
       const natural =
           logos.reduce((n, l) => n + l.spanW, 0) + (logos.length - 1) * gap,
         width = Math.min(

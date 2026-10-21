@@ -203,9 +203,6 @@ function carouselRender() {
   if (!carouselActive()) return false;
   const c = p.carousel;
   carouselKeepLogosOnTop(c);
-  c.objects
-    .filter((o) => o.type === "angle")
-    .forEach((o) => carouselAngleAlign(o, c));
   if (carouselUI.slide !== null)
     carouselUI.slide = Math.max(0, Math.min(c.n - 1, carouselUI.slide));
   const firstView = !Number.isFinite(c.zoom);

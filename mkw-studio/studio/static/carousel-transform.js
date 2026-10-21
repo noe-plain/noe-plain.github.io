@@ -157,9 +157,6 @@ function carouselRotateSelection(ev) {
     },
     () => {
       if (begun) {
-        objects
-          .filter((o) => o.type === "angle")
-          .forEach((o) => carouselAngleAlign(o));
         changed(false);
       }
       carouselPanel();
@@ -171,7 +168,14 @@ function carouselRotateSelection(ev) {
   );
 }
 // Constrain the snap correction to the Shift ray; never break the 45° movement.
-function carouselSnapConstrained(origin, dx, dy, bounds, disabled = false) {
+function carouselSnapConstrained(
+  origin,
+  dx,
+  dy,
+  bounds,
+  disabled = false,
+  anchors = [],
+) {
   if (disabled || !carouselUI.snap)
     return { x: origin.x + dx, y: origin.y + dy, guides: [] };
   const length = Math.hypot(dx, dy),
@@ -186,7 +190,12 @@ function carouselSnapConstrained(origin, dx, dy, bounds, disabled = false) {
     ["y", uy, bounds.h],
   ]) {
     if (Math.abs(u) < 1e-6) continue;
-    for (const offset of [0, size / 2, size])
+    for (const offset of [
+      0,
+      size / 2,
+      size,
+      ...anchors.map((point) => point[axis]),
+    ])
       for (const line of lines[axis]) {
         const delta =
           (line - origin[axis] - (axis === "x" ? dx : dy) - offset) / u;
@@ -209,7 +218,7 @@ function carouselSnapConstrained(origin, dx, dy, bounds, disabled = false) {
   ])
     for (const line of lines[axis])
       if (
-        [0, size / 2, size].some(
+        [0, size / 2, size, ...anchors.map((point) => point[axis])].some(
           (offset) => Math.abs(value + offset - line) < 0.001,
         )
       )

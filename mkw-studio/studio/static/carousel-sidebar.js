@@ -176,7 +176,6 @@ function carouselPanel() {
           else if (input.dataset.prop === "h")
             o.w = o.direction === "right" ? o.h / 2 : o.h * 2;
         }
-        if (o.type === "angle") carouselAngleAlign(o);
         if (o.type === "logo" && input.dataset.prop === "source")
           carouselLogoImage(o).then((im) => {
             o.h = (o.w * im.height) / im.width;

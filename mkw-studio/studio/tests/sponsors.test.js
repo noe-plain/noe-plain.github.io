@@ -280,3 +280,69 @@ test("sponsor blend modes select real multiply/screen and survive portable valid
     assert.equal(project.boards[0].sponsors.groups[0].logos[0].mode, mode);
   }
 });
+
+test("light-background logo sizes are the fixed reference across background brightness, modes and group wrapping", () => {
+  for (const [w, h] of [
+    [1080, 1350],
+    [1080, 1080],
+    [1920, 1080],
+  ]) {
+    const b = board(w, h);
+    b.sponsors.groups = [
+      {
+        id: "dark",
+        name: "Hauptpartnerin",
+        enabled: true,
+        logos: [
+          { ...logo("dark", 240, 80), darkDensity: 0.18, lightDensity: 0.82 },
+        ],
+      },
+      {
+        id: "light",
+        name: "Partner",
+        enabled: true,
+        logos: [
+          {
+            ...logo("light", 120, 100),
+            darkDensity: 0,
+            lightDensity: 0.8,
+            scale: 1.2,
+          },
+          {
+            ...logo("grey", 160, 70),
+            gray: true,
+            darkDensity: 0.14,
+            lightDensity: 0.65,
+          },
+        ],
+      },
+    ];
+    const light = S.layout(b),
+      reference = { ...light, colour: undefined };
+    if (w === 1080 && h === 1350)
+      assert(
+        Math.abs(light.groups[0].logos[0].h - 56.568542494923804) < 1e-9,
+        "Existing dark-on-light size stays unchanged",
+      );
+    for (const colour of ["#fdf9ee", "#777777", "#19232b", "#000000"]) {
+      b.sponsors.colour = colour;
+      assert.deepEqual({ ...S.layout(b), colour: undefined }, reference);
+    }
+    assert.equal(b.sponsors.groups[1].logos[0].scale, 1.2);
+    for (const mode of [
+      "multiply",
+      "screen",
+      "gray",
+      "original",
+      "black",
+      "white",
+    ]) {
+      for (const group of b.sponsors.groups)
+        for (const item of group.logos) item.mode = mode;
+      b.sponsors.colour = "#ffffff";
+      const before = { ...S.layout(b), colour: undefined };
+      b.sponsors.colour = "#000000";
+      assert.deepEqual({ ...S.layout(b), colour: undefined }, before);
+    }
+  }
+});

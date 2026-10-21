@@ -573,7 +573,8 @@ function carouselObject(type, rect = {}) {
     o.w = 550;
     o.h = 1100;
   }
-  if (type === "angle") carouselAngleAlign(o);
+  if (type === "angle" && rect.x === undefined && rect.y === undefined)
+    carouselInitialAngle(o);
   p.carousel.objects.push(o);
   carouselUI.ids = new Set([o.id]);
   carouselSelection = o.id;

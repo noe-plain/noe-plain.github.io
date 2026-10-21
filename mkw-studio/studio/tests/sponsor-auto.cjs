@@ -100,6 +100,15 @@ const { launch, artifact } = require("./browser.cjs");
               ]),
             ),
           mode: logo.mode,
+          positions: a.groups.map((g) => [
+            g.x,
+            g.y,
+            g.w,
+            g.h,
+            g.logos.map((l) => [l.x, l.y, l.w, l.h]),
+          ]),
+          content: a.content,
+          thickness: a.thickness,
         });
       }
       const bitmap = await sponsorBitmap(asset, "multiply", "#ffffff"),
@@ -121,6 +130,15 @@ const { launch, artifact } = require("./browser.cjs");
       result.results.map((r) => r.mode),
       ["multiply", "multiply", "screen"],
     );
+    for (const entry of result.results) {
+      assert.deepEqual(
+        entry.positions,
+        result.results[0].positions,
+        "Background changes must not resize or reposition logos",
+      );
+      assert.deepEqual(entry.content, result.results[0].content);
+      assert.equal(entry.thickness, result.results[0].thickness);
+    }
     assert.deepEqual(result.background, [255, 255, 255, 255]);
     assert.deepEqual(result.ink, [0, 0, 0, 255]);
     assert.deepEqual(errors, []);

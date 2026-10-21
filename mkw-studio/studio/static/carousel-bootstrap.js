@@ -116,9 +116,6 @@ window.addEventListener(
         if (key === "arrowup") o.y -= delta;
         if (key === "arrowdown") o.y += delta;
       });
-      chosen
-        .filter((o) => o.type === "angle")
-        .forEach((o) => carouselAngleAlign(o));
       changed(false);
       carouselPanel();
       return;

@@ -318,12 +318,28 @@ function carouselNearestSnap(values, lines) {
   return best;
 }
 
-function carouselSnap(x, y, bounds, disabled = false, excluded) {
+function carouselSnap(x, y, bounds, disabled = false, excluded, anchors = []) {
   const guides = [];
   if (disabled || !carouselUI.snap) return { x, y, guides };
   const lines = carouselSnapLines(excluded),
-    sx = carouselNearestSnap([x, x + bounds.w, x + bounds.w / 2], lines.x),
-    sy = carouselNearestSnap([y, y + bounds.h, y + bounds.h / 2], lines.y);
+    sx = carouselNearestSnap(
+      [
+        x,
+        x + bounds.w,
+        x + bounds.w / 2,
+        ...anchors.map((point) => x + point.x),
+      ],
+      lines.x,
+    ),
+    sy = carouselNearestSnap(
+      [
+        y,
+        y + bounds.h,
+        y + bounds.h / 2,
+        ...anchors.map((point) => y + point.y),
+      ],
+      lines.y,
+    );
   if (sx) {
     x += sx.delta;
     guides.push({ axis: "x", value: sx.line });
@@ -432,7 +448,8 @@ function carouselMove(ev) {
       carouselHasImage(objects[0]);
   let begun = false,
     original,
-    bounds;
+    bounds,
+    anchors;
   carouselListen(
     ev,
     (e) => {
@@ -454,6 +471,12 @@ function carouselMove(ev) {
         }
         original = objects.map(clone);
         bounds = carouselBounds(original);
+        anchors = original
+          .filter((o) => o.type === "angle")
+          .map((o) => {
+            const tip = carouselAngleTip(o);
+            return { x: tip.x - bounds.x, y: tip.y - bounds.y };
+          });
         begun = true;
       }
       if (e.shiftKey) {
@@ -478,12 +501,15 @@ function carouselMove(ev) {
               dy,
               bounds,
               e.ctrlKey || e.metaKey,
+              anchors,
             )
           : carouselSnap(
               bounds.x + dx,
               bounds.y + dy,
               bounds,
               e.ctrlKey || e.metaKey,
+              undefined,
+              anchors,
             );
         carouselUI.snapLines = snap.guides;
         objects.forEach((o, i) => {
@@ -491,29 +517,11 @@ function carouselMove(ev) {
           o.y = original[i].y + snap.y - bounds.y;
         });
       }
-      if (!content) {
-        objects.forEach((o, i) => {
-          if (o.type !== "angle") return;
-          const locked = o.direction === "right" ? "y" : "x";
-          o[locked] = original[i][locked];
-          carouselAngleAlign(o);
-          carouselUI.snapLines = carouselUI.snapLines.filter(
-            (line) => line.axis !== locked,
-          );
-          carouselUI.snapLines.push({
-            axis: locked,
-            value: carouselAngleTip(o)[locked],
-          });
-        });
-      }
       carouselRefresh();
       carouselCoordinates(objects);
     },
     () => {
       if (begun) {
-        objects
-          .filter((o) => o.type === "angle")
-          .forEach((o) => carouselAngleAlign(o));
         changed(false);
       }
       carouselPanel();
@@ -624,9 +632,6 @@ function carouselResize(ev, corner) {
     },
     () => {
       if (begun) {
-        objects
-          .filter((o) => o.type === "angle")
-          .forEach((o) => carouselAngleAlign(o));
         changed(false);
       }
       carouselPanel();
