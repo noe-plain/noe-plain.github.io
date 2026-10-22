@@ -364,6 +364,7 @@ const assert = require("node:assert/strict");
       curvature: false,
       pdfPreset: "linkedin",
       lineHeight: 95,
+      designerGrid: { columns: 6, rows: 6, gap: 0 },
       textSizes: {date: 52, title: 104, subtitle: 52, copyright: 32},
     });
     await page.setViewportSize({ width: 640, height: 900 });

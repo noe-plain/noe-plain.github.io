@@ -323,13 +323,6 @@ html[data-theme="dark"] :is(#templateGallery, #templateSaveDialog) .is-error {
   }
 }
 
-#settingsDialog .settings-tabs:has([data-settings-tab="templates"]) {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-#settingsDialog .settings-tabs:has([data-settings-tab="templates"]) button {
-  min-width: 0;
-}
 #templateGallery {
   width: min(1240px, 95vw);
 }

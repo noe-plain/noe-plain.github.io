@@ -1,0 +1,296 @@
+:root {
+  --studio-dialog-width: min(1320px, calc(100vw - clamp(24px, 6vw, 96px)));
+  --studio-dialog-height: min(900px, calc(100dvh - clamp(24px, 8dvh, 96px)));
+}
+:is(
+  #settingsDialog,
+  #studioHelpDialog,
+  #exportDialog,
+  #projectSetup,
+  #templateGallery,
+  #projectLibrary
+)[open] {
+  box-sizing: border-box;
+  width: var(--studio-dialog-width);
+  height: var(--studio-dialog-height);
+  max-width: none;
+  max-height: none;
+  border-radius: 18px;
+}
+:is(#settingsDialog, #studioHelpDialog)[open] {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+:is(#settingsDialog, #studioHelpDialog) > .dialog-heading {
+  position: relative;
+  top: auto;
+  flex: none;
+  align-items: center;
+  min-height: 78px;
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--studio-panel);
+}
+:is(#settingsDialog, #studioHelpDialog) > .dialog-heading h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+}
+.settings-layout {
+  display: grid;
+  grid-template-columns: 204px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+#settingsDialog .settings-tabs {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin: 0;
+  padding: 20px 12px;
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: var(--studio-panel);
+}
+#settingsDialog .settings-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: none;
+  min-height: 44px;
+  min-width: 0;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--studio-muted);
+  font-size: 12px;
+  text-align: left;
+}
+#settingsDialog .settings-tabs button .ui-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+#settingsDialog .settings-tabs button:hover {
+  background: color-mix(in srgb, var(--studio-ink) 5%, transparent);
+}
+#settingsDialog .settings-tabs button[aria-selected="true"] {
+  border-color: color-mix(in srgb, var(--project-accent) 25%, var(--line));
+  color: var(--project-accent);
+  background: color-mix(
+    in srgb,
+    var(--project-accent) 10%,
+    var(--studio-panel)
+  );
+}
+.settings-content {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 28px 36px;
+  scrollbar-gutter: stable;
+}
+#settingsDialog .settings-tab-panel {
+  padding: 0;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+@media (max-width: 700px) {
+  :root {
+    --studio-dialog-width: calc(100vw - 16px);
+    --studio-dialog-height: calc(100dvh - 16px);
+  }
+  :is(#settingsDialog, #studioHelpDialog) > .dialog-heading {
+    min-height: 64px;
+    padding: 14px 16px;
+  }
+  :is(#settingsDialog, #studioHelpDialog) > .dialog-heading h2 {
+    font-size: 20px;
+  }
+  .settings-layout {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+  #settingsDialog .settings-tabs {
+    padding: 12px 7px;
+    gap: 8px;
+  }
+  #settingsDialog .settings-tabs button {
+    padding: 10px;
+    justify-content: center;
+  }
+  #settingsDialog .settings-tabs button span {
+    display: none;
+  }
+  .settings-content {
+    padding: 20px 16px;
+  }
+  #settingsDialog .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.settings-content {
+  container: settings / inline-size;
+}
+#settingsDialog .settings-page-heading {
+  max-width: 860px;
+  margin: 0 auto 24px;
+}
+#settingsDialog .settings-page-heading h3 {
+  margin: 0 0 7px;
+  font-size: 20px;
+  color: var(--studio-ink);
+}
+#settingsDialog .settings-page-heading p {
+  margin: 0;
+  color: var(--studio-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+#settingsDialog
+  :is(
+    #settings-panel-general,
+    #settings-panel-guides,
+    #settings-panel-fonts,
+    #settings-panel-export
+  ):not([hidden]) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px;
+}
+#settingsDialog .settings-content .settings-tab-panel > section {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--studio-ink) 2%, var(--studio-panel));
+}
+#settingsDialog .settings-tab-panel > section > h3:first-child {
+  margin: 0 0 18px;
+  padding: 0;
+  color: var(--studio-ink);
+  font-size: 14px;
+}
+#settingsDialog :is(.settings-setup, .settings-fonts) {
+  grid-column: 1 / -1;
+}
+#settingsDialog .theme-options {
+  margin: 0;
+  gap: 10px;
+}
+#settingsDialog .theme-options button {
+  min-height: 76px;
+  gap: 8px;
+  padding: 12px;
+}
+#settingsDialog .theme-options .ui-icon {
+  width: 24px;
+  height: 24px;
+}
+#settingsDialog .settings-advanced .advanced-toggle {
+  margin: 0;
+  min-height: 76px;
+}
+#settingsDialog .settings-advanced .advanced-toggle small {
+  margin-top: 5px;
+}
+#settingsDialog .settings-tab-panel .settings-grid {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+#settingsDialog .settings-tab-panel .settings-snap-distance {
+  margin: 22px 0 0;
+}
+#settingsDialog .settings-tab-panel .settings-export-format {
+  margin: 0;
+}
+#settingsDialog .settings-leading > label {
+  font-size: 12px;
+  line-height: 1.5;
+}
+#settingsDialog .settings-size-value input {
+  background: var(--studio-panel);
+}
+#settingsDialog #settings-panel-fonts > section {
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+}
+#settingsDialog .settings-tab-panel .settings-designer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  align-items: center;
+  gap: 18px;
+}
+#settingsDialog .settings-designer-grid h3 {
+  grid-column: 1/-1;
+  margin: 0;
+}
+#settingsDialog .settings-grid-fields {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+#settingsDialog .settings-grid-fields label {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+#settingsDialog .settings-grid-fields input {
+  width: 76px;
+  flex: none;
+}
+#settingsDialog .settings-grid-preview {
+  margin: 0;
+}
+#settingsDialog .settings-tab-panel label.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.6;
+  font-size: 12px;
+  cursor: pointer;
+}
+#settingsDialog .settings-tab-panel label.check input {
+  flex: none;
+  margin-top: 3px;
+}
+@container settings (max-width:760px) {
+  #settingsDialog
+    :is(
+      #settings-panel-general,
+      #settings-panel-guides,
+      #settings-panel-fonts,
+      #settings-panel-export
+    ):not([hidden]) {
+    grid-template-columns: 1fr;
+  }
+}
+@container settings (max-width:360px) {
+  #settingsDialog .settings-content .settings-tab-panel > section {
+    padding: 16px;
+  }
+  #settingsDialog #settings-panel-fonts > section {
+    padding: 16px;
+  }
+  #settingsDialog .settings-tab-panel .settings-designer-grid {
+    grid-template-columns: 1fr;
+  }
+  #settingsDialog .settings-grid-fields input {
+    width: 96px;
+  }
+  #settingsDialog .settings-grid-preview {
+    justify-self: center;
+  }
+}

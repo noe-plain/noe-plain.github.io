@@ -230,16 +230,7 @@ html[data-theme="light"] {
 #sponsorLogoProperties:empty {
   display: none;
 }
-.settings-tabs {
-  flex-wrap: wrap;
-}
 
-#settingsDialog .settings-tabs {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-#settingsDialog .settings-tabs button {
-  padding: 9px 5px;
-}
 .sponsor-library-group .sponsor-project-heading {
   align-items: flex-end;
 }
@@ -325,12 +316,6 @@ html[data-theme="light"] {
   flex: none;
 }
 @media (max-width: 600px) {
-  #settingsDialog .settings-tabs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  #settingsDialog .settings-tabs button:last-child {
-    grid-column: 1/-1;
-  }
   .sponsor-project-heading {
     gap: 6px;
   }

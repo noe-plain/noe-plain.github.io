@@ -5,21 +5,24 @@ function studioSettingsUI() {
   tabs.className = "settings-tabs";
   tabs.setAttribute("role", "tablist");
   tabs.setAttribute("aria-label", "Einstellungsbereich");
+  tabs.setAttribute("aria-orientation", "vertical");
   const definitions = [
-      ["general", "Allgemein"],
-      ["guides", "Hilfslinien"],
-      ["fonts", "Schriften"],
-      ["sponsors", "Sponsoren"],
-      ["templates", "Vorlagen"],
-      ["export", "Export"],
+      ["general", "Allgemein", "settings"],
+      ["guides", "Hilfslinien", "guides"],
+      ["fonts", "Schriften", "text"],
+      ["sponsors", "Sponsoren", "sponsors"],
+      ["templates", "Vorlagen", "builder"],
+      ["export", "Export", "export"],
     ],
     panels = {};
-  for (const [id, label] of definitions) {
+  for (const [id, label, icon] of definitions) {
     const button = document.createElement("button");
     button.id = "settings-tab-" + id;
     button.dataset.settingsTab = id;
     button.type = "button";
-    button.textContent = label;
+    button.innerHTML = studioIcon(icon) + `<span>${label}</span>`;
+    button.setAttribute("aria-label", label);
+    button.title = label;
     button.setAttribute("role", "tab");
     button.setAttribute("aria-controls", "settings-panel-" + id);
     tabs.append(button);
@@ -34,17 +37,19 @@ function studioSettingsUI() {
   const theme = dialog.querySelector(".theme-options"),
     heading = theme.previousElementSibling,
     hint = theme.nextElementSibling;
-  panels.general.append(
-    heading,
-    theme,
-    dialog.querySelector(".settings-advanced"),
-  );
+  const appearance = document.createElement("section");
+  appearance.className = "settings-appearance";
+  appearance.append(heading, theme);
+  panels.general.append(appearance, dialog.querySelector(".settings-advanced"));
   hint.remove();
   const preferences = dialog.querySelector(".settings-preferences"),
     exportLabel = preferences.querySelector(".settings-export-format"),
     exportHeading = exportLabel.previousElementSibling,
     exportHint = exportLabel.nextElementSibling;
-  panels.export.append(exportHeading, exportLabel);
+  const imageExport = document.createElement("section");
+  exportHeading.textContent = "Bildformat";
+  imageExport.append(exportHeading, exportLabel);
+  panels.export.append(imageExport);
   exportHint.remove();
   preferences.querySelector("small")?.remove();
   dialog.querySelector(".settings-fonts > small")?.remove();
@@ -107,9 +112,30 @@ function studioSettingsUI() {
     studioPreferences.autoSaveFile = event.target.checked;
     studioApplyPreferences();
   };
-  dialog.querySelector(".dialog-heading").after(tabs);
-  for (const panel of Object.values(panels)) dialog.append(panel);
+  const layout = document.createElement("div"),
+    content = document.createElement("div"),
+    pageHeading = document.createElement("div");
+  layout.className = "settings-layout";
+  content.className = "settings-content";
+  pageHeading.className = "settings-page-heading";
+  pageHeading.innerHTML =
+    '<h3 id="settingsContentTitle"></h3><p id="settingsContentDescription"></p>';
+  content.append(pageHeading);
+  layout.append(tabs, content);
+  for (const panel of Object.values(panels)) content.append(panel);
+  dialog.querySelector(".dialog-heading").after(layout);
   const select = (id) => {
+    pageHeading.querySelector("h3").textContent = definitions.find(
+      ([key]) => key === id,
+    )[1];
+    pageHeading.querySelector("p").textContent = {
+      general: "Gilt für dein Studio in diesem Browser.",
+      guides: "Ansichtshilfen – sie erscheinen nicht im Export.",
+      fonts: "Startwerte für neue Texte und deine eigene Schriftbibliothek.",
+      sponsors: "Gruppen und Logos für die Sponsorenleiste verwalten.",
+      templates: "Gestaltungen für weitere Projekte wiederverwenden.",
+      export: "Startwerte wählen; beim Export jederzeit anpassbar.",
+    }[id];
     for (const button of tabs.children) {
       const selected = button.dataset.settingsTab === id;
       button.setAttribute("aria-selected", String(selected));
@@ -117,7 +143,7 @@ function studioSettingsUI() {
     }
     for (const [key, panel] of Object.entries(panels))
       panel.hidden = key !== id;
-    dialog.scrollTop = 0;
+    content.scrollTop = 0;
     if (id === "sponsors") sponsorRenderSettings();
   };
   select("general");
@@ -127,16 +153,15 @@ function studioSettingsUI() {
       const index = definitions.findIndex(
           ([id]) => id === button.dataset.settingsTab,
         ),
-        next =
-          event.key === "ArrowRight"
-            ? (index + 1) % definitions.length
-            : event.key === "ArrowLeft"
-              ? (index + definitions.length - 1) % definitions.length
-              : event.key === "Home"
-                ? 0
-                : event.key === "End"
-                  ? definitions.length - 1
-                  : null;
+        next = ["ArrowDown", "ArrowRight"].includes(event.key)
+          ? (index + 1) % definitions.length
+          : ["ArrowUp", "ArrowLeft"].includes(event.key)
+            ? (index + definitions.length - 1) % definitions.length
+            : event.key === "Home"
+              ? 0
+              : event.key === "End"
+                ? definitions.length - 1
+                : null;
       if (next !== null) {
         event.preventDefault();
         select(definitions[next][0]);

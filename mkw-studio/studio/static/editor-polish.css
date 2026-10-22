@@ -239,29 +239,7 @@ html[data-theme="light"]
   color: #315bcc;
   border-color: #d2ddfb;
 }
-#studioHelpDialog {
-  width: min(1120px, calc(100vw - 32px));
-  height: min(860px, calc(100dvh - 40px));
-  max-width: none;
-  max-height: none;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 16px;
-}
-#studioHelpDialog[open] {
-  display: flex;
-  flex-direction: column;
-}
-#studioHelpDialog .dialog-heading {
-  flex: none;
-  margin: 0;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
-}
-#studioHelpDialog h2 {
-  margin: 0;
-  font-size: 18px;
-}
+
 #studioHelpFrame {
   display: block;
   flex: 1;
@@ -277,13 +255,7 @@ html[data-theme="light"]
   padding: 24px;
   font-size: 13px;
 }
-@media (max-width: 600px) {
-  #studioHelpDialog {
-    width: calc(100vw - 16px);
-    height: calc(100dvh - 16px);
-    border-radius: 12px;
-  }
-}
+
 @media (max-width: 520px) {
   :root {
     --studio-header-height: 104px;

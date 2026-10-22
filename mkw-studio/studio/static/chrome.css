@@ -244,19 +244,7 @@ footer .view-control {
   line-height: 1.6;
   margin: 10px 0 18px;
 }
-#settingsDialog {
-  width: min(460px, calc(100vw - 32px));
-  padding: 26px;
-}
-#settingsDialog > .dialog-heading {
-  position: sticky;
-  top: -26px;
-  padding: 6px 0 16px;
-  margin: -6px 0 0;
-  background: #242a34;
-  border-bottom: 1px solid var(--line);
-  z-index: 3;
-}
+
 #settingsDialog h3 {
   font-size: 13px;
   margin: 24px 0 14px;
@@ -503,12 +491,6 @@ footer .view-control {
   footer .carousel-zoom-controls input {
     font-size: 12px;
     width: 47px;
-  }
-  #settingsDialog {
-    padding: 22px;
-  }
-  #settingsDialog > .dialog-heading {
-    top: -22px;
   }
 }
 @media (max-width: 420px) {

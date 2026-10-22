@@ -108,6 +108,7 @@
     "static/typography.css",
     "static/post-safezone.css",
     "static/post-text-stack.css",
-    "static/templates.css"
+    "static/templates.css",
+    "static/dialogs.css"
   ]
 }

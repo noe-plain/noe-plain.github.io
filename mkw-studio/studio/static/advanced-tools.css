@@ -296,34 +296,7 @@ html[data-theme="light"] .vector-node.is-selected {
     padding-bottom: 8px;
   }
 }
-/* A short settings navigation replaces the long stack of unrelated controls. */
-#settingsDialog {
-  width: min(560px, calc(100vw - 28px));
-  padding: 26px;
-  max-height: 88dvh;
-}
-.settings-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 4px;
-  margin: 20px 0 8px;
-  padding: 4px;
-  background: #191f29;
-  border-radius: 12px;
-}
-.settings-tabs button {
-  padding: 9px 4px;
-  min-width: 0;
-  border-color: transparent;
-  background: transparent;
-  color: #a3b2c9;
-  font-size: 12px;
-}
-.settings-tabs button[aria-selected="true"] {
-  background: #303f60;
-  color: #edf2ff;
-  border-color: #536a91;
-}
+
 .settings-tab-panel {
   padding: 4px 0 0;
 }
@@ -356,17 +329,7 @@ html[data-theme="light"] .vector-node.is-selected {
   font-size: 12px;
   line-height: 1.6;
 }
-html[data-theme="light"] .settings-tabs {
-  background: #f0f3f8;
-}
-html[data-theme="light"] .settings-tabs button {
-  color: #647187;
-}
-html[data-theme="light"] .settings-tabs button[aria-selected="true"] {
-  background: #fff;
-  border-color: #d9dfe7;
-  color: #244fab;
-}
+
 .export-preset-field,
 #pdfExportSettings label {
   display: flex;
