@@ -3,6 +3,7 @@
   "use strict";
   const defaults = Object.freeze({
     primaryColour: "#315bcc",
+    density: "comfortable",
     guideColour: "#93a8ef",
     sponsorColour: "#ffffff",
     snapColour: "#f5a8e8",
@@ -72,24 +73,27 @@
           }
         continue;
       }
-      const valid = key.endsWith("Colour")
-        ? /^#[a-f0-9]{6}$/i.test(item)
-        : ["advanced", "curvature", "autoSaveFile"].includes(key)
-          ? typeof item === "boolean"
-          : key === "snapDistance"
-            ? Number.isInteger(item) && item >= 1 && item <= 40
-            : key === "lineHeight"
-              ? Number.isFinite(item) && item >= 20 && item <= 300
-              : key === "exportFormat"
-                ? ["jpg", "png", "webp"].includes(item)
-                : key === "pdfPreset"
-                  ? [
-                      "linkedin",
-                      "linkedin-square",
-                      "original",
-                      "compact",
-                    ].includes(item)
-                  : false;
+      const valid =
+        key === "density"
+          ? ["comfortable", "compact"].includes(item)
+          : key.endsWith("Colour")
+            ? /^#[a-f0-9]{6}$/i.test(item)
+            : ["advanced", "curvature", "autoSaveFile"].includes(key)
+              ? typeof item === "boolean"
+              : key === "snapDistance"
+                ? Number.isInteger(item) && item >= 1 && item <= 40
+                : key === "lineHeight"
+                  ? Number.isFinite(item) && item >= 20 && item <= 300
+                  : key === "exportFormat"
+                    ? ["jpg", "png", "webp"].includes(item)
+                    : key === "pdfPreset"
+                      ? [
+                          "linkedin",
+                          "linkedin-square",
+                          "original",
+                          "compact",
+                        ].includes(item)
+                      : false;
       if (valid) result[key] = item;
       else if (strict) throw Error("Ungültige Einstellung: " + key);
     }

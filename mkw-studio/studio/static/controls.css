@@ -1,0 +1,262 @@
+/* Shared native controls. Canvas handles and colour samples keep their own geometry. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button {
+  position: relative;
+  cursor: pointer;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  padding: 9px 16px;
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    color var(--studio-motion-short) var(--studio-ease-effects),
+    border-color var(--studio-motion-short) var(--studio-ease-effects),
+    border-radius var(--studio-motion-spatial) var(--studio-ease-spatial);
+}
+button:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+button:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+button.primary,
+#carouselSidebar .carousel-place-image {
+  background: var(--md-sys-color-primary);
+  border-color: transparent;
+  color: var(--md-sys-color-on-primary);
+  font-weight: 600;
+}
+button.primary:hover:not(:disabled),
+#carouselSidebar .carousel-place-image:hover:not(:disabled) {
+  background: var(--md-sys-color-primary-hover);
+  color: var(--md-sys-color-on-primary);
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-color: transparent;
+  background: transparent;
+}
+.icon-button svg {
+  width: 24px;
+  height: 24px;
+}
+:where(button, select, input, summary, textarea, a):focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+input,
+select,
+textarea {
+  color-scheme: inherit;
+  accent-color: var(--md-sys-color-primary);
+}
+:where(input, textarea)::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+/* Binary settings retain native focus, form and Space-key behaviour. */
+input[type="checkbox"][role="switch"] {
+  appearance: none;
+  display: inline-block;
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 32px;
+  margin: 0;
+  border: 2px solid var(--md-sys-color-outline);
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  vertical-align: middle;
+  cursor: pointer;
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    border-color var(--studio-motion-short) var(--studio-ease-effects);
+}
+input[type="checkbox"][role="switch"]::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--md-sys-color-outline);
+  transition:
+    left var(--studio-motion-spatial) var(--studio-ease-spatial),
+    top var(--studio-motion-spatial) var(--studio-ease-spatial),
+    width var(--studio-motion-spatial) var(--studio-ease-spatial),
+    height var(--studio-motion-spatial) var(--studio-ease-spatial),
+    background-color var(--studio-motion-short) var(--studio-ease-effects);
+}
+input[type="checkbox"][role="switch"]:checked {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+input[type="checkbox"][role="switch"]:checked::before {
+  left: 22px;
+  top: 2px;
+  width: 24px;
+  height: 24px;
+  background: var(--md-sys-color-on-primary);
+}
+input[type="checkbox"][role="switch"]:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+/* Native ranges preserve keyboard/AT semantics; paint alpha has its own vertical track. */
+input[type="range"]:not(#paintAlphaSlider) {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  min-width: 0;
+  height: var(--studio-slider-handle-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+input[type="range"]:not(#paintAlphaSlider)::-webkit-slider-runnable-track {
+  height: 16px;
+  border-radius: var(--studio-shape-full);
+  background: linear-gradient(
+    to right,
+    var(--md-sys-color-primary) 0 var(--range-percent, 0%),
+    var(--md-sys-color-primary-container) var(--range-percent, 0%) 100%
+  );
+}
+input[type="range"]:not(#paintAlphaSlider)::-moz-range-track {
+  height: 16px;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-primary-container);
+}
+input[type="range"]:not(#paintAlphaSlider)::-moz-range-progress {
+  height: 16px;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-primary);
+}
+input[type="range"]:not(#paintAlphaSlider)::-webkit-slider-thumb {
+  appearance: none;
+  width: 4px;
+  height: var(--studio-slider-handle-size);
+  margin-top: calc((16px - var(--studio-slider-handle-size)) / 2);
+  border: 0;
+  border-radius: 2px;
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px var(--md-sys-color-surface);
+}
+input[type="range"]:not(#paintAlphaSlider)::-moz-range-thumb {
+  width: 4px;
+  height: var(--studio-slider-handle-size);
+  border: 0;
+  border-radius: 2px;
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px var(--md-sys-color-surface);
+}
+input[type="range"]:not(#paintAlphaSlider):disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+mkw-state-ripple {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+mkw-state-ripple > mkw-state-wave {
+  position: absolute;
+  display: block;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.14;
+  pointer-events: none;
+}
+#studioTooltip {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-surface);
+  font: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 2px 8px #0002;
+}
+#studioTooltip:not([hidden]),
+.studio-paint-picker:popover-open,
+.carousel-effect-menu:popover-open {
+  animation: studio-surface-enter var(--studio-motion-short)
+    var(--studio-ease-effects);
+}
+dialog[open],
+.carousel-effect-editor:popover-open {
+  animation: studio-surface-enter var(--studio-motion-effects)
+    cubic-bezier(0.34, 0.8, 0.34, 1);
+}
+@keyframes studio-surface-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:is(
+  .handle,
+  .carousel-handle,
+  .carousel-point-handle,
+  .carousel-rotate-handle,
+  .vector-node,
+  .vector-control,
+  .frame-point-choice,
+  .picker-stop,
+  .picker-mid,
+  .paint-fill,
+  .paint-stroke,
+  .paint-wells button
+) {
+  transition: none;
+}
+@media (forced-colors: active) {
+  input[type="checkbox"][role="switch"] {
+    forced-color-adjust: none;
+    background: Canvas;
+    border-color: ButtonText;
+  }
+  input[type="checkbox"][role="switch"]::before {
+    background: ButtonText;
+  }
+  input[type="checkbox"][role="switch"]:checked {
+    background: Highlight;
+    border-color: Highlight;
+  }
+  input[type="checkbox"][role="switch"]:checked::before {
+    background: HighlightText;
+  }
+}

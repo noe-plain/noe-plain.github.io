@@ -26,10 +26,7 @@
   color: var(--md-sys-color-on-surface-variant);
 }
 .advanced-toggle input {
-  width: 20px;
-  height: 20px;
   flex: none;
-  accent-color: var(--blue);
 }
 html[data-theme="light"] .advanced-toggle {
   background: var(--md-sys-color-surface-container-low);
@@ -313,11 +310,7 @@ html[data-theme="light"] .vector-node.is-selected {
 #settingsDialog .settings-tab-panel h3 {
   margin-top: 18px;
 }
-.settings-tab-panel .theme-options button {
-  min-height: 80px;
-  padding: 14px;
-  gap: 8px;
-}
+
 .settings-tab-panel .settings-snap-distance {
   margin-top: 24px;
 }

@@ -521,8 +521,8 @@ footer .carousel-zoom-controls input {
   padding: 5px;
 }
 #carouselProperties input[type="range"] {
-  min-height: 28px;
-  height: 28px;
+  min-height: var(--studio-slider-handle-size);
+  height: var(--studio-slider-handle-size);
   border: 0;
   background: none;
   padding: 0;
@@ -985,4 +985,10 @@ footer .carousel-zoom-controls input {
   min-width: 38px;
   padding: 8px;
   gap: 0;
+}
+
+.studio-commandbar
+  .studio-tool-group
+  > button:is(.active, [aria-pressed="true"]) {
+  border-radius: var(--studio-shape-large);
 }

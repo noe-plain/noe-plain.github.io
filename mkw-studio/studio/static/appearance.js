@@ -8,6 +8,7 @@ try {
 } catch {}
 function studioApplyPreferences() {
   studioApplyColourTheme();
+  studioApplyDensity();
   MKWDesignerGrid.sync(studioPreferences.designerGrid);
   const style = document.documentElement.style;
   style.setProperty("--studio-guide-colour", studioPreferences.guideColour);

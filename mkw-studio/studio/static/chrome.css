@@ -258,19 +258,15 @@ footer .view-control {
 }
 .theme-options button {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 12px;
-  min-height: 100px;
-  padding: 20px;
-  font-size: 13px;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--studio-control-height);
+  padding: 12px 20px;
+  font-size: 14px;
 }
-.theme-options button[aria-pressed="true"] {
-  background: var(--md-sys-color-primary-container);
-  border-color: var(--md-sys-color-primary);
-  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-surface);
-}
+
 .theme-options .ui-icon {
   width: 28px;
   height: 28px;
@@ -372,6 +368,7 @@ footer .view-control {
   gap: 7px;
 }
 .settings-snap-distance input {
+  min-height: var(--studio-control-height);
   width: 68px;
   padding: 9px;
   border-radius: 8px;
@@ -380,6 +377,7 @@ footer .view-control {
   color: var(--md-sys-color-on-surface);
 }
 .settings-export-format select {
+  min-height: var(--studio-control-height);
   width: 130px;
   padding: 9px;
   border-radius: 8px;

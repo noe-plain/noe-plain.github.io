@@ -41,6 +41,7 @@ function studioSettingsUI() {
   appearance.className = "settings-appearance";
   appearance.append(heading, theme);
   studioPrimaryColourSettings(appearance);
+  studioDensitySettings(appearance);
   panels.general.append(appearance, dialog.querySelector(".settings-advanced"));
   hint.remove();
   const preferences = dialog.querySelector(".settings-preferences"),
@@ -106,7 +107,7 @@ function studioSettingsUI() {
   const saving = document.createElement("section");
   saving.className = "settings-saving";
   saving.innerHTML =
-    '<h3>Projektsicherung</h3><label class="check"><input id="autoSaveFile" type="checkbox">Verknüpfte MKW-Datei automatisch aktualisieren</label>';
+    '<h3>Projektsicherung</h3><label class="check"><input id="autoSaveFile" type="checkbox" role="switch">Verknüpfte MKW-Datei automatisch aktualisieren</label>';
   panels.general.append(saving);
   saving.querySelector("#autoSaveFile").checked =
     studioPreferences.autoSaveFile;

@@ -1,6 +1,6 @@
 # Material 3 migration – compatibility inventory
 
-The first milestone establishes UI-only colour roles, adjustable tool colour, shared shape/focus/motion tokens and the settings/inspector pilot. It is not a completed component-by-component redesign. Keep the established renderer and document model unchanged through the remaining milestones.
+Two milestones now establish UI-only colour roles, adjustable tool colour, shared control/motion tokens, native switches/sliders, non-blocking plain tooltips, press feedback and an optional compact input density. This is not a completed component-by-component redesign. Keep the established renderer and document model unchanged through the remaining milestones.
 
 ## Ownership
 
@@ -60,3 +60,38 @@ The first milestone's Firefox reference is `/private/tmp/mkw-material-before/mat
 2. Complete a typography/spacing pass for both inspectors, FD options/cards and Designer layers/FX. Preserve compact desktop dimensions, accessible icon labels and simple/advanced placement.
 3. Apply the same component rules to start/setup, templates/library, save/export and handbook. Review all selected/hover/focus/error states in light/dark and narrow layouts. Keep lazy loading.
 4. Finish the full screenshot/accessibility/performance review and repeat Firefox/Chrome, export fidelity and publication checks. No feature is to be removed to accommodate the new design.
+
+## Shared controls: second milestone
+
+`controls.css` owns base buttons, icon-button alignment, native setting switches, native slider tracks, keyboard focus, plain tooltips and transient press feedback. Superseded global light/dark button rules were removed from `style.css` and `light-theme.css`; component-owned specialised geometry stays in its component. `ui-controls.js` delegates feedback without taking over click, drag, keyboard or selection handlers. It has no renderer/document imports and does not use a continuously running frame loop. The short-lived ripple uses two non-interactive custom elements; completed/cancelled animations release them. It never adds press effects to canvas nodes, transform handles, gradient stop handles or actual paint wells.
+
+`density` is a validated tool preference (`comfortable` / `compact`), defaulting to comfortable for old setups. It changes inspector/settings input dimensions through shared tokens; it never resizes the artwork, task window, footer or tool rail. It is stored in browser preferences and MKW-Setup only. Settings → General → Bedienelemente is the existing Appearance card's opt-in compact choice. Native checkbox-based switches retain labels, focus, Space-key behaviour and immediate setting application. Related multi-selection options remain checkboxes.
+
+Range decoration preserves native HTML range semantics and existing input handlers. A small child-list observer watches fixed UI containers only; Designer sidebar replacement explicitly disconnects the previous observer and attaches the new one via `MKWUIControls.designer`. No observer watches artwork, selection overlays, style attributes or pointer coordinates. Range percentages are updated on insertion, number/range edits, preset clicks and opening popovers. The colour picker's vertical alpha gradient is excluded because that track represents actual artwork colour/alpha rather than a generic numeric scale.
+
+A single lazy plain tooltip describes icon-only actions, preserves existing `aria-describedby` IDs, fits the viewport and disappears on pointer exit, keypress, scroll or focus loss. It is hosted inside its modal/popover owner, without becoming a modal or popover itself; tooltip visibility must never prevent editor shortcuts. The handbook remains entirely lazy.
+
+### Material reference decisions (reviewed 22 October 2026)
+
+| Element | Official guidance | Studio application |
+|---|---|---|
+| [Buttons](https://m3.material.io/components/buttons/guidelines) | Prioritise actions with filled/tonal/outlined styles; lead horizontal labels with icons. | Primary actions retain their emphasis. Setup file actions and light/dark choices use horizontal icon/label groups. |
+| [Icon buttons](https://m3.material.io/components/icon-buttons/guidelines) | Small default size 40; describe icon-only actions; give selection a cue beyond colour. | Centred 24px base icons, accessible tooltips, rounded/squarer selected shapes. Dense footer/canvas controls keep their purpose-specific dimensions. |
+| [Text fields](https://m3.material.io/components/text-fields/guidelines) | Keep labels visible; do not force dense fields on everyone. | Existing labels and units remain. Comfortable 48px inspector/settings inputs and an explicit compact choice replace fixed small fields in migrated owners. Inline artwork typography is excluded. |
+| [Switches](https://m3.material.io/components/switch/guidelines) | Standalone immediate settings, inline label, larger selected thumb. | Advanced mode and linked-file autosave use native accessible 52×32 switches. |
+| [Sliders](https://m3.material.io/components/sliders/guidelines) | Active/inactive track, immediate values, keyboard operation; XS track 16px. | Native ranges retain their measured values and handlers; track/vertical thumb updated. Existing numeric readouts replace redundant floating value labels. |
+| [Button groups](https://m3.material.io/components/button-groups/guidelines) | Connected choices can change selected shape without shifting neighbouring widths. | Appearance/density choices keep equal widths and use both shape and colour. Creative tool pills keep their positions and add a selected shape cue. |
+| [Plain tooltips](https://m3.material.io/components/tooltips/guidelines) | Concise labels, one at a time, 4px separation, viewport repositioning. | One lazy tooltip above the action, below header actions, with retained native accessible labels and delayed pointer dismissal. Essential information remains visible elsewhere. |
+| [Dialogs](https://m3.material.io/components/dialogs/guidelines) and [menus](https://m3.material.io/components/menus/guidelines) | Focused tasks and short, purposeful transitions. | Existing modal/native focus and dismissal remain. Opening fades do not transform or resize the dialog/picker. Full menu/list redesign remains a subsequent component pass. |
+| [Motion](https://m3.material.io/styles/motion/overview/specs) | Separate spatial movement and non-overshooting colour/opacity effects. Standard scheme suits utility workflows. | Official web conversions: fast standard spatial `(.27,1.06,.18,1)` / 350ms; fast effects `(.31,.94,.34,1)` / 150ms, default dialog effects `(.34,.8,.34,1)` / 200ms. This is CSS/web feedback, not a claim to implement a gesture-driven spring engine. |
+
+New effects respect `prefers-reduced-motion`, including cancellation of an in-flight press animation. Nothing delays drawing, typing, selection or a click handler. Native close/Escape is immediate. No framework, network asset, account or runtime dependency was added.
+
+`material-controls` checks actual input sizes, keyboard switches, selected shape, accessible tooltip relationships, reduced motion, press cleanup, native range/model synchronization, narrow light/dark dialogs, persistence, lazy help and unchanged document/revision/undo/export pixels. `setup-file` now round-trips non-default compact density. The previous Firefox export hashes remain the comparison reference.
+
+### Next component group
+
+The new shared control foundation is implemented, not the entire Material migration. Remaining phase 4 work includes option checkbox/list rows, complete menu grouping/navigation, notices/progress and component-specific field variants. Phases 5–6 still require the full typography/spacing and list/card pass across both inspectors, FD cards/options, Designer layers/FX, start/setup/templates/library/save/export and the handbook. Do not add another global override layer or modify artwork layout to obtain a UI appearance.
+
+
+Second-milestone verification covers all 46 browser areas in Firefox and Chrome, with a final eight-suite pass in each engine for controls, both editors, modal navigation, typography, direct text, picker placement and setup portability. All 111 model tests and formatting pass. Firefox's exported-image hashes match the original pre-Material reference. The source change adds no runtime dependency; generated JS is 641,211 bytes and CSS 195,985 bytes (gzip comparison only: +2,100 and +883 bytes against milestone one). These are local asset sizes, not a measured claim about network latency. Existing large-photo/50-image, cached preview, compaction, storage retention and original-resolution export checks remain enabled.

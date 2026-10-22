@@ -42,6 +42,7 @@ const { launch, artifact } = require("./browser.cjs");
     );
     assert(await page.locator("#setupRefresh").isDisabled());
     await page.locator("[data-theme-choice=dark]").click();
+    await page.locator("[data-ui-density=compact]").click();
     await page.locator("#primaryColour").evaluate((el) => {
       el.value = "#c2247a";
       el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -177,6 +178,7 @@ const { launch, artifact } = require("./browser.cjs");
     assert.equal(exported.format, "mkw-setup");
     assert.equal(exported.theme, "dark");
     assert.equal(exported.preferences.primaryColour, "#c2247a");
+    assert.equal(exported.preferences.density, "compact");
     assert.equal(exported.fonts.length, 1);
     assert.equal(exported.groups[0].name, "Hauptpartner");
     assert.equal(exported.logos.length, 1);

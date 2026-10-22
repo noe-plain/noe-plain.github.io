@@ -10,6 +10,8 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 
 | Module | Responsibility |
 | --- | --- |
+| `ui-colour-model.js`, `ui-theme.js`, `ui-theme.css` | UI-only semantic roles, palette and theme application; no artwork changes. |
+| `ui-controls.js`, `controls.css` | Shared native controls, density, transient press feedback and non-blocking plain tooltips. Designer sidebar observers disconnect on replacement; artwork overlays are never observed. |
 | `post-angle-model.js`, `post-angle.js` | Single-post chevron geometry/validation and its isolated editor service, crop interaction and shared rendering. |
 | `project-assets.js` | Pure portable-file compaction, reference traversal and hydration. No UI, disk access or editor mutation. |
 | `project-store.js` | IndexedDB transactions, project versions, conflict forks, shared binary assets, garbage collection, persistent file handles. No editor globals/UI. |

@@ -83,7 +83,7 @@ html[data-theme] .designer-grid {
 #settingsDialog .settings-grid-fields input {
   width: 100%;
   min-width: 0;
-  min-height: 38px;
+  min-height: var(--studio-control-height);
   padding: 9px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;

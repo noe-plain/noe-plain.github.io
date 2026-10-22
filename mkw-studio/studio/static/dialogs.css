@@ -192,7 +192,7 @@
   gap: 10px;
 }
 #settingsDialog .theme-options button {
-  min-height: 76px;
+  min-height: var(--studio-control-height);
   gap: 8px;
   padding: 12px;
 }
@@ -202,7 +202,7 @@
 }
 #settingsDialog .settings-advanced .advanced-toggle {
   margin: 0;
-  min-height: 76px;
+  min-height: var(--studio-control-height);
 }
 #settingsDialog .settings-advanced .advanced-toggle small {
   margin-top: 5px;
@@ -368,4 +368,49 @@
 .settings-preview-action {
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
+}
+
+.settings-density {
+  min-width: 0;
+  margin: 24px 0 0;
+  padding: 20px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.settings-density legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--studio-ink);
+}
+.settings-density-options {
+  display: flex;
+  gap: 2px;
+  clear: both;
+}
+:is(.settings-density-options, .theme-options) button {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--studio-control-height);
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  box-shadow: none;
+}
+:is(.settings-density-options, .theme-options) button[aria-pressed="true"] {
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  box-shadow: none;
+  font-weight: 600;
+}
+#settingsDialog .settings-saving .check {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  min-height: 48px;
+  gap: 24px;
 }

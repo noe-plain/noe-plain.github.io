@@ -99,16 +99,6 @@ html[data-theme="light"]
   ) {
   color: var(--md-sys-color-on-surface-variant);
 }
-html[data-theme="light"] button {
-  color: var(--md-sys-color-on-surface-variant);
-  background: var(--md-sys-color-surface-container-low);
-  border-color: var(--md-sys-color-outline-variant);
-}
-html[data-theme="light"] button:hover:not(:disabled) {
-  background: var(--md-sys-color-surface-container);
-  color: var(--md-sys-color-primary);
-  border-color: var(--md-sys-color-primary-outline);
-}
 html[data-theme="light"]
   :is(input:not([type="checkbox"]):not([type="range"]), select, textarea),
 html[data-theme="light"]
@@ -128,18 +118,6 @@ html[data-theme="light"] .group-heading .image-copyright input::placeholder {
 html[data-theme="light"] input[type="range"],
 html[data-theme="light"] input[type="checkbox"] {
   accent-color: var(--md-sys-color-primary);
-}
-html[data-theme="light"] :is(.primary, #carouselSidebar .carousel-place-image) {
-  background: var(--md-sys-color-primary);
-  border-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  box-shadow: none;
-}
-html[data-theme="light"]
-  :is(.primary, #carouselSidebar .carousel-place-image):hover {
-  background: var(--md-sys-color-primary-hover);
-  border-color: var(--md-sys-color-primary-hover);
-  color: var(--md-sys-color-on-primary);
 }
 html[data-theme="light"]
   :is(

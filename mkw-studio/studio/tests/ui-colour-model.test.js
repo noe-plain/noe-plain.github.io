@@ -57,3 +57,15 @@ test("main colour is a validated portable tool preference with compatible old-se
     model.palette(model.defaultColour),
   );
 });
+
+test("UI density is portable and invalid settings cannot inject presentation rules", () => {
+  assert.equal(setup.preferences({}).density, "comfortable");
+  assert.equal(
+    setup.preferences({ density: "compact" }, true).density,
+    "compact",
+  );
+  for (const density of [null, {}, "dense", "url(x)", 0]) {
+    assert.equal(setup.preferences({ density }).density, "comfortable");
+    assert.throws(() => setup.preferences({ density }, true));
+  }
+});

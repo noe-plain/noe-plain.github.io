@@ -183,28 +183,21 @@
 }
 .typography-inspector,
 .typo-content {
-  --typo-surface: #191f29;
-  --typo-border: #414e64;
-  --typo-muted: #a3b2c9;
-  --typo-text: #e3ebfa;
-  --typo-accent: #b5c4ff;
+  --typo-surface: var(--md-sys-color-surface);
+  --typo-border: var(--md-sys-color-outline-variant);
+  --typo-muted: var(--md-sys-color-on-surface-variant);
+  --typo-text: var(--md-sys-color-on-surface);
+  --typo-accent: var(--md-sys-color-primary);
 }
-html[data-theme="light"] :is(.typography-inspector, .typo-content) {
-  --typo-surface: #ffffff;
-  --typo-border: #d9dfe7;
-  --typo-muted: #647187;
-  --typo-text: #1d2838;
-  --typo-accent: #315bcc;
-}
-.typography-inspector :is(input, select),
+.typography-inspector :is(input:not([type="checkbox"]), select),
 .typo-content :is(select, textarea) {
   padding: 8px 10px;
   border: 1px solid var(--typo-border);
   border-radius: 8px;
   background: var(--typo-surface);
   color: var(--typo-text);
-  min-height: 36px;
-  font-size: 12px;
+  min-height: var(--studio-control-height);
+  font-size: var(--studio-control-font);
 }
 .typography-inspector .type-unit {
   display: flex;

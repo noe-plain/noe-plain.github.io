@@ -71,6 +71,7 @@
     "static/typography-ui.js",
     "static/ui-colour-model.js",
     "static/ui-theme.js",
+    "static/ui-controls.js",
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",
@@ -94,6 +95,7 @@
   "styles": [
     "static/ui-theme-tokens.css",
     "static/ui-theme.css",
+    "static/controls.css",
     "static/style.css",
     "static/upgrade.css",
     "static/carousel.css",
