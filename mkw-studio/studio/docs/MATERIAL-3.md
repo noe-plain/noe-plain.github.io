@@ -129,3 +129,15 @@ Visual QA also found legacy pale export filename/loading-total colours against l
 - Generated JS: 644,059 bytes (gzip 186,536), CSS: 198,279 bytes (gzip 35,107). Compared with milestone two this is +782 gzip JS and +248 gzip CSS. These are local asset measurements, not a promise about network or task duration. There is no added runtime dependency or continuous UI animation loop.
 
 Remaining phases 5–6: complete shared workspace typography/spacing and hierarchy (including the weak character/paragraph navigation cue), FD cards and Designer layers/FX, then start/setup/templates/library/save/export/picker/Wiki detail passes. Use the official web references per component and retire replaced owner rules. Preserve every tool, existing editing gestures, artwork layout and encoded export computation.
+
+
+## Expressive visual direction and start actions
+
+The user's six reference images refine the approved direction: soft tonal surfaces, coherent rounded control groups, distinct selected shapes and clear primary/secondary hierarchy. Use the existing seed-derived semantic light/dark roles, never hardcoded purple/pink. Keep the creative workspace restrained for accurate artwork assessment. This direction applies to upcoming component passes; it does not imply that the entire interface has already migrated, or permit changes to artwork fonts, masks, layout or exports.
+
+The start actions now share a3:2grid row: New Project has more width and remains primary, Templates uses a tonal primary-container treatment. Resume/Open retain their separate row. The top two remain side by side at narrow widths with wrapping labels; no startup JS, template asset loading or command handlers changed. [M3 buttons](https://m3.material.io/components/buttons/guidelines) inform the primary/tonal distinction and [colour roles](https://m3.material.io/styles/color/roles) inform readable seed-adapted pairs. No library, image, font or animation dependency was added.
+
+
+### Planned follow-up (not implemented)
+
+The next user-requested design pass is planning-only: bottom start actions40:60 (Resume/Open), a lightly seed-tinted Bento surface structure, access to the same settings dialog directly on the start screen, and an optional device/tool-owned start background image with MKW-Setup portability. It must not enter artwork/projects/exports, nor be stored in localStorage or project-owned assets. Keep the creative workspace large, typography/pixels unchanged, both editor tool-pill positions and all current functions. Use one optimised local image with proper replace/remove cleanup and accessible foreground surfaces. No implementation of these follow-up items is included in the current start-row release.

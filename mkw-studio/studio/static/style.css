@@ -1005,15 +1005,30 @@ a:focus-visible {
   max-width: 410px;
 }
 .start-choices {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   gap: 12px;
   margin: 30px 0 18px;
 }
 .start-choices button {
-  padding: 17px;
+  min-width: 0;
+  padding: 16px 14px;
   text-align: left;
   font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+#startTemplates {
+  background: var(--md-sys-color-primary-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-primary-container);
+}
+#startTemplates:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-primary-container) 8%,
+    var(--md-sys-color-primary-container)
+  );
 }
 #startDialog #startStatus {
   font-size: 12px;
@@ -1993,6 +2008,7 @@ dialog small {
 }
 
 .start-open-options {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
