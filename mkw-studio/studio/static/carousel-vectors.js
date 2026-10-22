@@ -429,103 +429,6 @@ function carouselSetPathGeometry(o, points) {
   carouselSetPathContours(o, contours);
   carouselKeepVectorImage(o, base);
 }
-function carouselFinishPath(closed = false) {
-  const draft = carouselPathDraft;
-  if (!draft) return;
-  carouselPathDraft = null;
-  carouselUI.vectorExtension = null;
-  if (draft.points.length < 2) {
-    carouselRefresh();
-    carouselPanel();
-    return;
-  }
-  const rect = {
-    ...carouselVectorDefaults("path"),
-    closed: closed && draft.points.length > 2,
-    fillEnabled:
-      !!closed && draft.points.length > 2 && carouselVectorColours.fillEnabled,
-  };
-  carouselSetPathGeometry(rect, draft.points);
-  carouselObject("path", rect);
-  carouselUI.tool = "select";
-  carouselToolUI();
-  carouselRefresh();
-  carouselPanel();
-}
-function carouselPathPointer(ev, pt) {
-  ev.preventDefault();
-  if (!studioPreferences.advanced) return;
-  if (ev.detail > 1 && carouselPathDraft?.points.length >= 2) {
-    carouselFinishPath();
-    return;
-  }
-  const draft = (carouselPathDraft ??= { points: [] }),
-    last = draft.points.at(-1);
-  if (last && ev.shiftKey) {
-    const a =
-        (Math.round(Math.atan2(pt.y - last.y, pt.x - last.x) / (Math.PI / 4)) *
-          Math.PI) /
-        4,
-      d = Math.hypot(pt.x - last.x, pt.y - last.y);
-    pt = { x: last.x + Math.cos(a) * d, y: last.y + Math.sin(a) * d };
-  }
-  const snap = carouselSnapPathPoint(
-    pt,
-    draft.points,
-    draft.points.length,
-    ev,
-    [],
-  );
-  pt = { x: snap.x, y: snap.y };
-  if (
-    draft.points.length > 2 &&
-    Math.hypot(pt.x - draft.points[0].x, pt.y - draft.points[0].y) *
-      carouselZoom <
-      9
-  ) {
-    carouselClosePathPointer(ev);
-    return;
-  }
-  if (last && Math.hypot(pt.x - last.x, pt.y - last.y) * carouselZoom < 2)
-    return;
-  if (draft.points.length >= 200) {
-    status("Maximal 200 Punkte pro Pfad.");
-    return;
-  }
-  const point = { ...pt };
-  draft.points.push(point);
-  delete draft.cursor;
-  carouselSelect([]);
-  carouselPanel();
-  carouselRefresh();
-  carouselListen(
-    ev,
-    (e) => {
-      const p = carouselPoint(e);
-      if (Math.hypot(p.x - pt.x, p.y - pt.y) * carouselZoom < 3) return;
-      carouselLinkedHandle(point, "out", p, e, pt);
-      carouselVectorOverlay();
-    },
-    () => {
-      carouselVectorOverlay();
-      carouselPanel();
-    },
-    () => {
-      draft.points.pop();
-      carouselVectorOverlay();
-      carouselPanel();
-    },
-  );
-}
-function carouselDraftPanel(panel) {
-  panel.innerHTML = `<h3>Pfad zeichnen</h3><output class="vector-point-count">${carouselPathDraft.points.length} Punkte</output><div class="carousel-fields"><button id="finishVectorPath" ${carouselPathDraft.points.length < 2 ? "disabled" : ""}>Pfad abschliessen</button><button id="cancelVectorPath">Abbrechen</button></div>`;
-  $("#finishVectorPath").onclick = () => carouselFinishPath();
-  $("#cancelVectorPath").onclick = () => {
-    carouselPathDraft = null;
-    carouselPanel();
-    carouselRefresh();
-  };
-}
 function carouselVectorKey(ev) {
   const key = ev.key.toLowerCase();
   if (carouselPathDraft) {
@@ -536,12 +439,10 @@ function carouselVectorKey(ev) {
       ev.preventDefault();
       ev.stopImmediatePropagation();
       if (key === "enter") carouselFinishPath();
-      else if (key === "escape") {
-        carouselPathDraft = null;
-        carouselRefresh();
-        carouselPanel();
-      } else {
-        carouselPathDraft.points.pop();
+      else if (key === "escape") carouselCancelPath();
+      else if (carouselPathDraft.undo?.length) {
+        carouselPathDraft.points = carouselPathDraft.undo.pop();
+        delete carouselPathDraft.cursor;
         carouselRefresh();
         carouselPanel();
       }
@@ -577,6 +478,7 @@ function carouselVectorOverlay() {
     : o?.type === "path" && carouselUI.vectorPoints
       ? carouselPathWorld(o)
       : null;
+  carouselPathEndpointsOverlay(root);
   if (!points?.length) return;
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.dataset.vectorOverlay = "";
@@ -603,21 +505,47 @@ function carouselVectorOverlay() {
         ? " is-selected"
         : "") +
       (point.in || point.out ? " is-curve" : "");
-    anchor.setAttribute("aria-label", `Pfadpunkt ${index + 1} verschieben`);
+    const endpoint =
+      !draft &&
+      carouselOpenPath(o) &&
+      (index === 0 || index === points.length - 1) &&
+      carouselUI.tool === "path";
+    anchor.setAttribute(
+      "aria-label",
+      draft && index === 0
+        ? "Pfad am Anfangspunkt schliessen"
+        : endpoint
+          ? "Pfad weiterzeichnen"
+          : `Pfadpunkt ${index + 1} verschieben`,
+    );
+    if (endpoint || (draft && index === 0))
+      anchor.classList.add("vector-endpoint");
     Object.assign(anchor.style, {
       left: point.x * s + "px",
       top: point.y * s + "px",
+      zIndex: draft && index === 0 ? "2" : "",
     });
     anchor.onpointerdown = (ev) => {
+      ev.preventDefault();
       ev.stopPropagation();
+      if (ev.button !== 0) return;
       if (draft) {
         if (index === 0 && points.length > 2) carouselClosePathPointer(ev);
+        else if (index === points.length - 1) {
+          const target =
+            !ev.altKey && carouselPathEndpointHit(carouselPoint(ev));
+          if (target) carouselJoinPath(target.o, target.index);
+        }
         return;
       }
       if (carouselUI.tool === "path" && ev.altKey) {
         carouselUI.vectorNode = index;
         carouselUI.vectorNodes = new Set([index]);
         carouselDeletePathPoint(o);
+        return;
+      }
+      if (endpoint) {
+        carouselResumePath(o, index);
         return;
       }
       carouselVectorPointDrag(ev, o, index);
@@ -672,11 +600,7 @@ function carouselVectorOverlay() {
   if (draft?.cursor) {
     const line = document.createElementNS("http://www.w3.org/2000/svg", "path"),
       a = points.at(-1),
-      b = draft.cursor,
-      closing =
-        points.length > 2 &&
-        Math.hypot(b.x - points[0].x, b.y - points[0].y) * s < 12,
-      end = closing ? points[0] : b;
+      end = draft.cursor;
     const data = carouselPathData(
       { type: "path", w: 1, h: 1, points: [a, end], closed: false },
       s,
@@ -706,14 +630,24 @@ window.addEventListener("pointermove", (ev) => {
         d = Math.hypot(point.x - last.x, point.y - last.y);
       point = { x: last.x + Math.cos(a) * d, y: last.y + Math.sin(a) * d };
     }
+    const close = ev.target.closest?.('[data-vector-point="0"]'),
+      hit = carouselPathEndpointHit(carouselPoint(ev));
     const snap = carouselSnapPathPoint(
       point,
       carouselPathDraft.points,
       carouselPathDraft.points.length,
       ev,
-      [],
+      carouselPathDraft.originId ? [carouselPathDraft.originId] : [],
     );
-    carouselPathDraft.cursor = { x: snap.x, y: snap.y };
+    const target = hit && carouselPathEndpoint(hit.o, hit.index);
+    carouselPathDraft.cursor =
+      close && carouselPathDraft.points.length > 2
+        ? clone(carouselPathDraft.points[0])
+        : target
+          ? hit.index === 0
+            ? target
+            : MKWPath.reverse([target])[0]
+          : { x: snap.x, y: snap.y };
     if (!carouselDraftPreviewFrame)
       carouselDraftPreviewFrame = requestAnimationFrame(() => {
         carouselDraftPreviewFrame = 0;

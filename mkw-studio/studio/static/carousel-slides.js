@@ -27,6 +27,7 @@ function carouselSlideControls() {
 }
 
 function carouselSlideSelect(index) {
+  if (carouselPathDraft) carouselFinishPath();
   carouselEndText();
   carouselSelection = null;
   carouselUI.ids.clear();
@@ -38,7 +39,8 @@ function carouselSlideSelect(index) {
 function carouselSlidePanel(panel) {
   const c = p.carousel,
     index = carouselUI.slide;
-  panel.innerHTML = `<div class="carousel-section-heading"><h3>Slide ${index + 1}</h3><span>Zeichenfläche</span></div><section class="carousel-property-section"><h4>Format</h4><p>${c.w} × ${c.h} px · ${index + 1} von ${c.n} Slides</p></section><section class="carousel-property-section"><h4>Anordnung</h4><div class="carousel-fields"><button id="carouselSlideBefore" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Davor hinzufügen</button><button id="carouselSlideAfter" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Danach hinzufügen</button><button id="carouselSlideLeft" ${index === 0 ? "disabled" : ""}>← Nach links</button><button id="carouselSlideRight" ${index === c.n - 1 ? "disabled" : ""}>Nach rechts →</button></div></section><section class="carousel-property-section"><h4>Slide bearbeiten</h4><button id="carouselSlideDuplicate" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Slide duplizieren</button><button id="carouselSlideDelete" ${c.n <= MKWCarouselPolicy.minSlides ? "disabled" : ""}>Slide entfernen</button><p>Beim Entfernen werden vollständig enthaltene Elemente mit entfernt. Übergreifende Elemente bleiben auf der Montagefläche. Das MKW-Logo bleibt erhalten.</p></section>`;
+  panel.innerHTML = `<div class="carousel-section-heading"><h3>Slide ${index + 1}</h3><span>${index + 1} von ${c.n}</span></div><div id="carouselSlideFormat"></div><section class="carousel-property-section"><h4>Anordnung</h4><div class="carousel-fields"><button id="carouselSlideBefore" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Davor hinzufügen</button><button id="carouselSlideAfter" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Danach hinzufügen</button><button id="carouselSlideLeft" ${index === 0 ? "disabled" : ""}>← Nach links</button><button id="carouselSlideRight" ${index === c.n - 1 ? "disabled" : ""}>Nach rechts →</button></div></section><section class="carousel-property-section"><h4>Slide bearbeiten</h4><button id="carouselSlideDuplicate" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Slide duplizieren</button><button id="carouselSlideDelete" ${c.n <= MKWCarouselPolicy.minSlides ? "disabled" : ""}>Slide entfernen</button><p>Beim Entfernen werden vollständig enthaltene Elemente mit entfernt. Übergreifende Elemente bleiben auf der Montagefläche. Das MKW-Logo bleibt erhalten.</p></section>`;
+  carouselSlideFormatPanel($("#carouselSlideFormat"));
   $("#carouselSlideBefore").onclick = () => carouselSlideInsert(index);
   $("#carouselSlideAfter").onclick = () => carouselSlideInsert(index + 1);
   $("#carouselSlideLeft").onclick = () => carouselSlideMove(-1);

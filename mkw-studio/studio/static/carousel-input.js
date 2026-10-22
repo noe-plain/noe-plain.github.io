@@ -126,6 +126,10 @@ function carouselPointer(ev) {
   }
   if (tool === "path") {
     if (!carouselPathDraft) {
+      if (!ev.altKey && carouselPathEndpointHit(pt)) {
+        carouselPathPointer(ev, pt);
+        return;
+      }
       const selected = carouselSelected()[0];
       if (selected?.type === "path") {
         const segment = carouselNearestSegment(selected, pt);
@@ -289,10 +293,9 @@ function carouselSnapLines(excluded = [...carouselUI.ids]) {
     ys = [0, c.h, c.h / 2];
   for (let i = 0; i < c.n; i++) {
     xs.push(i * c.w, (i + 1) * c.w, (i + 0.5) * c.w);
-    for (let j = 0; j <= 6; j++) xs.push(i * c.w + 100 + (j * (c.w - 200)) / 6);
+    xs.push(...MKWDesignerGrid.lines(c, i).x);
   }
-  for (let j = 0; j <= 6; j++)
-    ys.push(c.top + (j * (c.h - c.top - c.bottom)) / 6);
+  ys.push(...MKWDesignerGrid.lines(c).y);
   for (const o of c.objects)
     if (carouselObjectVisible(o) && !excluded.includes(o.id)) {
       const bounds = carouselObjectBounds(o);

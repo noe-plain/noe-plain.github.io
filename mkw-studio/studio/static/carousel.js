@@ -18,7 +18,7 @@ function carouselSetup() {
   options.id = "carouselSetup";
   options.hidden = true;
   options.innerHTML = `
- <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Texthilfslinien: 100 px vom Slide-Rand</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone für das gesamte Artwork</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
+ <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Raster innerhalb der gewählten Safezone</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone links und rechts auf jeder Slide</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
  <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
   $("#formatChoices").before(options);
   const refresh = () => {
@@ -39,13 +39,29 @@ function carouselSetup() {
       "--bottom",
       Math.min(95, (bottom / Math.max(1, h)) * 100) + "%",
     );
+    for (const [edge, value] of [
+      ["left", left],
+      ["right", right],
+    ])
+      preview.style.setProperty(
+        "--" + edge,
+        Math.min(95, (value / Math.max(1, w)) * 100) + "%",
+      );
+    MKWDesignerGrid.preview(preview.querySelector(".safe-preview-inner"), {
+      w,
+      h,
+      top,
+      bottom,
+      left,
+      right,
+    });
     $("#carouselFormatRatio").textContent =
       w > 0 && h > 0 ? MKW.ratio(w, h).replace("x", ":") : "Eigenes Format";
     $("#carouselArtworkSize").textContent = `${w * n} × ${h} px gesamt`;
     $("#carouselSetupStrip").innerHTML = Array.from(
       { length: Math.max(0, Math.min(MKWCarouselPolicy.maxSlides, n || 0)) },
       (_, i) =>
-        `<div style="aspect-ratio:${Math.max(1, w)}/${Math.max(1, h)}"><span>${i + 1}</span><i style="top:${Math.min(95, (top / Math.max(1, h)) * 100)}%;bottom:${Math.min(95, (bottom / Math.max(1, h)) * 100)}%;left:${((i === 0 ? left : 100) / Math.max(1, w)) * 100}%;right:${((i === n - 1 ? right : 100) / Math.max(1, w)) * 100}%"></i></div>`,
+        `<div style="aspect-ratio:${Math.max(1, w)}/${Math.max(1, h)}"><span>${i + 1}</span><i style="top:${Math.min(95, (top / Math.max(1, h)) * 100)}%;bottom:${Math.min(95, (bottom / Math.max(1, h)) * 100)}%;left:${(left / Math.max(1, w)) * 100}%;right:${(right / Math.max(1, w)) * 100}%"></i></div>`,
     ).join("");
     options
       .querySelector(".format-choice")
@@ -92,15 +108,8 @@ function carouselSetup() {
       right = +$("#cr").value;
     if (
       !$("#setupName").value.trim() ||
-      ![w, h, n, top, bottom, left, right].every(Number.isInteger) ||
-      w < 240 ||
-      h < 240 ||
-      w > 4000 ||
-      h > 4000 ||
-      !MKWCarouselPolicy.validCount(n) ||
-      Math.min(top, bottom, left, right) < 0 ||
-      top + bottom >= h ||
-      left + right >= w
+      !MKWCarouselPolicy.validFormat({ w, h, top, bottom, left, right }) ||
+      !MKWCarouselPolicy.validCount(n)
     ) {
       $("#setupError").textContent =
         "Bitte Projektname, 1–20 Slides (240–4000 px) und passende Safezones angeben.";
@@ -190,13 +199,12 @@ function carouselWarning(o) {
     bounds.y + bounds.h > c.h
   )
     return "Text überschreitet eine Slide-Grenze.";
+  const safe = MKWCarouselPolicy.safeRect(c, index);
   if (
-    bounds.x < index * c.w + 100 ||
-    bounds.x + bounds.w > (index + 1) * c.w - 100 ||
-    bounds.y < c.top ||
-    bounds.y + bounds.h > c.h - c.bottom ||
-    bounds.x < c.left ||
-    bounds.x + bounds.w > c.n * c.w - c.right
+    bounds.x < safe.x ||
+    bounds.x + bounds.w > safe.x + safe.w ||
+    bounds.y < safe.y ||
+    bounds.y + bounds.h > safe.y + safe.h
   )
     return "Text liegt ausserhalb der empfohlenen Safezone.";
   if (carouselTextHeight(o) > o.h + 1)
@@ -226,17 +234,8 @@ function validateCarousel(q) {
   const c = q.carousel;
   if (!c) return;
   if (
-    !["w", "h", "n", "top", "bottom", "left", "right"].every((k) =>
-      Number.isInteger(c[k]),
-    ) ||
-    c.w < 240 ||
-    c.h < 240 ||
-    c.w > 4000 ||
-    c.h > 4000 ||
+    !MKWCarouselPolicy.validFormat(c) ||
     !MKWCarouselPolicy.validCount(c.n) ||
-    Math.min(c.top, c.bottom, c.left, c.right) < 0 ||
-    c.top + c.bottom >= c.h ||
-    c.left + c.right >= c.w ||
     !/^#[0-9a-f]{6}$/i.test(c.bg) ||
     !Array.isArray(c.objects) ||
     c.objects.length > 500 ||

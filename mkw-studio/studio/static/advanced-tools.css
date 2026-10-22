@@ -74,6 +74,13 @@ html[data-theme="light"] .advanced-toggle small {
 .vector-node.is-selected {
   background: #315bcc;
 }
+.vector-node.vector-endpoint {
+  border-radius: 50%;
+  cursor: crosshair;
+}
+.vector-node.vector-endpoint:hover {
+  box-shadow: 0 0 0 3px var(--studio-accent);
+}
 .vector-control {
   width: 9px;
   height: 9px;

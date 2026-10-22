@@ -7,8 +7,13 @@ try {
   );
 } catch {}
 function studioApplyPreferences() {
+  MKWDesignerGrid.sync(studioPreferences.designerGrid);
   const style = document.documentElement.style;
   style.setProperty("--studio-guide-colour", studioPreferences.guideColour);
+  style.setProperty(
+    "--studio-guide-wash",
+    studioPreferences.guideColour + "12",
+  );
   style.setProperty(
     "--studio-guide-soft",
     studioPreferences.guideColour + "88",

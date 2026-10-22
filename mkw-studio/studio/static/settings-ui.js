@@ -49,6 +49,7 @@ function studioSettingsUI() {
   preferences.querySelector("small")?.remove();
   dialog.querySelector(".settings-fonts > small")?.remove();
   panels.guides.append(preferences);
+  MKWDesignerGrid.settingsPanel(panels.guides);
   panels.fonts.append(dialog.querySelector(".settings-fonts"));
   const leading = document.createElement("section");
   leading.className = "settings-leading";

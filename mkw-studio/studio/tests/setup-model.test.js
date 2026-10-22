@@ -116,3 +116,33 @@ test("compressed setup size limit rejects over-expansion before applying data", 
   assert(blob.size < 4096);
   await assert.rejects(codec.decode(blob, { maxBytes: 4096 }), /gross/);
 });
+test("Designer grid preferences migrate, validate and remain isolated from defaults", () => {
+  const old = model.preferences({ advanced: true }),
+    custom = model.preferences(
+      { designerGrid: { columns: 4, rows: 3, gap: 20 } },
+      true,
+    );
+  assert.deepEqual(old.designerGrid, { columns: 6, rows: 6, gap: 0 });
+  assert.deepEqual(custom.designerGrid, { columns: 4, rows: 3, gap: 20 });
+  custom.designerGrid.gap = 10;
+  assert.equal(model.defaults.designerGrid.gap, 0);
+  for (const field of ["columns", "rows"])
+    for (const value of [0, 25, 1.5, "6"])
+      assert.throws(() =>
+        model.preferences({ designerGrid: { [field]: value } }, true),
+      );
+  for (const value of [-1, 501, NaN, "20"])
+    assert.throws(() =>
+      model.preferences({ designerGrid: { gap: value } }, true),
+    );
+  assert.deepEqual(
+    model.validate({
+      ...fixture(),
+      preferences: {
+        ...fixture().preferences,
+        designerGrid: { columns: 4, rows: 3, gap: 20 },
+      },
+    }).preferences.designerGrid,
+    { columns: 4, rows: 3, gap: 20 },
+  );
+});

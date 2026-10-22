@@ -19,6 +19,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `project-validation.js` | Portable project validation with explicitly injected family/text/font/angle/sponsor validators; no DOM or editor globals. |
 | `post-inspector.js` | Single-post inspector with injected state reader, commands and view collaborators; separate crop/text/logo handlers, scoped DOM bindings. |
 | `angle-policy.js`, `carousel-policy.js` | Shared direction choices/legacy interpretation and inclusive integer slide count (1–20). |
+| `carousel-grid.js`, `carousel-slide-format.js` | Tool-owned grid preferences and view-only gutter previews; explicit document format/safezone application from the slide inspector. |
 | `image-preview.js` | Bounded screen-only rasters for large photos; reference pruning. Never used by exports or persisted. |
 | `bezier.js` | Pure analytical curve extrema and tight path bounds; no handles in selection boxes. |
 | `carousel.js` | Carousel document defaults, validation, creation and selection model. |
@@ -36,6 +37,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-slides.js` | Slide creation/removal/reordering. |
 | `carousel-bootstrap.js` | Carousel event registration and setup integration. |
 | `carousel-vectors.js`, `carousel-curves.js`, `carousel-constructor.js` | Bézier model and drawing, curve editing and boolean construction. |
+| `path-model.js`, `carousel-path-drawing.js` | Pure world-point reversal/joining and endpoint continuation UI. Drafts leave source objects untouched until one atomic commit. |
 | `paint-model.js`, `paint-picker.js` | Paint interpretation/validation and picker UI. |
 | `appearance.js`, `settings-ui.js`, `user-fonts.js` | Device/tool preferences and user font library. Existing design objects must not change when a default changes. |
 | `export.js`, `carousel-pdf.js`, `carousel-psd*.js` | Export sessions, image encoding, PDF and PSD. Export options are not project defaults. |
@@ -188,6 +190,10 @@ Sponsor geometry uses the existing dark-on-light density as a fixed reference fo
 `MKWProjectValidation.create` takes explicit model validators. It can validate portable documents without loading a DOM, UI, image decoder or editor session. Keep restoration and mutation in the session layer. New document validators belong in this service's injected dependency list, not in implicit UI globals.
 
 `MKWCarouselPolicy` defines an inclusive range of 1–20 integer slides across setup, validation and add/delete/duplicate controls. The last slide cannot be removed. Per-page image/PDF exports retain the same limits; PSD retains its independent total-pixel/dimension limits.
+
+`MKWCarouselPolicy.safeRect/grid` defines the per-slide safe rectangle and its sixths from all four document margins. Setup previews, viewport guides, snapping and text warnings use those margins consistently. Guides remain view-only. Path continuation keeps world-space draft points and a source identity; reversing swaps incoming/outgoing controls and endpoint decorations. Joining commits once, retains the source layer's style/identity/paint placement, and removes the consumed path through normal asset pruning. Cancellation leaves source objects untouched. Only clicking the draft's first anchor closes a path; snapped proximity never closes it.
+
+Designer grid columns/rows (1–24) and a shared gutter (0–500 output px) belong to tool preferences and MKW-Setup, never project snapshots. The default remains sixths without gutters. `MKWCarouselPolicy.grid` clamps oversize gutters to the available safe rectangle and supplies both gutter edges to snapping; `MKWDesignerGrid` uses the same cell/gap proportions in CSS previews without adding per-cell DOM or raster work. The slide format inspector edits a local draft, validates through `formatPlan`, then applies all six document fields and export board dimensions in one checkpoint. Width changes rebase object origins to the new slide origins without resizing/reflowing elements; objects wholly to the right retain their distance from the artwork edge. Safezone-only changes leave all object geometry untouched. Existing projects and locked objects never change when a grid preference changes.
 
 New angle directions are up/left/down in both editors. `MKWAnglePolicy` keeps legacy right-facing saved objects readable without mirroring or moving an existing design; only such objects expose a labelled legacy right choice. Left-facing geometry mirrors the clipping mask only, never the photo transform. Single-post left angles remain centred vertically and move only horizontally; carousel left angles remain freely movable/rotatable with ordinary snapping.
 

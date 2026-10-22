@@ -492,7 +492,9 @@ function carouselRefresh() {
   $("#carouselZoom").value = Math.round(s * 100);
   carouselSchedulePaint(canvas, rasterScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
+  const gridStyle = MKWDesignerGrid.style(c);
   const guideKey = JSON.stringify([
+    gridStyle,
     c.w,
     c.h,
     c.n,
@@ -510,7 +512,7 @@ function carouselRefresh() {
       Array.from(
         { length: c.n },
         (_, i) =>
-          `<div class="slide-guide" style="left:${i * c.w * s}px;width:${c.w * s}px;height:${c.h * s}px"><div class="sixths" style="left:${100 * s}px;right:${100 * s}px;top:${c.top * s}px;bottom:${c.bottom * s}px"></div></div>`,
+          `<div class="slide-guide" style="left:${i * c.w * s}px;width:${c.w * s}px;height:${c.h * s}px"><div class="sixths designer-grid" style="left:${c.left * s}px;right:${c.right * s}px;top:${c.top * s}px;bottom:${c.bottom * s}px;${gridStyle}"></div></div>`,
       ).join("") +
       `<div class="artwork-safe" style="left:${c.left * s}px;top:${c.top * s}px;width:${(c.w * c.n - c.left - c.right) * s}px;height:${(c.h - c.top - c.bottom) * s}px"></div>`;
     if (

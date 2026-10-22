@@ -557,6 +557,18 @@
           </p>
           <h3>Slides hinzufügen, entfernen oder umsortieren</h3>
           <p>
+            Klicke über einer Zeichenfläche auf <strong>Slide 1</strong>
+            beziehungsweise den Namen der gewünschten Slide. Rechts kannst du
+            unter <strong>Format für alle Slides</strong> die Breite und Höhe
+            ändern. Stelle darunter die Schutzzone oben, unten, links und rechts
+            ein; die kleine Vorschau zeigt dir den verbleibenden Bereich.
+            <strong>Für alle Slides übernehmen</strong> wendet die Werte
+            gemeinsam auf das ganze Design an. Elementgrössen bleiben erhalten,
+            die Inhalte behalten ihre Position relativ zum linken Slide-Rand.
+            Prüfe nach einer Grössenänderung die Bildabdeckung und Texte.
+            Mit Rückgängig kannst du die gesamte Änderung zurücknehmen.
+          </p>
+          <p>
             Ein Design kann <strong>1 bis 20 Slides</strong> enthalten. Klicke
             auf das <strong>Plus</strong> neben der Gestaltung, um eine weitere
             Slide anzufügen. Ein Klick auf den Namen einer Slide öffnet rechts
@@ -606,8 +618,14 @@
             Bilder dürfen über Slide-Grenzen reichen. Texte sollten innerhalb
             der markierten Bereiche bleiben, damit Wörter nicht zwischen zwei
             Seiten abgeschnitten werden. Die Hilfslinien zeigen die Schutzzonen
-            und deren Sechstel an. Ganz ausserhalb platzierte Elemente bleiben
+            und das Raster darin an (standardmässig Sechstel). Ganz ausserhalb platzierte Elemente bleiben
             als Arbeitshilfe sichtbar, erscheinen aber nicht im Export.
+          </p>
+          <p>
+            Die Abstände oben, unten, links und rechts legst du beim Einrichten
+            oder später in den Slide-Einstellungen fest. Das Raster passt sich auf jeder Slide an diese
+            Schutzzone an. Auch das Einrasten und die Textwarnungen richten sich
+            danach. Raster und Schutzzonen werden nicht exportiert.
           </p>
           <h3>Text hinzufügen</h3>
           <ol>
@@ -752,14 +770,26 @@
               Ziehen erzeugt eine Kurve. Ein Klick auf den ersten Punkt
               schliesst den Pfad; Ziehen beim Schliessen bestimmt seine Rundung.
               Enter oder Doppelklick beendet einen offenen Pfad, Rücktaste
-              entfernt den letzten Punkt, Escape bricht das Zeichnen ab.
+              entfernt den letzten Schritt, Escape bricht das Zeichnen ab.
+              Zum Schliessen klickst du ausdrücklich auf den Anfangspunkt des
+              gerade gezeichneten Pfads. Einrasten allein schliesst ihn nicht.
+            </li>
+            <li>
+              <strong>Pfad fortsetzen oder verbinden:</strong> Wähle das
+              Pfadwerkzeug (P) und klicke auf ein rund markiertes offenes Ende.
+              Zeichne von dort weiter. Klicke währenddessen auf das offene Ende
+              eines anderen Pfads, um beide zu einer Linie zu verbinden. Die
+              Gestaltung des zuerst fortgesetzten Pfads bleibt erhalten.
+              Escape verwirft eine noch nicht abgeschlossene Fortsetzung und
+              lässt den bisherigen Pfad unverändert.
             </li>
             <li>
               <strong>Punkte bearbeiten:</strong> Wähle mit P das Pfadwerkzeug
               und klicke auf eine bestehende Linie, um einen Punkt hinzuzufügen.
-              Alt/Option und Klick auf einen Punkt entfernt ihn. Mit Shift-Klick
-              oder einem Auswahlrahmen kannst du mehrere Punkte gemeinsam
-              verschieben.
+              Alt/Option und Klick auf einen Punkt entfernt ihn. Um Endpunkte
+              zu verschieben, nutze „Punkte &amp; Kurven bearbeiten“ mit dem
+              Auswahlwerkzeug. Mit Shift-Klick oder einem Auswahlrahmen kannst
+              du mehrere Punkte gemeinsam verschieben.
             </li>
             <li>
               <strong>Kurvenwerkzeug:</strong> Shift + C öffnet es. Ein Klick
@@ -1024,6 +1054,17 @@
               Schutzzonen und magnetische Hilfslinien. Ein grösserer
               Einrastabstand zieht ein Element schon früher an eine Hilfslinie;
               ein kleinerer erlaubt genaueres freies Platzieren.
+            </li>
+            <li>
+              <strong>Designer-Raster:</strong> Unter Hilfslinien kannst du
+              1–24 Spalten und Reihen sowie den Abstand dazwischen (Stege in
+              Pixeln) einstellen. Standard sind sechs Spalten, sechs Reihen und
+              keine Stege. Das Raster liegt innerhalb der Schutzzone jeder
+              Slide. Rahmen und Pfadpunkte können an beiden Stegkanten
+              einrasten. Bei sehr engen Schutzzonen werden zu breite Stege
+              automatisch verkleinert. Die Rastereinstellungen bleiben in
+              deinem Studio und werden auch in einer MKW-Setup-Datei gesichert;
+              sie verändern keine Elemente und erscheinen nicht im Export.
             </li>
             <li>
               <strong>Export:</strong> Wähle das Format, das beim Öffnen des

@@ -682,8 +682,8 @@
   background: #19212f80;
 }
 #carouselSetup .safe-preview-inner {
-  left: 9.26%;
-  right: 9.26%;
+  left: var(--left, 9.26%);
+  right: var(--right, 9.26%);
 }
 .carousel-setup-actions {
   grid-template-columns: 1fr !important;

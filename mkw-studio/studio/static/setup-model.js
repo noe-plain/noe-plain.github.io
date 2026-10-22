@@ -12,6 +12,7 @@
     curvature: false,
     pdfPreset: "linkedin",
     lineHeight: 95,
+    designerGrid: Object.freeze({ columns: 6, rows: 6, gap: 0 }),
     textSizes: Object.freeze({
       date: 52,
       title: 104,
@@ -23,10 +24,33 @@
   function preferences(value = {}, strict = false) {
     if (!value || typeof value !== "object" || Array.isArray(value))
       throw Error("Ungültige Werkzeugeinstellungen.");
-    const result = { ...defaults, textSizes: { ...defaults.textSizes } };
+    const result = {
+      ...defaults,
+      textSizes: { ...defaults.textSizes },
+      designerGrid: { ...defaults.designerGrid },
+    };
     for (const key of Object.keys(defaults)) {
       if (!Object.hasOwn(value, key)) continue;
       const item = value[key];
+      if (key === "designerGrid") {
+        if (!item || typeof item !== "object" || Array.isArray(item)) {
+          if (strict) throw Error("Ungültiges Designer-Raster.");
+          continue;
+        }
+        for (const field of ["columns", "rows", "gap"]) {
+          if (!Object.hasOwn(item, field)) continue;
+          const min = field === "gap" ? 0 : 1,
+            max = field === "gap" ? 500 : 24;
+          if (
+            Number.isInteger(item[field]) &&
+            item[field] >= min &&
+            item[field] <= max
+          )
+            result.designerGrid[field] = item[field];
+          else if (strict) throw Error("Ungültiger Rasterwert: " + field);
+        }
+        continue;
+      }
       if (key === "textSizes") {
         if (!item || typeof item !== "object" || Array.isArray(item)) {
           if (strict) throw Error("Ungültige Standard-Schriftgrössen.");

@@ -323,11 +323,11 @@ html[data-theme="dark"] :is(#templateGallery, #templateSaveDialog) .is-error {
   }
 }
 
-.settings-tabs:has([data-settings-tab="templates"]) {
+#settingsDialog .settings-tabs:has([data-settings-tab="templates"]) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-.settings-tabs:has([data-settings-tab="templates"]) button {
+#settingsDialog .settings-tabs:has([data-settings-tab="templates"]) button {
   min-width: 0;
 }
 #templateGallery {
