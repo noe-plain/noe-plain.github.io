@@ -40,6 +40,7 @@ function studioSettingsUI() {
   const appearance = document.createElement("section");
   appearance.className = "settings-appearance";
   appearance.append(heading, theme);
+  studioPrimaryColourSettings(appearance);
   panels.general.append(appearance, dialog.querySelector(".settings-advanced"));
   hint.remove();
   const preferences = dialog.querySelector(".settings-preferences"),
@@ -103,6 +104,7 @@ function studioSettingsUI() {
     .join("")}</select></label>`;
   panels.export.append(pdf);
   const saving = document.createElement("section");
+  saving.className = "settings-saving";
   saving.innerHTML =
     '<h3>Projektsicherung</h3><label class="check"><input id="autoSaveFile" type="checkbox">Verknüpfte MKW-Datei automatisch aktualisieren</label>';
   panels.general.append(saving);
@@ -184,5 +186,6 @@ function studioSettingsUI() {
     studioPreferences.pdfPreset = event.target.value;
     studioApplyPreferences();
   };
+  studioApplyColourTheme();
 }
 studioSettingsUI();

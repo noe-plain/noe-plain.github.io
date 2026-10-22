@@ -1,5 +1,5 @@
 "use strict";
-const studioHelpURL = "hilfe/?v=9f086b70344e";
+const studioHelpURL = "hilfe/?v=c1f78510d301";
 let studioHelpPopup = null;
 function studioOpenHelp(trigger) {
   if (!studioHelpPopup) {
@@ -20,8 +20,7 @@ function studioOpenHelp(trigger) {
         if (!doc?.querySelector("#helpContent"))
           throw Error("Wiki nicht verfügbar");
         doc.documentElement.classList.add("help-embedded");
-        doc.documentElement.dataset.theme =
-          document.documentElement.dataset.theme;
+        studioApplyHelpTheme(doc);
         doc.addEventListener("keydown", (event) => {
           if (event.key === "Escape") {
             event.preventDefault();
@@ -56,9 +55,7 @@ function studioOpenHelp(trigger) {
   }
   const state = studioHelpPopup;
   state.trigger = trigger;
-  if (state.ready)
-    state.frame.contentDocument.documentElement.dataset.theme =
-      document.documentElement.dataset.theme;
+  if (state.ready) studioApplyHelpTheme(state.frame.contentDocument);
   if (!state.dialog.open) state.dialog.showModal();
 }
 document.addEventListener("click", (event) => {
@@ -74,4 +71,20 @@ document.addEventListener("click", (event) => {
     return;
   event.preventDefault();
   studioOpenHelp(trigger);
+});
+
+function studioApplyHelpTheme(doc) {
+  doc.documentElement.style.colorScheme =
+    document.documentElement.dataset.theme;
+  doc.documentElement.dataset.theme = document.documentElement.dataset.theme;
+  const palette = MKWUIColor.palette(
+    studioPreferences.primaryColour,
+    document.documentElement.dataset.theme,
+  );
+  for (const [role, value] of Object.entries(palette))
+    doc.documentElement.style.setProperty("--md-sys-color-" + role, value);
+}
+document.addEventListener("mkw-ui-theme-change", () => {
+  if (studioHelpPopup?.ready)
+    studioApplyHelpTheme(studioHelpPopup.frame.contentDocument);
 });

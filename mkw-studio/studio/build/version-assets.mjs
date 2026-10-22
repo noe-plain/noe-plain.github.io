@@ -1,6 +1,8 @@
 // Run before publishing: changed editor assets receive a new browser cache key.
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { writeThemeTokens } from "./ui-theme.mjs";
+await writeThemeTokens();
 const root = new URL("../", import.meta.url),
   file = new URL("index.html", root);
 const spriteHash = createHash("sha256")
@@ -48,11 +50,21 @@ for (const name of ["hilfe.css", "hilfe.js"])
     .update(await readFile(new URL("hilfe/" + name, root)))
     .digest("hex")
     .slice(0, 12);
-const helpVersioned = helpSource.replace(
-  /((?:src|href)=")(hilfe\.(?:css|js))(?:\?[^"#]*)?("[\s>])/g,
-  (_, prefix, name, suffix) =>
-    `${prefix}${name}?v=${helpHashes[name]}${suffix}`,
-);
+const themeHash = createHash("sha256")
+  .update(await readFile(new URL("static/ui-theme-tokens.css", root)))
+  .update(await readFile(new URL("static/ui-theme.css", root)))
+  .digest("hex")
+  .slice(0, 12);
+const helpVersioned = helpSource
+  .replace(
+    /(href="\.\.\/static\/ui-theme(?:-tokens)?\.css)(?:\?[^"#]*)?("[\s>])/g,
+    (_, prefix, suffix) => `${prefix}?v=${themeHash}${suffix}`,
+  )
+  .replace(
+    /((?:src|href)=")(hilfe\.(?:css|js))(?:\?[^"#]*)?("[\s>])/g,
+    (_, prefix, name, suffix) =>
+      `${prefix}${name}?v=${helpHashes[name]}${suffix}`,
+  );
 if (helpSource !== helpVersioned) await writeFile(helpIndex, helpVersioned);
 const helpHash = createHash("sha256")
     .update(helpVersioned)

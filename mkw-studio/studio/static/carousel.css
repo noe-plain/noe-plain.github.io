@@ -13,7 +13,7 @@
   gap: 10px;
 }
 .mode-buttons [aria-pressed="true"] {
-  background: #b4c5ff;
+  background: var(--md-sys-color-primary);
   color: #17243b;
 }
 .carousel-fields {
@@ -81,7 +81,7 @@
   gap: 16px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--line);
-  background: #252b35;
+  background: var(--md-sys-color-surface-container);
   min-width: 0;
 }
 .carousel-contextbar button {
@@ -146,8 +146,8 @@
   align-items: center;
   gap: 6px;
   padding: 12px 6px;
-  background: #252b35;
-  border-right: 1px solid #3d4657;
+  background: var(--md-sys-color-surface-container);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
 }
 .carousel-toolrail button {
   position: relative;
@@ -166,9 +166,9 @@
   border-color: #53637f;
 }
 .carousel-toolrail [aria-pressed="true"] {
-  background: #435779;
+  background: var(--md-sys-color-primary-outline);
   color: #f1f6ff;
-  border-color: #7891bd;
+  border-color: var(--md-sys-color-primary-outline);
 }
 .carousel-toolrail svg {
   width: 23px;
@@ -190,7 +190,7 @@
   overflow: auto;
   padding: 64px 60px;
   touch-action: none;
-  background: #151a22;
+  background: var(--md-sys-color-workspace);
   outline: none;
   position: relative;
   user-select: none;
@@ -275,7 +275,7 @@
 }
 .carousel-frame {
   position: absolute;
-  outline: 1px solid #a6bdff;
+  outline: 1px solid var(--md-sys-color-primary);
   pointer-events: none;
   box-sizing: border-box;
 }
@@ -356,7 +356,7 @@
 }
 .carousel-marquee {
   position: absolute;
-  outline: 1px solid #a6bdff;
+  outline: 1px solid var(--md-sys-color-primary);
   background: #7ea3e325;
   pointer-events: none;
 }
@@ -402,8 +402,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: #252b35;
-  border-left: 1px solid #3d4657;
+  background: var(--md-sys-color-surface-container);
+  border-left: 1px solid var(--md-sys-color-outline-variant);
 }
 #carouselProperties {
   flex: 1;
@@ -505,11 +505,11 @@
   width: 100%;
   min-width: 0;
   background: #151c28;
-  color: #fff;
+  color: var(--md-sys-color-on-surface);
   border: 1px solid #8aa4d0;
 }
 .carousel-layer.drop-target {
-  border-top: 2px solid #b4c5ff;
+  border-top: 2px solid var(--md-sys-color-primary);
 }
 .carousel-statusbar {
   grid-column: 1/-1;
@@ -518,7 +518,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 5px 12px;
-  background: #252b35;
+  background: var(--md-sys-color-surface-container);
   border-top: 1px solid var(--line);
   font-size: 9px;
   color: #a3b4cc;
@@ -664,7 +664,7 @@
   min-width: 22px;
   max-height: 145px;
   max-width: 120px;
-  background: #30405b;
+  background: var(--md-sys-color-primary-container);
   border: 1px solid #7489ae;
   border-radius: 4px;
   display: grid;
@@ -792,8 +792,8 @@
   padding: 12px;
   font-size: 12px;
   color: #17243b;
-  background: #b4c5ff;
-  border-color: #b4c5ff;
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
   box-shadow: 0 2px 8px #0002;
 }
 #carouselSidebar .carousel-place-image:hover {
@@ -832,7 +832,7 @@
   gap: 10px;
   padding: 10px;
   background: #1e2531;
-  border: 1px solid #3d4657;
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 6px;
 }
 #carouselProperties .carousel-transparency-toggle {
@@ -844,7 +844,7 @@
   width: 14px;
   height: 14px;
   margin: 0;
-  accent-color: #b4c5ff;
+  accent-color: var(--md-sys-color-primary);
 }
 #carouselProperties .carousel-slider > span {
   display: flex;
@@ -862,7 +862,7 @@
   height: 34px;
   margin: 0;
   border: 0;
-  accent-color: #b4c5ff;
+  accent-color: var(--md-sys-color-primary);
   background: transparent;
   cursor: pointer;
 }
@@ -930,7 +930,7 @@
   position: absolute;
   overflow: visible;
   fill: none;
-  stroke: #a6bdff;
+  stroke: var(--md-sys-color-primary);
   stroke-width: 1;
   pointer-events: none;
 }
@@ -951,8 +951,8 @@
 }
 .carousel-point-count [aria-pressed="true"],
 #carouselFrameEdit[aria-pressed="true"] {
-  background: #435779;
-  border-color: #7891bd;
+  background: var(--md-sys-color-primary-outline);
+  border-color: var(--md-sys-color-primary-outline);
   color: #f1f6ff;
 }
 .carousel-inline-text > div {
@@ -969,8 +969,8 @@
 }
 
 .carousel-text-anchor [aria-pressed="true"] {
-  background: #435779;
-  border-color: #7891bd;
+  background: var(--md-sys-color-primary-outline);
+  border-color: var(--md-sys-color-primary-outline);
   color: #f1f6ff;
 }
 

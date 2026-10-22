@@ -103,7 +103,7 @@
   padding: 4px 8px;
   border-radius: 20px;
   background: #182332d9;
-  color: white;
+  color: var(--md-sys-color-on-surface);
   font-size: 11px;
 }
 #templateGallery .template-fill-heading {

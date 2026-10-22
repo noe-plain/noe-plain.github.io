@@ -86,7 +86,7 @@
 .typo-format button[aria-pressed="true"],
 .typo-format button[aria-pressed="mixed"] {
   color: var(--typo-accent, var(--blue));
-  background: var(--accent-soft, #315bd81a);
+  background: var(--md-sys-color-primary-container);
   border-color: var(--typo-accent, var(--blue));
 }
 .typo-format button[aria-pressed="mixed"] {
@@ -295,7 +295,7 @@ html[data-theme="light"] :is(.typography-inspector, .typo-content) {
 .mkw-inline-input {
   overflow: visible !important;
   overflow-wrap: normal !important;
-  caret-color: var(--studio-accent, #315bcc);
+  caret-color: var(--studio-accent, var(--md-sys-color-primary));
 }
 .mkw-inline-input[data-canvas-text="true"]:not(.mkw-composing),
 .mkw-inline-input[data-canvas-text="true"]:not(.mkw-composing) * {

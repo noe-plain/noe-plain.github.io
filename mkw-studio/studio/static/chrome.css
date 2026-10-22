@@ -33,8 +33,8 @@ footer {
   height: var(--studio-footer-height);
   padding: 8px 20px;
   gap: 18px;
-  background: #1e232b;
-  border-color: #343b47;
+  background: var(--md-sys-color-surface);
+  border-color: var(--md-sys-color-outline-variant);
   justify-content: space-between;
 }
 .footer-status {
@@ -43,7 +43,7 @@ footer {
   gap: 8px;
   flex: 1;
   min-width: 0;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .save-indicator {
   width: 6px;
@@ -59,15 +59,15 @@ footer {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 11px;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .footer-view-controls {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 0 14px;
-  border-left: 1px solid #394250;
-  border-right: 1px solid #394250;
+  border-left: 1px solid var(--md-sys-color-outline-variant);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
 }
 .footer-view-controls button {
   display: grid;
@@ -78,20 +78,20 @@ footer {
   border-radius: 9px;
   border: 1px solid transparent;
   background: transparent;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
   padding: 7px;
 }
 .footer-view-controls button:hover {
-  background: #30394a;
-  color: #edf2ff;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
 }
 .footer-view-controls button[aria-pressed="true"] {
-  background: #303c54;
-  border-color: #4a5c7e;
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary-outline);
   color: #cad7ff;
 }
 .footer-view-controls button[aria-expanded="false"] {
-  color: #7e8da6;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .footer-view-controls button > span {
   display: none;
@@ -115,14 +115,14 @@ footer .carousel-zoom-controls {
 }
 footer .carousel-zoom-controls label {
   font-size: 11px;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
 }
 footer .carousel-zoom-controls input {
   height: 30px;
   border-radius: 8px;
-  background: #151b24;
-  border-color: #414d60;
-  color: #dfe7f5;
+  background: var(--md-sys-color-surface-container-low);
+  border-color: var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
 }
 footer .carousel-zoom-controls button {
   display: grid;
@@ -134,7 +134,7 @@ footer .carousel-zoom-controls button {
   border-color: transparent;
 }
 footer .carousel-zoom-controls button:hover {
-  background: #30394a;
+  background: var(--md-sys-color-surface-container);
 }
 footer .carousel-zoom-controls button .ui-icon {
   width: 19px;
@@ -163,7 +163,7 @@ footer .view-control {
 .carousel-flip-controls [aria-pressed="true"] {
   background: #354969;
   border-color: #7792c0;
-  color: #edf2ff;
+  color: var(--md-sys-color-on-surface);
 }
 .carousel-flip-controls .ui-icon {
   width: 20px;
@@ -177,11 +177,11 @@ footer .view-control {
   justify-content: space-between;
   gap: 10px;
   font-size: 12px;
-  color: #bdc9dc;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .frame-point-heading strong {
   font-size: 12px;
-  color: #edf2ff;
+  color: var(--md-sys-color-on-surface);
   font-weight: 500;
 }
 .frame-point-diagram {
@@ -213,7 +213,7 @@ footer .view-control {
   height: 24px;
   min-height: 24px;
   padding: 0 !important;
-  border: 1px solid #687b9d;
+  border: 1px solid var(--md-sys-color-primary-outline);
   border-radius: 50%;
   background: #1b2331;
   transform: translate(-50%, -50%);
@@ -226,15 +226,16 @@ footer .view-control {
   background: #8c9bb3;
 }
 #carouselSidebar .frame-point-choice[aria-pressed="true"] {
-  background: #a4b5ff;
-  border-color: #c3d0ff;
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary-outline);
   opacity: 1;
 }
 #carouselSidebar .frame-point-choice[aria-pressed="true"] > span {
-  background: #1b2540;
+  background: var(--md-sys-color-primary-container);
 }
 #carouselSidebar .frame-point-choice:hover:not(:disabled) {
-  box-shadow: 0 0 0 4px #a4b5ff33;
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
 }
 #carouselSidebar .frame-point-choice:disabled {
   cursor: default;
@@ -265,10 +266,10 @@ footer .view-control {
   font-size: 13px;
 }
 .theme-options button[aria-pressed="true"] {
-  background: #303f60;
-  border-color: #a4b5ff;
-  box-shadow: 0 0 0 1px #a4b5ff;
-  color: #edf2ff;
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-surface);
 }
 .theme-options .ui-icon {
   width: 28px;
@@ -344,15 +345,15 @@ footer .view-control {
   gap: 10px;
   font-size: 12px;
   line-height: 1.5;
-  color: #bdc9dc;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .settings-grid input[type="color"] {
   width: 36px;
   height: 34px;
   padding: 4px;
-  border: 1px solid #46536a;
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 8px;
-  background: #171d26;
+  background: var(--md-sys-color-surface);
   flex: none;
 }
 .settings-snap-distance,
@@ -363,7 +364,7 @@ footer .view-control {
   gap: 15px;
   font-size: 12px;
   margin: 20px 0 12px;
-  color: #bdc9dc;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .settings-snap-distance span {
   display: flex;
@@ -374,17 +375,17 @@ footer .view-control {
   width: 68px;
   padding: 9px;
   border-radius: 8px;
-  border: 1px solid #46536a;
-  background: #171d26;
-  color: #edf2ff;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 .settings-export-format select {
   width: 130px;
   padding: 9px;
   border-radius: 8px;
-  border: 1px solid #46536a;
-  background: #171d26;
-  color: #edf2ff;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 #settingsDialog small {
   display: block;
@@ -411,15 +412,15 @@ footer .view-control {
   font-size: 11px;
   text-transform: none;
   letter-spacing: 0;
-  color: #b1bfd5;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .save-project-naming .project-fields input {
   width: 100% !important;
   font-size: 13px;
-  border: 1px solid #485671;
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 7px;
-  background: #191f2a;
-  color: #e3ebfa;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
   padding: 10px;
   margin-top: 7px;
 }

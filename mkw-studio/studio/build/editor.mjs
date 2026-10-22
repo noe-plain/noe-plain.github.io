@@ -1,6 +1,8 @@
-// index.html is the explicit script/style manifest. Vendors keep their own licences.
+// editor-manifest.json owns module/style order. Vendors keep their own licences.
 import { readFile, writeFile } from "node:fs/promises";
 import { build } from "esbuild";
+import { writeThemeTokens } from "./ui-theme.mjs";
+await writeThemeTokens();
 const root = new URL("../", import.meta.url),
   { scripts: own, styles } = JSON.parse(
     await readFile(new URL("build/editor-manifest.json", root), "utf8"),

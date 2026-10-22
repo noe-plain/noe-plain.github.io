@@ -112,11 +112,11 @@
   pointer-events: none;
 }
 .studio-paint-picker {
-  --picker-border: #46536a;
-  --picker-surface: #1c2430;
-  --picker-input: #151b24;
-  --picker-text: #e9eef6;
-  --picker-muted: #a9b6c9;
+  --picker-border: var(--md-sys-color-outline-variant);
+  --picker-surface: var(--md-sys-color-surface);
+  --picker-input: var(--md-sys-color-surface-container-low);
+  --picker-text: var(--md-sys-color-on-surface);
+  --picker-muted: var(--md-sys-color-on-surface-variant);
   position: fixed;
   z-index: 70;
   width: 320px;
@@ -135,11 +135,11 @@
   overscroll-behavior: contain;
 }
 html[data-theme="light"] .studio-paint-picker {
-  --picker-border: #d2dae6;
-  --picker-surface: #ffffff;
-  --picker-input: #f6f8fb;
-  --picker-text: #263247;
-  --picker-muted: #65748b;
+  --picker-border: var(--md-sys-color-outline-variant);
+  --picker-surface: var(--md-sys-color-surface);
+  --picker-input: var(--md-sys-color-surface-container-low);
+  --picker-text: var(--md-sys-color-on-surface);
+  --picker-muted: var(--md-sys-color-on-surface-variant);
   box-shadow: 0 14px 50px #25334b26;
 }
 .studio-paint-picker * {
@@ -173,7 +173,11 @@ html[data-theme="light"] .studio-paint-picker {
 }
 .studio-paint-picker button[aria-pressed="true"] {
   border-color: var(--studio-accent);
-  background: #315bcc18;
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 9.41%,
+    transparent
+  );
   color: var(--studio-accent);
 }
 .studio-paint-picker input,
@@ -300,7 +304,8 @@ html[data-theme="light"] .studio-paint-picker {
   margin: 14px 0 4px;
   background:
     linear-gradient(to right, var(--alpha-colour), transparent),
-    repeating-conic-gradient(#ccd3dd 0 25%, #fff 0 50%) 0 / 8px 8px;
+    repeating-conic-gradient(#ccd3dd 0 25%, var(--md-sys-color-surface) 0 50%)
+      0 / 8px 8px;
   border-radius: 8px;
   border: 0;
   cursor: pointer;
@@ -406,7 +411,7 @@ html[data-theme="light"] .studio-paint-picker {
   padding: 10px;
   margin-top: 10px;
   background: var(--studio-accent);
-  color: white;
+  color: var(--md-sys-color-on-primary);
   border-color: transparent;
 }
 #paintMessage {

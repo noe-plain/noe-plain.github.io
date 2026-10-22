@@ -2,6 +2,7 @@
 (function (root) {
   "use strict";
   const defaults = Object.freeze({
+    primaryColour: "#315bcc",
     guideColour: "#93a8ef",
     sponsorColour: "#ffffff",
     snapColour: "#f5a8e8",

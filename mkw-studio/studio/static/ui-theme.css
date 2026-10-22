@@ -1,0 +1,45 @@
+/* UI-only design tokens. Artwork renderers must never read these variables. */
+:root {
+  --studio-space-1: 4px;
+  --studio-space-2: 8px;
+  --studio-space-3: 12px;
+  --studio-space-4: 16px;
+  --studio-space-5: 20px;
+  --studio-space-6: 24px;
+  --studio-shape-small: 8px;
+  --studio-shape-medium: 12px;
+  --studio-shape-large: 16px;
+  --studio-shape-dialog: 28px;
+  --studio-shape-full: 999px;
+  --studio-motion-short: 120ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --studio-motion-short: 0ms;
+  }
+}
+
+:root {
+  --blue: var(--md-sys-color-primary);
+  --line: var(--md-sys-color-outline-variant);
+  --cream: var(--md-sys-color-warning-container);
+  --surface: var(--md-sys-color-surface);
+  --field: var(--md-sys-color-surface-container-low);
+  --muted: var(--md-sys-color-on-surface-variant);
+  --studio-border: var(--md-sys-color-outline-variant);
+  --studio-panel: var(--md-sys-color-surface);
+  --studio-panel-alt: var(--md-sys-color-surface-container-low);
+  --studio-canvas: var(--md-sys-color-workspace);
+  --studio-accent: var(--md-sys-color-primary);
+  --studio-ink: var(--md-sys-color-on-surface);
+  --studio-muted: var(--md-sys-color-on-surface-variant);
+  --project-surface: var(--md-sys-color-surface);
+  --project-ink: var(--md-sys-color-on-surface);
+  --project-border: var(--md-sys-color-outline-variant);
+  --project-accent: var(--md-sys-color-primary);
+  --project-warning: var(--md-sys-color-warning);
+}
+
+html.studio-theme-changing button {
+  transition: none !important;
+}

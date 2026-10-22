@@ -58,20 +58,20 @@
 }
 /* Typography stays readable in a narrow inspector, with one explicit editing scope. */
 #carouselProperties {
-  --type-surface: #191f29;
-  --type-border: #414e64;
-  --type-muted: #a3b2c9;
-  --type-text: #e3ebfa;
-  --type-selected: #303f60;
-  --type-accent: #b5c4ff;
+  --type-surface: var(--md-sys-color-surface-container-low);
+  --type-border: var(--md-sys-color-outline-variant);
+  --type-muted: var(--md-sys-color-on-surface-variant);
+  --type-text: var(--md-sys-color-on-surface);
+  --type-selected: var(--md-sys-color-primary-container);
+  --type-accent: var(--md-sys-color-primary);
 }
 html[data-theme="light"] #carouselProperties {
-  --type-surface: #f6f8fb;
-  --type-border: #d9dfe7;
-  --type-muted: #647187;
-  --type-text: #1d2838;
-  --type-selected: #eaf0ff;
-  --type-accent: #315bcc;
+  --type-surface: var(--md-sys-color-surface-container-low);
+  --type-border: var(--md-sys-color-outline-variant);
+  --type-muted: var(--md-sys-color-on-surface-variant);
+  --type-text: var(--md-sys-color-on-surface);
+  --type-selected: var(--md-sys-color-primary-container);
+  --type-accent: var(--md-sys-color-primary);
 }
 #carouselProperties.is-text-inspector .carousel-property-section {
   padding: 16px 0;

@@ -1,10 +1,7 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #253551;
+  color: var(--md-sys-color-on-surface);
   background: #f7f8fa;
-  --blue: #164ce4;
-  --line: #e4e7ee;
-  --cream: #f6f4ec;
 }
 * {
   box-sizing: border-box;
@@ -20,15 +17,19 @@ select {
 button {
   cursor: pointer;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: #364864;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 12px;
-  padding: 9px 13px;
+  padding: 9px 16px;
+  transition:
+    background-color var(--studio-motion-short),
+    border-color var(--studio-motion-short),
+    color var(--studio-motion-short);
 }
 button:hover {
-  border-color: #a0b6f2;
-  background: #f1f5ff;
+  border-color: var(--md-sys-color-primary-outline);
+  background: var(--md-sys-color-primary-container);
 }
 button:disabled {
   opacity: 0.4;
@@ -37,18 +38,18 @@ button:disabled {
 .primary {
   background: var(--blue);
   border-color: var(--blue);
-  color: #fff;
+  color: var(--md-sys-color-on-primary);
 }
 .primary:hover {
-  background: #1040cc;
-  color: white;
+  background: var(--md-sys-color-primary-hover);
+  color: var(--md-sys-color-on-primary);
 }
 .icon-button {
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  padding: 8px;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
   border-color: transparent;
   background: transparent;
 }
@@ -73,7 +74,7 @@ header {
   align-items: center;
   gap: 30px;
   border-bottom: 1px solid var(--line);
-  background: white;
+  background: var(--md-sys-color-surface);
   position: relative;
   z-index: 5;
 }
@@ -92,7 +93,7 @@ header {
   margin-top: 7px;
 }
 #projectTitle {
-  color: #939bac;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 12px;
   flex: 1;
 }
@@ -112,7 +113,10 @@ header {
   inset: 76px 0 0;
   overflow: auto;
   padding: 54px 60px 240px;
-  background-image: radial-gradient(#d9dee8 0.7px, transparent 0.7px);
+  background-image: radial-gradient(
+    var(--md-sys-color-workspace-dot) 0.7px,
+    transparent 0.7px
+  );
   background-size: 18px 18px;
 }
 #boardSpace {
@@ -136,15 +140,15 @@ header {
   color: var(--blue);
   font-size: 11px;
   font-weight: 750;
-  border: 1px solid #dbe4fc;
-  background: #eef2ff;
+  border: 1px solid var(--md-sys-color-primary-outline);
+  background: var(--md-sys-color-primary-container);
   padding: 5px 8px;
   border-radius: 6px;
 }
 .group-heading strong {
   font-size: 12px;
   font-weight: 550;
-  color: #627087;
+  color: var(--md-sys-color-on-surface-variant);
   max-width: 400px;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -178,7 +182,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #7c889b;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 10px;
   padding: 0 0 12px;
   letter-spacing: 0.5px;
@@ -188,7 +192,7 @@ header {
   padding: 3px 6px;
   border: 0;
   background: none;
-  color: #8290a5;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .board-label input {
   accent-color: var(--blue);
@@ -198,7 +202,7 @@ header {
   box-shadow:
     0 3px 6px #1b29490b,
     0 15px 45px #1b294918;
-  background: #fff;
+  background: var(--md-sys-color-surface);
   isolation: isolate;
 }
 .board-card.selected .board-surface {
@@ -234,7 +238,7 @@ header {
   width: 11px;
   height: 11px;
   border: 1.5px solid var(--blue);
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border-radius: 2px;
   padding: 0;
   pointer-events: auto;
@@ -278,21 +282,29 @@ header {
 .text-editor:focus,
 .text-editor:hover {
   outline: 1px dashed #6084ff;
-  background: #164ce414;
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 7.84%,
+    transparent
+  );
 }
 .text-editor:empty:before {
   content: attr(data-placeholder);
   opacity: 0.8;
   font-family: -apple-system, sans-serif;
   font-size: 12px;
-  color: #fff;
-  background: #164ce4b8;
+  color: var(--md-sys-color-on-surface);
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 72.16%,
+    transparent
+  );
   border-radius: 3px;
   padding: 3px 5px;
   text-shadow: none;
 }
 .text-editor.editing {
-  outline: 1px solid #164ce4;
+  outline: 1px solid var(--md-sys-color-primary);
 }
 .text-move {
   position: absolute;
@@ -300,7 +312,7 @@ header {
   height: 20px;
   padding: 3px;
   background: var(--blue);
-  color: white;
+  color: var(--md-sys-color-on-surface);
   border: none;
   cursor: move;
   pointer-events: auto;
@@ -331,7 +343,7 @@ header {
   left: 50%;
   bottom: 111px;
   transform: translateX(-50%);
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border: 1px solid var(--line);
   box-shadow: 0 12px 40px #182c5714;
   border-radius: 13px;
@@ -350,7 +362,7 @@ header {
 }
 .panel-caption {
   font-size: 11px;
-  color: #8290a5;
+  color: var(--md-sys-color-on-surface-variant);
   text-align: center;
   margin: 9px 0 0;
 }
@@ -375,7 +387,7 @@ header {
   height: 30px;
   padding: 2px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border-radius: 5px;
 }
 .panel-row select {
@@ -386,7 +398,7 @@ header {
   padding: 6px;
   border: 1px solid var(--line);
   border-radius: 5px;
-  color: #384b6c;
+  color: var(--md-sys-color-primary);
 }
 .panel-row details {
   font-size: 11px;
@@ -417,7 +429,7 @@ header {
   align-items: center;
   gap: 10px;
   padding: 10px 13px;
-  background: white;
+  background: var(--md-sys-color-surface);
   border: 1px solid var(--line);
   border-radius: 17px;
   box-shadow: 0 8px 40px #1832651b;
@@ -438,7 +450,7 @@ header {
   color: var(--blue);
 }
 .dock button.active {
-  color: #fff;
+  color: var(--md-sys-color-on-surface);
   background: var(--blue);
 }
 .dock button:last-child {
@@ -446,7 +458,7 @@ header {
   background: #edf2ff;
 }
 .dock button:last-child.active {
-  color: white;
+  color: var(--md-sys-color-on-surface);
   background: var(--blue);
 }
 
@@ -477,7 +489,7 @@ header {
   display: flex;
   align-items: center;
   gap: 1px;
-  background: white;
+  background: var(--md-sys-color-surface);
   border: 1px solid var(--line);
   border-radius: 9px;
   pointer-events: auto;
@@ -503,7 +515,7 @@ footer {
   display: flex;
   justify-content: space-between;
   font-size: 9px;
-  color: #8290a5;
+  color: var(--md-sys-color-on-surface-variant);
   background: #f7f8faed;
   z-index: 6;
 }
@@ -527,7 +539,7 @@ footer span:first-child {
   width: 55px;
   height: 55px;
   padding: 14px;
-  background: #eaf0ff;
+  background: var(--md-sys-color-primary-container);
   border-radius: 15px;
 }
 .empty-symbol svg {
@@ -557,12 +569,12 @@ h1 {
 dialog {
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: white;
+  background: var(--md-sys-color-surface);
   width: min(1040px, 95vw);
   max-height: 88vh;
   padding: 28px;
   overflow: auto;
-  color: #344563;
+  color: var(--md-sys-color-primary);
 }
 dialog::backdrop {
   background: #11264f66;
@@ -666,7 +678,7 @@ dialog small {
 #exportStatus,
 #psdStatus {
   white-space: pre-line;
-  color: #536b95;
+  color: var(--md-sys-color-primary);
 }
 #saveDialog {
   max-width: 480px;
@@ -845,7 +857,7 @@ input:focus-visible {
   padding: 3px;
   border: 1px solid #fff8;
   background: var(--blue);
-  color: #fff;
+  color: var(--md-sys-color-on-surface);
   cursor: ns-resize;
   pointer-events: auto;
   touch-action: none;
@@ -893,7 +905,7 @@ input:focus-visible {
   border: 0;
   border-bottom: 1px solid var(--line);
   background: transparent;
-  color: #344563;
+  color: var(--md-sys-color-primary);
   padding: 3px 2px 4px;
   margin-top: 2px;
   outline: 0;
@@ -943,10 +955,10 @@ input:focus-visible {
   max-width: 100%;
   min-width: 0;
   padding: 6px 9px;
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border: 1px solid var(--line);
   border-radius: 5px;
-  color: #384b6c;
+  color: var(--md-sys-color-primary);
   font:
     12px -apple-system,
     sans-serif;
@@ -970,10 +982,12 @@ input:focus-visible {
   padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: white;
-  color: #364864;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant);
 }
-.text-type-picker summary:focus-visible {
+.text-type-picker summary:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
@@ -984,7 +998,7 @@ input:focus-visible {
   z-index: 7;
   width: 245px;
   padding: 10px;
-  background: white;
+  background: var(--md-sys-color-surface);
   border: 1px solid var(--line);
   border-radius: 10px;
   box-shadow: 0 12px 35px #182c5724;
@@ -1006,7 +1020,7 @@ input:focus-visible {
   white-space: normal;
   padding: 7px 5px;
   font-size: 10px;
-  color: #7c889b;
+  color: var(--md-sys-color-on-surface-variant);
 }
 #startDialog {
   width: min(650px, calc(100vw - 32px));
@@ -1076,7 +1090,7 @@ input:focus-visible {
   max-width: 100%;
   margin: 0 0 22px;
   padding: 18px 20px;
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border: 1px solid #e2e7f0;
   border-radius: 14px;
   box-shadow: 0 3px 14px #25355105;
@@ -1096,7 +1110,7 @@ input:focus-visible {
   padding: 0;
   font-size: 12px;
   border-radius: 10px;
-  background: #f0f4ff;
+  background: var(--md-sys-color-primary-container);
   border-color: #e0e8ff;
 }
 .group-heading .image-caption {
@@ -1109,13 +1123,13 @@ input:focus-visible {
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
-  color: #33445f;
+  color: var(--md-sys-color-primary);
 }
 .group-heading .image-metadata {
   display: block;
   font-size: 10px;
   line-height: 1.5;
-  color: #7a879b;
+  color: var(--md-sys-color-on-surface-variant);
   white-space: normal;
 }
 .image-metadata > span {
@@ -1150,7 +1164,7 @@ input:focus-visible {
   flex: none;
 }
 .image-action:hover:not(:disabled) {
-  background: #f0f4ff;
+  background: var(--md-sys-color-primary-container);
   border-color: #e1e9fc;
   color: var(--blue);
 }
@@ -1196,10 +1210,10 @@ input:focus-visible {
   margin: 0;
   padding: 9px 11px;
   font-size: 12px;
-  color: #33445f;
-  border: 1px solid #dfe5ef;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 8px;
-  background: #fafbfe;
+  background: var(--md-sys-color-surface-container-low);
   transition:
     background 0.15s,
     border-color 0.15s;
@@ -1211,7 +1225,7 @@ input:focus-visible {
   border-color: #b9c8e2;
 }
 .group-heading .image-copyright input:focus {
-  background: #fff;
+  background: var(--md-sys-color-surface);
   border-color: #7c9cec;
 }
 .group-heading .text-type-picker {
@@ -1227,10 +1241,10 @@ input:focus-visible {
   list-style: none;
   height: 38px;
   padding: 8px 11px;
-  background: #fafbfe;
-  border: 1px solid #dfe5ef;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 8px;
-  color: #33445f;
+  color: var(--md-sys-color-primary);
 }
 .text-type-picker summary::-webkit-details-marker {
   display: none;
@@ -1252,7 +1266,7 @@ input:focus-visible {
   flex: none;
   padding: 3px 6px;
   border-radius: 5px;
-  background: #eaf0ff;
+  background: var(--md-sys-color-primary-container);
   color: #315ec8;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
@@ -1279,7 +1293,7 @@ input:focus-visible {
   padding: 8px 8px 10px;
   font-size: 10px;
   font-weight: 600;
-  color: #7a879b;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .group-heading .text-type-options label {
   padding: 10px 9px;
@@ -1292,7 +1306,7 @@ input:focus-visible {
   background: #f3f6fc;
 }
 .group-heading .text-type-options label:has(input:checked) {
-  background: #f0f4ff;
+  background: var(--md-sys-color-primary-container);
   color: #214fca;
 }
 .group-heading .text-type-options label + label {
@@ -1349,59 +1363,55 @@ input:focus-visible {
 
 /* Dark studio: the canvas is separate from a persistent right-hand inspector. */
 :root {
-  color-scheme: dark;
-  --blue: #a4b5ff;
-  --line: #343943;
-  --cream: #302b22;
-  --surface: #20242b;
-  --field: #191d23;
-  --muted: #9da7b7;
+  color-scheme: inherit;
   --sidebar: 300px;
-  background: #16191e;
-  color: #e3e7ef;
+  background: var(--md-sys-color-workspace);
+  color: var(--md-sys-color-on-surface);
 }
 body {
-  background: #16191e;
-  color: #e3e7ef;
+  background: var(--md-sys-color-workspace);
+  color: var(--md-sys-color-on-surface);
 }
 button {
-  background: #282d36;
-  border-color: #3b424e;
-  color: #d4dbe7;
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
 }
 button:hover {
-  background: #353e50;
-  border-color: #697ba6;
-  color: #f1f4ff;
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-surface);
 }
 button:disabled {
   opacity: 0.35;
 }
 .primary {
-  background: #a4b5ff;
-  border-color: #a4b5ff;
-  color: #171d32;
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font-weight: 600;
 }
 .primary:hover {
-  background: #bbc7ff;
-  color: #171d32;
+  background: var(--md-sys-color-primary-hover);
+  color: var(--md-sys-color-on-primary);
 }
 input,
 select {
-  color-scheme: dark;
-  accent-color: #a4b5ff;
+  color-scheme: inherit;
+  accent-color: var(--md-sys-color-primary);
 }
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
-summary:focus-visible {
-  outline: 2px solid #a4b5ff;
+summary:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 3px;
 }
 header {
-  background: #20242b;
-  border-color: #343943;
+  background: var(--md-sys-color-surface);
+  border-color: var(--md-sys-color-outline-variant);
   gap: 30px;
   padding: 16px 26px;
 }
@@ -1440,7 +1450,7 @@ header {
 #workspace {
   inset: 76px var(--sidebar) 32px 0;
   padding: 40px 38px 160px;
-  background-color: #16191e;
+  background-color: var(--md-sys-color-workspace);
   background-image: radial-gradient(#2e333e 0.7px, transparent 0.7px);
 }
 #boardSpace {
@@ -1463,7 +1473,7 @@ header {
 .group-heading {
   width: min(820px, calc(100vw - var(--sidebar) - 76px));
   background: #22262e;
-  border-color: #343b47;
+  border-color: var(--md-sys-color-outline-variant);
   box-shadow: 0 4px 14px #0001;
 }
 .group-heading .image-number {
@@ -1539,7 +1549,7 @@ header {
   color: #d3dced;
 }
 .group-heading .text-type-options label:hover {
-  background: #303b50;
+  background: var(--md-sys-color-primary-container);
 }
 .group-heading .text-type-options label:has(input:checked) {
   background: #364565;
@@ -1547,7 +1557,7 @@ header {
 }
 .group-heading .text-type-options small {
   border-color: #48536a;
-  color: #a9b7ce;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .tool-sidebar {
   position: fixed;
@@ -1558,7 +1568,7 @@ header {
   z-index: 8;
   display: flex;
   flex-direction: column;
-  background: #20242b;
+  background: var(--md-sys-color-surface);
   border-left: 1px solid #373e4a;
   overflow: auto;
   overscroll-behavior: contain;
@@ -1623,7 +1633,7 @@ header {
 }
 .tool-sidebar .panel-row input,
 .tool-sidebar .panel-row select {
-  background: #171c24;
+  background: var(--md-sys-color-surface-container-low);
   border: 1px solid #424d60;
   color: #e1e8f5;
   border-radius: 7px;
@@ -1643,7 +1653,7 @@ header {
   width: 36px;
   height: 32px;
   padding: 3px;
-  background: #171c24;
+  background: var(--md-sys-color-surface-container-low);
 }
 .tool-sidebar .panel-row label:has(input[type="checkbox"]) {
   justify-content: flex-start;
@@ -1718,7 +1728,7 @@ header {
   margin-top: auto;
   padding: 20px 22px;
   border-top: 1px solid var(--line);
-  background: #20242b;
+  background: var(--md-sys-color-surface);
   pointer-events: auto;
 }
 .zoom-heading {
@@ -1734,8 +1744,8 @@ header {
 .view-control {
   justify-content: space-between;
   width: 100%;
-  background: #171c24;
-  border-color: #414d60;
+  background: var(--md-sys-color-surface-container-low);
+  border-color: var(--md-sys-color-outline-variant);
 }
 .view-control #viewValue {
   color: #dce5f7;
@@ -1788,7 +1798,7 @@ header {
 }
 .dock button.active,
 .dock button:last-child.active {
-  background: #a4b5ff;
+  background: var(--md-sys-color-primary);
   color: #19213a;
 }
 .dock button:last-child {
@@ -1823,9 +1833,9 @@ h2 {
   color: #8391a8;
 }
 dialog {
-  background: #242a34;
+  background: var(--md-sys-color-surface);
   border-color: #485267;
-  color: #dfe7f5;
+  color: var(--md-sys-color-on-surface);
   box-shadow: 0 24px 80px #0008;
 }
 dialog::backdrop {
@@ -1838,13 +1848,13 @@ dialog small {
   color: #9aa9c2;
 }
 .dialog-heading h2 {
-  color: #eef3ff;
+  color: var(--md-sys-color-on-surface);
 }
 #startDialog::backdrop {
   background: #12161ef5;
 }
 #startDialog {
-  background: #222832;
+  background: var(--md-sys-color-surface);
   border-color: #3c475c;
 }
 .start-brand img {
@@ -1859,15 +1869,15 @@ dialog small {
   color: #eef2fb;
 }
 .export-fields {
-  border-color: #414c61;
+  border-color: var(--md-sys-color-outline-variant);
 }
 .field {
-  color: #b1bfd5;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .field input {
-  background: #191f2a;
-  border-color: #485671;
-  color: #e3ebfa;
+  background: var(--md-sys-color-surface-container-low);
+  border-color: var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
 }
 .export-card {
   background: #1d2430;
@@ -2093,7 +2103,7 @@ dialog small {
 .add-more-images:hover {
   background: #2b374e;
   border-color: #91a8df;
-  color: #edf2ff;
+  color: var(--md-sys-color-on-surface);
 }
 .add-more-images svg {
   width: 20px;
@@ -2239,11 +2249,11 @@ dialog > p {
   font-family: "MKW Editorial", Georgia, serif;
   font-size: 11px;
   line-height: 1.6;
-  color: #a9b7ce;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .tool-sidebar .tool-secondary {
   background: transparent;
-  color: #a9b7ce;
+  color: var(--md-sys-color-on-surface-variant);
 }
 #textContentField:empty {
   display: none;

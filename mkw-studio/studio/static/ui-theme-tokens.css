@@ -1,0 +1,53 @@
+/* Generated from ui-colour-model.js; edit that model for palette changes. */
+:root {
+  --md-sys-color-primary: #274fbf;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-hover: #183cab;
+  --md-sys-color-primary-container: #dde8ff;
+  --md-sys-color-on-primary-container: #17274c;
+  --md-sys-color-primary-outline: #5a78bb;
+  --md-sys-color-surface: #fcfcfd;
+  --md-sys-color-surface-container-low: #f6f7f9;
+  --md-sys-color-surface-container: #f0f2f5;
+  --md-sys-color-surface-container-high: #e8ebef;
+  --md-sys-color-surface-container-highest: #dfe3e9;
+  --md-sys-color-surface-bright: #ffffff;
+  --md-sys-color-on-surface: #20252d;
+  --md-sys-color-on-surface-variant: #566173;
+  --md-sys-color-outline: #737f91;
+  --md-sys-color-outline-variant: #cdd3dd;
+  --md-sys-color-workspace: #e9ecf0;
+  --md-sys-color-workspace-dot: #c2c9d4;
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-error-container: #fce8e6;
+  --md-sys-color-warning: #835200;
+  --md-sys-color-warning-container: #fff0cb;
+  --md-sys-color-success: #24633e;
+  --md-sys-color-success-container: #ddf3e4;
+}
+html[data-theme="dark"] {
+  --md-sys-color-primary: #a8c4ff;
+  --md-sys-color-on-primary: #12151b;
+  --md-sys-color-primary-hover: #c5d8ff;
+  --md-sys-color-primary-container: #253456;
+  --md-sys-color-on-primary-container: #e2ebff;
+  --md-sys-color-primary-outline: #6c8acf;
+  --md-sys-color-surface: #191c21;
+  --md-sys-color-surface-container-low: #1e2228;
+  --md-sys-color-surface-container: #252930;
+  --md-sys-color-surface-container-high: #2e333b;
+  --md-sys-color-surface-container-highest: #393f48;
+  --md-sys-color-surface-bright: #30353e;
+  --md-sys-color-on-surface: #e6e8ed;
+  --md-sys-color-on-surface-variant: #b6bfcc;
+  --md-sys-color-outline: #8993a3;
+  --md-sys-color-outline-variant: #424a57;
+  --md-sys-color-workspace: #111419;
+  --md-sys-color-workspace-dot: #353c47;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-error-container: #4c2425;
+  --md-sys-color-warning: #ffd580;
+  --md-sys-color-warning-container: #433518;
+  --md-sys-color-success: #9ed5b4;
+  --md-sys-color-success-container: #1d3c2d;
+}

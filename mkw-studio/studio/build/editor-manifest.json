@@ -69,6 +69,8 @@
     "static/sponsor-ui.js",
     "static/post-angle.js",
     "static/typography-ui.js",
+    "static/ui-colour-model.js",
+    "static/ui-theme.js",
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",
@@ -90,12 +92,13 @@
     "static/start.js"
   ],
   "styles": [
+    "static/ui-theme-tokens.css",
+    "static/ui-theme.css",
     "static/style.css",
     "static/upgrade.css",
     "static/carousel.css",
     "static/workspace-ui.css",
     "static/chrome.css",
-    "static/appearance.css",
     "static/preferences.css",
     "static/post-workspace.css",
     "static/light-theme.css",

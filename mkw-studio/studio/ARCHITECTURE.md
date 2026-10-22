@@ -208,3 +208,9 @@ User-facing modes are FD-Kampagnen and Designer; internal `post` / `carousel` ID
 ## Shared dialog layout
 
 `dialogs.css` owns the shared responsive size tokens for large content dialogs. Settings use a fixed left vertical tablist and an independently scrolling content pane; compact screens retain a labelled icon rail. Arrow keys/Home/End select tabs. DOM IDs, setup operations and lazy Wiki iframe loading remain unchanged. Small confirmation and effect dialogs keep their task-specific sizes.
+
+## Material UI colour boundary
+
+`ui-colour-model.js` owns pure perceptual UI palettes and contrast checks. `build/ui-theme.mjs` generates fallback CSS from the same palette model before asset versioning, keeping clean builds reproducible. `ui-theme.css` owns shared semantic aliases and shape/spacing/motion tokens; component styles own their geometry. The obsolete inverted `appearance.css` and generator are removed. Remaining component migration and function/test ownership are documented in `docs/MATERIAL-3.md`.
+
+`ui-theme.js` applies and caches palettes using only `primaryColour` and the current theme. Main-colour editing uses the existing opaque singleton picker in the settings modal, persists tool preferences and never checkpoints, changes document revision or repaints artwork. `primaryColour` belongs to MKW-Setup/browser preferences, not portable artwork. Legacy setups receive the default seed. Derived tones preserve readable UI contrast; source colour samples, guide/snap preferences and all artwork paints remain independent. The handbook receives UI roles only after its explicit lazy opening. Do not read `--md-sys-*` variables from a renderer or persist them on a design object.

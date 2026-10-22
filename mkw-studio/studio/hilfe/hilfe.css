@@ -10,11 +10,11 @@
 }
 :root {
   font-family: Harriet, Georgia, serif;
-  color: #26344a;
-  background: #f5f7fa;
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface);
   font-size: 16px;
   line-height: 1.65;
-  color-scheme: light;
+  color-scheme: light dark;
 }
 * {
   box-sizing: border-box;
@@ -23,7 +23,7 @@ body {
   margin: 0;
 }
 a {
-  color: #315bcc;
+  color: var(--md-sys-color-primary);
   text-underline-offset: 3px;
 }
 button,
@@ -43,8 +43,8 @@ header {
   align-items: center;
   gap: 28px;
   padding: 20px 32px;
-  background: #fff;
-  border-bottom: 1px solid #dce2eb;
+  background: var(--md-sys-color-surface);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
 }
 header img {
   display: block;
@@ -53,7 +53,7 @@ header img {
 }
 header span {
   font-size: 14px;
-  color: #65738b;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .back {
   margin-left: auto;
@@ -83,10 +83,10 @@ input {
   width: 100%;
   font-size: 15px;
   padding: 13px 14px;
-  border: 1px solid #cbd5e4;
+  border: 1px solid var(--md-sys-color-outline);
   border-radius: 10px;
-  background: #fff;
-  color: #26344a;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 input:focus-visible,
 a:focus-visible {
@@ -95,7 +95,7 @@ a:focus-visible {
 }
 .search-ready {
   font-size: 12px;
-  color: #65738b;
+  color: var(--md-sys-color-on-surface-variant);
   margin: 8px 0 20px;
 }
 nav {
@@ -106,13 +106,13 @@ nav a {
   font-size: 13px;
   padding: 10px 12px;
   text-decoration: none;
-  color: #52627d;
-  border-radius: 8px;
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: var(--studio-shape-full);
 }
 nav a:hover,
 nav a[aria-current] {
-  background: #e8edff;
-  color: #234db6;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 main {
   min-width: 0;
@@ -121,7 +121,7 @@ h1 {
   font-size: 44px;
   line-height: 1.07;
   letter-spacing: -1.3px;
-  color: #1c2b42;
+  color: var(--md-sys-color-on-surface);
   margin: 14px 0 22px;
 }
 h2 {
@@ -129,30 +129,30 @@ h2 {
   line-height: 1.2;
   letter-spacing: -0.5px;
   margin: 0 0 22px;
-  color: #1c2b42;
+  color: var(--md-sys-color-on-surface);
 }
 h3 {
   font-size: 16px;
   line-height: 1.4;
   margin: 26px 0 8px;
-  color: #26344a;
+  color: var(--md-sys-color-on-surface);
 }
 .eyebrow {
   font-size: 11px;
   letter-spacing: 1.6px;
-  color: #65738b;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .intro {
   padding-bottom: 16px;
 }
 .intro > p:last-child {
   max-width: 620px;
-  color: #586982;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 18px;
 }
 section {
   padding: 40px 0;
-  border-top: 1px solid #dce2eb;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   scroll-margin-top: 24px;
 }
 section p {
@@ -170,9 +170,9 @@ strong {
 }
 .note {
   padding: 18px 20px;
-  background: #eaf0ff;
+  background: var(--md-sys-color-primary-container);
   border-radius: 10px;
-  color: #304b78;
+  color: var(--md-sys-color-on-primary-container);
 }
 table {
   width: 100%;
@@ -182,12 +182,12 @@ table {
 th {
   text-align: left;
   font-size: 12px;
-  color: #65738b;
+  color: var(--md-sys-color-on-surface-variant);
 }
 th,
 td {
   padding: 13px 10px 13px 0;
-  border-bottom: 1px solid #e0e5ed;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
 }
 td:first-child {
   width: 48%;
@@ -198,7 +198,7 @@ kbd {
 }
 footer {
   font-size: 13px;
-  color: #65738b;
+  color: var(--md-sys-color-on-surface-variant);
   padding: 20px 0 42px;
 }
 footer a {
@@ -207,7 +207,7 @@ footer a {
 #helpResults {
   font-family: Replica, Arial, sans-serif;
   font-size: 13px;
-  color: #52627d;
+  color: var(--md-sys-color-on-surface-variant);
 }
 section[hidden],
 nav a[hidden],
@@ -286,59 +286,11 @@ nav a[hidden],
     break-inside: avoid;
   }
   body {
-    background: #fff;
+    background: var(--md-sys-color-surface);
   }
 }
 
-html[data-theme="dark"] {
-  color-scheme: dark;
-  background: #171d26;
-  color: #dfe6f0;
-}
-html[data-theme="dark"] header {
-  background: #202735;
-  border-color: #3b4657;
-}
-html[data-theme="dark"] header img {
-  filter: invert(1);
-}
-html[data-theme="dark"] h1,
-html[data-theme="dark"] h2,
-html[data-theme="dark"] h3 {
-  color: #edf2fa;
-}
-html[data-theme="dark"] a {
-  color: #b2c4ff;
-}
-html[data-theme="dark"] nav a,
-html[data-theme="dark"] .intro > p:last-child,
-html[data-theme="dark"] .eyebrow,
-html[data-theme="dark"] header span,
-html[data-theme="dark"] .search-ready,
-html[data-theme="dark"] th,
-html[data-theme="dark"] #helpResults,
-html[data-theme="dark"] footer {
-  color: #b1bfd3;
-}
-html[data-theme="dark"] nav a:hover,
-html[data-theme="dark"] nav a[aria-current] {
-  background: #2a3855;
-  color: #e0e8ff;
-}
-html[data-theme="dark"] input {
-  background: #202735;
-  color: #edf2fa;
-  border-color: #46546a;
-}
-html[data-theme="dark"] .note {
-  background: #243452;
-  color: #dbe6fc;
-}
-html[data-theme="dark"] section,
-html[data-theme="dark"] td,
-html[data-theme="dark"] th {
-  border-color: #3b4657;
-}
+html[data-theme="dark"] header img { filter: invert(1); }
 /* The same handbook can open independently or inside the Studio dialog. */
 .help-embedded body > header {
   display: none;
@@ -351,41 +303,10 @@ html[data-theme="dark"] th {
 .help-embedded aside {
   top: 20px;
 }
-:root[data-theme="dark"] {
-  color: #e3e8f1;
-  background: #20252e;
-  color-scheme: dark;
-}
-html[data-theme="dark"] :is(a, h1, h2, h3, nav a[aria-current]) {
-  color: #bdcaff;
-}
-html[data-theme="dark"] input {
-  background: #171d26;
-  color: #e3e8f1;
-  border-color: #414b5b;
-}
-html[data-theme="dark"] :is(.search-ready, .eyebrow) {
-  color: #a5b1c4;
-}
-html[data-theme="dark"] :is(section, th, td) {
-  border-color: #414b5b;
-}
-html[data-theme="dark"] :is(.note, kbd) {
-  background: #2e3745;
-  color: #e3e8f1;
-  border-color: #414b5b;
-}
 @media (max-width: 760px) {
   .help-embedded .layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding: 20px;
   }
-}
-html[data-theme="dark"] :is(.intro > p:last-child, footer, #helpResults, th) {
-  color: #a5b1c4;
-}
-html[data-theme="dark"] :is(nav a:hover, nav a[aria-current]) {
-  background: #303c54;
-  color: #dce5ff;
 }

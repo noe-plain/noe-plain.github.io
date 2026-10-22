@@ -137,13 +137,13 @@
   display: inline;
 }
 .studio-commandbar .studio-action#export {
-  background: #303c58;
+  background: var(--md-sys-color-primary-container);
   color: #dae4ff;
   border-color: #4b5e87;
 }
 html[data-theme="light"] .studio-commandbar .studio-action#export {
-  background: #eaf0ff;
-  color: #315bcc;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
   border-color: #d2ddfb;
 }
 .studio-commandbar .studio-notice-button {
@@ -175,17 +175,6 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
   margin: 8px 0 12px;
   color: var(--studio-muted);
   font-size: 11px;
-}
-#settingsDialog .settings-tab-panel h3 {
-  margin-bottom: 14px;
-}
-#settingsDialog .settings-tab-panel > section {
-  padding-top: 20px;
-  margin-top: 20px;
-}
-#settingsDialog .settings-tab-panel > section:first-child {
-  padding-top: 0;
-  margin-top: 0;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -235,8 +224,8 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
 html[data-theme="light"]
   .studio-commandbar
   .studio-action:is(#export, #carouselExport) {
-  background: #eaf0ff;
-  color: #315bcc;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
   border-color: #d2ddfb;
 }
 
@@ -461,31 +450,7 @@ html[data-theme]
 .settings-size-value > span {
   font-size: 11px;
 }
-#settingsDialog #settings-panel-fonts > section {
-  margin: 20px 0 0;
-  padding: 20px 0 0;
-  border: 0;
-}
-#settingsDialog #settings-panel-fonts > section + section {
-  border-top: 1px solid var(--line);
-}
-#settingsDialog #settings-panel-fonts > section:first-child {
-  margin-top: 0;
-  padding-top: 0;
-}
-#settingsDialog #settings-panel-fonts > section h3 {
-  margin-top: 0;
-}
 
-#settingsDialog #settings-panel-general > section {
-  margin: 20px 0 0;
-  padding: 20px 0 0;
-  border: 0;
-  border-top: 1px solid var(--line);
-}
-#settingsDialog #settings-panel-general > section h3 {
-  margin-top: 0;
-}
 #settingsDialog #settings-panel-general .check {
   display: flex;
   align-items: center;
@@ -498,7 +463,7 @@ html[data-theme]
   margin: 0;
   width: 17px;
   height: 17px;
-  accent-color: var(--accent);
+  accent-color: var(--md-sys-color-primary);
 }
 /* Every single-post option uses the same full-width selection row. */
 html[data-theme]

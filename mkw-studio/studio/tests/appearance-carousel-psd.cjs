@@ -354,7 +354,8 @@ const assert = require("node:assert/strict");
     );
     assert.equal(await page.evaluate(() => p.meta.code), "NEU");
     assert.deepEqual(await page.evaluate(() => ({ ...studioPreferences })), {
-      guideColour: "#1c8e5b",
+      primaryColour: "#315bcc",
+        guideColour: "#1c8e5b",
       sponsorColour: "#ffffff",
       snapColour: "#ea4156",
       snapDistance: 12,

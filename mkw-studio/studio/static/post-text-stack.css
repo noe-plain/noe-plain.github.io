@@ -54,7 +54,7 @@
   padding: 8px 32px 8px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--studio-surface, #191f29);
+  background: var(--studio-surface, var(--md-sys-color-surface-container-low));
   color: inherit;
   font: inherit;
   font-variant-numeric: tabular-nums;
@@ -72,8 +72,8 @@
   font-size: 11px;
 }
 html[data-theme="light"] .post-stack-unit input {
-  background: #fff;
-  color: #1d2838;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
 .post-stack-gap {
   position: absolute;
@@ -83,7 +83,7 @@ html[data-theme="light"] .post-stack-unit input {
   padding: 0;
   border: 1px solid #5076d9;
   border-radius: 5px;
-  color: #315bcc;
+  color: var(--md-sys-color-primary);
   background: #f4f7ff;
   font-family: inherit;
   font-size: 10px;
@@ -97,8 +97,9 @@ html[data-theme="light"] .post-stack-unit input {
 .post-stack-gap:hover,
 .post-stack-gap:focus-visible {
   background: #e3eaff;
-  border-color: #164ce4;
-  outline: 2px solid #315bcc40;
+  border-color: var(--md-sys-color-primary);
+  outline: 2px solid
+    color-mix(in srgb, var(--md-sys-color-primary) 25.1%, transparent);
 }
 .post-stack-gap-line {
   position: absolute;

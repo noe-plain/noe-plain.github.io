@@ -7,6 +7,7 @@ try {
   );
 } catch {}
 function studioApplyPreferences() {
+  studioApplyColourTheme();
   MKWDesignerGrid.sync(studioPreferences.designerGrid);
   const style = document.documentElement.style;
   style.setProperty("--studio-guide-colour", studioPreferences.guideColour);
@@ -39,6 +40,9 @@ function studioApplyPreferences() {
   if ($("#autoSaveFile"))
     $("#autoSaveFile").checked = studioPreferences.autoSaveFile;
   carouselSyncAdvancedTools();
+  studioPersistPreferences();
+}
+function studioPersistPreferences() {
   try {
     localStorage.setItem(
       "mkw-studio-preferences",
@@ -84,6 +88,7 @@ studioApplyPreferences();
 function studioSetTheme(theme) {
   theme = theme === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = theme;
+  studioApplyColourTheme();
   try {
     localStorage.setItem("mkw-studio-theme", theme);
   } catch {}

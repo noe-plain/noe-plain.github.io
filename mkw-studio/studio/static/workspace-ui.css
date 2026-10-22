@@ -4,10 +4,6 @@
   --studio-bar-height: 58px;
   --sidebar: 288px;
   --studio-inspector-width: 288px;
-  --studio-border: #343b47;
-  --studio-panel: #20252e;
-  --studio-canvas: #15191f;
-  --studio-accent: #b5c4ff;
 }
 svg.ui-icon {
   width: 22px;
@@ -21,7 +17,7 @@ svg.ui-icon {
 header {
   height: var(--studio-header-height);
   padding: 14px 24px;
-  background: #1e232b;
+  background: var(--md-sys-color-surface);
 }
 .studio-commandbar {
   display: flex;
@@ -32,8 +28,12 @@ header {
   width: max-content;
   max-width: calc(100vw - var(--sidebar) - 32px);
   padding: 8px 12px;
-  background: #252c37f5;
-  border: 1px solid #48556c;
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-surface) 96.08%,
+    transparent
+  );
+  border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: 0 8px 28px #0005;
   border-radius: 999px;
   z-index: 50;
@@ -46,12 +46,12 @@ header {
   bottom: 58px;
   left: calc((100% - var(--sidebar)) / 2);
   transform: translateX(-50%);
-  border: 1px solid #48556c;
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .studio-mode-label {
   display: none;
   font-size: 12px;
-  color: #9caac1;
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
   padding-right: 8px;
   flex: none;
@@ -82,7 +82,7 @@ header {
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 12px;
   line-height: 1.2;
   white-space: nowrap;
@@ -93,29 +93,29 @@ header {
   line-height: 1.2;
 }
 .studio-commandbar .studio-tool-group > button:hover {
-  background: #30394a;
-  border-color: #46536b;
-  color: #edf2ff;
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-primary-outline);
+  color: var(--md-sys-color-on-surface);
 }
 .studio-commandbar .studio-tool-group > button.active,
 .studio-commandbar .studio-tool-group > button[aria-pressed="true"] {
-  background: #b5c4ff;
-  border-color: #b5c4ff;
-  color: #1b2540;
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font-weight: 600;
 }
 .studio-commandbar .studio-tool-group > button[data-step="export"],
 .studio-commandbar #carouselExport {
-  background: #303c58;
+  background: var(--md-sys-color-primary-container);
   color: #dae4ff;
 }
 .studio-commandbar .studio-tool-group > button[data-step="export"]:hover,
 .studio-commandbar #carouselExport:hover {
-  background: #405173;
+  background: var(--md-sys-color-primary-outline);
 }
 .studio-commandbar .studio-tool-group > button[data-step="export"].active {
-  background: #b5c4ff;
-  color: #1b2540;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 .studio-commandbar .dock-arrow {
   width: 4px;
@@ -144,17 +144,17 @@ header {
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 11px;
   white-space: nowrap;
 }
 .studio-commandbar .studio-action:hover {
-  background: #30394a;
-  color: #edf2ff;
-  border-color: #46536b;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  border-color: var(--md-sys-color-primary-outline);
 }
 .studio-commandbar .studio-action[aria-pressed="true"] {
-  background: #303b50;
+  background: var(--md-sys-color-primary-container);
   border-color: #526484;
   color: #e2eaff;
 }
@@ -179,7 +179,7 @@ header {
 .studio-commandbar .studio-action#toolsToggle,
 .studio-commandbar .studio-action#carouselSidebarToggle {
   background: transparent;
-  color: #aebbd0;
+  color: var(--md-sys-color-on-surface-variant);
   border-left: 1px solid #465064;
   margin-left: 4px;
 }
@@ -193,7 +193,7 @@ header {
 .group-heading {
   width: min(820px, calc(100vw - var(--sidebar) - 68px));
   border-radius: 16px;
-  background: #20252e;
+  background: var(--md-sys-color-surface);
 }
 .group-heading .image-field-label {
   font-size: 12px;
@@ -246,18 +246,18 @@ header {
 }
 .tool-sidebar .tool-section h3 {
   font-size: 13px;
-  color: #eef3ff;
+  color: var(--md-sys-color-on-surface);
 }
 .tool-sidebar .panel-row label,
 .tool-sidebar .panel-row > span {
   font-size: 12px;
-  color: #bdc9dc;
+  color: var(--md-sys-color-on-surface-variant);
   line-height: 1.5;
 }
 .tool-sidebar .panel-row input,
 .tool-sidebar .panel-row select {
-  border: 1px solid #46536a;
-  background: #171d26;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
   border-radius: 9px;
   min-height: 38px;
   padding: 9px 10px;
@@ -369,7 +369,7 @@ footer .view-control {
   min-width: 152px;
   height: 29px;
   border-radius: 8px;
-  background: #151b24;
+  background: var(--md-sys-color-surface-container-low);
   flex: none;
 }
 footer .view-control .icon-button {
@@ -471,7 +471,7 @@ footer .carousel-zoom-controls input {
 #carouselSidebar h3 {
   font-size: 16px;
   line-height: 1.4;
-  color: #eef3ff;
+  color: var(--md-sys-color-on-surface);
 }
 #carouselSidebar p {
   font-size: 12px;
@@ -497,7 +497,7 @@ footer .carousel-zoom-controls input {
 #carouselProperties label {
   font-size: 12px;
   line-height: 1.4;
-  color: #bdc9dc;
+  color: var(--md-sys-color-on-surface-variant);
   gap: 7px;
   margin: 12px 0;
 }
@@ -506,10 +506,10 @@ footer .carousel-zoom-controls input {
 #carouselProperties textarea {
   min-height: 38px;
   padding: 9px 10px;
-  border: 1px solid #46536a;
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 9px;
   font-size: 13px;
-  background: #171d26;
+  background: var(--md-sys-color-surface);
 }
 #carouselProperties textarea {
   font-size: 14px;
@@ -560,23 +560,23 @@ footer .carousel-zoom-controls input {
   min-height: 44px;
   margin: 12px 0 0;
   font-size: 13px;
-  background: #b5c4ff;
-  color: #1b2540;
-  border-color: #b5c4ff;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: var(--md-sys-color-primary);
   border-radius: 10px;
   box-shadow: none;
 }
 #carouselProperties #carouselTextEdit,
 #carouselProperties #carouselGradientEdit {
-  background: #303f60;
+  background: var(--md-sys-color-primary-container);
   border-color: #526995;
-  color: #e5edff;
+  color: var(--md-sys-color-on-surface);
 }
 #carouselProperties .carousel-color-stop {
   padding: 12px;
   border-radius: 10px;
   gap: 12px;
-  background: #191f29;
+  background: var(--md-sys-color-surface-container-low);
 }
 #carouselProperties .carousel-color-stop label {
   font-size: 11px;
@@ -617,7 +617,7 @@ footer .carousel-zoom-controls input {
   border-color: #667ca9;
 }
 .carousel-layer.drop-target {
-  border-top-color: #b5c4ff;
+  border-top-color: var(--md-sys-color-primary);
 }
 #carouselSidebar .carousel-layer button {
   min-width: 24px;
@@ -682,9 +682,9 @@ footer .carousel-zoom-controls input {
   color: #bccbe3;
 }
 .carousel-slide-tab.active {
-  background: #b5c4ff;
-  color: #1b2540;
-  border-color: #b5c4ff;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: var(--md-sys-color-primary);
 }
 #carouselAddSlide {
   display: grid;
@@ -715,7 +715,7 @@ footer .carousel-zoom-controls input {
   padding: 12px;
   border: 1px solid #3c485d;
   border-radius: 10px;
-  background: #191f29;
+  background: var(--md-sys-color-surface-container-low);
 }
 
 .studio-notices {
@@ -742,7 +742,7 @@ footer .carousel-zoom-controls input {
 .studio-notices-heading h2 {
   font-size: 17px;
   margin: 0;
-  color: #eef3ff;
+  color: var(--md-sys-color-on-surface);
 }
 .studio-notices-heading button {
   width: 32px;

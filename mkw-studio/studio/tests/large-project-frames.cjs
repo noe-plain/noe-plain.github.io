@@ -45,6 +45,7 @@ const { launch, artifact } = require('./browser.cjs');
     const previousProject = await page.evaluate(() => p.projectId);
     await page.locator('#projectFile').setInputFiles(saved);
     await page.waitForFunction(async previous => !busy && p.images.length === 50 && p.projectId !== previous && (await MKWProjectStore.version(p.projectId)) > 0, previousProject);
+    await page.waitForFunction(() => document.querySelector('#projectFile').value === '');
     console.log('50-image MKW reopened and saved as its own browser project');
     assert.equal(await page.evaluate(async () => (await MKWProjectStore.open(p.projectId)).project.images.length), 50);
     require('node:fs').unlinkSync(saved);

@@ -15,7 +15,7 @@
   height: var(--studio-dialog-height);
   max-width: none;
   max-height: none;
-  border-radius: 18px;
+  border-radius: var(--studio-shape-dialog);
 }
 :is(#settingsDialog, #studioHelpDialog)[open] {
   display: flex;
@@ -56,7 +56,7 @@
   min-height: 0;
   overflow-y: auto;
   border-right: 1px solid var(--line);
-  background: var(--studio-panel);
+  background: var(--md-sys-color-surface-container-low);
 }
 #settingsDialog .settings-tabs button {
   display: flex;
@@ -68,7 +68,7 @@
   gap: 10px;
   padding: 10px 12px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--studio-shape-full);
   background: transparent;
   color: var(--studio-muted);
   font-size: 12px;
@@ -83,13 +83,9 @@
   background: color-mix(in srgb, var(--studio-ink) 5%, transparent);
 }
 #settingsDialog .settings-tabs button[aria-selected="true"] {
-  border-color: color-mix(in srgb, var(--project-accent) 25%, var(--line));
-  color: var(--project-accent);
-  background: color-mix(
-    in srgb,
-    var(--project-accent) 10%,
-    var(--studio-panel)
-  );
+  border-color: transparent;
+  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-primary-container);
 }
 .settings-content {
   min-height: 0;
@@ -173,8 +169,8 @@
   margin: 0;
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--studio-ink) 2%, var(--studio-panel));
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
 }
 #settingsDialog .settings-tab-panel > section > h3:first-child {
   margin: 0 0 18px;
@@ -184,6 +180,12 @@
 }
 #settingsDialog :is(.settings-setup, .settings-fonts) {
   grid-column: 1 / -1;
+}
+#settingsDialog .settings-appearance {
+  grid-row: span 2;
+}
+#settingsDialog .settings-saving {
+  grid-column: 2;
 }
 #settingsDialog .theme-options {
   margin: 0;
@@ -267,6 +269,13 @@
   margin-top: 3px;
 }
 @container settings (max-width:760px) {
+  #settingsDialog .settings-appearance {
+    grid-row: auto;
+  }
+  #settingsDialog .settings-saving {
+    grid-column: auto;
+  }
+
   #settingsDialog
     :is(
       #settings-panel-general,
@@ -293,4 +302,70 @@
   #settingsDialog .settings-grid-preview {
     justify-self: center;
   }
+}
+.settings-primary-colour {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+#settingsDialog .settings-primary-colour > label {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface);
+}
+.settings-colour-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+#settingsDialog .settings-colour-control input[type="color"] {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  flex: none;
+  padding: 4px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--studio-shape-small);
+  background: var(--md-sys-color-surface);
+  cursor: pointer;
+}
+.settings-colour-control output {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--md-sys-color-on-surface);
+}
+.settings-colour-control button {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 8px 12px;
+  min-height: 36px;
+}
+#settingsDialog .settings-primary-colour p {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.settings-colour-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.settings-colour-preview > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 16px;
+  border-radius: var(--studio-shape-full);
+  font-size: 11px;
+}
+.settings-preview-selection {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.settings-preview-action {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }

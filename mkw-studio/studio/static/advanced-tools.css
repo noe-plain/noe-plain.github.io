@@ -11,8 +11,8 @@
   font-size: 13px;
   line-height: 1.5;
   padding: 16px;
-  background: #191f29;
-  border: 1px solid #414e64;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 12px;
   cursor: pointer;
 }
@@ -23,7 +23,7 @@
 .advanced-toggle small {
   margin-top: 6px;
   font-size: 11px;
-  color: #a3b2c9;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .advanced-toggle input {
   width: 20px;
@@ -32,11 +32,11 @@
   accent-color: var(--blue);
 }
 html[data-theme="light"] .advanced-toggle {
-  background: #f6f8fb;
-  border-color: #d9dfe7;
+  background: var(--md-sys-color-surface-container-low);
+  border-color: var(--md-sys-color-outline-variant);
 }
 html[data-theme="light"] .advanced-toggle small {
-  color: #647187;
+  color: var(--md-sys-color-on-surface-variant);
 }
 #carouselViewport[data-tool="path"],
 #carouselViewport[data-tool="shape"] {
@@ -64,15 +64,15 @@ html[data-theme="light"] .advanced-toggle small {
   height: 11px;
   padding: 0 !important;
   transform: translate(-50%, -50%);
-  background: #fff;
-  border: 1px solid #315bcc;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-primary);
   border-radius: 2px;
   pointer-events: auto;
   touch-action: none;
   cursor: move;
 }
 .vector-node.is-selected {
-  background: #315bcc;
+  background: var(--md-sys-color-primary);
 }
 .vector-node.vector-endpoint {
   border-radius: 50%;
@@ -103,9 +103,9 @@ html[data-theme="light"] .advanced-toggle small {
   gap: 8px;
 }
 .vector-shapes [aria-pressed="true"] {
-  background: #303f60;
-  border-color: #8fa8ef;
-  color: #edf2ff;
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-surface);
 }
 .vector-end {
   display: grid;
@@ -116,17 +116,17 @@ html[data-theme="light"] .advanced-toggle small {
   width: 100%;
 }
 html[data-theme="light"] .vector-shapes [aria-pressed="true"] {
-  background: #eaf0ff;
-  border-color: #b8c9ef;
-  color: #244fab;
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary-outline);
+  color: var(--md-sys-color-primary);
 }
 html[data-theme="light"] .vector-node,
 html[data-theme="light"] .vector-control {
-  background: #fff;
-  border-color: #315bcc;
+  background: var(--md-sys-color-surface);
+  border-color: var(--md-sys-color-primary);
 }
 html[data-theme="light"] .vector-node.is-selected {
-  background: #315bcc;
+  background: var(--md-sys-color-primary);
 }
 /* Advanced creation tools float in a single vertical pill, leaving the artwork free. */
 .advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
@@ -283,7 +283,11 @@ html[data-theme="light"] .vector-node.is-selected {
 }
 #advancedColours .paint-actions button:hover,
 #advancedColours .paint-actions button[aria-pressed="true"] {
-  background: #315bcc22;
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 13.33%,
+    transparent
+  );
   color: var(--blue);
 }
 @media (max-height: 760px) {
@@ -345,16 +349,16 @@ html[data-theme="light"] .vector-node.is-selected {
   width: 100%;
   min-width: 0;
   padding: 9px;
-  border: 1px solid #46536a;
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 8px;
-  background: #171d26;
-  color: #edf2ff;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font: inherit;
 }
 #pdfExportSettings {
   padding: 14px;
-  background: #191f29;
-  border: 1px solid #414e64;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 12px;
   margin-top: 14px;
 }
@@ -371,8 +375,8 @@ html[data-theme="light"] .vector-node.is-selected {
   padding: 4px;
 }
 html[data-theme="light"] #pdfExportSettings {
-  background: #fff;
-  border-color: #d9dfe7;
+  background: var(--md-sys-color-surface);
+  border-color: var(--md-sys-color-outline-variant);
 }
 html[data-theme="light"]
   :is(
@@ -380,9 +384,9 @@ html[data-theme="light"]
     #pdfExportSettings input,
     #pdfExportSettings select
   ) {
-  background: #fff;
-  color: #1d2838;
-  border-color: #cdd5e1;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  border-color: var(--md-sys-color-outline-variant);
 }
 #pdfExportSettings a {
   color: var(--blue);
@@ -409,6 +413,6 @@ html[data-theme="light"]
   inset: 0;
   overflow: visible;
   pointer-events: none;
-  fill: #315bcc44;
-  stroke: #315bcc;
+  fill: color-mix(in srgb, var(--md-sys-color-primary) 26.67%, transparent);
+  stroke: var(--md-sys-color-primary);
 }
