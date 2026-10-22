@@ -24,7 +24,6 @@ html[data-theme="light"]
     #carouselSidebar,
     .studio-commandbar,
     dialog,
-    .studio-notices,
     .group-heading
   ) {
   background: var(--md-sys-color-surface);
@@ -308,27 +307,21 @@ html[data-theme="light"]
   color: #cb7900;
 }
 html[data-theme="light"] .studio-inline-warning,
-html[data-theme="light"] #carouselProperties .carousel-warning:not(:empty),
-html[data-theme="light"] .studio-warning-item {
+html[data-theme="light"] #carouselProperties .carousel-warning:not(:empty) {
   color: #834900;
   background: #fff6e5;
   border-color: #e8b665;
 }
-html[data-theme="light"]
-  :is(.studio-inline-warning, .studio-warning-item):hover {
+html[data-theme="light"] .studio-inline-warning:hover {
   color: #713b00;
   background: #ffedc6;
   border-color: #d98b17;
 }
-html[data-theme="light"]
-  :is(.studio-inline-warning, .studio-warning-item)
-  > svg,
+html[data-theme="light"] .studio-inline-warning > svg,
 html[data-theme="light"] .carousel-layer-name .layer-warning-icon {
   color: #d48200;
 }
-html[data-theme="light"] .studio-warning-item strong {
-  color: #704000;
-}
+
 html[data-theme="light"] .board-card.low-resolution .board-surface {
   outline-color: #eaa400;
 }
@@ -456,11 +449,7 @@ html[data-theme="light"] :is(.export-options, .export-download) {
   background: var(--md-sys-color-surface);
   border-color: var(--md-sys-color-outline-variant);
 }
-html[data-theme="light"] .download-progress {
-  background: var(--md-sys-color-primary-container);
-  border-color: var(--md-sys-color-primary-outline);
-  color: var(--md-sys-color-primary);
-}
+
 html[data-theme="light"] .export-options output {
   color: var(--md-sys-color-on-surface);
 }

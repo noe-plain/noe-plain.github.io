@@ -727,11 +727,11 @@ footer .carousel-zoom-controls input {
   width: min(420px, calc(100vw - 36px));
   max-height: calc(100dvh - var(--studio-header-height) - 180px);
   overflow: auto;
-  background: #242b36;
-  border: 1px solid #4b5a73;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 16px 50px #0007;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--line);
+  border-radius: var(--studio-shape-large);
+  padding: 16px;
+  box-shadow: 0 4px 16px #0002;
 }
 .studio-notices-heading {
   display: flex;
@@ -758,20 +758,25 @@ footer .carousel-zoom-controls input {
 .studio-warning-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  background: #1b2330;
-  border: 1px solid #414d63;
-  border-radius: 10px;
-  color: #f2c286;
+  min-height: 56px;
+  padding: 12px 16px;
+  margin: 2px 0;
+  background: var(--md-sys-color-surface-container);
+  border: 0;
+  border-radius: var(--studio-shape-medium);
+  color: var(--md-sys-color-on-surface-variant);
   text-align: left;
 }
 .studio-warning-item > svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex: none;
+  color: var(--md-sys-color-warning);
+}
+.studio-warning-item > svg:last-child {
+  color: var(--studio-muted);
 }
 .studio-warning-item > span {
   flex: 1;
@@ -779,21 +784,24 @@ footer .carousel-zoom-controls input {
 }
 .studio-warning-item strong {
   display: block;
-  color: #e2eafa;
-  font-size: 13px;
+  color: var(--studio-ink);
+  font-size: 14px;
+  line-height: 20px;
   overflow-wrap: anywhere;
-  font-weight: normal;
+  font-weight: 600;
 }
 .studio-warning-item span > span {
   display: block;
   font-size: 12px;
-  line-height: 1.6;
-  margin-top: 5px;
+  line-height: 20px;
+  margin-top: 4px;
 }
 .studio-warning-item:hover {
-  background: #303b4c;
-  border-color: #7386aa;
-  color: #ffdaad;
+  background: color-mix(
+    in srgb,
+    var(--studio-ink) 8%,
+    var(--md-sys-color-surface-container)
+  );
 }
 
 @media (max-width: 1250px) {

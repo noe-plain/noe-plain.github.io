@@ -17,6 +17,7 @@ function carouselLayerActions(root) {
     button.title = "Ebenenaktionen";
     button.innerHTML = studioIcon("down");
     row.append(button);
+    MKWUIMenu.trigger(button);
     button.onclick = () => {
       carouselCloseLayerMenu();
       $("#carouselLayerMenu")?.remove();
@@ -50,7 +51,7 @@ function carouselLayerActions(root) {
           o.type === "logo" || carouselObjectLocked(o),
         ],
       ];
-      menu.innerHTML = `<strong>${esc(o.name)}</strong>${actions.map(([key, label, icon, disabled]) => `<button role="menuitem" data-layer-menu="${key}" ${disabled ? "disabled" : ""}><span>${label}</span>${studioIcon(icon)}</button>`).join("")}`;
+      menu.innerHTML = `<strong>${esc(o.name)}</strong>${actions.map(([key, label, icon, disabled]) => `${["up", "duplicate"].includes(key) ? '<hr role="separator">' : ""}<button role="menuitem" data-layer-menu="${key}" ${disabled ? "disabled" : ""}><span>${label}</span>${studioIcon(icon)}</button>`).join("")}`;
       menu.querySelectorAll("button").forEach((item) => {
         item.onclick = () => {
           carouselCloseLayerMenu();
@@ -73,16 +74,7 @@ function carouselLayerActions(root) {
         button.setAttribute("aria-expanded", String(event.newState === "open"));
         if (event.newState === "closed") menu.remove();
       });
-      menu.showPopover();
-      const rect = button.getBoundingClientRect(),
-        b = menu.getBoundingClientRect();
-      menu.style.left =
-        Math.max(8, Math.min(innerWidth - b.width - 8, rect.right - b.width)) +
-        "px";
-      menu.style.top =
-        Math.max(8, Math.min(innerHeight - b.height - 8, rect.top - b.height)) +
-        "px";
-      menu.querySelector("button:not(:disabled)")?.focus();
+      MKWUIMenu.open(menu, button);
     };
   });
 }

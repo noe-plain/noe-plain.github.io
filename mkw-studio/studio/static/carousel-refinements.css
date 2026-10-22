@@ -328,42 +328,67 @@
 .carousel-effect-menu {
   position: fixed;
   margin: 0;
-  padding: 12px;
-  width: 252px;
+  padding: 8px;
+  width: min(280px, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--studio-panel);
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-surface-container-low);
   color: var(--studio-ink);
-  box-shadow: 0 8px 30px #0002;
+  box-shadow: 0 4px 12px #0002;
+  font-size: var(--studio-control-font);
+}
+.carousel-effect-menu > strong {
+  display: block;
+  margin: 8px 12px;
   font-size: 12px;
 }
 .carousel-effect-menu p {
-  margin: 5px 0 10px;
-  font-size: 10px;
+  margin: 4px 12px 12px;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--studio-muted);
   overflow-wrap: anywhere;
 }
 .carousel-effect-menu button {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 12px;
   width: 100%;
-  padding: 10px 8px;
+  min-height: var(--studio-control-height);
+  padding: 12px;
   text-align: left;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--studio-shape-small);
   font: inherit;
   background: transparent;
   color: inherit;
 }
-.carousel-effect-menu button:hover,
+.carousel-effect-menu button > span {
+  flex: 1;
+}
+.carousel-effect-menu button:hover:not([aria-disabled="true"]),
 .carousel-effect-menu button:focus-visible {
-  background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
+  background: color-mix(in srgb, var(--studio-ink) 8%, transparent);
 }
 .carousel-effect-menu .ui-icon {
-  width: 17px;
-  height: 17px;
+  width: 24px;
+  height: 24px;
+  order: -1;
+}
+.carousel-effect-menu hr {
+  height: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 8px -8px;
+}
+.carousel-effect-menu button:is(:disabled, [aria-disabled="true"]) {
+  opacity: 0.38;
+  cursor: default;
+  background: transparent;
 }
 
 /* Keep layer controls available while a long tree scrolls. */
@@ -531,10 +556,7 @@
   background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
   border-color: transparent;
 }
-.carousel-layer-menu button:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
+
 .carousel-folder-delete {
   width: min(420px, calc(100vw - 32px));
   padding: 24px;

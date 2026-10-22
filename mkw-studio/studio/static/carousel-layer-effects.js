@@ -122,16 +122,7 @@ function carouselOpenEffectMenu(button) {
     };
   });
   document.body.append(menu);
-  menu.showPopover();
-  const rect = button.getBoundingClientRect(),
-    bounds = menu.getBoundingClientRect();
-  menu.style.left =
-    Math.max(
-      8,
-      Math.min(innerWidth - bounds.width - 8, rect.right - bounds.width),
-    ) + "px";
-  menu.style.top = Math.max(8, rect.top - bounds.height - 8) + "px";
-  menu.querySelector("button")?.focus();
+  MKWUIMenu.open(menu, button);
 }
 function carouselLayerEffects(root, heading) {
   let button = $("#carouselAddEffect");
@@ -144,6 +135,7 @@ function carouselLayerEffects(root, heading) {
     button.setAttribute("aria-haspopup", "menu");
     button.setAttribute("aria-expanded", "false");
     button.onclick = () => carouselOpenEffectMenu(button);
+    MKWUIMenu.trigger(button);
     heading.insertBefore(button, $("#carouselNewFolder"));
   }
   button.disabled = !carouselSelected().some((o) => !carouselObjectLocked(o));

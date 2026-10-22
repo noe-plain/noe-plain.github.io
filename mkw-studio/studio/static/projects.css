@@ -7,9 +7,9 @@
   padding: 12px 16px;
   border: 1px solid var(--project-border);
   border-radius: 12px;
-  background: var(--project-surface);
+  background: var(--md-sys-color-surface-container-high);
   color: var(--project-ink);
-  box-shadow: 0 5px 24px #0001;
+  box-shadow: 0 4px 12px #0002;
   font-size: 13px;
   line-height: 1.5;
 }
@@ -417,4 +417,38 @@
   border-radius: 8px;
   background: var(--studio-panel);
   padding: 4px;
+}
+
+#projectStorageNotice.is-error,
+#psdStatus.save-error {
+  color: var(--md-sys-color-error);
+  background: var(--md-sys-color-error-container);
+  border: 1px solid var(--md-sys-color-error);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+#projectStorageNotice.notice-attention,
+#psdStatus.save-error {
+  animation: save-notice-attention var(--studio-motion-spatial)
+    var(--studio-ease-spatial) 2;
+}
+@keyframes save-notice-attention {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  70% {
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #projectStorageNotice.notice-attention,
+  #psdStatus.save-error {
+    animation: none;
+  }
 }

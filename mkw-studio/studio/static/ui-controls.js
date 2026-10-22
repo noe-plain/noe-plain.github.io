@@ -30,7 +30,13 @@ const MKWUIControls = (function () {
     reduced = matchMedia("(prefers-reduced-motion: reduce)"),
     ripples = new WeakMap();
   function ripple(button, event) {
-    if (button.disabled || button.matches(excluded) || reduced.matches) return;
+    if (
+      button.disabled ||
+      button.getAttribute("aria-disabled") === "true" ||
+      button.matches(excluded) ||
+      reduced.matches
+    )
+      return;
     ripples.get(button)?.cancel();
     const rect = button.getBoundingClientRect();
     if (!rect.width || !rect.height) return;

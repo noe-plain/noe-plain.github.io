@@ -296,38 +296,6 @@ html[data-theme]
   :is(.family-picker, .sponsor-options) {
   border: 0;
 }
-#projectStorageNotice.is-error,
-#psdStatus.save-error {
-  color: light-dark(#a52020, #ffb4b0);
-  background: light-dark(#fff0ef, #48262b);
-  border: 1px solid light-dark(#eeaaa5, #a4545a);
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  line-height: 1.5;
-}
-#projectStorageNotice.notice-attention,
-#psdStatus.save-error {
-  animation: save-notice-attention 400ms ease-out 2;
-}
-@keyframes save-notice-attention {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  30% {
-    transform: translateX(-3px);
-  }
-  70% {
-    transform: translateX(3px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  #projectStorageNotice.notice-attention,
-  #psdStatus.save-error {
-    animation: none;
-  }
-}
 
 #carouselOutsideCanvas {
   position: absolute;
@@ -465,10 +433,10 @@ html[data-theme]
   :is(.post-option-row, label.post-option-row) {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 40px;
+  gap: 12px;
+  min-height: var(--studio-control-height);
   margin: 0;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border: 0;
   border-radius: 7px;
   font-size: 12px;
@@ -500,11 +468,10 @@ html[data-theme]
   border: 0;
 }
 .image-info-card .text-type-options .post-option-row input {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: none;
   margin: 0;
-  accent-color: var(--studio-accent);
 }
 .image-info-card .post-angle-option .post-option-label {
   display: flex;

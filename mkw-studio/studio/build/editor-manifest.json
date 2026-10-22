@@ -72,6 +72,7 @@
     "static/ui-colour-model.js",
     "static/ui-theme.js",
     "static/ui-controls.js",
+    "static/ui-menus.js",
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",

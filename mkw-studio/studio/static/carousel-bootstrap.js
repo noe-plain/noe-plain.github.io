@@ -3,12 +3,21 @@
 window.addEventListener(
   "keydown",
   (ev) => {
-    if (!carouselActive() || busy || document.querySelector("dialog[open]"))
+    if (
+      !carouselActive() ||
+      busy ||
+      document.querySelector("dialog[open],[popover]:popover-open")
+    )
       return;
     const target = ev.target,
       typing =
         target.isContentEditable || target.closest("input,textarea,select");
     if (typing) return;
+    if (
+      target.closest('[aria-haspopup="menu"]') &&
+      ["ArrowDown", "ArrowUp", "Enter", " "].includes(ev.key)
+    )
+      return;
     const key = ev.key.toLowerCase(),
       command = ev.metaKey || ev.ctrlKey;
     if (studioPicker) return;

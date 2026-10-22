@@ -357,7 +357,7 @@ const assert = require("node:assert/strict");
         .locator(".studio-warning-item")
         .first()
         .evaluate((el) => getComputedStyle(el).backgroundColor),
-      "rgb(255, 246, 229)",
+      "rgb(240, 242, 245)",
     );
     await page.locator("#closeStudioWarnings").click();
     await page.evaluate(() => postFitRow());

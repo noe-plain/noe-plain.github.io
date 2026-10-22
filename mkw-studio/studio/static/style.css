@@ -1806,7 +1806,7 @@ dialog small {
   background: #141a24;
 }
 .export-card span {
-  color: #ccd8ee;
+  color: var(--md-sys-color-on-surface-variant);
 }
 #exportStatus,
 #psdStatus {

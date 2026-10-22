@@ -66,7 +66,7 @@ const { launch, artifact } = require("./browser.cjs");
     assert(
       rows.every(
         (row) =>
-          row.height === 40 && row.padding === "10px" && row.checkbox === 16,
+          row.height === 48 && row.padding === "12px" && row.checkbox === 18,
       ),
       JSON.stringify(rows),
     );
