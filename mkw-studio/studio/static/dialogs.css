@@ -391,7 +391,7 @@
   gap: 2px;
   clear: both;
 }
-:is(.settings-density-options, .theme-options) button {
+:is(.settings-density-options, .theme-options, .settings-colour-mode) button {
   flex: 1;
   min-width: 0;
   min-height: var(--studio-control-height);
@@ -401,7 +401,8 @@
   color: var(--md-sys-color-on-surface-variant);
   box-shadow: none;
 }
-:is(.settings-density-options, .theme-options) button[aria-pressed="true"] {
+:is(.settings-density-options, .theme-options, .settings-colour-mode)
+  button[aria-pressed="true"] {
   border-radius: var(--studio-shape-medium);
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
@@ -413,4 +414,31 @@
   justify-content: space-between;
   min-height: 48px;
   gap: 24px;
+}
+
+.settings-colour-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 0;
+}
+#settingsDialog .settings-colour-mode button {
+  min-height: var(--studio-control-height);
+  padding: 10px 12px;
+}
+.settings-colour-mode button:first-child {
+  border-radius: var(--studio-shape-full) 0 0 var(--studio-shape-full);
+}
+.settings-colour-mode button:last-child {
+  border-radius: 0 var(--studio-shape-full) var(--studio-shape-full) 0;
+  margin-left: -1px;
+}
+.settings-preview-secondary {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+#settingsColourModeLabel {
+  font-size: 12px;
+  color: var(--studio-ink);
 }

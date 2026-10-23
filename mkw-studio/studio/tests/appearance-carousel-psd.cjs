@@ -355,8 +355,9 @@ const assert = require("node:assert/strict");
     assert.equal(await page.evaluate(() => p.meta.code), "NEU");
     assert.deepEqual(await page.evaluate(() => ({ ...studioPreferences })), {
       primaryColour: "#315bcc",
+      colourMode: "normal",
       density: "comfortable",
-        guideColour: "#1c8e5b",
+      guideColour: "#1c8e5b",
       sponsorColour: "#ffffff",
       snapColour: "#ea4156",
       snapDistance: 12,
@@ -367,7 +368,7 @@ const assert = require("node:assert/strict");
       pdfPreset: "linkedin",
       lineHeight: 95,
       designerGrid: { columns: 6, rows: 6, gap: 0 },
-      textSizes: {date: 52, title: 104, subtitle: 52, copyright: 32},
+      textSizes: { date: 52, title: 104, subtitle: 52, copyright: 32 },
     });
     await page.setViewportSize({ width: 640, height: 900 });
     await page.screenshot({

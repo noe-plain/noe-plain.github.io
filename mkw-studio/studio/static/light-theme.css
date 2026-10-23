@@ -366,19 +366,8 @@ html[data-theme="light"] .tool-sidebar .tool-section h3 {
 html[data-theme="light"] .tool-sidebar .tool-section + .tool-section {
   border-color: var(--md-sys-color-outline-variant);
 }
-html[data-theme="light"] .carousel-layer.active button {
-  color: var(--md-sys-color-primary);
-}
 html[data-theme="light"] :is(.tool-sidebar .step-panel, #carouselProperties) {
   scrollbar-color: var(--md-sys-color-outline-variant) transparent;
-}
-html[data-theme="light"] .carousel-layer {
-  background: var(--md-sys-color-surface-container-low);
-  border-color: transparent;
-}
-html[data-theme="light"] .carousel-layer.active {
-  background: var(--md-sys-color-primary-container);
-  border-color: var(--md-sys-color-primary-outline);
 }
 html[data-theme="light"] .carousel-slide-tab {
   background: var(--md-sys-color-surface);

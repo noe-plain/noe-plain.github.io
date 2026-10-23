@@ -39,8 +39,13 @@
       -0.0041960863 * x - 0.7034186147 * y + 1.707614701 * z,
     ];
   }
-  function tone(seed, lightness, chroma = 1) {
-    const [, a, b] = lab(seed);
+  function tone(seed, lightness, chroma = 1, opposite = false) {
+    let [, a, b] = lab(seed);
+    if (opposite) {
+      if (Math.hypot(a, b) < 0.02) [, a, b] = lab(defaultColour);
+      a = -a;
+      b = -b;
+    }
     let low = 0,
       high = chroma,
       channels;
@@ -62,9 +67,10 @@
         .join("")
     );
   }
-  function palette(colour = defaultColour, theme = "light") {
+  function palette(colour = defaultColour, theme = "light", mode = "normal") {
     const seed = valid(colour) ? colour.toLowerCase() : defaultColour,
       dark = theme === "dark",
+      complementary = mode === "complementary",
       primary = tone(seed, dark ? 0.82 : 0.47),
       container = tone(seed, dark ? 0.33 : 0.93, 0.35),
       onContainer = tone(seed, dark ? 0.94 : 0.28, 0.4);
@@ -74,8 +80,18 @@
       "primary-hover": tone(seed, dark ? 0.88 : 0.41),
       "primary-container": container,
       "on-primary-container": onContainer,
-      "secondary-container": tone(seed, dark ? 0.34 : 0.93, 0.16),
-      "on-secondary-container": tone(seed, dark ? 0.94 : 0.28, 0.16),
+      "secondary-container": tone(
+        seed,
+        dark ? 0.34 : 0.93,
+        complementary ? 0.65 : 0.16,
+        complementary,
+      ),
+      "on-secondary-container": tone(
+        seed,
+        dark ? 0.94 : 0.28,
+        complementary ? 0.65 : 0.16,
+        complementary,
+      ),
       "primary-outline": tone(seed, dark ? 0.64 : 0.58, 0.6),
       surface: dark ? "#191c21" : "#fcfcfd",
       "surface-container-low": dark ? "#1e2228" : "#f6f7f9",

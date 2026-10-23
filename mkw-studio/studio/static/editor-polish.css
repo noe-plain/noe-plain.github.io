@@ -52,15 +52,15 @@
 #toolsSidebar .tool-section > h3,
 #carouselProperties .carousel-property-section > h4 {
   margin: 0 0 12px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--studio-ink);
 }
 #toolsSidebar .tool-section > label {
   margin: 10px 0;
   gap: 8px;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.5;
 }
 :is(#toolsSidebar, #carouselSidebar)
   :is(input[type="number"], input[type="text"], select) {
@@ -75,8 +75,8 @@
   min-height: 96px;
 }
 :is(#toolsSidebar, #carouselSidebar) input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
   flex: none;
   accent-color: var(--blue);
 }
@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 28px;
+  min-height: var(--studio-control-height);
 }
 #toolsSidebar .tool-button-grid {
   gap: 8px;
@@ -94,10 +94,10 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 36px;
-  padding: 8px 6px;
-  font-size: 11px;
-  border-radius: 8px;
+  min-height: var(--studio-control-height);
+  padding: 10px 8px;
+  font-size: 12px;
+  border-radius: var(--studio-shape-full);
 }
 #toolsSidebar .tool-button-grid .ui-icon {
   width: 18px;
@@ -192,7 +192,7 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
   gap: 12px;
 }
 #toolsSidebar .tool-section {
-  gap: 12px;
+  gap: 16px;
 }
 #toolsSidebar .tool-section > label {
   margin: 0;
@@ -525,4 +525,67 @@ html[data-theme] .image-info-card .post-angle-option select {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Shared property groups stay open; only unrelated tasks receive a divider. */
+#carouselProperties {
+  scrollbar-color: var(--line) transparent;
+}
+#carouselSidebar p {
+  color: var(--studio-muted);
+}
+#carouselProperties > .carousel-section-heading {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding-bottom: 16px;
+}
+#carouselProperties > .carousel-section-heading > span {
+  color: var(--studio-muted);
+  font-size: 12px;
+}
+#carouselProperties .carousel-property-section > h4 {
+  font-size: 14px;
+  font-weight: 500;
+}
+#carouselProperties .carousel-property-section {
+  min-width: 0;
+}
+#carouselProperties .carousel-property-section > label {
+  margin: 12px 0 0;
+}
+#carouselProperties .carousel-fields {
+  gap: 16px 12px;
+}
+#carouselProperties label {
+  color: var(--studio-muted);
+}
+#carouselProperties
+  :is(.carousel-property-section > button, .carousel-fields > button),
+#toolsSidebar
+  :is(.tool-section > button, .logo-panel > button, .tool-secondary) {
+  min-height: var(--studio-control-height);
+  border-radius: var(--studio-shape-full);
+  line-height: 20px;
+  padding: 10px 14px;
+}
+#carouselSidebar .carousel-place-image {
+  min-height: var(--studio-control-height);
+  border-radius: var(--studio-shape-full);
+}
+:is(#toolsSidebar, #carouselProperties) :is(.tool-hint, .panel-caption) {
+  color: var(--studio-muted);
+}
+#carouselProperties #carouselGradientEdit {
+  color: var(--md-sys-color-on-primary-container);
+  border-color: transparent;
+}
+#carouselProperties .carousel-warning:not(:empty) {
+  background: var(--md-sys-color-warning-container);
+  color: var(--md-sys-color-warning);
+  border-color: transparent;
+  border-radius: var(--studio-shape-medium);
+}
+#carouselProperties .carousel-flip-controls {
+  gap: 8px;
 }

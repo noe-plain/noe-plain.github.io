@@ -592,61 +592,6 @@ footer .carousel-zoom-controls input {
   font-size: 12px;
   border: 1px solid #67533b;
 }
-.carousel-layers-panel {
-  min-height: 140px;
-  max-height: 32%;
-  padding: 16px 10px;
-  border-color: var(--studio-border);
-}
-.carousel-layers-panel > .carousel-section-heading {
-  padding: 0 10px 12px;
-}
-.carousel-layers-panel h3 {
-  font-size: 13px !important;
-}
-.carousel-layer {
-  border: 1px solid transparent;
-  border-radius: 9px;
-  margin: 3px 0;
-  padding: 3px;
-  gap: 2px;
-  background: #1b212b;
-}
-.carousel-layer.active {
-  background: #303f5c;
-  border-color: #667ca9;
-}
-.carousel-layer.drop-target {
-  border-top-color: var(--md-sys-color-primary);
-}
-#carouselSidebar .carousel-layer button {
-  min-width: 24px;
-  min-height: 30px;
-  padding: 4px !important;
-  border-radius: 6px;
-}
-.carousel-layer .carousel-layer-name {
-  gap: 8px;
-  font-size: 12px;
-  line-height: 1.4;
-}
-.carousel-layer-name svg {
-  width: 18px;
-  height: 18px;
-}
-.carousel-layer [data-action="visible"] svg,
-.carousel-layer [data-action="locked"] svg,
-.carousel-layer [data-action="up"] svg,
-.carousel-layer [data-action="down"] svg {
-  width: 16px;
-  height: 16px;
-}
-.carousel-layer-name .layer-warning-icon {
-  width: 15px;
-  height: 15px;
-  color: #f2c286;
-  margin-left: auto;
-}
 .carousel-statusbar {
   grid-column: 1/-1;
   grid-row: 2;

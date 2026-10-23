@@ -70,3 +70,36 @@ test("UI density is portable and invalid settings cannot inject presentation rul
     assert.throws(() => setup.preferences({ density }, true));
   }
 });
+
+test("complementary UI keeps main and semantic colours while adding an accessible opposite secondary palette", () => {
+  for (const theme of ["light", "dark"])
+    for (let n = 0; n < 260; n++) {
+      const seed = "#" + ((n * 65237) % 0xffffff).toString(16).padStart(6, "0");
+      const normal = model.palette(seed, theme),
+        complementary = model.palette(seed, theme, "complementary");
+      for (const role of Object.keys(normal)) {
+        if (["secondary-container", "on-secondary-container"].includes(role))
+          continue;
+        assert.equal(complementary[role], normal[role], role);
+      }
+      assert(
+        model.contrast(
+          complementary["on-secondary-container"],
+          complementary["secondary-container"],
+        ) >= 4.5,
+      );
+      assert.notEqual(
+        complementary["secondary-container"],
+        normal["secondary-container"],
+      );
+    }
+  assert.equal(setup.preferences({}).colourMode, "normal");
+  assert.equal(
+    setup.preferences({ colourMode: "complementary" }, true).colourMode,
+    "complementary",
+  );
+  for (const colourMode of [null, 42, "opposite", {}, "url(x)"]) {
+    assert.equal(setup.preferences({ colourMode }).colourMode, "normal");
+    assert.throws(() => setup.preferences({ colourMode }, true));
+  }
+});

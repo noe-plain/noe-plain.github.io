@@ -15,7 +15,7 @@ function carouselLayerActions(root) {
     button.setAttribute("aria-haspopup", "menu");
     button.setAttribute("aria-expanded", "false");
     button.title = "Ebenenaktionen";
-    button.innerHTML = studioIcon("down");
+    button.innerHTML = studioIcon("more");
     row.append(button);
     MKWUIMenu.trigger(button);
     button.onclick = () => {

@@ -32,6 +32,7 @@ header {
   max-width: 100%;
 }
 #workspace {
+  scrollbar-width: none;
   background: var(--studio-canvas);
   top: calc(
     var(--studio-header-height) + var(--studio-shell-inset) +
@@ -55,6 +56,7 @@ header {
   background: transparent;
 }
 #carouselViewport {
+  scrollbar-width: none;
   margin-top: calc(var(--studio-header-height) + var(--studio-shell-gap));
   min-height: 0;
   border-radius: var(--studio-shape-dialog);
@@ -590,4 +592,8 @@ footer .view-control {
 #startHelp {
   color: inherit;
   text-underline-offset: 3px;
+}
+
+:is(#workspace, #carouselViewport)::-webkit-scrollbar {
+  display: none;
 }

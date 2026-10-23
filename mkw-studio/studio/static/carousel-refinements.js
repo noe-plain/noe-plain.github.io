@@ -181,6 +181,7 @@ function carouselLayerPanel() {
   const folderRow = (f) => {
     const row = document.createElement("div");
     row.className = "carousel-folder";
+    row.classList.toggle("is-selected", carouselUI.folder === f.id);
     row.dataset.folder = f.id;
     row.draggable = carouselFolderCanMove(c, f);
     row.title = row.draggable
@@ -197,7 +198,7 @@ function carouselLayerPanel() {
     };
     row.ondragend = carouselFolderDragEnd;
     row.style.setProperty("--folder-colour", carouselFolderColour(f));
-    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button class="carousel-folder-name" data-folder-action="select">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="remove" aria-label="Ordner entfernen" title="Ordner entfernen" ${f.locked ? "disabled" : ""}>${studioIcon("trash")}</button>`;
+    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button class="carousel-folder-name" data-folder-action="select" aria-label="Ordner auswählen: ${esc(f.name)}" title="${esc(f.name)}">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button><button data-folder-action="remove" aria-label="Ordner entfernen" title="Ordner entfernen" ${f.locked ? "disabled" : ""}>${studioIcon("trash")}</button>`;
     row.querySelectorAll("button").forEach(
       (b) =>
         (b.onclick = () => {

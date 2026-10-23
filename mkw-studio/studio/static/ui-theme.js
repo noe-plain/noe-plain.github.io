@@ -5,7 +5,8 @@ function studioApplyColourTheme() {
   const root = document.documentElement,
     theme = root.dataset.theme === "dark" ? "dark" : "light",
     colour = studioPreferences.primaryColour,
-    key = colour + theme;
+    mode = studioPreferences.colourMode,
+    key = colour + theme + mode;
   if (key !== studioColourThemeKey) {
     root.classList.add("studio-theme-changing");
     cancelAnimationFrame(studioColourThemeFrame);
@@ -15,13 +16,21 @@ function studioApplyColourTheme() {
       );
     });
     for (const [role, value] of Object.entries(
-      MKWUIColor.palette(colour, theme),
+      MKWUIColor.palette(colour, theme, mode),
     ))
       root.style.setProperty("--md-sys-color-" + role, value);
     root.style.colorScheme = theme;
     studioColourThemeKey = key;
     document.dispatchEvent(new Event("mkw-ui-theme-change"));
   }
+  document
+    .querySelectorAll("[data-colour-mode]")
+    .forEach((button) =>
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.colourMode === mode),
+      ),
+    );
   const input = document.querySelector("#primaryColour"),
     output = document.querySelector("#primaryColourValue");
   if (input) input.value = colour;
@@ -38,8 +47,15 @@ function studioSetPrimaryColour(colour) {
 function studioPrimaryColourSettings(section) {
   section.insertAdjacentHTML(
     "beforeend",
-    `<div class="settings-primary-colour"><label for="primaryColour">Hauptfarbe</label><div class="settings-colour-control"><input id="primaryColour" type="color" aria-label="Hauptfarbe des Studios"><output id="primaryColourValue" for="primaryColour"></output><button id="resetPrimaryColour" type="button">Zurücksetzen</button></div><p>Nur für die Oberfläche. Deine Designs bleiben unverändert.</p><div class="settings-colour-preview" aria-label="Vorschau der Oberflächenfarbe"><span class="settings-preview-selection">Ausgewählt</span><span class="settings-preview-action">Aktion</span></div></div>`,
+    `<div class="settings-primary-colour"><label for="primaryColour">Hauptfarbe</label><div class="settings-colour-control"><input id="primaryColour" type="color" aria-label="Hauptfarbe des Studios"><output id="primaryColourValue" for="primaryColour"></output><button id="resetPrimaryColour" type="button">Zurücksetzen</button></div><p>Nur für die Oberfläche. Deine Designs bleiben unverändert.</p><span id="settingsColourModeLabel">Farbkonzept</span><div class="settings-colour-mode" role="group" aria-labelledby="settingsColourModeLabel"><button type="button" data-colour-mode="normal" aria-pressed="true">Normal</button><button type="button" data-colour-mode="complementary" aria-pressed="false">Komplementär</button></div><p>Komplementär ergänzt die Hauptfarbe um eine Gegenfarbe für Auswahl und ergänzende Aktionen.</p><div class="settings-colour-preview" aria-label="Vorschau der Oberflächenfarbe"><span class="settings-preview-selection">Ausgewählt</span><span class="settings-preview-action">Aktion</span><span class="settings-preview-secondary">Ergänzend</span></div></div>`,
   );
+  section.querySelectorAll("[data-colour-mode]").forEach((button) => {
+    button.onclick = () => {
+      studioPreferences.colourMode = button.dataset.colourMode;
+      studioApplyColourTheme();
+      studioPersistPreferences();
+    };
+  });
   section.querySelector("#primaryColour").oninput = (event) =>
     studioSetPrimaryColour(event.target.value);
   section.querySelector("#resetPrimaryColour").onclick = () =>

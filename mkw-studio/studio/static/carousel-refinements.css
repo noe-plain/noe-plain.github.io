@@ -69,66 +69,6 @@
   border-color: var(--studio-accent);
   color: var(--studio-accent);
 }
-#carouselNewFolder {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 9px;
-  font-size: 10px;
-  border-radius: 8px;
-}
-#carouselNewFolder .ui-icon {
-  width: 16px;
-  height: 16px;
-}
-.carousel-folder {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  border: 1px solid var(--line);
-  background: var(--studio-panel);
-  border-radius: 8px;
-  margin: 6px 0;
-  padding: 4px;
-}
-.carousel-folder > button {
-  height: 28px;
-  min-width: 22px;
-  padding: 3px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  color: inherit;
-}
-.carousel-folder .carousel-folder-name {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  gap: 6px;
-  font-size: 11px;
-  text-align: left;
-}
-.carousel-folder-name span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.carousel-folder-name small {
-  margin-left: auto;
-  opacity: 0.6;
-}
-.carousel-layer.in-folder {
-  margin-left: 14px;
-  border-left: 2px solid
-    color-mix(in srgb, var(--studio-accent) 35%, transparent);
-}
-.carousel-layer[hidden] {
-  display: none;
-}
-.carousel-folder.drop-target {
-  outline: 2px solid var(--studio-accent);
-}
 .custom-font-row {
   display: flex;
   gap: 12px;
@@ -267,68 +207,6 @@
 .is-text-inspector #carouselTextStyles {
   scroll-margin-top: 52px;
 }
-.carousel-layers-panel .carousel-section-heading > span {
-  display: none;
-}
-.carousel-layers-panel .carousel-section-heading h3 {
-  margin-right: auto;
-}
-#carouselAddEffect {
-  height: 30px;
-  padding: 5px 9px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 8px;
-}
-.carousel-layer-box {
-  margin: 5px 0;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--studio-panel);
-}
-.carousel-layer-box[hidden] {
-  display: none;
-}
-.carousel-layer-box > .carousel-layer {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-.carousel-layer-effects {
-  margin: 0 8px 7px 30px;
-  padding-left: 9px;
-  border-left: 1px solid var(--line);
-}
-.carousel-effect-row {
-  padding: 5px 0;
-}
-.carousel-effect-heading {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  line-height: 1.4;
-}
-.carousel-effect-heading > span {
-  flex: 1;
-}
-.carousel-effect-heading button {
-  display: grid;
-  place-items: center;
-  width: 23px;
-  height: 25px;
-  padding: 3px;
-  border: 0;
-  background: transparent;
-  color: var(--studio-muted);
-}
-.carousel-effect-heading .ui-icon {
-  width: 15px;
-  height: 15px;
-}
-.carousel-effect-row.is-disabled .carousel-effect-name > span {
-  color: var(--studio-muted);
-}
 .carousel-effect-menu {
   position: fixed;
   margin: 0;
@@ -396,49 +274,6 @@
 }
 
 /* Keep layer controls available while a long tree scrolls. */
-.carousel-layers-panel {
-  padding-top: 0;
-}
-.carousel-layers-panel > .carousel-section-heading {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding-top: 12px;
-  background: var(--studio-panel);
-}
-#carouselSidebar .carousel-effect-heading > button {
-  flex: none;
-  width: 25px;
-  min-width: 25px;
-  height: 27px;
-  min-height: 27px;
-  padding: 4px !important;
-  border: 0;
-  background: transparent;
-  border-radius: 6px;
-}
-#carouselSidebar .carousel-effect-heading > .carousel-effect-name {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  width: auto;
-  height: auto;
-  min-height: 36px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 3px;
-  text-align: left;
-  white-space: normal;
-  font-size: 10px;
-  line-height: 1.4;
-  color: var(--studio-ink);
-}
-.carousel-effect-name small {
-  font-size: 10px;
-  color: var(--studio-muted);
-  font-variant-numeric: tabular-nums;
-}
 .carousel-effect-editor {
   position: fixed;
   margin: 0;
@@ -542,24 +377,6 @@
 #carouselSidebar .carousel-layer button[hidden] {
   display: none !important;
 }
-#carouselSidebar .carousel-layer .carousel-layer-actions {
-  margin-left: auto;
-}
-.carousel-layer-box {
-  border-color: transparent;
-  background: color-mix(in srgb, var(--studio-panel) 94%, var(--studio-accent));
-}
-.carousel-layer-box:has(.active) {
-  border-color: color-mix(in srgb, var(--studio-accent) 45%, var(--line));
-}
-.carousel-layer-box > .carousel-layer {
-  border-radius: 8px;
-  background: transparent;
-}
-.carousel-layer-box > .carousel-layer.active {
-  background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
-  border-color: transparent;
-}
 
 .carousel-folder-delete {
   width: min(420px, calc(100vw - 32px));
@@ -611,45 +428,6 @@
 .carousel-folder-delete::backdrop {
   background: #101a2f66;
 }
-#carouselSidebar .carousel-folder > button {
-  flex: none;
-  width: 24px;
-  min-width: 24px;
-  height: 28px;
-  min-height: 28px;
-  padding: 3px !important;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: inherit;
-}
-#carouselSidebar .carousel-folder > .carousel-folder-name {
-  flex: 1;
-  width: auto;
-  min-width: 0;
-}
-.carousel-folder > button > .ui-icon {
-  width: 16px;
-  height: 16px;
-}
-.carousel-folder {
-  border-left: 3px solid var(--folder-colour);
-  background: color-mix(in srgb, var(--folder-colour) 8%, var(--studio-panel));
-}
-.carousel-folder-name > .ui-icon {
-  color: var(--folder-colour);
-}
-.carousel-layer-box.in-folder {
-  margin-left: 14px;
-  border-left: 3px solid var(--folder-colour);
-}
-.carousel-layer-box.in-folder > .carousel-layer.in-folder {
-  margin-left: 0;
-  border-left: 0;
-}
-.carousel-layer-box.in-folder .carousel-layer-effects {
-  border-left-color: var(--folder-colour);
-}
 
 .carousel-folder[draggable="true"] {
   cursor: grab;
@@ -662,4 +440,245 @@
 }
 .folder-drop-after {
   box-shadow: inset 0 -3px 0 var(--studio-accent);
+}
+
+/* Material list anatomy: leading identity, label, then persistent trailing actions. */
+.carousel-layers-panel {
+  --layer-action-size: 40px;
+  --layer-row-height: 56px;
+  min-height: 180px;
+  max-height: 42%;
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--md-sys-color-surface-container-low);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  scroll-padding-top: 68px;
+}
+:root[data-density="compact"] .carousel-layers-panel {
+  --layer-action-size: 32px;
+  --layer-row-height: 48px;
+}
+.carousel-layers-panel > .carousel-section-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 64px;
+  padding: 8px 4px;
+  gap: 8px;
+  background: var(--md-sys-color-surface-container-low);
+}
+.carousel-layers-panel .carousel-section-heading > span {
+  display: none;
+}
+.carousel-layers-panel .carousel-section-heading h3 {
+  margin: 0 auto 0 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+#carouselSidebar :is(#carouselNewFolder, #carouselAddEffect) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: var(--studio-shape-full);
+  font-size: 12px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: transparent;
+}
+#carouselNewFolder .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+.carousel-layer-box {
+  margin: 4px 0;
+  border: 1px solid transparent;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface);
+  overflow: hidden;
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    border-color var(--studio-motion-short) var(--studio-ease-effects);
+}
+.carousel-layer-box:has(.active) {
+  background: var(--md-sys-color-secondary-container);
+  border-color: var(--md-sys-color-primary-outline);
+}
+.carousel-layer-box > .carousel-layer {
+  margin: 0;
+  min-height: var(--layer-row-height);
+  padding: 4px;
+  gap: 0;
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  background: transparent;
+}
+.carousel-layer-box > .carousel-layer.active {
+  background: transparent;
+}
+#carouselSidebar .carousel-layer button,
+#carouselSidebar .carousel-folder > button,
+#carouselSidebar .carousel-effect-heading > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--layer-action-size);
+  min-width: var(--layer-action-size);
+  min-height: var(--layer-action-size);
+  height: var(--layer-action-size);
+  padding: 8px !important;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: var(--studio-muted);
+}
+#carouselSidebar
+  :is(.carousel-layer, .carousel-folder, .carousel-effect-heading)
+  > button:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+#carouselSidebar .carousel-layer.active button {
+  color: var(--md-sys-color-on-secondary-container);
+}
+#carouselSidebar .carousel-layer .carousel-layer-name,
+#carouselSidebar .carousel-folder > .carousel-folder-name {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  gap: 8px;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--studio-ink);
+}
+.carousel-layer-name > .ui-icon,
+.carousel-folder-name > .ui-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+.carousel-layer-name span,
+.carousel-folder-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.carousel-folder-name small {
+  margin-left: auto;
+  min-width: 18px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--studio-muted);
+}
+.carousel-layer button[aria-pressed="false"][data-action="visible"],
+.carousel-folder button[aria-pressed="false"][data-folder-action="visible"] {
+  color: var(--studio-muted);
+}
+.carousel-layer button[aria-pressed="true"][data-action="locked"],
+.carousel-folder button[aria-pressed="true"][data-folder-action="locked"] {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--studio-ink);
+}
+.carousel-layer-name .layer-warning-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  color: var(--md-sys-color-warning);
+}
+.carousel-layer.drop-target {
+  box-shadow: inset 0 3px 0 var(--studio-accent);
+}
+.carousel-folder {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-height: var(--layer-row-height);
+  margin: 8px 0 4px;
+  padding: 4px 0;
+  border: 1px solid transparent;
+  border-left: 3px solid var(--folder-colour);
+  border-radius: var(--studio-shape-medium);
+  background: color-mix(in srgb, var(--folder-colour) 8%, var(--studio-panel));
+}
+.carousel-folder-name > .ui-icon {
+  color: var(--folder-colour);
+}
+.carousel-folder.is-selected {
+  outline: 2px solid var(--studio-accent);
+  outline-offset: -2px;
+}
+.carousel-folder.drop-target {
+  outline: 2px solid var(--studio-accent);
+}
+.carousel-layer-box.in-folder {
+  margin-left: 16px;
+  border-left: 3px solid var(--folder-colour);
+}
+.carousel-layer-box.in-folder > .carousel-layer.in-folder {
+  margin-left: 0;
+  border-left: 0;
+}
+.carousel-layer-box[hidden],
+.carousel-layer[hidden] {
+  display: none;
+}
+.carousel-layer-effects {
+  margin: 0 8px 8px 24px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
+}
+.carousel-layer-box.in-folder .carousel-layer-effects {
+  border-left-color: var(--folder-colour);
+}
+.carousel-effect-row {
+  padding: 0;
+}
+.carousel-effect-heading {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+#carouselSidebar .carousel-effect-heading > .carousel-effect-name {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  min-height: 48px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--studio-ink);
+}
+.carousel-effect-name small {
+  font-size: 11px;
+  color: var(--studio-muted);
+  font-variant-numeric: tabular-nums;
+}
+.carousel-effect-row.is-disabled .carousel-effect-name > span {
+  color: var(--studio-muted);
+}
+.carousel-effect-heading .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+@media (pointer: coarse) {
+  .carousel-layers-panel {
+    --layer-action-size: 48px;
+    --layer-row-height: 56px;
+  }
 }

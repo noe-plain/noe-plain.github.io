@@ -268,7 +268,7 @@ const { launch, artifact } = require("./browser.cjs");
           .querySelector("#startDialog")
           .style.getPropertyValue("--studio-start-image"),
     );
-    await page.locator("#setupName").fill("Weisse Montagefläche");
+    await page.locator("#setupName").fill("Montagefläche im Farbmodus");
     await page.locator("#createProject").click();
     for (const theme of ["light", "dark"]) {
       await page.evaluate((t) => studioSetTheme(t), theme);
@@ -276,7 +276,7 @@ const { launch, artifact } = require("./browser.cjs");
         await page
           .locator("#workspace")
           .evaluate((el) => getComputedStyle(el).backgroundColor),
-        "rgb(255, 255, 255)",
+        await page.locator("header").evaluate((el) => getComputedStyle(el).backgroundColor),
       );
     }
     await page.locator("#newproject").click();
@@ -290,7 +290,7 @@ const { launch, artifact } = require("./browser.cjs");
         await page
           .locator("#carouselViewport")
           .evaluate((el) => getComputedStyle(el).backgroundColor),
-        "rgb(255, 255, 255)",
+        await page.locator("header").evaluate((el) => getComputedStyle(el).backgroundColor),
       );
     }
     assert.deepEqual(errors, []);

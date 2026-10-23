@@ -34,6 +34,7 @@ const { launch, artifact } = require("./browser.cjs");
       render();
       await autosave();
     });
+    await page.evaluate(() => Promise.all(p.boards.map(prepareLogo)));
     const existingBoards = await page.evaluate(() => JSON.stringify(p.boards));
     await page.locator("#settings").click();
     assert.deepEqual(
