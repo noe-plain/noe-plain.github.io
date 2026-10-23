@@ -110,6 +110,7 @@
     "static/advanced-tools.css",
     "static/paint-picker.css",
     "static/projects.css",
+    "static/export-ui.css",
     "static/carousel-refinements.css",
     "static/editor-polish.css",
     "static/typography.css",

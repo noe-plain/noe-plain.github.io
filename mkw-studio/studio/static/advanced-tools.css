@@ -125,7 +125,6 @@ html[data-theme="light"] .vector-control {
 html[data-theme="light"] .vector-node.is-selected {
   background: var(--md-sys-color-primary);
 }
-/* Advanced creation tools float in a single vertical pill, leaving the artwork free. */
 .advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
   left: calc(var(--studio-shell-inset) + 8px);
   top: calc(
@@ -136,12 +135,27 @@ html[data-theme="light"] .vector-node.is-selected {
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  --studio-floating-actions-height: calc(var(--studio-bar-height) + 12px);
   width: 62px;
   max-width: 62px;
   height: auto;
   max-height: calc(
     100dvh - var(--studio-header-height) - var(--studio-footer-height) - 28px
+  );
+  padding: 0;
+  overflow: visible;
+}
+.advanced-mode .carousel-contextbar .studio-tool-surface {
+  flex-direction: column;
+  gap: 8px;
+  flex: none;
+  width: 62px;
+  height: auto;
+  max-height: calc(
+    100dvh - var(--studio-header-height) - var(--studio-footer-height) - 28px -
+      var(--studio-floating-actions-height)
   );
   border-radius: 30px;
   padding: 10px 8px;
@@ -172,18 +186,20 @@ html[data-theme="light"] .vector-node.is-selected {
 .advanced-mode .carousel-contextbar .studio-bar-actions {
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin: 0;
-  padding-top: 8px;
-  border-top: 1px solid var(--line);
-  width: 100%;
-  gap: 4px;
+  gap: 6px;
 }
-.advanced-mode .carousel-contextbar .studio-action {
-  width: 42px;
-  min-width: 42px;
-  height: 36px;
-  padding: 8px;
-  gap: 0;
+.advanced-mode
+  .carousel-contextbar
+  .studio-action:is(#export, #carouselExport) {
+  width: 58px;
+  min-width: 58px;
+  padding: 12px;
+}
+.advanced-mode.carousel-mode
+  .carousel-contextbar:has(.studio-notice-button:not([hidden])) {
+  --studio-floating-actions-height: calc(var(--studio-bar-height) * 2 + 18px);
 }
 .advanced-colours {
   flex: none;
@@ -291,7 +307,7 @@ html[data-theme="light"] .vector-node.is-selected {
   .advanced-mode .carousel-contextbar .studio-tool-group > button {
     height: 34px;
   }
-  .advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
+  .advanced-mode .carousel-contextbar .studio-tool-surface {
     gap: 5px;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -314,75 +330,9 @@ html[data-theme="light"] .vector-node.is-selected {
 .settings-tab-panel .settings-snap-distance {
   margin-top: 24px;
 }
-.settings-tab-panel .settings-export-format {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 8px;
-}
-.settings-tab-panel .settings-export-format select {
-  width: 100%;
-}
 .settings-tab-panel p {
   font-size: 12px;
   line-height: 1.6;
-}
-
-.export-preset-field,
-#pdfExportSettings label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 12px;
-  margin: 14px 0;
-  color: inherit;
-}
-.export-preset-field select,
-#pdfExportSettings input,
-#pdfExportSettings select {
-  width: 100%;
-  min-width: 0;
-  padding: 9px;
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 8px;
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  font: inherit;
-}
-#pdfExportSettings {
-  padding: 14px;
-  background: var(--md-sys-color-surface-container-low);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 12px;
-  margin-top: 14px;
-}
-#pdfExportSettings label {
-  margin: 0 0 14px;
-}
-#pdfExportSettings p,
-#pdfExportSettings small {
-  font-size: 11px;
-  line-height: 1.6;
-}
-#pdfExportSettings input[type="color"] {
-  height: 36px;
-  padding: 4px;
-}
-html[data-theme="light"] #pdfExportSettings {
-  background: var(--md-sys-color-surface);
-  border-color: var(--md-sys-color-outline-variant);
-}
-html[data-theme="light"]
-  :is(
-    .export-preset-field select,
-    #pdfExportSettings input,
-    #pdfExportSettings select
-  ) {
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  border-color: var(--md-sys-color-outline-variant);
-}
-#pdfExportSettings a {
-  color: var(--blue);
 }
 #carouselViewport[data-tool="builder"],
 #carouselViewport[data-tool="curve"] {

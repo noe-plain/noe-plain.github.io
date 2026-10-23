@@ -273,6 +273,15 @@ const { launch, artifact } = require("./browser.cjs");
         .evaluate((el) => getComputedStyle(el).animationName),
       "none",
     );
+    // Wait for the final viewport-resize/scroll bookmarks before testing dismissal itself.
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+        ),
+    );
     const beforeDismiss = await page.evaluate(() => ({
       document: JSON.stringify(p),
       revision,

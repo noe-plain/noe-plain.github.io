@@ -551,15 +551,6 @@ dialog small {
   font-size: 10px;
   color: #8d98aa;
 }
-.export-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr 1fr;
-  gap: 12px;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: 14px 0;
-  margin: 10px 0 22px;
-}
 .field {
   display: block;
   font-size: 10px;
@@ -575,46 +566,6 @@ dialog small {
   color: #294467;
   font-size: 12px;
 }
-.export-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 15px;
-}
-.export-card {
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 10px;
-  cursor: pointer;
-  background: #f8f9fc;
-}
-.export-card:has(input:checked) {
-  border-color: #98b0f4;
-  background: #f2f5ff;
-}
-.export-card .export-preview {
-  height: 180px;
-  display: grid;
-  place-items: center;
-  background: #eff1f5;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-.export-preview img {
-  max-height: 170px;
-  max-width: 100%;
-  box-shadow: 0 3px 12px #192b4220;
-}
-.export-card span {
-  display: block;
-  font:
-    10px/1.5 -apple-system,
-    sans-serif;
-  overflow-wrap: anywhere;
-  margin-top: 7px;
-}
-.export-card small {
-  display: block;
-}
 .dialog-actions {
   display: flex;
   align-items: center;
@@ -624,38 +575,6 @@ dialog small {
 }
 .dialog-actions small {
   margin-right: auto;
-}
-#exportStatus,
-#psdStatus {
-  white-space: pre-line;
-  color: var(--md-sys-color-primary);
-}
-#saveDialog {
-  max-width: 480px;
-}
-.save-choice {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  padding: 18px;
-  margin: 12px 0;
-  text-align: left;
-}
-.save-choice > span {
-  color: var(--blue);
-}
-.save-choice div {
-  flex: 1;
-}
-.save-choice strong {
-  display: block;
-  font-size: 12px;
-}
-.save-choice small {
-  display: block;
-  margin-top: 6px;
-  font-size: 10px;
 }
 .logo-choice {
   height: 46px;
@@ -749,18 +668,6 @@ input:focus-visible {
     width: 43px;
     height: 43px;
   }
-  .export-fields {
-    grid-template-columns: 1fr 1fr;
-  }
-  .export-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .export-preview {
-    height: 130px !important;
-  }
-  .export-preview img {
-    max-height: 120px;
-  }
   .dialog-actions {
     flex-wrap: wrap;
   }
@@ -774,7 +681,6 @@ input:focus-visible {
 .board-card:not(.selected) .text-editor:empty {
   visibility: hidden;
 }
-/* The blue inset is editor-only; output pixels never contain these guides. */
 .safe-zone {
   position: absolute;
   border: 1px dashed #3779e0aa;
@@ -920,7 +826,6 @@ input:focus-visible {
   align-items: flex-start;
 }
 
-/* Per-image multi-selection stays open while checking several text types. */
 .text-type-picker {
   position: relative;
   font-size: 12px;
@@ -1076,8 +981,6 @@ a:focus-visible {
   min-height: 2em;
 }
 
-/* Keep crop handles above neighbouring boards and floating editor controls.
-   Only the handles receive pointer events; the image stays in its normal layer. */
 .board-surface:has(.image-transform) {
   isolation: auto;
 }
@@ -1091,7 +994,6 @@ a:focus-visible {
   z-index: 2;
 }
 
-/* A compact, readable settings card for each source image. */
 .group-heading {
   display: block;
   width: min(820px, calc(100vw - 120px));
@@ -1369,7 +1271,6 @@ a:focus-visible {
   }
 }
 
-/* Dark studio: the canvas is separate from a persistent right-hand inspector. */
 :root {
   color-scheme: inherit;
   --sidebar: 300px;
@@ -1831,9 +1732,6 @@ dialog small {
 #startDialog h1 {
   color: #eef2fb;
 }
-.export-fields {
-  border-color: var(--md-sys-color-outline-variant);
-}
 .field {
   color: var(--md-sys-color-on-surface-variant);
 }
@@ -1841,33 +1739,6 @@ dialog small {
   background: var(--md-sys-color-surface-container-low);
   border-color: var(--md-sys-color-outline-variant);
   color: var(--md-sys-color-on-surface);
-}
-.export-card {
-  background: #1d2430;
-  border-color: #3f4a60;
-}
-.export-card:has(input:checked) {
-  background: #2b3854;
-  border-color: #7793d0;
-}
-.export-card .export-preview {
-  background: #141a24;
-}
-.export-card span {
-  color: var(--md-sys-color-on-surface-variant);
-}
-#exportStatus,
-#psdStatus {
-  color: #b5c7e8;
-}
-.save-choice strong {
-  color: #e3eafb;
-}
-.save-choice small {
-  color: #aab9d0;
-}
-.save-choice > span {
-  color: #bbcaff;
 }
 .tools-toggle {
   display: none;
@@ -2012,16 +1883,12 @@ dialog small {
   #startDialog h1 {
     font-size: 36px;
   }
-  .export-fields {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 @media (max-width: 760px) {
   .tools-open .tool-sidebar .workspace-info {
     padding-bottom: 105px;
   }
 }
-/* Scroll long tool groups independently so zoom remains reachable. */
 .tool-sidebar {
   overflow: hidden;
 }
@@ -2107,8 +1974,7 @@ select,
 textarea {
   font-family: "MKW UI", sans-serif;
 }
-.group-heading .image-copyright input,
-.export-card span {
+.group-heading .image-copyright input {
   font-family: "MKW UI", sans-serif;
 }
 .text-editor:empty:before {
@@ -2170,7 +2036,6 @@ dialog > p {
   margin-top: 0;
 }
 
-/* Sidebar groups follow the editing workflow; every control stays expanded. */
 .tool-sidebar .tool-section {
   display: flex;
   flex-direction: column;

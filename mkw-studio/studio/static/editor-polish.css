@@ -1,4 +1,3 @@
-/* Shared control rhythm. This stylesheet never changes artwork geometry. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -110,49 +109,6 @@
   :is(.carousel-warning, #sponsorMatteStatus):empty {
   display: none;
 }
-.studio-commandbar .studio-action:is(#export, #carouselExport) {
-  min-height: 40px;
-  padding: 9px 12px;
-  font-size: 12px;
-  border-radius: 999px;
-}
-.studio-commandbar .studio-action:is(#export, #carouselExport) > span {
-  display: inline;
-}
-.studio-commandbar .studio-action#export {
-  background: var(--md-sys-color-primary-container);
-  color: #dae4ff;
-  border-color: #4b5e87;
-}
-html[data-theme="light"] .studio-commandbar .studio-action#export {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-primary);
-  border-color: #d2ddfb;
-}
-.studio-commandbar .studio-notice-button {
-  height: 40px;
-  gap: 6px;
-  padding: 8px 10px;
-}
-.studio-commandbar .studio-action.studio-notice-button .studio-warning-count,
-.studio-commandbar.studio-icons-only
-  .studio-action.studio-notice-button
-  .studio-warning-count {
-  display: inline;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.studio-commandbar.studio-icons-only
-  .studio-action:is(#export, #carouselExport)
-  > span {
-  display: none;
-}
-.studio-commandbar.studio-icons-only
-  .studio-action:is(#export, #carouselExport) {
-  padding: 8px;
-  min-width: 40px;
-}
 .vector-point-count {
   display: block;
   margin: 8px 0 12px;
@@ -171,7 +127,6 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
     transition: none !important;
   }
 }
-/* Sidebar sections use their own gap, without stacking label margins on top. */
 #toolsSidebar .panel-row {
   gap: 0;
 }
@@ -196,21 +151,6 @@ html[data-theme="light"] .studio-commandbar .studio-action#export {
     min-height: max(48px, var(--studio-control-height));
   }
 }
-.studio-commandbar .studio-action:is(#export, #carouselExport) > span {
-  font-size: 12px;
-  line-height: 1.2;
-}
-.studio-commandbar .studio-action:is(#export, #carouselExport) > .ui-icon {
-  width: 20px;
-  height: 20px;
-}
-html[data-theme="light"]
-  .studio-commandbar
-  .studio-action:is(#export, #carouselExport) {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-primary);
-  border-color: #d2ddfb;
-}
 
 #studioHelpFrame {
   display: block;
@@ -232,30 +172,8 @@ html[data-theme="light"]
   :root {
     --studio-header-height: 104px;
   }
-  header {
-    height: var(--studio-header-height);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-    padding: 10px 16px;
-  }
-  .brand img {
-    width: 150px;
-  }
-  .header-actions {
-    margin: 0;
-    justify-content: flex-end;
-    gap: 4px;
-  }
-  .header-actions .icon-button {
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
-    padding: 6px;
-  }
 }
 
-/* A single quiet separator between related sections, in either theme. */
 :is(
   #toolsSidebar .tool-section,
   #carouselProperties .carousel-property-section
@@ -440,7 +358,6 @@ html[data-theme="light"]
   border: 0;
 }
 
-/* Shared property groups stay open; only unrelated tasks receive a divider. */
 #carouselProperties {
   scrollbar-color: var(--line) transparent;
 }

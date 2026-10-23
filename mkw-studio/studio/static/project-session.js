@@ -371,7 +371,7 @@ const MKWProjects = (() => {
       ? records
           .map(
             (record) =>
-              `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}"><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></button><button data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
+              `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}">${studioIcon(record.mode === "carousel" ? "builder" : "image")}<span><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></span></button><button class="icon-button" data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
           )
           .join("")
       : '<p class="project-library-empty">Noch keine Projekte in diesem Browser.<br>Öffne eine MKW-Datei oder starte ein neues Projekt.</p>';

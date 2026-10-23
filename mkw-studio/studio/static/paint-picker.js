@@ -96,7 +96,7 @@ function studioSyncPaintControls() {
       group.setAttribute("role", "group");
       group.setAttribute("aria-label", "Fläche und Kontur");
       group.innerHTML = `<div class="paint-wells"><button id="toolFillColour" class="paint-fill" title="Fläche bearbeiten" aria-label="Fläche bearbeiten" aria-haspopup="dialog"></button><button id="toolStrokeColour" class="paint-stroke" title="Kontur bearbeiten" aria-label="Kontur bearbeiten" aria-haspopup="dialog"></button></div><div class="paint-actions"><button id="toolSwapColours" title="Fläche und Kontur tauschen" aria-label="Fläche und Kontur tauschen">${studioIcon("replace")}</button><button id="toolPaintNone" title="Aktive Farbe ein- oder ausblenden" aria-label="Aktive Farbe ein- oder ausblenden">${studioIcon("hidden")}</button></div>`;
-      bar.insertBefore(group, bar.querySelector(".studio-bar-actions"));
+      bar.querySelector(".studio-tool-surface").append(group);
       for (const channel of ["fill", "stroke"])
         $(
           "#tool" + (channel === "fill" ? "Fill" : "Stroke") + "Colour",

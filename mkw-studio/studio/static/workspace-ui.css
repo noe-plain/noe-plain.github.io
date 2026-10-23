@@ -27,15 +27,11 @@ header {
   height: var(--studio-bar-height);
   width: max-content;
   max-width: calc(100vw - var(--sidebar) - 32px);
-  padding: 8px 12px;
-  background: color-mix(
-    in srgb,
-    var(--md-sys-color-surface) 96.08%,
-    transparent
-  );
-  border: 1px solid var(--md-sys-color-outline-variant);
-  box-shadow: 0 8px 28px #0005;
-  border-radius: 999px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
   z-index: 50;
 }
 .dock.studio-commandbar,
@@ -46,7 +42,7 @@ header {
   bottom: 58px;
   left: calc((100% - var(--studio-shell-side)) / 2);
   transform: translateX(-50%);
-  border: 1px solid var(--md-sys-color-outline-variant);
+  border: 0;
 }
 .studio-mode-label {
   display: none;
@@ -94,28 +90,15 @@ header {
 }
 .studio-commandbar .studio-tool-group > button:hover {
   background: var(--md-sys-color-surface-container);
-  border-color: var(--md-sys-color-primary-outline);
+  border-color: transparent;
   color: var(--md-sys-color-on-surface);
 }
 .studio-commandbar .studio-tool-group > button.active,
 .studio-commandbar .studio-tool-group > button[aria-pressed="true"] {
-  background: var(--md-sys-color-primary);
-  border-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-secondary-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-secondary-container);
   font-weight: 600;
-}
-.studio-commandbar .studio-tool-group > button[data-step="export"],
-.studio-commandbar #carouselExport {
-  background: var(--md-sys-color-primary-container);
-  color: #dae4ff;
-}
-.studio-commandbar .studio-tool-group > button[data-step="export"]:hover,
-.studio-commandbar #carouselExport:hover {
-  background: var(--md-sys-color-primary-outline);
-}
-.studio-commandbar .studio-tool-group > button[data-step="export"].active {
-  background: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
 }
 .studio-commandbar .dock-arrow {
   width: 4px;
@@ -154,14 +137,16 @@ header {
   border-color: var(--md-sys-color-primary-outline);
 }
 .studio-commandbar .studio-action[aria-pressed="true"] {
-  background: var(--md-sys-color-primary-container);
-  border-color: #526484;
-  color: #e2eaff;
+  background: var(--md-sys-color-secondary-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-secondary-container);
 }
 .studio-commandbar .studio-notice-button {
-  color: #f2c286;
-  background: #352e28;
-  border-color: #66503a;
+  color: var(--md-sys-color-warning);
+  background: var(--md-sys-color-warning-container);
+  border-color: transparent;
+  height: var(--studio-bar-height);
+  border-radius: var(--studio-shape-large);
 }
 .studio-commandbar .studio-action > span {
   display: none;
@@ -174,7 +159,7 @@ header {
   height: 20px;
 }
 .studio-commandbar .studio-action#carouselExport {
-  border-color: #4b5e87;
+  border-color: transparent;
 }
 .studio-commandbar .studio-action#toolsToggle,
 .studio-commandbar .studio-action#carouselSidebarToggle {
@@ -429,7 +414,7 @@ footer .carousel-zoom-controls input {
 }
 .carousel-contextbar.studio-commandbar {
   gap: 12px;
-  padding: 8px 12px;
+  padding: 0;
 }
 .carousel-toolrail.studio-tool-group {
   flex-direction: row;
@@ -756,8 +741,8 @@ footer .carousel-zoom-controls input {
   .studio-commandbar,
   .carousel-contextbar.studio-commandbar {
     gap: 8px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 0;
+    padding-right: 0;
   }
   .studio-commandbar .studio-tool-group > button {
     padding: 9px 10px;
@@ -814,8 +799,8 @@ footer .carousel-zoom-controls input {
   }
   .studio-commandbar,
   .carousel-contextbar.studio-commandbar {
-    padding: 8px;
-    gap: 6px;
+    padding: 0;
+    gap: 8px;
     max-width: calc(100vw - 24px);
   }
   .studio-tool-group {
@@ -944,4 +929,67 @@ footer .carousel-zoom-controls input {
   .studio-tool-group
   > button:is(.active, [aria-pressed="true"]) {
   border-radius: var(--studio-shape-large);
+}
+
+.studio-tool-surface {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: var(--studio-bar-height);
+  padding: 8px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--studio-shape-full);
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary-container) 18%,
+    var(--md-sys-color-surface-container-low)
+  );
+  box-shadow: 0 2px 8px #11182714;
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) {
+  display: inline-flex;
+  min-width: 58px;
+  height: var(--studio-bar-height);
+  min-height: var(--studio-bar-height);
+  padding: 12px 20px;
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-size: 14px;
+  line-height: 20px;
+  box-shadow: 0 2px 8px #11182714;
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport):hover {
+  background: var(--md-sys-color-primary-hover);
+}
+.studio-commandbar .studio-action:is(#export, #carouselExport) > span {
+  display: inline;
+}
+.studio-commandbar.studio-icons-only
+  .studio-action:is(#export, #carouselExport) {
+  width: 58px;
+  padding: 12px;
+}
+.studio-commandbar.studio-icons-only
+  .studio-action:is(#export, #carouselExport)
+  > span {
+  display: none;
+}
+.studio-commandbar .studio-action.studio-notice-button .studio-warning-count,
+.studio-commandbar.studio-icons-only
+  .studio-action.studio-notice-button
+  .studio-warning-count {
+  display: inline;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+@media (pointer: coarse) {
+  :root {
+    --studio-bar-height: 66px;
+  }
+  .studio-commandbar .studio-tool-group > button {
+    height: 48px;
+    min-width: 48px;
+  }
 }

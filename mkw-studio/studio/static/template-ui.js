@@ -17,7 +17,7 @@
   save.className = "save-choice";
   save.hidden = true;
   save.innerHTML = `${studioIcon("layers")}<div><strong>Design als Vorlage</strong><small>Bildfreie Vorlage für weitere Projekte</small></div>`;
-  $("#saveProject").after(save);
+  $("#savePSD").after(save);
   save.onclick = () => MKWTemplateSave.open();
   const original = $("#save").onclick;
   $("#save").onclick = () => {

@@ -1,4 +1,3 @@
-/* Shared editor chrome. Artwork colours are rendered independently on canvas. */
 :root {
   --studio-header-height: 68px;
   --studio-footer-height: 52px;
@@ -95,7 +94,7 @@ footer {
   border: 0;
   border-radius: var(--studio-shape-full);
   height: var(--studio-footer-height);
-  padding: 8px 20px;
+  padding: 6px 20px;
   gap: 18px;
   background: var(--md-sys-color-surface);
   border-color: var(--md-sys-color-outline-variant);
@@ -129,17 +128,18 @@ footer {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 0 14px;
-  border-left: 1px solid var(--md-sys-color-outline-variant);
-  border-right: 1px solid var(--md-sys-color-outline-variant);
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-low);
 }
 .footer-view-controls button {
   display: grid;
   place-items: center;
-  width: 34px;
-  min-width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: 1px solid transparent;
   background: transparent;
   color: var(--md-sys-color-on-surface-variant);
@@ -150,9 +150,9 @@ footer {
   color: var(--md-sys-color-on-surface);
 }
 .footer-view-controls button[aria-pressed="true"] {
-  background: var(--md-sys-color-primary-container);
-  border-color: var(--md-sys-color-primary-outline);
-  color: #cad7ff;
+  background: var(--md-sys-color-secondary-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-secondary-container);
 }
 .footer-view-controls button[aria-expanded="false"] {
   color: var(--md-sys-color-on-surface-variant);
@@ -453,46 +453,6 @@ footer .view-control {
   display: block;
   line-height: 1.6;
 }
-.save-project-naming {
-  margin: 20px 0;
-  padding: 18px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.save-project-naming h3 {
-  font-size: 13px;
-  margin: 0 0 14px;
-}
-.save-project-naming .project-fields {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  align-items: end;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-.save-project-naming .project-fields label {
-  font-size: 11px;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--md-sys-color-on-surface-variant);
-}
-.save-project-naming .project-fields input {
-  width: 100% !important;
-  font-size: 13px;
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 7px;
-  background: var(--md-sys-color-surface-container-low);
-  color: var(--md-sys-color-on-surface);
-  padding: 10px;
-  margin-top: 7px;
-}
-.save-project-naming .field {
-  font-size: 11px;
-}
-.save-project-naming .field input {
-  max-width: 160px;
-  font-size: 13px;
-}
 @media (max-width: 760px) {
   #carouselEditor {
     column-gap: 0;
@@ -596,4 +556,126 @@ footer .view-control {
 
 :is(#workspace, #carouselViewport)::-webkit-scrollbar {
   display: none;
+}
+
+header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.header-action-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-low);
+  flex: none;
+}
+header .header-action-group .icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+  border: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  background: transparent;
+}
+header .header-action-group .icon-button:hover {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+footer .view-control {
+  height: 40px;
+  background: transparent;
+}
+footer .view-control .icon-button,
+footer .carousel-zoom-controls button {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+}
+footer .carousel-zoom-controls input {
+  height: 36px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+footer .view-control #viewValue {
+  height: 36px;
+  border-radius: var(--studio-shape-full);
+}
+@media (max-width: 760px) {
+  header .brand img {
+    width: 145px;
+  }
+  header .header-actions {
+    gap: 4px;
+  }
+  header .header-action-group {
+    gap: 0;
+  }
+  header .header-action-group .icon-button {
+    width: 36px;
+    min-width: 36px;
+    height: 40px;
+    padding: 8px 6px;
+  }
+  footer {
+    padding-block: 6px;
+  }
+  footer .footer-view-controls {
+    gap: 0;
+    padding-inline: 4px;
+  }
+  footer .footer-view-controls button {
+    width: 36px;
+    min-width: 36px;
+    height: 40px;
+  }
+  footer .view-control .icon-button,
+  footer .carousel-zoom-controls button {
+    width: 32px;
+    min-width: 32px;
+  }
+}
+@media (max-width: 520px) {
+  :root {
+    --studio-header-height: 104px;
+  }
+  header {
+    height: var(--studio-header-height);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 16px;
+  }
+  header .brand img {
+    width: 150px;
+    max-height: 26px;
+  }
+  header .header-actions {
+    margin: 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
+@media (pointer: coarse) {
+  header {
+    padding-block: 10px;
+  }
+  header .header-action-group {
+    padding-block: 0;
+  }
+  header .header-action-group .icon-button {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+  }
 }
