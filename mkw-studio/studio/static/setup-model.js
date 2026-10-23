@@ -224,6 +224,21 @@
       )
         throw Error("Doppelte Vorlagenkennung im Setup.");
     }
+    if (Object.hasOwn(input, "backgrounds")) {
+      if (!Array.isArray(input.backgrounds) || input.backgrounds.length > 1)
+        throw Error("Ein Setup kann höchstens ein Startbild enthalten.");
+      result.backgrounds = input.backgrounds.map((image) => {
+        if (
+          !record(image) ||
+          image.id !== "start-background" ||
+          !text(image.name, 200) ||
+          !data(image.data, 3 * 1024 * 1024) ||
+          !/^data:image\/(jpeg|webp|png);base64,/i.test(image.data)
+        )
+          throw Error("Ungültiges Startbild in der Setup-Datei.");
+        return { id: "start-background", name: image.name, data: image.data };
+      });
+    }
     const metadata = {
       ...result,
       fonts: result.fonts.map((font) => ({ ...font, data: "" })),

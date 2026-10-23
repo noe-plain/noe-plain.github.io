@@ -74,6 +74,8 @@
       "primary-hover": tone(seed, dark ? 0.88 : 0.41),
       "primary-container": container,
       "on-primary-container": onContainer,
+      "secondary-container": tone(seed, dark ? 0.34 : 0.93, 0.16),
+      "on-secondary-container": tone(seed, dark ? 0.94 : 0.28, 0.16),
       "primary-outline": tone(seed, dark ? 0.64 : 0.58, 0.6),
       surface: dark ? "#191c21" : "#fcfcfd",
       "surface-container-low": dark ? "#1e2228" : "#f6f7f9",

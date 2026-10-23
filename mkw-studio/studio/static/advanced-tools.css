@@ -127,7 +127,7 @@ html[data-theme="light"] .vector-node.is-selected {
 }
 /* Advanced creation tools float in a single vertical pill, leaving the artwork free. */
 .advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
-  left: 14px;
+  left: calc(var(--studio-shell-inset) + 8px);
   top: calc(
     var(--studio-header-height) +
       (100vh - var(--studio-header-height) - var(--studio-footer-height)) / 2

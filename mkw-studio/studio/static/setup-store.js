@@ -48,6 +48,12 @@ const MKWSetupStore = (() => {
     });
   }
   return {
+    background: () => get("start-background"),
+    setBackground: (blob) =>
+      transaction((store) => {
+        if (blob) store.put(blob, "start-background");
+        else store.delete("start-background");
+      }),
     link: () => get("link"),
     pending: () => get("pending"),
     begin: (before) => transaction((store) => store.put(before, "pending")),

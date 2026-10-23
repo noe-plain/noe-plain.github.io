@@ -44,7 +44,7 @@ header {
   top: auto;
   right: auto;
   bottom: 58px;
-  left: calc((100% - var(--sidebar)) / 2);
+  left: calc((100% - var(--studio-shell-side)) / 2);
   transform: translateX(-50%);
   border: 1px solid var(--md-sys-color-outline-variant);
 }

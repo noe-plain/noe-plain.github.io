@@ -3,10 +3,11 @@
 const MKWSetupSession = (() => {
   const maxBytes = 256 * 1024 * 1024;
   async function capture() {
-    const [fonts, groups, templates] = await Promise.all([
+    const [fonts, groups, templates, backgrounds] = await Promise.all([
       studioStoredFonts(),
       MKWSponsorLibrary.groups(),
       MKWTemplateStore.all(),
+      MKWStartScreen.capture(),
     ]);
     const ids = [
         ...new Set(
@@ -31,6 +32,7 @@ const MKWSetupSession = (() => {
       groups,
       logos,
       templates,
+      backgrounds,
     });
   }
   function persistPreferences(setup) {
@@ -42,6 +44,7 @@ const MKWSetupSession = (() => {
     localStorage.setItem("mkw-studio-theme", setup.theme);
   }
   async function replaceLibraries(setup) {
+    await MKWStartScreen.replace(setup.backgrounds);
     await studioReplaceStoredFonts(setup.fonts);
     if (setup.templates) await MKWTemplateStore.replace(setup.templates);
     const assets = new Map(setup.logos.map((logo) => [logo.id, logo]));
@@ -57,6 +60,7 @@ const MKWSetupSession = (() => {
     );
   }
   async function syncUI(setup) {
+    await MKWStartScreen.refresh(true);
     studioPreferences = MKWSetupModel.preferences(setup.preferences, true);
     studioSetTheme(setup.theme);
     studioApplyPreferences();
@@ -88,6 +92,7 @@ const MKWSetupSession = (() => {
     return true;
   }
   async function validateResources(setup) {
+    await MKWStartScreen.validate(setup.backgrounds);
     for (const template of setup.templates || []) {
       MKWTemplates.validateDesign(template, setup.fonts);
       for (const font of template.fonts || [])
@@ -126,6 +131,15 @@ const MKWSetupSession = (() => {
     }
   }
   async function apply(setup, link) {
+    const resume = MKWStartScreen.pause();
+    try {
+      await MKWStartScreen.settled();
+      await applySettings(setup, link);
+    } finally {
+      resume();
+    }
+  }
+  async function applySettings(setup, link) {
     setup = MKWSetupModel.validate(setup);
     await validateResources(setup);
     const before = {
@@ -169,7 +183,7 @@ const MKWSetupSession = (() => {
     await writeSaveFile(
       handle,
       await MKWProjectFile.encodeDocument(setup, {
-        assetCollections: ["fonts", "logos"],
+        assetCollections: ["fonts", "logos", "backgrounds"],
       }),
       "MKW-Studio.mkwsetup",
     );

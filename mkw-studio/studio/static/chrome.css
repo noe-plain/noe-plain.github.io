@@ -3,7 +3,17 @@
   --studio-header-height: 68px;
   --studio-footer-height: 52px;
 }
+body {
+  min-height: 100dvh;
+  background: var(--studio-shell-background);
+}
 header {
+  position: absolute;
+  top: var(--studio-shell-inset);
+  left: var(--studio-shell-inset);
+  right: calc(var(--studio-shell-inset) + var(--studio-shell-side));
+  border: 0;
+  border-radius: var(--studio-shape-full);
   height: var(--studio-header-height);
   display: flex;
   justify-content: space-between;
@@ -13,23 +23,75 @@ header {
 .header-actions {
   margin-left: auto;
 }
+.brand {
+  min-width: 0;
+  flex-shrink: 1;
+}
 .brand img {
   width: 190px;
+  max-width: 100%;
 }
 #workspace {
-  bottom: var(--studio-footer-height);
+  background: var(--studio-canvas);
+  top: calc(
+    var(--studio-header-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap)
+  );
+  left: var(--studio-shell-inset);
+  right: calc(var(--studio-shell-inset) + var(--studio-shell-side));
+  bottom: calc(
+    var(--studio-footer-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap)
+  );
+  border-radius: var(--studio-shape-dialog);
 }
 #carouselEditor {
-  bottom: var(--studio-footer-height);
+  inset: var(--studio-shell-inset) var(--studio-shell-inset)
+    calc(
+      var(--studio-footer-height) + var(--studio-shell-inset) +
+        var(--studio-shell-gap)
+    );
+  column-gap: var(--studio-shell-gap);
+  background: transparent;
+}
+#carouselViewport {
+  margin-top: calc(var(--studio-header-height) + var(--studio-shell-gap));
+  min-height: 0;
+  border-radius: var(--studio-shape-dialog);
+}
+#carouselSidebar {
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
 }
 .tool-sidebar {
-  bottom: var(--studio-footer-height);
+  top: var(--studio-shell-inset);
+  right: var(--studio-shell-inset);
+  bottom: calc(
+    var(--studio-footer-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap)
+  );
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
+}
+.sidebar-hidden {
+  --studio-shell-side: 0px;
+}
+.sidebar-hidden #carouselEditor {
+  column-gap: 0;
 }
 .dock.studio-commandbar,
 .carousel-contextbar.studio-commandbar {
-  bottom: calc(var(--studio-footer-height) + 14px);
+  bottom: calc(
+    var(--studio-footer-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap) + 14px
+  );
 }
 footer {
+  left: var(--studio-shell-inset);
+  right: var(--studio-shell-inset);
+  bottom: var(--studio-shell-inset);
+  border: 0;
+  border-radius: var(--studio-shape-full);
   height: var(--studio-footer-height);
   padding: 8px 20px;
   gap: 18px;
@@ -430,8 +492,14 @@ footer .view-control {
   font-size: 13px;
 }
 @media (max-width: 760px) {
+  #carouselEditor {
+    column-gap: 0;
+  }
   :root {
     --studio-header-height: 64px;
+    --studio-shell-inset: 8px;
+    --studio-shell-gap: 8px;
+    --studio-shell-side: 0px;
   }
   header {
     height: 64px;

@@ -246,18 +246,22 @@
   margin: 0 0 12px;
   background: var(--studio-panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--studio-shape-full);
 }
 .type-inspector-nav button {
   flex: 1;
   border: 0;
   font-size: 11px;
   padding: 8px;
+  border-radius: var(--studio-shape-full);
 }
-.type-inspector-nav button:hover,
+.type-inspector-nav button:hover {
+  background: var(--md-sys-color-surface-container);
+}
 .type-inspector-nav [aria-pressed="true"] {
-  background: color-mix(in srgb, var(--studio-accent) 12%, var(--studio-panel));
-  color: var(--studio-accent);
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 .is-text-inspector .type-font,
 .is-text-inspector #carouselTextStyles {

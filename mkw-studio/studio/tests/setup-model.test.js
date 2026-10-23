@@ -146,3 +146,31 @@ test("Designer grid preferences migrate, validate and remain isolated from defau
     { columns: 4, rows: 3, gap: 20 },
   );
 });
+
+test("start background is optional, bounded, isolated and portable", async () => {
+  const old = model.validate(fixture());
+  assert.equal(old.backgrounds, undefined);
+  const image = {
+    id: "start-background",
+    name: "Startbild",
+    data: "data:image/jpeg;base64,AQID",
+  };
+  const setup = model.validate({ ...fixture(), backgrounds: [image] });
+  assert.deepEqual(setup.backgrounds, [image]);
+  const blob = await codec.encodeDocument(setup, {
+    assetCollections: ["fonts", "logos", "backgrounds"],
+  });
+  assert.deepEqual(model.validate(await codec.decode(blob)), setup);
+  assert.deepEqual(
+    model.validate({ ...fixture(), backgrounds: [] }).backgrounds,
+    [],
+  );
+  for (const backgrounds of [
+    null,
+    [image, image],
+    [{ ...image, id: "project-image" }],
+    [{ ...image, data: "https://example.com/image.jpg" }],
+    [{ ...image, data: "data:image/svg+xml;base64,AQID" }],
+  ])
+    assert.throws(() => model.validate({ ...fixture(), backgrounds }));
+});

@@ -78,6 +78,7 @@
     "static/settings-ui.js",
     "static/template-store.js",
     "static/setup-store.js",
+    "static/start-screen.js",
     "static/setup-session.js",
     "static/setup-ui.js",
     "static/post-text-stack.js",

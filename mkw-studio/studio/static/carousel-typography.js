@@ -168,7 +168,7 @@ function carouselTypographyNavigation(panel) {
   nav.className = "type-inspector-nav";
   nav.setAttribute("aria-label", "Typografie schnell erreichen");
   nav.innerHTML =
-    '<button data-type-section=".type-font">Zeichen</button><button data-type-section="#carouselTextStyles">Absatz</button>';
+    '<button aria-pressed="true" data-type-section=".type-font">Zeichen</button><button aria-pressed="false" data-type-section="#carouselTextStyles">Absatz</button>';
   panel.querySelector(".type-content")?.after(nav);
   nav.querySelectorAll("button").forEach(
     (button) =>

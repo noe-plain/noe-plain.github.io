@@ -22,22 +22,29 @@
 .typo-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 3px;
-  gap: 3px;
-  border-radius: 10px;
-  background: #8080800c;
-  border: 1px solid var(--line);
+  gap: 0;
+  border-bottom: 1px solid var(--line);
 }
 .typo-tabs button {
+  position: relative;
   border: 0;
   background: transparent;
-  border-radius: 7px;
-  min-height: 32px;
+  border-radius: var(--studio-shape-medium) var(--studio-shape-medium) 0 0;
+  min-height: 48px;
 }
 .typo-tabs button[aria-selected="true"] {
-  background: #80808014;
-  color: var(--typo-accent, var(--blue));
-  box-shadow: 0 1px 4px #00000013;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.typo-tabs button[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: calc(50% - 20px);
+  width: 40px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--md-sys-color-primary);
 }
 .typography-inspector [role="tabpanel"] {
   display: flex;

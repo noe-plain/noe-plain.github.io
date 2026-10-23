@@ -56,10 +56,12 @@ The first milestone's Firefox reference is `/private/tmp/mkw-material-before/mat
 
 ## Remaining migration
 
-1. Consolidate repeated control definitions into their owning component files, including segmented choices, native sliders, compact menus and states. Remove superseded rules as each component migrates; do not add a final override sheet.
-2. Complete a typography/spacing pass for both inspectors, FD options/cards and Designer layers/FX. Preserve compact desktop dimensions, accessible icon labels and simple/advanced placement.
-3. Apply the same component rules to start/setup, templates/library, save/export and handbook. Review all selected/hover/focus/error states in light/dark and narrow layouts. Keep lazy loading.
-4. Finish the full screenshot/accessibility/performance review and repeat Firefox/Chrome, export fidelity and publication checks. No feature is to be removed to accommodate the new design.
+Shared colour/control/menu foundations and the23October start/Bento pilot are implemented. The complete migration is not yet finished:
+
+1. Continue workspace typography/spacing and hierarchy in both inspectors, FD cards/options and Designer layers/folders/FX. Keep the implemented tab/jump-navigation distinction and all specialist tools.
+2. Apply the same component rules to remaining start/setup, templates/library, save/export, paint picker and handbook details. Keep lazy loading, all formats and the native file/persistence contracts.
+3. Remove superseded rules at each component owner rather than accumulating another final override layer.
+4. Repeat same-engine export fidelity, Firefox/Chrome, keyboard/theme/narrow and50-image/native-saving checks for each subsequent release. Keep the white montage and restrained artwork shadow explicitly requested by the user.
 
 ## Shared controls: second milestone
 
@@ -131,13 +133,37 @@ Visual QA also found legacy pale export filename/loading-total colours against l
 Remaining phases 5–6: complete shared workspace typography/spacing and hierarchy (including the weak character/paragraph navigation cue), FD cards and Designer layers/FX, then start/setup/templates/library/save/export/picker/Wiki detail passes. Use the official web references per component and retire replaced owner rules. Preserve every tool, existing editing gestures, artwork layout and encoded export computation.
 
 
-## Expressive visual direction and start actions
+## Expressive visual direction and start actions (22 October archive)
 
 The user's six reference images refine the approved direction: soft tonal surfaces, coherent rounded control groups, distinct selected shapes and clear primary/secondary hierarchy. Use the existing seed-derived semantic light/dark roles, never hardcoded purple/pink. Keep the creative workspace restrained for accurate artwork assessment. This direction applies to upcoming component passes; it does not imply that the entire interface has already migrated, or permit changes to artwork fonts, masks, layout or exports.
 
 The start actions now share a3:2grid row: New Project has more width and remains primary, Templates uses a tonal primary-container treatment. Resume/Open retain their separate row. The top two remain side by side at narrow widths with wrapping labels; no startup JS, template asset loading or command handlers changed. [M3 buttons](https://m3.material.io/components/buttons/guidelines) inform the primary/tonal distinction and [colour roles](https://m3.material.io/styles/color/roles) inform readable seed-adapted pairs. No library, image, font or animation dependency was added.
 
 
-### Planned follow-up (not implemented)
+### Planned follow-up (22 October archive; implemented by the following milestone)
 
 The next user-requested design pass is planning-only: bottom start actions40:60 (Resume/Open), a lightly seed-tinted Bento surface structure, access to the same settings dialog directly on the start screen, and an optional device/tool-owned start background image with MKW-Setup portability. It must not enter artwork/projects/exports, nor be stored in localStorage or project-owned assets. Keep the creative workspace large, typography/pixels unchanged, both editor tool-pill positions and all current functions. Use one optimised local image with proper replace/remove cleanup and accessible foreground surfaces. No implementation of these follow-up items is included in the current start-row release.
+
+
+## Start and Bento milestone – 23 October 2026
+
+User resumed implementation on23October, superseding the planning-only hold. The current milestone implements the two mirrored3:2/2:3start rows, the same native settings dialog on the start screen, an optional optimised start background, and the sketched shared shell: header over the montage, full-height right inspector, one full-width footer, rounded28px surfaces and12px gutters (8pxon narrow windows). Simple and advanced tool positions remain; no renderer/layout/persistence code for artworks changed. Latest user steering makes the montage white in BOTH themes and updates the welcome text to address both modes. The surrounding shell remains subtly seed-tinted.
+
+The new start-screen.js owns only device personalisation and fixed-dialog lifecycle. setup-store keeps one bounded Blob under a separate tool key, outside project assets/GC/localStorage; replacement/removal overwrites/deletes that key. One URL is shared by backdrop/settings preview while needed, revoked on replacement and when both dialogs close. A generation cancels stale async loads. Normal imports optimise once to2560px/max2MiB, cap source input/decoded dimensions and release bitmap/canvas. Invalid/quota operations leave the old stored image intact. Startup does not await the image, and no observer watches artwork or pointer/style attributes.
+
+Setup v1 optionally carries backgrounds (zero/one). Current capture includes the array; explicit empty clears, old omitted field preserves local personalisation. Strict model checks restrict local raster payloads and size; decoding/dimensions are validated before setup journal/apply. The existing rollback snapshot includes the start image. Settings imports temporarily block image mutations and await any in-progress edit; it never enters project/MKW/template content. This is separate from project reference traversal because it is not a new document object type.
+
+Material reference: official [colour roles](https://github.com/material-components/material-web/blob/main/docs/theming/color.md), [shape tokens](https://github.com/material-components/material-web/blob/main/docs/theming/shape.md), [buttons](https://github.com/material-components/material-web/blob/main/docs/components/button.md) and [tabs](https://m3.material.io/components/tabs/guidelines). Retain brand fonts and existing accessible DOM. Surfaces, rounded containers, tonal secondary actions, state layers and tab indicators implement the relevant patterns without claiming an exact copy of Google's HCT palette or adding a framework. Real character/paragraph tabs gain a visible selected indicator; the simple navigation remains a jump group, not mislabelled tabs.
+
+
+The new start tonal actions use secondary-container/on-secondary-container as prescribed by the Material Web button tokens. These seed-derived low-chroma roles are additive; existing artwork and primary/control roles remain unchanged. The palette contrast check includes both themes and extreme/arbitrary seeds. The no-image start backdrop uses the same seed-tinted shell role, rather than an unrelated neutral fallback.
+
+
+Verification:112/112model tests, formatting and reproducible build; complete48/48browser suites in Firefox AND Chrome, then final5/5in each after the last seed/tonal refinements. Original Firefox pre-Material export hashes match. New material-start covers native settings focus/Escape before project creation, two mirrored action rows down to320px, actual backdrop paint, bounded image import/reload/removal, setup stream portability, legacy preservation, rollback, corrupt input/quota protection, unchanged document/undo and white montage in both themes/editors. workspace-ui checks exact Bento edges/radii, sidebar/zoom preservation and all prior controls, with updated exact planned geometry rather than reduced assertions. Existing50-image/native-incremental/asset/typography/path/PDF/PSD checks pass. Screenshots reviewed in light/dark/narrow. Bundle sizes:JS651089bytes/gzip188361;CSS201857bytes/gzip35683. These are local asset sizes, not measured network-speed claims. No runtime dependency added.
+
+This is the start/Bento pilot milestone. Remaining rollout includes the broader inspector/card/layer hierarchy and remaining setup/library/export/Wiki component details; do not claim the entire Material migration finished.
+
+
+Latest user steering: both FD artboards and Designer artwork use one restrained view-only shadow (3%/5% opacity), replacing the previous dark20–50% shadows and removing the duplicate FD override. The common shadow is never read by a renderer and cannot enter an export.
+
+Final follow-up verification: lighter artwork shadows retain identical export hashes (workspace-ui/material-ui2/2 in each engine). Start/settings share the already decoded background while either is open; image mutations/setup explicitly invalidate it, and closing both releases it. Actual URL-reuse, import/legacy/rollback/removal cases pass material-start/setup-file2/2 in each engine after this final cache refinement.

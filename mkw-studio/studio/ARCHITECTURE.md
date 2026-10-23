@@ -12,6 +12,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | --- | --- |
 | `ui-colour-model.js`, `ui-theme.js`, `ui-theme.css` | UI-only semantic roles, palette and theme application; no artwork changes. |
 | `ui-controls.js`, `controls.css` | Shared native controls, density, transient press feedback and non-blocking plain tooltips. Designer sidebar observers disconnect on replacement; artwork overlays are never observed. |
+| `start-screen.js`, `setup-store.js` | Device-only start image, bounded single Blob, lazy backdrop/preview lifecycle, settings access and portable setup/rollback. Never project assets. |
 | `ui-menus.js` | Shared transient action-menu keyboard/focus/viewport behaviour. Original commands own mutations; disabled entries remain discoverable but non-actionable. |
 | `post-angle-model.js`, `post-angle.js` | Single-post chevron geometry/validation and its isolated editor service, crop interaction and shared rendering. |
 | `project-assets.js` | Pure portable-file compaction, reference traversal and hydration. No UI, disk access or editor mutation. |

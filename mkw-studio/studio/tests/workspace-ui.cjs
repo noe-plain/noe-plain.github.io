@@ -45,13 +45,11 @@ const assert = require("node:assert/strict");
       ctx.fill();
       return canvas.toDataURL();
     });
-    await page
-      .locator("#files")
-      .setInputFiles({
-        name: "Sommer.png",
-        mimeType: "image/png",
-        buffer: Buffer.from(fixture.split(",")[1], "base64"),
-      });
+    await page.locator("#files").setInputFiles({
+      name: "Sommer.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(fixture.split(",")[1], "base64"),
+    });
     await page.waitForFunction(() => !busy && p.boards.length === 2);
     await page.locator("#mainTextInput").fill("KONZERTE\nFÜR ALLE");
     await page.evaluate(() => document.activeElement.blur());
@@ -75,7 +73,7 @@ const assert = require("node:assert/strict");
     await page.locator("#mainTextInput").fill("KONZERTE\nFÜR ALLE");
     const postBar = await page.locator(".dock").boundingBox();
     assert.equal(postBar.height, 58);
-    assert.equal(postBar.y, 1000 - 52 - 14 - 58);
+    assert.equal(postBar.y, 1000 - 52 - 12 - 12 - 14 - 58);
     assert.equal(await page.locator(".dock [data-step]").count(), 6);
     assert.equal(
       await page.locator(".dock [data-step] svg[data-google-icon]").count(),
@@ -101,6 +99,44 @@ const assert = require("node:assert/strict");
       require("./browser.cjs").artifact("mkw-ui-fixture.png"),
       Buffer.from(fixture.split(",")[1], "base64"),
     );
+    const checkBento = async (viewport, sidebar) => {
+      const boxes = await page.evaluate(
+        ({ viewport, sidebar }) => {
+          const rect = (selector) => {
+            const el = document.querySelector(selector),
+              r = el.getBoundingClientRect();
+            return {
+              x: r.x,
+              y: r.y,
+              right: r.right,
+              bottom: r.bottom,
+              radius: parseFloat(getComputedStyle(el).borderTopLeftRadius),
+            };
+          };
+          return {
+            header: rect("header"),
+            footer: rect("footer"),
+            workspace: rect(viewport),
+            sidebar: rect(sidebar),
+            width: innerWidth,
+          };
+        },
+        { viewport, sidebar },
+      );
+      assert.equal(boxes.header.x, 12);
+      assert.equal(boxes.sidebar.y, 12);
+      assert.equal(boxes.workspace.y, boxes.header.bottom + 12);
+      assert.equal(boxes.workspace.bottom, boxes.sidebar.bottom);
+      assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
+      assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
+      assert.equal(boxes.header.right, boxes.workspace.right);
+      assert.equal(boxes.footer.right, boxes.width - 12);
+      for (const box of Object.values(boxes).filter(
+        (b) => typeof b === "object",
+      ))
+        assert(box.radius >= 28);
+    };
+    await checkBento("#workspace", "#toolsSidebar");
     const beforePixels = await pixels(),
       beforeWorkspace = await page.locator("#workspace").boundingBox();
     await page.locator("#toolsToggle").click();
@@ -174,6 +210,7 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator("#cb").inputValue(), "200");
     await page.locator("#createProject").click();
     await page.locator("#carouselCanvas").waitFor();
+    await checkBento("#carouselViewport", "#carouselSidebar");
     const carouselBar = await page
       .locator(".carousel-contextbar")
       .boundingBox();
@@ -191,8 +228,8 @@ const assert = require("node:assert/strict");
     );
     assert.equal(
       (await page.locator("#carouselViewport").boundingBox()).x,
-      0,
-      "No left tool column should occupy the artwork",
+      12,
+      "Only the 12px shell inset precedes the artwork; no left tool column",
     );
     const center = () =>
       page.evaluate(() => {

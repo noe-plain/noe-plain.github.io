@@ -1,5 +1,14 @@
 /* UI-only design tokens. Artwork renderers must never read these variables. */
 :root {
+  --studio-shell-gap: 12px;
+  --studio-shell-inset: 12px;
+  --studio-shell-side: calc(var(--sidebar) + var(--studio-shell-gap));
+  --studio-shell-background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary-container) 38%,
+    var(--md-sys-color-surface-container-low)
+  );
+  --studio-artwork-shadow: 0 2px 6px #1b294908, 0 6px 18px #1b29490d;
   --studio-space-1: 4px;
   --studio-space-2: 8px;
   --studio-space-3: 12px;
@@ -46,7 +55,7 @@
   --studio-border: var(--md-sys-color-outline-variant);
   --studio-panel: var(--md-sys-color-surface);
   --studio-panel-alt: var(--md-sys-color-surface-container-low);
-  --studio-canvas: var(--md-sys-color-workspace);
+  --studio-canvas: #ffffff;
   --studio-accent: var(--md-sys-color-primary);
   --studio-ink: var(--md-sys-color-on-surface);
   --studio-muted: var(--md-sys-color-on-surface-variant);

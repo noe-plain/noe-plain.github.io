@@ -151,9 +151,7 @@ header {
 }
 .board-surface {
   position: relative;
-  box-shadow:
-    0 3px 6px #1b29490b,
-    0 15px 45px #1b294918;
+  box-shadow: var(--studio-artwork-shadow);
   background: var(--md-sys-color-surface);
   isolation: isolate;
 }
@@ -975,16 +973,57 @@ a:focus-visible {
   color: var(--md-sys-color-on-surface-variant);
 }
 #startDialog {
+  border-radius: var(--studio-shape-dialog);
+  --studio-start-wash: color-mix(
+    in srgb,
+    var(--studio-shell-background) 55%,
+    transparent
+  );
   width: min(650px, calc(100vw - 32px));
   padding: clamp(25px, 6vw, 65px);
   text-align: left;
   box-shadow: 0 30px 100px #182c5720;
 }
 #startDialog::backdrop {
-  background: #f7f8faf5;
-  backdrop-filter: blur(8px);
+  background:
+    linear-gradient(var(--studio-start-wash), var(--studio-start-wash)),
+    var(--studio-start-image, none) center / cover no-repeat,
+    var(--studio-shell-background);
+}
+#startSettings {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+.settings-start-background-preview {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  margin: 16px 0;
+  overflow: hidden;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-high);
+}
+.settings-start-background-preview img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+.settings-start-background-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#startBackgroundStatus.is-error,
+#startBackgroundNotice {
+  color: var(--md-sys-color-error);
 }
 .start-brand {
+  padding-right: 48px;
   font-size: 32px;
   font-weight: 850;
   letter-spacing: -1.8px;
@@ -1018,16 +1057,18 @@ a:focus-visible {
   line-height: 20px;
   overflow-wrap: anywhere;
 }
-#startTemplates {
-  background: var(--md-sys-color-primary-container);
+#startTemplates,
+#startOpen {
+  background: var(--md-sys-color-secondary-container);
   border-color: transparent;
-  color: var(--md-sys-color-on-primary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
-#startTemplates:hover:not(:disabled) {
+#startTemplates:hover:not(:disabled),
+#startOpen:hover:not(:disabled) {
   background: color-mix(
     in srgb,
-    var(--md-sys-color-on-primary-container) 8%,
-    var(--md-sys-color-primary-container)
+    var(--md-sys-color-on-secondary-container) 8%,
+    var(--md-sys-color-secondary-container)
   );
 }
 #startDialog #startStatus {
@@ -1394,11 +1435,6 @@ header {
 }
 .board-label small {
   color: #78859a;
-}
-.board-surface {
-  box-shadow:
-    0 5px 12px #0003,
-    0 18px 40px #0004;
 }
 .group-heading {
   width: min(820px, calc(100vw - var(--sidebar) - 76px));
@@ -1780,9 +1816,6 @@ dialog small {
 .dialog-heading h2 {
   color: var(--md-sys-color-on-surface);
 }
-#startDialog::backdrop {
-  background: #12161ef5;
-}
 #startDialog {
   background: var(--md-sys-color-surface);
   border-color: #3c475c;
@@ -2010,7 +2043,7 @@ dialog small {
 .start-open-options {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   gap: 12px;
 }
 .start-open-options button {
@@ -2041,8 +2074,9 @@ dialog small {
   height: 20px;
 }
 @media (max-width: 480px) {
-  .start-open-options {
-    grid-template-columns: 1fr;
+  .start-choices button {
+    padding: 12px 10px;
+    font-size: 12px;
   }
   .add-more-images {
     padding: 20px 14px;

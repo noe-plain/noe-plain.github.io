@@ -26,6 +26,7 @@ test("UI palettes preserve legibility for extreme and arbitrary brand colours in
         ["primary", "on-primary"],
         ["primary", "surface"],
         ["on-primary-container", "primary-container"],
+        ["on-secondary-container", "secondary-container"],
         ["on-surface", "surface"],
         ["on-surface-variant", "surface-container-low"],
         ["error", "error-container"],
