@@ -189,57 +189,6 @@ html[data-theme="light"] footer .view-control button {
   background: transparent;
   color: var(--md-sys-color-on-surface-variant);
 }
-html[data-theme="light"]
-  :is(.image-info-card.group-heading, .group-heading .text-type-options) {
-  background: var(--md-sys-color-surface);
-  border-color: var(--md-sys-color-outline-variant);
-  box-shadow: 0 3px 15px #26354d08;
-}
-html[data-theme="light"] .image-info-card .image-card-summary {
-  background: transparent;
-}
-html[data-theme="light"] .image-info-card.group-heading .image-caption strong {
-  color: var(--md-sys-color-on-surface);
-}
-html[data-theme="light"] .image-info-card.group-heading .image-metadata {
-  color: var(--md-sys-color-on-surface-variant);
-}
-html[data-theme="light"] .image-info-card .image-number {
-  background: #17243bd9;
-  color: var(--md-sys-color-on-surface);
-  border-color: #ffffff66;
-}
-html[data-theme="light"] .image-info-card .group-actions > .image-action {
-  background: var(--md-sys-color-primary-container);
-  border-color: #c2d0f0;
-  color: var(--md-sys-color-primary);
-}
-html[data-theme="light"] .image-info-card .group-actions > .image-action:hover {
-  background: #dce7ff;
-  border-color: #a4b9e7;
-}
-html[data-theme="light"] .group-heading .text-type-picker summary {
-  background: var(--md-sys-color-surface-container-low);
-  border-color: var(--md-sys-color-outline-variant);
-  color: var(--md-sys-color-on-surface-variant);
-}
-html[data-theme="light"] .group-heading .text-type-options label {
-  color: var(--md-sys-color-on-surface-variant);
-}
-html[data-theme="light"] .group-heading .text-type-options label:hover {
-  background: var(--md-sys-color-surface-container);
-}
-html[data-theme="light"]
-  .group-heading
-  .text-type-options
-  label:has(input:checked) {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-primary);
-}
-html[data-theme="light"] .group-heading .text-type-options small {
-  color: var(--md-sys-color-on-surface-variant);
-  border-color: var(--md-sys-color-outline-variant);
-}
 html[data-theme="light"] :is(.image-field-label, .picker-heading) {
   color: var(--md-sys-color-on-surface-variant);
 }

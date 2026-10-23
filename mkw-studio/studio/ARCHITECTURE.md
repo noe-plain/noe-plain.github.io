@@ -223,3 +223,8 @@ User-facing modes are FD-Kampagnen and Designer; internal `post` / `carousel` ID
 ## Material inspector and optional complementary palette
 
 editor-polish.css owns the shared property-group spacing and task controls; carousel-refinements.css owns the Designer layer/folder/effect list presentation. Layer DOM order follows the visible identity-first/trailing-controls order. Commands, folder order and effect data remain in their original services. Theme-only colourMode is normal/complementary, validated with backward-compatible defaults by setup-model and carried only in browser preferences/MKW-Setup. ui-colour-model rotates the OKLab chromatic axes for secondary roles in complementary mode; primary/surface/status roles are identical. ui-theme cache keys include all three inputs(seed,theme,mode). No renderer reads UI palette roles. The montage uses the surface role in both themes; native scrollbars are hidden without changing scroll ownership or handlers.
+
+
+## FD image card presentation
+
+post-workspace.css is the single owner for FD image cards,metadata,action layout,copyright and native details/checkbox options in both themes. The obsolete light-theme/editor-polish/post-text-stack card overrides are removed. studio.js retains the existing action bindings/model commands and native disclosure; only the Format hinzufügen label and visual/tab order change. Cards remain230px wide with unchanged110pxpreview/460×220thumbnail cache. Frame position,zoom anchors,virtual painting and all renderer/persistence contracts stay unchanged. No per-card observer,timer,extra decoded image or persisted UI field is introduced.

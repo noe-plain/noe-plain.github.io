@@ -110,19 +110,6 @@
   :is(.carousel-warning, #sponsorMatteStatus):empty {
   display: none;
 }
-.image-info-card .image-card-summary {
-  cursor: default;
-}
-.image-info-card .image-card-body {
-  padding-top: 12px;
-}
-.image-info-card .template-badge {
-  margin: 0 0 10px;
-  font-size: 10px;
-}
-.image-info-card .image-settings {
-  border-top: 1px solid var(--line);
-}
 .studio-commandbar .studio-action:is(#export, #carouselExport) {
   min-height: 40px;
   padding: 9px 12px;
@@ -287,16 +274,6 @@ html[data-theme="light"]
 ) {
   border-color: var(--line);
 }
-.group-heading .text-type-options hr {
-  display: none;
-}
-html[data-theme]
-  .group-heading
-  .text-type-options
-  :is(.family-picker, .sponsor-options) {
-  border: 0;
-}
-
 #carouselOutsideCanvas {
   position: absolute;
   display: block;
@@ -425,70 +402,6 @@ html[data-theme]
 #settingsDialog #settings-panel-general .check input {
   flex: none;
   margin: 0;
-}
-/* Every single-post option uses the same full-width selection row. */
-html[data-theme]
-  .image-info-card
-  .text-type-options
-  :is(.post-option-row, label.post-option-row) {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: var(--studio-control-height);
-  margin: 0;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 7px;
-  font-size: 12px;
-  line-height: 1.5;
-  font-weight: 500;
-  color: var(--studio-ink);
-  background: transparent;
-}
-html[data-theme]
-  .image-info-card
-  .text-type-options
-  .post-option-row:has(input:checked) {
-  color: var(--studio-accent);
-  background: color-mix(in srgb, var(--studio-accent) 10%, transparent);
-}
-html[data-theme] .image-info-card .text-type-options .post-option-row:hover {
-  background: color-mix(in srgb, var(--studio-accent) 7%, transparent);
-}
-.image-info-card .text-type-options {
-  display: grid;
-  gap: 4px;
-}
-html[data-theme]
-  .image-info-card
-  .text-type-options
-  :is(.family-picker, [data-sponsor-options]) {
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-.image-info-card .text-type-options .post-option-row input {
-  width: 18px;
-  height: 18px;
-  flex: none;
-  margin: 0;
-}
-.image-info-card .post-angle-option .post-option-label {
-  display: flex;
-  padding: 0;
-  margin: 0;
-}
-html[data-theme] .image-info-card .post-angle-option select {
-  flex: 1;
-  width: 0;
-  min-width: 0;
-  height: 24px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  padding: 0 18px 0 0;
-  cursor: pointer;
 }
 .post-angle-outline {
   position: absolute;

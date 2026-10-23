@@ -1,22 +1,3 @@
-.image-info-card .text-type-options .post-options-heading {
-  display: block;
-  padding: 5px 10px 7px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--studio-muted);
-}
-.image-info-card .text-type-options .post-text-options {
-  display: grid;
-  gap: 4px;
-}
-.image-info-card .text-type-options .post-options-divider {
-  display: block;
-  width: 100%;
-  height: 0;
-  border: 0;
-  border-top: 1px solid var(--studio-border, var(--line));
-  margin: 6px 0;
-}
 #stepPanel > .post-text-stack {
   border-top: 1px solid var(--line);
   margin-top: 20px;
