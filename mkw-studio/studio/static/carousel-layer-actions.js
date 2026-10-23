@@ -1,8 +1,82 @@
 "use strict";
 function carouselCloseLayerMenu() {
-  const menu = $("#carouselLayerMenu");
-  if (menu?.matches(":popover-open")) menu.hidePopover();
-  menu?.remove();
+  for (const id of ["carouselLayerMenu", "carouselFolderMenu"]) {
+    const menu = $("#" + id);
+    if (menu?.matches(":popover-open")) menu.hidePopover();
+    menu?.remove();
+  }
+}
+function carouselFolderActions(root) {
+  root.querySelectorAll(".carousel-folder").forEach((row) => {
+    const button = document.createElement("button");
+    button.className = "carousel-folder-actions";
+    button.setAttribute("aria-label", "Ordneraktionen");
+    button.setAttribute("aria-haspopup", "menu");
+    button.setAttribute("aria-expanded", "false");
+    button.title = "Ordneraktionen";
+    button.innerHTML = studioIcon("more");
+    row.append(button);
+    MKWUIMenu.trigger(button);
+    button.onclick = () => {
+      carouselCloseLayerMenu();
+      const project = p,
+        c = p.carousel,
+        folder = c.folders.find((f) => f.id === row.dataset.folder);
+      if (!folder) return;
+      const blocks = carouselLayerBlocks(c),
+        index = blocks.findIndex((b) => b.folder?.id === folder.id),
+        front = blocks[index - 1]?.key,
+        back = blocks[index + 1]?.key,
+        actions = [
+          ["rename", "Umbenennen", "text", false],
+          [
+            "up",
+            "Nach vorne",
+            "front",
+            !front || !carouselReorderFolder(c, folder.id, front),
+          ],
+          [
+            "down",
+            "Nach hinten",
+            "back",
+            !back || !carouselReorderFolder(c, folder.id, back, true),
+          ],
+          ["remove", "Ordner entfernen …", "trash", !!folder.locked],
+        ],
+        menu = document.createElement("div");
+      menu.id = "carouselFolderMenu";
+      menu.className = "carousel-effect-menu carousel-layer-menu";
+      menu.setAttribute("popover", "auto");
+      menu.setAttribute("role", "menu");
+      menu.setAttribute("aria-label", "Aktionen: " + folder.name);
+      menu.innerHTML = `<strong>${esc(folder.name)}</strong>${actions.map(([key, label, icon, disabled]) => `${["up", "remove"].includes(key) ? '<hr role="separator">' : ""}<button role="menuitem" data-folder-menu="${key}" ${disabled ? "disabled" : ""}><span>${label}</span>${studioIcon(icon)}</button>`).join("")}`;
+      menu.querySelectorAll("button").forEach((item) => {
+        item.onclick = () => {
+          carouselCloseLayerMenu();
+          if (p !== project || !p.carousel.folders.includes(folder)) return;
+          const action = item.dataset.folderMenu;
+          if (action === "rename") {
+            row.querySelector(".carousel-folder-name").click();
+            const input = $("#carouselFolderName");
+            input?.focus({ preventScroll: true });
+            input?.select();
+          } else if (action === "remove") carouselRequestDeleteFolder(folder);
+          else
+            carouselMoveFolder(
+              folder.id,
+              action === "up" ? front : back,
+              action === "down",
+            );
+        };
+      });
+      menu.addEventListener("toggle", (event) => {
+        button.setAttribute("aria-expanded", String(event.newState === "open"));
+        if (event.newState === "closed") menu.remove();
+      });
+      document.body.append(menu);
+      MKWUIMenu.open(menu, button);
+    };
+  });
 }
 function carouselLayerActions(root) {
   root.querySelectorAll(".carousel-layer").forEach((row) => {

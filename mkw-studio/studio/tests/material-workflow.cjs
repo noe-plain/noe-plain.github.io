@@ -273,6 +273,68 @@ const { launch, artifact } = require("./browser.cjs");
         .evaluate((el) => getComputedStyle(el).animationName),
       "none",
     );
+    const beforeDismiss = await page.evaluate(() => ({
+      document: JSON.stringify(p),
+      revision,
+      undo: history.length,
+    }));
+    await page.locator("#save").focus();
+    await page.locator("#projectNoticeClose").focus();
+    await page.keyboard.press("Enter");
+    assert(!(await page.locator("#projectStorageNotice").isVisible()));
+    assert.equal(await page.evaluate(() => document.activeElement.id), "save");
+    assert.deepEqual(
+      await page.evaluate(() => ({
+        document: JSON.stringify(p),
+        revision,
+        undo: history.length,
+      })),
+      beforeDismiss,
+    );
+    await page.evaluate(() =>
+      MKWProjects.notice(
+        "Bitte Projekt speichern, um die Datei zu aktualisieren.",
+      ),
+    );
+    assert(await page.locator("#projectStorageNotice").isVisible());
+    assert.equal(
+      await page.locator("#projectStorageNotice").getAttribute("role"),
+      "status",
+    );
+    await page.locator("#projectNoticeClose").click();
+    assert(!(await page.locator("#projectStorageNotice").isVisible()));
+    await page.evaluate(() =>
+      MKWProjects.notice(
+        "Bitte Projekt speichern, um die Datei zu aktualisieren.",
+      ),
+    );
+    assert(
+      !(await page.locator("#projectStorageNotice").isVisible()),
+      "Dismissed identical information must not reappear on every autosave",
+    );
+    await page.evaluate(() =>
+      MKWProjects.notice("Eine andere Datei wurde geöffnet."),
+    );
+    assert(await page.locator("#projectStorageNotice").isVisible());
+    await page.locator("#projectNoticeClose").click();
+    await page.evaluate(() =>
+      MKWProjects.notice("Neue Sicherung nicht möglich.", true),
+    );
+    assert(await page.locator("#projectStorageNotice").isVisible());
+    assert.equal(
+      await page.locator("#projectStorageNotice").getAttribute("role"),
+      "alert",
+    );
+    await page.locator("#projectNoticeClose").click();
+    assert(!(await page.locator("#projectStorageNotice").isVisible()));
+    await page.evaluate(() =>
+      MKWProjects.notice("Neue Sicherung nicht möglich.", true),
+    );
+    assert(
+      await page.locator("#projectStorageNotice").isVisible(),
+      "A new failed save must remain visible even with the same error text",
+    );
+    await page.locator("#projectNoticeClose").click();
     assert.deepEqual(errors, []);
     console.log(
       "PASS keyboard menus/typeahead/focus, discoverable disabled choices with protected actions, duplicate/undo, independent FX, native export checkboxes, accurate progress and persistent accessible save errors in both themes",

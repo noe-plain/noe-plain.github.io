@@ -4,13 +4,19 @@ const MKWProjects = (() => {
   const versions = new Map(),
     links = new Map(),
     aliases = new Map();
-  let queue = Promise.resolve();
+  let queue = Promise.resolve(),
+    dismissedNotice = null;
   const stamp = (file) => ({ size: file.size, modified: file.lastModified });
   function notice(message, error = false) {
     const el = $("#projectStorageNotice");
     if (el) {
-      el.textContent = message;
-      el.hidden = !message;
+      el.querySelector("[data-notice-message]").textContent = message;
+      const dismissed =
+        !error &&
+        dismissedNotice?.id === p.projectId &&
+        dismissedNotice?.message === message;
+      if (!dismissed) dismissedNotice = null;
+      el.hidden = !message || dismissed;
       el.classList.toggle("is-error", error);
       el.setAttribute("role", error ? "alert" : "status");
       if (error) {
@@ -408,6 +414,27 @@ const MKWProjects = (() => {
     banner.className = "project-storage-notice";
     banner.setAttribute("role", "status");
     banner.hidden = true;
+    const message = document.createElement("span"),
+      close = document.createElement("button");
+    message.dataset.noticeMessage = "";
+    close.id = "projectNoticeClose";
+    close.type = "button";
+    close.className = "icon-button";
+    close.setAttribute("aria-label", "Meldung schliessen");
+    close.innerHTML = studioIcon("close");
+    let returnFocus = null;
+    close.onfocus = (event) => {
+      returnFocus = event.relatedTarget;
+    };
+    close.onclick = () => {
+      dismissedNotice = banner.classList.contains("is-error")
+        ? null
+        : { id: p.projectId, message: message.textContent };
+      banner.hidden = true;
+      if (returnFocus?.isConnected && !banner.contains(returnFocus))
+        returnFocus.focus?.({ preventScroll: true });
+    };
+    banner.append(message, close);
     document.body.append(banner);
     const saveAs = document.createElement("button");
     saveAs.id = "saveProjectAs";

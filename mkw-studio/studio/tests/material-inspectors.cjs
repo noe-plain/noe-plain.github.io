@@ -213,6 +213,78 @@ const { launch, artifact } = require("./browser.cjs");
         }
         await page.locator("#settings").click();
       }
+      if (mode === "carousel") {
+        await page.locator("#closeSettings").click();
+        const trigger = page.locator(
+          `[data-folder="${ids.folder}"] .carousel-folder-actions`,
+        );
+        await trigger.focus();
+        await page.keyboard.press("Enter");
+        assert(await page.locator("#carouselFolderMenu").isVisible());
+        assert(
+          await page.locator('[data-folder-menu="up"]').isDisabled(),
+          "Protected MKW logo remains on top",
+        );
+        await page.locator('[data-folder-menu="rename"]').click();
+        assert.equal(
+          await page.evaluate(() => document.activeElement.id),
+          "carouselFolderName",
+        );
+        await page.locator("#carouselFolderName").fill("Fotos und Titel");
+        await page.locator("#carouselFolderName").press("Tab");
+        assert.equal(
+          await page.evaluate(
+            (id) => p.carousel.folders.find((f) => f.id === id).name,
+            ids.folder,
+          ),
+          "Fotos und Titel",
+        );
+        const neighbour = await page.evaluate(
+          () =>
+            carouselObject("shape", {
+              name: "Nachbarebene",
+              x: 800,
+              y: 200,
+              w: 100,
+              h: 100,
+            }).id,
+        );
+        await trigger.click();
+        assert(!(await page.locator('[data-folder-menu="up"]').isDisabled()));
+        await page.locator('[data-folder-menu="up"]').click();
+        assert(
+          await page.evaluate(
+            ({ folder, neighbour }) => {
+              const blocks = carouselLayerBlocks(p.carousel);
+              return (
+                blocks.findIndex((b) => b.folder?.id === folder) <
+                blocks.findIndex((b) => b.key === "layer:" + neighbour)
+              );
+            },
+            { folder: ids.folder, neighbour },
+          ),
+        );
+        await trigger.click();
+        assert(!(await page.locator('[data-folder-menu="down"]').isDisabled()));
+        await page.locator('[data-folder-menu="down"]').click();
+        assert(
+          await page.evaluate(
+            ({ folder, neighbour }) => {
+              const blocks = carouselLayerBlocks(p.carousel);
+              return (
+                blocks.findIndex((b) => b.folder?.id === folder) >
+                blocks.findIndex((b) => b.key === "layer:" + neighbour)
+              );
+            },
+            { folder: ids.folder, neighbour },
+          ),
+        );
+        await trigger.click();
+        await page.locator('[data-folder-menu="remove"]').click();
+        assert(await page.locator("#carouselDeleteFolderDialog").isVisible());
+        await page.locator('[data-folder-delete="cancel"]').click();
+        await page.locator("#settings").click();
+      }
       await page.locator('[data-ui-density="compact"]').click();
       await page.locator("#closeSettings").click();
       await page.evaluate(
