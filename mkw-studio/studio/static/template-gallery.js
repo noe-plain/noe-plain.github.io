@@ -157,7 +157,9 @@ const MKWTemplateGallery = (() => {
       updateReady();
       $("#templateFill").scrollIntoView({
         block: "nearest",
-        behavior: "smooth",
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
       });
     } catch (error) {
       if (current === generation) message(error.message, true);
@@ -247,9 +249,19 @@ const MKWTemplateGallery = (() => {
       $("#templateLayers").replaceChildren();
     });
     $("#templatePrevious").onclick = () =>
-      $("#templateCards").scrollBy({ left: -470, behavior: "smooth" });
+      $("#templateCards").scrollBy({
+        left: -470,
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
     $("#templateNext").onclick = () =>
-      $("#templateCards").scrollBy({ left: 470, behavior: "smooth" });
+      $("#templateCards").scrollBy({
+        left: 470,
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
     $("#templateFill").onsubmit = (e) => {
       e.preventDefault();
       create();

@@ -228,3 +228,8 @@ editor-polish.css owns the shared property-group spacing and task controls; caro
 ## FD image card presentation
 
 post-workspace.css is the single owner for FD image cards,metadata,action layout,copyright and native details/checkbox options in both themes. The obsolete light-theme/editor-polish/post-text-stack card overrides are removed. studio.js retains the existing action bindings/model commands and native disclosure; only the Format hinzufügen label and visual/tab order change. Cards remain230px wide with unchanged110pxpreview/460×220thumbnail cache. Frame position,zoom anchors,virtual painting and all renderer/persistence contracts stay unchanged. No per-card observer,timer,extra decoded image or persisted UI field is introduced.
+
+
+## Material setup and template presentation
+
+Setup presentation stays in upgrade.css (dialog/fields/cards), carousel.css (mode/Designer setup), editor-forms.css (inert-aware format reveal) and post-safezone.css (four-sided diagram). Templates.css owns gallery/filling/saving/library presentation, with shared large-window bounds in dialogs.css. These styles use the established semantic roles in both themes; old light-only format/diagram overrides are removed. Native labels/inputs/fieldset/dialog, IDs and command ownership are unchanged. Template previews still use their existing bounded renderer; only navigation controls grow. The existing preview controls function adjusts its own horizontal dot lane on discrete slide changes, never the dialog scroll position or artwork. The gallery's explicit scroll commands honour reduced motion. No new observers, model fields, dependencies or persistence responsibilities.

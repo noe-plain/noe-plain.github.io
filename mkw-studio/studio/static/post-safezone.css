@@ -96,7 +96,3 @@ html[data-theme="dark"] .post-safezone-error {
   padding: 0;
   background: transparent;
 }
-html[data-theme="light"] .post-safezone-editor .safe-input label {
-  background: transparent;
-  color: #65758c;
-}

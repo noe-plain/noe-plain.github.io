@@ -24,6 +24,14 @@ const MKWTemplateFillPreview = (() => {
           "aria-pressed",
           String(+b.dataset.previewSlide === slide),
         );
+      const dot = dots.children[slide];
+      if (dot && dots.clientWidth) {
+        const left = dot.offsetLeft,
+          right = left + dot.offsetWidth;
+        if (left < dots.scrollLeft) dots.scrollLeft = left;
+        else if (right > dots.scrollLeft + dots.clientWidth)
+          dots.scrollLeft = right - dots.clientWidth;
+      }
     }
     async function draw() {
       timer = null;

@@ -58,10 +58,10 @@ The first milestone's Firefox reference is `/private/tmp/mkw-material-before/mat
 
 Shared colour/control/menu foundations and the23October start/Bento pilot are implemented. The complete migration is not yet finished:
 
-1. Continue workspace typography/spacing and hierarchy in both inspectors, FD cards/options and Designer layers/folders/FX. Keep the implemented tab/jump-navigation distinction and all specialist tools.
-2. Apply the same component rules to remaining start/setup, templates/library, save/export, paint picker and handbook details. Keep lazy loading, all formats and the native file/persistence contracts.
+1. Start/Bento, inspectors/layers, FD cards/options and setup/templates are migrated in the approved staged releases below. Preserve their tested component owners and specialist tools.
+2. Apply the same component rules to remaining project library, save/export, paint picker and handbook details. Keep lazy loading, all formats and the native file/persistence contracts.
 3. Remove superseded rules at each component owner rather than accumulating another final override layer.
-4. Repeat same-engine export fidelity, Firefox/Chrome, keyboard/theme/narrow and50-image/native-saving checks for each subsequent release. Keep the white montage and restrained artwork shadow explicitly requested by the user.
+4. Repeat same-engine export fidelity, Firefox/Chrome, keyboard/theme/narrow and50-image/native-saving checks for each subsequent release. Keep the montage matched to the bars in both themes, as most recently requested, and the restrained artwork shadow.
 
 ## Shared controls: second milestone
 
@@ -205,3 +205,14 @@ Ownership consolidated in post-workspace.css; remove redundant card-only light-t
 References: official [Material3cards](https://m3.material.io/components/cards/overview), [Material Web checkbox guidance](https://github.com/material-components/material-web/blob/main/docs/components/checkbox.md) and [Material Web menus](https://github.com/material-components/material-web/blob/main/docs/components/menu.md). The M3 card pages are JavaScript-rendered; do not claim their full specification text was retrieved. No Material Web framework is installed; the established native control architecture remains.
 
 New material-cards browser suite covers both themes/colour modes,230pxcard and48pxrow geometry,checkbox alignment/angle hit area,full-width labelled actions,first-image badge,contrast,native Space/Escape,compact/mobile overflow and unchanged artwork/history. Existing post-workspace exercises all replace/reorder/delete/add-format actions,thumbnail cache,pan/pinch/zoom; post-angle,text-stack,sponsors and original Firefox export references remain mandatory. Final release results are recorded in the local continuation checkpoint.
+
+
+## Setup and templates – 23 October 2026
+
+Project setup uses a connected two-choice mode control, outlined56pxfields with12pxpersistent labels, outlined12pxformat cards,48pxsafe-zone fields and48pxselection labels. Desktop FD formats use a responsive two-column grid; below1000px they return to one column. Disabled formats still show only ratio/dimensions; selection reveals the same inert-aware safe-zone editor using shared spatial/effect timing. Default9:16/1:1, optional4:5/3:4, custom sizes and four margins remain unchanged. Designer slide count1–20, all inputs and geometry previews are preserved. Sticky heading/actions retain the shared dialog sizing and native scrolling. Errors use semantic roles in both themes. Remove obsolete light-only setup/diagram rules rather than add another theme fork.
+
+Templates retain their lazy gallery, bounded thumbnails, draft preservation, validation and image-free stores. Cards use secondary selection roles plus a visible Ausgewählt label; preview badges have primary/on-primary contrast. Filling uses outlined text fields, tonal native uploads and clearly grouped layer cards. The live preview remains on the right on desktop and above the fields on narrow screens. Existing renderers and placeholder artwork are untouched. Native preview controls have40pxdesktop/48pxcoarse-pointer targets; a bounded horizontal dot lane keeps the selected slide visible without vertically scrolling the dialog. No new observers, background loops, dependencies, asset decoding or persistent state. Gallery scroll commands honour reduced-motion preferences. Template saving/naming and settings-library actions remain native and available.
+
+Official references reviewed: [Material3cards](https://m3.material.io/components/cards/overview), [Material Web text fields](https://github.com/material-components/material-web/blob/main/docs/components/text-field.md), [dialogs](https://github.com/material-components/material-web/blob/main/docs/components/dialog.md), and the existing checkbox/button/state/motion guidance. This adapts Material anatomy to the established native controls; it does not install Material Web or alter canvas/typography/render models. JavaScript-only M3 pages do not provide retrievable specification text here.
+
+material-setup covers360–1500pxlayout, field/selection targets, sticky actions, light/dark/complementary contrast, explicit selection, keyboard preview navigation, horizontally revealed current dot, lazy loading and document/history isolation. Existing templates/template-library cover full fill/create/save/portable/cancel/rollback flows; editor-forms/designer-layout/carousel-limits cover every setup function; material-ui compares the original same-engine Firefox artwork/export references. Final release evidence is recorded in the continuation checkpoint.
