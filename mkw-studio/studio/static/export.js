@@ -275,50 +275,60 @@ function scheduleExportPreviews() {
   document.querySelectorAll(".export-size").forEach((el) => {
     el.textContent = "Wird berechnet …";
     delete el.dataset.bytes;
+    delete el.dataset.exportError;
   });
   $("#exportTotal").textContent = "Dateigrössen werden berechnet …";
   previewTimer = setTimeout(() => refreshExportPreviews(generation), 220);
 }
 async function refreshExportPreviews(generation) {
-  const settings = exportSettings();
-  for (const b of orderedBoards()) {
-    if (generation !== exportGeneration || !$("#exportDialog").open) return;
-    const cell = [...document.querySelectorAll(".export-card")].find(
-      (el) => el.dataset.id === b.id,
-    );
-    if (!cell) continue;
-    try {
-      const entry = await encodedBoard(clone(b), settings);
-      if (generation !== exportGeneration) return;
-      const img = new Image();
-      img.src = entry.url;
-      img.alt = asset(b).name;
-      cell.querySelector(".export-preview").replaceChildren(img);
-      cell
-        .querySelector(".export-preview")
-        .classList.toggle("checkerboard", entry.hasTransparency);
-      const size = cell.querySelector(".export-size");
-      size.textContent = "ca. " + exportBytes(entry.blob.size);
-      size.dataset.bytes = entry.blob.size;
-    } catch (e) {
-      if (generation !== exportGeneration) return;
-      cell.querySelector(".export-size").textContent = e.message;
+  const finishLoading = MKWUIControls.loading("#exportTotal");
+  try {
+    const settings = exportSettings();
+    for (const b of orderedBoards()) {
+      if (generation !== exportGeneration || !$("#exportDialog").open) return;
+      const cell = [...document.querySelectorAll(".export-card")].find(
+        (el) => el.dataset.id === b.id,
+      );
+      if (!cell) continue;
+      try {
+        const entry = await encodedBoard(clone(b), settings);
+        if (generation !== exportGeneration) return;
+        const img = new Image();
+        img.src = entry.url;
+        img.alt = asset(b).name;
+        cell.querySelector(".export-preview").replaceChildren(img);
+        cell
+          .querySelector(".export-preview")
+          .classList.toggle("checkerboard", entry.hasTransparency);
+        const size = cell.querySelector(".export-size");
+        size.textContent = "ca. " + exportBytes(entry.blob.size);
+        size.dataset.bytes = entry.blob.size;
+      } catch (e) {
+        if (generation !== exportGeneration) return;
+        const size = cell.querySelector(".export-size");
+        size.textContent = e.message;
+        size.dataset.exportError = "true";
+      }
+      updateExportTotal();
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-    updateExportTotal();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+  } finally {
+    finishLoading();
   }
 }
 function updateExportTotal() {
   let total = 0,
-    missing = 0;
+    missing = 0,
+    failed = 0;
   for (const cell of document.querySelectorAll(".export-card"))
     if (cell.querySelector("input").checked) {
       const bytes = cell.querySelector(".export-size").dataset.bytes;
-      if (bytes === undefined) missing++;
+      if (cell.querySelector(".export-size").dataset.exportError) failed++;
+      else if (bytes === undefined) missing++;
       else total += +bytes;
     }
   $("#exportTotal").textContent =
-    `Auswahl: ca. ${exportBytes(total)}${missing ? " · weitere Grössen werden berechnet" : ""}`;
+    `Auswahl: ca. ${exportBytes(total)}${missing ? " · weitere Grössen werden berechnet" : ""}${failed ? ` · ${failed} Vorschau${failed === 1 ? "" : "en"} nicht verfügbar` : ""}`;
 }
 function updateExportNames() {
   $("#exportSelectionCount").textContent =
@@ -370,6 +380,7 @@ async function runExport(mode) {
   if (exportOptions.format === "pdf") return carouselRunPDF();
   if (busy || !exportPlan.length) return;
   busy = true;
+  const finishLoading = MKWUIControls.loading("#progressText");
   exportGeneration++;
   clearTimeout(previewTimer);
   const plan = clone(exportPlan),
@@ -459,6 +470,7 @@ async function runExport(mode) {
       e.name === "AbortError" ? "Export abgebrochen." : e.message;
     $("#exportProgress").classList.remove("is-running");
   } finally {
+    finishLoading();
     busy = false;
     for (const [el, value] of disabled) el.disabled = value;
     updateExportTotal();
@@ -494,6 +506,7 @@ async function showReview() {
     `${index + 1} / ${boards.length} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
   $("#reviewImage").hidden = true;
   $("#reviewMessage").textContent = "Vorschau wird erstellt …";
+  const finishLoading = MKWUIControls.loading("#reviewMessage");
   try {
     const entry = await encodedBoard(clone(b), exportSettings()),
       blob = entry.previewBlob || entry.blob,
@@ -510,6 +523,8 @@ async function showReview() {
     $("#reviewMessage").textContent = "";
   } catch (e) {
     $("#reviewMessage").textContent = e.message;
+  } finally {
+    finishLoading();
   }
 }
 $("#reviewExport").onclick = () => {

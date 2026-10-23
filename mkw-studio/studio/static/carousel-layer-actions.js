@@ -1,4 +1,84 @@
 "use strict";
+function carouselSetItemName(item, name) {
+  const c = p.carousel;
+  if (!c || (!c.objects.includes(item) && !c.folders?.includes(item)))
+    return false;
+  name = String(name).trim();
+  if (!name || name === item.name) return false;
+  name = name.slice(0, 160);
+  checkpoint();
+  item.name = name;
+  changed(false);
+  return true;
+}
+function carouselRenameItem(item, kind) {
+  document.querySelector(".carousel-name-input")?.blur();
+  const project = p,
+    selector =
+      kind === "folder"
+        ? `[data-folder="${CSS.escape(item.id)}"]`
+        : `[data-layer="${CSS.escape(item.id)}"]`,
+    row = $("#carouselLayers")?.querySelector(selector),
+    name = row?.querySelector(
+      kind === "folder" ? ".carousel-folder-name" : ".carousel-layer-name",
+    );
+  if (!name) return;
+  const input = document.createElement("input"),
+    draggable = row.draggable;
+  input.id = "carouselRenameInput";
+  input.className = "carousel-name-input";
+  input.type = "text";
+  input.maxLength = 160;
+  input.value = item.name;
+  input.setAttribute(
+    "aria-label",
+    kind === "folder" ? "Ordner umbenennen" : "Ebene umbenennen",
+  );
+  input.setAttribute("autocomplete", "off");
+  name.hidden = true;
+  row.draggable = false;
+  name.after(input);
+  let finished = false;
+  const finish = (commit, focus = false) => {
+    if (finished) return;
+    finished = true;
+    input.onblur = null;
+    if (commit && p === project) carouselSetItemName(item, input.value);
+    name.querySelector("span").textContent = item.name;
+    name.setAttribute(
+      "aria-label",
+      `${kind === "folder" ? "Ordner" : "Ebene"} auswählen: ${item.name}`,
+    );
+    name.title = item.name;
+    row
+      .querySelector("[aria-haspopup=menu]")
+      ?.setAttribute("aria-label", `Aktionen: ${item.name}`);
+    if (
+      p === project &&
+      kind === "folder" &&
+      carouselUI.folder === item.id &&
+      $("#carouselFolderName")
+    )
+      $("#carouselFolderName").value = item.name;
+    input.remove();
+    name.hidden = false;
+    row.draggable = draggable;
+    if (focus && name.isConnected) name.focus({ preventScroll: true });
+  };
+  input.onblur = () => finish(true);
+  input.onkeydown = (event) => {
+    if (!["Enter", "Escape"].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    finish(event.key === "Enter", true);
+  };
+  input.ondragstart = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  input.focus({ preventScroll: true });
+  input.select();
+}
 function carouselCloseLayerMenu() {
   for (const id of ["carouselLayerMenu", "carouselFolderMenu"]) {
     const menu = $("#" + id);
@@ -16,6 +96,21 @@ function carouselFolderActions(root) {
     button.title = "Ordneraktionen";
     button.innerHTML = studioIcon("more");
     row.append(button);
+    const folderName = row.querySelector(".carousel-folder-name");
+    folderName.ondblclick = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const folder = p.carousel.folders?.find(
+        (f) => f.id === row.dataset.folder,
+      );
+      if (folder) carouselRenameItem(folder, "folder");
+    };
+    folderName.addEventListener("keydown", (event) => {
+      if (event.key === "F2") {
+        event.preventDefault();
+        folderName.ondblclick(event);
+      }
+    });
     MKWUIMenu.trigger(button);
     button.onclick = () => {
       carouselCloseLayerMenu();
@@ -56,10 +151,7 @@ function carouselFolderActions(root) {
           if (p !== project || !p.carousel.folders.includes(folder)) return;
           const action = item.dataset.folderMenu;
           if (action === "rename") {
-            row.querySelector(".carousel-folder-name").click();
-            const input = $("#carouselFolderName");
-            input?.focus({ preventScroll: true });
-            input?.select();
+            carouselRenameItem(folder, "folder");
           } else if (action === "remove") carouselRequestDeleteFolder(folder);
           else
             carouselMoveFolder(
@@ -131,9 +223,7 @@ function carouselLayerActions(root) {
           carouselCloseLayerMenu();
           const action = item.dataset.layerMenu;
           if (action === "rename") {
-            row
-              .querySelector(".carousel-layer-name")
-              .dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+            carouselRenameItem(o, "layer");
           } else if (["up", "down"].includes(action)) {
             row.querySelector(`[data-action="${action}"]`).click();
           } else {

@@ -601,6 +601,7 @@ async function carouselImport(files, target) {
   carouselEndText();
   busy = true;
   $("#importDialog").showModal();
+  const finishLoading = MKWUIControls.loading("#importExplanation");
   let imported = 0;
   try {
     checkpoint();
@@ -647,6 +648,7 @@ async function carouselImport(files, target) {
     status(e.message);
   } finally {
     busy = false;
+    finishLoading();
     $("#importDialog").close();
     carouselPanel();
   }

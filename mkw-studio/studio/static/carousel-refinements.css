@@ -601,3 +601,39 @@
     --layer-row-height: 56px;
   }
 }
+
+#carouselSidebar :is(.carousel-layer-name, .carousel-folder-name)[hidden] {
+  display: none;
+}
+#carouselSidebar :is(.carousel-layer, .carousel-folder) > .carousel-name-input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  min-height: 40px;
+  height: 40px;
+  margin: 0 4px;
+  padding: 8px;
+  border: 1px solid var(--md-sys-color-primary);
+  border-radius: 4px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font:
+    14px/20px "MKW UI",
+    sans-serif;
+}
+html[data-density="compact"]
+  #carouselSidebar
+  :is(.carousel-layer, .carousel-folder)
+  > .carousel-name-input {
+  min-height: 32px;
+  height: 32px;
+  padding-block: 4px;
+}
+@media (pointer: coarse) {
+  #carouselSidebar
+    :is(.carousel-layer, .carousel-folder)
+    > .carousel-name-input {
+    min-height: 48px;
+    height: 48px;
+  }
+}

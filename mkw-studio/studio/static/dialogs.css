@@ -36,8 +36,8 @@
 }
 :is(#settingsDialog, #studioHelpDialog) > .dialog-heading h2 {
   margin: 0;
-  font-size: 22px;
-  line-height: 1.25;
+  font-size: var(--studio-title-size);
+  line-height: var(--studio-title-line);
 }
 .settings-layout {
   display: grid;
@@ -63,15 +63,16 @@
   align-items: center;
   justify-content: flex-start;
   flex: none;
-  min-height: 44px;
+  min-height: 48px;
   min-width: 0;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid transparent;
   border-radius: var(--studio-shape-full);
   background: transparent;
   color: var(--studio-muted);
-  font-size: 12px;
+  font-size: var(--studio-body-size);
+  line-height: var(--studio-body-line);
   text-align: left;
 }
 #settingsDialog .settings-tabs button .ui-icon {
@@ -142,7 +143,7 @@
   margin: 0 auto 24px;
 }
 #settingsDialog .settings-page-heading h3 {
-  margin: 0 0 7px;
+  margin: 0 0 8px;
   font-size: 20px;
   color: var(--studio-ink);
 }
@@ -336,14 +337,14 @@
 }
 .settings-colour-control button {
   margin-left: auto;
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   padding: 8px 12px;
-  min-height: 36px;
+  min-height: 40px;
 }
 #settingsDialog .settings-primary-colour p {
   margin: 0;
   color: var(--md-sys-color-on-surface-variant);
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   line-height: 1.5;
 }
 .settings-colour-preview {
@@ -359,7 +360,7 @@
   min-height: 32px;
   padding: 6px 16px;
   border-radius: var(--studio-shape-full);
-  font-size: 11px;
+  font-size: var(--studio-label-size);
 }
 .settings-preview-selection {
   background: var(--md-sys-color-primary-container);

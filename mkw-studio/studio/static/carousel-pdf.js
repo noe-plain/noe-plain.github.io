@@ -370,6 +370,7 @@ function carouselPDFUI() {
 async function carouselRunPDF() {
   if (busy || !exportPlan.length) return;
   busy = true;
+  const finishLoading = MKWUIControls.loading("#progressText");
   exportGeneration++;
   clearTimeout(previewTimer);
   const plan = clone(exportPlan),
@@ -420,6 +421,7 @@ async function carouselRunPDF() {
     $("#exportStatus").textContent = e.message;
     $("#exportProgress").classList.remove("is-running");
   } finally {
+    finishLoading();
     busy = false;
     for (const [el, value] of disabled) el.disabled = value;
   }

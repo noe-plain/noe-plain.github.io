@@ -38,6 +38,7 @@
   async function run(action) {
     if (running) return;
     running = true;
+    const finishLoading = MKWUIControls.loading(status);
     const controls = [
       ...dialog.querySelectorAll("button,input,select,textarea"),
     ].map((el) => [el, el.disabled]);
@@ -53,6 +54,7 @@
       await refresh().catch((error) =>
         message("Setup-Verknüpfung nicht verfügbar: " + error.message, true),
       );
+      finishLoading();
       running = false;
       for (const [el, disabled] of controls)
         if (el.isConnected) el.disabled = disabled;

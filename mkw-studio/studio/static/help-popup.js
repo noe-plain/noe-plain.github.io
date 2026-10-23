@@ -1,5 +1,5 @@
 "use strict";
-const studioHelpURL = "hilfe/?v=cb43fa257b59";
+const studioHelpURL = "hilfe/?v=e3c4b202f2af";
 let studioHelpPopup = null;
 function studioOpenHelp(trigger) {
   if (!studioHelpPopup) {
@@ -13,6 +13,9 @@ function studioOpenHelp(trigger) {
     frame.title = "MKW Studio: Hilfe und How-to";
     frame.hidden = true;
     const state = { dialog, frame, trigger: null, ready: false };
+    const finishLoading = MKWUIControls.loading(
+      dialog.querySelector("#studioHelpStatus"),
+    );
     studioHelpPopup = state;
     frame.addEventListener("load", () => {
       try {
@@ -39,6 +42,8 @@ function studioOpenHelp(trigger) {
       } catch {
         dialog.querySelector("#studioHelpStatus").innerHTML =
           `Wiki konnte nicht geladen werden. <a href="${studioHelpURL}" target="_blank" rel="noopener">Wiki in einem neuen Tab öffnen</a>`;
+      } finally {
+        finishLoading();
       }
     });
     dialog.querySelector("#closeStudioHelp").onclick = () => dialog.close();
@@ -74,6 +79,14 @@ document.addEventListener("click", (event) => {
 });
 
 function studioApplyHelpTheme(doc) {
+  const state = studioHelpPopup;
+  doc.documentElement.classList.add("studio-theme-changing");
+  cancelAnimationFrame(state.themeFrame);
+  state.themeFrame = requestAnimationFrame(() => {
+    state.themeFrame = requestAnimationFrame(() =>
+      doc.documentElement.classList.remove("studio-theme-changing"),
+    );
+  });
   doc.documentElement.style.colorScheme =
     document.documentElement.dataset.theme;
   doc.documentElement.dataset.theme = document.documentElement.dataset.theme;

@@ -87,14 +87,14 @@ const assert = require("node:assert/strict");
       }
     };
     // Continue a real pointer-drawn path at its end. The same layer survives.
-    await page.locator("[data-tool=path]").click();
+    await page.locator("button[data-tool=path]").click();
     await click(150, 350);
     await click(450, 350);
     await click(450, 650);
     await page.keyboard.press("Enter");
     const id = (await chosen()).id;
     assert.equal((await paths()).length, 1);
-    await page.locator("[data-tool=path]").click();
+    await page.locator("button[data-tool=path]").click();
     await click(450, 650);
     assert.equal(await page.evaluate(() => carouselPathDraft.originId), id);
     await click(200, 800);

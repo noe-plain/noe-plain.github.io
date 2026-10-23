@@ -54,6 +54,7 @@ const MKWStartScreen = (() => {
     // Keep the same decoded image while moving between start and settings.
     if (!force && currentURL) return;
     const token = ++generation;
+    const finishLoading = MKWUIControls.loading(preview.parentElement);
     release();
     try {
       const blob = await MKWSetupStore.background();
@@ -86,6 +87,8 @@ const MKWStartScreen = (() => {
           true,
         );
       }
+    } finally {
+      finishLoading();
     }
   }
   async function checked(blob) {
@@ -152,6 +155,7 @@ const MKWStartScreen = (() => {
   async function edit(input) {
     if (working || locks) return;
     working = true;
+    const finishLoading = MKWUIControls.loading("#startBackgroundStatus");
     controls();
     message(input ? "Bild wird vorbereitet …" : "Startbild wird entfernt …");
     mutation = (async () => {
@@ -169,6 +173,7 @@ const MKWStartScreen = (() => {
         message("Startbild nicht gespeichert: " + error.message, true),
       )
       .finally(() => {
+        finishLoading();
         working = false;
         controls();
       });

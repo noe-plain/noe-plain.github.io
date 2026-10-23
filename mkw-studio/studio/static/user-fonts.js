@@ -190,6 +190,9 @@ $("#customFontFiles").onchange = async (event) => {
   const files = [...event.target.files];
   if (!files.length) return;
   $("#addCustomFonts").disabled = true;
+  $("#fontImportStatus").textContent =
+    "Schriften werden geprüft und hinzugefügt …";
+  const finishLoading = MKWUIControls.loading("#fontImportStatus");
   let imported = 0,
     failed = [],
     storageMessage = "";
@@ -264,6 +267,7 @@ $("#customFontFiles").onchange = async (event) => {
       .filter(Boolean)
       .join("\n");
   } finally {
+    finishLoading();
     $("#addCustomFonts").disabled = false;
     event.target.value = "";
   }

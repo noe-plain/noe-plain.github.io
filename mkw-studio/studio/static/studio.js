@@ -663,6 +663,8 @@ $("#closeSave").onclick = () => $("#saveDialog").close();
 $("#logoFile").onchange = async (ev) => {
   const f = ev.target.files[0];
   if (!f) return;
+  const finishLoading = MKWUIControls.loading("#status");
+  status("Logo wird geladen …");
   try {
     const data = await dataURL(f);
     await image(data);
@@ -675,8 +677,11 @@ $("#logoFile").onchange = async (ev) => {
           b.elements.logo.visible = true;
         }
     });
+    status("Logo eingefügt.");
   } catch (e) {
     alert("Logo kann nicht geladen werden: " + e.message);
+  } finally {
+    finishLoading();
   }
   ev.target.value = "";
 };

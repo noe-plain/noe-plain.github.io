@@ -345,6 +345,7 @@ async function sponsorRenderSettings() {
   const root = $("#settings-panel-sponsors");
   if (!root) return;
   root.innerHTML = '<p role="status">Sponsorgruppen werden geladen …</p>';
+  const finishLoading = MKWUIControls.loading(root.firstElementChild);
   try {
     await sponsorLoadGroups(true);
     root.innerHTML = `<section class="sponsor-default-colour"><h3>Neue Sponsorenleisten</h3><label>Standard-Balkenfarbe<input id="defaultSponsorColour" type="color" aria-label="Standard-Balkenfarbe" value="${studioPreferences.sponsorColour}"></label></section><h3>Sponsorgruppen</h3><button id="newSponsorGroup">Gruppe hinzufügen</button><p class="sr-only" id="sponsorOrderHelp">Logos ziehen, um sie zu sortieren oder in eine andere Gruppe zu verschieben. Tastatur: Alt + Pfeiltasten.</p><div id="sponsorLibraryGroups">${sponsorGroups.map((g) => `<section class="sponsor-library-group" data-library-group="${esc(g.id)}"><div class="sponsor-project-heading"><label>Gruppenname<input data-sponsor-name="${esc(g.id)}" value="${esc(g.name)}" maxlength="80"></label><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="-1" aria-label="Gruppe nach vorne: ${esc(g.name)}">${studioIcon("up")}</button><button class="icon-button" data-sponsor-move="${esc(g.id)}" data-direction="1" aria-label="Gruppe nach hinten: ${esc(g.name)}">${studioIcon("down")}</button><button class="icon-button" data-sponsor-delete="${esc(g.id)}" aria-label="Gruppe löschen: ${esc(g.name)}">${studioIcon("trash")}</button></div><div class="sponsor-library-logos" data-sponsor-drop-group="${esc(g.id)}">${g.logos.map((l) => `<div class="sponsor-library-logo" draggable="true" tabindex="0" data-sponsor-drag="${esc(l.id)}" data-source-group="${esc(g.id)}" aria-label="${esc(l.name)} · Logo verschieben" aria-describedby="sponsorOrderHelp" aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"><i class="sponsor-drag-handle" aria-hidden="true">${studioIcon("move")}</i><img src="${esc(l.thumb || "")}" alt="" draggable="false"><span>${esc(l.name)}</span><button class="icon-button" data-library-logo="${esc(l.id)}" data-library-group="${esc(g.id)}" aria-label="Logo aus Bibliothek entfernen: ${esc(l.name)}">${studioIcon("trash")}</button></div>`).join("")}</div><button data-sponsor-upload="${esc(g.id)}">Logos hinzufügen</button></section>`).join("")}</div><p id="sponsorLibraryStatus" role="status"></p>`;
@@ -434,6 +435,7 @@ async function sponsorRenderSettings() {
             const controls = [...root.querySelectorAll("button,input")];
             for (const control of controls) control.disabled = true;
             let count = 0;
+            const finishUpload = MKWUIControls.loading("#sponsorLibraryStatus");
             try {
               for (const file of input.files) {
                 if (group.logos.length >= 30)
@@ -451,6 +453,8 @@ async function sponsorRenderSettings() {
             } catch (e) {
               $("#sponsorLibraryStatus").textContent = e.message;
               for (const control of controls) control.disabled = false;
+            } finally {
+              finishUpload();
             }
           };
           input.click();
@@ -459,6 +463,8 @@ async function sponsorRenderSettings() {
   } catch (e) {
     root.textContent =
       "Sponsorbibliothek konnte nicht geladen werden: " + e.message;
+  } finally {
+    finishLoading();
   }
 }
 document.addEventListener(

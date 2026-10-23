@@ -77,7 +77,7 @@ html[data-theme] .designer-grid {
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   color: var(--studio-muted);
 }
 #settingsDialog .settings-grid-fields input {
@@ -90,7 +90,7 @@ html[data-theme] .designer-grid {
   background: var(--studio-panel);
   color: var(--studio-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--studio-control-font);
 }
 .settings-grid-preview {
   width: 132px;
@@ -106,7 +106,7 @@ html[data-theme] .designer-grid {
   margin: 22px 0 14px;
 }
 .carousel-slide-format .slide-format-note {
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   line-height: 1.5;
   margin: 16px 0;
 }

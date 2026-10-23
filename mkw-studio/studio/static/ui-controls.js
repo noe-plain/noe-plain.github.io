@@ -186,6 +186,30 @@ const MKWUIControls = (function () {
   window.addEventListener("resize", hideTooltip);
   document.addEventListener("mkw-ui-theme-change", hideTooltip);
 
+  const loadingStates = new WeakMap();
+  function loading(target) {
+    const el =
+      typeof target === "string" ? document.querySelector(target) : target;
+    if (!el) return () => {};
+    let state = loadingStates.get(el);
+    if (!state) {
+      state = { count: 0, busy: el.getAttribute("aria-busy") };
+      loadingStates.set(el, state);
+    }
+    state.count++;
+    el.classList.add("studio-loading");
+    el.setAttribute("aria-busy", "true");
+    let finished = false;
+    return () => {
+      if (finished) return;
+      finished = true;
+      if (--state.count) return;
+      el.classList.remove("studio-loading");
+      if (state.busy === null) el.removeAttribute("aria-busy");
+      else el.setAttribute("aria-busy", state.busy);
+      loadingStates.delete(el);
+    };
+  }
   const rangeSelector = 'input[type="range"]:not(#paintAlphaSlider)';
   function syncRanges(root) {
     const ranges = root.matches?.(rangeSelector)
@@ -259,5 +283,5 @@ const MKWUIControls = (function () {
       );
       if (root) syncRanges(root);
     });
-  return Object.freeze({ designer });
+  return Object.freeze({ designer, loading });
 })();

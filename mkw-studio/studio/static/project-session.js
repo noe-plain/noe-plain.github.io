@@ -104,6 +104,7 @@ const MKWProjects = (() => {
     const document = MKWProjectAssets.capture(p),
       id = document.projectId,
       saveRevision = revision;
+    const finishLoading = MKWUIControls.loading("#status");
     status("Projekt wird gesichert …");
     const operation = async () => {
       let target = id;
@@ -171,6 +172,7 @@ const MKWProjects = (() => {
     };
     const task = queue.catch(() => {}).then(operation);
     queue = task;
+    task.then(finishLoading, finishLoading);
     task.catch((error) => {
       notice("Sicherung fehlgeschlagen: " + error.message, true);
       status("Projekt nicht gesichert. Bitte „Projekt speichern“ verwenden.");
@@ -178,53 +180,69 @@ const MKWProjects = (() => {
     return task;
   }
   async function open(record) {
-    if (savedRevision < revision) await autosave();
-    await restore(record.project);
-    await attach(record);
-    revision = savedRevision = 0;
-    $("#startDialog").close();
-    $("#projectLibrary")?.close();
-    busy = false;
-    notice("");
-    status(
-      record.fileHandle
-        ? "Projekt geöffnet · MKW-Datei verknüpft."
-        : "Projekt aus diesem Browser geöffnet.",
+    const finishLoading = MKWUIControls.loading(
+      $("#startDialog").open ? "#startStatus" : "#projectOpenStatus",
     );
+    try {
+      if (savedRevision < revision) await autosave();
+      await restore(record.project);
+      await attach(record);
+      revision = savedRevision = 0;
+      $("#startDialog").close();
+      $("#projectLibrary")?.close();
+      busy = false;
+      notice("");
+      status(
+        record.fileHandle
+          ? "Projekt geöffnet · MKW-Datei verknüpft."
+          : "Projekt aus diesem Browser geöffnet.",
+      );
+    } finally {
+      finishLoading();
+    }
   }
   async function openFile(file, handle = null) {
-    const document = MKWProjectAssets.hydrate(
-      await MKWProjectFile.decode(file),
+    const loadingTarget = $(
+      $("#projectLibrary")?.open ? "#projectOpenStatus" : "#startStatus",
     );
-    validate(document);
-    validateCarousel(document);
-    if (savedRevision < revision) await autosave();
-    document.projectId ??= uid();
-    // A separate copy must never silently replace another project's browser backup or file link.
-    let existing;
+    loadingTarget.textContent = "Projektdatei wird geöffnet …";
+    const finishLoading = MKWUIControls.loading(loadingTarget);
     try {
-      existing = await MKWProjectStore.open(document.projectId);
-    } catch {}
-    const same = !!(
-      handle &&
-      existing?.fileHandle &&
-      (await handle.isSameEntry(existing.fileHandle))
-    );
-    if (existing && !same) document.projectId = uid();
-    await restore(document);
-    versions.set(document.projectId, same ? existing.version : 0);
-    if (handle) links.set(document.projectId, { handle, stamp: stamp(file) });
-    else links.delete(document.projectId);
-    revision = savedRevision = 0;
-    busy = false;
-    $("#startDialog").close();
-    $("#projectLibrary")?.close();
-    await autosave({ writeFile: false });
-    notice(
-      handle
-        ? ""
-        : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
-    );
+      const document = MKWProjectAssets.hydrate(
+        await MKWProjectFile.decode(file),
+      );
+      validate(document);
+      validateCarousel(document);
+      if (savedRevision < revision) await autosave();
+      document.projectId ??= uid();
+      // A separate copy must never silently replace another project's browser backup or file link.
+      let existing;
+      try {
+        existing = await MKWProjectStore.open(document.projectId);
+      } catch {}
+      const same = !!(
+        handle &&
+        existing?.fileHandle &&
+        (await handle.isSameEntry(existing.fileHandle))
+      );
+      if (existing && !same) document.projectId = uid();
+      await restore(document);
+      versions.set(document.projectId, same ? existing.version : 0);
+      if (handle) links.set(document.projectId, { handle, stamp: stamp(file) });
+      else links.delete(document.projectId);
+      revision = savedRevision = 0;
+      busy = false;
+      $("#startDialog").close();
+      $("#projectLibrary")?.close();
+      await autosave({ writeFile: false });
+      notice(
+        handle
+          ? ""
+          : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
+      );
+    } finally {
+      finishLoading();
+    }
   }
   async function chooseFile() {
     if (window.showOpenFilePicker) {
@@ -350,6 +368,7 @@ const MKWProjects = (() => {
     const list = $("#projectLibraryList");
     list.innerHTML =
       '<p class="project-library-empty">Projekte werden geladen …</p>';
+    const finishLoading = MKWUIControls.loading(list.querySelector("p"));
     list.setAttribute("aria-busy", "true");
     if (!dialog.open) dialog.showModal();
     let records;
@@ -363,6 +382,7 @@ const MKWProjects = (() => {
       );
       return;
     } finally {
+      finishLoading();
       list.setAttribute("aria-busy", "false");
     }
     $("#projectLibraryCount").textContent =
@@ -380,12 +400,14 @@ const MKWProjects = (() => {
       button.onclick = async () => {
         if (opening) return;
         opening = true;
+        const finishLoading = MKWUIControls.loading("#projectOpenStatus");
         $("#projectOpenStatus").textContent = "Projekt wird geöffnet …";
         try {
           await open(await MKWProjectStore.open(button.dataset.projectId));
         } catch (error) {
           openError("Projekt konnte nicht geöffnet werden: " + error.message);
         } finally {
+          finishLoading();
           opening = false;
         }
       };

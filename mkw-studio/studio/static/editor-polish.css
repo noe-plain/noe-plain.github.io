@@ -23,7 +23,7 @@
 .tool-sidebar-heading h2 {
   margin: 0;
   font-size: 18px;
-  line-height: 1.3;
+  line-height: 24px;
 }
 #toolsSidebar .step-panel,
 #carouselProperties {
@@ -113,7 +113,7 @@
   display: block;
   margin: 8px 0 12px;
   color: var(--studio-muted);
-  font-size: 11px;
+  font-size: var(--studio-label-size);
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -164,8 +164,12 @@
   display: none;
 }
 #studioHelpStatus {
+  --studio-loading-inset: 24px;
   padding: 24px;
-  font-size: 13px;
+  color: var(--muted);
+  font:
+    var(--studio-body-size) / var(--studio-body-line) "MKW UI",
+    sans-serif;
 }
 
 @media (max-width: 520px) {
@@ -230,7 +234,7 @@
 }
 #settingsDialog .setup-file-card small {
   margin-top: 5px;
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   color: var(--studio-muted);
 }
 .settings-setup-actions {
@@ -256,7 +260,7 @@
 #settingsDialog .settings-setup > p,
 #settingsDialog .settings-text-sizes > p {
   color: var(--studio-muted);
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   line-height: 1.5;
   margin: 8px 0 12px;
 }
@@ -268,9 +272,9 @@
   color: var(--studio-ink);
 }
 #settingsDialog #setupStatus.is-error {
-  border-color: #df716b;
-  background: light-dark(#fff0ef, #48262b);
-  color: light-dark(#a52020, #ffb4b0);
+  border-color: var(--md-sys-color-error);
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
 }
 #setupStatus[hidden],
 #setupBrowserHint[hidden] {
@@ -285,8 +289,8 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 7px;
-  font-size: 11px;
+  gap: 8px;
+  font-size: var(--studio-label-size);
   color: var(--studio-muted);
 }
 .settings-size-value {
@@ -304,10 +308,10 @@
   background: var(--studio-panel);
   color: var(--studio-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--studio-control-font);
 }
 .settings-size-value > span {
-  font-size: 11px;
+  font-size: var(--studio-label-size);
 }
 
 #settingsDialog #settings-panel-general .check {
@@ -337,7 +341,7 @@
 }
 .post-angle-hint {
   margin: 0;
-  font-size: 11px;
+  font-size: var(--studio-label-size);
   color: var(--studio-muted);
   line-height: 1.5;
 }

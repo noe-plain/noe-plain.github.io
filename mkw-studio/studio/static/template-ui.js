@@ -37,6 +37,7 @@
       status = $("#templateLibraryStatus");
     button.disabled = true;
     status.textContent = "MKW-Datei wird geprüft …";
+    const finishLoading = MKWUIControls.loading(status);
     try {
       const q = await MKWTemplates.importProject(file);
       MKWTemplateSave.open(q);
@@ -45,6 +46,7 @@
       status.textContent = error.message;
       status.setAttribute("role", "alert");
     } finally {
+      finishLoading();
       button.disabled = false;
     }
   };
@@ -52,6 +54,9 @@
   async function refresh() {
     const current = ++generation;
     $("#settingsTemplateSave").disabled = !p.carousel;
+    const status = $("#templateLibraryStatus");
+    status.textContent = "Vorlagen werden geladen …";
+    const finishLoading = MKWUIControls.loading(status);
     try {
       const items = await MKWTemplates.list();
       if (current !== generation) return;
@@ -81,6 +86,13 @@
       });
     } catch (error) {
       $("#templateLibraryStatus").textContent = error.message;
+    } finally {
+      finishLoading();
+      if (
+        current === generation &&
+        status.textContent === "Vorlagen werden geladen …"
+      )
+        status.textContent = "";
     }
   }
   document.addEventListener("mkw-templates-changed", () => {

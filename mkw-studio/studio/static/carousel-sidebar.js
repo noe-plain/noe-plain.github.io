@@ -405,6 +405,15 @@ function carouselLegacyLayerPanel() {
             const o = c.objects.find((o) => o.id === row.dataset.layer),
               action = btn.dataset.action;
             if (action === "select") {
+              if (
+                !ev.shiftKey &&
+                !carouselUI.folder &&
+                !carouselUI.content &&
+                !carouselUI.editing &&
+                carouselSelected().length === 1 &&
+                carouselSelection === o.id
+              )
+                return;
               if (ev.shiftKey) {
                 const set = new Set(carouselSelected().map((o) => o.id));
                 set.has(o.id) ? set.delete(o.id) : set.add(o.id);
@@ -423,33 +432,18 @@ function carouselLegacyLayerPanel() {
             carouselPanel();
           }),
       );
-      row.querySelector(".carousel-layer-name").ondblclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const o = c.objects.find((o) => o.id === row.dataset.layer),
-          input = document.createElement("input");
-        input.value = o.name;
-        input.setAttribute("aria-label", "Ebene umbenennen");
-        const name = row.querySelector(".carousel-layer-name");
-        name.replaceChildren(input);
-        input.focus();
-        input.select();
-        const save = () => {
-          if (input.value.trim() && input.value.trim() !== o.name) {
-            checkpoint();
-            o.name = input.value.trim();
-            changed(false);
-          }
-          carouselLayerPanel();
-        };
-        input.onblur = save;
-        input.onkeydown = (e) => {
-          if (e.key === "Enter") input.blur();
-          if (e.key === "Escape") {
-            input.onblur = null;
-            carouselLayerPanel();
-          }
-        };
+      const name = row.querySelector(".carousel-layer-name");
+      name.ondblclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const o = c.objects.find((o) => o.id === row.dataset.layer);
+        if (o) carouselRenameItem(o, "layer");
       };
+      name.addEventListener("keydown", (event) => {
+        if (event.key === "F2") {
+          event.preventDefault();
+          name.ondblclick(event);
+        }
+      });
     });
 }

@@ -32,7 +32,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-transform.js` | Origin-based rotation, tight local/world bounds, rotation handles and constrained Shift snapping. |
 | `carousel-folder-order.js` | Pure root-block ordering, empty-folder anchors and folder drag/drop binding. |
 | `carousel-refinements.js` | Folder metadata, inherited locks/visibility, effect inspector and custom carousel logos. |
-| `carousel-layer-effects.js`, `carousel-layer-actions.js` | Layer tree, FX chooser and pop-up editor, per-effect visibility, action menus and explicit folder deletion choices. |
+| `carousel-layer-effects.js`, `carousel-layer-actions.js` | Layer tree, FX chooser and pop-up editor, per-effect visibility, action menus, shared inline folder/layer name editor and validated name setter, explicit folder deletion choices. |
 | `carousel-effects.js` | Bounded, non-persistent local effect rasters; deterministic monochrome noise and Gaussian blur. |
 | `carousel-typography.js`, `carousel-curvature.js` | Non-destructive case/script runs, source character offsets and view-only curvature comb. |
 | `carousel-text.js` | Text layout, paragraphs, leading, direct editing and typography UI. |
@@ -239,3 +239,8 @@ Setup presentation stays in upgrade.css (dialog/fields/cards), carousel.css (mod
 ## Material toolbar and file UI presentation
 
 workspace-ui.css owns floating tool/action states; a studio-tool-surface wraps each existing tool group. The external export action stays in the original studio-bar-actions with its original event/ID. Advanced places actions under the pill and retains fill/stroke controls inside its bounded scrollable surface. chrome.css owns grouped native header/footer controls. projects.css owns the library/save UI; library data reads, file handlers, version/conflict/retention and browser limitations are unchanged. export-ui.css owns all export/preview/PDF presentation and replaces the old scattered rules; the build manifest includes it after projects.css. UI-only wrappers and labels never enter artwork models. Actual encoded alpha still determines checkerboards, and preview/downloads keep shared bytes. No encoder, renderer, asset/cache, observer or persistence changes.
+
+
+## User-operation loading feedback
+
+`ui-controls.js` exposes `MKWUIControls.loading(elementOrSelector)`. Call it at the existing asynchronous user-operation boundary and always invoke its returned idempotent finish callback, normally in `finally`. Overlapping calls on the same element share a WeakMap reference count and restore its previous aria-busy attribute when the last finishes. For a queued promise, attach both success and failure cleanup without creating an unhandled rejected derivative. `controls.css` owns the circular progress styling, footer-indicator reuse, forced-colour and reduced-motion fallback. Existing measured import/export progress stays authoritative. Do not add fake percentages, document mutations, observers, frame callbacks or network loads to show progress. Hidden/lazy dialogs keep their existing loading boundaries; the Wiki still loads only on first open.

@@ -228,10 +228,10 @@ const { launch, artifact } = require("./browser.cjs");
         await page.locator('[data-folder-menu="rename"]').click();
         assert.equal(
           await page.evaluate(() => document.activeElement.id),
-          "carouselFolderName",
+          "carouselRenameInput",
         );
-        await page.locator("#carouselFolderName").fill("Fotos und Titel");
-        await page.locator("#carouselFolderName").press("Tab");
+        await page.locator("#carouselRenameInput").fill("Fotos und Titel");
+        await page.locator("#carouselRenameInput").press("Tab");
         assert.equal(
           await page.evaluate(
             (id) => p.carousel.folders.find((f) => f.id === id).name,

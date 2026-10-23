@@ -267,6 +267,7 @@ async function importFiles(files) {
     errors = [],
     recognitionFailed = 0;
   $("#importDialog").showModal();
+  const finishLoading = MKWUIControls.loading("#importExplanation");
   try {
     for (const [index, f] of [...files].entries()) {
       showImportStage(index, files.length, f.name, 0);
@@ -340,6 +341,7 @@ async function importFiles(files) {
     );
     if (errors.length) alert(errors.join("\n"));
   } finally {
+    finishLoading();
     $("#importDialog").close();
     busy = false;
     replaceId = null;

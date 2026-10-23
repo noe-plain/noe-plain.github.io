@@ -1,6 +1,6 @@
 # Material 3 migration – compatibility inventory
 
-The completed stages establish UI-only colour roles, adjustable tool colour, shared control/motion tokens, native switches/sliders, non-blocking plain tooltips, press feedback and an optional compact input density. The milestone sections below record the component rollout; final cross-component review remains separate. Keep the established renderer and document model unchanged through the remaining milestones.
+The completed stages establish UI-only colour roles, adjustable tool colour, shared control/motion tokens, native switches/sliders, non-blocking plain tooltips, press feedback and an optional compact input density. The milestone sections below record the component rollout and the final cross-component review. Keep the established renderer and document model unchanged during maintenance.
 
 ## Ownership
 
@@ -246,3 +246,34 @@ Sources reviewed: official [Material3 sliders](https://m3.material.io/components
 
 
 Final local release verification:113/113model tests,formatting and reproducible build pass. Complete53/53Firefox suites pass with the original pre-Material export references. Chrome10/10 targeted suites pass; after the final image-alpha/reset-symbol refinements,8/8Firefox and3/3Chrome pass again. Light/dark/complementary,narrow and short-window screenshots were reviewed. The production JS adds154gzip bytes and CSS removes267gzip bytes againstb24aa19; the independently lazy Wiki CSS/JS remain small. These asset sizes are not a claim about measured network speed. No renderer,document schema or persistence algorithm changed.
+
+
+## Final consistency, loading feedback and shared renaming – 23 October 2026
+
+Shared UI type roles use 12/16px labels, 14/20px body controls and 22/28px dialog titles. Typography sections use 16px grouping and 8px field spacing, 40px formatting actions, 48px disclosures and the existing 36px compact/48px comfortable inputs. Settings navigation uses 48px targets. Legacy specificity that overrode advanced typography density has been removed at the owning rules; imported-font empty states now use semantic readable text. This is control styling only: artwork fonts, point sizes, direct text baselines and renderers are unchanged. Native buttons, disclosure summaries and typography tabs retain their keyboard handling instead of being intercepted by Designer canvas shortcuts. Wiki loading text uses the same UI font/semantic readable colour. During a Wiki theme switch, the short native navigation colour transitions are briefly suppressed using the existing two-frame theme-guard pattern, avoiding mixed light/dark foreground/background contrast; ordinary navigation transitions remain.
+
+`MKWUIControls.loading(target)` owns small, accessible Material-style circular progress feedback. Each caller receives an idempotent finish callback, called at the actual operation boundary on success, cancellation or error. A WeakMap reference count retains feedback while overlapping work is still running and restores the prior aria-busy value. The footer reuses its existing save indicator instead of adding a second spinner. Reduced motion uses a stationary ring and live status text; forced colours use system colours. No observer, timer-based fake percentage, renderer loop or model setting is added.
+
+| Operation audited | Existing boundary / feedback |
+|---|---|
+| Startup, resume and project creation | start.js; start status or creation action |
+| Browser project library and file/record opening | project-session.js; list/open status |
+| Browser/native save, MKW and PSD | project-session.js/file-io.js; footer/save status, existing measured progress |
+| Image import in both editors | state.js/carousel.js; explanation plus existing measured import progress |
+| Export previews, export preview window, image/PDF export | export.js/carousel-pdf.js; preview/status plus existing actual progress |
+| Template gallery, import, fill preview and saving | template UI/gallery/fill-preview/save boundaries |
+| Settings setup link/refresh/export | setup-ui.js; setup status |
+| Font, sponsor, logo and paint-image imports | existing import boundaries and their status surfaces |
+| Start background image load/change/remove | start-screen.js; preview/status |
+| Wiki first open | help-popup.js; lazy iframe load/error status; no startup fetch |
+
+Cached painting, pointer movement and background thumbnail work retain their existing coalescing and cancellation; visible loading feedback is attached to user operations, not every rendering frame. Failed export-size previews now report unavailable previews rather than remaining labelled as still calculating.
+
+Folder and layer names use one inline editor in `carousel-layer-actions.js`. Both menus, real name double-click and F2 use the same native input; Enter commits, Escape cancels, blur/Tab commits and empty input retains the old name. Row dragging is temporarily disabled; the list does not rebuild on commit, preserving Tab focus. One shared setter validates the current project member and creates one undo checkpoint only for an actual change. Folder inspector naming remains available through the same setter. Names do not alter geometry, paints, assets or export pixels. The Wiki describes the shared operation for users.
+
+Official guidance reviewed: [Material Web text fields](https://github.com/material-components/material-web/blob/main/docs/components/text-field.md), [buttons](https://github.com/material-components/material-web/blob/main/docs/components/button.md), [Material 3 typography](https://m3.material.io/styles/typography/type-scale-tokens) and [spacing](https://m3.material.io/foundations/layout/understanding-layout/spacing). Material 3 pages require JavaScript here; do not imply their full specification text was retrieved. Specialist editing retains native controls and existing application behaviour.
+
+New `material-consistency` and `layer-renaming` browser suites cover density/spacing/type/contrast in both editors and themes, keyboard disclosure/tab navigation, delayed and failed loading cleanup, concurrent loading, reduced motion, forced colours, shared renaming, cancellation, undo/redo and unchanged artwork/history. Existing regression suites remain; their selectors are updated only where the requested shared name input or an unambiguously scoped path-tool button requires it. Final release counts and deployment evidence are recorded in the continuation checkpoint.
+
+
+Final local verification: 113/113 model tests, formatting and a reproducible build pass. Full Firefox 55/55 passes with the original pre-Material artwork references; after the final Wiki loading typography and theme-transition correction, affected Firefox 4/4 and Chrome 3/3 pass again. Chrome's earlier 12/12 operation suites and final path/name/consistency 3/3 also pass. Light/dark settings/text, shared renaming, loading, reduced-motion and forced-colour screenshots reviewed. Runtime bundles against 6ac2e7d: JS +1528 gzip bytes; CSS +673 gzip bytes. These are asset sizes, not measured network-speed claims. No renderer, document schema or persistence algorithm changed.

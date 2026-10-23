@@ -30,6 +30,7 @@ const MKWTemplateSave = (() => {
       const status = $("#templateSaveStatus");
       status.textContent = "Vorlage wird geprüft und gespeichert …";
       status.classList.remove("is-error");
+      const finishLoading = MKWUIControls.loading(status);
       try {
         const layers = [...dialog.querySelectorAll("[data-template-name]")].map(
           (input) => ({
@@ -66,6 +67,7 @@ const MKWTemplateSave = (() => {
         status.classList.add("is-error");
         status.setAttribute("role", "alert");
       } finally {
+        finishLoading();
         running = false;
         controls.forEach((el) => (el.disabled = false));
       }

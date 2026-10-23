@@ -47,6 +47,7 @@ const MKWTemplateFillPreview = (() => {
           revision === version &&
           slide === index;
       status.textContent = "Vorschau wird aktualisiert …";
+      const finishLoading = MKWUIControls.loading(status);
       try {
         const src = await MKWTemplatePreview.paint(
           item,
@@ -67,6 +68,7 @@ const MKWTemplateFillPreview = (() => {
         if (current())
           status.textContent = "Vorschau nicht verfügbar: " + error.message;
       } finally {
+        finishLoading();
         painting = false;
         if (
           active &&

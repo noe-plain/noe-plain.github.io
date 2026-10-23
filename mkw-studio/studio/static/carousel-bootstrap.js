@@ -14,8 +14,17 @@ window.addEventListener(
         target.isContentEditable || target.closest("input,textarea,select");
     if (typing) return;
     if (
-      target.closest('[aria-haspopup="menu"]') &&
-      ["ArrowDown", "ArrowUp", "Enter", " "].includes(ev.key)
+      target.closest("button,summary,a[href]") &&
+      [
+        "ArrowDown",
+        "ArrowUp",
+        "ArrowLeft",
+        "ArrowRight",
+        "Home",
+        "End",
+        "Enter",
+        " ",
+      ].includes(ev.key)
     )
       return;
     const key = ev.key.toLowerCase(),

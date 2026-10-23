@@ -204,6 +204,7 @@ function carouselLayerPanel() {
         (b.onclick = () => {
           const action = b.dataset.folderAction;
           if (action === "select") {
+            if (carouselUI.folder === f.id) return;
             carouselSelect(
               c.objects.filter((o) => o.folderId === f.id).map((o) => o.id),
             );
@@ -276,10 +277,8 @@ function carouselRefinementsPanel(panel, items) {
     section.innerHTML = `<h4>Ordner</h4><label>Name<input id="carouselFolderName" maxlength="160" value="${esc(folder.name)}"></label><button id="carouselRemoveFolder" ${folder.locked ? "disabled" : ""}>Ordner entfernen …</button>`;
     panel.prepend(section);
     $("#carouselFolderName").onchange = (e) => {
-      if (!e.target.value.trim()) return;
-      checkpoint();
-      folder.name = e.target.value.trim();
-      changed(false);
+      carouselSetItemName(folder, e.target.value);
+      e.target.value = folder.name;
       carouselLayerPanel();
     };
     $("#carouselRemoveFolder").onclick = () =>
@@ -350,6 +349,8 @@ function carouselReplaceLogo(o) {
   input.onchange = async () => {
     const file = input.files[0];
     if (!file || carouselObjectLocked(o)) return;
+    status("Logo wird geladen …");
+    const finishLoading = MKWUIControls.loading("#status");
     try {
       if (file.size > 20 * 1024 * 1024) throw Error("Logo maximal 20 MB.");
       const data = await dataURL(file),
@@ -366,8 +367,11 @@ function carouselReplaceLogo(o) {
       o.source = logo.id;
       o.h = (o.w * bitmap.height) / bitmap.width;
       changed();
+      status("Logo ersetzt.");
     } catch (e) {
       status(e.message);
+    } finally {
+      finishLoading();
     }
   };
   input.click();

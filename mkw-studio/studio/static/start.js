@@ -1,10 +1,20 @@
 "use strict";
 icons();
+const createWithFeedback = $("#createProject").onclick;
+$("#createProject").onclick = async function (...args) {
+  const finishLoading = MKWUIControls.loading(this);
+  try {
+    return await createWithFeedback.apply(this, args);
+  } finally {
+    finishLoading();
+  }
+};
 busy = true;
 const startDialog = $("#startDialog");
 startDialog.showModal();
 startDialog.addEventListener("cancel", (event) => event.preventDefault());
 (async () => {
+  const finishLoading = MKWUIControls.loading("#startStatus");
   let saved = null,
     restoreError = "";
   try {
@@ -26,6 +36,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     $("#startStatus").textContent =
       "Start nur eingeschränkt möglich: " + error.message;
   }
+  finishLoading();
   $("#startNew").disabled =
     $("#startOpen").disabled =
     $("#startTemplates").disabled =
@@ -35,12 +46,15 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
   $("#startNew").onclick = openProjectSetup;
   $("#startContinue").onclick = async () => {
     $("#startContinue").disabled = true;
+    const finishLoading = MKWUIControls.loading("#startStatus");
     try {
       await MKWProjects.open(await MKWProjectStore.open(saved.id));
     } catch (error) {
       $("#startStatus").textContent =
         "Projekt konnte nicht geöffnet werden: " + error.message;
       $("#startContinue").disabled = false;
+    } finally {
+      finishLoading();
     }
   };
 })();

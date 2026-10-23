@@ -190,6 +190,9 @@ nav a {
 nav a:hover {
   background: var(--md-sys-color-surface-container-high);
 }
+.studio-theme-changing nav a {
+  transition: none;
+}
 nav a[aria-current="location"] {
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);

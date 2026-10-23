@@ -47,6 +47,8 @@ async function writeSaveFile(handle, blob, name) {
 }
 function setSaveBusy(value) {
   busy = value;
+  $("#psdStatus").classList.toggle("studio-loading", value);
+  $("#psdStatus").setAttribute("aria-busy", String(value));
   $("#saveDialog")
     .querySelectorAll("input,button")
     .forEach((el) => (el.disabled = value));

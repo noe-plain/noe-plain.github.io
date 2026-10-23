@@ -35,6 +35,9 @@ const MKWTemplateGallery = (() => {
     pending++;
     updateReady();
     input.disabled = true;
+    const finishLoading = MKWUIControls.loading(
+      input.closest(".template-file-field"),
+    );
     message(
       "„" + file.name + "“ wird geladen und für den Designer vorbereitet …",
     );
@@ -67,6 +70,7 @@ const MKWTemplateGallery = (() => {
     } catch (error) {
       if (current === generation) message(error.message, true);
     } finally {
+      finishLoading();
       if (current === generation) {
         pending--;
         updateReady();
@@ -99,70 +103,76 @@ const MKWTemplateGallery = (() => {
     return `<section class="template-layer" data-template-layer="${esc(o.id)}"><div class="template-layer-heading">${studioIcon(o.type === "logo" ? "logo" : o.type)}<div><h4>${esc(o.name)}</h4><small>${esc([folder?.name, kindNames[o.type], visible ? null : "Ausgeblendet"].filter(Boolean).join(" · "))}</small></div></div>${body}</section>`;
   }
   async function select(id) {
-    if (selectedTemplate) drafts.set(selectedTemplate.id, values);
-    const current = ++generation;
-    pending = 0;
-    selectedTemplate = null;
-    updateReady();
-    message("Vorlage wird geladen …");
+    const finishLoading = MKWUIControls.loading("#templateStatus");
     try {
-      const t = await MKWTemplates.get(id);
-      if (current !== generation || !dialog.open) return;
-      selectedTemplate = t;
-      values = drafts.get(id) || Object.create(null);
-      dialog
-        .querySelectorAll("[data-template-id]")
-        .forEach((b) =>
-          b.setAttribute("aria-pressed", String(b.dataset.templateId === id)),
-        );
-      $("#templateFill").hidden = false;
-      $("#templateFillTitle").textContent = t.name;
-      $("#templateFillDescription").textContent = t.description;
-      $("#templateLayers").innerHTML = t.carousel.objects
-        .map((o) => layerField(o, t))
-        .join("");
-      for (const input of dialog.querySelectorAll("[data-template-upload]"))
-        input.onchange = () =>
-          upload(input, input.dataset.templateUpload, input.dataset.channel);
-      for (const input of dialog.querySelectorAll("[data-template-text]"))
-        input.oninput = () => {
-          values[input.dataset.templateText] ??= {};
-          values[input.dataset.templateText].text = input.value;
-          livePreview.changed();
-        };
-      for (const input of dialog.querySelectorAll("[data-template-logo]")) {
-        input.value = values[input.dataset.templateLogo]?.source || input.value;
-        input.onchange = () => {
-          const v = (values[input.dataset.templateLogo] ??= {});
-          v.source = input.value;
-          delete v.logo;
-          livePreview.changed();
-          input
-            .closest(".template-layer")
-            .querySelector("[data-file-name]").textContent = "Bild auswählen";
-        };
-      }
-      livePreview.show(t, () => values);
-      for (const field of dialog.querySelectorAll("[data-template-layer]"))
-        field.addEventListener("focusin", () =>
-          livePreview.reveal(
-            t.carousel.objects.find(
-              (o) => o.id === field.dataset.templateLayer,
-            ),
-          ),
-        );
-      message(
-        `${t.carousel.n} Slides · ${t.carousel.objects.length} Ebenen · Bilder wählen und Texte prüfen.`,
-      );
+      if (selectedTemplate) drafts.set(selectedTemplate.id, values);
+      const current = ++generation;
+      pending = 0;
+      selectedTemplate = null;
       updateReady();
-      $("#templateFill").scrollIntoView({
-        block: "nearest",
-        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-      });
-    } catch (error) {
-      if (current === generation) message(error.message, true);
+      message("Vorlage wird geladen …");
+      try {
+        const t = await MKWTemplates.get(id);
+        if (current !== generation || !dialog.open) return;
+        selectedTemplate = t;
+        values = drafts.get(id) || Object.create(null);
+        dialog
+          .querySelectorAll("[data-template-id]")
+          .forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.templateId === id)),
+          );
+        $("#templateFill").hidden = false;
+        $("#templateFillTitle").textContent = t.name;
+        $("#templateFillDescription").textContent = t.description;
+        $("#templateLayers").innerHTML = t.carousel.objects
+          .map((o) => layerField(o, t))
+          .join("");
+        for (const input of dialog.querySelectorAll("[data-template-upload]"))
+          input.onchange = () =>
+            upload(input, input.dataset.templateUpload, input.dataset.channel);
+        for (const input of dialog.querySelectorAll("[data-template-text]"))
+          input.oninput = () => {
+            values[input.dataset.templateText] ??= {};
+            values[input.dataset.templateText].text = input.value;
+            livePreview.changed();
+          };
+        for (const input of dialog.querySelectorAll("[data-template-logo]")) {
+          input.value =
+            values[input.dataset.templateLogo]?.source || input.value;
+          input.onchange = () => {
+            const v = (values[input.dataset.templateLogo] ??= {});
+            v.source = input.value;
+            delete v.logo;
+            livePreview.changed();
+            input
+              .closest(".template-layer")
+              .querySelector("[data-file-name]").textContent = "Bild auswählen";
+          };
+        }
+        livePreview.show(t, () => values);
+        for (const field of dialog.querySelectorAll("[data-template-layer]"))
+          field.addEventListener("focusin", () =>
+            livePreview.reveal(
+              t.carousel.objects.find(
+                (o) => o.id === field.dataset.templateLayer,
+              ),
+            ),
+          );
+        message(
+          `${t.carousel.n} Slides · ${t.carousel.objects.length} Ebenen · Bilder wählen und Texte prüfen.`,
+        );
+        updateReady();
+        $("#templateFill").scrollIntoView({
+          block: "nearest",
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto"
+            : "smooth",
+        });
+      } catch (error) {
+        if (current === generation) message(error.message, true);
+      }
+    } finally {
+      finishLoading();
     }
   }
   async function create() {
@@ -206,6 +216,7 @@ const MKWTemplateGallery = (() => {
     controls.forEach(([el]) => (el.disabled = true));
     dialog.setAttribute("aria-busy", "true");
     message("Dein Projekt wird erstellt …");
+    const finishLoading = MKWUIControls.loading("#templateStatus");
     try {
       await MKWTemplates.create(selectedTemplate, {
         name: name.value.trim(),
@@ -215,6 +226,7 @@ const MKWTemplateGallery = (() => {
     } catch (error) {
       message("Projekt nicht erstellt: " + error.message, true);
     } finally {
+      finishLoading();
       pending = Math.max(0, pending - 1);
       creating = false;
       controls.forEach(([el, disabled]) => {
@@ -270,60 +282,68 @@ const MKWTemplateGallery = (() => {
   }
   async function open() {
     mount();
-    observer?.disconnect();
-    generation++;
-    selectedTemplate = null;
-    livePreview.close();
-    values = Object.create(null);
-    pending = 0;
-    drafts.clear();
-    updateReady();
-    $("#templateFill").hidden = true;
-    $("#templateProjectName").value = $("#setupName").value || "";
-    $("#templateProjectCode").value = $("#setupCode").value || "";
-    $("#templateCards").replaceChildren();
-    message("Vorlagen werden geladen …");
-    if (!dialog.open) dialog.showModal();
-    const current = generation;
+    const finishLoading = MKWUIControls.loading("#templateStatus");
     try {
-      const records = await MKWTemplates.list();
-      if (current !== generation || !dialog.open) return;
-      $("#templateCards").innerHTML = records
-        .map(
-          (t) =>
-            `<button type="button" class="template-card" data-template-id="${esc(t.id)}" aria-pressed="false"><span class="template-card-preview"><img alt="Vorschau: ${esc(t.name)}" hidden><span data-preview-status>Vorschau wird geladen …</span><span class="template-slide-badge">${t.n} ${t.n === 1 ? "Slide" : "Slides"}</span></span><strong>${esc(t.name)}</strong><small>${t.w} × ${t.h} px${t.builtIn ? " · Mitgeliefert" : ""}</small></button>`,
-        )
-        .join("");
-      observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries)
-            if (entry.isIntersecting) {
-              observer.unobserve(entry.target);
-              loadPreview(entry.target, current);
-            }
-        },
-        { root: $("#templateCards"), rootMargin: "120px" },
-      );
-      for (const card of dialog.querySelectorAll("[data-template-id]")) {
-        card.onclick = () => select(card.dataset.templateId);
-        observer.observe(card);
+      observer?.disconnect();
+      generation++;
+      selectedTemplate = null;
+      livePreview.close();
+      values = Object.create(null);
+      pending = 0;
+      drafts.clear();
+      updateReady();
+      $("#templateFill").hidden = true;
+      $("#templateProjectName").value = $("#setupName").value || "";
+      $("#templateProjectCode").value = $("#setupCode").value || "";
+      $("#templateCards").replaceChildren();
+      message("Vorlagen werden geladen …");
+      if (!dialog.open) dialog.showModal();
+      const current = generation;
+      try {
+        const records = await MKWTemplates.list();
+        if (current !== generation || !dialog.open) return;
+        $("#templateCards").innerHTML = records
+          .map(
+            (t) =>
+              `<button type="button" class="template-card" data-template-id="${esc(t.id)}" aria-pressed="false"><span class="template-card-preview"><img alt="Vorschau: ${esc(t.name)}" hidden><span data-preview-status>Vorschau wird geladen …</span><span class="template-slide-badge">${t.n} ${t.n === 1 ? "Slide" : "Slides"}</span></span><strong>${esc(t.name)}</strong><small>${t.w} × ${t.h} px${t.builtIn ? " · Mitgeliefert" : ""}</small></button>`,
+          )
+          .join("");
+        observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries)
+              if (entry.isIntersecting) {
+                observer.unobserve(entry.target);
+                loadPreview(entry.target, current);
+              }
+          },
+          { root: $("#templateCards"), rootMargin: "120px" },
+        );
+        for (const card of dialog.querySelectorAll("[data-template-id]")) {
+          card.onclick = () => select(card.dataset.templateId);
+          observer.observe(card);
+        }
+        const slider = $("#templateCards"),
+          updateArrows = () => {
+            $("#templatePrevious").disabled = slider.scrollLeft <= 1;
+            $("#templateNext").disabled =
+              slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 1;
+          };
+        slider.onscroll = updateArrows;
+        updateArrows();
+        message(
+          "Wähle eine Vorlage. Darunter erscheinen die Felder für deine Inhalte.",
+        );
+      } catch (error) {
+        message(error.message, true);
       }
-      const slider = $("#templateCards"),
-        updateArrows = () => {
-          $("#templatePrevious").disabled = slider.scrollLeft <= 1;
-          $("#templateNext").disabled =
-            slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 1;
-        };
-      slider.onscroll = updateArrows;
-      updateArrows();
-      message(
-        "Wähle eine Vorlage. Darunter erscheinen die Felder für deine Inhalte.",
-      );
-    } catch (error) {
-      message(error.message, true);
+    } finally {
+      finishLoading();
     }
   }
   async function loadPreview(card, current) {
+    const finishLoading = MKWUIControls.loading(
+      card.querySelector("[data-preview-status]"),
+    );
     try {
       const t = await MKWTemplates.get(card.dataset.templateId),
         src = await MKWTemplatePreview.render(t);
@@ -335,6 +355,8 @@ const MKWTemplateGallery = (() => {
     } catch {
       card.querySelector("[data-preview-status]").textContent =
         "Vorschau nicht verfügbar · zum Öffnen anklicken";
+    } finally {
+      finishLoading();
     }
   }
   return { open };

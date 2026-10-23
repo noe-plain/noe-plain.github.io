@@ -953,6 +953,7 @@ async function studioPickerImport() {
     if (!file || !studioPicker || studioPicker !== state || busy) return;
     $("#paintPlaceImage").disabled = true;
     $("#paintMessage").textContent = "Bild wird geladen …";
+    const finishLoading = MKWUIControls.loading("#paintMessage");
     busy = true;
     try {
       if (file.size > 100 * 1024 * 1024)
@@ -984,6 +985,7 @@ async function studioPickerImport() {
     } catch (error) {
       $("#paintMessage").textContent = error.message;
     } finally {
+      finishLoading();
       busy = false;
       if ($("#paintPlaceImage")) $("#paintPlaceImage").disabled = false;
     }
