@@ -8,12 +8,16 @@
       name="description"
       content="Schnellstart und Handbuch für MKW Studio: FD-Kampagnen, Designer, Speichern, Export und häufige Fragen."
     />
-    <link rel="stylesheet" href="../static/ui-theme-tokens.css?v=21c85f97dffd" />
+    <link
+      rel="stylesheet"
+      href="../static/ui-theme-tokens.css?v=21c85f97dffd"
+    />
     <link rel="stylesheet" href="../static/ui-theme.css?v=21c85f97dffd" />
-    <link rel="stylesheet" href="hilfe.css?v=706d25227e5f" />
-    <script src="hilfe.js?v=719184701874" defer></script>
+    <link rel="stylesheet" href="hilfe.css?v=3e943f13ad87" />
+    <script src="hilfe.js?v=097f3e57514e" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#helpContent">Zum Inhalt springen</a>
     <header>
       <a href="../" class="brand" aria-label="MKW Studio öffnen"
         ><img
@@ -26,14 +30,33 @@
     </header>
     <div class="layout">
       <aside aria-label="Handbuch-Navigation">
-        <label for="helpSearch">Was möchtest du machen?</label
-        ><input
-          id="helpSearch"
-          type="search"
-          placeholder="Zum Beispiel: Speichern"
-          autocomplete="off"
-          hidden
-        />
+        <label for="helpSearch">Was möchtest du machen?</label>
+        <div class="help-search-field">
+          <input
+            id="helpSearch"
+            type="search"
+            placeholder="Thema suchen"
+            aria-controls="helpContent"
+            aria-describedby="searchHint"
+            autocomplete="off"
+            hidden
+          /><button
+            id="helpSearchClear"
+            type="button"
+            aria-label="Suche zurücksetzen"
+            hidden
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 -960 960 960"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <use href="../static/icons/material-symbols.svg#close"></use>
+            </svg>
+          </button>
+        </div>
         <p class="search-ready" hidden id="searchHint">
           Suche in allen Anleitungen
         </p>
@@ -48,7 +71,7 @@
           ><a href="#fragen">Häufige Fragen</a>
         </nav>
       </aside>
-      <main id="helpContent">
+      <main id="helpContent" tabindex="-1">
         <div class="intro">
           <p class="eyebrow">MKW STUDIO · HANDBUCH</p>
           <h1>Dein Post.<br />Schritt für Schritt.</h1>
@@ -91,10 +114,11 @@
             </li>
             <li>
               Wähle deine Formate. Bei FD-Kampagnen sind Story (9:16) und
-              Quadrat (1:1) vorausgewählt. Bei nicht ausgewählten Formaten siehst du
-              nur Breite und Höhe. Setze das Häkchen beim Format, um auch seine
-              Schutzzonen einzustellen. Beim Designer gibst du Breite, Höhe
-              und die Anzahl von <strong>1 bis 20 Slides</strong> an.
+              Quadrat (1:1) vorausgewählt. Bei nicht ausgewählten Formaten
+              siehst du nur Breite und Höhe. Setze das Häkchen beim Format, um
+              auch seine Schutzzonen einzustellen. Beim Designer gibst du
+              Breite, Höhe und die Anzahl von
+              <strong>1 bis 20 Slides</strong> an.
             </li>
             <li>
               Prüfe die Schutzzonen. Das sind die Abstände zwischen wichtigen
@@ -119,7 +143,14 @@
               herunter.
             </li>
           </ol>
-          <p>In <strong>Projekt öffnen</strong> kannst du oben eine MKW-Datei von deinem Computer wählen. Darunter stehen die Projekte aus diesem Browser mit Name, Modus und letztem Speicherzeitpunkt. Klicke auf einen Eintrag zum Öffnen. Der Papierkorb daneben entfernt nur die Browsersicherung; das gerade geöffnete Projekt ist vor diesem Löschen geschützt.</p>
+          <p>
+            In <strong>Projekt öffnen</strong> kannst du oben eine MKW-Datei von
+            deinem Computer wählen. Darunter stehen die Projekte aus diesem
+            Browser mit Name, Modus und letztem Speicherzeitpunkt. Klicke auf
+            einen Eintrag zum Öffnen. Der Papierkorb daneben entfernt nur die
+            Browsersicherung; das gerade geöffnete Projekt ist vor diesem
+            Löschen geschützt.
+          </p>
           <h3>Was sehe ich auf der Arbeitsfläche?</h3>
           <p>
             Eine <strong>Zeichenfläche</strong> ist das Rechteck, das später als
@@ -135,8 +166,20 @@
             ausblenden. Die Zoomstufe verändert nur deine Ansicht, nicht die
             fertige Bildgrösse.
           </p>
-          <p>Die Werkzeuge liegen in einer schwebenden Pille. Der separate <strong>Export</strong>-Button rechts daneben öffnet Vorschau und Exporteinstellungen. Im Advanced-Modus steht die Werkzeug-Pille links und der Exportbutton separat darunter. Wenn der Platz knapp wird, erscheinen nur die Symbole. Mit der Maus über einem Symbol siehst du seinen Namen.</p>
-          <p>Oben sind die Aktionen in drei Gruppen geordnet: Rückgängig und Wiederholen, Projekt öffnen/speichern/neu sowie Hilfe und Einstellungen. Unten bleiben Zoom, Schutzzonen, Einrasten und das Ein- oder Ausblenden der Seitenleiste erreichbar.</p>
+          <p>
+            Die Werkzeuge liegen in einer schwebenden Pille. Der separate
+            <strong>Export</strong>-Button rechts daneben öffnet Vorschau und
+            Exporteinstellungen. Im Advanced-Modus steht die Werkzeug-Pille
+            links und der Exportbutton separat darunter. Wenn der Platz knapp
+            wird, erscheinen nur die Symbole. Mit der Maus über einem Symbol
+            siehst du seinen Namen.
+          </p>
+          <p>
+            Oben sind die Aktionen in drei Gruppen geordnet: Rückgängig und
+            Wiederholen, Projekt öffnen/speichern/neu sowie Hilfe und
+            Einstellungen. Unten bleiben Zoom, Schutzzonen, Einrasten und das
+            Ein- oder Ausblenden der Seitenleiste erreichbar.
+          </p>
           <p class="note">
             Für den Einstieg reicht der normale Modus. Der Advanced-Modus
             ergänzt freie Formen, Pfade und genauere Texteinstellungen. Du
@@ -150,15 +193,27 @@
             Jedes Foto hat eine eigene Reihe. Links steht seine Bildkarte,
             rechts liegen die ausgewählten Formate. Über
             <strong>Weitere Bilder hinzufügen</strong> am Ende der Reihen
-            ergänzt du Fotos. Über <strong>Format hinzufügen</strong> in einer Bildkarte
-            ergänzt du eine Zeichenfläche und kannst deren Grösse und
+            ergänzt du Fotos. Über <strong>Format hinzufügen</strong> in einer
+            Bildkarte ergänzt du eine Zeichenfläche und kannst deren Grösse und
             Schutzzonen einstellen.
           </p>
           <p>
-            In der Bildkarte findest du unter der Vorschau den Dateinamen und die Bildinformationen. Über <strong>Bild ersetzen</strong> tauschst du das Foto aus. Mit den Pfeilen verschiebst du die Reihe nach oben oder unten; der Papierkorb entfernt das Bild. Wenn du nur den
+            In der Bildkarte findest du unter der Vorschau den Dateinamen und
+            die Bildinformationen. Über <strong>Bild ersetzen</strong> tauschst
+            du das Foto aus. Mit den Pfeilen verschiebst du die Reihe nach oben
+            oder unten; der Papierkorb entfernt das Bild. Wenn du nur den
             Bildinhalt ändern möchtest, verwende <strong>Bild ersetzen</strong>.
           </p>
-          <p>Unter <strong>Copyright</strong> trägst du die Bildbeschreibung und den Namen ein. Öffne darunter <strong>Optionen</strong>, um Texte, Winkel, Familienkonzert oder Sponsorenleiste auszuwählen. Die farbigen Zeilen und Häkchen zeigen, was aktiv ist. Die Anzahl steht bereits im geschlossenen Feld. Mit Tab erreichst du die Optionen, mit der Leertaste öffnest du sie oder änderst ein Kästchen, mit Escape schliesst du sie wieder. Die Karte selbst bleibt immer geöffnet.</p>
+          <p>
+            Unter <strong>Copyright</strong> trägst du die Bildbeschreibung und
+            den Namen ein. Öffne darunter <strong>Optionen</strong>, um Texte,
+            Winkel, Familienkonzert oder Sponsorenleiste auszuwählen. Die
+            farbigen Zeilen und Häkchen zeigen, was aktiv ist. Die Anzahl steht
+            bereits im geschlossenen Feld. Mit Tab erreichst du die Optionen,
+            mit der Leertaste öffnest du sie oder änderst ein Kästchen, mit
+            Escape schliesst du sie wieder. Die Karte selbst bleibt immer
+            geöffnet.
+          </p>
           <h3>Was übernimmt das erste Bild für die anderen?</h3>
           <p>
             Die erste Bildkarte trägt den Hinweis
@@ -321,7 +376,7 @@
             <li>
               Aktiviere unter <strong>Optionen</strong> das Kästchen neben
               <strong>Winkel</strong>. Wähle im danebenstehenden Menü Oben,
-              Rechts oder Unten.
+              Links oder Unten.
             </li>
             <li>
               Ziehe den sichtbaren Winkel an seine Position. Bei Oben und Unten
@@ -569,16 +624,17 @@
           </p>
           <h3>Slides hinzufügen, entfernen oder umsortieren</h3>
           <p>
-            Klicke über einer Zeichenfläche auf <strong>Slide 1</strong>
-            beziehungsweise den Namen der gewünschten Slide. Rechts kannst du
-            unter <strong>Format für alle Slides</strong> die Breite und Höhe
-            ändern. Stelle darunter die Schutzzone oben, unten, links und rechts
-            ein; die kleine Vorschau zeigt dir den verbleibenden Bereich.
+            Klicke über einer Zeichenfläche auf
+            <strong>Slide 1</strong> beziehungsweise den Namen der gewünschten
+            Slide. Rechts kannst du unter
+            <strong>Format für alle Slides</strong> die Breite und Höhe ändern.
+            Stelle darunter die Schutzzone oben, unten, links und rechts ein;
+            die kleine Vorschau zeigt dir den verbleibenden Bereich.
             <strong>Für alle Slides übernehmen</strong> wendet die Werte
             gemeinsam auf das ganze Design an. Elementgrössen bleiben erhalten,
             die Inhalte behalten ihre Position relativ zum linken Slide-Rand.
-            Prüfe nach einer Grössenänderung die Bildabdeckung und Texte.
-            Mit Rückgängig kannst du die gesamte Änderung zurücknehmen.
+            Prüfe nach einer Grössenänderung die Bildabdeckung und Texte. Mit
+            Rückgängig kannst du die gesamte Änderung zurücknehmen.
           </p>
           <p>
             Ein Design kann <strong>1 bis 20 Slides</strong> enthalten. Klicke
@@ -630,14 +686,16 @@
             Bilder dürfen über Slide-Grenzen reichen. Texte sollten innerhalb
             der markierten Bereiche bleiben, damit Wörter nicht zwischen zwei
             Seiten abgeschnitten werden. Die Hilfslinien zeigen die Schutzzonen
-            und das Raster darin an (standardmässig Sechstel). Ganz ausserhalb platzierte Elemente bleiben
-            als Arbeitshilfe sichtbar, erscheinen aber nicht im Export.
+            und das Raster darin an (standardmässig Sechstel). Ganz ausserhalb
+            platzierte Elemente bleiben als Arbeitshilfe sichtbar, erscheinen
+            aber nicht im Export.
           </p>
           <p>
             Die Abstände oben, unten, links und rechts legst du beim Einrichten
-            oder später in den Slide-Einstellungen fest. Das Raster passt sich auf jeder Slide an diese
-            Schutzzone an. Auch das Einrasten und die Textwarnungen richten sich
-            danach. Raster und Schutzzonen werden nicht exportiert.
+            oder später in den Slide-Einstellungen fest. Das Raster passt sich
+            auf jeder Slide an diese Schutzzone an. Auch das Einrasten und die
+            Textwarnungen richten sich danach. Raster und Schutzzonen werden
+            nicht exportiert.
           </p>
           <h3>Text hinzufügen</h3>
           <ol>
@@ -723,13 +781,33 @@
             </li>
           </ol>
           <p>
+            Die Zahlenfelder unter der Farbfläche erlauben genaue Werte:
+            <strong>HEX</strong> ist die Farbnummer,
+            <strong>Transparenz</strong>
+            bedeutet 0 % für deckend und 100 % für durchsichtig. Mit der
+            Tastatur ändern die Pfeiltasten im Farbrechteck Sättigung und
+            Helligkeit. Die Farbwahl steht auch bei FD-Kampagnen und in den
+            Einstellungen zur Verfügung; dort werden nur die jeweils passenden
+            Optionen angezeigt.
+          </p>
+          <p>
             Beim Verlaufswerkzeug kannst du Linear oder Radial sowie die
             Richtung wählen. <strong>Multiplizieren</strong> wirkt abdunkelnd,
             <strong>Negativ multiplizieren (Screen)</strong> aufhellend. Die
             Deckkraft neben dem Mischmodus betrifft das ganze Element; die
-            Deckkraft eines Farbpunkts nur diesen Teil des Verlaufs.
+            Deckkraft eines Farbpunkts nur diesen Teil des Verlaufs. Unter
+            <strong>Position</strong> stellst du den ausgewählten Farbpunkt
+            genau ein, unter <strong>Mitte</strong> den Übergang zum nächsten
+            Punkt. Über das Papierkorb-Symbol entfernst du einen Farbpunkt;
+            mindestens zwei bleiben erhalten. Mit dem Auge blendest du Fläche
+            oder Kontur aus und wieder ein. Escape schliesst die Farbwahl.
           </p>
-          <p>Die Montagefläche lässt sich mit Maus oder Trackpad in beide Richtungen scrollen. Die Scroll-Balken sind ausgeblendet. Zum Verschieben kannst du auch das Handwerkzeug verwenden; Zoom und Einpassen findest du unten rechts.</p>
+          <p>
+            Die Montagefläche lässt sich mit Maus oder Trackpad in beide
+            Richtungen scrollen. Die Scroll-Balken sind ausgeblendet. Zum
+            Verschieben kannst du auch das Handwerkzeug verwenden; Zoom und
+            Einpassen findest du unten rechts.
+          </p>
           <h3>Ebenen und Ordner verwenden</h3>
           <p>
             Das Menü mit den drei Punkten an einer Ebene enthält zum Beispiel
@@ -744,16 +822,20 @@
           </p>
           <p>
             Rechts in der Ebenenliste steht das vorderste Element oben. Wähle
-            dort ein Element. Die farbig hinterlegte Zeile zeigt deine Auswahl. Blende es mit dem Auge rechts neben dem Namen aus oder schütze es über
-            das Schloss vor Änderungen. Ziehen verändert die Reihenfolge. Das
-            MKW-Logo bleibt ganz vorne.
+            dort ein Element. Die farbig hinterlegte Zeile zeigt deine Auswahl.
+            Blende es mit dem Auge rechts neben dem Namen aus oder schütze es
+            über das Schloss vor Änderungen. Ziehen verändert die Reihenfolge.
+            Das MKW-Logo bleibt ganz vorne.
           </p>
           <p>
             Über <strong>Ordner</strong> bündelst du zusammengehörige Ebenen.
-            Die automatisch vergebene Farbe zeigt ihre Zugehörigkeit. Mit dem Pfeil links klappst du den Ordner auf und zu. Das Aktionsmenü rechts funktioniert wie bei Ebenen: Es bietet <strong>Umbenennen</strong>, <strong>Nach vorne</strong>, <strong>Nach hinten</strong> und <strong>Ordner entfernen</strong>. Ordner
-            lassen sich samt Inhalt verschieben. Beim Löschen entscheidest du,
-            ob du die enthaltenen Elemente behalten oder ebenfalls entfernen
-            möchtest.
+            Die automatisch vergebene Farbe zeigt ihre Zugehörigkeit. Mit dem
+            Pfeil links klappst du den Ordner auf und zu. Das Aktionsmenü rechts
+            funktioniert wie bei Ebenen: Es bietet <strong>Umbenennen</strong>,
+            <strong>Nach vorne</strong>, <strong>Nach hinten</strong> und
+            <strong>Ordner entfernen</strong>. Ordner lassen sich samt Inhalt
+            verschieben. Beim Löschen entscheidest du, ob du die enthaltenen
+            Elemente behalten oder ebenfalls entfernen möchtest.
           </p>
           <h3>Weichzeichner oder Rauschen hinzufügen</h3>
           <ol>
@@ -794,24 +876,24 @@
               Ziehen erzeugt eine Kurve. Ein Klick auf den ersten Punkt
               schliesst den Pfad; Ziehen beim Schliessen bestimmt seine Rundung.
               Enter oder Doppelklick beendet einen offenen Pfad, Rücktaste
-              entfernt den letzten Schritt, Escape bricht das Zeichnen ab.
-              Zum Schliessen klickst du ausdrücklich auf den Anfangspunkt des
-              gerade gezeichneten Pfads. Einrasten allein schliesst ihn nicht.
+              entfernt den letzten Schritt, Escape bricht das Zeichnen ab. Zum
+              Schliessen klickst du ausdrücklich auf den Anfangspunkt des gerade
+              gezeichneten Pfads. Einrasten allein schliesst ihn nicht.
             </li>
             <li>
               <strong>Pfad fortsetzen oder verbinden:</strong> Wähle das
               Pfadwerkzeug (P) und klicke auf ein rund markiertes offenes Ende.
               Zeichne von dort weiter. Klicke währenddessen auf das offene Ende
               eines anderen Pfads, um beide zu einer Linie zu verbinden. Die
-              Gestaltung des zuerst fortgesetzten Pfads bleibt erhalten.
-              Escape verwirft eine noch nicht abgeschlossene Fortsetzung und
-              lässt den bisherigen Pfad unverändert.
+              Gestaltung des zuerst fortgesetzten Pfads bleibt erhalten. Escape
+              verwirft eine noch nicht abgeschlossene Fortsetzung und lässt den
+              bisherigen Pfad unverändert.
             </li>
             <li>
               <strong>Punkte bearbeiten:</strong> Wähle mit P das Pfadwerkzeug
               und klicke auf eine bestehende Linie, um einen Punkt hinzuzufügen.
-              Alt/Option und Klick auf einen Punkt entfernt ihn. Um Endpunkte
-              zu verschieben, nutze „Punkte &amp; Kurven bearbeiten“ mit dem
+              Alt/Option und Klick auf einen Punkt entfernt ihn. Um Endpunkte zu
+              verschieben, nutze „Punkte &amp; Kurven bearbeiten“ mit dem
               Auswahlwerkzeug. Mit Shift-Klick oder einem Auswahlrahmen kannst
               du mehrere Punkte gemeinsam verschieben.
             </li>
@@ -837,7 +919,14 @@
           </p>
         </section>
         <section id="speichern">
-          <p>Über das Speichersymbol oben öffnest du die Projektbenennung und die Speicheroptionen. Die hervorgehobene MKW-Aktion sichert das Projekt zum Weiterarbeiten. <strong>Speichern unter …</strong> legt eine weitere Datei an; PSD ist für die Übergabe an Photoshop gedacht. Die verfügbaren Optionen und der Hinweis auf den Speicherort hängen von deinem Browser ab.</p>
+          <p>
+            Über das Speichersymbol oben öffnest du die Projektbenennung und die
+            Speicheroptionen. Die hervorgehobene MKW-Aktion sichert das Projekt
+            zum Weiterarbeiten. <strong>Speichern unter …</strong> legt eine
+            weitere Datei an; PSD ist für die Übergabe an Photoshop gedacht. Die
+            verfügbaren Optionen und der Hinweis auf den Speicherort hängen von
+            deinem Browser ab.
+          </p>
           <h2>Speichern &amp; übergeben</h2>
           <p class="note">
             <strong>Wichtig:</strong> „Im Browser gesichert“ ist nicht dasselbe
@@ -956,7 +1045,15 @@
           </p>
         </section>
         <section id="export">
-          <p>Öffne den separaten Exportbutton an der Werkzeug-Pille. Links wählst du die Bilder aus, rechts das Format und seine Einstellungen. Die Formate sind als zusammenhängende Auswahl angeordnet. Der Fortschritt und der Downloadbutton bleiben unten sichtbar, während du durch die Einstellungen scrollst. <strong>Alle auswählen</strong> und <strong>Alle abwählen</strong> ändern deine gesamte Bildauswahl.</p>
+          <p>
+            Öffne den separaten Exportbutton an der Werkzeug-Pille. Links wählst
+            du die Bilder aus, rechts das Format und seine Einstellungen. Die
+            Formate sind als zusammenhängende Auswahl angeordnet. Der
+            Fortschritt und der Downloadbutton bleiben unten sichtbar, während
+            du durch die Einstellungen scrollst.
+            <strong>Alle auswählen</strong> und
+            <strong>Alle abwählen</strong> ändern deine gesamte Bildauswahl.
+          </p>
           <h2>Fertige Bilder und PDFs herunterladen</h2>
           <h3>Der Unterschied zu Speichern</h3>
           <p>
@@ -1062,29 +1159,68 @@
             Öffne das <strong>Zahnrad oben rechts</strong>. Die Einstellungen
             gehören zu deinem Studio in diesem Browser, nicht zu einer einzelnen
             Projektdatei. Wähle links den gewünschten Bereich; rechts erscheinen
-            die zugehörigen Einstellungen in thematischen Gruppen. Zusammengehörige
-            Felder stehen direkt nebeneinander; beim Raster siehst du daneben
-            eine Vorschau. Auf kleinen Bildschirmen zeigt die
-            linke Leiste nur Symbole. Das Fenster passt sich an deinen Bildschirm
-            an und ist gleich gross wie das Wiki. Neue Vorgaben verändern bereits gestaltete Elemente
-            nicht automatisch.
+            die zugehörigen Einstellungen in thematischen Gruppen.
+            Zusammengehörige Felder stehen direkt nebeneinander; beim Raster
+            siehst du daneben eine Vorschau. Auf kleinen Bildschirmen zeigt die
+            linke Leiste nur Symbole. Das Fenster passt sich an deinen
+            Bildschirm an und ist gleich gross wie das Wiki. Neue Vorgaben
+            verändern bereits gestaltete Elemente nicht automatisch.
           </p>
           <h3>Startseite und eigenes Hintergrundbild</h3>
-          <p>Auch auf der Startseite öffnest du das <strong>Zahnrad oben rechts</strong>,
-            bevor du ein Projekt erstellst. Nach dem Schliessen kommst du zur Startseite zurück.
-            Unter <strong>Allgemein → Startseite → Bild auswählen</strong> kannst du ein JPG-,
-            PNG- oder WebP-Bild wählen. Das Studio verkleinert es automatisch für die Bildschirmansicht.
-            Mit <strong>Ersetzen</strong> wählst du ein anderes Bild; <strong>Entfernen</strong>
-            stellt den farbigen Standardhintergrund wieder her. Das Startbild wird nur für dein Studio
-            verwendet und erscheint nie in deinen Projekten oder Exporten.</p>
-          <p>Die Montagefläche verwendet in beiden Editoren denselben hellen oder dunklen Hintergrund wie die Bedienleisten. Die umgebende Fläche und die Bedienelemente passen sich deinem Farbmodus und deiner Hauptfarbe an. Die tatsächlichen
-            Hintergründe deiner Zeichenflächen bleiben so, wie du sie gestaltest.</p>
-          <p>Hinweise zum Speichern oder Aktualisieren kannst du über das Kreuz rechts schliessen. Das blendet nur den Hinweis aus: Ein laufender Speichervorgang geht weiter. Derselbe Hinweis bleibt für dieses Projekt ausgeblendet, solange sich die Situation nicht ändert; ein neuer Speicherfehler wird erneut angezeigt. Die Schaltflächen zum Speichern findest du weiterhin oben.</p>
+          <p>
+            Auch auf der Startseite öffnest du das
+            <strong>Zahnrad oben rechts</strong>, bevor du ein Projekt
+            erstellst. Nach dem Schliessen kommst du zur Startseite zurück.
+            Unter
+            <strong>Allgemein → Startseite → Bild auswählen</strong> kannst du
+            ein JPG-, PNG- oder WebP-Bild wählen. Das Studio verkleinert es
+            automatisch für die Bildschirmansicht. Mit
+            <strong>Ersetzen</strong> wählst du ein anderes Bild;
+            <strong>Entfernen</strong> stellt den farbigen Standardhintergrund
+            wieder her. Das Startbild wird nur für dein Studio verwendet und
+            erscheint nie in deinen Projekten oder Exporten.
+          </p>
+          <p>
+            Die Montagefläche verwendet in beiden Editoren denselben hellen oder
+            dunklen Hintergrund wie die Bedienleisten. Die umgebende Fläche und
+            die Bedienelemente passen sich deinem Farbmodus und deiner
+            Hauptfarbe an. Die tatsächlichen Hintergründe deiner Zeichenflächen
+            bleiben so, wie du sie gestaltest.
+          </p>
+          <p>
+            Hinweise zum Speichern oder Aktualisieren kannst du über das Kreuz
+            rechts schliessen. Das blendet nur den Hinweis aus: Ein laufender
+            Speichervorgang geht weiter. Derselbe Hinweis bleibt für dieses
+            Projekt ausgeblendet, solange sich die Situation nicht ändert; ein
+            neuer Speicherfehler wird erneut angezeigt. Die Schaltflächen zum
+            Speichern findest du weiterhin oben.
+          </p>
           <h3>Die wichtigsten Einstellungen</h3>
           <ul>
             <li>
               <strong>Darstellung:</strong> Hell oder Dunkel. Neue Nutzer:innen
-              starten im hellen Modus. Unter <strong>Hauptfarbe</strong> öffnest du die Farbwahl und wählst deine Farbe für Schaltflächen und Auswahlen. Sehr helle oder dunkle Farben werden für lesbare Beschriftungen angepasst. <strong>Zurücksetzen</strong> stellt die MKW-Standardfarbe wieder her. Deine Gestaltungen, Exporte und Hilfslinienfarben bleiben unverändert. Unter <strong>Farbkonzept</strong> wählst du <strong>Normal</strong> oder <strong>Komplementär</strong>. Normal verwendet aufeinander abgestimmte Töne deiner Hauptfarbe. Komplementär ergänzt eine automatisch berechnete Gegenfarbe für ergänzende Aktionen und ausgewählte Ebenen. Die Hauptfarbe sowie Warn- und Fehlerfarben bleiben erhalten. Bei einer grauen Hauptfarbe verwendet das Studio eine dezente Gegenfarbe zur MKW-Standardfarbe. Das Farbkonzept wird wie die Hauptfarbe in diesem Browser und beim Export einer MKW-Setup-Datei gespeichert. Unter <strong>Bedienelemente</strong> wählst du <strong>Komfortabel</strong> für grössere Eingabefelder oder <strong>Kompakt</strong>, um mehr Eigenschaften gleichzeitig zu sehen. Das verändert nur die Oberfläche, nicht dein Design. Kurze Animationen geben Rückmeldung beim Bedienen. Wenn du Bewegungen in den Systemeinstellungen reduzierst, verzichtet das Studio auf diese neuen Animationen.
+              starten im hellen Modus. Unter <strong>Hauptfarbe</strong> öffnest
+              du die Farbwahl und wählst deine Farbe für Schaltflächen und
+              Auswahlen. Sehr helle oder dunkle Farben werden für lesbare
+              Beschriftungen angepasst. <strong>Zurücksetzen</strong> stellt die
+              MKW-Standardfarbe wieder her. Deine Gestaltungen, Exporte und
+              Hilfslinienfarben bleiben unverändert. Unter
+              <strong>Farbkonzept</strong> wählst du
+              <strong>Normal</strong> oder <strong>Komplementär</strong>. Normal
+              verwendet aufeinander abgestimmte Töne deiner Hauptfarbe.
+              Komplementär ergänzt eine automatisch berechnete Gegenfarbe für
+              ergänzende Aktionen und ausgewählte Ebenen. Die Hauptfarbe sowie
+              Warn- und Fehlerfarben bleiben erhalten. Bei einer grauen
+              Hauptfarbe verwendet das Studio eine dezente Gegenfarbe zur
+              MKW-Standardfarbe. Das Farbkonzept wird wie die Hauptfarbe in
+              diesem Browser und beim Export einer MKW-Setup-Datei gespeichert.
+              Unter <strong>Bedienelemente</strong> wählst du
+              <strong>Komfortabel</strong> für grössere Eingabefelder oder
+              <strong>Kompakt</strong>, um mehr Eigenschaften gleichzeitig zu
+              sehen. Das verändert nur die Oberfläche, nicht dein Design. Kurze
+              Animationen geben Rückmeldung beim Bedienen. Wenn du Bewegungen in
+              den Systemeinstellungen reduzierst, verzichtet das Studio auf
+              diese neuen Animationen.
             </li>
             <li>
               <strong>Advanced-Modus:</strong> Zusätzliche Formen und
@@ -1098,15 +1234,15 @@
               ein kleinerer erlaubt genaueres freies Platzieren.
             </li>
             <li>
-              <strong>Designer-Raster:</strong> Unter Hilfslinien kannst du
-              1–24 Spalten und Reihen sowie den Abstand dazwischen (Stege in
-              Pixeln) einstellen. Standard sind sechs Spalten, sechs Reihen und
-              keine Stege. Das Raster liegt innerhalb der Schutzzone jeder
-              Slide. Rahmen und Pfadpunkte können an beiden Stegkanten
-              einrasten. Bei sehr engen Schutzzonen werden zu breite Stege
-              automatisch verkleinert. Die Rastereinstellungen bleiben in
-              deinem Studio und werden auch in einer MKW-Setup-Datei gesichert;
-              sie verändern keine Elemente und erscheinen nicht im Export.
+              <strong>Designer-Raster:</strong> Unter Hilfslinien kannst du 1–24
+              Spalten und Reihen sowie den Abstand dazwischen (Stege in Pixeln)
+              einstellen. Standard sind sechs Spalten, sechs Reihen und keine
+              Stege. Das Raster liegt innerhalb der Schutzzone jeder Slide.
+              Rahmen und Pfadpunkte können an beiden Stegkanten einrasten. Bei
+              sehr engen Schutzzonen werden zu breite Stege automatisch
+              verkleinert. Die Rastereinstellungen bleiben in deinem Studio und
+              werden auch in einer MKW-Setup-Datei gesichert; sie verändern
+              keine Elemente und erscheinen nicht im Export.
             </li>
             <li>
               <strong>Export:</strong> Wähle das Format, das beim Öffnen des
@@ -1149,9 +1285,10 @@
           <p>
             Eine <strong>.mkwsetup-Datei</strong> enthält deine
             Studio-Einstellungen, eigenen Schriften, Sponsorgruppen mit Logos
-            und eigenen Designvorlagen sowie deinem optionalen Startbild. Die Vorlagen enthalten keine
-            Projektfotos. Zum Weiterarbeiten an einem befüllten Projekt
-            verwendest du weiterhin eine <strong>.mkw-Datei</strong>.
+            und eigenen Designvorlagen sowie deinem optionalen Startbild. Die
+            Vorlagen enthalten keine Projektfotos. Zum Weiterarbeiten an einem
+            befüllten Projekt verwendest du weiterhin eine
+            <strong>.mkw-Datei</strong>.
           </p>
           <p>
             Du findest sie unter

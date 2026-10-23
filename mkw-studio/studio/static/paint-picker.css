@@ -7,30 +7,32 @@
 .paint-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px;
+  gap: 4px;
+  padding: 4px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--studio-panel);
+  background: var(--md-sys-color-surface-container-low);
 }
 #carouselProperties .paint-edit {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   flex: 1;
   text-align: left;
   min-width: 0;
-  padding: 7px;
+  min-height: 56px;
+  padding: 8px;
+  border-radius: 8px;
   background: transparent;
   border: 0;
 }
 .paint-edit > span:last-child {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 20px;
 }
 .paint-kind {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--studio-muted);
   font-weight: 400;
 }
@@ -39,16 +41,16 @@
   flex: none;
   width: 35px;
   height: 35px;
-  border: 1px solid #8b99ad77;
+  border: 1px solid var(--md-sys-color-outline);
   border-radius: 8px;
 }
 .paint-visibility {
   flex: none;
-  opacity: 0.7;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .paint-visibility[aria-pressed="false"] {
-  color: #e24959;
-  opacity: 1;
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container-high);
 }
 .paint-stroke-details {
   padding-top: 8px;
@@ -70,15 +72,31 @@
 #vectorShapePoints {
   margin-bottom: 12px;
 }
+.advanced-colours {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  width: 100%;
+}
+.paint-wells {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 1px 0;
+}
 .paint-wells button {
   position: absolute;
-  width: 29px;
-  height: 29px;
+  width: 27px;
+  height: 27px;
   min-width: 0 !important;
   min-height: 0 !important;
   padding: 0;
-  border: 1px solid #7f8da6;
-  border-radius: 6px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 5px;
   cursor: pointer;
   box-shadow: 0 0 0 2px var(--studio-panel);
 }
@@ -94,8 +112,19 @@
 }
 .paint-wells button.is-front {
   z-index: 3;
-  outline: 1px solid var(--studio-accent);
-  outline-offset: 2px;
+  outline: none;
+  border: 1.5px solid var(--studio-accent);
+}
+.paint-wells .paint-stroke::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  background: var(--studio-panel);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.paint-wells button.no-paint {
+  background: var(--studio-panel) !important;
 }
 .paint-wells button.no-paint::before {
   content: "";
@@ -104,17 +133,50 @@
   background: linear-gradient(
     135deg,
     transparent 45%,
-    #ec4652 46%,
-    #ec4652 53%,
+    var(--md-sys-color-error) 46%,
+    var(--md-sys-color-error) 53%,
     transparent 54%
   );
   z-index: 2;
   pointer-events: none;
 }
+
+#advancedColours .paint-actions {
+  display: flex;
+  justify-content: center;
+  width: 42px;
+  gap: 2px;
+  flex-wrap: nowrap;
+}
+#advancedColours .paint-actions button {
+  width: 20px;
+  min-width: 20px;
+  height: 26px;
+  min-height: 24px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  border-radius: 5px;
+  color: inherit;
+}
+#advancedColours .paint-actions button svg {
+  width: 17px;
+  height: 17px;
+}
+#toolSwapColours svg {
+  transform: rotate(90deg);
+}
+#advancedColours .paint-actions button:hover,
+#advancedColours .paint-actions button[aria-pressed="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
 .studio-paint-picker {
   --picker-border: var(--md-sys-color-outline-variant);
-  --picker-surface: var(--md-sys-color-surface);
-  --picker-input: var(--md-sys-color-surface-container-low);
+  --picker-surface: var(--md-sys-color-surface-container-high);
+  --picker-input: var(--md-sys-color-surface-container-high);
   --picker-text: var(--md-sys-color-on-surface);
   --picker-muted: var(--md-sys-color-on-surface-variant);
   position: fixed;
@@ -123,94 +185,91 @@
   max-width: calc(100vw - 24px);
   max-height: calc(100dvh - 24px);
   overflow-y: auto;
-  padding: 16px;
+  padding: 20px;
   border: 1px solid var(--picker-border);
-  border-radius: 18px;
-  box-shadow: 0 16px 60px #0004;
+  border-radius: var(--studio-shape-dialog);
+  box-shadow: 0 8px 24px #0003;
   background: var(--picker-surface);
   color: var(--picker-text);
   font:
-    12px/1.5 "Replica LL",
+    14px/20px "MKW UI",
     sans-serif;
   overscroll-behavior: contain;
-}
-html[data-theme="light"] .studio-paint-picker {
-  --picker-border: var(--md-sys-color-outline-variant);
-  --picker-surface: var(--md-sys-color-surface);
-  --picker-input: var(--md-sys-color-surface-container-low);
-  --picker-text: var(--md-sys-color-on-surface);
-  --picker-muted: var(--md-sys-color-on-surface-variant);
-  box-shadow: 0 14px 50px #25334b26;
 }
 .studio-paint-picker * {
   box-sizing: border-box;
 }
-.picker-heading {
+.studio-paint-picker .picker-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 12px;
+  padding: 0;
+  margin-bottom: 16px;
+  color: var(--picker-text);
 }
-.picker-heading strong {
-  font-size: 14px;
+.studio-paint-picker .picker-heading strong {
+  font-size: 20px;
+  line-height: 28px;
+  overflow-wrap: anywhere;
 }
 .studio-paint-picker .icon-button {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  padding: 6px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 8px;
   color: inherit;
 }
 .studio-paint-picker button {
   background: var(--picker-input);
   color: inherit;
   border: 1px solid var(--picker-border);
-  border-radius: 8px;
+  border-radius: var(--studio-shape-full);
   font: inherit;
 }
-.studio-paint-picker button:hover {
-  border-color: var(--studio-accent);
+.studio-paint-picker button:hover:not(:disabled) {
+  background-color: var(--md-sys-color-surface-container-highest);
+}
+.studio-paint-picker .icon-button {
+  border-color: transparent;
+  background: transparent;
 }
 .studio-paint-picker button[aria-pressed="true"] {
-  border-color: var(--studio-accent);
-  background: color-mix(
-    in srgb,
-    var(--md-sys-color-primary) 9.41%,
-    transparent
-  );
-  color: var(--studio-accent);
+  border-color: var(--md-sys-color-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 .studio-paint-picker input,
 .studio-paint-picker select {
   min-width: 0;
   width: 100%;
-  padding: 7px 8px;
-  border: 1px solid var(--picker-border);
-  border-radius: 7px;
+  min-height: var(--studio-control-height);
+  padding: 10px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 4px;
   background: var(--picker-input);
   color: inherit;
   font: inherit;
 }
 .studio-paint-picker label {
-  font-size: 10px;
+  font-size: 12px;
+  line-height: 16px;
   color: var(--picker-muted);
   display: block;
 }
 .picker-mode {
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 8px;
-  margin-bottom: 16px;
-}
-.picker-mode > select {
-  flex: 1;
+  margin-bottom: 20px;
 }
 .picker-mode > label {
-  position: absolute;
-  clip-path: inset(50%);
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+.picker-mode select {
+  margin-top: 4px;
 }
 .picker-colour-space {
   height: 170px;
@@ -274,7 +333,7 @@ html[data-theme="light"] .studio-paint-picker {
 }
 .picker-colour-values {
   display: grid;
-  grid-template-columns: 35px minmax(0, 1fr) 93px;
+  grid-template-columns: 32px minmax(0, 1fr) 96px;
   gap: 10px;
   align-items: end;
 }
@@ -297,19 +356,6 @@ html[data-theme="light"] .studio-paint-picker {
   pointer-events: none;
   color: var(--picker-muted);
 }
-.studio-paint-picker input[type="range"] {
-  accent-color: var(--studio-accent);
-  padding: 0;
-  height: 16px;
-  margin: 14px 0 4px;
-  background:
-    linear-gradient(to right, var(--alpha-colour), transparent),
-    repeating-conic-gradient(#ccd3dd 0 25%, var(--md-sys-color-surface) 0 50%)
-      0 / 8px 8px;
-  border-radius: 8px;
-  border: 0;
-  cursor: pointer;
-}
 #paintGradientPanel {
   border-top: 1px solid var(--picker-border);
   margin-top: 14px;
@@ -321,11 +367,12 @@ html[data-theme="light"] .studio-paint-picker {
   align-items: end;
 }
 .picker-gradient-kind button {
-  height: 33px;
-  padding: 7px 10px;
+  height: 40px;
+  min-width: 0;
+  padding: 8px 12px;
 }
 .picker-gradient-kind label {
-  width: 78px;
+  width: 76px;
   margin-left: auto;
 }
 #paintGradientTrack {
@@ -341,7 +388,7 @@ html[data-theme="light"] .studio-paint-picker {
   top: 15px;
   cursor: copy;
   border-radius: 5px;
-  border: 1px solid #8b99ad77;
+  border: 1px solid var(--md-sys-color-outline);
 }
 #paintGradientHandles {
   position: absolute;
@@ -363,12 +410,12 @@ html[data-theme="light"] .studio-paint-picker {
   top: 39px;
   border-radius: 50%;
   transform: translateX(-50%);
-  border: 2px solid #8392a9;
+  border: 2px solid var(--md-sys-color-outline);
 }
 #paintGradientHandles .picker-stop[aria-pressed="true"] {
   outline: 2px solid var(--studio-accent);
   outline-offset: 2px;
-  border-color: white;
+  border-color: var(--picker-surface);
 }
 #paintGradientHandles .picker-mid {
   width: 9px;
@@ -380,19 +427,19 @@ html[data-theme="light"] .studio-paint-picker {
   border: 1px solid var(--picker-muted);
 }
 .picker-hint {
-  font-size: 10px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 16px;
   color: var(--picker-muted);
   margin: 8px 0 12px;
 }
 .picker-stop-options {
   display: grid;
-  grid-template-columns: 1fr 1fr 28px;
+  grid-template-columns: 1fr 1fr 40px;
   gap: 10px;
   align-items: end;
 }
 .picker-stop-options .icon-button {
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 #paintImagePanel {
   margin-top: 12px;
@@ -404,25 +451,26 @@ html[data-theme="light"] .studio-paint-picker {
   display: grid;
   place-items: center;
   color: var(--picker-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 #paintPlaceImage {
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
+  min-height: var(--studio-control-height);
+  padding: 10px 16px;
+  margin-top: 12px;
   background: var(--studio-accent);
   color: var(--md-sys-color-on-primary);
   border-color: transparent;
 }
 #paintMessage {
-  font-size: 10px;
-  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 16px 0 0;
   color: var(--picker-muted);
 }
 #paintMessage:empty {
   display: none;
 }
-.studio-paint-picker.is-image .picker-colour-space,
 .studio-paint-picker.is-image #paintPreview,
 .studio-paint-picker.is-image .picker-colour-values > label:first-of-type {
   display: none;
@@ -432,7 +480,7 @@ html[data-theme="light"] .studio-paint-picker {
 }
 @media (max-width: 600px) {
   .studio-paint-picker {
-    width: 300px;
+    width: 320px;
   }
   .picker-colour-space {
     height: 145px;
@@ -489,51 +537,6 @@ html[data-theme="light"] .studio-paint-picker {
   margin: 0;
   flex: none;
 }
-.paint-wells {
-  width: 40px;
-  height: 40px;
-  margin: 1px 0;
-}
-.paint-wells button {
-  width: 27px;
-  height: 27px;
-  border-radius: 5px;
-  box-shadow: 0 0 0 2px var(--studio-panel);
-}
-.paint-wells button.is-front {
-  outline: none;
-  border: 1.5px solid var(--studio-accent);
-  box-shadow: 0 0 0 2px var(--studio-panel);
-}
-.paint-wells .paint-stroke::after {
-  inset: 6px;
-  border-radius: 1px;
-}
-.paint-wells button.no-paint {
-  background: var(--studio-panel) !important;
-}
-.paint-chip {
-  border-radius: 7px;
-  box-shadow: inset 0 0 0 1px #fff2;
-}
-.paint-edit .paint-kind {
-  font-size: 10px;
-  line-height: 1.5;
-  color: var(--studio-muted);
-}
-#advancedColours .paint-actions {
-  width: 42px;
-  gap: 2px;
-  flex-wrap: nowrap;
-}
-#advancedColours .paint-actions button {
-  width: 20px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-}
-
 #studioPaintPicker {
   margin: 0;
   inset: auto;
@@ -542,9 +545,126 @@ html[data-theme="light"] .studio-paint-picker {
 #studioPaintPicker.is-opaque-colour .picker-colour-values > label:last-child {
   display: none;
 }
-#studioPaintPicker.is-opaque-colour .picker-colour-space {
-  grid-template-columns: 18px minmax(0, 1fr);
-}
 #studioPaintPicker.is-opaque-colour .picker-colour-values {
-  grid-template-columns: 35px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr);
+}
+
+.picker-opacity {
+  width: 28px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--picker-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.studio-paint-picker #paintAlphaSlider {
+  writing-mode: vertical-lr;
+  direction: ltr;
+  width: 24px;
+  min-width: 24px;
+  height: 100%;
+  min-height: 100px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  appearance: none;
+  background:
+    linear-gradient(to bottom, var(--alpha-colour), transparent),
+    repeating-conic-gradient(#ccd3dd 0 25%, #fff 0 50%) 0/6px 6px;
+  accent-color: var(--studio-accent);
+  cursor: ns-resize;
+}
+.studio-paint-picker #paintAlphaSlider::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 7px;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: 0 0 0 1px #24324b;
+}
+.studio-paint-picker #paintAlphaSlider::-moz-range-thumb {
+  width: 20px;
+  height: 3px;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: 0 0 0 1px #24324b;
+}
+.studio-paint-picker #paintAlphaSlider::-moz-range-track {
+  background: transparent;
+}
+.studio-paint-picker.is-image .picker-colour-space {
+  display: flex;
+}
+.studio-paint-picker.is-image #paintHue,
+.studio-paint-picker.is-image #paintSV {
+  display: none;
+}
+.studio-paint-picker.is-image .picker-colour-space {
+  height: 48px;
+  justify-content: flex-end;
+}
+.studio-paint-picker.is-image .picker-opacity {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+.studio-paint-picker.is-image #paintAlphaSlider {
+  writing-mode: horizontal-tb;
+  width: 100%;
+  min-height: 18px;
+  height: 18px;
+  direction: ltr;
+  background:
+    linear-gradient(to right, var(--alpha-colour), transparent),
+    repeating-conic-gradient(#ccd3dd 0 25%, #fff 0 50%) 0/6px 6px;
+}
+.studio-paint-picker.is-image #paintAlphaSlider::-webkit-slider-thumb {
+  width: 7px;
+  height: 24px;
+}
+.studio-paint-picker.is-image #paintAlphaSlider::-moz-range-thumb {
+  width: 3px;
+  height: 20px;
+}
+
+#paintPreview {
+  width: 32px;
+  height: var(--studio-control-height);
+  border-radius: 8px;
+}
+#paintGradientHandles button::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+#studioPaintPicker button:focus-visible,
+#studioPaintPicker input:focus-visible,
+#studioPaintPicker select:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+#studioPaintPicker.is-opaque-colour .picker-mode {
+  display: none;
+}
+@media (pointer: coarse) {
+  .studio-paint-picker .icon-button {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+  .picker-gradient-kind button {
+    height: 48px;
+  }
+  .picker-stop-options {
+    grid-template-columns: 1fr 1fr 48px;
+  }
 }

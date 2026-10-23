@@ -1,5 +1,5 @@
 "use strict";
-const studioHelpURL = "hilfe/?v=1883f01df2d7";
+const studioHelpURL = "hilfe/?v=cb43fa257b59";
 let studioHelpPopup = null;
 function studioOpenHelp(trigger) {
   if (!studioHelpPopup) {
@@ -80,6 +80,7 @@ function studioApplyHelpTheme(doc) {
   const palette = MKWUIColor.palette(
     studioPreferences.primaryColour,
     document.documentElement.dataset.theme,
+    studioPreferences.colourMode,
   );
   for (const [role, value] of Object.entries(palette))
     doc.documentElement.style.setProperty("--md-sys-color-" + role, value);

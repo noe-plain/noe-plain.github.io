@@ -42,7 +42,8 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | `carousel-bootstrap.js` | Carousel event registration and setup integration. |
 | `carousel-vectors.js`, `carousel-curves.js`, `carousel-constructor.js` | Bézier model and drawing, curve editing and boolean construction. |
 | `path-model.js`, `carousel-path-drawing.js` | Pure world-point reversal/joining and endpoint continuation UI. Drafts leave source objects untouched until one atomic commit. |
-| `paint-model.js`, `paint-picker.js` | Paint interpretation/validation and picker UI. |
+| `paint-model.js`, `paint-picker.js`, `paint-picker.css` | Paint interpretation/validation and the shared picker UI, including alpha and Advanced wells. Picker styling never changes paint values or renderer math. |
+| `help-popup.js`, `hilfe/` | Lazy, shared-size Wiki dialog and independent searchable handbook. UI roles (seed/theme/colour mode) are forwarded only after opening; no project mutations. |
 | `appearance.js`, `settings-ui.js`, `user-fonts.js` | Device/tool preferences and user font library. Existing design objects must not change when a default changes. |
 | `export.js`, `carousel-pdf.js`, `carousel-psd*.js` | Export sessions, image encoding, PDF and PSD. Export options are not project defaults. |
 

@@ -3,6 +3,8 @@ const search = document.getElementById("helpSearch"),
   sections = [...document.querySelectorAll("main section")],
   links = [...document.querySelectorAll("nav a")],
   results = document.getElementById("helpResults"),
+  clear = document.getElementById("helpSearchClear"),
+  chapterLinks = new Map(links.map((link) => [link.hash.slice(1), link])),
   normalize = (text) =>
     text
       .toLocaleLowerCase("de")
@@ -15,19 +17,24 @@ search.hidden = false;
 document.getElementById("searchHint").hidden = false;
 search.addEventListener("input", () => {
   const words = normalize(search.value.trim()).split(/\s+/).filter(Boolean);
+  clear.hidden = !search.value;
   let count = 0;
   for (const section of sections) {
     section.hidden = !words.every((word) =>
       text.get(section.id).includes(word),
     );
     if (!section.hidden) count++;
-    links.find((link) => link.hash === "#" + section.id).hidden =
-      section.hidden;
+    chapterLinks.get(section.id).hidden = section.hidden;
   }
   results.hidden = !words.length;
   results.textContent = count
     ? `${count} ${count === 1 ? "passendes Kapitel" : "passende Kapitel"}`
     : "Keine passenden Kapitel. Versuche einen anderen Suchbegriff.";
+});
+clear.addEventListener("click", () => {
+  search.value = "";
+  search.dispatchEvent(new Event("input"));
+  search.focus({ preventScroll: true });
 });
 function markSection(hash = location.hash) {
   const target = document.getElementById(hash.slice(1)),
