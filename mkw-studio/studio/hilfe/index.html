@@ -291,6 +291,20 @@
             denselben beteiligten Texten. Bei späteren Bildern bleiben deine
             Änderungen individuell. Das Copyright gehört nicht zum Textstapel.
           </p>
+          <h3>Automatischer Ausschnitt beim Import</h3>
+          <p>Bei FD-Kampagnen sucht das Tool beim Import nach Gesichtern. Es setzt das
+            deutlichste Gesicht horizontal in die Mitte und die Augen auf das obere
+            Drittel der gesamten Zeichenfläche. Falls dafür ein freier Bildrand
+            entstehen würde, wird die nächstmögliche Position verwendet. Ohne
+            erkanntes Gesicht hilft weiterhin die Personenerkennung beim Ausschnitt.
+            Du kannst das Ergebnis danach selbst verändern.</p>
+          <p>Bei langsamer Verbindung oder aktiviertem Datensparmodus wird die
+            Erkennung übersprungen. Falls dein Browser die Verbindungsgeschwindigkeit
+            nicht meldet, etwa Firefox, wartet das Tool höchstens 4,5 Sekunden auf
+            den ersten Erkennungsversuch. Danach werden die weiteren Bilder dieses
+            Imports ohne Erkennung vorbereitet. Der mittige Ausschnitt, die Formate
+            und das MKW-Logo stehen trotzdem bereit. Prüfe die Ausschnitte vor dem
+            Export. Deine Fotos bleiben auf deinem Computer.</p>
           <h3>Das Foto zuschneiden, ohne es zu verändern</h3>
           <ol>
             <li>
@@ -656,7 +670,14 @@
             die Leertaste gedrückt und ziehe, um die Arbeitsfläche zu
             verschieben. Zoomen kannst du unten rechts, mit zwei Fingern oder
             mit Alt/Option und Scrollen. Cmd/Ctrl + 0 passt die Gestaltung ins
-            Fenster ein; Cmd/Ctrl + 1 zeigt 100 %.
+            Fenster ein; Cmd/Ctrl + 1 zeigt die Smartphone-Vorschau (100 %).
+            Die Referenzbreite beträgt 390 Bildschirmpixel pro Slide. Bei
+            FD-Kampagnen dient das erste eingerichtete Format als Referenz;
+            weitere Formate werden dazu proportional angezeigt. Minus und Plus
+            stehen links und rechts der Prozentanzeige. Im Designer kannst du
+            den Prozentwert direkt eingeben. Die tatsächliche Grösse auf einem
+            Smartphone hängt von dessen Display und der jeweiligen App ab.
+            Die Exportauflösung bleibt unverändert.
           </p>
           <h3>Ein Bild platzieren und zuschneiden</h3>
           <ol>
@@ -1369,7 +1390,7 @@
               </tr>
               <tr>
                 <td><kbd>Cmd/Ctrl</kbd> + <kbd>1</kbd></td>
-                <td>Ansicht auf 100 % stellen</td>
+                <td>Smartphone-Vorschau (100 %, Referenzbreite 390 px)</td>
               </tr>
               <tr>
                 <td><kbd>Alt/Option</kbd> + Scrollen</td>
@@ -1404,7 +1425,7 @@
           <h2>Wenn etwas nicht wie erwartet funktioniert</h2>
           <h3>Woran sehe ich, dass das Studio noch arbeitet?</h3>
           <p>
-            Eine drehende Form, die ihre Gestalt wechselt, zeigt einen laufenden Lade- oder
+            Eine drehende Form in einem ruhigen Hintergrundkreis, die ihre Gestalt wechselt, zeigt einen laufenden Lade- oder
             Speichervorgang. Wo der Fortschritt messbar ist, siehst du
             einen wellenförmigen Balken und die tatsächliche Anzahl oder
             Prozentzahl, etwa beim Import und Export. Beim automatischen

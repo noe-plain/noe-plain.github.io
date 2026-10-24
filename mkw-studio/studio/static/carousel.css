@@ -890,47 +890,13 @@
 .carousel-statusbar {
   overflow: hidden;
 }
-.carousel-zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: auto;
-  flex: none;
-}
-.carousel-zoom-controls button {
-  padding: 3px 8px;
-  font-size: 10px;
-}
-.carousel-zoom-controls label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  color: #d7e1f2;
-}
-.carousel-zoom-controls input {
-  width: 48px;
-  box-sizing: border-box;
-  background: #151c29;
-  border: 1px solid #4a5871;
-  border-radius: 3px;
-  padding: 3px;
-  color: #e6efff;
-  font: inherit;
-}
 .carousel-statusbar #carouselHint {
   flex: 1;
   min-width: 0;
 }
 @media (max-width: 760px) {
-  .carousel-zoom-controls {
-    gap: 5px;
-  }
   .carousel-statusbar {
     gap: 8px;
-  }
-  .carousel-zoom-controls button {
-    padding: 3px 5px;
   }
   .carousel-statusbar #carouselHint {
     font-size: 8px;

@@ -348,29 +348,6 @@ footer {
   max-width: none;
   color: #c3d0e5;
 }
-footer .view-control {
-  margin-left: auto;
-  width: auto;
-  min-width: 152px;
-  height: 29px;
-  border-radius: 8px;
-  background: var(--md-sys-color-surface-container-low);
-  flex: none;
-}
-footer .view-control .icon-button {
-  width: 32px;
-  height: 27px;
-  padding: 4px;
-}
-footer .view-control #viewValue {
-  min-width: 58px;
-  padding: 4px 8px;
-  font-size: 12px;
-}
-footer .view-control .ui-icon {
-  width: 18px;
-  height: 18px;
-}
 .carousel-mode #postViewControls {
   display: none;
 }
@@ -389,13 +366,6 @@ footer #carouselHint {
 footer #carouselCoordinates {
   font-size: 11px;
   color: #9eafc7;
-}
-footer .carousel-zoom-controls {
-  margin-left: auto;
-  flex: none;
-}
-footer .carousel-zoom-controls input {
-  font-size: 12px;
 }
 .sidebar-hidden {
   --sidebar: 0px;
@@ -584,23 +554,6 @@ footer .carousel-zoom-controls input {
   padding: 5px 18px;
   background: #1d232d;
   border-color: var(--studio-border);
-}
-.carousel-zoom-controls {
-  gap: 10px;
-}
-.carousel-zoom-controls button {
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 8px;
-}
-.carousel-zoom-controls label {
-  font-size: 12px;
-}
-.carousel-zoom-controls input {
-  font-size: 12px;
-  width: 52px;
-  padding: 4px 6px;
-  border-radius: 7px;
 }
 .carousel-slide-tab {
   font-size: 12px;
@@ -872,9 +825,6 @@ footer .carousel-zoom-controls input {
   }
   .carousel-statusbar #carouselHint {
     display: none;
-  }
-  .carousel-zoom-controls {
-    margin-left: auto;
   }
   footer {
     padding: 6px 10px;

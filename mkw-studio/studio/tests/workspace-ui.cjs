@@ -161,7 +161,10 @@ const assert = require("node:assert/strict");
     for (const command of ["Meta", "Control"]) {
       await page.evaluate(() => document.activeElement.blur());
       await page.keyboard.press(command + "+1");
-      assert.equal(await page.evaluate(() => view), 1);
+      assert.equal(
+        await page.evaluate(() => view),
+        await page.evaluate(() => studioZoomReference(false)),
+      );
       assert.equal(await page.locator("#viewValue").textContent(), "100%");
       await page.keyboard.press(command + "+0");
       const shortcut = await page.evaluate(() => view);
@@ -329,7 +332,10 @@ const assert = require("node:assert/strict");
     for (const command of ["Meta", "Control"]) {
       await page.evaluate(() => document.activeElement.blur());
       await page.keyboard.press(command + "+1");
-      assert.equal(await page.evaluate(() => carouselZoom), 1);
+      assert.equal(
+        await page.evaluate(() => carouselZoom),
+        await page.evaluate(() => studioZoomReference(true)),
+      );
       assert.equal(await page.locator("#carouselZoom").inputValue(), "100");
       await page.keyboard.press(command + "+0");
       const shortcut = await page.evaluate(() => carouselZoom);
@@ -357,8 +363,8 @@ const assert = require("node:assert/strict");
       await page.evaluate(() => {
         const c = $("#carouselCanvas");
         return (
-          carouselZoom === 1 &&
-          Math.abs(c.getBoundingClientRect().width - p.carousel.w * 20) < 1 &&
+          carouselZoom === studioZoomReference(true) &&
+          Math.abs(c.getBoundingClientRect().width - 390 * 20) < 1 &&
           c.width <= 16000 &&
           c.width * c.height <= 24040000
         );

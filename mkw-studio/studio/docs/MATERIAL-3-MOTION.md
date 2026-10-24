@@ -46,3 +46,8 @@ material-motion exercises actual shape changes and rotation, measured import/exp
 
 
 Final local release gate: 113/113 model tests, formatting and reproducible build pass. Full Firefox 56/56 with original pre-Material export references passes; after the final small-indicator centering refinement, affected Firefox 4/4 and Chrome 3/3 pass again. The 12/12 Chrome operation suites also pass, including real 50-image imports/native incremental saving/PDF. Light/dark option rows, contained loading, wavy export and reduced-motion/system-colour screenshots reviewed. Against 40e4527, the runtime JS adds 158 gzip bytes and CSS adds 3457 gzip bytes, mostly build-sampled shapes. These are asset sizes, not claims about measured network speed. Publication/live results belong in the continuation checkpoint.
+
+
+## Contained indicator follow-up
+
+On user preference, all small morphing indicators now sit in a stationary tonal circle, including footer saving and button/status loading. Only the inner shape morphs and rotates; the circle stays still. The existing larger import indicator already uses this configuration. Shared primary-container/on-primary-container roles follow light/dark and the chosen seed; forced colours use a Canvas circle and Highlight foreground. Hidden duplicate status indicators remain suppressed; lifecycle, measured wavy progress, document data and rendering are unchanged. No extra DOM or JavaScript is added.

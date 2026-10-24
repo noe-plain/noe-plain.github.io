@@ -41,6 +41,39 @@ const patternPath = "static/hyphenation/hyph-de-1996.tex",
     `const patternURL = "${patternPath}?v=${patternHash}";`,
   );
 if (hyphenSource !== nextHyphen) await writeFile(hyphenFile, nextHyphen);
+// Recognition remains lazy; version the worker and its local models together.
+const workerFile = new URL("static/subject-worker.js", root),
+  workerSource = await readFile(workerFile, "utf8");
+let workerVersioned = workerSource;
+for (const path of [
+  "vendor/vision.js",
+  "vendor/face.tflite",
+  "vendor/person.tflite",
+]) {
+  const hash = createHash("sha256")
+    .update(await readFile(new URL("static/" + path, root)))
+    .digest("hex")
+    .slice(0, 12);
+  workerVersioned = workerVersioned.replaceAll(
+    new RegExp('"' + path.replaceAll(".", "\\.") + '(?:\\?[^"\\s]*)?"', "g"),
+    '"' + path + "?v=" + hash + '"',
+  );
+}
+if (workerSource !== workerVersioned)
+  await writeFile(workerFile, workerVersioned);
+const workerHash = createHash("sha256")
+    .update(workerVersioned)
+    .digest("hex")
+    .slice(0, 12),
+  subjectFile = new URL("static/subject.js", root),
+  subjectSource = await readFile(subjectFile, "utf8"),
+  subjectVersioned = subjectSource.replace(
+    /const workerURL = "[^"]+";/,
+    `const workerURL = "static/subject-worker.js?v=${workerHash}";`,
+  );
+if (subjectSource !== subjectVersioned)
+  await writeFile(subjectFile, subjectVersioned);
+
 // Version the lazily loaded handbook independently from the editor's startup assets.
 const helpIndex = new URL("hilfe/index.html", root),
   helpSource = await readFile(helpIndex, "utf8"),

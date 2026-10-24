@@ -236,7 +236,8 @@
 #importExplanation.studio-loading {
   padding-inline-start: 0 !important;
 }
-#importExplanation.studio-loading::before {
+#importExplanation.studio-loading::before,
+#importExplanation.studio-loading::after {
   display: none;
 }
 .import-stages {

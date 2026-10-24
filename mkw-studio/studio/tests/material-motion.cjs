@@ -127,6 +127,36 @@ const { launch, artifact } = require("./browser.cjs");
           );
           assert.equal(look.height, look.otherHeight);
           assert(look.arrow);
+          for (const checked of [false, true]) {
+            const states = await options.evaluate((el, checked) => {
+              const row = el.querySelector(".post-angle-option"),
+                other = el.querySelector(".post-text-options .post-option-row"),
+                input = row.querySelector("input"),
+                reference = other.querySelector("input"),
+                before = [input.checked, reference.checked];
+              input.checked = reference.checked = checked;
+              const own = getComputedStyle(input),
+                normal = getComputedStyle(reference),
+                label = getComputedStyle(row.querySelector("label")),
+                out = {
+                  background: own.backgroundColor,
+                  referenceBackground: normal.backgroundColor,
+                  border: own.border,
+                  referenceBorder: normal.border,
+                  labelBorder: parseFloat(label.borderWidth),
+                  labelBackground: label.backgroundColor,
+                  surface: getComputedStyle(row).backgroundColor,
+                  referenceSurface: getComputedStyle(other).backgroundColor,
+                };
+              [input.checked, reference.checked] = before;
+              return out;
+            }, checked);
+            assert.equal(states.background, states.referenceBackground);
+            assert.equal(states.border, states.referenceBorder);
+            assert.equal(states.surface, states.referenceSurface);
+            assert.equal(states.labelBorder, 0);
+            assert.equal(states.labelBackground, "rgba(0, 0, 0, 0)");
+          }
           await options.locator(".post-angle-option").scrollIntoViewIfNeeded();
           await page.screenshot({
             path: artifact(`material-motion-options-${theme}.png`),
@@ -153,13 +183,21 @@ const { launch, artifact } = require("./browser.cjs");
       });
       const sample = async (time) =>
         page.locator(".save-indicator").evaluate(async (el, time) => {
-          for (const animation of el.getAnimations()) {
+          for (const animation of el.getAnimations({ subtree: true })) {
             animation.pause();
             animation.currentTime = time;
           }
           await new Promise(requestAnimationFrame);
-          const s = getComputedStyle(el);
-          return { clip: s.clipPath, rotate: s.rotate };
+          const s = getComputedStyle(el, "::before"),
+            circle = getComputedStyle(el);
+          return {
+            clip: s.clipPath,
+            rotate: s.rotate,
+            circle: circle.backgroundColor,
+            circleRotate: circle.rotate,
+            circleClip: circle.clipPath,
+            circleSize: el.getBoundingClientRect().width,
+          };
         }, time);
       const first = await sample(0),
         second = await sample(1900);
@@ -172,6 +210,14 @@ const { launch, artifact } = require("./browser.cjs");
         first.rotate,
         second.rotate,
         "The indicator also rotates",
+      );
+      assert.notEqual(first.circle, "rgba(0, 0, 0, 0)");
+      assert.equal(first.circle, second.circle);
+      assert.equal(first.circleRotate, "none");
+      assert.equal(first.circleClip, "none");
+      assert(
+        first.circleSize > 16,
+        "Stationary circle surrounds the smaller morphing shape",
       );
       await page.evaluate(() => endMotion());
       assert.equal(await page.locator("#status.studio-loading").count(), 0);

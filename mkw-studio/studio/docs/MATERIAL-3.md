@@ -282,3 +282,8 @@ Final local verification: 113/113 model tests, formatting and a reproducible bui
 ## Expressive motion follow-up – 24 October 2026
 
 The full component-family animation audit and ownership are recorded in [MATERIAL-3-MOTION.md](MATERIAL-3-MOTION.md). Short unknown waits now use the expressive morphing/rotating indicator; measured import/export uses real wavy progress with native values. Legacy action/field/chevron timings and press feedback use the shared motion tokens. No artwork manipulation is smoothed or delayed. The toolbar warning shares Export dimensions in normal/icon-only/Advanced layouts, and the FD angle direction field shares the other options' typography and surface, with a Google chevron. Wiki instructions are updated. No document, renderer or persistence algorithm changes.
+
+
+## Current component/state detail audit
+
+See [MATERIAL-3-DETAILCHECK.md](MATERIAL-3-DETAILCHECK.md) for the 24 October source/browser inventory, explicit remaining differences and eight prioritised steps. Earlier next-stage paragraphs above are historical milestone notes; this inventory is the current follow-up plan. No artwork changes are part of those UI tasks.

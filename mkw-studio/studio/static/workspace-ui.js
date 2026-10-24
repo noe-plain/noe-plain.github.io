@@ -93,7 +93,8 @@ function studioSyncFooter() {
       button.setAttribute("aria-keyshortcuts", "Meta+0 Control+0");
     }
   }
-  $("#viewValue").title = "100 % · Cmd/Ctrl + 1";
+  $("#viewValue").title =
+    "Smartphone-Vorschau · 100 % = 390 px Breite · Cmd/Ctrl + 1";
   $("#viewValue").setAttribute("aria-keyshortcuts", "Meta+1 Control+1");
   $("#footerSnap").hidden = !carousel;
   if ($("#postHand")) $("#postHand").hidden = carousel;
@@ -311,9 +312,9 @@ window.addEventListener(
     if (event.repeat) return;
     if (p.carousel) {
       if (event.key === "0") carouselFit();
-      else carouselSetZoom(1);
+      else studioSetZoomPercent(100);
     } else if (event.key === "0") postFitRow();
-    else postSetZoom(1);
+    else studioSetZoomPercent(100);
   },
   true,
 );
@@ -352,6 +353,24 @@ $("#footerSnap").onclick = () => {
     studioSyncFooter();
   }
 };
+function studioZoomReference(carousel = !!p.carousel) {
+  const width = carousel
+    ? p.carousel.w
+    : p.formats?.[0]?.w || p.boards[0]?.w || 1080;
+  return MKWZoom.reference(width, carousel ? 1 : 0.24);
+}
+function studioSetZoomPercent(percentage) {
+  if (!Number.isFinite(percentage)) return;
+  const next = MKWZoom.value(percentage, studioZoomReference());
+  if (p.carousel) carouselSetZoom(next);
+  else postSetZoom(next);
+}
+function studioStepZoom(amount) {
+  studioSetZoomPercent(
+    MKWZoom.percent(p.carousel ? carouselZoom : view, studioZoomReference()) +
+      amount,
+  );
+}
 $("#postViewControls").setAttribute("aria-label", "Zoom");
 $("#footerZoom").append($("#postViewControls"));
 studioSetSidebar(studioSidebarOpen);

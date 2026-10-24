@@ -168,46 +168,106 @@ footer {
   display: flex;
   align-items: center;
   flex: none;
-  min-width: 150px;
+  min-width: 0;
   justify-content: flex-end;
 }
 footer .carousel-statusbar {
   display: contents;
 }
-footer .carousel-zoom-controls {
-  gap: 8px;
-}
-footer .carousel-zoom-controls label {
-  font-size: 11px;
-  color: var(--md-sys-color-on-surface-variant);
-}
-footer .carousel-zoom-controls input {
-  height: 30px;
-  border-radius: 8px;
+/* One shared footer zoom group for both editors. */
+footer .studio-zoom-controls {
+  --studio-zoom-button-size: 40px;
+  --studio-zoom-value-width: 60px;
+  display: grid;
+  grid-template-columns:
+    var(--studio-zoom-button-size) var(--studio-zoom-button-size)
+    var(--studio-zoom-value-width) var(--studio-zoom-button-size);
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  width: auto;
+  min-width: 0;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--studio-shape-full);
   background: var(--md-sys-color-surface-container-low);
-  border-color: var(--md-sys-color-outline-variant);
   color: var(--md-sys-color-on-surface);
 }
-footer .carousel-zoom-controls button {
+footer .studio-zoom-controls button {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 30px;
-  padding: 6px;
-  background: transparent;
-  border-color: transparent;
-}
-footer .carousel-zoom-controls button:hover {
-  background: var(--md-sys-color-surface-container);
-}
-footer .carousel-zoom-controls button .ui-icon {
-  width: 19px;
-  height: 19px;
-}
-footer .view-control {
+  width: var(--studio-zoom-button-size);
+  min-width: 0;
+  height: 40px;
   margin: 0;
-  min-width: 150px;
-  height: 30px;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  color: var(--md-sys-color-on-surface-variant);
+  background: transparent;
+}
+footer .studio-zoom-controls .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+footer .studio-zoom-controls .studio-zoom-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: var(--studio-zoom-value-width);
+  min-width: 0;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+footer .studio-zoom-value input {
+  appearance: textfield;
+  width: 3ch;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: inherit;
+  text-align: right;
+}
+footer .studio-zoom-value input::-webkit-inner-spin-button,
+footer .studio-zoom-value input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+footer .studio-zoom-controls button:hover,
+footer .studio-zoom-controls .studio-zoom-value:hover {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+footer .studio-zoom-controls .studio-zoom-value:focus-within {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+footer .studio-zoom-value input:focus-visible {
+  outline: none;
+}
+@media (max-width: 760px) {
+  footer .studio-zoom-controls {
+    --studio-zoom-button-size: 32px;
+    --studio-zoom-value-width: 48px;
+  }
 }
 .guides-hidden .safe-zone {
   display: none;
@@ -506,27 +566,6 @@ footer .view-control {
     height: 32px;
     padding: 6px;
   }
-  #footerZoom {
-    min-width: 118px;
-  }
-  footer .view-control {
-    min-width: 118px;
-  }
-  footer .view-control #viewValue {
-    min-width: 40px;
-    padding: 4px;
-  }
-  footer .carousel-zoom-controls {
-    gap: 4px;
-  }
-  footer .carousel-zoom-controls label {
-    font-size: 0;
-    gap: 4px;
-  }
-  footer .carousel-zoom-controls input {
-    font-size: 12px;
-    width: 47px;
-  }
 }
 @media (max-width: 420px) {
   .footer-status {
@@ -541,9 +580,6 @@ footer .view-control {
   .footer-view-controls {
     border-left: 0;
     padding-left: 0;
-  }
-  footer .view-control {
-    min-width: 112px;
   }
 }
 
@@ -595,27 +631,6 @@ header .header-action-group .icon-button:hover {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
 }
-footer .view-control {
-  height: 40px;
-  background: transparent;
-}
-footer .view-control .icon-button,
-footer .carousel-zoom-controls button {
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-  padding: 8px;
-  border-radius: 50%;
-}
-footer .carousel-zoom-controls input {
-  height: 36px;
-  border-radius: 4px;
-  font-size: 14px;
-}
-footer .view-control #viewValue {
-  height: 36px;
-  border-radius: var(--studio-shape-full);
-}
 @media (max-width: 760px) {
   header .brand img {
     width: 145px;
@@ -643,11 +658,6 @@ footer .view-control #viewValue {
     width: 36px;
     min-width: 36px;
     height: 40px;
-  }
-  footer .view-control .icon-button,
-  footer .carousel-zoom-controls button {
-    width: 32px;
-    min-width: 32px;
   }
 }
 @media (max-width: 520px) {
@@ -690,27 +700,41 @@ footer .view-control #viewValue {
 #status.studio-loading {
   padding-inline-start: 0 !important;
 }
-#status.studio-loading::before {
+#status.studio-loading::before,
+#status.studio-loading::after {
   display: none;
 }
 .footer-status:has(#status.studio-loading) .save-indicator {
-  width: 16px;
-  height: 16px;
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
   border: 0;
-  border-radius: 0;
-  background: var(--md-sys-color-primary);
+  border-radius: 50%;
+  background: var(--md-sys-color-primary-container);
+}
+.footer-status:has(#status.studio-loading) .save-indicator::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  background: var(--md-sys-color-on-primary-container);
   clip-path: var(--studio-loading-shape);
   animation:
     studio-loading-morph 4550ms var(--studio-ease-spatial) infinite,
     studio-loading-rotate 2800ms linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .footer-status:has(#status.studio-loading) .save-indicator {
+  .footer-status:has(#status.studio-loading) .save-indicator::before {
     animation: none;
   }
 }
 @media (forced-colors: active) {
   .footer-status:has(#status.studio-loading) .save-indicator {
+    background: Canvas;
+    outline: 1px solid CanvasText;
+    forced-color-adjust: none;
+  }
+  .footer-status:has(#status.studio-loading) .save-indicator::before {
     background: Highlight;
     forced-color-adjust: none;
   }

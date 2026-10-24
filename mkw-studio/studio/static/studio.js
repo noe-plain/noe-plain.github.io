@@ -308,7 +308,8 @@ function updateDock() {
     b.classList.toggle("active", b.dataset.step === step);
     b.setAttribute("aria-current", b.dataset.step === step ? "true" : "false");
   });
-  $("#viewValue").textContent = Math.round(view * 100) + "%";
+  $("#viewValue").textContent =
+    Math.round(MKWZoom.percent(view, studioZoomReference(false))) + "%";
 }
 function chooseStep(value) {
   if (editingText) editingText.el.blur();
@@ -638,9 +639,9 @@ window.addEventListener("keydown", (ev) => {
 function setView(v) {
   postSetZoom(v);
 }
-$("#zoomIn").onclick = () => setView(view + 0.2);
-$("#zoomOut").onclick = () => setView(view - 0.2);
-$("#viewValue").onclick = () => setView(1);
+$("#zoomIn").onclick = () => studioStepZoom(20);
+$("#zoomOut").onclick = () => studioStepZoom(-20);
+$("#viewValue").onclick = () => studioSetZoomPercent(100);
 $("#open").onclick = () => $("#projectFile").click();
 $("#newproject").onclick = () => openProjectSetup();
 $("#save").onclick = () => {

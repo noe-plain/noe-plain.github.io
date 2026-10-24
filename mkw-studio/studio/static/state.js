@@ -248,7 +248,7 @@ function showImportStage(index, total, file, stage) {
   MKWUIControls.progress("#importProgress", index * 3 + stage, total * 3);
   $("#importExplanation").textContent = [
     "Dein Bild wird geladen und für die Bearbeitung vorbereitet.",
-    "Personen werden direkt in deinem Browser erkannt. Beim ersten Import wird dafür das Modell geladen.",
+    "Gesichter werden direkt im Browser erkannt. Bei langsamer Verbindung oder zu langer Ladezeit wird die Erkennung übersprungen.",
     "Die gewählten Formate werden zugeschnitten und mit dem weissen MKW-Logo versehen.",
   ][stage];
   document.querySelectorAll("[data-import-stage]").forEach((el) => {
@@ -264,7 +264,9 @@ async function importFiles(files) {
   checkpoint();
   let ok = 0,
     errors = [],
-    recognitionFailed = 0;
+    recognitionFailed = 0,
+    recognitionSkipped = 0;
+  MKWSubject.beginBatch();
   $("#importDialog").showModal();
   const finishLoading = MKWUIControls.loading("#importExplanation");
   try {
@@ -291,13 +293,18 @@ async function importFiles(files) {
         try {
           im.people = await MKWSubject.detect(im);
           im.subjectStatus = im.people.length
-            ? "Personenausschnitt vorbereitet"
+            ? im.people.some((r) => r.eyes)
+              ? "Gesicht mittig · Augen im oberen Drittel"
+              : "Personenausschnitt vorbereitet"
             : "Keine Person erkannt · mittiger Ausschnitt";
-        } catch {
+        } catch (error) {
           im.people = [];
-          im.subjectStatus =
-            "Personenerkennung nicht verfügbar · mittiger Ausschnitt";
-          recognitionFailed++;
+          const skipped = ["connection", "timeout"].includes(error.code);
+          im.subjectStatus = skipped
+            ? "Erkennung übersprungen · mittiger Ausschnitt"
+            : "Personenerkennung nicht verfügbar · mittiger Ausschnitt";
+          if (skipped) recognitionSkipped++;
+          else recognitionFailed++;
         }
         showImportStage(index, files.length, f.name, 2);
         await new Promise((resolve) => setTimeout(resolve, 30));
@@ -336,7 +343,7 @@ async function importFiles(files) {
     }
     changed();
     status(
-      `${ok} Bilder importiert${recognitionFailed ? " · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen." : ""}${errors.length ? " · " + errors.join(" · ") : ""}`,
+      `${ok} Bilder importiert${recognitionSkipped ? " · Erkennung übersprungen; Ausschnitte bitte prüfen." : ""}${recognitionFailed ? " · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen." : ""}${errors.length ? " · " + errors.join(" · ") : ""}`,
     );
     if (errors.length) alert(errors.join("\n"));
   } finally {

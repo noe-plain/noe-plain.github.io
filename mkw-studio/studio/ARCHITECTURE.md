@@ -249,3 +249,15 @@ workspace-ui.css owns floating tool/action states; a studio-tool-surface wraps e
 ## UI motion and measured progress
 
 build/ui-motion.mjs owns the generated ui-motion-shapes.css keyframes, included through the editor manifest. Edit the generator rather than sampled polygons. ui-controls.js keeps the reference-counted loading lifecycle and exposes progress(target,value,max), which updates the existing native element and its UI-only decorative fraction. Wavy progress uses small CSS masks; unknown waits use CSS morph/rotation. No per-frame application JavaScript, extra observer or model/render coupling. Closed dialogs, completion and reduced-motion stop these animations. See docs/MATERIAL-3-MOTION.md for the complete component-family audit and official references.
+
+## Bounded local import recognition
+
+`subject-model.js` owns the pure connection policy and initial crop calculation. `subject.js` owns one reusable lazy worker and a bounded request lifetime: reported slow networks/data saving skip before decoding an analysis bitmap; unknown networks (including Firefox) receive a 4.5-second first attempt and 1.5-second warm inference budget. Timeout/failure terminates the worker, rejects/cleans pending work and skips remaining images in that explicit import batch. The next import may retry. There is no probe download, background late crop, observer or permanent retry timer.
+
+`subject-worker.js` lazily initializes the pinned local MediaPipe FaceDetector with BlazeFace short-range. The first two actual landmarks supply average eye height. No detected face falls back to the existing person detector, still under the caller's deadline. Crop alignment uses the most prominent face's box centre at half artwork width and its eye height at one third of the whole artwork height, clamped to preserve filled edges. Family/illustration placement and existing designs are unchanged. The worker and local model/bundle URLs are versioned by content; none are startup assets. Detection metadata stays small; portable assets/renderer ownership is unchanged.
+
+The Material component/state inventory and prioritised remaining work live in `docs/MATERIAL-3-DETAILCHECK.md`. This is an audit and implementation sequence, not a claim of pixel-identical Google components.
+
+## Shared phone-reference view zoom
+
+`zoom-model.js` converts UI percentages to the existing editor scales without changing render coordinates, export dimensions or saved view bookmarks. 100% means a 390-CSS-pixel reference width: the Designer slide width, or the first FD format width. FD's legacy 0.24 base scale remains in its renderer and is accounted for only by the conversion. Shared footer markup classes and chrome.css own identical fit/minus/value/plus geometry and theme roles; the Designer keeps direct numeric entry and FD keeps click-to-100%. Buttons move 20 percentage points, Cmd/Ctrl+1 uses the phone reference, and Cmd/Ctrl+0/pinch/Alt-scroll retain their existing view handlers. Original zoom limits remain available, with the Designer numeric limits converted to the displayed percentage units.

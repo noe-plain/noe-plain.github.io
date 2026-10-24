@@ -114,14 +114,6 @@ html[data-theme="light"]
 html[data-theme="light"] .divider {
   background: #d9dfe7;
 }
-html[data-theme="light"] footer .view-control {
-  background: var(--md-sys-color-surface-container-low);
-  border-color: var(--md-sys-color-outline-variant);
-}
-html[data-theme="light"] footer .view-control button {
-  background: transparent;
-  color: var(--md-sys-color-on-surface-variant);
-}
 html[data-theme="light"] :is(.image-field-label, .picker-heading) {
   color: var(--md-sys-color-on-surface-variant);
 }

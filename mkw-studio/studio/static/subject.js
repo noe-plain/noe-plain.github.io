@@ -1,33 +1,57 @@
 "use strict";
-// Images stay on device. The worker and the detection model are served with the app.
 const MKWSubject = (() => {
+  const workerURL = "static/subject-worker.js?v=9a36a99c62d2";
   let worker,
-    sequence = 0;
+    ready = false,
+    sequence = 0,
+    batchFailure = null;
   const pending = new Map();
-  function reset() {
+  function skipped(code) {
+    return Object.assign(Error("Personenerkennung übersprungen."), { code });
+  }
+  function reset(code = "unavailable") {
+    batchFailure = code;
     worker?.terminate();
     worker = null;
+    ready = false;
     for (const task of pending.values()) {
       clearTimeout(task.timer);
-      task.reject(Error("Personenerkennung nicht verfügbar."));
+      task.reject(skipped(code));
     }
     pending.clear();
   }
+  function beginBatch() {
+    batchFailure = null;
+  }
+  function skipReason() {
+    return MKWSubjectModel.skipConnection(navigator.connection)
+      ? "connection"
+      : batchFailure;
+  }
   function getWorker() {
     if (!worker) {
-      worker = new Worker("static/subject-worker.js");
-      worker.onerror = reset;
-      worker.onmessage = ({ data }) => {
+      const w = new Worker(workerURL);
+      worker = w;
+      w.onerror = (event) => {
+        event.preventDefault();
+        if (worker === w) reset();
+      };
+      w.onmessage = ({ data }) => {
+        if (worker !== w) return;
         const task = pending.get(data.id);
         if (!task) return;
+        if (data.error || !Array.isArray(data.people)) return reset();
         pending.delete(data.id);
         clearTimeout(task.timer);
-        data.error ? task.reject(Error(data.error)) : task.resolve(data.people);
+        ready = true;
+        task.resolve(data.people);
       };
     }
     return worker;
   }
   async function detect(im) {
+    const reason = skipReason();
+    if (reason) throw skipped(reason);
     const source = await image(im.data),
       scale = Math.min(1, 1280 / im.width, 1280 / im.height),
       canvas = makeCanvas(im.width * scale, im.height * scale);
@@ -38,48 +62,27 @@ const MKWSubject = (() => {
       id = ++sequence;
     try {
       return await new Promise((resolve, reject) => {
-        const w = getWorker(),
-          timer = setTimeout(reset, 60000);
+        const timer = setTimeout(
+          () => reset("timeout"),
+          ready
+            ? MKWSubjectModel.detectionBudget
+            : MKWSubjectModel.startupBudget,
+        );
         pending.set(id, { resolve, reject, timer });
-        w.postMessage({ id, bitmap }, [bitmap]);
+        try {
+          getWorker().postMessage({ id, bitmap }, [bitmap]);
+        } catch {
+          reset();
+        }
       });
     } finally {
       bitmap.close();
+      canvas.width = canvas.height = 1;
     }
   }
-  function crop(b, im) {
-    if (b.family?.enabled || !im.people?.length) return;
-    const t = b.image,
-      s = t.scale,
-      people = im.people,
-      visibleW = b.w / s / im.width,
-      visibleH = b.h / s / im.height;
-    const left = Math.min(...people.map((r) => r.x)),
-      right = Math.max(...people.map((r) => r.x + r.w)),
-      top = Math.min(...people.map((r) => r.y)),
-      bottom = Math.max(...people.map((r) => r.y + r.h));
-    // Keep the group if it fits; otherwise favour the most prominent person.
-    const lead = people.reduce((a, r) =>
-        r.w * r.h * r.score > a.w * a.h * a.score ? r : a,
-      ),
-      group = right - left <= visibleW;
-    const cx = group ? (left + right) / 2 : lead.x + lead.w / 2;
-    const head = group ? top : lead.y,
-      bodyBottom = group ? bottom : lead.y + lead.h;
-    const cy =
-      bodyBottom - head <= visibleH
-        ? (head + bodyBottom) / 2
-        : head + visibleH * 0.42;
-    t.x = MKWLayout.clamp(
-      b.w / 2 - (cx - 0.5) * im.width * s,
-      b.w - (im.width * s) / 2,
-      (im.width * s) / 2,
-    );
-    t.y = MKWLayout.clamp(
-      b.h / 2 - (cy - 0.5) * im.height * s,
-      b.h - (im.height * s) / 2,
-      (im.height * s) / 2,
-    );
+  function crop(board, im) {
+    const position = MKWSubjectModel.position(board, im);
+    if (position) Object.assign(board.image, position);
   }
-  return { detect, crop };
+  return { detect, crop, beginBatch, skipReason };
 })();

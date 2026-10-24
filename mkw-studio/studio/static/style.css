@@ -435,27 +435,6 @@ header {
 #warning:empty {
   display: none;
 }
-.view-control {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  background: var(--md-sys-color-surface);
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  pointer-events: auto;
-}
-.view-control #viewValue {
-  background: none;
-  border: 0;
-  padding: 8px;
-  font-size: 11px;
-  min-width: 52px;
-}
-.view-control .icon-button {
-  width: 28px;
-  height: 30px;
-  padding: 7px;
-}
 footer {
   position: fixed;
   bottom: 0;
@@ -1607,21 +1586,6 @@ header {
 .zoom-heading span {
   font-size: 10px;
   color: #8d9ab0;
-}
-.view-control {
-  justify-content: space-between;
-  width: 100%;
-  background: var(--md-sys-color-surface-container-low);
-  border-color: var(--md-sys-color-outline-variant);
-}
-.view-control #viewValue {
-  color: #dce5f7;
-  flex: 1;
-}
-.view-control .icon-button {
-  width: 38px;
-  height: 36px;
-  color: #aabce0;
 }
 #warning {
   background: #362e23;

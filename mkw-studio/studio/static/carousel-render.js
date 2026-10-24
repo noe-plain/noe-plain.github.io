@@ -248,7 +248,7 @@ function carouselRender() {
      "",
    )}</div></div><div class="studio-bar-actions"><button id="carouselNotice" class="studio-action studio-notice-button" aria-controls="studioWarnings" aria-expanded="false" hidden></button><button id="carouselExport" class="studio-action">${studioIcon("export")}<span>Export</span></button></div></nav>
  <div id="carouselViewport" tabindex="0" aria-label="Designer-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Designer-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
- <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><label>Zoom <input id="carouselZoom" type="number" min="5" max="200" step="5" value="${Math.round(carouselZoom * 100)}"> %</label></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
+ <aside id="carouselSidebar"><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls studio-zoom-controls" role="group" aria-label="Zoom"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><button id="carouselZoomOut" aria-label="Ansicht verkleinern" title="Ansicht verkleinern">${studioIcon("minus")}</button><label class="studio-zoom-value"><input id="carouselZoom" aria-label="Zoom in Prozent" type="number" min="5" max="200" step="1" value="${Math.round(MKWZoom.percent(carouselZoom, studioZoomReference(true)))}"><span aria-hidden="true">%</span></label><button id="carouselZoomIn" aria-label="Ansicht vergrössern" title="Ansicht vergrössern">${studioIcon("plus")}</button></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
   MKWUIControls.designer($("#carouselSidebar"));
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
@@ -260,8 +260,13 @@ function carouselRender() {
     carouselEndText();
     openExport();
   };
-  $("#carouselZoom").onchange = (ev) => carouselSetZoom(+ev.target.value / 100);
+  $("#carouselZoom").onchange = (ev) => {
+    if (!ev.target.value.trim()) return carouselRefresh();
+    studioSetZoomPercent(+ev.target.value);
+  };
   $("#carouselFit").onclick = carouselFit;
+  $("#carouselZoomOut").onclick = () => studioStepZoom(-20);
+  $("#carouselZoomIn").onclick = () => studioStepZoom(20);
   const viewport = $("#carouselViewport");
   viewport.oncontextmenu = (event) => {
     if (
@@ -491,7 +496,14 @@ function carouselRefresh() {
   const viewport = $("#carouselViewport");
   carouselPasteboardSpace(viewport, width, height);
   carouselScheduleOutside();
-  $("#carouselZoom").value = Math.round(s * 100);
+  const zoomField = $("#carouselZoom"),
+    zoomValue = Math.round(MKWZoom.percent(s, studioZoomReference(true)));
+  zoomField.value = zoomValue;
+  zoomField.style.width = String(zoomValue).length + "ch";
+  zoomField.min = Math.floor(MKWZoom.percent(0.05, studioZoomReference(true)));
+  zoomField.max = Math.ceil(
+    MKWZoom.percent(carouselMaxZoom(), studioZoomReference(true)),
+  );
   carouselSchedulePaint(canvas, rasterScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
   const gridStyle = MKWDesignerGrid.style(c);

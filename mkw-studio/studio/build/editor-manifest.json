@@ -1,6 +1,7 @@
 {
   "scripts": [
     "static/core.js",
+    "static/zoom-model.js",
     "static/browser.js",
     "static/family.js",
     "static/project-assets.js",
@@ -26,6 +27,7 @@
     "static/studio.js",
     "static/file-io.js",
     "static/project-formats.js",
+    "static/subject-model.js",
     "static/subject.js",
     "static/export.js",
     "static/psd.js",

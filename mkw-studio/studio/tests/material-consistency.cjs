@@ -303,14 +303,14 @@ const { launch, artifact } = require("./browser.cjs");
       assert.equal(
         await page
           .locator(".save-indicator")
-          .evaluate((el) => getComputedStyle(el).animationName),
+          .evaluate((el) => getComputedStyle(el, "::before").animationName),
         "studio-loading-morph, studio-loading-rotate",
       );
       await page.emulateMedia({ reducedMotion: "reduce" });
       assert.equal(
         await page
           .locator(".save-indicator")
-          .evaluate((el) => getComputedStyle(el).animationName),
+          .evaluate((el) => getComputedStyle(el, "::before").animationName),
         "none",
       );
       await page.evaluate(() => endB());

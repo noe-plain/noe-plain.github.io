@@ -394,24 +394,39 @@ dialog[open],
 .studio-loading {
   position: relative;
   padding-inline-start: calc(
-    var(--studio-loading-inset, 0px) + 28px
+    var(--studio-loading-inset, 0px) + 36px
   ) !important;
-  min-height: 20px;
+  min-height: 28px;
 }
 .studio-loading::before {
   content: "";
   position: absolute;
-  inset-inline-start: var(--studio-loading-inset, 0px);
+  inset-inline-start: calc(var(--studio-loading-inset, 0px) + 4px);
   top: 50%;
+  z-index: 1;
   width: 20px;
   height: 20px;
   translate: 0 -50%;
-  background: var(--md-sys-color-primary);
+  background: var(--md-sys-color-on-primary-container);
   clip-path: var(--studio-loading-shape);
   pointer-events: none;
   animation:
     studio-loading-morph 4550ms var(--studio-ease-spatial) infinite,
     studio-loading-rotate 2800ms linear infinite;
+}
+.studio-loading::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: var(--studio-loading-inset, 0px);
+  top: 50%;
+  z-index: 0;
+  width: 28px;
+  height: 28px;
+  translate: 0 -50%;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: var(--md-sys-color-primary-container);
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .studio-loading::before {
@@ -421,6 +436,11 @@ dialog[open],
 @media (forced-colors: active) {
   .studio-loading::before {
     background: Highlight;
+    forced-color-adjust: none;
+  }
+  .studio-loading::after {
+    background: Canvas;
+    border: 1px solid CanvasText;
     forced-color-adjust: none;
   }
 }
@@ -445,8 +465,4 @@ dialog[open],
 
 button.studio-loading {
   --studio-loading-inset: 8px;
-}
-button.studio-loading::before {
-  inset-inline-start: 8px;
-  background: currentColor;
 }

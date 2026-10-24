@@ -185,7 +185,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.keyboard.press("Control+1");
     assert.equal(
       await page.evaluate(() => carouselZoom),
-      1,
+      await page.evaluate(() => studioZoomReference(true)),
       "an icon hint must not block the workspace zoom shortcut",
     );
     await page.keyboard.press("Control+0");

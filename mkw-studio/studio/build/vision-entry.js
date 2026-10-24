@@ -1,1 +1,5 @@
-export { FilesetResolver, ObjectDetector } from "@mediapipe/tasks-vision";
+export {
+  FilesetResolver,
+  ObjectDetector,
+  FaceDetector,
+} from "@mediapipe/tasks-vision";
