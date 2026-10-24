@@ -120,8 +120,21 @@ const { launch, artifact } = require("./browser.cjs");
         body: "self.onmessage = () => {};",
       });
     });
+    // Isolate the recognition deadline from large-photo decode/preview work.
+    const smallImage = Buffer.from(
+      await delayed.evaluate(
+        () => makeCanvas(64, 64).toDataURL().split(",")[1],
+      ),
+      "base64",
+    );
     const started = Date.now();
-    await delayed.locator("#files").setInputFiles([fixture, fixture, fixture]);
+    await delayed.locator("#files").setInputFiles(
+      [1, 2, 3].map((index) => ({
+        name: `timeout-${index}.png`,
+        mimeType: "image/png",
+        buffer: smallImage,
+      })),
+    );
     await delayed.waitForFunction(() => !busy && p.images.length === 3);
     assert(
       Date.now() - started < 12000,

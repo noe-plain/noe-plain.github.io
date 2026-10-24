@@ -53,7 +53,10 @@ const { launch, artifact } = require("./browser.cjs");
     await help.locator('a[href="#advanced-typografie"]').click();
     assert(await help.locator("#advanced-typografie").isVisible());
     assert.equal(await help.locator("#helpSearch").inputValue(), "");
-    assert.equal(await help.locator('nav [aria-current="location"]').getAttribute("href"), "#einzelposts");
+    assert.equal(
+      await help.locator('nav [aria-current="location"]').getAttribute("href"),
+      "#einzelposts",
+    );
     await help.locator("#helpSearch").fill("Rahmenpunkte");
     await help.locator('a[href="#advanced-typografie"]').click();
     assert(await help.locator("#advanced-typografie").isVisible());
@@ -69,7 +72,15 @@ const { launch, artifact } = require("./browser.cjs");
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
-      JSON.stringify(await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:[...document.body.children].filter(el=>el.getBoundingClientRect().right>innerWidth+1).map(el=>el.id||el.tagName)}))),
+      JSON.stringify(
+        await page.evaluate(() => ({
+          width: innerWidth,
+          scroll: document.documentElement.scrollWidth,
+          overflow: [...document.body.children]
+            .filter((el) => el.getBoundingClientRect().right > innerWidth + 1)
+            .map((el) => el.id || el.tagName),
+        })),
+      ),
     );
     await page
       .locator("#studioHelpDialog")
@@ -423,7 +434,13 @@ const { launch, artifact } = require("./browser.cjs");
       sponsorApply(id, clone(p.boards.find((b) => b.imageId === id).sponsors));
     }, overrideImage);
     assert(await page.evaluate((id) => p.sponsorOverrides[id], overrideImage));
+    const beforeUndo = await page
+      .locator(".image-info-card")
+      .first()
+      .elementHandle();
     await page.locator("#undo").click();
+    await page.waitForFunction((card) => !card.isConnected, beforeUndo);
+    await beforeUndo.dispose();
     assert(
       !(await page.evaluate((id) => p.sponsorOverrides?.[id], overrideImage)),
     );
