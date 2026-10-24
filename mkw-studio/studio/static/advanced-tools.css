@@ -257,3 +257,7 @@ html[data-theme="light"] .vector-node.is-selected {
   fill: color-mix(in srgb, var(--md-sys-color-primary) 26.67%, transparent);
   stroke: var(--md-sys-color-primary);
 }
+
+.advanced-mode.carousel-mode .carousel-contextbar.studio-commandbar {
+  --studio-export-action-width: 58px;
+}

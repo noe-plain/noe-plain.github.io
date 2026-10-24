@@ -244,3 +244,8 @@ workspace-ui.css owns floating tool/action states; a studio-tool-surface wraps e
 ## User-operation loading feedback
 
 `ui-controls.js` exposes `MKWUIControls.loading(elementOrSelector)`. Call it at the existing asynchronous user-operation boundary and always invoke its returned idempotent finish callback, normally in `finally`. Overlapping calls on the same element share a WeakMap reference count and restore its previous aria-busy attribute when the last finishes. For a queued promise, attach both success and failure cleanup without creating an unhandled rejected derivative. `controls.css` owns the circular progress styling, footer-indicator reuse, forced-colour and reduced-motion fallback. Existing measured import/export progress stays authoritative. Do not add fake percentages, document mutations, observers, frame callbacks or network loads to show progress. Hidden/lazy dialogs keep their existing loading boundaries; the Wiki still loads only on first open.
+
+
+## UI motion and measured progress
+
+build/ui-motion.mjs owns the generated ui-motion-shapes.css keyframes, included through the editor manifest. Edit the generator rather than sampled polygons. ui-controls.js keeps the reference-counted loading lifecycle and exposes progress(target,value,max), which updates the existing native element and its UI-only decorative fraction. Wavy progress uses small CSS masks; unknown waits use CSS morph/rotation. No per-frame application JavaScript, extra observer or model/render coupling. Closed dialogs, completion and reduced-motion stop these animations. See docs/MATERIAL-3-MOTION.md for the complete component-family audit and official references.

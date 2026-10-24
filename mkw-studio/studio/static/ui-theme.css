@@ -23,6 +23,7 @@
   --studio-motion-short: 150ms;
   --studio-motion-effects: 200ms;
   --studio-motion-spatial: 350ms;
+  --studio-motion-press: 450ms;
   --studio-ease-effects: cubic-bezier(0.31, 0.94, 0.34, 1);
   --studio-ease-spatial: cubic-bezier(0.27, 1.06, 0.18, 1);
   --studio-label-size: 12px;
@@ -48,6 +49,7 @@
     --studio-motion-short: 0ms;
     --studio-motion-effects: 0ms;
     --studio-motion-spatial: 0ms;
+    --studio-motion-press: 0ms;
   }
 }
 

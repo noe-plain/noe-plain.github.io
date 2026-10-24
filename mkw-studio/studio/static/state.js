@@ -245,8 +245,7 @@ function basicBoard(im, w = 1080, h = 1080, metadata = p.meta) {
 function showImportStage(index, total, file, stage) {
   $("#importFile").textContent = file;
   $("#importCount").textContent = `Bild ${index + 1} von ${total}`;
-  $("#importProgress").max = total * 3;
-  $("#importProgress").value = index * 3 + stage;
+  MKWUIControls.progress("#importProgress", index * 3 + stage, total * 3);
   $("#importExplanation").textContent = [
     "Dein Bild wird geladen und für die Bearbeitung vorbereitet.",
     "Personen werden direkt in deinem Browser erkannt. Beim ersten Import wird dafür das Modell geladen.",

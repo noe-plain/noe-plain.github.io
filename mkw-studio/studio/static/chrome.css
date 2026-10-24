@@ -696,16 +696,13 @@ footer .view-control #viewValue {
 .footer-status:has(#status.studio-loading) .save-indicator {
   width: 16px;
   height: 16px;
-  border: 2px solid var(--md-sys-color-primary);
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  background: transparent;
-  animation: studio-status-turn 1400ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes studio-status-turn {
-  to {
-    transform: rotate(360deg);
-  }
+  border: 0;
+  border-radius: 0;
+  background: var(--md-sys-color-primary);
+  clip-path: var(--studio-loading-shape);
+  animation:
+    studio-loading-morph 4550ms var(--studio-ease-spatial) infinite,
+    studio-loading-rotate 2800ms linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .footer-status:has(#status.studio-loading) .save-indicator {
@@ -714,9 +711,7 @@ footer .view-control #viewValue {
 }
 @media (forced-colors: active) {
   .footer-status:has(#status.studio-loading) .save-indicator {
-    border-color: Highlight;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    background: Highlight;
     forced-color-adjust: none;
   }
 }

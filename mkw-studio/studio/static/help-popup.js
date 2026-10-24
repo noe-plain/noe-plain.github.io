@@ -1,5 +1,5 @@
 "use strict";
-const studioHelpURL = "hilfe/?v=e3c4b202f2af";
+const studioHelpURL = "hilfe/?v=ae340b832ee4";
 let studioHelpPopup = null;
 function studioOpenHelp(trigger) {
   if (!studioHelpPopup) {

@@ -38,7 +38,8 @@ const MKWUIControls = (function () {
     )
       return;
     ripples.get(button)?.cancel();
-    const rect = button.getBoundingClientRect();
+    const rect = button.getBoundingClientRect(),
+      motion = getComputedStyle(button);
     if (!rect.width || !rect.height) return;
     const layer = document.createElement("mkw-state-ripple"),
       wave = document.createElement("mkw-state-wave"),
@@ -61,7 +62,11 @@ const MKWUIControls = (function () {
         { transform: "scale(0.8)", opacity: 0.12, offset: 0.6 },
         { transform: "scale(1)", opacity: 0 },
       ],
-      { duration: 450, easing: "cubic-bezier(.31,.94,.34,1)" },
+      {
+        duration:
+          parseFloat(motion.getPropertyValue("--studio-motion-press")) || 450,
+        easing: motion.getPropertyValue("--studio-ease-effects").trim(),
+      },
     );
     ripples.set(button, animation);
     const remove = () => {
@@ -210,6 +215,19 @@ const MKWUIControls = (function () {
       loadingStates.delete(el);
     };
   }
+  function progress(target, value, max = 1) {
+    const el =
+      typeof target === "string" ? document.querySelector(target) : target;
+    if (!el) return;
+    el.max = max > 0 ? max : 1;
+    el.value = Math.max(0, Math.min(value, el.max));
+    const surface = el.closest(".studio-progress");
+    if (surface) {
+      const ratio = el.value / el.max;
+      surface.style.setProperty("--studio-progress", ratio * 100 + "%");
+      surface.classList.toggle("is-complete", ratio === 1);
+    }
+  }
   const rangeSelector = 'input[type="range"]:not(#paintAlphaSlider)';
   function syncRanges(root) {
     const ranges = root.matches?.(rangeSelector)
@@ -283,5 +301,5 @@ const MKWUIControls = (function () {
       );
       if (root) syncRanges(root);
     });
-  return Object.freeze({ designer, loading });
+  return Object.freeze({ designer, loading, progress });
 })();

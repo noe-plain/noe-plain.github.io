@@ -117,43 +117,88 @@ input[type="checkbox"]:disabled {
   opacity: 0.38;
   cursor: default;
 }
-progress {
-  appearance: none;
-  display: block;
+/* Native progress keeps its value and accessibility; decoration follows measured work. */
+.studio-progress {
+  position: relative;
   width: 100%;
+  height: 12px;
+  --studio-progress: 0%;
+  color: var(--md-sys-color-primary);
+}
+.studio-progress progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 12px;
+  opacity: 0;
+  margin: 0 !important;
+  pointer-events: none;
+}
+.studio-progress::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: min(100%, calc(var(--studio-progress) + 8px));
+  right: 0;
   height: 4px;
-  border: 0;
   border-radius: var(--studio-shape-full);
   background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-primary);
-  accent-color: var(--md-sys-color-primary);
 }
-progress[value] {
-  background:
-    radial-gradient(
-      circle at calc(100% - 2px) 50%,
-      var(--md-sys-color-primary) 2px,
-      transparent 2px
-    ),
-    var(--md-sys-color-primary-container);
+.studio-progress::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
 }
-progress::-webkit-progress-bar {
+.studio-progress-active {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--studio-progress);
+  overflow: hidden;
   border-radius: var(--studio-shape-full);
-  background:
-    radial-gradient(
-      circle at calc(100% - 2px) 50%,
-      var(--md-sys-color-primary) 2px,
-      transparent 2px
-    ),
-    var(--md-sys-color-primary-container);
+  pointer-events: none;
 }
-progress::-webkit-progress-value {
-  border-radius: var(--studio-shape-full);
-  background: var(--md-sys-color-primary);
+.studio-progress-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M-20 6Q-10-2 0 6T20 6T40 6T60 6' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E")
+    repeat-x 0 0 / 40px 12px;
 }
-progress::-moz-progress-bar {
-  border-radius: var(--studio-shape-full);
-  background: var(--md-sys-color-primary);
+:is(#importDialog[open], #exportDialog[open] #exportProgress.is-running)
+  .studio-progress-active::before {
+  animation: studio-progress-wave 1200ms linear infinite;
+}
+.studio-progress.is-complete .studio-progress-active::before {
+  inset-block: 4px;
+  mask: none;
+  animation: none;
+}
+@keyframes studio-progress-wave {
+  to {
+    mask-position: -40px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-progress .studio-progress-active::before {
+    animation: none !important;
+    inset-block: 4px;
+    mask: none;
+  }
+}
+@media (forced-colors: active) {
+  .studio-progress {
+    color: Highlight;
+    forced-color-adjust: none;
+  }
+  .studio-progress::before {
+    background: CanvasText;
+  }
 }
 /* Binary settings retain native focus, form and Space-key behaviour. */
 input[type="checkbox"][role="switch"] {
@@ -300,7 +345,7 @@ mkw-state-ripple > mkw-state-wave {
 dialog[open],
 .carousel-effect-editor:popover-open {
   animation: studio-surface-enter var(--studio-motion-effects)
-    cubic-bezier(0.34, 0.8, 0.34, 1);
+    var(--studio-ease-effects);
 }
 @keyframes studio-surface-enter {
   from {
@@ -345,7 +390,7 @@ dialog[open],
   }
 }
 
-/* Indeterminate work shares Material circular feedback; measured work keeps native progress. */
+/* Short, unspecified work uses Material Expressive shape morphing. */
 .studio-loading {
   position: relative;
   padding-inline-start: calc(
@@ -358,35 +403,24 @@ dialog[open],
   position: absolute;
   inset-inline-start: var(--studio-loading-inset, 0px);
   top: 50%;
-  width: 16px;
-  height: 16px;
-  box-sizing: border-box;
-  border: 2px solid var(--md-sys-color-primary);
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  translate: 0 -50%;
+  background: var(--md-sys-color-primary);
+  clip-path: var(--studio-loading-shape);
   pointer-events: none;
-  animation: studio-loading-turn 1400ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes studio-loading-turn {
-  from {
-    transform: translateY(-50%) rotate(0deg);
-  }
-  to {
-    transform: translateY(-50%) rotate(360deg);
-  }
+  animation:
+    studio-loading-morph 4550ms var(--studio-ease-spatial) infinite,
+    studio-loading-rotate 2800ms linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .studio-loading::before {
     animation: none;
-    transform: translateY(-50%);
   }
 }
 @media (forced-colors: active) {
   .studio-loading::before {
-    border-color: Highlight;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    background: Highlight;
     forced-color-adjust: none;
   }
 }
@@ -409,8 +443,10 @@ dialog[open],
   }
 }
 
+button.studio-loading {
+  --studio-loading-inset: 8px;
+}
 button.studio-loading::before {
   inset-inline-start: 8px;
-  border-top-color: currentColor;
-  border-left-color: currentColor;
+  background: currentColor;
 }

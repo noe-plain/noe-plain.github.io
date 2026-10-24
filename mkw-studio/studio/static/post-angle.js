@@ -17,7 +17,7 @@ const MKWPostAngleEditor = (() => {
   function postAngleOption(im) {
     const b = p.boards.find((b) => b.imageId === im.id),
       a = b?.angle;
-    return `<div class="post-option-row post-angle-option"><label class="post-option-label"><input type="checkbox" data-post-angle="${esc(im.id)}" ${a?.enabled ? "checked" : ""}><span class="visually-hidden">Winkel anzeigen</span></label><select data-post-angle-direction="${esc(im.id)}" aria-label="Winkel · Ausrichtung">${MKWAnglePolicy.choices(
+    return `<div class="post-option-row post-angle-option"><label class="post-option-label"><input type="checkbox" data-post-angle="${esc(im.id)}" ${a?.enabled ? "checked" : ""}><span class="visually-hidden">Winkel anzeigen</span></label><span class="post-angle-select"><select data-post-angle-direction="${esc(im.id)}" aria-label="Winkel · Ausrichtung">${MKWAnglePolicy.choices(
       a?.direction,
     )
       .map((key) => [
@@ -30,7 +30,7 @@ const MKWPostAngleEditor = (() => {
         ([key, label]) =>
           `<option value="${key}" ${(a?.direction || "left") === key ? "selected" : ""}>Winkel · ${label}</option>`,
       )
-      .join("")}</select></div>`;
+      .join("")}</select>${studioIcon("down")}</span></div>`;
   }
   function postAngleRefreshOptions() {
     for (const im of p.images) {

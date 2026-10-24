@@ -277,3 +277,8 @@ New `material-consistency` and `layer-renaming` browser suites cover density/spa
 
 
 Final local verification: 113/113 model tests, formatting and a reproducible build pass. Full Firefox 55/55 passes with the original pre-Material artwork references; after the final Wiki loading typography and theme-transition correction, affected Firefox 4/4 and Chrome 3/3 pass again. Chrome's earlier 12/12 operation suites and final path/name/consistency 3/3 also pass. Light/dark settings/text, shared renaming, loading, reduced-motion and forced-colour screenshots reviewed. Runtime bundles against 6ac2e7d: JS +1528 gzip bytes; CSS +673 gzip bytes. These are asset sizes, not measured network-speed claims. No renderer, document schema or persistence algorithm changed.
+
+
+## Expressive motion follow-up – 24 October 2026
+
+The full component-family animation audit and ownership are recorded in [MATERIAL-3-MOTION.md](MATERIAL-3-MOTION.md). Short unknown waits now use the expressive morphing/rotating indicator; measured import/export uses real wavy progress with native values. Legacy action/field/chevron timings and press feedback use the shared motion tokens. No artwork manipulation is smoothed or delayed. The toolbar warning shares Export dimensions in normal/icon-only/Advanced layouts, and the FD angle direction field shares the other options' typography and surface, with a Google chevron. Wiki instructions are updated. No document, renderer or persistence algorithm changes.

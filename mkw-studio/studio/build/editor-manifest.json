@@ -97,6 +97,7 @@
   "styles": [
     "static/ui-theme-tokens.css",
     "static/ui-theme.css",
+    "static/ui-motion-shapes.css",
     "static/controls.css",
     "static/style.css",
     "static/upgrade.css",

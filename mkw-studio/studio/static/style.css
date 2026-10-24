@@ -114,7 +114,7 @@ header {
   display: flex;
   margin-left: auto;
   opacity: 0.25;
-  transition: opacity 0.15s;
+  transition: opacity var(--studio-motion-short) var(--studio-ease-effects);
 }
 .image-group:hover .group-actions,
 .group-actions:focus-within {
@@ -1125,8 +1125,8 @@ a:focus-visible {
   border-radius: 8px;
   background: var(--md-sys-color-surface-container-low);
   transition:
-    background 0.15s,
-    border-color 0.15s;
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    border-color var(--studio-motion-short) var(--studio-ease-effects);
 }
 .group-heading .image-copyright input::placeholder {
   color: #9aa6b8;
@@ -1186,7 +1186,7 @@ a:focus-visible {
   height: 14px;
   flex: none;
   color: #7d8ca5;
-  transition: transform 0.15s;
+  transition: transform var(--studio-motion-short) var(--studio-ease-spatial);
 }
 .text-type-picker[open] .picker-chevron {
   transform: rotate(180deg);

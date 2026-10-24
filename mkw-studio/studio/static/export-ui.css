@@ -346,7 +346,7 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-#downloadProgress {
+#exportProgress .studio-progress {
   display: block;
   width: 100%;
   margin-top: 8px;

@@ -379,18 +379,39 @@
   margin: 0 -12px;
   background: transparent;
 }
-.image-info-card.group-heading .post-angle-option select {
+.image-info-card .post-angle-select {
+  position: relative;
+  display: flex;
+  align-items: center;
   flex: 1;
-  width: 0;
+  min-width: 0;
+}
+.image-info-card .post-angle-select > svg {
+  position: absolute;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  color: inherit;
+}
+.image-info-card.group-heading .text-type-options .post-angle-option select {
+  appearance: none;
+  flex: 1;
+  width: 100%;
   min-width: 0;
   min-height: var(--studio-control-height);
   height: auto;
   border: 0;
-  background: transparent;
+  border-radius: 0;
+  background: none;
   color: inherit;
   font: inherit;
-  padding: 8px 16px 8px 0;
+  padding: 8px 24px 8px 0;
   cursor: pointer;
+}
+.image-info-card .post-angle-option select option {
+  background: var(--studio-panel);
+  color: var(--studio-ink);
 }
 .image-info-card .family-settings {
   min-width: 0;

@@ -2,7 +2,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { build } from "esbuild";
 import { writeThemeTokens } from "./ui-theme.mjs";
+import { writeMotionShapes } from "./ui-motion.mjs";
 await writeThemeTokens();
+await writeMotionShapes();
 const root = new URL("../", import.meta.url),
   { scripts: own, styles } = JSON.parse(
     await readFile(new URL("build/editor-manifest.json", root), "utf8"),

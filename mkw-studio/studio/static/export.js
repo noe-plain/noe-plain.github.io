@@ -371,8 +371,7 @@ function setExportProgress(done, total, text) {
   const percent = total ? Math.round((done / total) * 100) : 0;
   $("#exportProgress").hidden = false;
   $("#exportProgress").classList.toggle("is-running", done < total);
-  $("#downloadProgress").value = done;
-  $("#downloadProgress").max = total;
+  MKWUIControls.progress("#downloadProgress", done, total);
   $("#progressPercent").textContent = percent + " %";
   $("#progressText").textContent = text;
 }

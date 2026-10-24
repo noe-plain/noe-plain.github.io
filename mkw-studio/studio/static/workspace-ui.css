@@ -946,6 +946,20 @@ footer .carousel-zoom-controls input {
   );
   box-shadow: 0 2px 8px #11182714;
 }
+.studio-commandbar
+  .studio-action:is(#export, #carouselExport, .studio-notice-button) {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: var(--studio-export-action-width, 112px);
+  min-width: var(--studio-export-action-width, 112px);
+  height: var(--studio-bar-height);
+  min-height: var(--studio-bar-height);
+  flex: none;
+  justify-content: center;
+}
+.studio-commandbar.studio-icons-only {
+  --studio-export-action-width: 58px;
+}
 .studio-commandbar .studio-action:is(#export, #carouselExport) {
   display: inline-flex;
   min-width: 58px;
