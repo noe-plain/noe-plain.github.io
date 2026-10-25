@@ -70,6 +70,8 @@ const assert = require("node:assert/strict");
       await page.evaluate(async () => (await MKWProjectStore.list()).length),
       2,
     );
+    // Visible-browser checks must activate the original tab before clicking its controls.
+    await page.bringToFront();
     const writableHandles = await page.evaluate(async () => {
       const root = await navigator.storage.getDirectory(),
         h = await root.getFileHandle("capability-probe.mkw", { create: true });
@@ -104,8 +106,11 @@ const assert = require("node:assert/strict");
         touchMeta();
         await autosave();
       });
-      const saved = await page.evaluate(async () =>
-        await MKWProjectFile.decode(await MKWProjects.fileLink().handle.getFile()),
+      const saved = await page.evaluate(
+        async () =>
+          await MKWProjectFile.decode(
+            await MKWProjects.fileLink().handle.getFile(),
+          ),
       );
       assert.equal(saved.meta.subtitle, "Automatisch in derselben Datei");
       assert.equal(downloads, 0);
@@ -167,9 +172,31 @@ const assert = require("node:assert/strict");
       assert.equal(downloads, 0);
       await page.locator("#save").click();
       const downloading = page.waitForEvent("download");
-      await page.locator("#saveProjectAs").click();
+      downloading.catch(() => {});
+      await page.bringToFront();
+      await page
+        .locator("#saveProjectAs")
+        .click()
+        .catch(async (error) => {
+          console.error(
+            await page.evaluate(() => ({
+              visibility: document.visibilityState,
+              focused: document.hasFocus(),
+              busy,
+              active: document.activeElement.id,
+              status: document.querySelector("#psdStatus").textContent,
+              dialogs: [...document.querySelectorAll("dialog[open]")].map(
+                (el) => el.id,
+              ),
+              saveDisabled: document.querySelector("#saveProjectAs").disabled,
+            })),
+          );
+          throw error;
+        });
       const file = await downloading,
-        project = await require("../static/project-file.js").decode(new Blob([require("node:fs").readFileSync(await file.path())]));
+        project = await require("../static/project-file.js").decode(
+          new Blob([require("node:fs").readFileSync(await file.path())]),
+        );
       assert(file.suggestedFilename().endsWith(".mkw"));
       assert.equal(project.projectId, id);
       assert.equal(project.meta.subtitle, "Firefox-Browsersicherung");
