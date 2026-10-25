@@ -11,6 +11,7 @@ The application runs on static GitHub Pages. Runtime assets are bundled and comm
 | Module | Responsibility |
 | --- | --- |
 | `ui-colour-model.js`, `ui-theme.js`, `ui-theme.css` | UI-only semantic roles, palette and theme application; no artwork changes. |
+| `ui-fields.js`, `ui-fields.css` | Shared native outlined-field states, German constraint feedback and explicit cross-field errors. Delegated listeners and weak field state; no field scanning observer, document mutation or new validation limits. Existing hint IDs are preserved. |
 | `ui-controls.js`, `controls.css` | Shared native controls, density, transient press feedback and non-blocking plain tooltips. Designer sidebar observers disconnect on replacement; artwork overlays are never observed. |
 | `start-screen.js`, `setup-store.js` | Device-only start image, bounded single Blob, lazy backdrop/preview lifecycle, settings access and portable setup/rollback. Never project assets. |
 | `ui-menus.js` | Shared transient action-menu keyboard/focus/viewport behaviour. Original commands own mutations; disabled entries remain discoverable but non-actionable. |
@@ -261,3 +262,10 @@ The Material component/state inventory and prioritised remaining work live in `d
 ## Shared phone-reference view zoom
 
 `zoom-model.js` converts UI percentages to the existing editor scales without changing render coordinates, export dimensions or saved view bookmarks. 100% means a 390-CSS-pixel reference width: the Designer slide width, or the first FD format width. FD's legacy 0.24 base scale remains in its renderer and is accounted for only by the conversion. Shared footer markup classes and chrome.css own identical fit/minus/value/plus geometry and theme roles; the Designer keeps direct numeric entry and FD keeps click-to-100%. Buttons move 20 percentage points, Cmd/Ctrl+1 uses the phone reference, and Cmd/Ctrl+0/pinch/Alt-scroll retain their existing view handlers. Original zoom limits remain available, with the Designer numeric limits converted to the displayed percentage units.
+
+
+## Template filling and field feedback
+
+Gallery UI groups existing fields into photos, copy and a native disclosure for design details; it does not reorder stored objects or mutate template data. The required-photo counter uses the same `MKWTemplateModel.requirements` and channel checks as creation. Missing-file errors describe the actual file control; a failed replacement keeps the previous valid asset. Template switches keep session drafts, while closing clears them. Existing lazy preview, generation cancellation, shared render path and independent project creation remain in their owners.
+
+`MKWFields` binds native validation only at interaction/submission, with explicit group feedback for format/safe-zone constraints. It never sets custom validity, changes values, checkpoints or writes preferences. Settings owners reject invalid drafts before persisting; date remains optional. Source `ui-fields.js` must precede the synchronous Designer setup initialization. Field feedback preserves unrelated `aria-describedby` IDs and cleans up on correction/dialog close. Canvas text editors and manipulation handles remain outside field styling/validation; no animation delays editing. Native confirm/alert migration is a later, separate change.

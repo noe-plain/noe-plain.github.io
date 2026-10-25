@@ -150,7 +150,27 @@ const assert = require("node:assert/strict"),
     await page.locator('[data-designer-grid="gap"]').dispatchEvent("change");
     assert.equal(
       await page.locator('[data-designer-grid="gap"]').inputValue(),
-      "20",
+      "-1",
+      "invalid draft stays visible for correction",
+    );
+    assert.equal(
+      await page
+        .locator('[data-designer-grid="gap"]')
+        .getAttribute("aria-invalid"),
+      "true",
+    );
+    assert.equal(
+      await page.evaluate(() => studioPreferences.designerGrid.gap),
+      20,
+      "invalid gap must not replace the valid preference",
+    );
+    await page.locator('[data-designer-grid="gap"]').fill("20");
+    await page.locator('[data-designer-grid="gap"]').dispatchEvent("change");
+    assert.notEqual(
+      await page
+        .locator('[data-designer-grid="gap"]')
+        .getAttribute("aria-invalid"),
+      "true",
     );
     await page.screenshot({
       path: artifact("designer-grid-settings-light.png"),

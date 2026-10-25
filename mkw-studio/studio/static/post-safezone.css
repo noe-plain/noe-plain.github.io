@@ -73,17 +73,14 @@
   margin: 12px 0 0;
   font-size: 11px;
   line-height: 1.45;
-  color: #d13838;
+  color: var(--md-sys-color-error);
 }
 .post-safezone-error:empty {
   display: none;
 }
 .post-safezone-section.invalid .safe-preview {
-  outline: 2px solid #e34848;
+  outline: 2px solid var(--md-sys-color-error);
   outline-offset: 2px;
-}
-html[data-theme="dark"] .post-safezone-error {
-  color: #ff9696;
 }
 @media (max-width: 650px) {
   #formatChoices .is-enabled .format-row {

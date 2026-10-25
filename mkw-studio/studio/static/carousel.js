@@ -18,8 +18,8 @@ function carouselSetup() {
   options.id = "carouselSetup";
   options.hidden = true;
   options.innerHTML = `
- <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Raster innerhalb der gewählten Safezone</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone links und rechts auf jeder Slide</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div></fieldset>
- <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></fieldset>`;
+ <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Raster innerhalb der gewählten Safezone</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone links und rechts auf jeder Slide</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p></fieldset>
+ <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p></fieldset>`;
   $("#formatChoices").before(options);
   const refresh = () => {
     const w = +$("#cw").value,
@@ -63,12 +63,25 @@ function carouselSetup() {
       (_, i) =>
         `<div style="aspect-ratio:${Math.max(1, w)}/${Math.max(1, h)}"><span>${i + 1}</span><i style="top:${Math.min(95, (top / Math.max(1, h)) * 100)}%;bottom:${Math.min(95, (bottom / Math.max(1, h)) * 100)}%;left:${(left / Math.max(1, w)) * 100}%;right:${(right / Math.max(1, w)) * 100}%"></i></div>`,
     ).join("");
+    const format = { w, h, top, bottom, left, right },
+      fields = ["cw", "ch", "ct", "cb", "cl", "cr"].map((id) => $("#" + id)),
+      invalid = !MKWCarouselPolicy.validFormat(format),
+      text = invalid
+        ? w > 4000 || h > 4000
+          ? "Breite und Höhe dürfen höchstens 4000 px betragen."
+          : MKWFormats.feedback(format)
+        : "";
     options
       .querySelector(".format-choice")
-      .classList.toggle(
-        "invalid",
-        top + bottom >= h || left + right >= w || w < 240 || h < 240,
-      );
+      .classList.toggle("invalid", invalid);
+    MKWFields.group(fields, text, $("#carouselFormatFeedback"));
+    MKWFields.group(
+      [$("#cn")],
+      MKWCarouselPolicy.validCount(n)
+        ? ""
+        : "Bitte eine ganze Anzahl von 1 bis 20 Slides eingeben.",
+      $("#carouselCountFeedback"),
+    );
   };
   options.querySelectorAll("input").forEach((el) => (el.oninput = refresh));
   refresh();
@@ -106,13 +119,22 @@ function carouselSetup() {
       bottom = +$("#cb").value,
       left = +$("#cl").value,
       right = +$("#cr").value;
+    const named = MKWFields.validate($("#setupName"), true);
+    refresh();
     if (
-      !$("#setupName").value.trim() ||
+      !named ||
       !MKWCarouselPolicy.validFormat({ w, h, top, bottom, left, right }) ||
       !MKWCarouselPolicy.validCount(n)
     ) {
-      $("#setupError").textContent =
-        "Bitte Projektname, 1–20 Slides (240–4000 px) und passende Safezones angeben.";
+      $("#setupError").textContent = !named
+        ? "Gib deinem Projekt bitte einen Namen."
+        : !MKWCarouselPolicy.validCount(n)
+          ? "Bitte eine ganze Anzahl von 1–20 Slides angeben."
+          : "Bitte die markierten Angaben korrigieren.";
+      (!named
+        ? $("#setupName")
+        : options.querySelector("[data-field-error]")
+      )?.focus();
       return;
     }
     if (savedRevision < revision) await autosave();

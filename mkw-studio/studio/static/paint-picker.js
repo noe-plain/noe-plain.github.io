@@ -287,6 +287,7 @@ function studioClosePicker(focus = true) {
   const el = $("#studioPaintPicker");
   el.hidePopover();
   el.hidden = true;
+  MKWFields.reset(el);
   document.body.append(el);
   studioSyncPaintControls();
   if (focus && anchor?.isConnected) anchor.focus();
@@ -389,10 +390,11 @@ function studioCreatePicker() {
   el.innerHTML = `<div class="picker-heading"><strong id="paintPickerTitle">Fläche</strong><button id="paintClose" class="icon-button" aria-label="Farbfeld schliessen">${studioIcon("close")}</button></div>
  <div class="picker-mode"><label>Füllung<select id="paintMode"><option value="solid">Farbe</option><option value="gradient">Verlauf</option><option value="image">Bild</option></select></label><button id="paintEnabled" class="icon-button" title="Ein- oder ausblenden" aria-label="Farbe ein- oder ausblenden">${studioIcon("visible")}</button></div>
  <div id="paintColourArea"><div class="picker-colour-space"><div id="paintHue" role="slider" tabindex="0" aria-label="Farbton" aria-valuemin="0" aria-valuemax="359" aria-orientation="vertical"><span></span></div><div id="paintSV" role="group" tabindex="0" aria-describedby="paintSVHelp" aria-label="Sättigung und Helligkeit"><span></span></div><div class="picker-opacity"><span aria-hidden="true">100</span><input id="paintAlphaSlider" type="range" min="0" max="100" step="1" aria-label="Deckkraft · oben 100 Prozent, unten 0 Prozent" aria-orientation="vertical"><span aria-hidden="true">0</span></div></div>
- <span id="paintSVHelp" class="visually-hidden">Links und rechts ändern die Sättigung, oben und unten die Helligkeit.</span><div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div></div>
+ <span id="paintSVHelp" class="visually-hidden">Links und rechts ändern die Sättigung, oben und unten die Helligkeit.</span><div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" pattern="#?[0-9a-fA-F]{6}" title="Bitte sechs Farbzeichen eingeben, zum Beispiel #3B7A71." spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div></div>
  <div id="paintGradientPanel"><div class="picker-gradient-kind" role="group" aria-label="Verlaufsform"><button data-gradient-kind="linear">Linear</button><button data-gradient-kind="radial">Radial</button><label>Winkel<span class="picker-unit"><input id="paintAngle" type="number" min="-360" max="360" aria-label="Verlaufswinkel"><span>°</span></span></label></div><div id="paintGradientTrack" aria-label="Verlaufsfarbwerte"><div id="paintGradientBar"></div><div id="paintGradientHandles"></div></div><div class="picker-stop-options"><label>Position<span class="picker-unit"><input id="paintStopPosition" type="number" min="0" max="100" step=".1" aria-label="Position des Farbwertes"><span>%</span></span></label><label>Mitte<span class="picker-unit"><input id="paintMidPosition" type="number" min="5" max="95" step="1" aria-label="Verlaufsmitte"><span>%</span></span></label><button id="paintDeleteStop" class="icon-button" title="Farbwert entfernen" aria-label="Farbwert entfernen">${studioIcon("trash")}</button></div></div>
  <div id="paintImagePanel"><div id="paintImagePreview"></div><button id="paintPlaceImage" class="primary">Bild auswählen / ersetzen</button></div><p id="paintMessage" role="status"></p>`;
   document.body.append(el);
+  el.addEventListener("mkw-field-feedback", studioPositionPicker);
   $("#paintClose").onclick = () => studioClosePicker();
   $("#paintMode").onchange = () =>
     studioPickerAction(() => {
@@ -740,13 +742,15 @@ function studioRenderPicker(refreshHandles = true) {
   $("#paintAlphaSlider").style.setProperty("--alpha-colour", colour.colour);
   if (document.activeElement !== $("#paintAngle"))
     $("#paintAngle").value = value.angle;
-  $("#paintMessage").textContent =
+  MKWFields.notice(
+    $("#paintMessage"),
     vector &&
-    state.channel === "fill" &&
-    state.object.type === "path" &&
-    !state.object.closed
+      state.channel === "fill" &&
+      state.object.type === "path" &&
+      !state.object.closed
       ? "Für eine sichtbare Füllung den Pfad zuerst schliessen."
-      : "";
+      : "",
+  );
   if (gradient) {
     elGradientKind();
     $("#paintGradientBar").style.background = studioPaintCSS({
@@ -771,6 +775,7 @@ function studioRenderPicker(refreshHandles = true) {
     $("#paintImagePreview").textContent = im ? "" : "Noch kein Bild gewählt";
     $("#paintPlaceImage").disabled = !!state.object.locked;
   }
+  MKWFields.refresh($("#studioPaintPicker"));
   studioPositionPicker();
   function elGradientKind() {
     document
@@ -952,7 +957,7 @@ async function studioPickerImport() {
     const file = input.files[0];
     if (!file || !studioPicker || studioPicker !== state || busy) return;
     $("#paintPlaceImage").disabled = true;
-    $("#paintMessage").textContent = "Bild wird geladen …";
+    MKWFields.notice($("#paintMessage"), "Bild wird geladen …");
     const finishLoading = MKWUIControls.loading("#paintMessage");
     busy = true;
     try {
@@ -981,9 +986,10 @@ async function studioPickerImport() {
       state.editing = false;
       studioRenderPicker();
       carouselPanel();
-      $("#paintMessage").textContent = "Bild eingesetzt.";
+      MKWFields.notice($("#paintMessage"), "Bild eingesetzt.");
     } catch (error) {
-      $("#paintMessage").textContent = error.message;
+      MKWFields.notice($("#paintMessage"), error.message, true);
+      studioPositionPicker();
     } finally {
       finishLoading();
       busy = false;

@@ -75,6 +75,25 @@ const { launch, artifact } = require("./browser.cjs");
       5,
     );
     assert.equal(await page.locator(".template-linked").count(), 3);
+    assert.equal(
+      await page.locator("#template-group-images").innerText(),
+      "Bilder einsetzen",
+    );
+    assert.equal(
+      await page.locator("#template-group-texts").innerText(),
+      "Texte prüfen",
+    );
+    assert.equal(
+      await page.locator("details.template-content-group").getAttribute("open"),
+      null,
+    );
+    assert.match(
+      await page.locator("#templateFillProgress").innerText(),
+      /0 von 5/,
+    );
+    await page.locator("details.template-content-group summary").click();
+    assert(await page.locator(".template-linked").first().isVisible());
+    await page.locator("details.template-content-group summary").click();
     await page.waitForFunction(
       () =>
         !!document
@@ -117,6 +136,11 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#templateStatus").textContent(),
       /markierten/,
     );
+    assert.equal(await page.locator(".needs-content").count(), 5);
+    assert.equal(
+      await page.locator('[data-template-upload][aria-invalid="true"]').count(),
+      5,
+    );
     const buffer = await page.evaluate(() => {
       const c = makeCanvas(900, 900),
         x = c.getContext("2d");
@@ -138,6 +162,15 @@ const { launch, artifact } = require("./browser.cjs");
         () => !document.querySelector("#templateCreate").disabled,
       );
     }
+    assert.match(
+      await page.locator("#templateFillProgress").innerText(),
+      /Bilder vollständig/,
+    );
+    assert.equal(await page.locator(".needs-content").count(), 0);
+    assert.equal(
+      await page.locator('[data-template-upload][aria-invalid="true"]').count(),
+      0,
+    );
     const oldPreview = await page
       .locator(".template-artwork-slide img")
       .first()

@@ -418,6 +418,8 @@ async function buildPSD(progress = () => {}) {
 $("#savePSD").onclick = async () => {
   if (busy) return;
   setSaveBusy(true);
+  $("#psdStatus").classList.remove("save-error");
+  MKWFields.notice($("#psdStatus"), "PSD wird vorbereitet …");
   try {
     // Open the native picker while the click still has user activation, before generating the PSD.
     const name = saveFileName("psd"),
@@ -436,10 +438,13 @@ $("#savePSD").onclick = async () => {
         : "Photoshop-Datei: Download gestartet.",
     );
   } catch (e) {
-    $("#psdStatus").textContent =
+    MKWFields.notice(
+      $("#psdStatus"),
       e.name === "AbortError"
         ? "Speichern abgebrochen."
-        : "PSD konnte nicht gespeichert werden: " + e.message;
+        : "PSD konnte nicht gespeichert werden: " + e.message,
+      e.name !== "AbortError",
+    );
   } finally {
     setSaveBusy(false);
   }

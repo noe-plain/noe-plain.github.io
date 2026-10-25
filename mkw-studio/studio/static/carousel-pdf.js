@@ -414,11 +414,13 @@ async function carouselRunPDF() {
       1,
       `Fertig · ${pages.length} Seiten · ${exportBytes(blob.size)}`,
     );
-    $("#exportStatus").textContent =
-      `PDF mit ${pages.length} Einzelseiten heruntergeladen · ${exportBytes(blob.size)}`;
+    MKWFields.notice(
+      $("#exportStatus"),
+      `PDF mit ${pages.length} Einzelseiten heruntergeladen · ${exportBytes(blob.size)}`,
+    );
     status("Designer als PDF exportiert");
   } catch (e) {
-    $("#exportStatus").textContent = e.message;
+    MKWFields.notice($("#exportStatus"), e.message, e.name !== "AbortError");
     $("#exportProgress").classList.remove("is-running");
   } finally {
     finishLoading();

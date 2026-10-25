@@ -361,9 +361,12 @@ function updateExportNames() {
       exportPlan.find((x) => x.board.id === el.dataset.id)?.name ||
       "Nicht im Export";
   });
-  $("#exportStatus").textContent =
+  MKWFields.notice(
+    $("#exportStatus"),
     error ||
-    `${bs.length} Sujets bereit.${!String(p.meta.date || "").trim() ? " Hinweis: Kein Datum angegeben; die Dateinamen enthalten kein Datum." : ""}`;
+      `${bs.length} Sujets bereit.${!String(p.meta.date || "").trim() ? " Hinweis: Kein Datum angegeben; die Dateinamen enthalten kein Datum." : ""}`,
+    !!error,
+  );
   $("#zip").disabled = $("#folder").disabled = !!error;
   $("#reviewExport").disabled = !bs.length;
 }
@@ -454,8 +457,11 @@ async function runExport(mode) {
       );
     }
     const successes = plan.length - failures.length;
-    $("#exportStatus").textContent =
-      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${failures.length ? " " + failures.join(" · ") : ""}`;
+    MKWFields.notice(
+      $("#exportStatus"),
+      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${failures.length ? " " + failures.join(" · ") : ""}`,
+      failures.length > 0,
+    );
     setExportProgress(
       plan.length,
       plan.length,
@@ -465,8 +471,11 @@ async function runExport(mode) {
     );
     status(`${successes} Bilder exportiert`);
   } catch (e) {
-    $("#exportStatus").textContent =
-      e.name === "AbortError" ? "Export abgebrochen." : e.message;
+    MKWFields.notice(
+      $("#exportStatus"),
+      e.name === "AbortError" ? "Export abgebrochen." : e.message,
+      e.name !== "AbortError",
+    );
     $("#exportProgress").classList.remove("is-running");
   } finally {
     finishLoading();

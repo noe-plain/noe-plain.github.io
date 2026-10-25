@@ -27,11 +27,11 @@ const MKWPostSafezone = (() => {
           input.value === "" ? NaN : Number(input.value);
         const valid = MKWFormats.validate(values);
         section.classList.toggle("invalid", !valid);
-        error.textContent = valid
-          ? ""
-          : "Oben + unten müssen kleiner als die Höhe sein, links + rechts kleiner als die Breite.";
-        for (const field of section.querySelectorAll("input"))
-          field.setAttribute("aria-invalid", String(!valid));
+        MKWFields.group(
+          section.querySelectorAll("input"),
+          MKWFormats.feedback(values),
+          error,
+        );
         if (!valid) return;
         if (!began) {
           checkpoint();
@@ -51,9 +51,7 @@ const MKWPostSafezone = (() => {
         }
         section.classList.remove("invalid");
         error.textContent = "";
-        section
-          .querySelectorAll("input")
-          .forEach((field) => field.setAttribute("aria-invalid", "false"));
+        MKWFields.group(section.querySelectorAll("input"), "", error);
       };
     });
   }

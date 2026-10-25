@@ -278,7 +278,7 @@ const MKWProjects = (() => {
         throw Error("Dateizugriff wurde nicht freigegeben.");
       setSaveBusy(true);
       $("#psdStatus").classList.remove("save-error");
-      $("#psdStatus").textContent = "Projektdatei wird vorbereitet …";
+      MKWFields.notice($("#psdStatus"), "Projektdatei wird vorbereitet …");
       if (
         asNew &&
         fileLink() &&
@@ -350,8 +350,9 @@ const MKWProjects = (() => {
   }
   function openError(message) {
     const field = $("#projectOpenStatus");
-    if (field && $("#projectLibrary").open) field.textContent = message;
-    else notice(message);
+    if (field && $("#projectLibrary").open)
+      MKWFields.notice(field, message, true);
+    else notice(message, true);
   }
   async function library() {
     let dialog = $("#projectLibrary");
@@ -364,7 +365,7 @@ const MKWProjects = (() => {
       $("#closeProjectLibrary").onclick = () => dialog.close();
       $("#openProjectFile").onclick = chooseFile;
     }
-    $("#projectOpenStatus").textContent = "";
+    MKWFields.notice($("#projectOpenStatus"), "");
     const list = $("#projectLibraryList");
     list.innerHTML =
       '<p class="project-library-empty">Projekte werden geladen …</p>';
@@ -401,7 +402,7 @@ const MKWProjects = (() => {
         if (opening) return;
         opening = true;
         const finishLoading = MKWUIControls.loading("#projectOpenStatus");
-        $("#projectOpenStatus").textContent = "Projekt wird geöffnet …";
+        MKWFields.notice($("#projectOpenStatus"), "Projekt wird geöffnet …");
         try {
           await open(await MKWProjectStore.open(button.dataset.projectId));
         } catch (error) {

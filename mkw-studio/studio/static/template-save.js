@@ -28,8 +28,7 @@ const MKWTemplateSave = (() => {
       const controls = [...dialog.querySelectorAll("input,button,select")];
       controls.forEach((el) => (el.disabled = true));
       const status = $("#templateSaveStatus");
-      status.textContent = "Vorlage wird geprüft und gespeichert …";
-      status.classList.remove("is-error");
+      MKWFields.notice(status, "Vorlage wird geprüft und gespeichert …");
       const finishLoading = MKWUIControls.loading(status);
       try {
         const layers = [...dialog.querySelectorAll("[data-template-name]")].map(
@@ -84,7 +83,7 @@ const MKWTemplateSave = (() => {
     own = project === p;
     $("#templateSaveName").value = project.meta.title || "Neue Vorlage";
     $("#templateSaveDescription").value = "";
-    $("#templateSaveStatus").textContent = "";
+    MKWFields.notice($("#templateSaveStatus"), "");
     const layers = MKWTemplateModel.suggest(project),
       images = project.carousel.objects.filter(MKWTemplateModel.imageLayer);
     $("#templateFolderNames").innerHTML = (project.carousel.folders || [])

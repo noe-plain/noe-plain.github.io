@@ -40,6 +40,7 @@ function studioApplyPreferences() {
     if ($("#" + id)) $("#" + id).value = studioPreferences[key];
   if ($("#autoSaveFile"))
     $("#autoSaveFile").checked = studioPreferences.autoSaveFile;
+  MKWFields.refresh($("#settingsDialog"));
   carouselSyncAdvancedTools();
   studioPersistPreferences();
 }
@@ -69,10 +70,8 @@ $("#snapDistance").oninput = (event) => {
   studioApplyPreferences();
 };
 $("#snapDistance").onchange = (event) => {
-  studioPreferences.snapDistance = Math.max(
-    1,
-    Math.min(40, Math.round(Number(event.target.value) || 6)),
-  );
+  if (!MKWFields.validate(event.target, true)) return;
+  studioPreferences.snapDistance = Number(event.target.value);
   studioApplyPreferences();
 };
 $("#defaultExportFormat").onchange = (event) => {

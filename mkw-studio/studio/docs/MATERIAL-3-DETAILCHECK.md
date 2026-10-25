@@ -1,12 +1,12 @@
 # Material 3: Detailprüfung und nächste Schritte
 
-Stand: 24. Oktober 2026. Geprüft wurden die gemeinsam verwendeten Bedienelemente und ihre Ausprägungen in Start, Einrichtung, FD-Kampagnen, Designer, Einstellungen, Vorlagen, Bibliothek, Speichern, Export und Wiki. Grundlage sind die Quellmodule und die Firefox-/Chrome-Prüfungen. Diese Liste ist ein Arbeitsplan; die unten aufgeführten Restarbeiten sind noch nicht umgesetzt.
+Stand: 25. Oktober 2026. Geprüft wurden die gemeinsam verwendeten Bedienelemente und ihre Ausprägungen in Start, Einrichtung, FD-Kampagnen, Designer, Einstellungen, Vorlagen, Bibliothek, Speichern, Export und Wiki. Grundlage sind die Quellmodule und die Firefox-/Chrome-Prüfungen. Diese Liste ist ein Arbeitsplan; die unten aufgeführten Restarbeiten sind noch nicht umgesetzt.
 
 Das Tool verwendet eigene, an Material 3 angepasste Web-Komponenten. Es ist noch keine vollständige 1:1-Umsetzung der Material-Komponenten. Besonders Farbmodell, Form-Morphing und Bewegungsabläufe unterscheiden sich technisch von Googles Referenz. Die vorhandenen MKW-Schriften und die gewünschten platzsparenden Arbeitsflächen bleiben bewusst erhalten.
 
 ## Zuerst erledigen
 
-1. **Eingabefelder und Fehlerzustände vereinheitlichen.** Ein gemeinsamer Aufbau für Beschriftung, Wert, Einheit und Fehlermeldung. Die heutigen Aussenbeschriftungen funktionieren; Filled-/Outlined-Felder mit konsistenter Fokus- und Fehlerdarstellung würden Material genauer entsprechen. Fehler müssen am betroffenen Feld erscheinen und über `aria-describedby`/`aria-invalid` verständlich sein. Keine springenden Texte oder veränderten Zahlenwerte.
+1. **Eingabefelder und Fehlerzustände: gemeinsamer Kern umgesetzt.** Native Outlined-Felder behalten ihre Beschriftungen, Einheiten und Bereichsgeometrie. Fokus-, Hover-, deaktivierte und Fehlerzustände werden gemeinsam gestaltet; deutsche Hinweise sind über `aria-describedby`/`aria-invalid` verbunden. Einrichtung, Format-/Schutzzonen und wichtige Zahlen-Standardeinstellungen verwenden gezielte Rückmeldungen; fehlende Vorlagenbilder zeigen Hinweise am Bildfeld. Ungültige Einstellungsentwürfe werden nicht gespeichert. Canvas-Eingaben und Artworks bleiben unverändert. Weitere fachliche Eingabeprüfungen bleiben bei ihren bisherigen Werkzeugen; die gemeinsame Darstellung ersetzt nicht pauschal deren Modelle.
 2. **Browser-Meldungen durch gemeinsame Dialoge ersetzen.** Beim Entfernen eines Bildes, Importfehlern, Ersetzen von Vorlagen und einzelnen Projektentscheidungen werden noch `alert()`/`confirm()` verwendet. Diese sehen je nach Browser anders aus. Einheitliche Material-Dialoge mit eindeutigen Aktionen, sicherem Abbrechen und Rückkehr des Fokus verbessern den Ablauf. Die Systemfenster für Dateiauswahl bleiben erhalten.
 3. **Interaktionszustände zentral abstimmen.** Hover, Tastaturfokus, gedrückt, ausgewählt und deaktiviert verwenden bereits gemeinsame Rollen, aber unterschiedliche Komponenten setzen noch eigene Überlagerungen und Deckkraftwerte. Die Zustandsflächen sollten aus einem gemeinsamen Satz von Tokens kommen. Auswahl darf beim Darüberfahren nicht verschwinden; deaktivierte Aktionen dürfen keine aktive Rückmeldung zeigen. Zoomtasten an ihren Grenzen sichtbar deaktivieren, statt einen weiteren Klick lediglich zu begrenzen.
 4. **Kleine Bedienziele nachprüfen.** Besonders der Schliessen-Button im FX-Fenster und die technischen Farb-/Verlaufskontrollen brauchen einen durchgängigen grossen unsichtbaren Klickbereich. Die sichtbaren Griffe bleiben klein und präzise. Komfortabel und kompakt getrennt prüfen; für Touch die grösseren Ziele sicherstellen.
@@ -80,3 +80,12 @@ Jeden Schritt als kleine eigene Änderung behandeln: zuerst gemeinsames Element,
 - FD: `post-workspace.css`, `post-inspector.js`; Designer-Liste/FX: `carousel-refinements.css`, `carousel-layer-actions.js`, `carousel-layer-effects.js`.
 - Native Bestätigungen: `state.js`, `studio.js`, `template-ui.js`, `project-session.js`.
 - Picker: `paint-picker.css/js`; übrige Dialoge: `projects.css`, `export-ui.css`, `templates.css`; Hilfe: `hilfe/`.
+
+
+## Vorlagenführung und Felder · 25. Oktober 2026
+
+Vorlagen wählen und Befüllen sind deutlich bezeichnet. Fotos und Texte stehen zuerst; bereits eingerichtete Gestaltungselemente bleiben über einen nativen aufklappbaren Bereich erreichbar. Der Zähler zeigt tatsächlich benötigte, erfolgreich importierte Bildkanäle. Der Designer-Button und die Live-Slidevorschau bleiben erhalten. Es gibt keinen zusätzlichen verpflichtenden Assistenten.
+
+Offizielle Referenz: [Material Web Textfelder](https://github.com/material-components/material-web/blob/main/docs/components/text-field.md), insbesondere externe Beschriftungen, Constraint Validation und Supporting/Error Text. Die eigenen nativen Controls übernehmen diese Anatomie ohne zusätzliche Laufzeitbibliothek. Eingabefehler erscheinen als Text und Farbzustand; korrigierte Felder werden wieder freigegeben. Formgeometrie und Text im Artwork werden nicht von UI-Tokens gesteuert.
+
+Die Firefox-CI läuft auf einem festgelegten Ubuntu-24.04-Runner mit Xvfb im sichtbaren Browsermodus statt ohne Display. Das stabilisiert die Plattform für lokale Vision-/Canvas-Prüfungen; bestehende Erkennungs- und Zeitlimits bleiben erhalten. Bei einem Workerfehler liefert der Test nun zusätzlich die eigentliche Workerfehlermeldung. Referenz: [Playwright CI mit Xvfb](https://playwright.dev/docs/ci#running-headed).

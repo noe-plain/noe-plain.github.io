@@ -48,15 +48,7 @@ const MKWDesignerGrid = (() => {
       input.onchange = () => {
         const value = Number(input.value),
           key = input.dataset.designerGrid;
-        if (
-          !input.value ||
-          !Number.isInteger(value) ||
-          value < +input.min ||
-          value > +input.max
-        ) {
-          input.value = settings[key];
-          return;
-        }
+        if (!MKWFields.validate(input, true)) return;
         studioPreferences.designerGrid = { ...settings, [key]: value };
         studioApplyPreferences();
         draw();

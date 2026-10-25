@@ -81,6 +81,19 @@ const { launch, artifact } = require("./browser.cjs");
     };
     await page.locator("[data-paint-channel=fill]").click();
     await assertPicker();
+    await page.locator("#paintHex").fill("XYZ");
+    await page.locator("#paintHex").press("Tab");
+    assert.equal(
+      await page.locator("#paintHex").getAttribute("aria-invalid"),
+      "true",
+    );
+    assert.match(
+      await page
+        .locator("#studioPaintPicker .studio-field-feedback")
+        .innerText(),
+      /sechs Farbzeichen/,
+    );
+    await assertPicker();
     await page.locator("#paintHue").focus();
     await page.keyboard.press("Escape");
     assert(await page.locator("#studioPaintPicker").isHidden());
@@ -101,6 +114,11 @@ const { launch, artifact } = require("./browser.cjs");
         studioApplyPreferences();
       }, theme);
       await page.locator("[data-paint-channel=fill]").click();
+      assert.notEqual(
+        await page.locator("#paintHex").getAttribute("aria-invalid"),
+        "true",
+        "reopening removes stale draft errors",
+      );
       await page.locator("#paintMode").selectOption("solid");
       await assertPicker();
       await page.locator("#paintMode").selectOption("gradient");

@@ -673,3 +673,66 @@ html[data-theme="dark"] .template-instagram-header img {
     flex-basis: 48px;
   }
 }
+
+/* Content-first filling: mandatory photos and editable copy precede design details. */
+#templateLayers {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+.template-content-group {
+  min-width: 0;
+}
+.template-group-fields {
+  display: grid;
+  gap: 12px;
+}
+#templateGallery .template-content-group h3 {
+  margin-top: 0;
+}
+#templateGallery .template-group-hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#templateGallery details.template-content-group {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  padding: 0 16px 16px;
+}
+#templateGallery details.template-content-group:not([open]) {
+  padding-bottom: 0;
+}
+.template-content-group > summary {
+  cursor: pointer;
+  padding: 16px 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.template-content-group > summary > span {
+  float: right;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.template-step-label,
+#templateGallery .template-required {
+  color: var(--md-sys-color-primary);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+#templateFillProgress {
+  margin: 16px 0 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  font-size: 13px;
+}
+#templateGallery .template-layer:focus-within {
+  box-shadow: inset 3px 0 var(--md-sys-color-primary);
+}
+#templateGallery [data-template-error] {
+  font-size: 12px;
+  color: var(--md-sys-color-error);
+}

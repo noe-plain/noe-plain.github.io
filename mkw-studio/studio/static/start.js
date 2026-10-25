@@ -28,13 +28,20 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     }
     await loadFonts();
     render();
-    $("#startStatus").textContent = saved
-      ? `${saved.title} · ${saved.document.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
-      : restoreError || "Noch kein gespeichertes Projekt vorhanden.";
+    MKWFields.notice(
+      $("#startStatus"),
+      saved
+        ? `${saved.title} · ${saved.document.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
+        : restoreError || "Noch kein gespeichertes Projekt vorhanden.",
+      !!restoreError,
+    );
     $("#startContinue").disabled = !saved;
   } catch (error) {
-    $("#startStatus").textContent =
-      "Start nur eingeschränkt möglich: " + error.message;
+    MKWFields.notice(
+      $("#startStatus"),
+      "Start nur eingeschränkt möglich: " + error.message,
+      true,
+    );
   }
   finishLoading();
   $("#startNew").disabled =
@@ -50,8 +57,11 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     try {
       await MKWProjects.open(await MKWProjectStore.open(saved.id));
     } catch (error) {
-      $("#startStatus").textContent =
-        "Projekt konnte nicht geöffnet werden: " + error.message;
+      MKWFields.notice(
+        $("#startStatus"),
+        "Projekt konnte nicht geöffnet werden: " + error.message,
+        true,
+      );
       $("#startContinue").disabled = false;
     } finally {
       finishLoading();

@@ -26,6 +26,25 @@ const MKWFormats = (() => {
       (f.left ?? (100 * f.w) / 1080) + (f.right ?? (100 * f.w) / 1080) < f.w
     );
   }
+  function feedback(f) {
+    if (
+      !["w", "h", "top", "bottom", "left", "right"].every(
+        (key) => f[key] === undefined || Number.isInteger(f[key]),
+      )
+    )
+      return "Bitte ganze Zahlen eingeben.";
+    if (f.w < 240 || f.h < 240 || f.w > 10000 || f.h > 10000)
+      return "Breite und Höhe müssen zwischen 240 und 10000 px liegen.";
+    if (f.w * f.h > 40000000)
+      return "Die Arbeitsfläche darf höchstens 40 Millionen Pixel haben. Bitte Breite oder Höhe verkleinern.";
+    if (["top", "bottom", "left", "right"].some((key) => f[key] < 0))
+      return "Schutzzonen dürfen nicht negativ sein.";
+    if (f.top + f.bottom >= f.h)
+      return "Oben und unten müssen zusammen kleiner als die Höhe sein.";
+    if ((f.left ?? (100 * f.w) / 1080) + (f.right ?? (100 * f.w) / 1080) >= f.w)
+      return "Links und rechts müssen zusammen kleiner als die Breite sein.";
+    return "";
+  }
   const legacy = () => [
     { w: 1080, h: 1080, top: 100, bottom: 200 },
     { w: 1080, h: 1920, top: 200, bottom: 500 },
@@ -60,7 +79,7 @@ const MKWFormats = (() => {
       );
     }
   }
-  return { defaults, validate, legacy, safe, editor, preview };
+  return { defaults, validate, feedback, legacy, safe, editor, preview };
 })();
 let formatDraft = [],
   setupWasBusy = false,
@@ -73,6 +92,7 @@ function openProjectSetup() {
   $("#setupName").value = "";
   $("#setupCode").value = "";
   $("#setupError").textContent = "";
+  MKWFields.reset($("#projectSetup"));
   renderFormatSetup();
   $("#projectSetup").showModal();
 }
@@ -82,7 +102,7 @@ function renderFormatSetup() {
   $("#formatChoices").innerHTML = formatDraft
     .map(
       (f, i) =>
-        `<fieldset class="format-choice ${f.enabled ? "is-enabled" : ""}" data-format="${i}"><legend><label><input type="checkbox" data-format-enabled aria-expanded="${f.enabled}" aria-controls="format-safezone-${i}" ${f.enabled ? "checked" : ""}> <span data-format-label>${MKW.ratio(f.w, f.h).replace("x", ":")}</span></label></legend><div class="format-row"><div class="format-dimensions"><div class="format-reveal" data-format-reveal><div><h4>Arbeitsfläche</h4></div></div><div class="format-fields">${input(f, "w", "Breite")}${input(f, "h", "Höhe")}</div><div class="format-reveal" data-format-reveal><div><small>Schutzzone für Text und Logo</small></div></div></div><div class="format-reveal format-safezone" id="format-safezone-${i}" data-format-reveal><div>${MKWFormats.editor(f, input)}</div></div></div></fieldset>`,
+        `<fieldset class="format-choice ${f.enabled ? "is-enabled" : ""}" data-format="${i}"><legend><label><input type="checkbox" data-format-enabled aria-expanded="${f.enabled}" aria-controls="format-safezone-${i}" ${f.enabled ? "checked" : ""}> <span data-format-label>${MKW.ratio(f.w, f.h).replace("x", ":")}</span></label></legend><div class="format-row"><div class="format-dimensions"><div class="format-reveal" data-format-reveal><div><h4>Arbeitsfläche</h4></div></div><div class="format-fields">${input(f, "w", "Breite")}${input(f, "h", "Höhe")}</div><div class="format-reveal" data-format-reveal><div><small>Schutzzone für Text und Logo</small></div></div></div><div class="format-reveal format-safezone" id="format-safezone-${i}" data-format-reveal><div>${MKWFormats.editor(f, input)}</div></div></div><p class="format-feedback" role="status"></p></fieldset>`,
     )
     .join("");
   $("#formatChoices")
@@ -106,13 +126,20 @@ function renderFormatSetup() {
       const preview = () => {
         const box = row.querySelector(".safe-preview");
         MKWFormats.preview(box, f);
-        row.classList.toggle("invalid", !MKWFormats.validate(f));
+        const text = MKWFormats.feedback(f);
+        row.classList.toggle("invalid", !!text);
+        MKWFields.group(
+          row.querySelectorAll("[data-format-key]"),
+          text,
+          row.querySelector(".format-feedback"),
+        );
       };
       preview();
       row.querySelectorAll("[data-format-key]").forEach(
         (input) =>
           (input.oninput = () => {
-            f[input.dataset.formatKey] = Number(input.value);
+            f[input.dataset.formatKey] =
+              input.value === "" ? NaN : Number(input.value);
             row.querySelector("[data-format-label]").textContent =
               f.w > 0 && f.h > 0
                 ? MKW.ratio(f.w, f.h).replace("x", ":")
@@ -140,7 +167,7 @@ $("#projectSetup").addEventListener("close", () => {
   if (!setupCommitted) busy = setupWasBusy;
 });
 $("#createProject").onclick = async () => {
-  if (!$("#setupName").value.trim()) {
+  if (!MKWFields.validate($("#setupName"), true)) {
     $("#setupError").textContent = "Gib deinem Projekt bitte einen Namen.";
     $("#setupName").focus();
     return;
@@ -156,8 +183,10 @@ $("#createProject").onclick = async () => {
       right,
     }));
   if (!formats.length || formats.some((f) => !MKWFormats.validate(f))) {
-    $("#setupError").textContent =
-      "Wähle mindestens ein Format. Breite/Höhe: 240–10000 px, maximal 40 Mio. Pixel. Oben + unten müssen kleiner als die Höhe sein, links + rechts kleiner als die Breite.";
+    $("#setupError").textContent = !formats.length
+      ? "Wähle mindestens ein Format aus."
+      : "Bitte die markierten Formate korrigieren.";
+    $("#formatChoices [data-field-error='true']")?.focus();
     return;
   }
   if (new Set(formats.map((f) => `${f.w}x${f.h}`)).size !== formats.length) {

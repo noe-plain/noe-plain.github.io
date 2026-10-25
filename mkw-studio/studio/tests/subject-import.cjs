@@ -33,6 +33,21 @@ const { launch, artifact } = require("./browser.cjs");
         configurable: true,
       }),
     );
+    await page.evaluate(() => {
+      window.subjectDiagnostics = [];
+      const NativeWorker = window.Worker;
+      window.Worker = class extends NativeWorker {
+        constructor(...args) {
+          super(...args);
+          this.addEventListener("error", (event) =>
+            window.subjectDiagnostics.push(event.message || "Worker error"),
+          );
+          this.addEventListener("message", ({ data }) => {
+            if (data.error) window.subjectDiagnostics.push(data.error);
+          });
+        }
+      };
+    });
     const requests = [];
     page.on("request", (r) => requests.push(r.url()));
     assert.equal(
@@ -52,6 +67,7 @@ const { launch, artifact } = require("./browser.cjs");
       people: p.images[0].people,
       status: p.images[0].subjectStatus,
       covered: p.boards.every((b) => MKW.imageCovers(b, asset(b))),
+      diagnostics: window.subjectDiagnostics,
     }));
     assert(real.people.length > 0, JSON.stringify(real));
     assert(real.covered);

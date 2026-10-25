@@ -28,8 +28,11 @@ function carouselSlideFormatPanel(host) {
     }
     apply.disabled = !plan?.changed;
     section.classList.toggle("invalid", !plan);
-    for (const field of section.querySelectorAll("input"))
-      field.setAttribute("aria-invalid", String(!plan));
+    MKWFields.group(
+      section.querySelectorAll("input"),
+      error.textContent,
+      error,
+    );
   };
   for (const field of section.querySelectorAll("input"))
     field.oninput = () => {

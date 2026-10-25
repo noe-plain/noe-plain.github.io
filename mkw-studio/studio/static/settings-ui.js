@@ -61,7 +61,7 @@ function studioSettingsUI() {
   const leading = document.createElement("section");
   leading.className = "settings-leading";
   leading.innerHTML =
-    '<h3>Zeilenabstand im Designer</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="1" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
+    '<h3>Zeilenabstand im Designer</h3><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="any" aria-label="Standard-Zeilenhöhe in Prozent"><span>%</span></span></label>';
   panels.fonts.prepend(leading);
   const textSizes = document.createElement("section");
   textSizes.className = "settings-text-sizes";
@@ -73,7 +73,7 @@ function studioSettingsUI() {
   ]
     .map(
       ([key, label]) =>
-        `<label>${label}<span class="settings-size-value"><input type="number" data-default-text-size="${key}" aria-label="Standard-Schriftgrösse ${label}" min="1" max="5000" step="1" value="${studioPreferences.textSizes[key]}"><span>px</span></span></label>`,
+        `<label>${label}<span class="settings-size-value"><input type="number" data-default-text-size="${key}" aria-label="Standard-Schriftgrösse ${label}" min="1" max="5000" step="any" value="${studioPreferences.textSizes[key]}"><span>px</span></span></label>`,
     )
     .join("")}</div>`;
   panels.fonts.prepend(textSizes);
@@ -81,15 +81,7 @@ function studioSettingsUI() {
     input.onchange = () => {
       const value = Number(input.value),
         key = input.dataset.defaultTextSize;
-      if (
-        !input.value ||
-        !Number.isFinite(value) ||
-        value < 1 ||
-        value > 5000
-      ) {
-        input.value = studioPreferences.textSizes[key];
-        return;
-      }
+      if (!MKWFields.validate(input, true)) return;
       studioPreferences.textSizes = {
         ...studioPreferences.textSizes,
         [key]: value,
@@ -175,10 +167,7 @@ function studioSettingsUI() {
   $("#defaultLineHeight").value = studioPreferences.lineHeight;
   $("#defaultLineHeight").onchange = (event) => {
     const value = Number(event.target.value);
-    if (!Number.isFinite(value) || value < 20 || value > 300) {
-      event.target.value = studioPreferences.lineHeight;
-      return;
-    }
+    if (!MKWFields.validate(event.target, true)) return;
     studioPreferences.lineHeight = value;
     studioApplyPreferences();
   };
