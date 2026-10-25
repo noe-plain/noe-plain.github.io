@@ -180,6 +180,56 @@ const { launch, artifact } = require("./browser.cjs");
       "concert date stays optional",
     );
     await page.locator("#closeSave").click();
+    const beforeLibraryError = await artwork();
+    await page.locator("#settings").click();
+    await page.locator("#settings-tab-templates").click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector("#templateLibraryList").children.length > 0 &&
+        !document.querySelector("#templateLibraryStatus").textContent,
+    );
+    await page
+      .locator("#templateImportFile")
+      .setInputFiles({
+        name: "Kaputte-Vorlage.mkw",
+        mimeType: "application/octet-stream",
+        buffer: Buffer.from("not a project"),
+      });
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector("#templateLibraryStatus")
+          .classList.contains("is-error") &&
+        !document.querySelector("#settingsTemplateImport").disabled,
+    );
+    assert.equal(
+      await page.locator("#templateLibraryStatus").getAttribute("role"),
+      "alert",
+    );
+    await page.locator("#settings-tab-general").click();
+    await page.locator("#settings-tab-templates").click();
+    await page.waitForFunction(
+      () =>
+        !document.querySelector("#templateLibraryStatus").textContent &&
+        document.querySelector("#templateLibraryList").children.length > 0,
+    );
+    assert.equal(
+      await page.locator("#templateLibraryStatus").getAttribute("role"),
+      "status",
+    );
+    assert.equal(
+      await page
+        .locator("#templateLibraryStatus")
+        .evaluate((el) => el.classList.contains("is-error")),
+      false,
+      "a successful reload clears the previous import error",
+    );
+    await page.locator("#closeSettings").click();
+    assert.deepEqual(
+      await artwork(),
+      beforeLibraryError,
+      "invalid template import and recovery preserve the current project",
+    );
     // Native form submission must identify the first invalid field and preserve existing help IDs.
     await page.evaluate(() => {
       const dialog = document.createElement("dialog");

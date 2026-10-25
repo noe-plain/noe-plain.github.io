@@ -36,15 +36,14 @@
     const button = $("#settingsTemplateImport"),
       status = $("#templateLibraryStatus");
     button.disabled = true;
-    status.textContent = "MKW-Datei wird geprüft …";
+    MKWFields.notice(status, "MKW-Datei wird geprüft …");
     const finishLoading = MKWUIControls.loading(status);
     try {
       const q = await MKWTemplates.importProject(file);
       MKWTemplateSave.open(q);
-      status.textContent = "";
+      MKWFields.notice(status, "");
     } catch (error) {
-      status.textContent = error.message;
-      status.setAttribute("role", "alert");
+      MKWFields.notice(status, error.message, true);
     } finally {
       finishLoading();
       button.disabled = false;
@@ -55,7 +54,7 @@
     const current = ++generation;
     $("#settingsTemplateSave").disabled = !p.carousel;
     const status = $("#templateLibraryStatus");
-    status.textContent = "Vorlagen werden geladen …";
+    MKWFields.notice(status, "Vorlagen werden geladen …");
     const finishLoading = MKWUIControls.loading(status);
     try {
       const items = await MKWTemplates.list();
@@ -79,20 +78,20 @@
             await MKWTemplates.remove(button.dataset.removeTemplate);
             await refresh();
           } catch (error) {
-            $("#templateLibraryStatus").textContent = error.message;
+            MKWFields.notice($("#templateLibraryStatus"), error.message, true);
             button.disabled = false;
           }
         };
       });
     } catch (error) {
-      $("#templateLibraryStatus").textContent = error.message;
+      MKWFields.notice($("#templateLibraryStatus"), error.message, true);
     } finally {
       finishLoading();
       if (
         current === generation &&
         status.textContent === "Vorlagen werden geladen …"
       )
-        status.textContent = "";
+        MKWFields.notice(status, "");
     }
   }
   document.addEventListener("mkw-templates-changed", () => {
