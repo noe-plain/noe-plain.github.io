@@ -106,6 +106,9 @@ const { launch, artifact } = require("./browser.cjs");
     await page
       .locator("#closeSettings")
       .evaluate((el) => el.setAttribute("aria-describedby", "settingsTitle"));
+    // Keep the pointer away from controls whose layout changed while checking
+    // keyboard focus; hover feedback is checked independently below.
+    await page.mouse.move(0, 0);
     await page.locator("#closeSettings").focus();
     await page.locator("#studioTooltip").waitFor({ state: "visible" });
     assert.equal(

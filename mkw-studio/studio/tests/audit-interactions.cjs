@@ -6,6 +6,16 @@ const { launch, artifact } = require("./browser.cjs");
     const page = await browser.newPage({
       viewport: { width: 1500, height: 1050 },
     });
+    // Resize observers and media-query listeners run on a rendering frame.
+    const resize = async (viewport) => {
+      await page.setViewportSize(viewport);
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
+    };
     const errors = [],
       nativeDialogs = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -107,7 +117,7 @@ const { launch, artifact } = require("./browser.cjs");
       { width: 1500, height: 1050 },
       { width: 320, height: 700 },
     ]) {
-      await page.setViewportSize(viewport);
+      await resize(viewport);
       await page.evaluate(() => studioSetSidebar(true));
       const fitting = await page.locator("#stepPanel").evaluate((panel) => {
         const bounds = document
@@ -130,7 +140,7 @@ const { launch, artifact } = require("./browser.cjs");
         animations: "disabled",
       });
     }
-    await page.setViewportSize({ width: 1500, height: 1050 });
+    await resize({ width: 1500, height: 1050 });
     await page.locator("#width").fill("0");
     await page.locator("#resize").click();
     assert.equal(
@@ -289,7 +299,7 @@ const { launch, artifact } = require("./browser.cjs");
       0,
     );
     await page.locator("#paintClose").click();
-    await page.setViewportSize({ width: 320, height: 480 });
+    await resize({ width: 320, height: 480 });
     await page.evaluate(() => {
       studioSetSidebar(true);
       carouselSelect(["audit-object"]);
@@ -315,7 +325,7 @@ const { launch, artifact } = require("./browser.cjs");
       ),
       false,
     );
-    await page.setViewportSize({ width: 390, height: 844 });
+    await resize({ width: 390, height: 844 });
     await page.evaluate(() => studioSetSidebar(false));
     await page.locator("#toolPaintNone").focus();
     assert(
@@ -332,7 +342,7 @@ const { launch, artifact } = require("./browser.cjs");
       }),
       "Scrolled paint action stays reachable in the short pill",
     );
-    await page.setViewportSize({ width: 1500, height: 1050 });
+    await resize({ width: 1500, height: 1050 });
     await page.evaluate(async () => {
       await autosave();
     });
@@ -352,7 +362,7 @@ const { launch, artifact } = require("./browser.cjs");
     assert.equal(await page.evaluate(() => p.carousel.n), 2);
     assert.equal(await page.locator("#projectLibrary button:focus").count(), 1);
     await page.locator("#closeProjectLibrary").click();
-    await page.setViewportSize({ width: 320, height: 480 });
+    await resize({ width: 320, height: 480 });
     await page.evaluate(() => {
       window.auditLongError = MKWFeedback.ask({
         title: "Bilder konnten nicht geladen werden",
