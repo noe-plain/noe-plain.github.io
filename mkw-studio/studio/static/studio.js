@@ -8,8 +8,10 @@ function icon(name) {
 function icons() {
   document.querySelectorAll("[data-icon]").forEach((el) => {
     el.innerHTML = icon(el.dataset.icon);
-    if (el.dataset.step)
+    if (el.dataset.step) {
       el.innerHTML += `<span class="dock-label">${{ import: "Bilder", text: "Text", logo: "Logo", sponsors: "Sponsoren", crop: "Ausschnitt", export: "Export" }[el.dataset.step]}</span>`;
+      el.setAttribute("aria-label", el.textContent.trim());
+    }
   });
 }
 function smallButton(name, title, action, id) {
@@ -52,7 +54,7 @@ function postOptionSummary(b) {
 function textTypePicker(im) {
   const b = p.boards.find((b) => b.imageId === im.id),
     active = postOptionSummary(b);
-  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}"><summary aria-label="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Optionen gewählt"}</span><span class="text-count" data-text-count>${active.length} Optionen</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="post-text-options" role="group" aria-label="Textoptionen"><span class="post-options-heading">Textoptionen</span>${textTypes.map(([key, label]) => `<label class="post-option-row"><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}</div><hr class="post-options-divider">${MKWPostAngleEditor.options(im)}${familyPicker(im)}<hr class="post-options-divider">${sponsorOptions(im)}</div></details>`;
+  return `<details class="text-type-picker" data-text-picker="${esc(im.id)}" aria-label="Optionen · ${esc(im.name)}"><summary title="Optionen auswählen · ${esc(im.name)}"><span class="text-selection" data-text-summary>${active.join(" · ") || "Keine Optionen gewählt"}</span><span class="text-count" data-text-count>${active.length} Optionen</span>${studioIcon("down", "picker-chevron")}</summary><div class="text-type-options" role="group" aria-label="Optionen · ${esc(im.name)}"><div class="post-text-options" role="group" aria-label="Textoptionen"><span class="post-options-heading">Textoptionen</span>${textTypes.map(([key, label]) => `<label class="post-option-row"><input type="checkbox" data-text-type="${key}" data-image="${esc(im.id)}" ${b && (b.elements[key].enabled ?? b.elements[key].visible) ? "checked" : ""}><span>${label}</span></label>`).join("")}</div><hr class="post-options-divider">${MKWPostAngleEditor.options(im)}${familyPicker(im)}<hr class="post-options-divider">${sponsorOptions(im)}</div></details>`;
 }
 function familyPicker(im) {
   const config = familyConfig(
@@ -121,7 +123,7 @@ function imageAction(name, label, title, action, id, disabled = false) {
   return `<button class="image-action ${action === "removeImage" ? "image-action-delete" : ""}" data-action="${action}" data-id="${esc(id)}" title="${title}" aria-label="${title}" ${disabled ? "disabled" : ""}>${icon(name)}${label ? `<span>${label}</span>` : ""}</button>`;
 }
 function imageHeading(im, i) {
-  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><div class="image-card-summary"><span class="image-preview"><img data-image-preview="${esc(im.id)}" alt="" decoding="async"><span class="image-number" aria-label="Bild ${i + 1}">${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong></span></div><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}${imageAction("plus", "Format hinzufügen", "Zeichenfläche hinzufügen", "addBoard", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Optionen</span>${textTypePicker(im)}</div></div></div></aside>`;
+  return `<aside class="group-heading image-info-card" data-image-card="${esc(im.id)}" aria-label="Bildinformationen · ${esc(im.name)}"><div class="image-card-summary"><span class="image-preview"><img data-image-preview="${esc(im.id)}" alt="" decoding="async"><span class="image-number"><span class="visually-hidden">Bild </span>${String(i + 1).padStart(2, "0")}</span></span><span class="image-caption"><strong title="${esc(im.name)}">${esc(im.name)}</strong></span></div><div class="image-card-body">${i === 0 ? '<div class="template-badge">Textvorlage für weitere Bilder</div>' : ""}<small class="image-metadata">${im.width} × ${im.height} px<br>${im.captureDate ? esc(im.captureDay) + " " + esc(im.captureDate) : "Kein Aufnahmedatum"}</small><div class="group-actions" role="group" aria-label="Bildaktionen">${imageAction("replace", "Bild ersetzen", "Bild ersetzen", "replace", im.id)}<div class="image-card-actions">${imageAction("up", "", "Bild nach oben", "imageUp", im.id, i === 0)}${imageAction("down", "", "Bild nach unten", "imageDown", im.id, i === p.images.length - 1)}${imageAction("trash", "", "Bild entfernen", "removeImage", im.id)}${imageAction("plus", "Format hinzufügen", "Format hinzufügen", "addBoard", im.id)}</div></div><div class="image-settings"><label class="image-copyright"><span class="image-field-label">Copyright</span><input data-copyright="${esc(im.id)}" aria-label="Copyright · ${esc(im.name)}" placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.imageId === im.id)?.elements.copyright.text || "")}" /></label><div class="image-text-field"><span class="image-field-label">Optionen</span>${textTypePicker(im)}</div></div></div></aside>`;
 }
 document.addEventListener("click", (ev) => {
   document.querySelectorAll(".text-type-picker[open]").forEach((picker) => {
@@ -304,6 +306,7 @@ function render() {
   draw();
 }
 function updateDock() {
+  studioSyncZoomLimits(false, view, 0.2, 3);
   document.querySelectorAll(".dock [data-step]").forEach((b) => {
     b.classList.toggle("active", b.dataset.step === step);
     b.setAttribute("aria-current", b.dataset.step === step ? "true" : "false");
@@ -506,7 +509,7 @@ function editBoardOptions(b) {
   $("#toolEmpty").hidden = true;
   const panel = $("#stepPanel");
   panel.hidden = false;
-  panel.innerHTML = `<div class="panel-row"><label>Breite <input id="width" type="number" value="${b.w}"></label><label>Höhe <input id="height" type="number" value="${b.h}"></label><select id="resizeMode"><option value="canvas">Fläche ändern</option><option value="layout">Layout proportional skalieren</option></select><button id="resize">Anwenden</button><button data-size="1080,1080">1:1</button><button data-size="1080,1920">9:16</button><button data-size="1080,1350">4:5</button><button id="duplicate">Duplizieren</button><button id="boardUp">←</button><button id="boardDown">→</button><button id="deleteBoard">Löschen</button></div>`;
+  panel.innerHTML = `<section class="tool-section post-format-section"><h3>Abmessungen</h3><div class="post-format-dimensions"><label>Breite (px)<input id="width" type="number" min="16" max="10000" step="1" value="${b.w}"></label><label>Höhe (px)<input id="height" type="number" min="16" max="10000" step="1" value="${b.h}"></label></div><label>Verhalten beim Ändern<select id="resizeMode"><option value="canvas">Fläche ändern</option><option value="layout">Layout proportional skalieren</option></select></label><button id="resize" class="primary">Anwenden</button><div class="post-format-presets" role="group" aria-label="Standardformate"><button data-size="1080,1080">1:1</button><button data-size="1080,1920">9:16</button><button data-size="1080,1350">4:5</button></div></section><section class="tool-section post-format-section"><h3>Zeichenfläche verwalten</h3><div class="tool-button-grid"><button id="duplicate">Duplizieren</button><button id="deleteBoard">Löschen</button></div><div class="tool-button-grid post-format-order" role="group" aria-label="Reihenfolge der Formate"><button id="boardUp" aria-label="Format nach links">${studioIcon("back")}Nach links</button><button id="boardDown" aria-label="Format nach rechts">${studioIcon("front")}Nach rechts</button></div></section>`;
   MKWPostSafezone.bind(b, panel);
   on("resize", "click", () =>
     resize(+$("#width").value, +$("#height").value, $("#resizeMode").value),
@@ -548,7 +551,7 @@ function editBoardOptions(b) {
     );
   syncOverlays(true);
 }
-$("#boardSpace").onclick = (ev) => {
+$("#boardSpace").onclick = async (ev) => {
   const el = ev.target.closest("[data-action]");
   if (!el) return;
   const { action, id } = el.dataset;
@@ -562,11 +565,23 @@ $("#boardSpace").onclick = (ev) => {
     editBoardOptions(p.boards.find((b) => b.id === id));
     return;
   }
-  if (
-    action === "removeImage" &&
-    !confirm("Dieses Bild mit seinen Zeichenflächen entfernen?")
-  )
-    return;
+  if (action === "removeImage") {
+    const project = p,
+      image = p.images.find((im) => im.id === id);
+    if (
+      !image ||
+      !(await MKWFeedback.ask({
+        title: "Bild entfernen?",
+        message: `„${image.name}“ mit allen zugehörigen Zeichenflächen entfernen? Du kannst dies anschliessend rückgängig machen.`,
+        confirm: "Bild entfernen",
+        destructive: true,
+        trigger: el,
+      })) ||
+      p !== project ||
+      !p.images.includes(image)
+    )
+      return;
+  }
   mutate(() => {
     if (action === "removeImage") {
       p.images = p.images.filter((i) => i.id !== id);
@@ -589,6 +604,12 @@ $("#boardSpace").onclick = (ev) => {
       selected = b.id;
     }
   });
+  if (action === "removeImage") {
+    const target =
+      document.querySelector(".image-info-card button:not(:disabled)") ||
+      $("#emptyAdd");
+    target?.focus();
+  }
   if (action === "addBoard") {
     studioSetSidebar(true);
     editBoardOptions(board());
@@ -680,7 +701,12 @@ $("#logoFile").onchange = async (ev) => {
     });
     status("Logo eingefügt.");
   } catch (e) {
-    alert("Logo kann nicht geladen werden: " + e.message);
+    status("Logo kann nicht geladen werden: " + e.message);
+    await MKWFeedback.ask({
+      title: "Logo konnte nicht geladen werden",
+      message: e.message + "\nBitte wähle eine lesbare Bilddatei.",
+      trigger: $("#customLogo"),
+    });
   } finally {
     finishLoading();
   }

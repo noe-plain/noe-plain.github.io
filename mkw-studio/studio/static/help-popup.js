@@ -1,5 +1,5 @@
 "use strict";
-const studioHelpURL = "hilfe/?v=d49b146c7301";
+const studioHelpURL = "hilfe/?v=72ca2b54dc5f";
 let studioHelpPopup = null;
 function studioOpenHelp(trigger) {
   if (!studioHelpPopup) {
@@ -57,6 +57,9 @@ function studioOpenHelp(trigger) {
     frame.src = studioHelpURL;
     dialog.append(frame);
     document.body.append(dialog);
+    document
+      .querySelectorAll("#help,#startHelp")
+      .forEach((button) => button.setAttribute("aria-controls", dialog.id));
   }
   const state = studioHelpPopup;
   state.trigger = trigger;

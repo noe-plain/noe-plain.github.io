@@ -67,6 +67,11 @@ function studioIcon(name, extra = "") {
   return `<svg class="ui-icon ${extra}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-google-icon="${symbol}"><use width="24" height="24" href="${studioIconSprite}#${symbol}"></use></svg>`;
 }
 
+const studioWorkspaceTitle = document.createElement("h1");
+studioWorkspaceTitle.className = "visually-hidden";
+studioWorkspaceTitle.textContent = "MKW Studio · Gestaltungsarbeitsplatz";
+document.querySelector("header").prepend(studioWorkspaceTitle);
+
 let studioSidebarOpen = !matchMedia("(max-width:760px)").matches,
   studioWarningItems = [];
 let studioCommandbarFrame = 0,
@@ -155,7 +160,7 @@ function studioSetSidebar(open) {
     button.setAttribute("aria-expanded", String(open));
     button.setAttribute(
       "aria-label",
-      open ? "Einstellungen ausblenden" : "Einstellungen einblenden",
+      open ? "Eigenschaften ausblenden" : "Eigenschaften einblenden",
     );
     button.title = button.getAttribute("aria-label");
     button.innerHTML =
@@ -221,13 +226,20 @@ function studioSetWarnings(items) {
         (button.onclick = () =>
           studioFocusWarning(items[+button.dataset.warningIndex])),
     );
-  if (!items.length) studioCloseWarnings();
+  if (!items.length) studioCloseWarnings(true);
   studioQueueCommandbarFit();
 }
-function studioCloseWarnings() {
+function studioCloseWarnings(restore = false) {
+  const panel = $("#studioWarnings"),
+    hadFocus = panel.contains(document.activeElement);
   $("#studioWarnings").hidden = true;
   for (const id of ["postNotice", "carouselNotice"])
     $("#" + id)?.setAttribute("aria-expanded", "false");
+  if (restore && hadFocus) {
+    const trigger = $(p.carousel ? "#carouselNotice" : "#postNotice"),
+      fallback = $(p.carousel ? "#carouselExport" : "#export");
+    (trigger?.getClientRects().length ? trigger : fallback)?.focus();
+  }
 }
 function studioToggleWarnings() {
   const panel = $("#studioWarnings"),
@@ -247,6 +259,11 @@ function studioFocusWarning(item) {
     if (!o) return;
     carouselTool("select");
     carouselSelect([o.id]);
+    $("#carouselProperties")
+      ?.querySelector(
+        "input:not(:disabled),textarea:not(:disabled),button:not(:disabled)",
+      )
+      ?.focus({ preventScroll: true });
     const viewport = $("#carouselViewport"),
       rect = viewport.getBoundingClientRect(),
       art = $("#carouselCanvas").getBoundingClientRect();
@@ -265,6 +282,11 @@ function studioFocusWarning(item) {
     selectBoard(item.id);
     if (item.key) layer = item.key;
     chooseStep(item.step);
+    $("#toolsSidebar")
+      ?.querySelector(
+        "input:not(:disabled),textarea:not(:disabled),button:not(:disabled)",
+      )
+      ?.focus({ preventScroll: true });
     if (item.key === "postAngle" && board()?.angle?.enabled)
       MKWPostAngleEditor.select(board(), true);
     document
@@ -280,7 +302,7 @@ studioWarnings.hidden = true;
 studioWarnings.setAttribute("aria-labelledby", "studioWarningsTitle");
 studioWarnings.innerHTML = `<div class="studio-notices-heading"><h2 id="studioWarningsTitle">Hinweise zum Artwork</h2><button id="closeStudioWarnings" class="icon-button" aria-label="Hinweise schliessen">${studioIcon("close")}</button></div><div id="studioWarningList"></div>`;
 document.body.append(studioWarnings);
-$("#closeStudioWarnings").onclick = studioCloseWarnings;
+$("#closeStudioWarnings").onclick = () => studioCloseWarnings(true);
 $("#postNotice").onclick = studioToggleWarnings;
 $("#toolsToggle").onclick = studioToggleSidebar;
 $("#footerGuides").onclick = () => {
@@ -353,6 +375,12 @@ $("#footerSnap").onclick = () => {
     studioSyncFooter();
   }
 };
+function studioSyncZoomLimits(carousel, value, min, max) {
+  const out = $(carousel ? "#carouselZoomOut" : "#zoomOut"),
+    into = $(carousel ? "#carouselZoomIn" : "#zoomIn");
+  if (out) out.disabled = value <= min + 1e-8;
+  if (into) into.disabled = value >= max - 1e-8;
+}
 function studioZoomReference(carousel = !!p.carousel) {
   const width = carousel
     ? p.carousel.w
@@ -371,6 +399,7 @@ function studioStepZoom(amount) {
       amount,
   );
 }
+$("#postViewControls").setAttribute("role", "group");
 $("#postViewControls").setAttribute("aria-label", "Zoom");
 $("#footerZoom").append($("#postViewControls"));
 studioSetSidebar(studioSidebarOpen);
@@ -382,7 +411,8 @@ document.addEventListener(
   "keydown",
   (event) => {
     if (event.key === "Escape" && !$("#studioWarnings").hidden) {
-      studioCloseWarnings();
+      studioCloseWarnings(true);
+      event.preventDefault();
       event.stopPropagation();
     }
   },

@@ -29,7 +29,7 @@ function studioPaintCards(o) {
     .map((channel) => {
       const value = studioPaintRead(o, channel),
         label = channel === "fill" ? "Fläche" : "Kontur";
-      return `<div class="paint-row"><button class="paint-edit" data-paint-channel="${channel}" aria-label="${label} bearbeiten" aria-haspopup="dialog"><span class="paint-chip" data-paint-chip="${channel}" style='background:${studioPaintSwatch(value)}'></span><span>${label}<small class="paint-kind">${studioPaintKindName(value)}</small></span></button>${carouselIsVector(o) ? `<button class="paint-visibility icon-button" data-paint-toggle="${channel}" title="${label} ein- oder ausblenden" aria-label="${label} ein- oder ausblenden" aria-pressed="${value.enabled}">${studioIcon(value.enabled ? "visible" : "hidden")}</button>` : ""}</div>`;
+      return `<div class="paint-row"><button class="paint-edit" data-paint-channel="${channel}" aria-haspopup="dialog"><span class="paint-chip" data-paint-chip="${channel}" style='background:${studioPaintSwatch(value)}'></span><span>${label}<small class="paint-kind">${studioPaintKindName(value)}</small></span></button>${carouselIsVector(o) ? `<button class="paint-visibility icon-button" data-paint-toggle="${channel}" title="${label} ein- oder ausblenden" aria-label="${label} ein- oder ausblenden" aria-pressed="${value.enabled}">${studioIcon(value.enabled ? "visible" : "hidden")}</button>` : ""}</div>`;
     })
     .join("")}</div>`;
 }
@@ -95,13 +95,20 @@ function studioSyncPaintControls() {
       group.className = "advanced-colours";
       group.setAttribute("role", "group");
       group.setAttribute("aria-label", "Fläche und Kontur");
-      group.innerHTML = `<div class="paint-wells"><button id="toolFillColour" class="paint-fill" title="Fläche bearbeiten" aria-label="Fläche bearbeiten" aria-haspopup="dialog"></button><button id="toolStrokeColour" class="paint-stroke" title="Kontur bearbeiten" aria-label="Kontur bearbeiten" aria-haspopup="dialog"></button></div><div class="paint-actions"><button id="toolSwapColours" title="Fläche und Kontur tauschen" aria-label="Fläche und Kontur tauschen">${studioIcon("replace")}</button><button id="toolPaintNone" title="Aktive Farbe ein- oder ausblenden" aria-label="Aktive Farbe ein- oder ausblenden">${studioIcon("hidden")}</button></div>`;
+      group.innerHTML = `<button id="toolPaintPicker" class="paint-wells" title="Fläche und Kontur bearbeiten" aria-label="Fläche und Kontur bearbeiten" aria-haspopup="dialog"><span id="toolFillColour" class="paint-fill" aria-hidden="true"></span><span id="toolStrokeColour" class="paint-stroke" aria-hidden="true"></span></button><div class="paint-actions"><button id="toolSwapColours" title="Fläche und Kontur tauschen" aria-label="Fläche und Kontur tauschen">${studioIcon("replace")}</button><button id="toolPaintNone" title="Aktive Farbe ein- oder ausblenden" aria-label="Aktive Farbe ein- oder ausblenden">${studioIcon("hidden")}</button></div>`;
       bar.querySelector(".studio-tool-surface").append(group);
-      for (const channel of ["fill", "stroke"])
-        $(
-          "#tool" + (channel === "fill" ? "Fill" : "Stroke") + "Colour",
-        ).onclick = (event) =>
-          studioOpenPicker(studioPaintTarget(), channel, event.currentTarget);
+      $("#toolPaintPicker").onclick = (event) => {
+        const stroke = event.target.closest(".paint-stroke"),
+          fill = event.target.closest(".paint-fill"),
+          channel =
+            stroke && !stroke.disabled
+              ? "stroke"
+              : fill
+                ? "fill"
+                : studioPaintFront,
+          o = studioPaintTarget();
+        studioOpenPicker(o, channel, event.currentTarget);
+      };
       $("#toolSwapColours").onclick = () =>
         studioSwapPaints(studioPaintTarget());
       $("#toolPaintNone").onclick = () =>
@@ -123,11 +130,15 @@ function studioSyncPaintControls() {
         carouselObjectLocked(o) ||
         (!vector &&
           (channel === "stroke" || !["text", "gradient"].includes(o.type)));
-      button.setAttribute(
-        "aria-expanded",
-        String(!!studioPicker && studioPicker.channel === channel),
-      );
+      button.classList.toggle("is-disabled", button.disabled);
     }
+    const pickerButton = $("#toolPaintPicker");
+    pickerButton.disabled =
+      $("#toolFillColour").disabled && $("#toolStrokeColour").disabled;
+    pickerButton.setAttribute(
+      "aria-expanded",
+      String(!!studioPicker && studioPicker.anchor === pickerButton),
+    );
     $("#toolSwapColours").disabled = carouselObjectLocked(o) || !vector;
     $("#toolPaintNone").disabled = carouselObjectLocked(o) || !vector;
     $("#toolPaintNone").setAttribute(
@@ -388,14 +399,22 @@ function studioCreatePicker() {
   el.setAttribute("aria-modal", "false");
   el.setAttribute("aria-labelledby", "paintPickerTitle");
   el.innerHTML = `<div class="picker-heading"><strong id="paintPickerTitle">Fläche</strong><button id="paintClose" class="icon-button" aria-label="Farbfeld schliessen">${studioIcon("close")}</button></div>
- <div class="picker-mode"><label>Füllung<select id="paintMode"><option value="solid">Farbe</option><option value="gradient">Verlauf</option><option value="image">Bild</option></select></label><button id="paintEnabled" class="icon-button" title="Ein- oder ausblenden" aria-label="Farbe ein- oder ausblenden">${studioIcon("visible")}</button></div>
+ <div id="paintChannels" role="group" aria-label="Fläche oder Kontur"><button type="button" data-picker-channel="fill">Fläche</button><button type="button" data-picker-channel="stroke">Kontur</button></div><div class="picker-mode"><label>Füllung<select id="paintMode"><option value="solid">Farbe</option><option value="gradient">Verlauf</option><option value="image">Bild</option></select></label><button id="paintEnabled" class="icon-button" title="Ein- oder ausblenden" aria-label="Farbe ein- oder ausblenden">${studioIcon("visible")}</button></div>
  <div id="paintColourArea"><div class="picker-colour-space"><div id="paintHue" role="slider" tabindex="0" aria-label="Farbton" aria-valuemin="0" aria-valuemax="359" aria-orientation="vertical"><span></span></div><div id="paintSV" role="group" tabindex="0" aria-describedby="paintSVHelp" aria-label="Sättigung und Helligkeit"><span></span></div><div class="picker-opacity"><span aria-hidden="true">100</span><input id="paintAlphaSlider" type="range" min="0" max="100" step="1" aria-label="Deckkraft · oben 100 Prozent, unten 0 Prozent" aria-orientation="vertical"><span aria-hidden="true">0</span></div></div>
  <span id="paintSVHelp" class="visually-hidden">Links und rechts ändern die Sättigung, oben und unten die Helligkeit.</span><div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" pattern="#?[0-9a-fA-F]{6}" title="Bitte sechs Farbzeichen eingeben, zum Beispiel #3B7A71." spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div></div>
- <div id="paintGradientPanel"><div class="picker-gradient-kind" role="group" aria-label="Verlaufsform"><button data-gradient-kind="linear">Linear</button><button data-gradient-kind="radial">Radial</button><label>Winkel<span class="picker-unit"><input id="paintAngle" type="number" min="-360" max="360" aria-label="Verlaufswinkel"><span>°</span></span></label></div><div id="paintGradientTrack" aria-label="Verlaufsfarbwerte"><div id="paintGradientBar"></div><div id="paintGradientHandles"></div></div><div class="picker-stop-options"><label>Position<span class="picker-unit"><input id="paintStopPosition" type="number" min="0" max="100" step=".1" aria-label="Position des Farbwertes"><span>%</span></span></label><label>Mitte<span class="picker-unit"><input id="paintMidPosition" type="number" min="5" max="95" step="1" aria-label="Verlaufsmitte"><span>%</span></span></label><button id="paintDeleteStop" class="icon-button" title="Farbwert entfernen" aria-label="Farbwert entfernen">${studioIcon("trash")}</button></div></div>
+ <div id="paintGradientPanel"><div class="picker-gradient-kind" role="group" aria-label="Verlaufsform"><button data-gradient-kind="linear">Linear</button><button data-gradient-kind="radial">Radial</button><label>Winkel<span class="picker-unit"><input id="paintAngle" type="number" min="-360" max="360" aria-label="Verlaufswinkel"><span>°</span></span></label></div><div id="paintGradientTrack" role="group" aria-label="Verlaufsfarbwerte"><div id="paintGradientBar"></div><div id="paintGradientHandles"></div></div><div class="picker-stop-options"><label>Position<span class="picker-unit"><input id="paintStopPosition" type="number" min="0" max="100" step=".1" aria-label="Position des Farbwertes"><span>%</span></span></label><label>Mitte<span class="picker-unit"><input id="paintMidPosition" type="number" min="5" max="95" step="1" aria-label="Verlaufsmitte"><span>%</span></span></label><button id="paintDeleteStop" class="icon-button" title="Farbwert entfernen" aria-label="Farbwert entfernen">${studioIcon("trash")}</button></div></div>
  <div id="paintImagePanel"><div id="paintImagePreview"></div><button id="paintPlaceImage" class="primary">Bild auswählen / ersetzen</button></div><p id="paintMessage" role="status"></p>`;
   document.body.append(el);
   el.addEventListener("mkw-field-feedback", studioPositionPicker);
   $("#paintClose").onclick = () => studioClosePicker();
+  el.querySelectorAll("[data-picker-channel]").forEach((button) => {
+    button.onclick = () => {
+      if (!studioPicker || studioPicker.adapter) return;
+      const { object, anchor } = studioPicker;
+      studioOpenPicker(object, button.dataset.pickerChannel, anchor);
+      button.focus({ preventScroll: true });
+    };
+  });
   $("#paintMode").onchange = () =>
     studioPickerAction(() => {
       const mode = $("#paintMode").value,
@@ -683,6 +702,15 @@ function studioRenderPicker(refreshHandles = true) {
     colour = studioPickerColour(),
     vector =
       carouselIsVector(state.object) || state.object === carouselVectorColours;
+  $("#paintChannels").hidden = !!state.adapter || !vector;
+  document
+    .querySelectorAll("[data-picker-channel]")
+    .forEach((button) =>
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.pickerChannel === state.channel),
+      ),
+    );
   $("#paintPickerTitle").textContent =
     state.adapter?.label || (state.channel === "stroke" ? "Kontur" : "Fläche");
   $("#studioPaintPicker").classList.toggle("is-opaque-colour", !!state.adapter);

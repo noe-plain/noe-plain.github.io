@@ -50,7 +50,7 @@ const MKWTypography = (() => {
     ]
       .map(
         ([key, text, label]) =>
-          `<button data-typo-toggle="${key}" title="${label}" aria-label="${label}" aria-pressed="false"><span class="typo-symbol typo-${key}">${text}</span></button>`,
+          `<button data-typo-toggle="${key}" title="${label}" aria-label="${label} · ${text}" aria-pressed="false"><span class="typo-symbol typo-${key}" aria-hidden="true">${text}</span></button>`,
       )
       .join(
         "",
@@ -170,6 +170,11 @@ const MKWTypography = (() => {
         ? "Schwarz / Weiss"
         : "Familienpalette"
       : colour || "Gemischt";
+    colourButton.setAttribute(
+      "aria-label",
+      "Textfarbe wählen · " +
+        host.querySelector("[data-typo-colour-label]").textContent,
+    );
     const align = common(
       indices.map((i) => o.textStyles?.[i]?.align || base.textAlign),
     );

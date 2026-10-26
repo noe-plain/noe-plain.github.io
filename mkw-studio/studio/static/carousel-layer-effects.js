@@ -8,10 +8,11 @@ function carouselCloseEffectMenu() {
   if (menu?.matches(":popover-open")) menu.hidePopover();
   menu?.remove();
 }
-function carouselCloseEffectEditor() {
+function carouselCloseEffectEditor(restore = false) {
   const popup = $("#carouselEffectEditor");
   if (popup?.matches(":popover-open")) popup.hidePopover();
   popup?.remove();
+  if (restore) popup?.mkwReturnFocus?.();
 }
 function carouselOpenEffectEditor(o, effect) {
   if (carouselObjectLocked(o)) return;
@@ -19,6 +20,19 @@ function carouselOpenEffectEditor(o, effect) {
   $("#carouselEffectEditor")?.remove();
   const project = p,
     popup = document.createElement("div");
+  popup.mkwReturnFocus = () => {
+    if (p !== project) return;
+    const target =
+      document.querySelector(
+        `[data-layer-effects="${CSS.escape(o.id)}"] [data-effect-edit="${effect.key}"]`,
+      ) || $("#carouselAddEffect");
+    if (
+      target?.isConnected &&
+      !target.disabled &&
+      target.getClientRects().length
+    )
+      target.focus({ preventScroll: true });
+  };
   popup.id = "carouselEffectEditor";
   popup.className = "carousel-effect-editor";
   popup.setAttribute("popover", "auto");
@@ -26,6 +40,11 @@ function carouselOpenEffectEditor(o, effect) {
   popup.setAttribute("aria-labelledby", "carouselEffectTitle");
   popup.innerHTML = `<div class="carousel-effect-editor-heading"><h3 id="carouselEffectTitle">${effect.name}</h3><button data-effect-close aria-label="Effekteinstellungen schliessen">${studioIcon("close")}</button></div><p>${esc(o.name)}</p><label class="carousel-effect-strength" for="carouselEffectStrength">Stärke <span><input id="carouselEffectNumber" type="number" min="0" max="100" step="1" value="${o.effects[effect.key]}" aria-label="${effect.name}: ${effect.unit}">${effect.unit}</span></label><input id="carouselEffectStrength" type="range" min="0" max="100" step="1" value="${o.effects[effect.key]}" aria-label="${effect.name}: Stärke"><div class="carousel-effect-editor-footer"><label><input id="carouselEffectEnabled" type="checkbox" ${o.effects[effect.key + "Enabled"] !== false ? "checked" : ""}> Effekt sichtbar</label><button data-effect-done>Fertig</button></div>`;
   document.body.append(popup);
+  const strength = popup.querySelector("#carouselEffectStrength");
+  strength.setAttribute(
+    "aria-valuetext",
+    `${o.effects[effect.key]} ${effect.unit}`,
+  );
   let begun = false;
   const editable = () =>
     p === project &&
@@ -40,7 +59,9 @@ function carouselOpenEffectEditor(o, effect) {
   };
   popup
     .querySelectorAll("[data-effect-close],[data-effect-done]")
-    .forEach((button) => (button.onclick = carouselCloseEffectEditor));
+    .forEach(
+      (button) => (button.onclick = () => carouselCloseEffectEditor(true)),
+    );
   for (const id of ["carouselEffectStrength", "carouselEffectNumber"]) {
     const input = popup.querySelector("#" + id);
     input.oninput = () => {
@@ -48,6 +69,7 @@ function carouselOpenEffectEditor(o, effect) {
       if (!input.value || !input.validity.valid) return;
       begin();
       o.effects[effect.key] = +input.value;
+      strength.setAttribute("aria-valuetext", `${input.value} ${effect.unit}`);
       for (const name of ["carouselEffectStrength", "carouselEffectNumber"])
         if (name !== id) popup.querySelector("#" + name).value = input.value;
       const summary = $(
@@ -65,6 +87,12 @@ function carouselOpenEffectEditor(o, effect) {
     changed(false);
     carouselLayerPanel();
   };
+  popup.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    carouselCloseEffectEditor(true);
+  });
   popup.addEventListener("toggle", (event) => {
     if (event.newState === "closed") popup.remove();
   });
@@ -76,7 +104,14 @@ function carouselOpenEffectEditor(o, effect) {
       8,
       Math.min(innerWidth - bounds.width - 8, sidebar.left - bounds.width - 20),
     ) + "px";
-  popup.style.top = Math.max(76, (innerHeight - bounds.height) / 2) + "px";
+  popup.style.top =
+    Math.max(
+      8,
+      Math.min(
+        innerHeight - bounds.height - 8,
+        (innerHeight - bounds.height) / 2,
+      ),
+    ) + "px";
   popup.querySelector("#carouselEffectStrength").focus();
 }
 function carouselOpenEffectMenu(button) {
@@ -131,7 +166,7 @@ function carouselLayerEffects(root, heading) {
     button.id = "carouselAddEffect";
     button.textContent = "FX";
     button.title = "Effekt für ausgewählte Ebene hinzufügen";
-    button.setAttribute("aria-label", "Ebeneneffekt hinzufügen");
+    button.setAttribute("aria-label", "FX · Ebeneneffekt hinzufügen");
     button.setAttribute("aria-haspopup", "menu");
     button.setAttribute("aria-expanded", "false");
     button.onclick = () => carouselOpenEffectMenu(button);
@@ -158,6 +193,7 @@ function carouselLayerEffects(root, heading) {
     box.ondrop = layer.ondrop;
     list.className = "carousel-layer-effects";
     list.dataset.layerEffects = o.id;
+    list.setAttribute("role", "group");
     list.setAttribute("aria-label", `Effekte: ${o.name}`);
     layer.before(box);
     box.append(layer);
@@ -169,7 +205,7 @@ function carouselLayerEffects(root, heading) {
       row.className = "carousel-effect-row";
       row.classList.toggle("is-disabled", !enabled);
       row.dataset.effectRow = effect.key;
-      row.innerHTML = `<div class="carousel-effect-heading"><button data-effect-toggle="${effect.key}" aria-label="${effect.name} ein-/ausblenden" aria-pressed="${enabled}" ${locked ? "disabled" : ""}>${studioIcon(enabled ? "visible" : "hidden")}</button><button class="carousel-effect-name" data-effect-edit="${effect.key}" aria-label="${effect.name} einstellen" ${locked ? "disabled" : ""}><span>${effect.name}</span><small data-effect-summary="${effect.key}">${o.effects[effect.key]} ${effect.unit}</small></button><button data-effect-remove="${effect.key}" aria-label="${effect.name} entfernen" title="Effekt entfernen" ${locked ? "disabled" : ""}>${studioIcon("trash")}</button></div>`;
+      row.innerHTML = `<div class="carousel-effect-heading"><button data-effect-toggle="${effect.key}" aria-label="${effect.name} ein-/ausblenden" aria-pressed="${enabled}" ${locked ? "disabled" : ""}>${studioIcon(enabled ? "visible" : "hidden")}</button><button class="carousel-effect-name" data-effect-edit="${effect.key}" title="${effect.name} einstellen" ${locked ? "disabled" : ""}><span>${effect.name}</span><small data-effect-summary="${effect.key}">${o.effects[effect.key]} ${effect.unit}</small></button><button data-effect-remove="${effect.key}" aria-label="${effect.name} entfernen" title="Effekt entfernen" ${locked ? "disabled" : ""}>${studioIcon("trash")}</button></div>`;
       row.querySelector("[data-effect-edit]").onclick = () =>
         carouselOpenEffectEditor(o, effect);
       row.querySelector("[data-effect-toggle]").onclick = () => {

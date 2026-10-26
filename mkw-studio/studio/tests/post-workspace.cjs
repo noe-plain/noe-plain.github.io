@@ -9,7 +9,6 @@ const assert = require("node:assert/strict");
       errors = [],
       failed = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    page.on("dialog", (d) => d.accept());
     page.on("response", (r) => {
       if (r.status() >= 400 && !r.url().includes("/api/session"))
         failed.push(r.url());
@@ -389,6 +388,7 @@ const assert = require("node:assert/strict");
       .last()
       .locator("[data-action=removeImage]")
       .click();
+    await page.locator("[data-feedback-confirm]").click();
     assert.equal(await page.evaluate(() => p.images.length), 1);
     assert(await page.locator("#addMoreImages").isVisible());
     assert.deepEqual(errors, []);

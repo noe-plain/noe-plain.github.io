@@ -82,38 +82,45 @@
   padding-top: 10px;
   width: 100%;
 }
-.paint-wells {
+/* One large native target, two compact Affinity-style visual swatches. */
+#advancedColours .paint-wells {
   position: relative;
-  width: 40px;
-  height: 40px;
-  margin: 1px 0;
-}
-.paint-wells button {
-  position: absolute;
-  width: 27px;
-  height: 27px;
-  min-width: 0 !important;
-  min-height: 0 !important;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  margin: 2px 0;
   padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.paint-wells > span {
+  position: absolute;
+  display: block;
+  width: 28px;
+  height: 28px;
   border: 1px solid var(--md-sys-color-outline);
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 4px;
   box-shadow: 0 0 0 2px var(--studio-panel);
+  z-index: 1;
 }
 .paint-wells .paint-fill {
-  left: 0;
-  top: 0;
-  z-index: 1;
+  left: 2px;
+  top: 2px;
 }
 .paint-wells .paint-stroke {
-  right: 0;
-  bottom: 0;
-  z-index: 1;
+  left: 17px;
+  top: 17px;
 }
-.paint-wells button.is-front {
+.paint-wells .is-front {
   z-index: 3;
-  outline: none;
-  border: 1.5px solid var(--studio-accent);
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 1px;
+}
+.paint-wells .is-disabled {
+  opacity: 0.38;
 }
 .paint-wells .paint-stroke::after {
   content: "";
@@ -123,10 +130,10 @@
   border-radius: 1px;
   pointer-events: none;
 }
-.paint-wells button.no-paint {
+.paint-wells .no-paint {
   background: var(--studio-panel) !important;
 }
-.paint-wells button.no-paint::before {
+.paint-wells .no-paint::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -140,19 +147,17 @@
   z-index: 2;
   pointer-events: none;
 }
-
 #advancedColours .paint-actions {
   display: flex;
   justify-content: center;
-  width: 42px;
-  gap: 2px;
-  flex-wrap: nowrap;
+  width: 56px;
+  gap: 4px;
 }
 #advancedColours .paint-actions button {
-  width: 20px;
-  min-width: 20px;
-  height: 26px;
-  min-height: 24px;
+  width: 26px;
+  min-width: 26px;
+  height: 28px;
+  min-height: 28px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -172,6 +177,20 @@
 #advancedColours .paint-actions button[aria-pressed="true"] {
   background: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
+}
+#paintChannels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 16px;
+}
+#paintChannels button {
+  min-height: 48px;
+}
+#paintChannels button[aria-pressed="true"] {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-color: var(--md-sys-color-primary);
 }
 .studio-paint-picker {
   --picker-border: var(--md-sys-color-outline-variant);
@@ -666,5 +685,25 @@
   }
   .picker-stop-options {
     grid-template-columns: 1fr 1fr 48px;
+  }
+}
+
+@media (pointer: coarse) {
+  #advancedColours .paint-wells {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+  }
+  #advancedColours .paint-actions {
+    display: grid;
+    width: 48px;
+    grid-template-columns: 48px;
+  }
+  #advancedColours .paint-actions button {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
   }
 }

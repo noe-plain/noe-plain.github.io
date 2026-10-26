@@ -345,7 +345,6 @@ async function importFiles(files) {
     status(
       `${ok} Bilder importiert${recognitionSkipped ? " · Erkennung übersprungen; Ausschnitte bitte prüfen." : ""}${recognitionFailed ? " · Personenerkennung nicht verfügbar; Ausschnitte bitte prüfen." : ""}${errors.length ? " · " + errors.join(" · ") : ""}`,
     );
-    if (errors.length) alert(errors.join("\n"));
   } finally {
     finishLoading();
     $("#importDialog").close();
@@ -355,6 +354,12 @@ async function importFiles(files) {
     syncOverlays(true);
     renderPanel();
   }
+  if (errors.length)
+    await MKWFeedback.ask({
+      title: "Nicht alle Bilder konnten importiert werden",
+      message: errors.join("\n"),
+      trigger: p.images.length ? $("#addMoreImages") : $("#emptyAdd"),
+    });
 }
 function fit(b, mode) {
   const im = asset(b),
@@ -413,9 +418,17 @@ function resize(w, h, mode) {
     h > 10000 ||
     w * h > 40000000
   ) {
-    alert("Breite/Höhe: 16–10000 px, maximal 40 Millionen Pixel.");
+    const fields = [$("#width"), $("#height")].filter(Boolean);
+    for (const field of fields)
+      MKWFields.error(
+        field,
+        "Breite und Höhe: ganze Zahlen von 16–10000 px; zusammen höchstens 40 Millionen Pixel.",
+      );
+    fields[0]?.focus({ preventScroll: true });
     return;
   }
+  for (const field of [$("#width"), $("#height")])
+    if (field) MKWFields.clear(field);
   mutate(() => {
     const b = board(),
       ow = b.w,

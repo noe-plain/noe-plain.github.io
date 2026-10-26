@@ -443,3 +443,59 @@
   font-size: 12px;
   color: var(--studio-ink);
 }
+
+/* Short decisions retain native modality and the least destructive initial focus. */
+#studioFeedbackDialog {
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+#studioFeedbackDialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+#studioFeedbackTitle {
+  margin: 0 0 16px;
+  font-size: var(--studio-title-size);
+  line-height: var(--studio-title-line);
+  overflow-wrap: anywhere;
+}
+#studioFeedbackMessage {
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-body-size);
+  line-height: var(--studio-body-line);
+}
+.studio-feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+.studio-feedback-actions button {
+  min-height: 48px;
+  padding: 10px 20px;
+}
+.studio-feedback-actions .studio-destructive {
+  border: 0;
+  background: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+}
+.studio-feedback-actions .studio-destructive:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-error) 8%,
+    var(--md-sys-color-error)
+  );
+}

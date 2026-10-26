@@ -67,16 +67,25 @@
         .join("");
       panel.querySelectorAll("[data-remove-template]").forEach((button) => {
         button.onclick = async () => {
+          const id = button.dataset.removeTemplate;
           if (
-            !confirm(
-              "Diese Vorlage aus der Bibliothek entfernen? Bestehende Projekte bleiben erhalten.",
-            )
+            !(await MKWFeedback.ask({
+              title: "Vorlage entfernen?",
+              message:
+                "Diese Vorlage aus der Bibliothek entfernen? Bestehende Projekte bleiben erhalten.",
+              confirm: "Vorlage entfernen",
+              destructive: true,
+              trigger: button,
+            })) ||
+            current !== generation ||
+            !button.isConnected
           )
             return;
           button.disabled = true;
           try {
-            await MKWTemplates.remove(button.dataset.removeTemplate);
+            await MKWTemplates.remove(id);
             await refresh();
+            $("#settingsTemplateImport")?.focus({ preventScroll: true });
           } catch (error) {
             MKWFields.notice($("#templateLibraryStatus"), error.message, true);
             button.disabled = false;

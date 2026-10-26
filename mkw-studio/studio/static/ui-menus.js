@@ -128,6 +128,11 @@ const MKWUIMenu = (() => {
     window.addEventListener("resize", resize);
     menu.addEventListener("toggle", (event) => {
       if (event.newState !== "closed") return;
+      if (
+        button.getAttribute("aria-controls") === menu.id &&
+        !document.getElementById(menu.id)?.matches(":popover-open")
+      )
+        button.removeAttribute("aria-controls");
       cancelAnimationFrame(positionFrame);
       window.removeEventListener("resize", resize);
     });

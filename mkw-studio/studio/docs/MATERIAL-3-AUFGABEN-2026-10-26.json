@@ -1,0 +1,240 @@
+[
+  {
+    "id": "A01",
+    "priority": "P1",
+    "element": "Kontrast & Textlesbarkeit",
+    "location": "static/style.css:1675, static/projects.css:#saveAsHint, static/workspace-ui.css:.carousel-document-summary",
+    "problem": "Helle Hilfstexte verwenden alte Dunkelmodus-Hexwerte; Speicherhinweis zusätzlich opacity0.8.",
+    "impact": "Start, Vorlagen und Dateihinweise sind schwer lesbar.",
+    "change": "Bestehende on-surface-variant Rolle verwenden, Opacity entfernen, Hinweise mindestens Labelgröße12px. UI-Farben nicht Artwork.",
+    "sources": [
+      "D02",
+      "D03",
+      "A01"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Stable axe-Kontrastfehler beseitigt; helle/dunkle Screenshots; Paletteunit-/Exporthashes unverändert.",
+    "status": "abgeschlossen",
+    "verification": [
+      "Firefox41 Kontexte ohne automatische Kontrastverletzung; Start/Vorlage/Speichern/FD-Format/PDF visuell angesehen; material-ui zeigt Original-Exporthashes unverändert.",
+      "Letzte manuelle Nachsicht der gradientbedingten Incomplete-Befunde siehe Bericht; keine vollständige Pixel-/AT-Zertifizierung behauptet."
+    ]
+  },
+  {
+    "id": "A02",
+    "priority": "P1",
+    "element": "Namen/Semantik",
+    "location": "static/studio.js, carousel-render.js, carousel-refinements.js, carousel-layer-effects.js, typography-ui.js, paint-picker.js, carousel-grid.js",
+    "problem": "Sichtbarer Text fehlt im zugänglichen Namen; Resize-Select unbenannt; Sidebar fehlt Name; FD Hauptüberschrift fehlt. Manuelle Sichtung von axe-Incomplete: benannte generische Container ohne zulässige Rolle und dangling aria-controls bei lazy Wiki/entfernten Menüs.",
+    "impact": "Sprachbedienung/Screenreader findet sichtbare Befehle nicht zuverlässig.",
+    "change": "Natürliche Buttonnamen mit sichtbarem Kontext nutzen, echte Symbole aria-hidden, Label Resize, Landmark Sidebar; Preview roleimg. Keine Menürollen löschen um axe ruhigzustellen. Container mit echtem Gruppenzweck erhalten role=group; Bildindex erhält echten Text. Zielreferenzen nur bei existierendem Dialog/Menü.",
+    "sources": [
+      "D01",
+      "W02",
+      "A02",
+      "A06"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Alle Kontexte ohne label-content-name-mismatch/select-name/region; Ordnerzählung/Effektwert weiter zugänglich; Exportname sofort vorhanden.",
+    "status": "abgeschlossen",
+    "verification": [
+      "Firefox und Chrome41 Kontexte; keine unerwarteten axe-Verstösse; keine fehlende aria-controls-ID.",
+      "Symbol-/Popup-Incomplete-Befunde manuell klassifiziert; zwei benannte temporäre Menüs behalten dokumentierte region-Advisories."
+    ]
+  },
+  {
+    "id": "A03",
+    "priority": "P2",
+    "element": "Inspector-Benennung",
+    "location": "static/workspace-ui.js:studioSetSidebar",
+    "problem": "Seitenleisten-Schalter nennt sich Einstellungen wie die globale Konfiguration.",
+    "impact": "Nutzende öffnen falschen Bereich (eigene UX-Einschätzung).",
+    "change": "Eigenschaften ein-/ausblenden; echte globale Einstellungen bleiben so benannt.",
+    "sources": [
+      "D01",
+      "D05"
+    ],
+    "dependencies": "A02",
+    "acceptance": "Beide Editoren aria-label/title stimmen mit Ziel überein; keine Funktionsänderung.",
+    "status": "abgeschlossen",
+    "verification": [
+      "workspace-ui/material-bars bestanden; globaler Gearbereich weiterhin Einstellungen, Inspector-Schalter Eigenschaften."
+    ]
+  },
+  {
+    "id": "A04",
+    "priority": "P1",
+    "element": "Fokus und Popupgrenzen",
+    "location": "static/carousel-layer-effects.js; static/workspace-ui.js:studioCloseWarnings",
+    "problem": "Effekt schliessen/Escape und Warnungen schliessen lassen Fokus verschwinden; Popup kann auf kurzer Höhe unten hinausragen.",
+    "impact": "Tastaturfluss bricht ab, Eigenschaften unerreichbar.",
+    "change": "Fokus an aktuellen Effektknopf zurück; beim Hinweis Schliessen zum Auslöser, bei Zielwahl in Eigenschaften; Viewportclamp und Grössenlimit; Sliderwert mit Einheit.",
+    "sources": [
+      "W01",
+      "W03",
+      "A04"
+    ],
+    "dependencies": "A02",
+    "acceptance": "Escape/Fertig/X prüfen, kein Fokusstehlen bei Pointer-light-dismiss, detached trigger fallback, 320×480 Popup innerhalb8px.",
+    "status": "abgeschlossen",
+    "verification": [
+      "audit-interactions: FX Escape/Fertig/X führen zurück zum Effekt; Warnungs-Escape/X zum Auslöser; 320×480 Popup innerhalb8px; Slider aria-valuetext mit px."
+    ]
+  },
+  {
+    "id": "A05",
+    "priority": "P1",
+    "element": "Farbwerkzeug-Ziele & FX Schliessen",
+    "location": "static/paint-picker.css:.paint-wells,.paint-actions; static/carousel-refinements.css:.carousel-effect-editor-heading",
+    "problem": "Überlappende27px-Swatches lassen nur13px frei;20px Aktionsziele.",
+    "impact": "Fehlklicks, besonders Touch oder Motorikeinschränkung.",
+    "change": "Affinity-Anordnung kompakt erhalten: zwei visuelle28px-Felder mit15px Versatz in einem einzigen nativen46px-Button (48px/coarse). Direkter Klick auf das sichtbare Feld wählt den Kanal, Enter öffnet den aktiven Kanal. Im Popup bieten zwei48px-Buttons Fläche/Kontur die vollständige Tastatur-/Touchalternative. Pille bleibt62px breit. Tauschen/KeineFarbe sind26×28px bzw.48px/coarse; FXclose40px.",
+    "sources": [
+      "W04",
+      "A03"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Keine target-size-Befunde; beide visuellen Felder direkt anwählbar; gemeinsamer Button>=44px, Popupkanäle48px; Keyboard Enter/Fläche/Kontur/Fokusreturn, Vordergrund/Swap/None; Pille<70px; coarse48px; Artwork unverändert.",
+    "status": "abgeschlossen",
+    "verification": [
+      "Firefox10/10 und Chrome8/8 abschliessend bestanden; advanced-tools Pille<70px; paint-paths Vordergrund, direkte Feldwahl und Transparenz; audit-interactions Gesamttarget/Enter/Kanalwechsel/Rückkehr/coarse48px.",
+      "Screenshot finale Farbfelder28px/15px Versatz in ursprünglicher62px-Pille angesehen."
+    ]
+  },
+  {
+    "id": "A06",
+    "priority": "P2",
+    "element": "Zoomgrenzen",
+    "location": "static/post-workspace.js; static/carousel-render.js; static/workspace-ui.js",
+    "problem": "+/- an Grenze bleiben klickbar obwohl Aktion nichts tut.",
+    "impact": "Unklare Grenze und unnötige Klicks.",
+    "change": "Beide Buttons mit bestehendem Min/Max synchronisieren; keine anderen Zoomgrenzen/Phone-Referenz ändern.",
+    "sources": [
+      "W04",
+      "D01"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Min/Max je Editor deaktiviert nur richtige Richtung; Fit und Cmd0/1 funktionieren weiter; ungültige Zahl kein NaN.",
+    "status": "abgeschlossen",
+    "verification": [
+      "audit-interactions prüft beide Clamps und deaktivierte Richtung; zoom-ui Smartphone390px/20%-Schritte/Cmd0/1/Fit bestanden."
+    ]
+  },
+  {
+    "id": "A07",
+    "priority": "P2",
+    "element": "Destruktive Entscheidungen",
+    "location": "static/studio.js:removeImage, static/project-session.js:delete-project, static/template-ui.js:remove-template",
+    "problem": "Browserconfirm passt nicht zur Anwendung; generische Bestätigung ohne nativeapp-Fokusstrategie.",
+    "impact": "Inkonsistente Bedienung und unklare Rückkehr.",
+    "change": "Kleiner gemeinsamer nativer dialog mit Titel/Text, Abbrechen voreingestellt, benanntem Löschziel. Asynchrone Ziel/Projektguards vor Mutation.",
+    "sources": [
+      "W01",
+      "A04"
+    ],
+    "dependencies": "A02",
+    "acceptance": "Enter default löscht nichts, Escape schliesst, bestätigtes Ziel wird genau einmal entfernt; Projektwechsel während Frage löscht nichts; Browserdatei bleibt.",
+    "status": "abgeschlossen",
+    "verification": [
+      "audit-interactions: Abbrechen voreingestellt, Enter/Escape behalten Bild, Tab erreicht Löschaktion, Stale-Owner löscht nichts, Bestätigen genau einmal, Undo stellt wieder her.",
+      "Browsersicherung abbrechen/bestätigen und Vorlage entfernen erfolgreich; native Alerts/Confirms im Anwendungscode entfallen."
+    ]
+  },
+  {
+    "id": "A08",
+    "priority": "P1",
+    "element": "Fehler im Bearbeiten/Import",
+    "location": "static/state.js:resize/importFiles, static/studio.js:logo upload",
+    "problem": "Native Alerts stoppen Arbeit; Resizefehler nicht am Feld.",
+    "impact": "Fehlbedienung und Statusverlust; Fehler wirkt ohne Feldbezug.",
+    "change": "Resize als shared MKWFields Fehler an Breite/Höhe; Dateifehler über gemeinsamen benannten Fehlerdialog wenn kein eigener Fehlerplatz; Import erst nach busy cleanup anzeigen.",
+    "sources": [
+      "W02",
+      "W01",
+      "D01"
+    ],
+    "dependencies": "A07",
+    "acceptance": "Ungültige Größe verändert Board nicht; Inputs korrekt aria-invalid; korrigierbar ohne Alert; Import bleibt nach Fehler bedienbar.",
+    "status": "abgeschlossen",
+    "verification": [
+      "audit-interactions: ungültige Resizewerte verändern Board nicht; aria-invalid am Feld, Korrektur möglich; kaputtes PNG zeigt Fehler erst nach busy-cleanup.",
+      "material-fields/post-safezones und 50 reale Bildimporte, MKW Save/Reopen/Quota-Fallback im breiten Firefoxlauf bestanden."
+    ]
+  },
+  {
+    "id": "A09",
+    "priority": "P1",
+    "element": "Dauerhafte Nachweise & Responsive",
+    "location": "tests/seven-perspectives.cjs; tests/audit-interactions.cjs; docs/MATERIAL-3-*",
+    "problem": "Bisherige Tests erkennen keine Label/Target/Theme-Regressionskombinationen.",
+    "impact": "Wiederholte Änderungen können Barrieren unbemerkt zurückbringen.",
+    "change": "Dev-only axe, getrennte settled States/Animation, Kontextinventar; explizite Tastatur/Grenz-/coarse/320px Prüfungen, Exportreferenz.",
+    "sources": [
+      "D01",
+      "A01",
+      "A02",
+      "A03"
+    ],
+    "dependencies": "A01–A08",
+    "acceptance": "Firefox Audit+Interaktion+bestehendeSuiten grün, relevante Chrome-Suite, build/unit/format; Rohbelege und Grenzen dokumentiert.",
+    "status": "abgeschlossen",
+    "verification": [
+      "119/119 Modelltests, Formatierung und reproduzierbarer Build bestanden.",
+      "Breiter Firefoxlauf60/61: ein bestehender Optionen-Namen-Check deckte fehlenden Gruppenkontext auf; korrigiert. Betroffene Bereiche anschliessend8/8, finale Farbwahl-/UI-Prüfungen10/10 plus Dienste3/3 bestanden. Alle61 verschiedenen Suiten damit abgedeckt; kein roter Befund bleibt offen.",
+      "Chrome abschliessend8/8; zwei Browser ×41 axe-Kontexte; Light/Dark/320/390/1500px, reduced-motion, simuliertes coarse Target, Tastatur, Code und Screenshots; keine Behauptung realer Touchhardware-/OSzoom-/SR-Abnahme."
+    ]
+  },
+  {
+    "id": "L01",
+    "priority": "P2",
+    "element": "Reale assistive Technik & freie Zeichengesten",
+    "location": "Canvas Vektor-/Kurvenediting und Inline-Text; VoiceOver/NVDA",
+    "problem": "Automatischer Accessibilitytree ist keine reale Screenreader-Nutzung; freie Knotenoperationen nicht vollständig nichtvisuell geprüft.",
+    "impact": "Keine seriöse Aussage vollständiger Barrierefreiheit.",
+    "change": "Separater moderierter Durchlauf mit realer assistiver Technik; priorisierte Taskliste bei Befund. Keine Gestenfunktion entfernen.",
+    "sources": [
+      "A04",
+      "D01"
+    ],
+    "dependencies": "Gerät/AT-Prüfung",
+    "acceptance": "VoiceOver und NVDA tatsächliche Ausgabe dokumentiert; derzeit explizit nicht verifiziert.",
+    "status": "nicht vollständig verifizierbar",
+    "verification": []
+  },
+  {
+    "id": "L02",
+    "priority": "P2",
+    "element": "Externe Plattformtests",
+    "location": "OS-Dateiauswahl, Photoshop, reale Touchhardware",
+    "problem": "Headless/portable Tests ersetzen nicht physische Bedienung, Photoshop oder Betriebssystem-Dateidialog.",
+    "impact": "Verbleibende plattformspezifische Risiken.",
+    "change": "Konkrete manuelle Abnahme ergänzen, vorhandene File/PSDreadback Tests erhalten.",
+    "sources": [
+      "D01"
+    ],
+    "dependencies": "Verfügbare Programme/Geräte",
+    "acceptance": "Reale OS/Photoshop/Touch Ergebnisse protokolliert; derzeit eingeschränkt.",
+    "status": "nicht vollständig verifizierbar",
+    "verification": []
+  },
+  {
+    "id": "A10",
+    "priority": "P1",
+    "element": "FD Format-Inspector: Feldüberlauf und Gruppierung",
+    "location": "static/studio.js:editBoardOptions, static/editor-forms.css",
+    "problem": "Visuelle Nachkontrolle zeigt abgeschnittene Breite/Höhe und aneinandergeklebte Aktionen. Dokumentoverflow allein erkennt den abgeschnittenen Inspectorinhalt nicht.",
+    "impact": "Masse teilweise unsichtbar; Formatbearbeitung schwer verständlich.",
+    "change": "Begrenzte zweispaltige Zahlenfelder, volle Breite für Resize-Verhalten/Anwenden; Presets und Formataktionen in benannten Gruppen mit Abstand; IDs und Handler erhalten.",
+    "sources": [
+      "D01",
+      "D03",
+      "W02"
+    ],
+    "dependencies": "A02/A08",
+    "acceptance": "Feldboxen vollständig im Sidebar bei1500 und320px, Text/Values sichtbar; alle9 Aktionen bleiben vorhanden; Format/Undo/Safezonentests grün.",
+    "status": "abgeschlossen",
+    "verification": [
+      "audit-interactions: alle Formatfelder passen bei1500/320px, Screenshots angesehen; Handler/Presets/Formatreihenfolge/Duplizieren/Löschen beibehalten. material-fields, post-safezones, post-workspace bestanden."
+    ]
+  }
+]

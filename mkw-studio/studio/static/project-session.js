@@ -360,7 +360,7 @@ const MKWProjects = (() => {
       dialog = document.createElement("dialog");
       dialog.id = "projectLibrary";
       dialog.setAttribute("aria-labelledby", "projectOpenTitle");
-      dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Wähle ein gespeichertes Projekt oder eine MKW-Datei.</p></div><button id="closeProjectLibrary" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><button id="openProjectFile" class="project-open-file">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small>Eine Projektdatei von deinem Gerät auswählen</small></span></button><div class="project-library-heading"><h3>In diesem Browser</h3><small id="projectLibraryCount">Maximal ${MKWProjectStore.projectLimit} Projekte</small></div><p class="project-library-retention">Die ${MKWProjectStore.projectLimit} zuletzt bearbeiteten Projekte bleiben im Browser. Ältere Browsersicherungen werden automatisch entfernt. MKW-Dateien auf deinem Gerät bleiben erhalten.</p><p id="projectOpenStatus" role="status"></p><div id="projectLibraryList" aria-label="Gespeicherte Projekte"></div>`;
+      dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Wähle ein gespeichertes Projekt oder eine MKW-Datei.</p></div><button id="closeProjectLibrary" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><button id="openProjectFile" class="project-open-file">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small>Eine Projektdatei von deinem Gerät auswählen</small></span></button><div class="project-library-heading"><h3>In diesem Browser</h3><small id="projectLibraryCount">Maximal ${MKWProjectStore.projectLimit} Projekte</small></div><p class="project-library-retention">Die ${MKWProjectStore.projectLimit} zuletzt bearbeiteten Projekte bleiben im Browser. Ältere Browsersicherungen werden automatisch entfernt. MKW-Dateien auf deinem Gerät bleiben erhalten.</p><p id="projectOpenStatus" role="status"></p><div id="projectLibraryList" role="group" aria-label="Gespeicherte Projekte"></div>`;
       document.body.append(dialog);
       $("#closeProjectLibrary").onclick = () => dialog.close();
       $("#openProjectFile").onclick = chooseFile;
@@ -415,16 +415,28 @@ const MKWProjects = (() => {
     });
     list.querySelectorAll("[data-delete-project]").forEach((button) => {
       button.onclick = async () => {
+        if (opening) return;
+        const id = button.dataset.deleteProject;
         if (
+          !(await MKWFeedback.ask({
+            title: "Browsersicherung löschen?",
+            message:
+              "Eine gespeicherte MKW-Datei auf deinem Gerät bleibt erhalten.",
+            confirm: "Sicherung löschen",
+            destructive: true,
+            trigger: button,
+          })) ||
           opening ||
-          !confirm(
-            "Diese Browsersicherung löschen? Eine gespeicherte MKW-Datei auf deinem Gerät bleibt erhalten.",
-          )
+          id === p.projectId ||
+          !button.isConnected
         )
           return;
         try {
-          await MKWProjectStore.remove(button.dataset.deleteProject);
+          await MKWProjectStore.remove(id);
           await library();
+          $("#projectLibrary")
+            ?.querySelector("button:not(:disabled)")
+            ?.focus({ preventScroll: true });
         } catch (error) {
           openError(error.message);
         }

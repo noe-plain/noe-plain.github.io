@@ -1308,13 +1308,16 @@ header {
   gap: 56px;
 }
 .board-label {
-  color: #9da9bc;
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--studio-canvas);
+  font-size: var(--studio-label-size);
 }
-.board-label button {
-  color: #b8c4db;
+.board-label button,
+.board-label small {
+  color: var(--md-sys-color-on-surface-variant);
 }
 .board-label small {
-  color: #78859a;
+  font-size: inherit;
 }
 .group-heading {
   width: min(820px, calc(100vw - var(--sidebar) - 76px));
@@ -1673,10 +1676,12 @@ dialog::backdrop {
   background: #090d15bb;
 }
 dialog p {
-  color: #aebcd3;
+  color: var(--md-sys-color-on-surface-variant);
 }
 dialog small {
-  color: #9aa9c2;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-label-size);
+  line-height: var(--studio-label-line);
 }
 .dialog-heading h2 {
   color: var(--md-sys-color-on-surface);

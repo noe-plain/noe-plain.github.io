@@ -26,7 +26,7 @@ function studioDensitySettings(section) {
 /* Delegation adds feedback without replacing the editors' click/drag handlers. */
 const MKWUIControls = (function () {
   const excluded =
-      ".handle,.carousel-handle,.carousel-point-handle,.carousel-rotate-handle,.vector-node,.vector-control,.frame-point-choice,.picker-stop,.picker-mid,.paint-fill,.paint-stroke,.paint-wells button,.paint-actions button",
+      ".handle,.carousel-handle,.carousel-point-handle,.carousel-rotate-handle,.vector-node,.vector-control,.frame-point-choice,.picker-stop,.picker-mid,.paint-fill,.paint-stroke,.paint-wells,.paint-wells button,.paint-actions button",
     reduced = matchMedia("(prefers-reduced-motion: reduce)"),
     ripples = new WeakMap();
   function ripple(button, event) {

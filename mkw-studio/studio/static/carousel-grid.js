@@ -31,7 +31,7 @@ const MKWDesignerGrid = (() => {
       )
       .join(
         "",
-      )}</div><div class="settings-grid-preview"><div class="designer-grid" aria-label="Rastervorschau"></div></div>`;
+      )}</div><div class="settings-grid-preview"><div class="designer-grid" role="img" aria-label="Rastervorschau"></div></div>`;
     panel.append(section);
     const draw = () => {
       preview(section.querySelector(".designer-grid"), {

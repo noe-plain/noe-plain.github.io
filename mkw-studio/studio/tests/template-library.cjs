@@ -230,8 +230,8 @@ const { launch, artifact } = require("./browser.cjs");
     await page.waitForFunction(
       () => document.querySelectorAll("[data-remove-template]").length === 1,
     );
-    page.once("dialog", (dialog) => dialog.accept());
     await page.locator("[data-remove-template]").click();
+    await page.locator("[data-feedback-confirm]").click();
     await page.waitForFunction(
       () => document.querySelectorAll(".template-library-row").length === 1,
     );

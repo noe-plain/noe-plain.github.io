@@ -317,3 +317,39 @@ html[data-theme="light"] #carouselProperties {
     transition: none;
   }
 }
+
+/* Precise format controls fit the inspector instead of inheriting wide row inputs. */
+.tool-sidebar .post-format-section {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.tool-sidebar .post-format-section label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--studio-label-size);
+  line-height: var(--studio-label-line);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.tool-sidebar .post-format-section :is(input, select) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.post-format-dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.post-format-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.post-format-order .ui-icon {
+  transform: rotate(90deg);
+}

@@ -45,10 +45,8 @@ function carouselRenameItem(item, kind) {
     input.onblur = null;
     if (commit && p === project) carouselSetItemName(item, input.value);
     name.querySelector("span").textContent = item.name;
-    name.setAttribute(
-      "aria-label",
-      `${kind === "folder" ? "Ordner" : "Ebene"} auswählen: ${item.name}`,
-    );
+    if (kind === "folder") name.removeAttribute("aria-label");
+    else name.setAttribute("aria-label", `Ebene auswählen: ${item.name}`);
     name.title = item.name;
     row
       .querySelector("[aria-haspopup=menu]")

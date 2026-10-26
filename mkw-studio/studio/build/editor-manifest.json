@@ -4,6 +4,7 @@
     "static/zoom-model.js",
     "static/browser.js",
     "static/ui-fields.js",
+    "static/ui-feedback.js",
     "static/family.js",
     "static/project-assets.js",
     "static/project-blocks.js",
