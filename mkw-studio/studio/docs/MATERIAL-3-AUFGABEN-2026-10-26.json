@@ -244,7 +244,7 @@
     "location": "static/workspace-ui.js, post-workspace.js, carousel-render.js",
     "problem": "Gewünschte plattformbezogene Seitwärtsbedienung fehlt.",
     "impact": "Seitliches Navigieren ist umständlicher.",
-    "change": "Gemeinsamer Viewportadapter: MacCmd und physischerWindowsCtrl rollen horizontal; synthetischePinch-Events und Alt bleiben Zoom; Keyzustand bei Blur zurücksetzen.",
+    "change": "Gemeinsamer Viewportadapter: Mac Cmd und physisches Windows Ctrl scrollen horizontal; synthetische Pinch-Events und Alt bleiben Zoom. Tastenzustand bei Fensterwechsel zurücksetzen.",
     "sources": [
       "D01"
     ],
@@ -252,7 +252,8 @@
     "acceptance": "Beide Editoren und Plattformen mit echten Wheel-Events; gleiche Zoomstufe/Y-Position/Artwork; Pinch/Alt bleiben Zoom.",
     "status": "abgeschlossen",
     "verification": [
-      "modifier-scroll in Firefox und gepinntemChromium erfolgreich; Geometrie und Zoomgrenzen bleiben unverändert."
+      "modifier-scroll in Firefox und gepinntem Chromium erfolgreich; Geometrie und Zoomgrenzen unverändert.",
+      "GitHub Linux Chromium: alle vier Kombinationen aus Plattform und Editor im Lauf 40301334490 erfolgreich."
     ]
   },
   {
@@ -262,36 +263,41 @@
     "location": "static/ui-colour-model.js, ui-theme.js/css, setup-model.js, dialogs.css",
     "problem": "Neben Normal/Komplementär werden zwei zusätzliche Kombinationen gewünscht.",
     "impact": "Weniger persönliche Auswahl für die Werkzeugoberfläche.",
-    "change": "Harmonisch (Nachbarfarben) und Lebendig (Dreiklang), automatisch aus Hauptfarbe; vier Buttons in2×2-Gruppe; tertiärerAkzent nur UI-Hilfebereich; portableWerkzeugeinstellung.",
+    "change": "Harmonisch (Nachbarfarben) und Lebendig (Dreiklang), automatisch aus der Hauptfarbe; vier Buttons in einer 2×2-Gruppe. Tertiärer Akzent nur im UI-Hilfebereich, als Werkzeugeinstellung im Setup portabel.",
     "sources": [
       "D02"
     ],
     "dependencies": "Keine",
-    "acceptance": "Alle4 Modi inLight/Dark, robusteRollenkontraste auchExtremfarben; SetupRoundtrip/Persistenz; keine Änderung von Dokument/Exportpixeln;390px passt.",
+    "acceptance": "Alle vier Modi in Hell/Dunkel; lesbare Farbrollen auch für extreme Hauptfarben; Setup-Roundtrip und Persistenz; Dokument und Exportpixel unverändert; Auswahl passt bei 390 px.",
     "status": "abgeschlossen",
     "verification": [
-      "121 Modelltests einschliesslich neuer Farb- und Setup-Prüfungen grün.",
-      "colour-combinations inFirefox undChromium grün, mitaxe-Prüfung der neuen Einstellungen und identischen Exportpixeln."
+      "121 Modelltests einschliesslich neuer Farb- und Setup-Prüfungen bestanden.",
+      "colour-combinations in Firefox und Chromium erfolgreich, einschliesslich axe-Prüfungen und identischer Exportpixel.",
+      "GitHub Linux Chromium: colour-combinations im Lauf 40301334490 bestanden."
     ]
   },
   {
     "id": "R01",
     "priority": "P1",
     "element": "GitHub-Browserprüfung",
-    "location": "tests/post-workspace.cjs, inline-fidelity.cjs; carousel-render.js; ci/mkw-studio.yml",
-    "problem": "GitHubRun40295226958: Löschassertion2!==1 und ReplicaLL/justify-Pixelvergleich fehlgeschlagen.",
+    "location": "tests/post-workspace.cjs, inline-fidelity.cjs, audit-interactions.cjs, material-controls.cjs; static/carousel-render.js; ci/mkw-studio.yml",
+    "problem": "Lauf 40295226958: asynchroner Löschtest und Textpixelvergleich fehlgeschlagen. Lauf 40301334490: diese Fälle erfolgreich, aber responsive Inspectorprüfung und Tooltipprüfung fehlgeschlagen.",
     "impact": "CI ist rot und Firefox-Phase wurde übersprungen.",
-    "change": "Löschtest wartet auf abgeschlossene asynchrone Mutation; Texttest wartet reale Renderqueue und Fonts, isoliert unabhängige Floating-UI/Fokuszustände, prüft zusätzlich exakt nativeCanvaspixel und erzeugtFehlerartefakte. Cache enthältTrennmuster-Epoche. Manueller fokussierter Testumfang ergänzt; Pushprüfungen bleiben vollständig.",
+    "change": "Auf die abgeschlossene Löschmutation und reale Renderqueue/Fonts warten; Textvergleich von unabhängigen UI-Overlays isolieren und um exakten Canvasvergleich/Fehlerartefakte ergänzen. Rendercache berücksichtigt die Trennmuster-Epoche. Responsive Prüfung wartet auf Resize-/Mediaquery-Verarbeitung. Tastatur-Tooltipprüfung beginnt mit neutraler Mausposition. Keine Assertions entfernt oder Pixeltoleranzen erhöht; vollständiger Standardlauf bleibt aktiv.",
     "sources": [
       "D01"
     ],
     "dependencies": "GitHub-Runner",
-    "acceptance": "Beide Fälle und neueBedienung auf LinuxChromium/Firefox grün; voller Standardlauf bleibt aktiv.",
-    "status": "lokal geprüft; GitHub-Nachprüfung offen",
+    "acceptance": "Vollständiger Standardlauf und Firefox-Phase auf GitHub erfolgreich; lokale Firefox-Nachprüfung vor Push; Scroll- und Farbprüfungen bestehen ohne Änderung der Artworkpixel.",
+    "status": "abgeschlossen",
     "verification": [
       "Fehlerannotationen und Jobprotokoll des tatsächlichen Runs gelesen.",
       "Originalfehler im lokalenChrome/gepinntenChromium/Firefox trotzCPU-Verlangsamung nicht reproduzierbar; keine bestätigte Änderung am tatsächlichen Satz behauptet.",
-      "Strikter ergänzter Pixelvergleich und Löschtest lokal in beiden Browsern grün; keine Pixeltoleranz gelockert."
+      "Strikter ergänzter Pixelvergleich und Löschtest lokal in beiden Browsern grün; keine Pixeltoleranz gelockert.",
+      "Lauf 40301334490: 61/63 Chromium-Suiten erfolgreich, einschliesslich beider ursprünglichen Fehlerfälle.",
+      "Asynchrones automatisches Schliessen der Seitenleiste nach Resize lokal reproduziert. Prüfung nach Rendering-Frames stabilisiert; audit-interactions und material-controls danach jeweils in gepinntem Chromium und Firefox bestanden.",
+      "GitHub-Lauf 40347731047 für Commit 90283d28e2bde3e737b01c90dec8f002295f2528 vollständig erfolgreich: 121 Modelltests, Formatierung, reproduzierbarer Build, 63/63 Chromium-Suiten und 48/48 Firefox-Suiten. Keine Assertions entfernt oder Pixeltoleranzen erhöht.",
+      "GitHub Pages 40347729840 erfolgreich; ausgelieferte HTML-/JS-/CSS-Dateien entsprechen bytegenau dem lokal geprüften Stand. Vollständige Protokolle im Arbeitsbereich unter work/audits/material3-2026-10-26/scroll-ci-fix/."
     ]
   }
 ]
