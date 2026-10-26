@@ -127,6 +127,7 @@ function studioPrepareSave() {
   $("#projectCode").value = p.meta.code || "";
   $("#projectName").value = p.meta.title || "";
   $("#saveDate").value = p.meta.date || "";
+  MKWDateFields.validate($("#saveDate"));
   $("#saveName").dataset.custom = "false";
   $("#psdDescription").textContent = p.carousel
     ? "Zusammenhängendes Artwork, Ebenen, Texte und ein Slice pro Slide"
@@ -142,8 +143,11 @@ $("#saveName").addEventListener(
 );
 for (const id of ["projectCode", "projectName"])
   $("#" + id).addEventListener("input", studioRefreshSaveName);
+MKWDateFields.attach($("#saveDate"));
 $("#saveDate").oninput = (event) => {
   p.meta.date = event.target.value;
+  p.meta.dateSource = "manual";
+  MKWDateFields.validate(event.target);
   touchMeta();
   studioRefreshSaveName();
 };

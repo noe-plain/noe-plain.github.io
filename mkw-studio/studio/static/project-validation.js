@@ -17,6 +17,11 @@
         !Array.isArray(q.logos)
       )
         throw Error("Keine unterstützte MKW-Projektdatei.");
+      if (
+        q.meta.dateSource !== undefined &&
+        !["manual", "heading"].includes(q.meta.dateSource)
+      )
+        throw Error("Ungültige Herkunft des Konzertdatums.");
       const ids = new Set();
       for (const i of q.images) {
         if (

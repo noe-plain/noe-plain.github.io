@@ -139,11 +139,14 @@ async function openExport() {
     status("Zuerst Bilder importieren.");
     return;
   }
-  const inferred = MKW.headingDate(
-    p.boards.find((b) => b.imageId === p.images[0]?.id)?.elements.date.text ||
-      "",
-  );
-  if (inferred) p.meta.date = inferred;
+  if (
+    MKW.syncHeadingDate(
+      p.meta,
+      p.boards.find((b) => b.imageId === p.images[0]?.id)?.elements.date.text ||
+        "",
+    )
+  )
+    touchMeta();
   exportOptions = {
     format: studioPreferences.exportFormat,
     quality: 90,
@@ -166,7 +169,7 @@ async function openExport() {
     exportOptions.colours = 256;
   $("#exportFields").innerHTML =
     field(
-      "Konzertdatum · TT.MM.JJ",
+      "Konzertdatum",
       "date",
       p.meta.date,
       "text",
@@ -174,13 +177,20 @@ async function openExport() {
     ) +
     field("Projektkürzel", "code", p.meta.code) +
     field("Projekttitel", "title", p.meta.title) +
-    field("Startnummer", "start", p.meta.start, "number", 'min="0" step="1"');
+    field(
+      "Erste Bildnummer",
+      "start",
+      p.meta.start,
+      "number",
+      'min="0" step="1"',
+    );
+  MKWDateFields.attach($("#date"));
+  $("#date").closest("label").classList.add("export-naming-date");
   for (const key of ["date", "code", "title", "start"])
     on(key, "input", (ev) => {
       p.meta[key] = key === "start" ? +ev.target.value : ev.target.value;
-      revision++;
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => autosave().catch(() => {}), 1200);
+      if (key === "date") p.meta.dateSource = "manual";
+      touchMeta();
       updateExportNames();
     });
   $("#exportFormat").value = exportOptions.format;
@@ -229,6 +239,9 @@ function syncExportSettings() {
   $("#exportFormatHint").textContent = jpg
     ? "JPG · deckender Hintergrund · sRGB"
     : "Transparenz entfernt die Zeichenflächenfarbe. Fotos werden dadurch nicht freigestellt.";
+  $("#start")
+    ?.closest("label")
+    .toggleAttribute("hidden", exportOptions.format === "pdf");
   carouselPDFUI();
 }
 function exportOptionsChanged() {
@@ -284,11 +297,15 @@ async function refreshExportPreviews(generation) {
   const finishLoading = MKWUIControls.loading("#exportTotal");
   try {
     const settings = exportSettings();
+    const cells = new Map(
+      [...document.querySelectorAll(".export-card")].map((cell) => [
+        cell.dataset.id,
+        cell,
+      ]),
+    );
     for (const b of orderedBoards()) {
       if (generation !== exportGeneration || !$("#exportDialog").open) return;
-      const cell = [...document.querySelectorAll(".export-card")].find(
-        (el) => el.dataset.id === b.id,
-      );
+      const cell = cells.get(b.id);
       if (!cell) continue;
       try {
         const entry = await encodedBoard(clone(b), settings);
@@ -336,15 +353,17 @@ function updateExportNames() {
   let error = "",
     names = [];
   const bs = orderedBoards().filter((b) => b.checked);
+  const dateError = MKWDateFields.message(p.meta.date);
+  MKWDateFields.validate($("#date"));
   try {
+    if (dateError) throw Error(dateError);
     if (exportOptions.format === "pdf") {
       if (!carouselValidatePDF(exportOptions.pdf))
         throw Error(
           "Bitte PDF-Seitengrösse (240–4000 px) und Einstellungen prüfen.",
         );
-      names = bs.map(
-        (_, i) => MKW.projectName(p.meta) + ".pdf · Seite " + (i + 1),
-      );
+      const name = MKW.projectName(p.meta);
+      names = bs.map((_, i) => name + ".pdf · Seite " + (i + 1));
     } else
       names = MKW.names(p.meta, bs).map((name) =>
         name.replace(/\.jpg$/, "." + exportOptions.format),
@@ -356,10 +375,15 @@ function updateExportNames() {
   exportPlan = error
     ? []
     : bs.map((b, i) => ({ board: clone(b), name: names[i] }));
+  const plannedNames = new Map(
+    exportPlan.map((item) => [item.board.id, item.name]),
+  );
   document.querySelectorAll(".export-card").forEach((el) => {
     el.querySelector(".export-name").textContent =
-      exportPlan.find((x) => x.board.id === el.dataset.id)?.name ||
-      "Nicht im Export";
+      plannedNames.get(el.dataset.id) ||
+      (el.querySelector("input").checked
+        ? "Dateiname nach Korrektur verfügbar"
+        : "Nicht ausgewählt");
   });
   MKWFields.notice(
     $("#exportStatus"),

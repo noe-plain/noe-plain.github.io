@@ -4,14 +4,76 @@
     const d = gcd(w, h);
     return `${w / d}x${h / d}`;
   };
-  function dateName(value) {
-    const m = /^(\d{2})\.(\d{2})\.(\d{2})$/.exec(value);
-    if (!m) throw Error("Datum bitte als TT.MM.JJ eingeben.");
-    const [, d, mo, y] = m,
-      dt = new Date(Date.UTC(2000 + Number(y), Number(mo) - 1, Number(d)));
-    if (dt.getUTCDate() != +d || dt.getUTCMonth() != +mo - 1)
+  const months = [
+    "JAN",
+    "FEB",
+    "MÄR",
+    "APR",
+    "MAI",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OKT",
+    "NOV",
+    "DEZ",
+  ];
+  function dateParts(value) {
+    const text = String(value ?? "")
+      .trim()
+      .replace(/\s+/g, " ");
+    let day, month, year, match;
+    if ((match = /^(\d{2})(\d{2})(\d{2})$/.exec(text))) {
+      [, day, month, year] = match;
+    } else if ((match = /^(20\d{2})-(\d{2})-(\d{2})$/.exec(text))) {
+      [, year, month, day] = match;
+    } else if (
+      (match = /^(\d{1,2})\s*([./-])\s*(\d{1,2})\s*\2\s*(\d{4}|\d{2})$/.exec(
+        text,
+      ))
+    ) {
+      [, day, , month, year] = match;
+    } else if ((match = /^(\d{2})(\d{2})(20\d{2})$/.exec(text))) {
+      [, day, month, year] = match;
+    } else if ((match = /^(20\d{2})(\d{2})(\d{2})$/.exec(text))) {
+      [, year, month, day] = match;
+    } else {
+      match = text
+        .toUpperCase()
+        .match(
+          /^(?:(?:MO(?:NTAG)?|DI(?:ENSTAG)?|MI(?:TTWOCH)?|DO(?:NNERSTAG)?|D0|FR(?:EITAG)?|SA(?:MSTAG)?|SO(?:NNTAG)?)[.,]?\s+)?(\d{1,2})\.?\s+(JAN(?:UAR)?|FEB(?:RUAR)?|MÄR(?:Z)?|MAERZ|MRZ|APR(?:IL)?|MAI|JUN(?:I)?|JUL(?:I)?|AUG(?:UST)?|SEP(?:T(?:EMBER)?)?|OKT(?:OBER)?|NOV(?:EMBER)?|DEZ(?:EMBER)?)\.?\s+(\d{4}|\d{2})$/,
+        );
+      if (!match)
+        throw Error(
+          "Datum nicht erkannt. Zum Beispiel 151126, 15.11.2026 oder 2026-11-15 eingeben.",
+        );
+      [, day, month, year] = match;
+      month =
+        months.indexOf(
+          month.replace("MAERZ", "MÄR").replace("MRZ", "MÄR").slice(0, 3),
+        ) + 1;
+    }
+    day = Number(day);
+    month = Number(month);
+    year = String(year).length === 2 ? 2000 + Number(year) : Number(year);
+    if (year < 2000 || year > 2099)
+      throw Error("Bitte ein Jahr zwischen 2000 und 2099 eingeben.");
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
+    )
       throw Error("Dieses Kalenderdatum gibt es nicht.");
-    return y + mo + d;
+    return { day, month, year };
+  }
+  function dateName(value) {
+    const { day, month, year } = dateParts(value);
+    return (
+      String(year).slice(-2) +
+      String(month).padStart(2, "0") +
+      String(day).padStart(2, "0")
+    );
   }
   const clean = (s) =>
     s
@@ -35,10 +97,13 @@
   }
   function weekday(value) {
     if (!value) return "";
-    const m = /^(\d{2})\.(\d{2})\.(\d{2})$/.exec(value);
-    if (!m) return "";
-    const [, d, mo, y] = m,
-      dt = new Date(Date.UTC(2000 + Number(y), Number(mo) - 1, Number(d)));
+    let parts;
+    try {
+      parts = dateParts(value);
+    } catch {
+      return "";
+    }
+    const dt = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
     return [
       "Sonntag",
       "Montag",
@@ -53,26 +118,13 @@
     if (!Number.isInteger(+p.start) || +p.start < 0)
       throw Error("Startnummer muss eine nichtnegative ganze Zahl sein.");
     const date = String(p.date || "").trim();
+    const prefix = date ? dateName(date) + "_" : "";
     return boards.map(
       (b, i) =>
-        `${date ? dateName(date) + "_" : ""}${p.code ? clean(p.code) + "_" : ""}${clean(p.title)}_${ratio(b.w, b.h)}_${+p.start + i}.jpg`,
+        `${prefix}${p.code ? clean(p.code) + "_" : ""}${clean(p.title)}_${ratio(b.w, b.h)}_${+p.start + i}.jpg`,
     );
   }
   function headingDate(text) {
-    const months = [
-      "JAN",
-      "FEB",
-      "MÄR",
-      "APR",
-      "MAI",
-      "JUN",
-      "JUL",
-      "AUG",
-      "SEP",
-      "OKT",
-      "NOV",
-      "DEZ",
-    ];
     const m = String(text)
       .trim()
       .toUpperCase()
@@ -97,6 +149,19 @@
     } catch {
       return "";
     }
+  }
+  function syncHeadingDate(meta, text) {
+    const date = headingDate(text);
+    if (
+      !date ||
+      meta.dateSource === "manual" ||
+      (meta.date && meta.dateSource !== "heading")
+    )
+      return false;
+    if (meta.date === date && meta.dateSource === "heading") return false;
+    meta.date = date;
+    meta.dateSource = "heading";
+    return true;
   }
   function imageCovers(b, im) {
     const t = b.image,
@@ -136,6 +201,8 @@
     imageCovers,
     ratio,
     dateName,
+    dateParts,
+    syncHeadingDate,
     clean,
     filenameDate,
     weekday,

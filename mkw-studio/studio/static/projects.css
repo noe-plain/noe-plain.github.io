@@ -595,7 +595,7 @@
   box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
 }
 #saveDialog #saveDate {
-  max-width: 180px;
+  max-width: 280px;
 }
 #saveDialog :is(p, small) {
   font-family: "MKW UI", sans-serif;

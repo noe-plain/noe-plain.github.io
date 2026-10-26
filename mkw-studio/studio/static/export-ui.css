@@ -224,7 +224,7 @@
   line-height: 20px;
 }
 #exportDialog
-  :is(
+  :where(
     input:not([type="range"]):not([type="checkbox"]):not([type="color"]),
     select
   ) {
@@ -242,7 +242,7 @@
   line-height: 24px;
 }
 #exportDialog
-  :is(input:not([type="range"]):not([type="checkbox"]), select):focus {
+  :where(input:not([type="range"]):not([type="checkbox"]), select):focus {
   border-color: var(--md-sys-color-primary);
   box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
 }
@@ -489,4 +489,8 @@ html.studio-theme-changing #exportDialog .export-card {
     0 10px,
     10px -10px,
     -10px 0;
+}
+
+#exportFields .export-naming-date {
+  grid-column: 1 / -1;
 }

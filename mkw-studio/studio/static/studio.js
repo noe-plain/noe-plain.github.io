@@ -669,11 +669,14 @@ $("#save").onclick = () => {
   if (editingText) editingText.el.blur();
   if (p.carousel) carouselEndText();
   $("#psdStatus").textContent = "";
-  const inferred = MKW.headingDate(
-    p.boards.find((b) => b.imageId === p.images[0]?.id)?.elements.date.text ||
-      "",
-  );
-  if (inferred) p.meta.date = inferred;
+  if (
+    MKW.syncHeadingDate(
+      p.meta,
+      p.boards.find((b) => b.imageId === p.images[0]?.id)?.elements.date.text ||
+        "",
+    )
+  )
+    touchMeta();
   studioPrepareSave();
   $("#saveName").value = MKW.projectName(p.meta);
   $("#saveLocationHint").textContent = window.showSaveFilePicker
