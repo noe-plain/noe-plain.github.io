@@ -31,6 +31,10 @@ function studioApplyColourTheme() {
         String(button.dataset.colourMode === mode),
       ),
     );
+  document.documentElement.dataset.palette = mode;
+  document.querySelectorAll("[data-tertiary-preview]").forEach((el) => {
+    el.hidden = mode !== "triadic";
+  });
   const input = document.querySelector("#primaryColour"),
     output = document.querySelector("#primaryColourValue");
   if (input) input.value = colour;
@@ -47,7 +51,7 @@ function studioSetPrimaryColour(colour) {
 function studioPrimaryColourSettings(section) {
   section.insertAdjacentHTML(
     "beforeend",
-    `<div class="settings-primary-colour"><label for="primaryColour">Hauptfarbe</label><div class="settings-colour-control"><input id="primaryColour" type="color" aria-label="Hauptfarbe des Studios"><output id="primaryColourValue" for="primaryColour"></output><button id="resetPrimaryColour" type="button">Zurücksetzen</button></div><p>Nur für die Oberfläche. Deine Designs bleiben unverändert.</p><span id="settingsColourModeLabel">Farbkonzept</span><div class="settings-colour-mode" role="group" aria-labelledby="settingsColourModeLabel"><button type="button" data-colour-mode="normal" aria-pressed="true">Normal</button><button type="button" data-colour-mode="complementary" aria-pressed="false">Komplementär</button></div><p>Komplementär ergänzt die Hauptfarbe um eine Gegenfarbe für Auswahl und ergänzende Aktionen.</p><div class="settings-colour-preview" aria-label="Vorschau der Oberflächenfarbe"><span class="settings-preview-selection">Ausgewählt</span><span class="settings-preview-action">Aktion</span><span class="settings-preview-secondary">Ergänzend</span></div></div>`,
+    `<div class="settings-primary-colour"><label for="primaryColour">Hauptfarbe</label><div class="settings-colour-control"><input id="primaryColour" type="color" aria-label="Hauptfarbe des Studios"><output id="primaryColourValue" for="primaryColour"></output><button id="resetPrimaryColour" type="button">Zurücksetzen</button></div><p>Nur für die Oberfläche. Deine Designs bleiben unverändert.</p><span id="settingsColourModeLabel">Farbkonzept</span><div class="settings-colour-mode" role="group" aria-labelledby="settingsColourModeLabel"><button type="button" data-colour-mode="normal" aria-pressed="true">Normal</button><button type="button" data-colour-mode="complementary" aria-pressed="false">Komplementär</button><button type="button" data-colour-mode="analogous" aria-pressed="false">Harmonisch</button><button type="button" data-colour-mode="triadic" aria-pressed="false">Lebendig</button></div><p>Komplementär nutzt eine Gegenfarbe. Harmonisch kombiniert benachbarte Töne. Lebendig ergänzt die Hauptfarbe zu einem farbigen Dreiklang.</p><div class="settings-colour-preview" aria-label="Vorschau der Oberflächenfarbe"><span class="settings-preview-selection">Ausgewählt</span><span class="settings-preview-action">Aktion</span><span class="settings-preview-secondary">Ergänzend</span><span class="settings-preview-tertiary" data-tertiary-preview hidden>Dritte Farbe</span></div></div>`,
   );
   section.querySelectorAll("[data-colour-mode]").forEach((button) => {
     button.onclick = () => {

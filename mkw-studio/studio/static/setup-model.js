@@ -76,7 +76,7 @@
       }
       const valid =
         key === "colourMode"
-          ? ["normal", "complementary"].includes(item)
+          ? ["normal", "complementary", "analogous", "triadic"].includes(item)
           : key === "density"
             ? ["comfortable", "compact"].includes(item)
             : key.endsWith("Colour")

@@ -8,6 +8,15 @@ const assert = require("node:assert/strict"),
       }),
       errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
+    if (
+      +process.env.MKW_TEST_CPU_THROTTLE > 1 &&
+      browser.browserType().name() === "chromium"
+    ) {
+      const session = await page.context().newCDPSession(page);
+      await session.send("Emulation.setCPUThrottlingRate", {
+        rate: +process.env.MKW_TEST_CPU_THROTTLE,
+      });
+    }
     await page.goto(process.env.STUDIO_URL);
     await page.locator("#startNew").click();
     await page.locator("[data-project-mode=carousel]").click();
@@ -16,21 +25,14 @@ const assert = require("node:assert/strict"),
     await page.locator("#createProject").click();
     await page.waitForFunction(() => !busy && !!fontStatus["Harriet"]);
     await page.addStyleTag({
-      content: `#carouselGuides,#carouselSelectionOverlay,#carouselSlideControls,#carouselSnapOverlay,.safe-zone,.text-group-move,.post-stack-gap {visibility:hidden!important}.mkw-inline-input,.text-editor,.text-group {outline:0!important;background:transparent!important;caret-color:transparent!important}.mkw-inline-input::selection,.mkw-inline-input *::selection {background:transparent!important}`,
+      content: `#carouselGuides,#carouselSelectionOverlay,#carouselSlideControls,#carouselSnapOverlay,.carousel-contextbar,#studioTooltip,.safe-zone,.text-group-move,.post-stack-gap {visibility:hidden!important}.mkw-inline-input,.text-editor,.text-group {outline:0!important;background:transparent!important;caret-color:transparent!important}#carouselViewport{outline:0!important}.mkw-inline-input::selection,.mkw-inline-input *::selection {background:transparent!important}`,
     });
     const settle = async () => {
       await page.evaluate(async () => {
+        await document.fonts.ready;
         await draw();
-        for (
-          let i = 0;
-          i < 100 &&
-          (carouselPaintPending ||
-            carouselPaintRunning ||
-            drawing ||
-            drawAgain);
-          i++
-        )
-          await new Promise(requestAnimationFrame);
+        await carouselWaitForPaint();
+        while (drawing || drawAgain) await new Promise(requestAnimationFrame);
         await new Promise(requestAnimationFrame);
       });
     };
@@ -100,6 +102,9 @@ const assert = require("node:assert/strict"),
       if (align === "justify")
         await page.evaluate(() => MKWTextHyphen.ensure());
       await settle();
+      const canvasBefore = await page
+        .locator("#carouselCanvas")
+        .evaluate((el) => el.toDataURL());
       const before = await shot("#carouselCanvas"),
         position = await view(),
         source = await page.evaluate(() => carouselSelected()[0].text);
@@ -110,8 +115,52 @@ const assert = require("node:assert/strict"),
         position,
         "Entering text must not pan the carousel",
       );
+      assert.equal(
+        await page.locator("#carouselCanvas").evaluate((el) => el.toDataURL()),
+        canvasBefore,
+        "Entering text must preserve all rendered canvas pixels",
+      );
+      const after = await shot("#carouselCanvas");
+      if (!before.equals(after)) {
+        const fs = require("node:fs"),
+          prefix = `inline-carousel-${font.replace(/[^a-z]/gi, "-")}-${align}`;
+        fs.writeFileSync(artifact(prefix + "-before.png"), before);
+        fs.writeFileSync(artifact(prefix + "-after.png"), after);
+        const details = await page.evaluate(() => ({
+          version: MKWTextHyphen.version,
+          editing: carouselUI.editing?.id,
+          paintPending: carouselPaintPending,
+          paintRunning: carouselPaintRunning,
+          paintFrame: carouselPaintFrame,
+          object: carouselSelected()[0],
+          layout: carouselTextLayout(carouselSelected()[0]),
+          canvas: document
+            .querySelector("#carouselCanvas")
+            .getBoundingClientRect()
+            .toJSON(),
+          bar: document
+            .querySelector(".carousel-contextbar")
+            .getBoundingClientRect()
+            .toJSON(),
+          fonts: fontStatus,
+        }));
+        fs.writeFileSync(
+          artifact(prefix + "-state.json"),
+          JSON.stringify(details, null, 2),
+        );
+        console.error(
+          "Inline fidelity mismatch",
+          JSON.stringify({
+            font,
+            align,
+            version: details.version,
+            canvas: details.canvas,
+            bar: details.bar,
+          }),
+        );
+      }
       assert(
-        before.equals(await shot("#carouselCanvas")),
+        before.equals(after),
         `${font}/${align} must look identical while editing`,
       );
       assert.equal(

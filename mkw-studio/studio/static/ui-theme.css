@@ -77,3 +77,12 @@
 html.studio-theme-changing button {
   transition: none !important;
 }
+
+/* The lively scheme reserves its third hue for secondary utilities, never artwork. */
+html[data-palette="triadic"] header .header-utilities {
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+html[data-palette="triadic"] header .header-utilities .icon-button {
+  color: var(--md-sys-color-on-tertiary-container);
+}

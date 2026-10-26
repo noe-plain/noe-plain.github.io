@@ -236,5 +236,62 @@
     "verification": [
       "audit-interactions: alle Formatfelder passen bei1500/320px, Screenshots angesehen; Handler/Presets/Formatreihenfolge/Duplizieren/Löschen beibehalten. material-fields, post-safezones, post-workspace bestanden."
     ]
+  },
+  {
+    "id": "F01",
+    "priority": "P2",
+    "element": "Cmd/Ctrl-Scrollen",
+    "location": "static/workspace-ui.js, post-workspace.js, carousel-render.js",
+    "problem": "Gewünschte plattformbezogene Seitwärtsbedienung fehlt.",
+    "impact": "Seitliches Navigieren ist umständlicher.",
+    "change": "Gemeinsamer Viewportadapter: MacCmd und physischerWindowsCtrl rollen horizontal; synthetischePinch-Events und Alt bleiben Zoom; Keyzustand bei Blur zurücksetzen.",
+    "sources": [
+      "D01"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Beide Editoren und Plattformen mit echten Wheel-Events; gleiche Zoomstufe/Y-Position/Artwork; Pinch/Alt bleiben Zoom.",
+    "status": "abgeschlossen",
+    "verification": [
+      "modifier-scroll in Firefox und gepinntemChromium erfolgreich; Geometrie und Zoomgrenzen bleiben unverändert."
+    ]
+  },
+  {
+    "id": "F02",
+    "priority": "P2",
+    "element": "Vier automatische UI-Farbkonzepte",
+    "location": "static/ui-colour-model.js, ui-theme.js/css, setup-model.js, dialogs.css",
+    "problem": "Neben Normal/Komplementär werden zwei zusätzliche Kombinationen gewünscht.",
+    "impact": "Weniger persönliche Auswahl für die Werkzeugoberfläche.",
+    "change": "Harmonisch (Nachbarfarben) und Lebendig (Dreiklang), automatisch aus Hauptfarbe; vier Buttons in2×2-Gruppe; tertiärerAkzent nur UI-Hilfebereich; portableWerkzeugeinstellung.",
+    "sources": [
+      "D02"
+    ],
+    "dependencies": "Keine",
+    "acceptance": "Alle4 Modi inLight/Dark, robusteRollenkontraste auchExtremfarben; SetupRoundtrip/Persistenz; keine Änderung von Dokument/Exportpixeln;390px passt.",
+    "status": "abgeschlossen",
+    "verification": [
+      "121 Modelltests einschliesslich neuer Farb- und Setup-Prüfungen grün.",
+      "colour-combinations inFirefox undChromium grün, mitaxe-Prüfung der neuen Einstellungen und identischen Exportpixeln."
+    ]
+  },
+  {
+    "id": "R01",
+    "priority": "P1",
+    "element": "GitHub-Browserprüfung",
+    "location": "tests/post-workspace.cjs, inline-fidelity.cjs; carousel-render.js; ci/mkw-studio.yml",
+    "problem": "GitHubRun40295226958: Löschassertion2!==1 und ReplicaLL/justify-Pixelvergleich fehlgeschlagen.",
+    "impact": "CI ist rot und Firefox-Phase wurde übersprungen.",
+    "change": "Löschtest wartet auf abgeschlossene asynchrone Mutation; Texttest wartet reale Renderqueue und Fonts, isoliert unabhängige Floating-UI/Fokuszustände, prüft zusätzlich exakt nativeCanvaspixel und erzeugtFehlerartefakte. Cache enthältTrennmuster-Epoche. Manueller fokussierter Testumfang ergänzt; Pushprüfungen bleiben vollständig.",
+    "sources": [
+      "D01"
+    ],
+    "dependencies": "GitHub-Runner",
+    "acceptance": "Beide Fälle und neueBedienung auf LinuxChromium/Firefox grün; voller Standardlauf bleibt aktiv.",
+    "status": "lokal geprüft; GitHub-Nachprüfung offen",
+    "verification": [
+      "Fehlerannotationen und Jobprotokoll des tatsächlichen Runs gelesen.",
+      "Originalfehler im lokalenChrome/gepinntenChromium/Firefox trotzCPU-Verlangsamung nicht reproduzierbar; keine bestätigte Änderung am tatsächlichen Satz behauptet.",
+      "Strikter ergänzter Pixelvergleich und Löschtest lokal in beiden Browsern grün; keine Pixeltoleranz gelockert."
+    ]
   }
 ]

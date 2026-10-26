@@ -427,12 +427,20 @@
   min-height: var(--studio-control-height);
   padding: 10px 12px;
 }
-.settings-colour-mode button:first-child {
-  border-radius: var(--studio-shape-full) 0 0 var(--studio-shape-full);
+#settingsDialog .settings-colour-mode {
+  gap: 6px;
 }
-.settings-colour-mode button:last-child {
-  border-radius: 0 var(--studio-shape-full) var(--studio-shape-full) 0;
-  margin-left: -1px;
+#settingsDialog .settings-colour-mode button {
+  border-radius: var(--studio-shape-full);
+  min-width: 0;
+}
+#settingsDialog .settings-colour-mode button[aria-pressed="true"] {
+  border-radius: var(--studio-shape-medium);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+}
+.settings-preview-tertiary {
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
 }
 .settings-preview-secondary {
   background: var(--md-sys-color-secondary-container);

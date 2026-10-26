@@ -375,6 +375,45 @@ $("#footerSnap").onclick = () => {
     studioSyncFooter();
   }
 };
+// Track a physical Control key so synthetic Ctrl+wheel trackpad pinch keeps zooming.
+const MKWWorkspaceWheel = (() => {
+  let controlHeld = false;
+  const mac = /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key === "Control") controlHeld = true;
+    },
+    true,
+  );
+  window.addEventListener(
+    "keyup",
+    (event) => {
+      if (event.key === "Control") controlHeld = false;
+    },
+    true,
+  );
+  window.addEventListener("blur", () => {
+    controlHeld = false;
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) controlHeld = false;
+  });
+  function horizontal(event, viewport) {
+    if (!(mac ? event.metaKey : event.ctrlKey && controlHeld) || event.altKey)
+      return false;
+    event.preventDefault();
+    const unit =
+      event.deltaMode === 1
+        ? 16
+        : event.deltaMode === 2
+          ? viewport.clientWidth
+          : 1;
+    viewport.scrollLeft += (event.deltaY || event.deltaX) * unit;
+    return true;
+  }
+  return Object.freeze({ horizontal });
+})();
 function studioSyncZoomLimits(carousel, value, min, max) {
   const out = $(carousel ? "#carouselZoomOut" : "#zoomOut"),
     into = $(carousel ? "#carouselZoomIn" : "#zoomIn");

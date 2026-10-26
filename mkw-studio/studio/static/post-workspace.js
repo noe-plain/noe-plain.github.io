@@ -266,6 +266,7 @@ postViewport.addEventListener(
   "wheel",
   (event) => {
     if (!postActive() || busy) return;
+    if (MKWWorkspaceWheel.horizontal(event, postViewport)) return;
     if (event.ctrlKey || event.metaKey || event.altKey) {
       event.preventDefault();
       postSetZoom(view * Math.exp(-event.deltaY * 0.003), event);

@@ -39,12 +39,19 @@
       -0.0041960863 * x - 0.7034186147 * y + 1.707614701 * z,
     ];
   }
-  function tone(seed, lightness, chroma = 1, opposite = false) {
+  function tone(seed, lightness, chroma = 1, opposite = false, rotation = 0) {
     let [, a, b] = lab(seed);
+    if ((opposite || rotation) && Math.hypot(a, b) < 0.02)
+      [, a, b] = lab(defaultColour);
     if (opposite) {
-      if (Math.hypot(a, b) < 0.02) [, a, b] = lab(defaultColour);
       a = -a;
       b = -b;
+    }
+    if (rotation) {
+      const angle = (rotation * Math.PI) / 180,
+        x = a * Math.cos(angle) - b * Math.sin(angle);
+      b = a * Math.sin(angle) + b * Math.cos(angle);
+      a = x;
     }
     let low = 0,
       high = chroma,
@@ -71,6 +78,8 @@
     const seed = valid(colour) ? colour.toLowerCase() : defaultColour,
       dark = theme === "dark",
       complementary = mode === "complementary",
+      rotation = mode === "analogous" ? 30 : mode === "triadic" ? 120 : 0,
+      vivid = complementary || !!rotation,
       primary = tone(seed, dark ? 0.82 : 0.47),
       container = tone(seed, dark ? 0.33 : 0.93, 0.35),
       onContainer = tone(seed, dark ? 0.94 : 0.28, 0.4);
@@ -83,14 +92,30 @@
       "secondary-container": tone(
         seed,
         dark ? 0.34 : 0.93,
-        complementary ? 0.65 : 0.16,
+        vivid ? 0.65 : 0.16,
         complementary,
+        rotation,
       ),
       "on-secondary-container": tone(
         seed,
         dark ? 0.94 : 0.28,
-        complementary ? 0.65 : 0.16,
+        vivid ? 0.65 : 0.16,
         complementary,
+        rotation,
+      ),
+      "tertiary-container": tone(
+        seed,
+        dark ? 0.34 : 0.93,
+        mode === "triadic" ? 0.65 : 0.16,
+        false,
+        mode === "triadic" ? -120 : 0,
+      ),
+      "on-tertiary-container": tone(
+        seed,
+        dark ? 0.94 : 0.28,
+        mode === "triadic" ? 0.65 : 0.16,
+        false,
+        mode === "triadic" ? -120 : 0,
       ),
       "primary-outline": tone(seed, dark ? 0.64 : 0.58, 0.6),
       surface: dark ? "#191c21" : "#fcfcfd",

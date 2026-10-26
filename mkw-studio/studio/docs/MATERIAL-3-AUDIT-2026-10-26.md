@@ -735,3 +735,14 @@ Rohbelege im Arbeitsbereich:`work/audits/material3-2026-10-26/{before,final-fire
 | `static/editor.bundle.css` | 41474 B | 41855 B | +381 B |
 
 Diese Grössen sind komprimierte Assetgrössen, keine gemessene Netzwerk-Ladezeit. Testdaten, axe und Screenshots werden nicht in die Produktionsdatei eingebündelt.
+
+## Nachträge: Scrollen, vier Farbkonzepte und GitHub-Befund
+
+Nach der lokalen Erstabnahme meldete GitHubRun[40295226958](https://github.com/noe-plain/noe-plain.github.io/actions/runs/40295226958) zwei roteBrowserfälle. Der vorstehende lokale Prüfbericht ist damit keine Behauptung grünerGitHub-Checks. Die tatsächlichenAnnotations-/Jobprotokolle wurden gelesen. R01 dokumentiert die laufendeNachprüfung.
+
+- Beim Entfernen prüfte der Test vor Abschluss der asynchronenDialogaktion. Er wartet jetzt auf den tatsächlichenModellzustand und behält die ursprünglicheAssertion.
+- Der Textbildvergleich konnte auchFloating-UI/Fokusfeedback enthalten und brach seine Wartephase nach100Frames ab. Er wartet jetzt die realeRenderqueue undFontbereitschaft ab. UI-Hilfsebenen sind für diesenArtworkvergleich ausgeblendet; der strikteScreenshotvergleich bleibt. Zusätzlich müssen sämtliche nativenCanvaspixel vor/nach Eintritt inTextbearbeitung identisch bleiben. Fehler liefernPNG-/Layoutartefakte. Die Designer-Rendercache enthält nun wie dasTextlayout dieTrennmuster-Epoche. Die konkreteLinux-Abweichung konnte lokal noch nicht reproduziert werden; keine unbewieseneSatzkorrektur wird behauptet.
+- F01: Cmd+Scrollen aufMac bzw. physischerCtrl+Scrollen aufWindows verschiebt beideMontageflächen seitlich. Alt/Option+Scrollen undPinch bleibenZoom. Tastenzustand wird beiFensterwechsel verworfen.
+- F02: Auf Nutzerwunsch insgesamtvier UI-Schemata: Normal, Komplementär, Harmonisch undLebendig. Die beiden neuenVarianten sind eigeneOKLab-Ableitungen, keine behauptetenoffiziellenGoogle-HCT-Presets. Die Hauptfarbe bleibt, Zusatzrollen werden30° bzw.±120° versetzt. Sie sind reinWerkzeugeinstellung und imSetup portabel; bestehendeMKW-Objekte/Exporte ändern sich nicht.
+
+Lokale Nachweise:121Modelltests; neueFarb-/Scrolltests und beideRegressionsfälle inFirefox undChromium145 jeweils4/4 grün. GitHub-Nachprüfung fürR01 steht beimCommit diesesDokuments noch aus. VollständigePushprüfungen bleiben aktiv; manuell kann der fokussierteUmfang `text-and-scroll` gewählt werden.

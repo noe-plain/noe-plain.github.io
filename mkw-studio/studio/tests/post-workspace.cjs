@@ -389,6 +389,7 @@ const assert = require("node:assert/strict");
       .locator("[data-action=removeImage]")
       .click();
     await page.locator("[data-feedback-confirm]").click();
+    await page.waitForFunction(() => p.images.length === 1);
     assert.equal(await page.evaluate(() => p.images.length), 1);
     assert(await page.locator("#addMoreImages").isVisible());
     assert.deepEqual(errors, []);

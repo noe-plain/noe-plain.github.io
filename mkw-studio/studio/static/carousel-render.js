@@ -316,6 +316,7 @@ function carouselRender() {
     }
   };
   viewport.onwheel = (ev) => {
+    if (MKWWorkspaceWheel.horizontal(ev, viewport)) return;
     if (ev.ctrlKey || ev.metaKey || ev.altKey) {
       ev.preventDefault();
       carouselSetZoom(carouselZoom * Math.exp(-ev.deltaY * 0.003), ev);
@@ -389,6 +390,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
       p.carousel.objects,
       scale,
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
+      MKWTextHyphen.version,
       fontStatus,
     ]),
     sources = [...p.images, ...p.logos].map((a) => a.data),

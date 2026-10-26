@@ -174,3 +174,18 @@ test("start background is optional, bounded, isolated and portable", async () =>
   ])
     assert.throws(() => model.validate({ ...fixture(), backgrounds }));
 });
+
+test("new UI colour combinations survive a portable setup roundtrip", async () => {
+  for (const colourMode of ["analogous", "triadic"]) {
+    const source = fixture();
+    source.preferences.colourMode = colourMode;
+    const portable = model.validate(source);
+    const blob = await codec.encodeDocument(portable, {
+      assetCollections: ["fonts", "logos"],
+    });
+    assert.equal(
+      model.validate(await codec.decode(blob)).preferences.colourMode,
+      colourMode,
+    );
+  }
+});

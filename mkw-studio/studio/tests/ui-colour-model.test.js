@@ -103,3 +103,48 @@ test("complementary UI keeps main and semantic colours while adding an accessibl
     assert.throws(() => setup.preferences({ colourMode }, true));
   }
 });
+
+test("harmonious and triadic UI palettes preserve document colours and usable paired roles", () => {
+  for (const mode of ["analogous", "triadic"]) {
+    assert.equal(
+      setup.preferences({ colourMode: mode }, true).colourMode,
+      mode,
+    );
+    for (const theme of ["light", "dark"])
+      for (let i = 0; i < 264; i++) {
+        const seed =
+          i === 0
+            ? "#000000"
+            : i === 1
+              ? "#ffffff"
+              : "#" + ((i * 65497) % 0xffffff).toString(16).padStart(6, "0");
+        const normal = model.palette(seed, theme),
+          palette = model.palette(seed, theme, mode);
+        for (const role of [
+          "primary",
+          "on-primary",
+          "surface",
+          "on-surface",
+          "error",
+          "warning",
+        ])
+          assert.equal(palette[role], normal[role]);
+        for (const channel of ["secondary", "tertiary"])
+          assert(
+            model.contrast(
+              palette["on-" + channel + "-container"],
+              palette[channel + "-container"],
+            ) >= 4.5,
+          );
+        assert.notEqual(
+          palette["secondary-container"],
+          normal["secondary-container"],
+        );
+        if (mode === "triadic")
+          assert.notEqual(
+            palette["tertiary-container"],
+            palette["secondary-container"],
+          );
+      }
+  }
+});
