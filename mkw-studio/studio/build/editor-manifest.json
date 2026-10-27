@@ -97,7 +97,8 @@
     "static/template-gallery.js",
     "static/template-save.js",
     "static/template-ui.js",
-    "static/start.js"
+    "static/start.js",
+    "static/workspace-scroll.js"
   ],
   "styles": [
     "static/ui-theme-tokens.css",

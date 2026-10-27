@@ -154,7 +154,8 @@ function carouselPanel() {
             ? Number(input.value)
             : input.value;
         if (input.type === "number") {
-          if (!Number.isFinite(value)) return;
+          if (!MKWFields.validate(input, true) || !Number.isFinite(value))
+            return;
           value = Math.max(+input.min, Math.min(+input.max, value));
         }
         if (input.type === "range") {

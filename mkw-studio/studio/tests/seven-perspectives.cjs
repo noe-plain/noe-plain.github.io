@@ -21,7 +21,7 @@ const { launch, artifact } = require("./browser.cjs");
       // Inspect settled states separately from entrance animations.
       await page.waitForTimeout(450);
       const state = await page.evaluate(async () => {
-        const modal = [...document.querySelectorAll("dialog:modal")].at(-1);
+        const modal = document.activeElement?.closest("dialog:modal") || [...document.querySelectorAll("dialog:modal")].at(-1);
         const scope = modal || document;
         const controls = [
           ...scope.querySelectorAll(
@@ -88,6 +88,7 @@ const { launch, artifact } = require("./browser.cjs");
         );
         return {
           controls,
+          auditedModal: modal?.id || null,
           // A named top-layer menu is a transient widget, not an additional page landmark.
           // Keep this best-practice advisory in the raw report; never suppress WCAG rules.
           menuLandmarkAdvisories: result.violations
@@ -164,6 +165,8 @@ const { launch, artifact } = require("./browser.cjs");
           ].map((el) => el.id),
         };
       });
+      if (name.startsWith("settings-")) assert.equal(state.auditedModal, "settingsDialog", "Audit the active settings dialog, not the underlying start dialog");
+      if (name.startsWith("setup-")) assert.notEqual(state.auditedModal, "startDialog");
       records.push({ name, ...state });
       fs.writeFileSync(
         artifact(`seven-${phase}.json`),

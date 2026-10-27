@@ -353,29 +353,72 @@ async function sponsorRenderSettings() {
       studioPreferences.sponsorColour = event.target.value;
       studioApplyPreferences();
     };
+    let committed = clone(sponsorGroups);
     const save = async (assets) => {
-      await MKWSponsorLibrary.save(sponsorGroups, assets);
-      sponsorRefreshOptions();
+      try {
+        const next = clone(sponsorGroups);
+        await MKWSponsorLibrary.save(next, assets);
+        committed = clone(next);
+        sponsorRefreshOptions();
+      } catch (error) {
+        sponsorGroups = clone(committed);
+        throw error;
+      }
+    };
+    const reportFailure = (message) => {
+      let field = root.querySelector("#sponsorLibraryStatus");
+      if (!field) {
+        field = document.createElement("p");
+        field.id = "sponsorLibraryStatus";
+        root.append(field);
+      }
+      MKWFields.notice(field, message, true);
+    };
+    const action = (fn) => async () => {
+      if (root.getAttribute("aria-busy") === "true") return;
+      const focused = document.activeElement;
+      const controls = [...root.querySelectorAll("button,input")].map((el) => [
+        el,
+        el.disabled,
+      ]);
+      root.setAttribute("aria-busy", "true");
+      controls.forEach(([el]) => (el.disabled = true));
+      try {
+        await fn();
+      } catch (error) {
+        await sponsorRenderSettings();
+        reportFailure("Änderung nicht gespeichert: " + error.message);
+      } finally {
+        root.removeAttribute("aria-busy");
+        controls.forEach(([el, disabled]) => {
+          if (el.isConnected) el.disabled = disabled;
+        });
+        if (focused?.isConnected) focused.focus({ preventScroll: true });
+        else
+          root
+            .querySelector("#newSponsorGroup")
+            ?.focus({ preventScroll: true });
+      }
     };
     sponsorBindOrdering(root, save);
-    $("#newSponsorGroup").onclick = async () => {
+    $("#newSponsorGroup").onclick = action(async () => {
       if (sponsorGroups.length >= 20)
         return status("Maximal 20 Sponsorgruppen.");
       sponsorGroups.push({ id: uid(), name: "Neue Gruppe", logos: [] });
       await save();
       await sponsorRenderSettings();
-    };
+    });
     root.querySelectorAll("[data-sponsor-name]").forEach(
       (input) =>
-        (input.onchange = async () => {
+        (input.onchange = action(async () => {
           sponsorGroups.find((g) => g.id === input.dataset.sponsorName).name =
             input.value.trim().slice(0, 80) || "Sponsorgruppe";
           await save();
-        }),
+        })),
     );
     root.querySelectorAll("[data-sponsor-move]").forEach(
       (btn) =>
-        (btn.onclick = async () => {
+        (btn.onclick = action(async () => {
           const index = sponsorGroups.findIndex(
               (g) => g.id === btn.dataset.sponsorMove,
             ),
@@ -391,28 +434,28 @@ async function sponsorRenderSettings() {
           sponsorGroups.splice(target, 0, group);
           await save();
           await sponsorRenderSettings();
-        }),
+        })),
     );
     root.querySelectorAll("[data-sponsor-delete]").forEach(
       (btn) =>
-        (btn.onclick = async () => {
+        (btn.onclick = action(async () => {
           sponsorGroups = sponsorGroups.filter(
             (g) => g.id !== btn.dataset.sponsorDelete,
           );
           await save();
           await sponsorRenderSettings();
-        }),
+        })),
     );
     root.querySelectorAll("[data-library-logo]").forEach(
       (btn) =>
-        (btn.onclick = async () => {
+        (btn.onclick = action(async () => {
           const g = sponsorGroups.find(
             (g) => g.id === btn.dataset.libraryGroup,
           );
           g.logos = g.logos.filter((l) => l.id !== btn.dataset.libraryLogo);
           await save();
           await sponsorRenderSettings();
-        }),
+        })),
     );
     root.querySelectorAll("[data-sponsor-upload]").forEach(
       (btn) =>
@@ -451,8 +494,8 @@ async function sponsorRenderSettings() {
               }
               await sponsorRenderSettings();
             } catch (e) {
-              $("#sponsorLibraryStatus").textContent = e.message;
-              for (const control of controls) control.disabled = false;
+              await sponsorRenderSettings();
+              reportFailure("Import nicht vollständig: " + e.message);
             } finally {
               finishUpload();
             }

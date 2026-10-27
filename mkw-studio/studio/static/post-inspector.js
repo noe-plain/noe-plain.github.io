@@ -25,7 +25,11 @@
       textTypes,
     } = views;
     const on = (panel, id, event, fn) =>
-      panel.querySelector("#" + id)?.addEventListener(event, fn);
+      panel.querySelector("#" + id)?.addEventListener(event, (ev) => {
+        if (ev.target.type === "number" && !MKWFields.validate(ev.target, true))
+          return;
+        fn(ev);
+      });
     function renderCrop({ b, panel }) {
       panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bildausschnitt</h3><div class="tool-button-grid"><button data-fit="fill" title="Bild so vergrössern, dass es die ganze Fläche bedeckt">Fläche füllen</button><button data-fit="fit" title="Das gesamte Bild innerhalb der Zeichenfläche zeigen">Ganzes Bild</button></div><label>Bildgrösse (%) <input id="scale" aria-label="Bildskalierung in Prozent" type="number" min="0.1" step="0.1" value="${(b.image.scale * 100).toFixed(1)}"></label><div class="tool-button-grid"><button data-fit="center">Zentrieren</button><button data-fit="original">Originalgrösse</button></div></section><section class="tool-section"><h3>Gestaltung</h3><label>Drehung (°) <input id="angle" type="number" value="${b.image.angle}"></label><div class="tool-button-grid"><button id="flipX" title="Links und rechts tauschen">${studioIcon("flip")}Horizontal</button><button id="flipY" title="Oben und unten tauschen">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button data-fit="reset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Hintergrund</h3><label>Zeichenflächenfarbe <input id="bg" aria-label="Zeichenflächenfarbe" type="color" value="${b.family?.enabled ? b.family.background : b.bg}"></label></section></div>`;
       panel.querySelectorAll("[data-fit]").forEach(

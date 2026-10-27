@@ -55,7 +55,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     $("#startContinue").disabled = true;
     const finishLoading = MKWUIControls.loading("#startStatus");
     try {
-      await MKWProjects.open(await MKWProjectStore.open(saved.id));
+      await MKWProjects.open(MKWProjectStore.open(saved.id));
     } catch (error) {
       MKWFields.notice(
         $("#startStatus"),

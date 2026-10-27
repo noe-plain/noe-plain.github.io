@@ -5,7 +5,8 @@ const MKWProjects = (() => {
     links = new Map(),
     aliases = new Map();
   let queue = Promise.resolve(),
-    dismissedNotice = null;
+    dismissedNotice = null,
+    openingProject = false;
   const stamp = (file) => ({ size: file.size, modified: file.lastModified });
   function notice(message, error = false) {
     const el = $("#projectStorageNotice");
@@ -179,11 +180,39 @@ const MKWProjects = (() => {
     });
     return task;
   }
+  function beginOpen() {
+    if (openingProject) return null;
+    openingProject = true;
+    const wasBusy = busy;
+    busy = true;
+    const dialog = document.createElement("dialog");
+    dialog.id = "projectOpeningDialog";
+    dialog.setAttribute("aria-labelledby", "projectOpeningTitle");
+    dialog.innerHTML =
+      '<h2 id="projectOpeningTitle" tabindex="-1" autofocus>Projekt wird geöffnet</h2><p role="status">Bilder und Schriften werden geladen …</p>';
+    dialog.addEventListener("cancel", (event) => event.preventDefault());
+    document.body.append(dialog);
+    const finishLoading = MKWUIControls.loading(dialog.querySelector("p"));
+    dialog.showModal();
+    return (success) => {
+      finishLoading();
+      dialog.close();
+      dialog.remove();
+      openingProject = false;
+      busy = success ? false : wasBusy;
+    };
+  }
   async function open(record) {
+    const finishOpen = beginOpen();
+    if (!finishOpen) return;
+    let success = false;
     const finishLoading = MKWUIControls.loading(
       $("#startDialog").open ? "#startStatus" : "#projectOpenStatus",
     );
     try {
+      record = await record;
+      if (!record?.project)
+        throw Error("Diese Browsersicherung ist nicht mehr vorhanden.");
       if (savedRevision < revision) await autosave();
       await restore(record.project);
       await attach(record);
@@ -197,11 +226,16 @@ const MKWProjects = (() => {
           ? "Projekt geöffnet · MKW-Datei verknüpft."
           : "Projekt aus diesem Browser geöffnet.",
       );
+      success = true;
     } finally {
       finishLoading();
+      finishOpen(success);
     }
   }
   async function openFile(file, handle = null) {
+    const finishOpen = beginOpen();
+    if (!finishOpen) return;
+    let success = false;
     const loadingTarget = $(
       $("#projectLibrary")?.open ? "#projectOpenStatus" : "#startStatus",
     );
@@ -234,6 +268,7 @@ const MKWProjects = (() => {
       busy = false;
       $("#startDialog").close();
       $("#projectLibrary")?.close();
+      success = true;
       await autosave({ writeFile: false });
       notice(
         handle
@@ -242,6 +277,7 @@ const MKWProjects = (() => {
       );
     } finally {
       finishLoading();
+      finishOpen(success);
     }
   }
   async function chooseFile() {
@@ -404,7 +440,7 @@ const MKWProjects = (() => {
         const finishLoading = MKWUIControls.loading("#projectOpenStatus");
         MKWFields.notice($("#projectOpenStatus"), "Projekt wird geöffnet …");
         try {
-          await open(await MKWProjectStore.open(button.dataset.projectId));
+          await open(MKWProjectStore.open(button.dataset.projectId));
         } catch (error) {
           openError("Projekt konnte nicht geöffnet werden: " + error.message);
         } finally {

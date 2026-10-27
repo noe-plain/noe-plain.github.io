@@ -459,6 +459,7 @@ postViewport.addEventListener("scroll", () => {
     postRoomFrame = 0;
     if (!postActive()) return;
     draw();
+    if (performance.now() < (postViewport.scrollControlUntil || 0)) return;
     const x = postViewport.scrollLeft,
       y = postViewport.scrollTop;
     const addX =

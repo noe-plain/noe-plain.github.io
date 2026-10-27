@@ -739,3 +739,67 @@ header .header-action-group .icon-button:hover {
     forced-color-adjust: none;
   }
 }
+
+/* Scroll grips stay on the straight edges, clear of the workspace's rounded corners. */
+.workspace-scroll-controls {
+  position: fixed;
+  z-index: 4;
+  pointer-events: none;
+}
+.workspace-scroll-track {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+}
+.workspace-scroll-track.scroll-x {
+  bottom: 0;
+  height: 24px;
+}
+.workspace-scroll-track.scroll-y {
+  right: 0;
+  width: 24px;
+}
+.workspace-scroll-handle {
+  position: absolute;
+  border-radius: var(--studio-shape-full);
+  touch-action: none;
+  cursor: grab;
+}
+.scroll-x .workspace-scroll-handle {
+  height: 24px;
+}
+.scroll-y .workspace-scroll-handle {
+  width: 24px;
+}
+.workspace-scroll-handle::before {
+  content: "";
+  position: absolute;
+  inset: 9px 0;
+  border-radius: inherit;
+  background: var(--md-sys-color-outline);
+}
+.scroll-y .workspace-scroll-handle::before {
+  inset: 0 9px;
+}
+.workspace-scroll-handle:hover::before,
+.workspace-scroll-handle:focus-visible::before,
+.workspace-scroll-handle:active::before {
+  background: var(--md-sys-color-primary);
+}
+.workspace-scroll-handle:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
+.workspace-scroll-handle:active {
+  cursor: grabbing;
+}
+@media (forced-colors: active) {
+  .workspace-scroll-handle::before {
+    forced-color-adjust: none;
+    background: ButtonText;
+  }
+  .workspace-scroll-handle:focus-visible::before,
+  .workspace-scroll-handle:active::before {
+    background: Highlight;
+  }
+}

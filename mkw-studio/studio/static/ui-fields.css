@@ -187,3 +187,10 @@
     sans-serif;
   overflow-wrap: anywhere;
 }
+
+#toolsSidebar .tool-section > label:has(> .studio-field-feedback) {
+  flex-wrap: wrap;
+}
+#toolsSidebar .tool-section > label > .studio-field-feedback {
+  flex-shrink: 0;
+}

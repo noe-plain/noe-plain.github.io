@@ -205,6 +205,7 @@ function carouselRender() {
   carouselEndText();
   document.body.classList.toggle("carousel-mode", carouselActive());
   $("#carouselEditor")?.remove();
+  window.MKWWorkspaceScroll?.sync();
   $(".carousel-statusbar")?.remove();
   studioSyncFooter();
   if (!carouselActive()) return false;
@@ -250,6 +251,7 @@ function carouselRender() {
  <div id="carouselViewport" tabindex="0" aria-label="Designer-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Designer-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
  <aside id="carouselSidebar" aria-label="Designer-Eigenschaften und Ebenen"><h2 class="visually-hidden">Designer</h2><h3 class="visually-hidden">Eigenschaften</h3><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls studio-zoom-controls" role="group" aria-label="Zoom"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><button id="carouselZoomOut" aria-label="Ansicht verkleinern" title="Ansicht verkleinern">${studioIcon("minus")}</button><label class="studio-zoom-value"><input id="carouselZoom" aria-label="Zoom in Prozent" type="number" min="5" max="200" step="1" value="${Math.round(MKWZoom.percent(carouselZoom, studioZoomReference(true)))}"><span aria-hidden="true">%</span></label><button id="carouselZoomIn" aria-label="Ansicht vergrössern" title="Ansicht vergrössern">${studioIcon("plus")}</button></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
+  window.MKWWorkspaceScroll?.sync();
   MKWUIControls.designer($("#carouselSidebar"));
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
   host

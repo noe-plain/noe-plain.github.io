@@ -463,6 +463,11 @@ function studioCreatePicker() {
   };
   for (const id of ["paintAlpha", "paintAlphaSlider"])
     $("#" + id).oninput = (event) => {
+      if (
+        event.target.type === "number" &&
+        !MKWFields.validate(event.target, true)
+      )
+        return;
       const n = Number(event.target.value);
       if (!Number.isFinite(n) || n < 0 || n > 100) return;
       studioPickerBegin();
@@ -489,6 +494,7 @@ function studioCreatePicker() {
     });
   }
   $("#paintAngle").oninput = (event) => {
+    if (!MKWFields.validate(event.target, true)) return;
     const n = Number(event.target.value);
     if (!Number.isFinite(n) || Math.abs(n) > 360) return;
     studioPickerBegin();
@@ -508,6 +514,7 @@ function studioCreatePicker() {
         })),
   );
   $("#paintStopPosition").oninput = (event) => {
+    if (!MKWFields.validate(event.target, true)) return;
     const value = Number(event.target.value) / 100;
     if (!Number.isFinite(value)) return;
     studioPickerBegin();
@@ -516,6 +523,7 @@ function studioCreatePicker() {
     studioRenderPicker(false);
   };
   $("#paintMidPosition").oninput = (event) => {
+    if (!MKWFields.validate(event.target, true)) return;
     const n = Number(event.target.value);
     if (!Number.isFinite(n) || n < 5 || n > 95) return;
     studioPickerBegin();

@@ -680,3 +680,18 @@
     padding: 12px;
   }
 }
+
+#projectOpeningDialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+}
+#projectOpeningDialog h2 {
+  margin: 0 0 16px;
+}
+#projectOpeningDialog p {
+  margin: 0;
+}
