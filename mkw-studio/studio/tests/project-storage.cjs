@@ -175,7 +175,7 @@ const assert = require("node:assert/strict");
       downloading.catch(() => {});
       await page.bringToFront();
       await page
-        .locator("#saveProjectAs")
+        .locator("#saveProject")
         .click()
         .catch(async (error) => {
           console.error(
@@ -188,7 +188,7 @@ const assert = require("node:assert/strict");
               dialogs: [...document.querySelectorAll("dialog[open]")].map(
                 (el) => el.id,
               ),
-              saveDisabled: document.querySelector("#saveProjectAs").disabled,
+              saveDisabled: document.querySelector("#saveProject").disabled,
             })),
           );
           throw error;

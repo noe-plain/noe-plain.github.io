@@ -58,7 +58,7 @@ const { launch, artifact } = require("./browser.cjs");
       });
       await page.locator("#save").click();
       await page.locator("#saveName").fill("Gewählter Name");
-      await page.locator("#saveProjectAs").click();
+      await page.locator("#saveProject").click();
       await page.waitForFunction(
         () => !busy && !document.querySelector("#saveDialog").open,
       );
@@ -122,7 +122,7 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#save").click();
       await page.locator("#saveName").fill("Gewählter Name");
       const downloading = page.waitForEvent("download");
-      await page.locator("#saveProjectAs").click();
+      await page.locator("#saveProject").click();
       const downloaded = await downloading,
         text = require("node:fs").readFileSync(await downloaded.path());
       const decoded = await require("../static/project-file.js").decode(new Blob([text]));

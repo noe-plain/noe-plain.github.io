@@ -96,18 +96,9 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#save").click();
       assert(await page.locator("#saveDialog").isVisible());
       assert((await page.locator("#saveName").boundingBox()).height >= 56);
-      assert((await page.locator("#saveProjectAs").boundingBox()).height >= 48);
-      assert(
-        await page
-          .locator("#saveProject")
-          .evaluate(
-            (e) =>
-              !!(
-                e.compareDocumentPosition(document.querySelector("#savePSD")) &
-                Node.DOCUMENT_POSITION_FOLLOWING
-              ),
-          ),
-      );
+      assert(!(await page.locator("#saveProjectAs").isVisible()));
+      assert((await page.locator("#saveProject").boundingBox()).height >= 56);
+      assert.equal(await page.locator("#saveProject").evaluate(el => !!el.closest(".save-dialog-footer")), true);
       await checkContrast("#saveProject strong");
       await checkContrast("#savePSD small");
       await page.screenshot({

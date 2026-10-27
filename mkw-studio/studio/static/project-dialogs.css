@@ -1,0 +1,506 @@
+:is(#saveDialog, #projectLibrary)[open] {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--studio-dialog-width);
+  height: var(--studio-dialog-height);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--studio-shape-dialog);
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-low);
+}
+.project-task-dialog > .dialog-heading {
+  position: relative;
+  top: auto;
+  flex: none;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 28px;
+  margin: 0;
+  border: 0;
+  background: var(--md-sys-color-surface-container-low);
+}
+.project-task-dialog > .dialog-heading > div {
+  min-width: 0;
+}
+.project-task-dialog > .dialog-heading > button {
+  flex: none;
+}
+.project-task-dialog h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+}
+.project-task-dialog .dialog-heading p {
+  margin: 4px 0 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-body-size);
+  line-height: 1.5;
+}
+.project-dialog-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 28px;
+  border-radius: 24px 24px 0 0;
+  background: var(--md-sys-color-surface);
+}
+.project-dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  align-items: start;
+  gap: 28px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.project-task-dialog h3 {
+  margin: 0 0 16px;
+  color: var(--md-sys-color-on-surface);
+  font-size: 18px;
+  line-height: 26px;
+}
+.project-task-dialog :is(p, small) {
+  font-family: "MKW UI", sans-serif;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-label-size);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.project-task-dialog p {
+  margin: 0 0 16px;
+}
+.project-browser-section {
+  min-width: 0;
+}
+.project-library-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.project-library-heading h3 {
+  margin-bottom: 4px;
+}
+.project-library-heading p {
+  margin: 0;
+}
+.project-count {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: var(--studio-shape-full);
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  font-size: var(--studio-label-size);
+  font-variant-numeric: tabular-nums;
+}
+#projectLibraryList {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 4px 0;
+  min-width: 0;
+}
+.project-library-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 8px;
+  padding-right: 8px;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+.project-library-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 20px;
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  text-align: left;
+  box-shadow: none;
+  overflow-wrap: anywhere;
+}
+.project-library-row > .ui-icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  color: var(--md-sys-color-primary);
+}
+.project-library-row > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+#projectLibrary .project-library-row strong {
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  line-height: 24px;
+}
+.project-library-entry > .icon-button {
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.project-library-entry > .icon-button:hover:not(:disabled) {
+  color: var(--md-sys-color-error);
+  background: var(--md-sys-color-error-container);
+}
+.project-current-label {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border-radius: var(--studio-shape-full);
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  font-size: var(--studio-label-size);
+  line-height: 1.5;
+}
+.project-library-empty {
+  padding: 28px 24px;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+.project-library-empty strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.project-library-empty p {
+  max-width: 52ch;
+  margin: 0;
+}
+.project-file-section {
+  padding: 28px;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.project-task-dialog .project-file-section :is(h3, p) {
+  color: inherit;
+}
+.project-dialog-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
+  border-radius: 20px;
+  color: var(--md-sys-color-on-secondary-container);
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 8%,
+    transparent
+  );
+}
+.project-dialog-symbol .ui-icon {
+  width: 32px;
+  height: 32px;
+}
+#projectLibrary .project-open-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  margin: 24px 0 16px;
+  padding: 16px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-primary);
+  box-shadow: none;
+}
+#projectLibrary #openProjectFile :is(strong, small, span) {
+  color: var(--md-sys-color-on-primary);
+}
+#projectLibrary .project-open-file strong {
+  font-size: var(--studio-body-size);
+}
+#projectLibrary .project-open-file small {
+  display: none;
+}
+.project-task-dialog .project-file-note {
+  margin: 0;
+}
+#projectOpenStatus {
+  margin: 0 0 16px;
+}
+#projectOpenStatus:empty {
+  display: none;
+}
+#retryProjectLibrary {
+  margin: 0 0 16px;
+}
+.project-dialog-footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 28px;
+}
+.project-task-dialog .project-library-retention {
+  max-width: 90ch;
+  margin: 0;
+}
+.project-dialog-footer > button {
+  flex: none;
+  min-width: 104px;
+  min-height: 48px;
+}
+.save-dialog-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+#saveDialog :is(.save-project-naming, .save-file-naming) {
+  margin: 0;
+  padding: 24px;
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+#saveDialog .project-fields {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  margin: 0 0 20px;
+}
+#saveDialog :is(label, .field) {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-body-size);
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+}
+#saveDialog input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 56px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 4px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  line-height: 24px;
+}
+#saveDialog #saveDate {
+  max-width: 320px;
+}
+#saveDialog :is(#saveDateFormats, #saveDateHint) {
+  margin: 0;
+  font-size: var(--studio-label-size);
+  line-height: 1.6;
+}
+#saveDialog #saveDateHint {
+  color: var(--md-sys-color-warning);
+}
+#saveDateHint:empty {
+  display: none;
+}
+#saveDialog .save-preview-label {
+  margin: 16px 0 0;
+}
+.save-file-preview {
+  display: block;
+  margin-top: 4px;
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--studio-body-size);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+#saveLocationHint {
+  margin: 16px 0 0;
+}
+#saveAsHint {
+  margin: 8px 0 0;
+}
+.save-primary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+#saveDialog .save-primary-actions button {
+  width: auto;
+  min-height: 56px;
+  margin: 0;
+  padding: 16px 24px;
+  border-radius: var(--studio-shape-full);
+  font-size: var(--studio-body-size);
+}
+#saveDialog #saveProject {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-primary);
+}
+#saveDialog #saveProject strong {
+  color: inherit;
+  font-size: var(--studio-body-size);
+}
+#saveDialog #saveProject :is(small, span:last-child[data-icon="export"]) {
+  display: none;
+}
+.save-alternatives {
+  min-width: 0;
+  padding: 24px;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+#saveDialog .save-alternatives .save-choice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 88px;
+  margin: 0 0 12px;
+  padding: 20px 16px;
+  border: 0;
+  border-radius: var(--studio-shape-medium);
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-high);
+  text-align: left;
+  box-shadow: none;
+}
+#saveDialog .save-choice > :is(span, svg) {
+  flex: none;
+  color: inherit;
+}
+#saveDialog .save-choice div {
+  flex: 1;
+  min-width: 0;
+}
+#saveDialog .save-alternatives .save-choice strong {
+  display: block;
+  color: inherit;
+  font-size: 16px;
+  line-height: 24px;
+}
+#saveDialog .save-choice small {
+  display: block;
+  margin-top: 4px;
+}
+#saveDialog .save-export-entry {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+.save-export-entry button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.save-dialog-footer {
+  flex: none;
+  display: grid;
+  gap: 12px;
+  padding: 16px 28px;
+  background: var(--md-sys-color-surface-container-low);
+}
+.project-dialog-status {
+  max-height: 120px;
+  overflow-y: auto;
+}
+.save-dialog-footer .save-primary-actions {
+  padding: 0;
+}
+.project-dialog-status:has(#psdStatus:empty:not(.studio-loading)) {
+  display: none;
+}
+#saveDialog #psdStatus {
+  margin: 0;
+  white-space: pre-line;
+}
+@media (max-width: 850px) {
+  .project-dialog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  #projectLibrary .project-file-section {
+    grid-row: 1;
+  }
+  #projectLibrary .project-dialog-symbol {
+    display: none;
+  }
+  #projectLibrary .project-open-file {
+    width: auto;
+    margin-top: 20px;
+  }
+}
+@media (max-width: 600px) {
+  .project-task-dialog > .dialog-heading {
+    padding: 20px;
+    gap: 16px;
+  }
+  .project-task-dialog h2 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .project-dialog-body {
+    padding: 20px 16px;
+  }
+  #saveDialog :is(.save-project-naming, .save-file-naming),
+  .save-alternatives,
+  .project-file-section {
+    padding: 20px;
+  }
+  #saveDialog .project-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .save-primary-actions > button,
+  #projectLibrary .project-open-file {
+    flex: 1;
+    width: 100%;
+  }
+  .project-library-row {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+  .project-library-entry {
+    gap: 0;
+    padding-right: 4px;
+  }
+  .project-library-heading {
+    align-items: flex-start;
+  }
+  .project-dialog-footer {
+    padding: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .project-dialog-footer button {
+    margin-left: auto;
+  }
+  .save-dialog-footer {
+    padding: 12px 16px;
+  }
+}

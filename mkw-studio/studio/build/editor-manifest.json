@@ -90,6 +90,7 @@
     "static/post-safezone.js",
     "static/post-workspace.js",
     "static/project-session.js",
+    "static/project-dialogs.js",
     "static/help-popup.js",
     "static/template-session.js",
     "static/template-preview.js",
@@ -126,6 +127,7 @@
     "static/templates.css",
     "static/dialogs.css",
     "static/settings.css",
+    "static/project-dialogs.css",
     "static/ui-fields.css"
   ]
 }

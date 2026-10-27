@@ -33,12 +33,19 @@ const { launch, artifact } = require('./browser.cjs');
   await page.locator('#scale').fill('');await page.locator('#angle').focus();
   assert.equal(await page.evaluate(() => board().image.scale),scale);
   async function checkScroll(id, label) {
+    await page.evaluate(async () => {
+      if (carouselActive()) await carouselWaitForPaint();
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    });
     const x = page.locator(`[role="scrollbar"][aria-controls="${id}"][aria-orientation="horizontal"]`);
     const y = page.locator(`[role="scrollbar"][aria-controls="${id}"][aria-orientation="vertical"]`);
     await x.waitFor({state:'visible'});await y.waitFor({state:'visible'});
     for (const handle of [x,y]) {
       await handle.focus();await page.keyboard.press('End');
-      await page.waitForTimeout(80);
+      await page.waitForFunction(({id,axis}) => {
+        const el=document.querySelector(`[role="scrollbar"][aria-controls="${id}"][aria-orientation="${axis}"]`);
+        return el && Math.abs(+el.getAttribute('aria-valuenow') - +el.getAttribute('aria-valuemax')) <= 1;
+      }, {id,axis:await handle.getAttribute('aria-orientation')});
       const bounds=await handle.evaluate(el=>{
         const r=el.getBoundingClientRect(), v=document.getElementById(el.getAttribute('aria-controls')),b=v.getBoundingClientRect();
         const radius=parseFloat(getComputedStyle(v).borderBottomRightRadius);
@@ -46,9 +53,9 @@ const { launch, artifact } = require('./browser.cjs');
       });
       assert(Math.abs(bounds.n-bounds.max)<=1);
       assert(bounds.orient==='horizontal' ? bounds.x>=bounds.l+bounds.radius-1&&bounds.right<=bounds.r-bounds.radius+1 : bounds.y>=bounds.t+bounds.radius-1&&bounds.bottom<=bounds.b-bounds.radius+1,JSON.stringify(bounds));
-      await page.keyboard.press('Home');await page.waitForTimeout(80);
+      await page.keyboard.press('Home');await page.waitForFunction(({id,axis}) => document.querySelector(`[role="scrollbar"][aria-controls="${id}"][aria-orientation="${axis}"]`)?.getAttribute('aria-valuenow') === '0', {id,axis:await handle.getAttribute('aria-orientation')});
       assert.equal(await handle.getAttribute('aria-valuenow'),'0');
-      await page.keyboard.press('PageDown');await page.waitForTimeout(80);
+      await page.keyboard.press('PageDown');await page.waitForFunction(({id,axis}) => +document.querySelector(`[role="scrollbar"][aria-controls="${id}"][aria-orientation="${axis}"]`)?.getAttribute('aria-valuenow') > 0, {id,axis:await handle.getAttribute('aria-orientation')});
       assert(+await handle.getAttribute('aria-valuenow')>0);
     }
     const before=await x.getAttribute('aria-valuenow'),r=await x.boundingBox();

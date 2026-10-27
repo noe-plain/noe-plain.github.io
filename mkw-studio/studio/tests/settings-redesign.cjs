@@ -194,6 +194,13 @@ const { launch, artifact } = require("./browser.cjs");
       { width: 700, height: 500 },
     ]) {
       await page.setViewportSize(viewport);
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector(".settings-tabs")
+            .getAttribute("aria-orientation") ===
+          (matchMedia("(max-width:700px)").matches ? "horizontal" : "vertical"),
+      );
       assert.equal(
         await page.locator(".settings-tabs").getAttribute("aria-orientation"),
         viewport.width <= 700 ? "horizontal" : "vertical",

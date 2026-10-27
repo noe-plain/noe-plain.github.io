@@ -6,7 +6,8 @@ const MKWProjects = (() => {
     aliases = new Map();
   let queue = Promise.resolve(),
     dismissedNotice = null,
-    openingProject = false;
+    openingProject = false,
+    libraryGeneration = 0;
   const stamp = (file) => ({ size: file.size, modified: file.lastModified });
   function notice(message, error = false) {
     const el = $("#projectStorageNotice");
@@ -198,7 +199,7 @@ const MKWProjects = (() => {
       finishLoading();
       dialog.close();
       dialog.remove();
-      openingProject = false;
+      ((openingProject = false), (libraryGeneration = 0));
       busy = success ? false : wasBusy;
     };
   }
@@ -302,6 +303,9 @@ const MKWProjects = (() => {
   async function saveFile(asNew = false) {
     if (busy) return;
     let handle = asNew ? null : fileLink()?.handle;
+    setSaveBusy(true);
+    $("#psdStatus").classList.remove("save-error");
+    MKWFields.notice($("#psdStatus"), "Speicherort wird vorbereitet …");
     // Ask for a handle/permission during the user gesture, before asynchronous project processing.
     try {
       if (!handle && window.showSaveFilePicker)
@@ -312,8 +316,6 @@ const MKWProjects = (() => {
         (await handle.requestPermission({ mode: "readwrite" })) !== "granted"
       )
         throw Error("Dateizugriff wurde nicht freigegeben.");
-      setSaveBusy(true);
-      $("#psdStatus").classList.remove("save-error");
       MKWFields.notice($("#psdStatus"), "Projektdatei wird vorbereitet …");
       if (
         asNew &&
@@ -373,7 +375,9 @@ const MKWProjects = (() => {
       }
       $("#saveDialog").close();
     } catch (error) {
-      if (error.name !== "AbortError") {
+      if (error.name === "AbortError")
+        MKWFields.notice($("#psdStatus"), "Speichern abgebrochen.");
+      else {
         const message = "Speichern nicht abgeschlossen: " + error.message;
         $("#psdStatus").textContent = message;
         notice(message, true);
@@ -393,18 +397,20 @@ const MKWProjects = (() => {
   async function library() {
     let dialog = $("#projectLibrary");
     if (!dialog) {
-      dialog = document.createElement("dialog");
-      dialog.id = "projectLibrary";
-      dialog.setAttribute("aria-labelledby", "projectOpenTitle");
-      dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Wähle ein gespeichertes Projekt oder eine MKW-Datei.</p></div><button id="closeProjectLibrary" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><button id="openProjectFile" class="project-open-file">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small>Eine Projektdatei von deinem Gerät auswählen</small></span></button><div class="project-library-heading"><h3>In diesem Browser</h3><small id="projectLibraryCount">Maximal ${MKWProjectStore.projectLimit} Projekte</small></div><p class="project-library-retention">Die ${MKWProjectStore.projectLimit} zuletzt bearbeiteten Projekte bleiben im Browser. Ältere Browsersicherungen werden automatisch entfernt. MKW-Dateien auf deinem Gerät bleiben erhalten.</p><p id="projectOpenStatus" role="status"></p><div id="projectLibraryList" role="group" aria-label="Gespeicherte Projekte"></div>`;
-      document.body.append(dialog);
-      $("#closeProjectLibrary").onclick = () => dialog.close();
+      dialog = MKWProjectDialogs.libraryShell();
+      dialog.addEventListener("close", () => {
+        if (!dialog.open) libraryGeneration++;
+      });
       $("#openProjectFile").onclick = chooseFile;
+      $("#retryProjectLibrary").onclick = () =>
+        library().catch((error) => openError(error.message));
     }
+    const generation = ++libraryGeneration;
+    $("#retryProjectLibrary").hidden = true;
     MKWFields.notice($("#projectOpenStatus"), "");
     const list = $("#projectLibraryList");
     list.innerHTML =
-      '<p class="project-library-empty">Projekte werden geladen …</p>';
+      '<p class="project-library-empty" role="listitem">Projekte werden geladen …</p>';
     const finishLoading = MKWUIControls.loading(list.querySelector("p"));
     list.setAttribute("aria-busy", "true");
     if (!dialog.open) dialog.showModal();
@@ -412,7 +418,9 @@ const MKWProjects = (() => {
     try {
       records = await MKWProjectStore.list();
     } catch (error) {
+      if (generation !== libraryGeneration || !dialog.open) return;
       list.innerHTML = "";
+      $("#retryProjectLibrary").hidden = false;
       openError(
         "Browsersicherungen konnten nicht geladen werden. Du kannst weiterhin eine MKW-Datei öffnen. " +
           error.message,
@@ -420,18 +428,11 @@ const MKWProjects = (() => {
       return;
     } finally {
       finishLoading();
-      list.setAttribute("aria-busy", "false");
+      if (generation === libraryGeneration)
+        list.setAttribute("aria-busy", "false");
     }
-    $("#projectLibraryCount").textContent =
-      `${records.length} / ${MKWProjectStore.projectLimit} Projekte`;
-    list.innerHTML = records.length
-      ? records
-          .map(
-            (record) =>
-              `<div class="project-library-entry"><button class="project-library-row" data-project-id="${record.id}">${studioIcon(record.mode === "carousel" ? "builder" : "image")}<span><strong>${esc(record.title)}</strong><small>${record.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(record.updatedAt).toLocaleString("de-CH")}${record.fileName ? " · " + esc(record.fileName) : ""}</small></span></button><button class="icon-button" data-delete-project="${record.id}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${record.id === p.projectId ? "disabled" : ""}>${studioIcon("trash")}</button></div>`,
-          )
-          .join("")
-      : '<p class="project-library-empty">Noch keine Projekte in diesem Browser.<br>Öffne eine MKW-Datei oder starte ein neues Projekt.</p>';
+    if (generation !== libraryGeneration || !dialog.open) return;
+    MKWProjectDialogs.libraryRows(records, p.projectId);
     let opening = false;
     list.querySelectorAll("[data-project-id]").forEach((button) => {
       button.onclick = async () => {
@@ -464,7 +465,8 @@ const MKWProjects = (() => {
           })) ||
           opening ||
           id === p.projectId ||
-          !button.isConnected
+          !button.isConnected ||
+          !dialog.open
         )
           return;
         try {
@@ -554,7 +556,7 @@ const MKWProjects = (() => {
       $("#saveProject strong").textContent = fileLink()
         ? "MKW-Datei aktualisieren"
         : window.showSaveFilePicker
-          ? "MKW-Datei speichern"
+          ? "Speichern unter …"
           : "MKW-Datei herunterladen";
       $("#saveLocationHint").textContent = fileLink()
         ? "Verknüpft: " +
@@ -563,7 +565,9 @@ const MKWProjects = (() => {
             ? " · wird automatisch aktualisiert."
             : " · automatische Dateiaktualisierung ausgeschaltet.")
         : window.showSaveFilePicker
-          ? "Einmal eine MKW-Datei wählen. Weitere Änderungen aktualisieren diese Datei automatisch."
+          ? studioPreferences.autoSaveFile
+            ? "Wähle einen Ordner und Dateinamen. Danach wird diese MKW-Datei automatisch aktualisiert."
+            : "Wähle einen Ordner und Dateinamen. Die automatische Dateiaktualisierung ist ausgeschaltet."
           : "Automatische Sicherung im Browser. Lokale Dateien können hier nur heruntergeladen werden.";
     };
   }
@@ -594,12 +598,9 @@ const MKWProjects = (() => {
 })();
 MKWProjects.setup();
 window.addEventListener("keydown", (event) => {
-  if (
-    (event.metaKey || event.ctrlKey) &&
-    event.key.toLowerCase() === "s" &&
-    !busy
-  ) {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
     event.preventDefault();
+    if (busy) return;
     if (event.shiftKey) MKWProjects.saveFile(true);
     else if (MKWProjects.fileLink()) MKWProjects.saveFile();
     else $("#save").click();

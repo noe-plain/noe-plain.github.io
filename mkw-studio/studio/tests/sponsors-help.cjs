@@ -274,11 +274,40 @@ const { launch, artifact } = require("./browser.cjs");
     );
     const grayId = ids[1].logos[0],
       complexId = ids[1].logos[1];
-    await page
-      .locator(`[data-sponsor-drag="${grayId}"]`)
-      .dragTo(page.locator(`[data-sponsor-drag="${complexId}"]`), {
-        targetPosition: { x: 40, y: 45 },
+    async function dragSponsor(sourceId, target, after = false) {
+      // Keep both ends visible before native drag-and-drop; implicit scrolling
+      // during drag can move the source beneath the fixed dialog chrome.
+      await target.evaluate((target, sourceId) => {
+        const source = document.querySelector(
+            `[data-sponsor-drag="${sourceId}"]`,
+          ),
+          content = target.closest(".settings-content"),
+          a = source.getBoundingClientRect(),
+          b = target.getBoundingClientRect(),
+          viewport = content.getBoundingClientRect();
+        content.scrollTop +=
+          (Math.min(a.top, b.top) + Math.max(a.bottom, b.bottom)) / 2 -
+          (viewport.top + viewport.bottom) / 2;
+      }, sourceId);
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
+      const bounds = await target.boundingBox();
+      await page.locator(`[data-sponsor-drag="${sourceId}"]`).dragTo(target, {
+        targetPosition: {
+          x: bounds.width / 2,
+          y: bounds.height * (after ? 0.75 : 0.5),
+        },
       });
+    }
+    await dragSponsor(
+      grayId,
+      page.locator(`[data-sponsor-drag="${complexId}"]`),
+      true,
+    );
     await page.waitForFunction(
       (id) => sponsorGroups[1].logos[0].id === id,
       complexId,
@@ -286,16 +315,12 @@ const { launch, artifact } = require("./browser.cjs");
     await page.waitForFunction(() =>
       $("#sponsorLibraryStatus")?.textContent.startsWith("Logo verschoben"),
     );
-    await page
-      .locator(`[data-sponsor-drag="${grayId}"]`)
-      .dragTo(page.locator("[data-sponsor-upload]").first());
+    await dragSponsor(grayId, page.locator("[data-sponsor-upload]").first());
     await page.waitForFunction(() => sponsorGroups[0].logos.length === 2);
     await page.waitForFunction(() =>
       $("#sponsorLibraryStatus")?.textContent.startsWith("Logo verschoben"),
     );
-    await page
-      .locator(`[data-sponsor-drag="${grayId}"]`)
-      .dragTo(page.locator("[data-sponsor-upload]").nth(1));
+    await dragSponsor(grayId, page.locator("[data-sponsor-upload]").nth(1));
     await page.waitForFunction(
       () =>
         sponsorGroups[0].logos.length === 1 &&
@@ -566,9 +591,15 @@ const { launch, artifact } = require("./browser.cjs");
     for (const target of [1, 0]) {
       await page.locator("#settings").click();
       await page.locator("#settings-tab-sponsors").click();
-      await page
-        .locator(`[data-sponsor-drag="${zkbId}"]`)
-        .dragTo(page.locator("[data-sponsor-upload]").nth(target));
+      await dragSponsor(
+        zkbId,
+        page.locator("[data-sponsor-upload]").nth(target),
+      );
+      await page.waitForFunction(
+        ({ id, target }) =>
+          sponsorGroups[target].logos.some((logo) => logo.id === id),
+        { id: zkbId, target },
+      );
       await page.waitForFunction(() =>
         $("#sponsorLibraryStatus")?.textContent.startsWith("Logo verschoben"),
       );

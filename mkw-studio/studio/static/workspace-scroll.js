@@ -97,11 +97,18 @@ window.MKWWorkspaceScroll = (() => {
         const bar = { axis, track, handle, maximum: 0, travel: 0 };
         const read = () =>
           horizontal ? viewport.scrollLeft : viewport.scrollTop;
+        const maximum = () =>
+          Math.max(
+            0,
+            horizontal
+              ? viewport.scrollWidth - viewport.clientWidth
+              : viewport.scrollHeight - viewport.clientHeight,
+          );
         const write = (value) => {
           viewport.scrollControlUntil = performance.now() + 200;
           viewport[horizontal ? "scrollLeft" : "scrollTop"] = Math.max(
             0,
-            Math.min(bar.maximum, value),
+            Math.min(maximum(), value),
           );
           schedule();
         };
@@ -152,7 +159,7 @@ window.MKWWorkspaceScroll = (() => {
             : viewport.clientHeight;
           const values = {
             Home: 0,
-            End: bar.maximum,
+            End: maximum(),
             PageUp: read() - step * 0.85,
             PageDown: read() + step * 0.85,
           };
