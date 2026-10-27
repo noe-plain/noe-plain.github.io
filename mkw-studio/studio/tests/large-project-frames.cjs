@@ -107,7 +107,7 @@ const { launch, artifact } = require('./browser.cjs');
     }),original,'Gradient frame appearance matches the PSD layer');
     // Both pen and curve modes keep anchors/handles after real undo/redo shortcuts.
     await carousel.locator('#settings').click();
-    await carousel.locator('#advancedMode').check();
+    await carousel.locator("#settings-tab-workflow").click();await carousel.locator('#advancedMode').check();
     await carousel.locator('#closeSettings').click();
     await carousel.evaluate(() => { p.carousel.objects = []; carouselObject('path', { x: 150, y: 300, w: 600, h: 400, closed: false, points: [{ x: 0, y: 0.5, out: { x: 0.3, y: 0 } }, { x: 1, y: 0.5, in: { x: 0.7, y: 1 } }] }); });
     for (const tool of ['path', 'curve']) {

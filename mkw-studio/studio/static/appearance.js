@@ -44,13 +44,25 @@ function studioApplyPreferences() {
   carouselSyncAdvancedTools();
   studioPersistPreferences();
 }
-function studioPersistPreferences() {
+const studioPreferenceStorageErrors = new Set();
+function studioWritePreference(key, value) {
   try {
-    localStorage.setItem(
-      "mkw-studio-preferences",
-      JSON.stringify(studioPreferences),
-    );
-  } catch {}
+    localStorage.setItem(key, value);
+    studioPreferenceStorageErrors.delete(key);
+  } catch {
+    studioPreferenceStorageErrors.add(key);
+  }
+  document.dispatchEvent(
+    new CustomEvent("mkw-preferences-storage", {
+      detail: studioPreferenceStorageErrors.size === 0,
+    }),
+  );
+}
+function studioPersistPreferences() {
+  studioWritePreference(
+    "mkw-studio-preferences",
+    JSON.stringify(studioPreferences),
+  );
 }
 for (const id of ["guideColour", "snapColour"])
   $("#" + id).oninput = (event) => {
@@ -89,9 +101,7 @@ function studioSetTheme(theme) {
   theme = theme === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = theme;
   studioApplyColourTheme();
-  try {
-    localStorage.setItem("mkw-studio-theme", theme);
-  } catch {}
+  studioWritePreference("mkw-studio-theme", theme);
   document
     .querySelectorAll("[data-theme-choice]")
     .forEach((button) =>

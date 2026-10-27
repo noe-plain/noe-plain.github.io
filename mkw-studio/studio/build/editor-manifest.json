@@ -125,6 +125,7 @@
     "static/post-text-stack.css",
     "static/templates.css",
     "static/dialogs.css",
+    "static/settings.css",
     "static/ui-fields.css"
   ]
 }

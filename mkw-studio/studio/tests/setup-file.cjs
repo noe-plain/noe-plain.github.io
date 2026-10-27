@@ -43,12 +43,14 @@ const { launch, artifact } = require("./browser.cjs");
     );
     assert(await page.locator("#setupRefresh").isDisabled());
     await page.locator("[data-theme-choice=dark]").click();
-    await page.locator("[data-ui-density=compact]").click();
+    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=compact]").click();
+    await page.locator("#settings-tab-general").click();
     await page.locator("#primaryColour").evaluate((el) => {
       el.value = "#c2247a";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    await page.locator("#advancedMode").check();
+    await page.locator("#settings-tab-workflow").click();await page.locator("#advancedMode").check();
+    await page.locator("#settings-tab-export").click();
     await page.locator("#autoSaveFile").uncheck();
     await page.locator("#settings-tab-guides").click();
     await page.evaluate(() => {
@@ -129,7 +131,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.screenshot({
       path: artifact("mkw-setup-export-preferences.png"),
     });
-    await page.locator("#settings-tab-general").click();
+    await page.locator("#settings-tab-export").click();
     const native = await page.evaluate(async () => {
       if (!window.showOpenFilePicker || !window.showSaveFilePicker)
         return false;
@@ -333,7 +335,7 @@ const { launch, artifact } = require("./browser.cjs");
       "162",
     );
     await page.screenshot({ path: artifact("mkw-setup-font-sizes.png") });
-    await page.locator("#settings-tab-general").click();
+    await page.locator("#settings-tab-export").click();
     const current = await page.evaluate(() => MKWSetupSession.capture());
     // Invalid files are rejected before mutations.
     await choose(Buffer.from('{"version":1,"boards":[]}'));

@@ -49,6 +49,7 @@ const { launch, artifact } = require("./browser.cjs");
     const comfortableField = await page
       .locator("#settingsDialog")
       .evaluate((el) => ({ width: el.clientWidth, height: el.clientHeight }));
+    await page.locator("#settings-tab-workflow").click();
     const options = page.locator("[data-ui-density]");
     assert.equal(await options.nth(0).getAttribute("aria-pressed"), "true");
     const shape = async (selector) =>
@@ -60,7 +61,7 @@ const { launch, artifact } = require("./browser.cjs");
       await shape("[data-ui-density=compact]"),
       "selection has a non-colour cue",
     );
-    await page.locator("[data-ui-density=compact]").click();
+    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=compact]").click();
     assert.equal(
       await page.locator("html").getAttribute("data-density"),
       "compact",
@@ -70,7 +71,7 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("[data-default-text-size=title]").boundingBox()
     ).height;
     await page.locator("#settings-tab-general").click();
-    await page.locator("[data-ui-density=comfortable]").click();
+    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=comfortable]").click();
     await page.locator("#settings-tab-fonts").click();
     const comfortableHeight = (
       await page.locator("[data-default-text-size=title]").boundingBox()
@@ -89,6 +90,7 @@ const { launch, artifact } = require("./browser.cjs");
       "density does not resize the task window",
     );
     await page.locator("#settings-tab-general").click();
+    await page.locator("#settings-tab-export").click();
     const toggle = page.locator("#autoSaveFile");
     assert.equal(await toggle.getAttribute("role"), "switch");
     assert((await toggle.boundingBox()).width >= 48);
@@ -137,6 +139,7 @@ const { launch, artifact } = require("./browser.cjs");
       "settingsTitle",
     );
     await page.locator("#settings").click();
+    await page.locator("#settings-tab-workflow").click();
     const button = page.locator("[data-ui-density=compact]");
     await button.hover();
     await page.mouse.down();
@@ -146,7 +149,7 @@ const { launch, artifact } = require("./browser.cjs");
       () => !document.querySelector("mkw-state-ripple"),
     );
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.locator("[data-ui-density=comfortable]").hover();
+    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=comfortable]").hover();
     await page.mouse.down();
     assert.equal(await page.locator("mkw-state-ripple").count(), 0);
     await page.mouse.up();
@@ -159,7 +162,7 @@ const { launch, artifact } = require("./browser.cjs");
       true,
     );
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.locator("[data-ui-density=compact]").click();
+    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=compact]").click();
     await page.locator("#closeSettings").click();
     assert.deepEqual(
       await page.evaluate(() => ({

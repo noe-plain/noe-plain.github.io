@@ -230,6 +230,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startSettings").click();
     for (const tab of [
       "general",
+      "workflow",
       "guides",
       "fonts",
       "sponsors",

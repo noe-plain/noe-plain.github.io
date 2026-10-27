@@ -19,7 +19,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     await page.locator("#createProject").click();
     await page.locator("#carouselCanvas").waitFor();
     await page.locator("#settings").click();
-    await page.locator("#advancedMode").check();
+    await page.locator("#settings-tab-workflow").click();await page.locator("#advancedMode").check();
     await page.locator("#closeSettings").click();
     const chosen = () => page.evaluate(() => clone(carouselSelected()[0])),
       point = async (x, y) =>

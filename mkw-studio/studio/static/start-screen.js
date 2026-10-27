@@ -7,9 +7,15 @@ const MKWStartScreen = (() => {
     notice = document.createElement("p");
   card.className = "settings-start-background";
   card.innerHTML = `<h3>Startseite</h3><p>Ein eigenes Bild für deinen Einstieg ins Studio. Deine Designs bleiben unverändert.</p><div class="settings-start-background-preview"><span>Hintergrund aus deiner Hauptfarbe</span><img id="startBackgroundPreview" alt="Vorschau deines Startbilds" hidden decoding="async"></div><div class="settings-start-background-actions"><button id="chooseStartBackground" type="button">Bild auswählen</button><button id="removeStartBackground" type="button" disabled>Entfernen</button></div><input id="startBackgroundFile" type="file" accept="image/jpeg,image/png,image/webp" hidden><p id="startBackgroundStatus" role="status"></p>`;
-  document
-    .querySelector("#settings-panel-general .settings-appearance")
-    .after(card);
+  document.querySelector("#settings-panel-general").append(card);
+  MKWSettings.register(
+    "background",
+    "general",
+    ".settings-start-background",
+    "Startbild",
+    "Ein Hintergrundbild für die Startseite auswählen oder entfernen.",
+    "hintergrund foto bild startseite",
+  );
   notice.id = "startBackgroundNotice";
   notice.setAttribute("role", "status");
   notice.hidden = true;

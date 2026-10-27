@@ -285,7 +285,7 @@ const { launch, artifact } = require("./browser.cjs");
         await page.locator('[data-folder-delete="cancel"]').click();
         await page.locator("#settings").click();
       }
-      await page.locator('[data-ui-density="compact"]').click();
+      await page.locator("#settings-tab-workflow").click();await page.locator('[data-ui-density="compact"]').click();
       await page.locator("#closeSettings").click();
       await page.evaluate(
         (mode) => (mode === "post" ? postFitRow() : carouselFit()),

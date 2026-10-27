@@ -56,7 +56,7 @@ const assert = require("node:assert/strict"),
           return { x: r.x, y: r.y, w: r.width, h: r.height };
         }),
       );
-    assert.equal(positions.length, 6);
+    assert.equal(positions.length, 7);
     for (let i = 1; i < positions.length; i++) {
       assert.equal(positions[i].x, positions[0].x);
       assert(positions[i].y > positions[i - 1].y);
@@ -66,6 +66,8 @@ const assert = require("node:assert/strict"),
       "vertical",
     );
     await page.locator("#settings-tab-general").focus();
+    await page.keyboard.press("ArrowDown");
+    assert(await page.locator("#settings-panel-workflow").isVisible());
     await page.keyboard.press("ArrowDown");
     assert.equal(
       await page.locator("#settings-tab-guides").getAttribute("aria-selected"),
@@ -108,7 +110,7 @@ const assert = require("node:assert/strict"),
     await page.locator("#settings-tab-guides").click();
     assert.equal(
       await page.locator("#settingsContentTitle").textContent(),
-      "Hilfslinien",
+      "Raster & Hilfslinien",
     );
     const groups = await page
       .locator("#settings-panel-guides > section")
@@ -119,8 +121,8 @@ const assert = require("node:assert/strict"),
         }),
       );
     assert.equal(groups.length, 2);
-    assert(Math.abs(groups[0].y - groups[1].y) < 1);
-    assert(groups[1].x > groups[0].x + groups[0].w);
+    assert(groups[1].y >= groups[0].y + groups[0].h);
+    assert.equal(groups[0].x, groups[1].x);
     const fields = await page
         .locator(".settings-designer-grid .settings-grid-fields")
         .boundingBox(),
@@ -179,7 +181,7 @@ const assert = require("node:assert/strict"),
       );
       assert.equal(
         await page.locator("#settings-tab-guides span").isVisible(),
-        viewport.width > 700,
+        true,
       );
       await page.screenshot({
         path: artifact(`settings-sidebar-${viewport.width}.png`),

@@ -3,7 +3,15 @@
   const section = document.createElement("section");
   section.className = "settings-setup";
   section.innerHTML = `<h3>MKW-Setup</h3><p>Werkzeugeinstellungen, eigene Schriften, Sponsorlogos, bildfreie Vorlagen und dein Startbild gemeinsam speichern.</p><div class="setup-file-card">${studioIcon("folder")}<div><strong id="setupFileName">Keine Setup-Datei verknüpft</strong><small id="setupFileDetail">Verknüpfen übernimmt die Einstellungen aus der gewählten Datei.</small></div></div><div class="settings-setup-actions"><button type="button" id="setupLink">${studioIcon("folder")}<span>Verknüpfen</span></button><button type="button" id="setupRefresh" disabled>${studioIcon("refresh")}<span>Aktualisieren</span></button><button type="button" id="setupExport">${studioIcon("export")}<span>Exportieren</span></button></div><p id="setupBrowserHint" class="setup-browser-hint"></p><p id="setupStatus" role="status" aria-live="polite" hidden></p><input type="file" id="setupFile" accept=".mkwsetup" hidden>`;
-  $("#settings-panel-general").append(section);
+  $("#settings-panel-export").append(section);
+  MKWSettings.register(
+    "setup",
+    "export",
+    ".settings-setup",
+    "MKW-Setup weitergeben",
+    "Einstellungen, Schriften und Bibliotheken gemeinsam übertragen.",
+    "verknüpfen aktualisieren exportieren import team sichern backup",
+  );
   const dialog = $("#settingsDialog"),
     input = $("#setupFile"),
     status = $("#setupStatus");

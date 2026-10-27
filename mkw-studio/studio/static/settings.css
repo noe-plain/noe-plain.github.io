@@ -1,0 +1,619 @@
+#settingsDialog {
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-low);
+}
+#settingsDialog > .dialog-heading {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(220px, 360px) auto;
+  gap: 24px;
+  padding: 20px 28px;
+  border: 0;
+  background: var(--md-sys-color-surface-container-low);
+}
+#settingsDialog > .dialog-heading p {
+  margin: 4px 0 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-label-size);
+  line-height: 1.5;
+}
+.settings-search {
+  position: relative;
+  min-width: 0;
+}
+#settingsDialog #settingsSearch {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 48px 12px 20px;
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  font-size: var(--studio-body-size);
+}
+#settingsSearch::-webkit-search-cancel-button {
+  display: none;
+}
+#settingsDialog #settingsSearchClear {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+}
+.settings-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+#settingsDialog .settings-tabs {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--md-sys-color-surface-container-low);
+}
+#settingsDialog .settings-tabs button {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-body-size);
+  line-height: 1.4;
+  text-align: left;
+  box-shadow: none;
+}
+#settingsDialog .settings-tabs .ui-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+#settingsDialog .settings-tabs button:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+#settingsDialog .settings-tabs button[aria-selected="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font-weight: 600;
+}
+.settings-content {
+  container: settings / inline-size;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 28px 36px 36px;
+  border-radius: 24px 0 0 24px;
+  background: var(--md-sys-color-surface);
+}
+#settingsDialog
+  :is(.settings-page-heading, .settings-tab-panel, .settings-search-results) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0;
+}
+#settingsDialog .settings-page-heading {
+  margin-bottom: 24px;
+}
+#settingsDialog :is(.settings-page-heading, .settings-search-results) > h3 {
+  margin: 0 0 8px;
+  color: var(--md-sys-color-on-surface);
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+#settingsDialog :is(.settings-page-heading, .settings-search-results) > p {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-body-size);
+  line-height: 1.6;
+}
+#settingsDialog .settings-tab-panel:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-content: start;
+}
+#settingsDialog #settings-panel-general:not([hidden]) {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+#settingsDialog .settings-colours {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+#settingsDialog .settings-start-background {
+  grid-column: 1;
+}
+#settingsDialog .settings-tab-panel > section {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+#settingsDialog .settings-tab-panel h3 {
+  margin: 0 0 16px;
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+#settingsDialog .settings-tab-panel p,
+#settingsDialog .settings-tab-panel small {
+  font-size: var(--studio-label-size);
+  line-height: 1.6;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#settingsDialog .settings-tab-panel > section > p {
+  margin: 0 0 20px;
+}
+#settingsDialog .settings-tab-panel > section > :last-child {
+  margin-bottom: 0;
+}
+#settingsDialog .settings-tab-panel h3 + p {
+  margin-top: -8px;
+}
+#settingsDialog .settings-tab-panel label {
+  font-size: var(--studio-body-size);
+  line-height: 1.5;
+}
+#settingsDialog
+  .settings-tab-panel
+  :is(input[type="number"], input[type="text"], select) {
+  box-sizing: border-box;
+  min-width: 0;
+  background: var(--md-sys-color-surface);
+}
+#settingsDialog .theme-options {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+}
+#settingsDialog
+  :is(.theme-options, .settings-density-options, .settings-colour-mode)
+  button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: var(--studio-control-height);
+  padding: 12px 16px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  box-shadow: none;
+  font-size: var(--studio-body-size);
+}
+#settingsDialog
+  :is(.theme-options, .settings-density-options, .settings-colour-mode)
+  button[aria-pressed="true"] {
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+  font-weight: 600;
+}
+#settingsDialog .settings-primary-colour {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+.settings-colour-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+#settingsDialog .settings-colour-control input[type="color"] {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 4px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 12px;
+  background: var(--md-sys-color-surface);
+}
+.settings-colour-control output {
+  font-size: var(--studio-body-size);
+  font-variant-numeric: tabular-nums;
+}
+.settings-colour-control button {
+  margin-left: auto;
+}
+#settingsDialog .settings-primary-colour p {
+  margin: 0;
+}
+.settings-colour-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+.settings-colour-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-surface);
+}
+.settings-colour-preview > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  min-height: 32px;
+  border-radius: var(--studio-shape-full);
+  font-size: var(--studio-label-size);
+}
+.settings-preview-selection {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.settings-preview-action {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+.settings-preview-secondary {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.settings-preview-tertiary {
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+#settingsDialog .settings-density {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.settings-density-options {
+  display: flex;
+  gap: 4px;
+}
+#settingsDialog .settings-density p {
+  margin-bottom: 0;
+}
+#settingsDialog :is(.advanced-toggle, .settings-saving .check) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 48px;
+  margin: 0;
+}
+#settingsDialog .advanced-toggle strong {
+  font-size: var(--studio-body-size);
+}
+#settingsDialog .advanced-toggle small {
+  display: block;
+  margin-top: 4px;
+  max-width: 52ch;
+}
+#settingsDialog .settings-saving .check input {
+  flex: none;
+  margin: 0;
+}
+#settingsDialog #settingsSavingHint {
+  margin: 12px 0 0;
+  max-width: 65ch;
+}
+#settingsDialog .settings-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+#settingsDialog .settings-grid label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 16px;
+}
+#settingsDialog .settings-snap-distance {
+  margin: 24px 0 8px;
+}
+#settingsDialog .settings-designer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  gap: 16px 32px;
+  align-items: center;
+}
+#settingsDialog .settings-designer-grid h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+#settingsDialog .settings-grid-fields {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+#settingsDialog .settings-grid-fields label {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#settingsDialog .settings-grid-fields input {
+  width: 96px;
+  flex: none;
+}
+#settingsDialog .settings-grid-preview {
+  margin: 0;
+  justify-self: center;
+}
+#settingsDialog .settings-export-format {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 1fr);
+  align-items: center;
+  gap: 12px 24px;
+  margin: 0;
+}
+#settingsDialog .settings-export-format select {
+  width: 100%;
+}
+#settingsDialog
+  .settings-tab-panel
+  :is(.settings-export-format, .settings-leading > label)
+  + :is(p, small) {
+  display: block;
+  margin: 12px 0 0;
+}
+#settingsDialog .settings-size-grid {
+  gap: 20px 24px;
+}
+#settingsDialog .settings-size-grid label {
+  gap: 8px;
+}
+#settingsDialog .settings-leading > label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+#settingsDialog :is(.settings-size-value, .settings-leading-value) input {
+  min-width: 0;
+}
+#settingsDialog .settings-section-heading {
+  padding: 0;
+  margin: 0 0 16px;
+  background: transparent;
+  gap: 16px;
+}
+#settingsDialog .settings-section-heading h3 {
+  margin: 0;
+}
+#settingsDialog .settings-section-heading p {
+  margin: 8px 0 0;
+}
+#settingsDialog
+  :is(
+    #fontImportStatus,
+    #startBackgroundStatus,
+    #sponsorLibraryStatus,
+    #templateLibraryStatus,
+    #setupStatus
+  ):empty {
+  display: none;
+}
+#settingsDialog .settings-start-background-preview {
+  margin: 0 0 16px;
+  height: 140px;
+  max-width: none;
+  border: 0;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+#settingsDialog .settings-start-background-actions {
+  margin: 0;
+  gap: 8px;
+}
+#settingsDialog :is(.settings-setup-actions, .template-settings-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+#settingsDialog .settings-setup-actions button {
+  flex: 1 1 140px;
+}
+#settingsDialog .sponsor-default-colour label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#settingsDialog .settings-tab-panel > #newSponsorGroup {
+  justify-self: start;
+}
+#settingsDialog .settings-tab-panel > h3 {
+  margin: 8px 0 -8px;
+}
+#settingsDialog .sponsor-library-group {
+  background: var(--md-sys-color-surface-container-low);
+  border: 0;
+  border-radius: var(--studio-shape-large);
+  padding: 20px;
+}
+.settings-footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 28px;
+  background: var(--md-sys-color-surface-container-low);
+}
+#settingsDialog .settings-footer p {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-label-size);
+  line-height: 1.5;
+}
+#settingsDialog .settings-footer button {
+  flex: none;
+  min-width: 100px;
+  min-height: 48px;
+}
+.settings-result-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+}
+#settingsDialog .settings-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  width: 100%;
+  padding: 20px;
+  border: 0;
+  border-radius: var(--studio-shape-medium);
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-low);
+  text-align: left;
+  box-shadow: none;
+}
+#settingsDialog .settings-result > span {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+#settingsDialog .settings-result strong {
+  font-size: var(--studio-body-size);
+}
+#settingsDialog .settings-result :is(small, span > span) {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--studio-label-size);
+  line-height: 1.5;
+}
+#settingsDialog .settings-result:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+@container settings (max-width:760px) {
+  #settingsDialog #settings-panel-general:not([hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #settingsDialog :is(.settings-colours, .settings-start-background) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+@container settings (max-width:620px) {
+  #settingsDialog .settings-colour-mode {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #settingsDialog .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+@container settings (max-width:400px) {
+  #settingsDialog .settings-tab-panel > section {
+    padding: 20px;
+  }
+  #settingsDialog .settings-designer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #settingsDialog .settings-export-format {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  #settingsDialog .settings-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  #settingsDialog .settings-size-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #settingsDialog .settings-colour-control {
+    flex-wrap: wrap;
+  }
+  #settingsDialog .settings-colour-control button {
+    margin-left: 0;
+  }
+}
+@media (max-width: 700px) {
+  #settingsDialog > .dialog-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    padding: 16px;
+  }
+  #settingsDialog > .dialog-heading > .settings-search {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  #settingsDialog > .dialog-heading > #closeSettings {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  #settingsDialog .settings-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 16px 12px;
+    gap: 4px;
+  }
+  #settingsDialog .settings-tabs button {
+    min-height: 48px;
+    padding: 12px 16px;
+    white-space: nowrap;
+  }
+  .settings-content {
+    padding: 24px 16px;
+    border-radius: 20px 20px 0 0;
+  }
+  #settingsDialog .settings-page-heading h3 {
+    font-size: 22px;
+  }
+  .settings-footer {
+    padding: 12px 16px;
+  }
+}
+@media (forced-colors: active) {
+  #settingsDialog
+    :is(.settings-tabs button[aria-selected="true"], [aria-pressed="true"]) {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+  #settingsDialog .settings-result {
+    border: 1px solid ButtonText;
+  }
+}
+
+#settingsDialog .advanced-toggle {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}

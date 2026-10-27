@@ -137,7 +137,7 @@ const { launch, artifact } = require("./browser.cjs");
       "UI colours/disclosure must not change document or history",
     );
     await page.locator("#settings").click();
-    await page.locator('[data-ui-density="compact"]').click();
+    await page.locator("#settings-tab-workflow").click();await page.locator('[data-ui-density="compact"]').click();
     await page.locator("#closeSettings").click();
     await summary.click();
     assert(await picker.locator('[data-text-type="title"]').isVisible());
