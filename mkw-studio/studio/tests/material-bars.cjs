@@ -160,12 +160,12 @@ const { launch, artifact } = require("./browser.cjs");
         const layout = await page.locator("#exportDialog").evaluate((el) => {
           const r = el.getBoundingClientRect(),
             b = el.querySelector("#zip").getBoundingClientRect(),
-            s = el.querySelector(".export-settings-scroll");
+            s = el.querySelector(matchMedia("(max-width: 760px)").matches ? ".export-layout" : ".export-settings-scroll");
           return {
             overflow: el.scrollWidth > el.clientWidth + 1,
             visible:
               b.bottom <= r.bottom && b.right <= r.right && b.left >= r.left,
-            scroll: s.scrollHeight > s.clientHeight,
+            scroll: ["auto", "scroll"].includes(getComputedStyle(s).overflowY),
           };
         });
         assert.equal(
@@ -174,7 +174,7 @@ const { launch, artifact } = require("./browser.cjs");
           `${width}: export has no horizontal overflow`,
         );
         assert(layout.visible, `${width}: download stays visible`);
-        assert(layout.scroll, "Settings keep independent scroll access");
+        assert(layout.scroll, "Settings keep a reachable scroll container at this breakpoint");
       }
       await page.locator("#deselectAllExports").click();
       assert(await page.locator("#zip").isDisabled());

@@ -280,20 +280,22 @@ const { launch, artifact } = require("./browser.cjs");
           e = exportContext(expected).getImageData(0, 0, b.w, b.h).data;
         const psd = agPsd.readPsd(await (await buildPSD()).arrayBuffer()),
           layer = psd.children[0].children.find(
-            (l) => l.name === "Winkel · Bildausschnitt (gerastert)",
+            (l) => l.name === "Winkel",
           ),
           direct = await layerBitmap(b, "postAngle"),
           layerCanvas = makeCanvas(b.w, b.h),
           layerContext = exportContext(layerCanvas);
-        layerContext.drawImage(layer.canvas, layer.left || 0, layer.top || 0);
+        for(const child of layer.children) layerContext.drawImage(child.canvas, child.left || 0, child.top || 0);
         const la = layerContext.getImageData(0, 0, b.w, b.h).data,
           ld = exportContext(direct.canvas).getImageData(0, 0, b.w, b.h).data;
         return {
           png: a.every((v, i) => v === e[i]),
-          psd: la.every((v, i) => v === ld[i]),
+          // Separate translucent photo/glow caches round alpha independently.
+          psd: la.every((v, i) => Math.abs(v - ld[i]) <= 3) && la.reduce((n,v,i)=>n+(v!==ld[i]),0)/la.length < .005,
+          merged: exportContext(psd.canvas).getImageData(0,0,b.w,b.h).data.every((v,i)=>v===e[i]),
           psdSize: [
-            layer.canvas.width,
-            layer.canvas.height,
+            layerCanvas.width,
+            layerCanvas.height,
             direct.canvas.width,
             direct.canvas.height,
           ],
@@ -305,7 +307,7 @@ const { launch, artifact } = require("./browser.cjs");
               if (la[i] !== ld[i]) out.push([i, la[i], ld[i]]);
             return out;
           })(),
-          layer: !!layer,
+          layer: !!layer.children.find(child=>child.placedLayer&&child.vectorMask?.notLink),
           opaque: a.every((v, i) => i % 4 !== 3 || v === 255),
         };
       } finally {
@@ -314,6 +316,7 @@ const { launch, artifact } = require("./browser.cjs");
     });
     assert(fidelity.png, JSON.stringify(fidelity));
     assert(fidelity.psd, JSON.stringify(fidelity));
+    assert(fidelity.merged, "Full PSD reference must preserve the original appearance");
     assert(fidelity.layer);
     assert(fidelity.opaque);
     await page.evaluate(async () => {

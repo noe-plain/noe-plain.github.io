@@ -494,3 +494,162 @@ html.studio-theme-changing #exportDialog .export-card {
 #exportFields .export-naming-date {
   grid-column: 1 / -1;
 }
+
+/* Task layout: a stable download footer leaves both content panes available. */
+#exportDialog .export-layout {
+  grid-template-columns: minmax(0, 1fr) 380px;
+}
+#exportDialog .export-sidebar {
+  background: var(--md-sys-color-surface);
+  border-left: 0;
+}
+#exportDialog .export-settings-scroll {
+  padding: 24px 24px 24px 0;
+}
+#exportDialog .export-settings-card {
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--md-sys-color-surface-container-low);
+  min-width: 0;
+  margin-bottom: 16px;
+}
+#exportDialog .export-naming-heading {
+  margin: 0 0 12px !important;
+}
+#exportDialog .export-format-buttons {
+  gap: 4px;
+  margin: 16px 0;
+}
+#exportDialog .export-format-buttons button {
+  border: 0;
+  margin: 0;
+  border-radius: 8px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+}
+#exportDialog .export-format-buttons button:first-child {
+  border-radius: 24px 8px 8px 24px;
+}
+#exportDialog .export-format-buttons button:last-child:not([hidden]),
+#exportDialog .export-format-buttons button:has(+ button[hidden]) {
+  border-radius: 8px 24px 24px 8px;
+}
+#exportDialog .export-format-buttons button[aria-pressed="true"] {
+  border-radius: 24px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#exportDialog :is(.export-options, #pdfExportSettings) {
+  margin-top: 20px;
+  padding: 0;
+  border: 0;
+}
+#exportDialog #exportFormatHint {
+  margin: 16px 0 0;
+}
+#exportDialog .export-card {
+  border-radius: 16px;
+}
+#exportDialog .export-preview {
+  border-radius: 8px;
+}
+#exportDialog .export-task-footer {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(
+      240px,
+      auto
+    );
+  align-items: center;
+  gap: 16px 24px;
+  padding: 16px 24px;
+  min-width: 0;
+}
+#exportDialog .export-footer-summary {
+  min-width: 0;
+}
+#exportDialog .export-footer-summary #exportStatus {
+  margin-bottom: 0;
+}
+#exportDialog .export-task-footer .download-progress {
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+#exportDialog .export-task-footer .export-download-buttons {
+  min-width: 0;
+}
+#exportDialog .export-task-footer .export-download-buttons button {
+  padding-inline: 20px;
+}
+#exportDialog .export-download-buttons #zip {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+#exportDialog .export-task-footer .studio-progress {
+  margin-top: 12px;
+}
+@media (max-width: 1000px) {
+  #exportDialog .export-task-footer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px 20px;
+  }
+  #exportDialog .export-task-footer .export-download-buttons {
+    grid-column: 1/-1;
+    justify-content: flex-end;
+  }
+  #exportDialog .export-task-footer .export-download-buttons button {
+    flex: 0 1 auto;
+    min-width: 180px;
+  }
+}
+@media (max-width: 760px) {
+  #exportDialog .export-layout {
+    display: block;
+    overflow: auto;
+    min-height: 0;
+  }
+  #exportDialog .export-images {
+    min-height: 0;
+    padding: 16px 20px;
+  }
+  #exportDialog #exportNames {
+    flex: none;
+    min-height: 120px;
+    max-height: 280px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  #exportDialog .export-sidebar {
+    border: 0;
+    overflow: visible;
+  }
+  #exportDialog .export-settings-scroll {
+    overflow: visible;
+    padding: 0 20px 16px;
+  }
+  #exportDialog .export-settings-card {
+    padding: 16px;
+  }
+  #exportDialog .export-task-footer {
+    padding: 12px 20px 16px;
+    gap: 8px 12px;
+  }
+  #exportDialog .export-task-footer .export-download-buttons button {
+    flex: 1;
+    min-width: 0;
+  }
+  #exportDialog .export-footer-summary #exportStatus {
+    max-height: 40px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+  #exportDialog .export-task-footer .download-arrow {
+    display: none;
+  }
+  #exportDialog .export-task-footer .progress-heading {
+    font-size: 11px;
+    gap: 8px;
+  }
+  #exportDialog .export-task-footer .studio-progress {
+    margin-top: 8px;
+  }
+}

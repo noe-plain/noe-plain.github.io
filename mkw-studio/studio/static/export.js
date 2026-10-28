@@ -221,6 +221,7 @@ async function openExport() {
   scheduleExportPreviews();
 }
 function syncExportSettings() {
+  MKWExportPanel.sync();
   document
     .querySelectorAll("[data-export-format]")
     .forEach((button) =>

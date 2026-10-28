@@ -12,7 +12,7 @@ function psdArrangement() {
     let left = 0,
       rowHeight = 0;
     for (const b of p.boards.filter((b) => b.imageId === im.id)) {
-      result.push({ b, left, top });
+      result.push({ b: clone(b), left, top });
       rowHeight = Math.max(rowHeight, b.h);
       left += b.w + 100;
     }
@@ -197,8 +197,9 @@ async function buildPSD(progress = () => {}) {
       },
     },
   };
-  const linked = new Map(),
-    boardCanvas = makeCanvas(1, 1);
+  const registry = MKWPSD.sources();
+  psd.linkedFiles = registry.files;
+  const boardCanvas = makeCanvas(1, 1);
   for (const [index, { b, left, top }] of layout.boards.entries()) {
     progress(
       `Zeichenfläche ${index + 1} / ${layout.boards.length} vorbereiten …`,
@@ -227,8 +228,16 @@ async function buildPSD(progress = () => {}) {
       "image",
       "background",
     ]) {
-      if (key === "sponsors" && !MKWSponsors.layout(b)) continue;
-      if (key === "postAngle" && !b.angle?.enabled) continue;
+      if (key === "sponsors") {
+        const group = await MKWPSDPost.sponsors(b, left, top, registry);
+        if (group) children.push(group);
+        continue;
+      }
+      if (key === "postAngle") {
+        if (b.angle?.enabled)
+          children.push(await MKWPSDPost.angle(b, left, top, registry));
+        continue;
+      }
       if (b.family?.enabled && key === "logoShadow") continue;
       if (b.family?.enabled && key === "textShadow") {
         if (textChildren.length)
@@ -270,6 +279,12 @@ async function buildPSD(progress = () => {}) {
           canvas: bitmap.canvas,
           hidden: e ? !e.visible : false,
         };
+      if (key === "background")
+        MKWPSD.fill(
+          l,
+          b.family?.enabled ? b.family.background : b.bg,
+          MKWPSD.rectangle(left, top, b.w, b.h),
+        );
       if (shadow) {
         l.blendMode = "multiply";
         l.opacity = key === "textShadow" ? 0.42 : 0.28;
@@ -278,45 +293,53 @@ async function buildPSD(progress = () => {}) {
         if (e.styled) {
           l.name += " · Typografie (gerastert)";
           const editable = {
-            name: elementNames[key] + " · editierbare Textläufe",
-            opened: false,
+            name: elementNames[key] + " · Text bearbeiten",
             hidden: true,
-            children: [],
+            text: MKWPSDPost.typography(e, b.elements[key], left, top),
           };
-          const x =
-            e.x -
-            (e.align === "right" ? e.w : e.align === "center" ? e.w / 2 : 0);
-          for (const line of e.styled.lines)
-            for (const run of line.runs) {
-              const a = ((e.angle || 0) * Math.PI) / 180,
-                lx = line.x + run.x,
-                ly = line.y + run.dy;
-              editable.children.push({
-                name: run.text,
-                text: textLayerData(
-                  {
-                    ...e,
-                    styled: undefined,
-                    text: run.text,
-                    lines: [run.text],
-                    x: x + lx * Math.cos(a) - ly * Math.sin(a),
-                    y: e.y + lx * Math.sin(a) + ly * Math.cos(a),
-                    size: run.size,
-                    role: run.font,
-                    color: run.color || e.color,
-                    align: "left",
-                    tracking: run.tracking,
-                    glyphScale: run.glyphScale || 1,
-                    underline: run.underline,
-                    strike: run.strike,
-                  },
-                  left,
-                  top,
-                ),
-              });
-            }
-          children.push(editable);
+          const appearance = {
+            ...l,
+            name: "Darstellung · gerastert",
+            hidden: false,
+          };
+          for (const field of Object.keys(l)) delete l[field];
+          Object.assign(l, {
+            name: elementNames[key],
+            opened: false,
+            hidden: !e.visible,
+            children: [editable, appearance],
+          });
         } else l.text = textLayerData(e, left, top, b.family, block);
+      }
+      if (key === "logo") {
+        const bitmap = await logoImage(b.elements.logo),
+          source = await MKWPSD.bitmapSource(
+            bitmap,
+            "logo:" + b.elements.logo.source,
+            "Logo",
+            Math.max(
+              b.elements.logo.size,
+              ...p.boards
+                .filter(
+                  (board) =>
+                    board.elements.logo.source === b.elements.logo.source,
+                )
+                .map((board) => board.elements.logo.size),
+            ),
+          ),
+          e = b.elements.logo,
+          w = e.size,
+          h = (w * source.height) / source.width;
+        MKWPSD.placed(l, registry, source, [
+          left + e.x,
+          top + e.y,
+          left + e.x + w,
+          top + e.y,
+          left + e.x + w,
+          top + e.y + h,
+          left + e.x,
+          top + e.y + h,
+        ]);
       }
       if (key === "image") {
         const content = MKWSponsors.layout(b)?.content;
@@ -339,39 +362,13 @@ async function buildPSD(progress = () => {}) {
               },
             ],
           };
-        if (!linked.has(im.id)) {
-          const id = uid();
-          linked.set(im.id, id);
-          psd.linkedFiles.push({
-            id,
-            name: im.name.replace(/\.[^.]+$/, "") + "_sRGB.png",
-            type: "PNG ",
-            data: bytesFromData(im.data),
-          });
-        }
-        const t = b.image,
-          transform = [
-            [-1, -1],
-            [1, -1],
-            [1, 1],
-            [-1, 1],
-          ].flatMap(([sx, sy]) => {
-            const q = rotatePoint(
-              (sx * im.width * t.scale * t.flipX) / 2,
-              (sy * im.height * t.scale * t.flipY) / 2,
-              t.angle,
-            );
-            return [left + t.x + q.x, top + t.y + q.y];
-          });
-        l.placedLayer = {
-          id: linked.get(im.id),
-          placed: uid(),
-          type: "raster",
-          width: im.width,
-          height: im.height,
-          transform,
-          resolution: { value: 72, units: "Density" },
-        };
+        MKWPSD.placed(
+          l,
+          registry,
+          im,
+          MKWPSD.photoTransform(im, b.image, left, top),
+          l.vectorMask,
+        );
       }
       if (MKWLayout.keys.includes(key) || key === "textShadow") {
         textChildren.push(l);
@@ -387,10 +384,7 @@ async function buildPSD(progress = () => {}) {
     if (shadowIndex >= 0) {
       const shadow = children.splice(shadowIndex, 1)[0];
       children.splice(
-        children.findIndex(
-          (l) =>
-            l.placedLayer || l.name === "Winkel · Bildausschnitt (gerastert)",
-        ),
+        children.findIndex((l) => l.placedLayer || l.name === "Winkel"),
         0,
         shadow,
       );

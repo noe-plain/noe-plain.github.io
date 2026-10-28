@@ -65,14 +65,15 @@ const { launch, artifact } = require('./browser.cjs');
     });
     pdf.text.forEach((line, i) => assert(Math.abs(line.x - pdf.expected[i]) < 1e-8, 'PDF selectable text must align with the artwork'));
     const psd = await page.evaluate(async () => {
-      const data = agPsd.readPsd(await (await buildPSD()).arrayBuffer()), text = data.children.flatMap(layer => layer.children || []).filter(layer => layer.text).map(layer => layer.text);
+      const data = agPsd.readPsd(await (await buildPSD()).arrayBuffer()), text = data.children.filter(layer => layer.text).map(layer => layer.text);
       const expected = makeCanvas(data.width, data.height); await carouselPaint(exportContext(expected));
       const a = data.canvas.getContext('2d').getImageData(0, 0, data.width, data.height).data, b = expected.getContext('2d').getImageData(0, 0, data.width, data.height).data;
-      return { alignments: text.map(t => t.paragraphStyle.justification), anchors: text.map(t => t.transform[4]), exact: a.every((v, i) => v === b[i]) };
+      return { alignments: text.flatMap(t => t.paragraphStyleRuns.map(r => r.style.justification)), anchors: text.map(t => t.transform[4]), coherent: text.length===1&&text[0].text===p.carousel.objects.find(o=>o.id===carouselSelection).text&&text[0].shapeType==='box', exact: a.every((v, i) => v === b[i]) };
     });
     assert(psd.exact, 'PSD composite preserves alignment');
-    assert.deepEqual(psd.alignments, (await lines()).filter(line => line.text).map(line => line.align));
-    psd.anchors.forEach((x, i) => assert(Math.abs(x - (i === 0 ? 475 : 800)) < .01));
+    assert(psd.coherent, 'One editable text field retains its original paragraphs');
+    assert.deepEqual(psd.alignments, ['center','right']);
+    psd.anchors.forEach(x => assert(Math.abs(x - 150) < .01, 'Paragraph box stays at the frame origin'));
     await page.locator('#carouselTextEdit').click();
     const inline = await page.evaluate(() => {
       const o = p.carousel.objects.find(o => o.id === carouselSelection), lines = carouselTextLayout(o).lines;

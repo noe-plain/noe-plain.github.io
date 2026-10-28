@@ -291,7 +291,7 @@ const assert = require("node:assert/strict");
         artboards: data.artboards || null,
         texts: layers
           .filter((l) => l.text)
-          .map((l) => ({ text: l.text.text, size: l.text.style.fontSize })),
+          .map((l) => ({ text: l.text.text, size: l.text.style.fontSize, sizes: l.text.styleRuns?.map(r=>r.style.fontSize) || [] })),
         hidden: layers.find((l) => l.name === "Versteckt").hidden,
         top: data.children.at(-1).name,
         multiply: layers.find((l) => l.name === "Kontrast").blendMode,
@@ -314,9 +314,9 @@ const assert = require("node:assert/strict");
     assert.equal(psd.hidden, true);
     assert.equal(psd.multiply, "multiply");
     assert(Math.abs(psd.opacity - 0.39) < 0.004);
-    assert(psd.texts.some((t) => t.text.trim() === "TITEL" && t.size === 80));
+    assert(psd.texts.some((t) => t.text.includes("TITEL") && (t.size === 80 || t.sizes.includes(80))));
     assert(
-      psd.texts.some((t) => t.text.trim() === "Untertitel" && t.size === 40),
+      psd.texts.some((t) => t.text.includes("Untertitel") && (t.size === 40 || t.sizes.includes(40))),
     );
     assert.equal(psd.difference, 0);
     await page.locator("#save").click();

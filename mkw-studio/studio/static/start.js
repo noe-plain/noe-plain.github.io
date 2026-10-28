@@ -1,14 +1,5 @@
 "use strict";
 icons();
-const createWithFeedback = $("#createProject").onclick;
-$("#createProject").onclick = async function (...args) {
-  const finishLoading = MKWUIControls.loading(this);
-  try {
-    return await createWithFeedback.apply(this, args);
-  } finally {
-    finishLoading();
-  }
-};
 busy = true;
 const startDialog = $("#startDialog");
 startDialog.showModal();
@@ -31,7 +22,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     MKWFields.notice(
       $("#startStatus"),
       saved
-        ? `${saved.title} · ${saved.document.images.length} Bilder · ${new Date(saved.updatedAt).toLocaleString("de-CH")}`
+        ? `${saved.title} · ${saved.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(saved.updatedAt).toLocaleString("de-CH", { dateStyle: "medium", timeStyle: "short" })}`
         : restoreError || "Noch kein gespeichertes Projekt vorhanden.",
       !!restoreError,
     );

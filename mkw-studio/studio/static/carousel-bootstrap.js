@@ -167,8 +167,6 @@ window.addEventListener("resize", () => {
   if (carouselActive() && $("#carouselViewport")) carouselSetZoom(carouselZoom);
 });
 
-carouselSetup();
-
 window.addEventListener(
   "pointerdown",
   (ev) => {

@@ -12,6 +12,7 @@ const { launch } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Formatbezogene Grössen");
     await page.locator("#createProject").click();
+    await page.waitForFunction(()=>!busy&&!document.querySelector("#projectSetup").open);
     await page.evaluate(() => {
       const c = makeCanvas(2000, 2400),
         ctx = exportContext(c);

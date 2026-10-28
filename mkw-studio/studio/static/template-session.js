@@ -109,7 +109,7 @@ const MKWTemplates = (() => {
     carouselUI.tool = "select";
     carouselUI.content = false;
     await MKWProjects.startDocument(q);
-    setupCommitted = true;
+    MKWProjectSetup.complete();
     for (const id of [
       "startDialog",
       "projectSetup",

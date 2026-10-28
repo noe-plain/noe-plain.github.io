@@ -1,3 +1,9 @@
+# Ergänzung · 28. Oktober 2026
+
+Neue Material-Dialoge für Start, Einrichtung und Export sowie konservative PSD-Editierbarkeit umgesetzt. Nachweise, Aufgabenstatus und konkrete Prüfgrenzen stehen in [docs/RELEASE-2026-10-28.md](docs/RELEASE-2026-10-28.md). Ältere Abschnitte beschreiben den damaligen Stand.
+
+---
+
 # Ergänzung: fehlende Carousel-Fotos in Firefox · 15. Oktober 2026
 
 - Mit der bereitgestellten MKW-Datei (399 MB, fünf Slides, zehn Fotos) in Firefox 158 auf macOS nachgestellt: Mit normaler Grafikbeschleunigung fehlen Fotos auf Slide 2, 3 und 4, im Headless-Test erscheinen sie. Keine Projektdatei wurde verändert.

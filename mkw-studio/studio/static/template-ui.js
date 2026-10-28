@@ -10,7 +10,7 @@
   setup.className = "designer-template-entry";
   setup.setAttribute("aria-label", "Designer-Vorlagen");
   setup.innerHTML = `<div class="designer-template-description">${studioIcon("layers")}<div><h3>Mit einer Vorlage beginnen</h3><p>Design auswählen, Inhalte einsetzen und weitergestalten.</p></div></div><button type="button" id="designerTemplateStart">${studioIcon("folder")}<span>Vorlagen ansehen</span></button>`;
-  $("#carouselSetup").prepend(setup);
+  $("#carouselSetup").append(setup);
   $("#designerTemplateStart").onclick = () => MKWTemplateGallery.open();
   const save = document.createElement("button");
   save.id = "saveTemplate";

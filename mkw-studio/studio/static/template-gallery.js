@@ -339,6 +339,10 @@ const MKWTemplateGallery = (() => {
       if (creating) event.preventDefault();
     });
     dialog.addEventListener("close", () => {
+      MKWProjectSetup.resumeTemplate(
+        $("#templateProjectName").value,
+        $("#templateProjectCode").value,
+      );
       generation++;
       livePreview.close();
       observer?.disconnect();

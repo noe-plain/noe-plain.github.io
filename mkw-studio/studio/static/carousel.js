@@ -2,202 +2,49 @@
 // Designer model: see ARCHITECTURE.md for ownership and load order.
 let carouselSelection = null,
   carouselZoom = 0.35,
-  carouselDraw = 0,
-  carouselMode = "post";
+  carouselDraw = 0;
 
 const carouselActive = () => !!p.carousel;
 
-function carouselSetup() {
-  const host = document.createElement("div");
-  host.className = "mode-buttons";
-  host.innerHTML = `<button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button>`;
-  $("#projectSetup .dialog-heading").after(host);
-  const input = (id, label, value, min = 0, max = 4000) =>
-    `<label>${label} (px)<input id="${id}" type="number" value="${value}" min="${min}" max="${max}" step="1"></label>`;
-  const options = document.createElement("section");
-  options.id = "carouselSetup";
-  options.hidden = true;
-  options.innerHTML = `
- <fieldset class="format-choice carousel-format-choice"><legend><span id="carouselFormatRatio">4:5</span> · Designer</legend><div class="format-row"><div class="format-dimensions"><h4>Arbeitsfläche pro Slide</h4><div class="format-fields">${input("cw", "Breite", 1080, 240)}${input("ch", "Höhe", 1350, 240)}</div><small>Raster innerhalb der gewählten Safezone</small></div><div class="safezone-editor"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner sixths"><span>Safezone</span></div></div><div class="safe-input safe-top">${input("ct", "Oben", 100)}</div><div class="safe-input safe-bottom">${input("cb", "Unten", 200)}</div></div></div><div class="carousel-outer-margins"><span>Safezone links und rechts auf jeder Slide</span><div class="format-fields">${input("cl", "Links", 100)}${input("cr", "Rechts", 100)}</div></div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p></fieldset>
- <fieldset class="format-choice carousel-slides-choice"><legend>Slides aneinanderreihen</legend><div class="carousel-slide-count"><label>Anzahl<input id="cn" type="number" value="4" min="${MKWCarouselPolicy.minSlides}" max="${MKWCarouselPolicy.maxSlides}" step="1"></label><div><strong id="carouselArtworkSize"></strong><small>1–20 Slides · gemeinsame Montagefläche</small></div></div><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p></fieldset>`;
-  $("#formatChoices").before(options);
-  const refresh = () => {
-    const w = +$("#cw").value,
-      h = +$("#ch").value,
-      n = +$("#cn").value,
-      top = +$("#ct").value,
-      bottom = +$("#cb").value,
-      left = +$("#cl").value,
-      right = +$("#cr").value;
-    const preview = $("#carouselSafePreview");
-    preview.style.aspectRatio = `${Math.max(1, w)}/${Math.max(1, h)}`;
-    preview.style.setProperty(
-      "--top",
-      Math.min(95, (top / Math.max(1, h)) * 100) + "%",
-    );
-    preview.style.setProperty(
-      "--bottom",
-      Math.min(95, (bottom / Math.max(1, h)) * 100) + "%",
-    );
-    for (const [edge, value] of [
-      ["left", left],
-      ["right", right],
-    ])
-      preview.style.setProperty(
-        "--" + edge,
-        Math.min(95, (value / Math.max(1, w)) * 100) + "%",
-      );
-    MKWDesignerGrid.preview(preview.querySelector(".safe-preview-inner"), {
-      w,
-      h,
-      top,
-      bottom,
-      left,
-      right,
-    });
-    $("#carouselFormatRatio").textContent =
-      w > 0 && h > 0 ? MKW.ratio(w, h).replace("x", ":") : "Eigenes Format";
-    $("#carouselArtworkSize").textContent = `${w * n} × ${h} px gesamt`;
-    $("#carouselSetupStrip").innerHTML = Array.from(
-      { length: Math.max(0, Math.min(MKWCarouselPolicy.maxSlides, n || 0)) },
-      (_, i) =>
-        `<div style="aspect-ratio:${Math.max(1, w)}/${Math.max(1, h)}"><span>${i + 1}</span><i style="top:${Math.min(95, (top / Math.max(1, h)) * 100)}%;bottom:${Math.min(95, (bottom / Math.max(1, h)) * 100)}%;left:${(left / Math.max(1, w)) * 100}%;right:${(right / Math.max(1, w)) * 100}%"></i></div>`,
-    ).join("");
-    const format = { w, h, top, bottom, left, right },
-      fields = ["cw", "ch", "ct", "cb", "cl", "cr"].map((id) => $("#" + id)),
-      invalid = !MKWCarouselPolicy.validFormat(format),
-      text = invalid
-        ? w > 4000 || h > 4000
-          ? "Breite und Höhe dürfen höchstens 4000 px betragen."
-          : MKWFormats.feedback(format)
-        : "";
-    options
-      .querySelector(".format-choice")
-      .classList.toggle("invalid", invalid);
-    MKWFields.group(fields, text, $("#carouselFormatFeedback"));
-    MKWFields.group(
-      [$("#cn")],
-      MKWCarouselPolicy.validCount(n)
-        ? ""
-        : "Bitte eine ganze Anzahl von 1 bis 20 Slides eingeben.",
-      $("#carouselCountFeedback"),
-    );
+async function carouselNewDocument(format, count, metadata) {
+  const q = fresh(),
+    { w, h, top, bottom, left, right } = format;
+  q.fonts = [...p.fonts];
+  Object.assign(q.meta, metadata);
+  q.carousel = { ...format, n: count, bg: "#ffffff", objects: [] };
+  const canvas = makeCanvas(1, 1),
+    data = canvas.toDataURL();
+  canvas.width = canvas.height = 0;
+  const im = {
+    id: uid(),
+    name: "Designer",
+    data,
+    original: data,
+    width: w,
+    height: h,
   };
-  options.querySelectorAll("input").forEach((el) => (el.oninput = refresh));
-  refresh();
-  const intro = $("#setupInstructions");
-  const postIntro = intro?.textContent;
-  host.querySelectorAll("button").forEach(
-    (btn) =>
-      (btn.onclick = () => {
-        carouselMode = btn.dataset.projectMode;
-        host
-          .querySelectorAll("button")
-          .forEach((b) => b.setAttribute("aria-pressed", b === btn));
-        $("#carouselSetup").hidden = carouselMode !== "carousel";
-        $("#formatChoices").hidden = carouselMode === "carousel";
-        $("#addFormat").hidden = carouselMode === "carousel";
-        $("#projectSetup .setup-actions").classList.toggle(
-          "carousel-setup-actions",
-          carouselMode === "carousel",
-        );
-        if (intro && postIntro)
-          intro.textContent =
-            carouselMode === "carousel"
-              ? "Bestimme Format, Safezone und Anzahl der Slides. Alle Slides bilden eine gemeinsame Montagefläche."
-              : postIntro;
-        refresh();
-      }),
-  );
-  const create = $("#createProject").onclick;
-  $("#createProject").onclick = async () => {
-    if (carouselMode !== "carousel") return create();
-    const w = +$("#cw").value,
-      h = +$("#ch").value,
-      n = +$("#cn").value,
-      top = +$("#ct").value,
-      bottom = +$("#cb").value,
-      left = +$("#cl").value,
-      right = +$("#cr").value;
-    const named = MKWFields.validate($("#setupName"), true);
-    refresh();
-    if (
-      !named ||
-      !MKWCarouselPolicy.validFormat({ w, h, top, bottom, left, right }) ||
-      !MKWCarouselPolicy.validCount(n)
-    ) {
-      $("#setupError").textContent = !named
-        ? "Gib deinem Projekt bitte einen Namen."
-        : !MKWCarouselPolicy.validCount(n)
-          ? "Bitte eine ganze Anzahl von 1–20 Slides angeben."
-          : "Bitte die markierten Angaben korrigieren.";
-      (!named
-        ? $("#setupName")
-        : options.querySelector("[data-field-error]")
-      )?.focus();
-      return;
-    }
-    if (savedRevision < revision) await autosave();
-    const fonts = p.fonts;
-    p = fresh();
-    p.fonts = fonts;
-    p.meta.title = $("#setupName").value.trim();
-    p.meta.code = $("#setupCode").value.trim();
-    p.carousel = {
-      w,
-      h,
-      n,
-      top,
-      bottom,
-      left,
-      right,
-      bg: "#ffffff",
-      objects: [],
-    };
-    const c = makeCanvas(1, 1),
-      data = c.toDataURL();
-    const im = {
-      id: uid(),
-      name: "Designer",
-      data,
-      original: data,
-      width: w,
-      height: h,
-    };
-    p.images.push(im);
-    for (let i = 0; i < n; i++) {
-      const b = basicBoard(im, w, h);
-      b.carouselSlide = i;
-      p.boards.push(b);
-    }
-    const logo = await image("mkw-logo-bold-neg.svg"),
-      lw = Math.min(600, w - left - right);
-    p.carousel.objects.push({
-      id: uid(),
-      type: "logo",
-      name: "MKW Logo",
-      x: w - right - lw,
-      y: top,
-      w: lw,
-      h: (lw * logo.height) / logo.width,
-      source: "white",
-      visible: true,
-      locked: false,
-      opacity: 1,
-    });
-    selected = null;
-    carouselSelection = null;
-    carouselUI.ids.clear();
-    carouselUI.slide = null;
-    carouselUI.tool = "select";
-    history = [];
-    future = [];
-    busy = false;
-    setupCommitted = true;
-    $("#projectSetup").close();
-    $("#startDialog").close();
-    changed();
-  };
+  q.images.push(im);
+  for (let i = 0; i < count; i++) {
+    const b = basicBoard(im, w, h, q.meta);
+    b.carouselSlide = i;
+    q.boards.push(b);
+  }
+  const logo = await image("mkw-logo-bold-neg.svg"),
+    lw = Math.min(600, w - left - right);
+  q.carousel.objects.push({
+    id: uid(),
+    type: "logo",
+    name: "MKW Logo",
+    x: w - right - lw,
+    y: top,
+    w: lw,
+    h: (lw * logo.height) / logo.width,
+    source: "white",
+    visible: true,
+    locked: false,
+    opacity: 1,
+  });
+  return q;
 }
 
 function carouselWarning(o) {

@@ -1,0 +1,15 @@
+Photoshop 27.10.0; initial type-update prompt was inspected separately through the UI. Automated commands suppress repeated prompts.
+SOURCE /private/tmp/mkw-release-final2-firefox/psd-editability.psd exists=true
+OPEN psd-editability 1200x750
+COUNTS type=2 smart=5 fills=1
+TYPE EDIT Test: Text erfolgreich geändert
+BOX RESIZE + RESTORE
+SMART PHOTO OPEN 600x400
+REOPEN 19 layers
+SOURCE /private/tmp/mkw-release-final2-firefox/psd-post-editability.psd exists=true
+OPEN psd-post-editability 1300x750
+COUNTS type=8 smart=10 fills=4
+TYPE EDIT Test: Text erfolgreich geändert
+SMART PHOTO OPEN 600x750
+REOPEN 44 layers
+PASS open, coherent type edit, paragraph resize, smart-content open, save and reopen

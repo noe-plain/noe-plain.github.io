@@ -5,12 +5,18 @@ on:
   pull_request:
     paths: ['mkw-studio/studio/**', '.github/workflows/mkw-studio.yml']
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Browserprüfungen
+        type: choice
+        default: all
+        options: [all, text-and-scroll]
 permissions:
   contents: read
 jobs:
   studio:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: mkw-studio/studio
@@ -32,11 +38,26 @@ jobs:
       - run: npm run build
       - name: Verify committed build
         run: git diff --exit-code -- index.html static/editor.bundle.js static/editor.bundle.css static/editor.bundle.js.map
-      - run: npm run test:browser
-      - name: Firefox export regression checks
-        run: node tests/run-browser.mjs dialog-layout designer-layout path-continuation templates template-library carousel-limits inline-fidelity text-hyphenation post-text-size-scope text-justification sponsor-auto post-text-stack advanced-typography post-safezones angle-axis post-angle native-incremental-save setup-file large-project-frames project-storage project-open sponsors-help project-retention carousel-photo-effects carousel-refinements workspace-ui interactive-performance carousel-export-images carousel-pdf
+      - name: Browser regression checks
         env:
+          MKW_CI_SCOPE: ${{ inputs.scope }}
+        run: |
+          if [ "$MKW_CI_SCOPE" = "text-and-scroll" ]; then
+            node tests/run-browser.mjs inline-fidelity post-workspace modifier-scroll colour-combinations
+          else
+            npm run test:browser
+          fi
+      - name: Firefox export regression checks
+        run: |
+          if [ "$MKW_CI_SCOPE" = "text-and-scroll" ]; then
+            xvfb-run --auto-servernum node tests/run-browser.mjs inline-fidelity post-workspace modifier-scroll colour-combinations
+          else
+            xvfb-run --auto-servernum node tests/run-browser.mjs export-panel psd-post-editability psd-editability project-setup project-dialogs settings-redesign comprehensive-check five-person-check seven-perspectives audit-interactions modifier-scroll colour-combinations material-fields zoom-ui subject-import material-motion material-consistency layer-renaming material-paint-wiki material-bars material-setup material-cards material-inspectors material-start material-workflow material-controls material-ui dialog-layout designer-layout path-continuation templates template-library carousel-limits inline-fidelity text-hyphenation post-text-size-scope text-justification sponsor-auto post-text-stack advanced-typography post-safezones angle-axis post-angle native-incremental-save setup-file large-project-frames project-storage project-open sponsors-help project-retention carousel-photo-effects carousel-refinements workspace-ui interactive-performance carousel-export-images carousel-pdf
+          fi
+        env:
+          MKW_CI_SCOPE: ${{ inputs.scope }}
           MKW_TEST_BROWSER: firefox
+          MKW_TEST_HEADED: '1'
       - uses: actions/upload-artifact@v4
         if: always()
         with:

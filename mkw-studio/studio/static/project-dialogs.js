@@ -88,6 +88,8 @@ const MKWProjectDialogs = (() => {
     alternative.setAttribute("aria-labelledby", "saveAlternativesTitle");
     alternative.innerHTML =
       '<h3 id="saveAlternativesTitle">Weitere Möglichkeiten</h3>';
+    psdHint.textContent =
+      "Photoshop benötigt dieselben Schriften. Spezialfälle enthalten eine genaue Rasterdarstellung und zusätzliche Ebenen zum Bearbeiten. MKW zum Weiterarbeiten im Studio behalten.";
     alternative.append(psd, psdHint);
     const exportCard = document.createElement("section");
     exportCard.className = "save-export-entry";

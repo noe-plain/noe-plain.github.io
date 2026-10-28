@@ -25,10 +25,10 @@ const { launch, artifact } = require("./browser.cjs");
     await name.fill("Musik im Herbst");
     assert.notEqual(await name.getAttribute("aria-invalid"), "true");
     const row = page.locator('[data-format="0"]'),
-      top = row.locator('[data-format-key="top"]');
+      top = page.locator('#setupSafeFields [data-format-key="top"]');
     await top.fill("1900");
     assert.match(
-      await row.locator(".format-feedback").textContent(),
+      await page.locator("#setupSafeFeedback").textContent(),
       /kleiner als die Höhe/,
     );
     assert.equal(await top.getAttribute("aria-invalid"), "true");
@@ -38,7 +38,7 @@ const { launch, artifact } = require("./browser.cjs");
       "invalid setup never changes the document",
     );
     await top.fill("200");
-    assert.equal(await row.locator(".format-feedback").textContent(), "");
+    assert.equal(await page.locator("#setupSafeFeedback").textContent(), "");
     assert.notEqual(await top.getAttribute("aria-invalid"), "true");
     await page.locator('[data-project-mode="carousel"]').click();
     await page.locator("#cn").fill("21");
@@ -54,12 +54,12 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#cn").fill("1");
     await page.locator("#cl").fill("1000");
     assert.match(
-      await page.locator("#carouselFormatFeedback").textContent(),
+      await page.locator("#setupSafeFeedback").textContent(),
       /kleiner als die Breite/,
     );
     await page.locator("#cl").fill("100");
     assert.equal(
-      await page.locator("#carouselFormatFeedback").textContent(),
+      await page.locator("#setupSafeFeedback").textContent(),
       "",
     );
     await page.locator("#createProject").click();

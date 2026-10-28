@@ -58,6 +58,8 @@
     "static/carousel-slide-format.js",
     "static/carousel-bootstrap.js",
     "static/carousel-psd-vectors.js",
+    "static/psd-editable.js",
+    "static/psd-post-editable.js",
     "static/carousel-psd.js",
     "static/carousel-vectors.js",
     "static/carousel-constructor.js",
@@ -84,6 +86,7 @@
     "static/template-store.js",
     "static/setup-store.js",
     "static/start-screen.js",
+    "static/start-home.js",
     "static/setup-session.js",
     "static/setup-ui.js",
     "static/post-text-stack.js",
@@ -91,6 +94,9 @@
     "static/post-workspace.js",
     "static/project-session.js",
     "static/project-dialogs.js",
+    "static/project-setup-model.js",
+    "static/project-setup.js",
+    "static/export-panel.js",
     "static/help-popup.js",
     "static/template-session.js",
     "static/template-preview.js",
@@ -128,6 +134,8 @@
     "static/dialogs.css",
     "static/settings.css",
     "static/project-dialogs.css",
+    "static/project-setup.css",
+    "static/start-home.css",
     "static/ui-fields.css"
   ]
 }

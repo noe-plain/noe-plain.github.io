@@ -35,21 +35,31 @@ function carouselPSDBounds(o) {
     h: Math.max(0, Math.min(c.h, Math.ceil(bottom + pad + effectPad)) - top),
   };
 }
-async function carouselPSDLayer(o) {
+async function carouselPSDLayer(o, project = p) {
   const bounds = carouselPSDBounds(o);
   if (!bounds.w || !bounds.h) return null;
   const canvas = makeCanvas(bounds.w, bounds.h),
     ctx = exportContext(canvas);
   ctx.translate(-bounds.left, -bounds.top);
-  await carouselPaint(ctx, null, 1, true, null, [
-    {
-      ...o,
-      folderId: undefined,
-      visible: true,
-      opacity: 1,
-      blend: "source-over",
-    },
-  ]);
+  await carouselPaint(
+    ctx,
+    null,
+    1,
+    true,
+    null,
+    [
+      {
+        ...o,
+        folderId: undefined,
+        visible: true,
+        opacity: 1,
+        blend: "source-over",
+      },
+    ],
+    () => true,
+    image,
+    project,
+  );
   return carouselPSDVectorData(o, {
     name: o.name,
     left: bounds.left,
@@ -64,7 +74,9 @@ async function carouselPSDLayer(o) {
   });
 }
 async function buildCarouselPSD(progress = () => {}) {
-  const c = p.carousel,
+  const project = { ...p, carousel: clone(p.carousel) },
+    c = project.carousel,
+    sources = MKWPSD.sources(),
     width = c.w * c.n,
     height = c.h;
   if (width > 30000 || height > 30000 || width * height > 80000000)
@@ -74,144 +86,228 @@ async function buildCarouselPSD(progress = () => {}) {
   await document.fonts.ready;
   carouselKeepLogosOnTop(c);
   const composite = makeCanvas(width, height);
-  await carouselPaint(exportContext(composite));
+  await carouselPaint(
+    exportContext(composite),
+    null,
+    1,
+    false,
+    null,
+    null,
+    () => true,
+    image,
+    project,
+  );
   const background = makeCanvas(width, height),
     bg = background.getContext("2d");
   bg.fillStyle = c.bg;
   bg.fillRect(0, 0, width, height);
   const children = [
-      { name: "Hintergrund", canvas: background, left: 0, top: 0 },
+      MKWPSD.fill(
+        { name: "Hintergrund", canvas: background, left: 0, top: 0 },
+        c.bg,
+      ),
     ],
     bounds = { left: 0, top: 0, right: width, bottom: height };
-  const folders = new Map();
+  const folders = new Map(),
+    entries = new Map();
   const append = (o, entry) => {
-    const folder = carouselFolder(o);
+    const folder = c.folders?.find((f) => f.id === o.folderId);
     if (!folder) {
       children.push(entry);
+      entries.set("layer:" + o.id, entry);
       return;
     }
     let group = folders.get(folder.id);
     if (!group) {
       group = {
         name: folder.name,
+        blendMode: "pass through",
         opened: !folder.collapsed,
         hidden: folder.visible === false,
+        ...(folder.locked
+          ? {
+              protected: {
+                composite: true,
+                position: true,
+                transparency: true,
+              },
+            }
+          : {}),
         children: [],
       };
       folders.set(folder.id, group);
       children.push(group);
+      entries.set("folder:" + folder.id, group);
     }
-    group.children.push(entry);
+    if (entry) group.children.push(entry);
   };
   for (const [index, o] of c.objects.entries()) {
     progress(`Ebene ${index + 1} / ${c.objects.length} vorbereiten …`);
     await new Promise((resolve) => setTimeout(resolve, 0));
     if (o.type === "text") {
       const layout = carouselTextLayout(o),
-        offset = carouselTextOffset(o, layout),
-        lines = [];
-      for (const originalLine of layout.lines)
-        for (const run of originalLine.runs) {
-          const line = {
-            ...originalLine,
-            text: run.text,
-            size: run.size,
-            x: originalLine.x + run.x,
-            y: originalLine.y + run.dy,
-          };
-          if (!line.text) continue;
-          const record = {
-            ...o,
-            folderId: undefined,
-            effects: undefined,
-            uppercase: false,
-            script: "normal",
-            characterStyles: undefined,
-            textAlpha: 1,
-            text: line.text,
-            font: run.font,
-            color: run.color || o.color,
-            tracking: run.tracking,
-            underline: run.underline,
-            strike: run.strike,
-            baselineShift: 0,
-            textStyles: undefined,
-            textAlign: "left",
-            x: carouselToWorld(o, { x: line.x, y: line.y + offset }).x,
-            size: line.size,
-            textAnchor: "top",
-            y: carouselToWorld(o, { x: line.x, y: line.y + offset }).y,
-            h: line.size * 1.12,
-            opacity: 1,
-            blend: "source-over",
-            visible: true,
-          };
-          const layer = await carouselPSDLayer(record);
-          if (!layer) continue;
-          layer.name = line.text;
-          layer.text = textLayerData(
-            {
-              text: line.text,
-              x: carouselToWorld(o, {
-                x:
-                  line.x +
-                  carouselTextAlign(o, line.paragraph).factor * run.width,
-                y: line.y + offset,
-              }).x,
-              y: carouselToWorld(o, {
-                x:
-                  line.x +
-                  carouselTextAlign(o, line.paragraph).factor * run.width,
-                y: line.y + offset,
-              }).y,
-              size: line.size,
-              role: run.font,
-              tracking: run.tracking,
-              underline: run.underline,
-              strike: run.strike,
-              color: run.color || o.color,
-              align: line.justification ? "left" : line.align,
-              glyphScale: run.glyphScale || 1,
-              angle: o.angle || 0,
-            },
-            0,
-            0,
-          );
-          layer.text.style.leading = line.leading;
-          lines.push(layer);
-        }
-      if (
-        carouselHasEffects(o) ||
-        layout.lines.some((line) => line.justification)
-      ) {
-        const layer = await carouselPSDLayer(o);
-        if (layer) {
-          if (layout.lines.some((line) => line.justification))
-            layer.name += " · Blocksatz (gerastert)";
-          append(o, layer);
-        }
-        append(o, {
-          name: o.name + " · editierbare Textläufe",
-          hidden: true,
-          children: lines,
-        });
-      } else
+        layer = await carouselPSDLayer(o, project);
+      if (!layer) continue;
+      const editable = {
+        ...layer,
+        ...MKWPSD.blend(o),
+        opacity: (o.opacity ?? 1) * (o.textAlpha ?? 1),
+        text: MKWPSD.text(o, layout),
+      };
+      if (MKWPSD.needsTextReference(o, layout))
+        append(o, MKWPSD.reference(o.name, layer, editable));
+      else append(o, editable);
+    } else if (
+      ["image", "angle"].includes(o.type) &&
+      project.images.some((im) => im.id === o.imageId)
+    ) {
+      const source = project.images.find((im) => im.id === o.imageId),
+        bounds = carouselPSDBounds(o);
+      if (!bounds.w || !bounds.h) continue;
+      const canvas = makeCanvas(bounds.w, bounds.h),
+        ctx = exportContext(canvas);
+      ctx.translate(-bounds.left, -bounds.top);
+      ctx.translate(o.x, o.y);
+      if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
+      ctx.clip(
+        o.type === "angle" ? carouselAngleMask(o) : carouselImageMask(o),
+      );
+      await carouselPaintPhoto(ctx, o, image, 0, project);
+      const layer = MKWPSD.placed(
+        {
+          name: o.name,
+          left: bounds.left,
+          top: bounds.top,
+          canvas,
+          ...MKWPSD.blend(o),
+        },
+        sources,
+        source,
+        MKWPSD.designerTransform(o, source),
+        MKWPSD.imageMask(o),
+      );
+      if (o.effects)
+        layer.placedLayer.filter = MKWPSD.filters(
+          o,
+          Math.max(o.w / source.width, o.h / source.height) * o.scale,
+        );
+      if (carouselHasEffects(o)) {
+        const appearance = await carouselPSDLayer(o, project);
+        append(o, MKWPSD.reference(o.name, appearance, layer));
+      } else if (o.type === "angle") {
+        const glow = makeCanvas(bounds.w, bounds.h),
+          g = exportContext(glow);
+        g.translate(-bounds.left, -bounds.top);
+        g.translate(o.x, o.y);
+        if (o.angle) g.rotate((o.angle * Math.PI) / 180);
+        g.fillStyle = "#ffffff";
+        g.shadowColor = studioPaintRGBA(o.glowColor, o.glowAlpha);
+        g.shadowBlur = o.glow;
+        g.fill(carouselAngleMask(o));
         append(o, {
           name: o.name,
-          opened: true,
-          hidden: o.visible === false,
-          opacity: (o.opacity ?? 1) * (o.textAlpha ?? 1),
-          blendMode:
-            { "source-over": "normal", multiply: "multiply", screen: "screen" }[
-              o.blend
-            ] || "normal",
-          children: lines,
+          opened: false,
+          ...MKWPSD.blend(o),
+          children: [
+            {
+              name: "Schein · Darstellung (gerastert)",
+              left: bounds.left,
+              top: bounds.top,
+              canvas: glow,
+            },
+            {
+              ...layer,
+              name: "Bildinhalt",
+              opacity: 1,
+              hidden: false,
+              blendMode: "normal",
+              protected: undefined,
+            },
+          ],
         });
+      } else append(o, layer);
+    } else if (o.type === "logo") {
+      const layer = await carouselPSDLayer(o, project);
+      if (layer) {
+        const source = await MKWPSD.bitmapSource(
+          await carouselLogoImage(o, project),
+          "logo:" + o.source,
+          o.name || "Logo",
+          Math.max(
+            o.w,
+            ...c.objects
+              .filter(
+                (item) => item.type === "logo" && item.source === o.source,
+              )
+              .map((item) => item.w),
+          ),
+        );
+        const transform = [
+          [0, 0],
+          [o.w, 0],
+          [o.w, o.h],
+          [0, o.h],
+        ].flatMap(([x, y]) => {
+          const q = carouselToWorld(o, { x, y });
+          return [q.x, q.y];
+        });
+        MKWPSD.placed(layer, sources, source, transform);
+        Object.assign(layer, MKWPSD.blend(o));
+        append(o, layer);
+      }
     } else {
-      const layer = await carouselPSDLayer(o);
-      if (layer) append(o, layer);
+      const layer = await carouselPSDLayer(o, project);
+      if (layer) {
+        Object.assign(layer, MKWPSD.blend(o));
+        const value = studioPaintRead(o, "fill");
+        if (["linear", "radial"].includes(value.kind)) {
+          const native = {
+            ...layer,
+            vectorFill: MKWPSD.gradient(value),
+            vectorMask: carouselIsVector(o)
+              ? carouselPSDVectorMask(o)
+              : MKWPSD.imageMask(o),
+          };
+          append(o, MKWPSD.reference(o.name, layer, native));
+        } else if (
+          value.kind === "image" &&
+          value.enabled &&
+          (!carouselIsVector(o) || !studioPaintRead(o, "stroke").enabled)
+        ) {
+          const source = project.images.find((im) => im.id === value.imageId);
+          if (source) {
+            const native = { ...layer };
+            delete native.vectorFill;
+            delete native.vectorStroke;
+            MKWPSD.placed(
+              native,
+              sources,
+              source,
+              MKWPSD.designerTransform({ ...o, ...value }, source),
+              carouselIsVector(o)
+                ? carouselPSDVectorMask(o)
+                : MKWPSD.imageMask(o),
+            );
+            append(
+              o,
+              carouselHasEffects(o)
+                ? MKWPSD.reference(o.name, layer, native)
+                : native,
+            );
+          } else append(o, layer);
+        } else append(o, layer);
+      }
     }
   }
+
+  for (const folder of c.folders || [])
+    if (!folders.has(folder.id)) append({ folderId: folder.id }, null);
+  const ordered = carouselLayerBlocks(c)
+    .reverse()
+    .map((block) => entries.get(block.key))
+    .filter(Boolean);
+  children.splice(1, children.length - 1, ...ordered);
+
   const slices = Array.from({ length: c.n }, (_, i) => ({
     id: i + 1,
     groupId: 1,
@@ -240,6 +336,7 @@ async function buildCarouselPSD(progress = () => {}) {
         height,
         canvas: composite,
         children,
+        linkedFiles: sources.files,
         imageResources: {
           slices: [{ bounds, groupName: p.meta.title || "Designer", slices }],
           versionInfo: {

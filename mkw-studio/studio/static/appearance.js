@@ -140,8 +140,8 @@ function studioPrepareSave() {
   MKWDateFields.validate($("#saveDate"));
   $("#saveName").dataset.custom = "false";
   $("#psdDescription").textContent = p.carousel
-    ? "Zusammenhängendes Artwork, Ebenen, Texte und ein Slice pro Slide"
-    : "Zeichenflächen, Textebenen und eingebettete Bilder";
+    ? "Textfelder, Bild-Smartobjekte und ein Slice pro Slide"
+    : "Zeichenflächen, Bild-Smartobjekte und einzelne Sponsoren";
 }
 function studioRefreshSaveName() {
   if ($("#saveDialog").open && $("#saveName").dataset.custom !== "true")

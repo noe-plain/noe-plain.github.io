@@ -181,7 +181,8 @@ const { launch, artifact } = require("./browser.cjs");
         png: a.every((v, i) => v === c[i]),
         psd: a.every((v, i) => v === ps[i]),
         raster: psd.children.some((l) =>
-          l.name.includes("Blocksatz (gerastert)"),
+          l.children?.some(child => child.name === "Darstellung · gerastert" && child.canvas) &&
+          l.children.some(child => child.hidden && child.text?.text === o.text),
         ),
         pdfSize: file.size,
         pdfRuns: text.length,

@@ -916,7 +916,7 @@ const { launch, artifact } = require("./browser.cjs");
         psd = agPsd.readPsd(await (await buildPSD()).arrayBuffer()),
         strip = psd.children
           .flatMap((l) => l.children || [])
-          .find((l) => l.name === "Sponsorleiste · gerastert");
+          .find((l) => l.name === "Sponsorenleiste");
       let bounds = [b.w, b.h, 0, 0],
         samples = [];
       for (let i = 0; i < a.length; i += 4)
@@ -944,7 +944,7 @@ const { launch, artifact } = require("./browser.cjs");
         png: a.every((v, i) => v === e[i]),
         diff: a.reduce((n, v, i) => n + (v !== e[i]), 0),
         max: a.reduce((n, v, i) => Math.max(n, Math.abs(v - e[i])), 0),
-        strip: !!strip,
+        strip: !!strip?.children?.some(l=>l.vectorFill?.type==="color") && !!(()=>{const flat=ls=>ls.flatMap(l=>[l,...flat(l.children||[])]);return flat(strip.children).some(l=>l.placedLayer)})(),
         logos: MKWProjectAssets.compact(p).logos.length,
       };
     });

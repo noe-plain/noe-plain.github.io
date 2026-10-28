@@ -224,7 +224,10 @@ const { launch, artifact } = require("./browser.cjs");
       [0.05, true, false],
       [2, false, true],
     ]) {
-      await page.evaluate((v) => carouselSetZoom(v), value);
+      await page.evaluate(async (v) => {
+        carouselSetZoom(v);
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }, value);
       assert.equal(await page.locator("#carouselZoomOut").isDisabled(), out);
       assert.equal(await page.locator("#carouselZoomIn").isDisabled(), into);
     }

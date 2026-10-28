@@ -1,0 +1,214 @@
+#startDialog[open] {
+  width: min(860px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  box-sizing: border-box;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+#startDialog .start-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 32px 16px;
+}
+#startDialog .start-brand {
+  padding: 0;
+}
+#startDialog .start-brand img {
+  width: 230px;
+  max-width: 100%;
+}
+#startDialog #startSettings {
+  position: static;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  background: var(--md-sys-color-surface-container-high);
+}
+#startDialog .start-home-content {
+  padding: 0 32px 24px;
+}
+#startDialog h1 {
+  color: var(--md-sys-color-on-surface);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin: 8px 0 12px;
+}
+#startDialog .start-intro {
+  font:
+    16px/24px "MKW UI",
+    sans-serif;
+  max-width: 600px;
+  margin: 0 0 24px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#startDialog .start-home-card {
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 12px 0;
+}
+#startDialog h2 {
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0 0 12px;
+}
+#startDialog .start-choices {
+  margin: 0;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 12px;
+}
+#startDialog .start-open-options {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 12px;
+}
+#startDialog :is(.start-choices, .start-open-options) button {
+  min-height: 56px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 28px;
+  text-align: center;
+}
+#startDialog #startNew {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: 0;
+}
+#startDialog :is(#startTemplates, #startOpen) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border: 0;
+}
+#startDialog #startContinue {
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
+}
+#startDialog #startContinue:disabled {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  border-color: transparent;
+  opacity: 0.65;
+}
+#startDialog :is(#startStatus, #startOpenHint, #startBackgroundNotice) {
+  max-width: none;
+  margin: 12px 0 0;
+  font:
+    12px/18px "MKW UI",
+    sans-serif;
+  min-height: 0;
+  color: var(--md-sys-color-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+#startDialog :is(#startStatus.is-error, #startBackgroundNotice) {
+  color: var(--md-sys-color-error);
+}
+#startDialog #startOpenHint {
+  margin-top: 8px;
+}
+#startDialog .start-mode-help {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 12px 4px;
+}
+#startDialog .start-mode-help > div {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+#startDialog .start-mode-help .ui-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: var(--md-sys-color-primary);
+}
+#startDialog .start-mode-help p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#startDialog .start-mode-help :is(strong, span) {
+  display: block;
+}
+#startDialog .start-mode-help strong {
+  color: var(--md-sys-color-on-surface);
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 4px;
+}
+#startDialog .start-home-footer {
+  display: block;
+  padding: 12px 4px 0;
+  font-size: 12px;
+  line-height: 18px;
+}
+#startDialog #startHelp {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: 8px;
+  color: var(--md-sys-color-primary);
+}
+@media (max-width: 500px) {
+  #startDialog .start-home-header {
+    padding: 20px 20px 12px;
+    gap: 16px;
+  }
+  #startDialog .start-home-content {
+    padding: 0 20px 20px;
+  }
+  #startDialog .start-brand img {
+    width: 190px;
+  }
+  #startDialog .start-home-card {
+    padding: 16px;
+  }
+  #startDialog :is(.start-choices, .start-open-options) {
+    gap: 8px;
+  }
+  #startDialog :is(.start-choices, .start-open-options) button {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+  #startDialog .start-mode-help {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  #startDialog #startHelp {
+    margin-left: 0;
+  }
+}
+/* Keep the personal image behind task dialogs, without showing two interfaces at once. */
+body:has(
+    #projectSetup[open],
+    #templateGallery[open],
+    #projectLibrary[open],
+    #settingsDialog[open],
+    #studioHelpDialog[open]
+  )
+  #startDialog[open] {
+  background: transparent;
+  box-shadow: none;
+}
+body:has(
+    #projectSetup[open],
+    #templateGallery[open],
+    #projectLibrary[open],
+    #settingsDialog[open],
+    #studioHelpDialog[open]
+  )
+  #startDialog[open]
+  > * {
+  visibility: hidden;
+}
