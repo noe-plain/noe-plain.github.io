@@ -12,6 +12,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Automatik Sponsorlogo");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const result = await page.evaluate(async () => {
       const logoCanvas = makeCanvas(500, 180),
         ctx = exportContext(logoCanvas);

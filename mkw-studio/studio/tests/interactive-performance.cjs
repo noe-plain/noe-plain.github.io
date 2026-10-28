@@ -12,6 +12,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Flüssig arbeiten");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.evaluate(() => {
       for (let i = 0; i < 12; i++) {
         const c = makeCanvas(800, 1000),

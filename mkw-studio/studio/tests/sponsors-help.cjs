@@ -110,6 +110,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#setupName").fill("Sponsorleisten");
     await page.locator("[data-format-enabled]").nth(2).check();
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const photo = fs
       .readFileSync(
         path.resolve("testbilder/260831_A1_Probe_c-noe-plain-4.jpg"),
@@ -944,7 +945,13 @@ const { launch, artifact } = require("./browser.cjs");
         png: a.every((v, i) => v === e[i]),
         diff: a.reduce((n, v, i) => n + (v !== e[i]), 0),
         max: a.reduce((n, v, i) => Math.max(n, Math.abs(v - e[i])), 0),
-        strip: !!strip?.children?.some(l=>l.vectorFill?.type==="color") && !!(()=>{const flat=ls=>ls.flatMap(l=>[l,...flat(l.children||[])]);return flat(strip.children).some(l=>l.placedLayer)})(),
+        strip:
+          !!strip?.children?.some((l) => l.vectorFill?.type === "color") &&
+          !!(() => {
+            const flat = (ls) =>
+              ls.flatMap((l) => [l, ...flat(l.children || [])]);
+            return flat(strip.children).some((l) => l.placedLayer);
+          })(),
         logos: MKWProjectAssets.compact(p).logos.length,
       };
     });

@@ -17,6 +17,7 @@ const assert = require("node:assert/strict");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Bildkarten");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const fixture = await page.evaluate(() => {
       MKWSubject.detect = async () => [];
       const c = makeCanvas(1600, 2000),

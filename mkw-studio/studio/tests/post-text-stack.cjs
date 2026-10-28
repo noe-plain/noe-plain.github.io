@@ -12,6 +12,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Textstapel");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.evaluate(async () => {
       const c = makeCanvas(1600, 2000),
         ctx = c.getContext("2d");

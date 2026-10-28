@@ -12,6 +12,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Winkel in Einzelposts");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.evaluate(async () => {
       p.meta.headline = "Konzert";
       const c = makeCanvas(2400, 2400),
@@ -71,13 +72,27 @@ const { launch, artifact } = require("./browser.cjs");
       JSON.stringify(rows),
     );
     await page.locator(`[data-post-angle="${ids[0]}"]`).check();
-    assert(await page.evaluate(() => p.boards.filter((b) => b.imageId === p.images[0].id).every((b) => b.angle.enabled)));
-    assert(await page.evaluate(() => p.boards.filter((b) => b.imageId === p.images[1].id).every((b) => !b.angle?.enabled)));
     assert(
       await page.evaluate(() =>
-        p.boards.filter((b) => b.angle?.enabled).every((b) =>
-          MKWPostAngle.covers(b, asset(b), MKWPostAngleEditor.area(b)),
-        ),
+        p.boards
+          .filter((b) => b.imageId === p.images[0].id)
+          .every((b) => b.angle.enabled),
+      ),
+    );
+    assert(
+      await page.evaluate(() =>
+        p.boards
+          .filter((b) => b.imageId === p.images[1].id)
+          .every((b) => !b.angle?.enabled),
+      ),
+    );
+    assert(
+      await page.evaluate(() =>
+        p.boards
+          .filter((b) => b.angle?.enabled)
+          .every((b) =>
+            MKWPostAngle.covers(b, asset(b), MKWPostAngleEditor.area(b)),
+          ),
       ),
     );
     assert.equal(
@@ -93,7 +108,9 @@ const { launch, artifact } = require("./browser.cjs");
       .selectOption("up");
     assert(
       await page.evaluate(() =>
-        p.boards.filter((b) => b.imageId === p.images[0].id).every((b) => b.angle.direction === "up"),
+        p.boards
+          .filter((b) => b.imageId === p.images[0].id)
+          .every((b) => b.angle.direction === "up"),
       ),
     );
     await page.locator(`[data-text-picker="${ids[1]}"] summary`).click();
@@ -108,7 +125,13 @@ const { launch, artifact } = require("./browser.cjs");
       await page.evaluate(() => p.boards.map((b) => b.angle.direction)),
       ["left", "left", "down", "down"],
     );
-    assert(await page.evaluate(() => !createBoard({ ...p.images[0], id: "new-photo" }, 1080, 1350).angle), "New images never inherit an angle from the first image");
+    assert(
+      await page.evaluate(
+        () =>
+          !createBoard({ ...p.images[0], id: "new-photo" }, 1080, 1350).angle,
+      ),
+      "New images never inherit an angle from the first image",
+    );
     // Geometry is backed by the same Path2D mask as the carousel, for every direction.
     const masks = await page.evaluate(() => {
       const b = p.boards[0],
@@ -161,7 +184,7 @@ const { launch, artifact } = require("./browser.cjs");
     await drag(await point(), 18, -12);
     const moved = await page.evaluate(() => clone(p.boards[0].angle));
     assert.notDeepEqual(moved.tip, initial.angle.tip);
-    assert.equal(moved.tip.y, .5);
+    assert.equal(moved.tip.y, 0.5);
     assert.deepEqual(
       await page.evaluate(() => p.boards[0].image),
       initial.background,
@@ -279,20 +302,23 @@ const { launch, artifact } = require("./browser.cjs");
         const a = exportContext(actual).getImageData(0, 0, b.w, b.h).data,
           e = exportContext(expected).getImageData(0, 0, b.w, b.h).data;
         const psd = agPsd.readPsd(await (await buildPSD()).arrayBuffer()),
-          layer = psd.children[0].children.find(
-            (l) => l.name === "Winkel",
-          ),
+          layer = psd.children[0].children.find((l) => l.name === "Winkel"),
           direct = await layerBitmap(b, "postAngle"),
           layerCanvas = makeCanvas(b.w, b.h),
           layerContext = exportContext(layerCanvas);
-        for(const child of layer.children) layerContext.drawImage(child.canvas, child.left || 0, child.top || 0);
+        for (const child of layer.children)
+          layerContext.drawImage(child.canvas, child.left || 0, child.top || 0);
         const la = layerContext.getImageData(0, 0, b.w, b.h).data,
           ld = exportContext(direct.canvas).getImageData(0, 0, b.w, b.h).data;
         return {
           png: a.every((v, i) => v === e[i]),
           // Separate translucent photo/glow caches round alpha independently.
-          psd: la.every((v, i) => Math.abs(v - ld[i]) <= 3) && la.reduce((n,v,i)=>n+(v!==ld[i]),0)/la.length < .005,
-          merged: exportContext(psd.canvas).getImageData(0,0,b.w,b.h).data.every((v,i)=>v===e[i]),
+          psd:
+            la.every((v, i) => Math.abs(v - ld[i]) <= 3) &&
+            la.reduce((n, v, i) => n + (v !== ld[i]), 0) / la.length < 0.005,
+          merged: exportContext(psd.canvas)
+            .getImageData(0, 0, b.w, b.h)
+            .data.every((v, i) => v === e[i]),
           psdSize: [
             layerCanvas.width,
             layerCanvas.height,
@@ -307,7 +333,9 @@ const { launch, artifact } = require("./browser.cjs");
               if (la[i] !== ld[i]) out.push([i, la[i], ld[i]]);
             return out;
           })(),
-          layer: !!layer.children.find(child=>child.placedLayer&&child.vectorMask?.notLink),
+          layer: !!layer.children.find(
+            (child) => child.placedLayer && child.vectorMask?.notLink,
+          ),
           opaque: a.every((v, i) => i % 4 !== 3 || v === 255),
         };
       } finally {
@@ -316,7 +344,10 @@ const { launch, artifact } = require("./browser.cjs");
     });
     assert(fidelity.png, JSON.stringify(fidelity));
     assert(fidelity.psd, JSON.stringify(fidelity));
-    assert(fidelity.merged, "Full PSD reference must preserve the original appearance");
+    assert(
+      fidelity.merged,
+      "Full PSD reference must preserve the original appearance",
+    );
     assert(fidelity.layer);
     assert(fidelity.opaque);
     await page.evaluate(async () => {

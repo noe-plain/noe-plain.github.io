@@ -13,6 +13,7 @@ const assert = require("node:assert/strict");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Projekt A");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.evaluate(async () => {
       MKWSubject.detect = async () => [];
       const c = makeCanvas(800, 1000),

@@ -13,6 +13,7 @@ const { launch } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("50 Bilder Dateisicherung");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const native = await page.evaluate(async () => {
       const root = await navigator.storage.getDirectory(),
         h = await root.getFileHandle("fifty.mkw", { create: true });

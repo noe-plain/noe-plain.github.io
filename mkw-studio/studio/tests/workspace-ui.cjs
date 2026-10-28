@@ -25,6 +25,7 @@ const assert = require("node:assert/strict");
     await page.locator("#setupName").fill("Sommerkonzerte");
     await page.locator("#setupCode").fill("S1");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const fixture = await page.evaluate(() => {
       MKWSubject.detect = async () => [];
       const canvas = makeCanvas(2400, 3000),
@@ -212,6 +213,7 @@ const assert = require("node:assert/strict");
     await page.locator("#setupName").fill("Sommer Carousel");
     assert.equal(await page.locator("#cb").inputValue(), "200");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.locator("#carouselCanvas").waitFor();
     await checkBento("#carouselViewport", "#carouselSidebar");
     const carouselBar = await page

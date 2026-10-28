@@ -31,6 +31,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Projekt Eins");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const writableHandles = await page.evaluate(async () => {
       const root = await navigator.storage.getDirectory(),
         h = await root.getFileHandle("capability-probe.mkw", { create: true });
@@ -125,7 +126,9 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#saveProject").click();
       const downloaded = await downloading,
         text = require("node:fs").readFileSync(await downloaded.path());
-      const decoded = await require("../static/project-file.js").decode(new Blob([text]));
+      const decoded = await require("../static/project-file.js").decode(
+        new Blob([text]),
+      );
       assert.equal(downloaded.suggestedFilename(), "Gewählter_Name.mkw");
       first = { id: await page.evaluate(() => p.projectId), text };
       assert.equal(decoded.projectId, first.id);

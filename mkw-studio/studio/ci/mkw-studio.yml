@@ -14,7 +14,12 @@ on:
 permissions:
   contents: read
 jobs:
-  studio:
+  browser_checks:
+    name: browser (${{ matrix.browser }})
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     defaults:
@@ -32,7 +37,7 @@ jobs:
           cache: npm
           cache-dependency-path: mkw-studio/studio/package-lock.json
       - run: npm ci
-      - run: npx playwright install --with-deps chromium firefox
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npm test
       - run: npm run format:check
       - run: npm run build
@@ -40,6 +45,7 @@ jobs:
         id: verify_build
         run: git diff --exit-code -- index.html static/editor.bundle.js static/editor.bundle.css static/editor.bundle.js.map
       - name: Browser regression checks
+        if: ${{ matrix.browser == 'chromium' }}
         env:
           MKW_CI_SCOPE: ${{ inputs.scope }}
         run: |
@@ -49,7 +55,7 @@ jobs:
             npm run test:browser
           fi
       - name: Firefox export regression checks
-        if: ${{ !cancelled() && steps.verify_build.outcome == 'success' }}
+        if: ${{ matrix.browser == 'firefox' }}
         run: |
           if [ "$MKW_CI_SCOPE" = "text-and-scroll" ]; then
             xvfb-run --auto-servernum node tests/run-browser.mjs inline-fidelity post-workspace modifier-scroll colour-combinations
@@ -63,5 +69,16 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mkw-studio-test-results
+          name: mkw-studio-test-results-${{ matrix.browser }}
           path: /tmp/mkw-test-results
+
+  studio:
+    needs: browser_checks
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Both browser checks must succeed
+        env:
+          BROWSER_CHECK_RESULT: ${{ needs.browser_checks.result }}
+        run: test "$BROWSER_CHECK_RESULT" = "success"

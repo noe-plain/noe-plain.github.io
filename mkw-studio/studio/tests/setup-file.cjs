@@ -14,6 +14,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Setup prüfen");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     await page.evaluate(async () => {
       const canvas = makeCanvas(1000, 1200),
         ctx = canvas.getContext("2d");
@@ -43,13 +44,15 @@ const { launch, artifact } = require("./browser.cjs");
     );
     assert(await page.locator("#setupRefresh").isDisabled());
     await page.locator("[data-theme-choice=dark]").click();
-    await page.locator("#settings-tab-workflow").click();await page.locator("[data-ui-density=compact]").click();
+    await page.locator("#settings-tab-workflow").click();
+    await page.locator("[data-ui-density=compact]").click();
     await page.locator("#settings-tab-general").click();
     await page.locator("#primaryColour").evaluate((el) => {
       el.value = "#c2247a";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    await page.locator("#settings-tab-workflow").click();await page.locator("#advancedMode").check();
+    await page.locator("#settings-tab-workflow").click();
+    await page.locator("#advancedMode").check();
     await page.locator("#settings-tab-export").click();
     await page.locator("#autoSaveFile").uncheck();
     await page.locator("#settings-tab-guides").click();
@@ -462,6 +465,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#startNew").click();
     await page.locator("#setupName").fill("Neue Standardgrössen");
     await page.locator("#createProject").click();
+    await require("./browser.cjs").waitForProjectReady(page);
     const newSizes = await page.evaluate(() => {
       const im = { id: uid(), width: 100, height: 100 };
       return Object.fromEntries(
