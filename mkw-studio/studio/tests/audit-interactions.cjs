@@ -205,7 +205,10 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#setupName").fill("Designer Bedienprüfung");
     await page.locator("#cn").fill("2");
     await page.locator("#createProject").click();
-    await page.waitForFunction(() => p.carousel && !busy);
+    await page.waitForFunction(
+      () =>
+        p.carousel && !busy && !document.querySelector("#projectSetup").open,
+    );
     await page.evaluate(async () => {
       studioPreferences.advanced = true;
       studioApplyPreferences();
@@ -226,7 +229,9 @@ const { launch, artifact } = require("./browser.cjs");
     ]) {
       await page.evaluate(async (v) => {
         carouselSetZoom(v);
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        );
       }, value);
       assert.equal(await page.locator("#carouselZoomOut").isDisabled(), out);
       assert.equal(await page.locator("#carouselZoomIn").isDisabled(), into);

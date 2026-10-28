@@ -574,13 +574,18 @@ const MKWProjects = (() => {
   async function startDocument(document) {
     validate(document);
     validateCarousel(document);
-    if (savedRevision < revision) await autosave();
-    await restore(document);
-    revision = 1;
-    savedRevision = 0;
-    busy = false;
-    await autosave({ writeFile: false });
-    return document;
+    const wasBusy = busy;
+    busy = true;
+    try {
+      if (savedRevision < revision) await autosave();
+      await restore(document);
+      revision = 1;
+      savedRevision = 0;
+      await autosave({ writeFile: false });
+      return document;
+    } finally {
+      busy = p === document ? false : wasBusy;
+    }
   }
   return {
     autosave,

@@ -302,8 +302,28 @@ const { launch, artifact } = require("./browser.cjs");
       })),
       before,
     );
-    await page.evaluate(() => (carouselNewDocument = originalNewDocument));
+    await page.evaluate(() => {
+      carouselNewDocument = originalNewDocument;
+      window.originalStoreSave = MKWProjectStore.save;
+      MKWProjectStore.save = async (...args) => {
+        window.projectBackupPending = true;
+        await new Promise((resolve) => (window.releaseProjectBackup = resolve));
+        return originalStoreSave(...args);
+      };
+    });
     await page.locator("#createProject").click();
+    await page.waitForFunction(() => window.projectBackupPending);
+    assert.equal(
+      await page.evaluate(() => busy),
+      true,
+      "Creation stays busy until its initial browser backup completes",
+    );
+    assert(await page.locator("#projectSetup").isVisible());
+    assert(await page.locator("#createProject").isDisabled());
+    await page.evaluate(() => {
+      MKWProjectStore.save = originalStoreSave;
+      releaseProjectBackup();
+    });
     await page.waitForFunction(
       () =>
         p.carousel?.n === 1 &&
