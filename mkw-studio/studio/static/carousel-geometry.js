@@ -16,6 +16,19 @@ function carouselAnglePath(o) {
 }
 
 function carouselAngleBleed(o, c = p.carousel, lockedAxis = null) {
+  if (MKWCarouselPolicy.isFree(c)) {
+    const index = MKWCarouselPolicy.nearest(c, carouselObjectBounds(o));
+    const a = MKWCarouselPolicy.frame(c, index < 0 ? 0 : index),
+      local = { ...o, x: o.x - a.x, y: o.y - a.y };
+    carouselAngleBleed(
+      local,
+      { ...c, layout: undefined, artboards: undefined, w: a.w, h: a.h, n: 1 },
+      lockedAxis,
+    );
+    o.x = local.x + a.x;
+    o.y = local.y + a.y;
+    return;
+  }
   const width = c.w * c.n,
     height = c.h;
   if (lockedAxis !== "x") {
@@ -152,6 +165,22 @@ function carouselAngleTip(o) {
 }
 
 function carouselInitialAngle(o, c = p.carousel) {
+  if (MKWCarouselPolicy.isFree(c)) {
+    const index = MKWCarouselPolicy.nearest(c, carouselObjectBounds(o)),
+      a = MKWCarouselPolicy.frame(c, Math.max(0, index)),
+      local = { ...o, x: o.x - a.x, y: o.y - a.y };
+    carouselInitialAngle(local, {
+      ...c,
+      layout: undefined,
+      artboards: undefined,
+      w: a.w,
+      h: a.h,
+      n: 1,
+    });
+    o.x = local.x + a.x;
+    o.y = local.y + a.y;
+    return;
+  }
   if (o.angle) return carouselRotatedAngleAlign(o, c);
   const tip = carouselAngleTip(o),
     axis = MKWAnglePolicy.horizontal(o.direction) ? "y" : "x";

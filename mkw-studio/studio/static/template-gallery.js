@@ -7,7 +7,8 @@ const MKWTemplateGallery = (() => {
     requiredImages = [],
     values = Object.create(null),
     pending = 0,
-    creating = false;
+    creating = false,
+    stage = "choose";
   const drafts = new Map();
   let livePreview;
   const kindNames = {
@@ -25,11 +26,57 @@ const MKWTemplateGallery = (() => {
     el.classList.toggle("is-error", error);
     el.setAttribute("role", error ? "alert" : "status");
   }
+  function showStage(next, focus = false) {
+    stage = next;
+    $("#templateChoose").hidden = next !== "choose";
+    $("#templateFill").hidden = next !== "fill";
+    $("#templateCreate").hidden = next !== "fill";
+    $("#templateGalleryTitle").textContent =
+      next === "fill"
+        ? "Vorlage mit Inhalten füllen"
+        : "Mit einer Vorlage starten";
+    updateReady();
+    if (focus)
+      (next === "fill"
+        ? $("#templateProjectName")
+        : $("#templateSearch")
+      ).focus({ preventScroll: true });
+  }
+  function filterCards() {
+    const search = $("#templateSearch").value.trim().toLocaleLowerCase("de"),
+      origin = $("#templateOrigin").value;
+    let count = 0;
+    for (const card of dialog.querySelectorAll("[data-template-id]")) {
+      card.hidden = !(
+        card.dataset.search.includes(search) &&
+        (origin === "all" || card.dataset.origin === origin)
+      );
+      if (!card.hidden) count++;
+    }
+    $("#templateEmpty").hidden = !!count;
+    $("#templateResultCount").textContent =
+      `${count} ${count === 1 ? "Vorlage" : "Vorlagen"}`;
+    $("#templateCards").scrollLeft = 0;
+    $("#templateCards").dispatchEvent(new Event("scroll"));
+  }
+  function filterLayers() {
+    const value = $("#templateAreaFilter").value;
+    for (const field of dialog.querySelectorAll("[data-template-layer]"))
+      field.hidden =
+        value !== "all" &&
+        !field.dataset.templateAreas.split(" ").includes(value);
+    for (const group of dialog.querySelectorAll(".template-content-group"))
+      group.hidden = ![...group.querySelectorAll("[data-template-layer]")].some(
+        (el) => !el.hidden,
+      );
+    if (value !== "all") livePreview.jump(+value);
+  }
   function missingImages() {
     return requiredImages.filter((slot) => !values[slot.id]?.[slot.channel]);
   }
   function updateReady() {
-    $("#templateCreate").disabled = !!pending || !selectedTemplate;
+    $("#templateCreate").disabled =
+      !!pending || !selectedTemplate || stage !== "fill";
     const progress = $("#templateFillProgress");
     if (!progress || !selectedTemplate) return;
     const missing = missingImages(),
@@ -180,7 +227,18 @@ const MKWTemplateGallery = (() => {
         body =
           '<p class="template-design-kept">Form, Farben und Effekte aus der Vorlage bleiben erhalten. Im Designer anpassbar.</p>';
     }
-    return `<section class="template-layer" data-template-layer="${esc(o.id)}"><div class="template-layer-heading">${studioIcon(o.type === "logo" ? "logo" : o.type)}<div><h4>${esc(o.name)}</h4><small>${esc([folder?.name, kindNames[o.type], visible ? null : "Ausgeblendet"].filter(Boolean).join(" · "))}</small></div></div>${body}<p data-template-error role="status" hidden></p></section>`;
+    const bounds = carouselObjectBounds(o),
+      areas = MKWCarouselPolicy.frames(t.carousel).flatMap((a, i) =>
+        MKWCarouselPolicy.intersects(a, bounds) ? [i] : [],
+      ),
+      owner = MKWCarouselPolicy.owner(t.carousel, bounds),
+      area =
+        areas.length > 1
+          ? `${areas.length} Zeichenflächen`
+          : owner >= 0
+            ? MKWCarouselPolicy.frame(t.carousel, owner).name
+            : "Ausserhalb der Zeichenflächen";
+    return `<section class="template-layer" data-template-areas="${areas.length ? areas.join(" ") : "-1"}" data-template-area="${owner}" data-template-layer="${esc(o.id)}"><div class="template-layer-heading">${studioIcon(o.type === "logo" ? "logo" : o.type)}<div><h4>${esc(o.name)}</h4><small>${esc([area, folder?.name, kindNames[o.type], visible ? null : "Ausgeblendet"].filter(Boolean).join(" · "))}</small></div></div>${body}<p data-template-error role="status" hidden></p></section>`;
   }
   async function select(id) {
     const finishLoading = MKWUIControls.loading("#templateStatus");
@@ -198,6 +256,10 @@ const MKWTemplateGallery = (() => {
         const t = await MKWTemplates.get(id);
         if (current !== generation || !dialog.open) return;
         selectedTemplate = t;
+        const card = dialog.querySelector(
+          `[data-template-id="${CSS.escape(id)}"]`,
+        );
+        if (card) loadPreview(card, current);
         const objects = new Map(t.carousel.objects.map((o) => [o.id, o]));
         requiredImages = MKWTemplateModel.requirements(t).flatMap((slot) => {
           const o = objects.get(slot.objectId);
@@ -214,7 +276,13 @@ const MKWTemplateGallery = (() => {
           .forEach((b) =>
             b.setAttribute("aria-pressed", String(b.dataset.templateId === id)),
           );
-        $("#templateFill").hidden = false;
+        showStage("fill");
+        $("#templateAreaFilter").innerHTML =
+          '<option value="all">Alle Zeichenflächen</option>' +
+          MKWCarouselPolicy.frames(t.carousel)
+            .map((a, i) => `<option value="${i}">${esc(a.name)}</option>`)
+            .join("") +
+          '<option value="-1">Ausserhalb der Zeichenflächen</option>';
         $("#templateFillTitle").textContent = t.name;
         $("#templateFillDescription").textContent = t.description;
         $("#templateFillDescription").hidden = !t.description;
@@ -254,21 +322,19 @@ const MKWTemplateGallery = (() => {
           `${t.carousel.n} ${t.carousel.n === 1 ? "Slide" : "Slides"} · Bilder einsetzen und Texte prüfen. Deine Vorlage bleibt unverändert.`,
         );
         updateReady();
-        $("#templateFill").scrollIntoView({
-          block: "nearest",
-          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-            ? "auto"
-            : "smooth",
-        });
+        $("#templateProjectName").focus({ preventScroll: true });
       } catch (error) {
-        if (current === generation) message(error.message, true);
+        if (current === generation) {
+          showStage("choose", true);
+          message(error.message, true);
+        }
       }
     } finally {
       finishLoading();
     }
   }
   async function create() {
-    if (pending || !selectedTemplate) return;
+    if (pending || !selectedTemplate || stage !== "fill") return;
     const name = $("#templateProjectName");
     if (!MKWFields.validate(name, true)) {
       message("Gib deinem Projekt bitte einen Namen.", true);
@@ -280,6 +346,8 @@ const MKWTemplateGallery = (() => {
       .querySelectorAll(".needs-content")
       .forEach((el) => el.classList.remove("needs-content"));
     if (missing.length) {
+      $("#templateAreaFilter").value = "all";
+      filterLayers();
       for (const slot of missing) {
         const card = dialog.querySelector(
             `[data-template-layer="${CSS.escape(slot.id)}"]`,
@@ -329,7 +397,7 @@ const MKWTemplateGallery = (() => {
     dialog = document.createElement("dialog");
     dialog.id = "templateGallery";
     dialog.setAttribute("aria-labelledby", "templateGalleryTitle");
-    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="templateGalleryTitle">Mit einer Vorlage starten</h2><p>Wähle ein fertiges Design und ersetze seine Inhalte. Danach kannst du alles im Designer anpassen.</p></div><button class="icon-button" id="closeTemplateGallery" aria-label="Vorlagen schliessen">${studioIcon("close")}</button></div><div class="template-gallery-heading"><h3>1 · Vorlage auswählen</h3><div class="template-slider-controls"><button id="templatePrevious" aria-label="Vorherige Vorlagen">${studioIcon("back")}</button><button id="templateNext" aria-label="Weitere Vorlagen">${studioIcon("front")}</button></div></div><div id="templateCards" class="template-slider" role="group" aria-label="Vorlagen"></div><form id="templateFill" hidden><div class="template-fill-heading"><span class="template-step-label">2 · Inhalte einsetzen</span><h3 id="templateFillTitle"></h3><p id="templateFillDescription"></p></div><div class="template-content-fields"><h3>Projekt benennen</h3><div class="setup-project-fields"><label>Projektname<input id="templateProjectName" maxlength="80" required placeholder="Zum Beispiel: Saisonauftakt"></label><label>Kürzel<input id="templateProjectCode" maxlength="24" placeholder="E2"></label></div><p id="templateFillProgress" role="status"></p><div id="templateLayers"></div></div><aside id="templateLivePreview"></aside></form><div class="template-footer"><p id="templateStatus" role="status" aria-live="polite"></p><button id="templateCreate" class="primary" disabled>Im Designer öffnen</button></div>`;
+    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="templateGalleryTitle">Mit einer Vorlage starten</h2><p>Wähle ein fertiges Design und ersetze seine Inhalte. Danach kannst du alles im Designer anpassen.</p></div><button class="icon-button" id="closeTemplateGallery" aria-label="Vorlagen schliessen">${studioIcon("close")}</button></div><section id="templateChoose"><div class="template-gallery-heading"><h3>1 · Design auswählen</h3><span id="templateResultCount" role="status"></span><div class="template-slider-controls"><button id="templatePrevious" aria-label="Vorherige Vorlagen">${studioIcon("back")}</button><button id="templateNext" aria-label="Weitere Vorlagen">${studioIcon("front")}</button></div></div><div class="template-search-fields"><label>Vorlagen suchen<input type="search" id="templateSearch" placeholder="Name oder Beschreibung"></label><label>Sammlung<select id="templateOrigin"><option value="all">Alle Vorlagen</option><option value="builtin">Mitgeliefert</option><option value="own">Eigene Vorlagen</option></select></label></div><div id="templateCards" class="template-slider" role="group" aria-label="Vorlagen"></div><p id="templateEmpty" role="status" hidden>Keine passende Vorlage. Ändere die Suche oder die Sammlung.</p></section><form id="templateFill" hidden novalidate><div class="template-fill-heading"><button type="button" id="templateChangeChoice">${studioIcon("back")}Andere Vorlage wählen</button><span class="template-step-label">2 · Inhalte einsetzen</span><h3 id="templateFillTitle"></h3><p id="templateFillDescription"></p></div><div class="template-content-fields"><h3>Projekt benennen</h3><div class="setup-project-fields"><label>Projektname<input id="templateProjectName" maxlength="80" required placeholder="Zum Beispiel: Saisonauftakt"></label><label>Kürzel<input id="templateProjectCode" maxlength="24" placeholder="E2"></label></div><p id="templateFillProgress" role="status"></p><label class="template-area-filter">Inhalte anzeigen<select id="templateAreaFilter"><option value="all">Alle Zeichenflächen</option></select></label><div id="templateLayers"></div></div><aside id="templateLivePreview"></aside></form><div class="template-footer"><p id="templateStatus" role="status" aria-live="polite"></p><button id="templateCreate" class="primary" disabled>Im Designer öffnen</button></div>`;
     document.body.append(dialog);
     livePreview = MKWTemplateFillPreview.attach($("#templateLivePreview"));
     $("#closeTemplateGallery").onclick = () => {
@@ -373,6 +441,19 @@ const MKWTemplateGallery = (() => {
       create();
     };
     $("#templateCreate").onclick = create;
+    $("#templateSearch").oninput = filterCards;
+    $("#templateOrigin").onchange = filterCards;
+    $("#templateAreaFilter").onchange = filterLayers;
+    $("#templateChangeChoice").onclick = () => {
+      if (pending || creating)
+        return message("Bitte warte, bis das Bild fertig geladen ist.");
+      if (selectedTemplate) drafts.set(selectedTemplate.id, values);
+      livePreview.close();
+      showStage("choose", true);
+      message(
+        "Wähle ein Design. Deine bisherigen Eingaben bleiben beim Zurückwechseln erhalten.",
+      );
+    };
   }
   async function open() {
     mount();
@@ -387,7 +468,9 @@ const MKWTemplateGallery = (() => {
       pending = 0;
       drafts.clear();
       updateReady();
-      $("#templateFill").hidden = true;
+      showStage("choose");
+      $("#templateSearch").value = "";
+      $("#templateOrigin").value = "all";
       MKWFields.reset(dialog);
       $("#templateProjectName").value = $("#setupName").value || "";
       $("#templateProjectCode").value = $("#setupCode").value || "";
@@ -401,7 +484,7 @@ const MKWTemplateGallery = (() => {
         $("#templateCards").innerHTML = records
           .map(
             (t) =>
-              `<button type="button" class="template-card" data-template-id="${esc(t.id)}" aria-pressed="false"><span class="template-card-preview"><img alt="Vorschau: ${esc(t.name)}" hidden><span data-preview-status>Vorschau wird geladen …</span><span class="template-slide-badge">${t.n} ${t.n === 1 ? "Slide" : "Slides"}</span></span><strong>${esc(t.name)}</strong><small>${t.w} × ${t.h} px${t.builtIn ? " · Mitgeliefert" : ""}</small></button>`,
+              `<button type="button" class="template-card" data-template-id="${esc(t.id)}" data-origin="${t.builtIn ? "builtin" : "own"}" data-search="${esc((t.name + " " + (t.description || "")).toLocaleLowerCase("de"))}" aria-pressed="false"><span class="template-card-preview"><img alt="Vorschau: ${esc(t.name)}" hidden><span data-preview-status>Vorschau wird geladen …</span><span class="template-slide-badge">${t.n} ${t.layout === "free" ? "Flächen" : t.n === 1 ? "Slide" : "Slides"}</span></span><strong>${esc(t.name)}</strong><small>${t.mixed ? "Verschiedene Formate" : `${t.w} × ${t.h} px`}${t.builtIn ? " · Mitgeliefert" : ""}</small></button>`,
           )
           .join("");
         observer = new IntersectionObserver(
@@ -426,8 +509,9 @@ const MKWTemplateGallery = (() => {
           };
         slider.onscroll = updateArrows;
         updateArrows();
+        filterCards();
         message(
-          "Wähle eine Vorlage. Darunter erscheinen die Felder für deine Inhalte.",
+          "Wähle ein Design. Im nächsten Schritt setzt du Bilder und Texte ein.",
         );
       } catch (error) {
         message(error.message, true);
@@ -443,7 +527,12 @@ const MKWTemplateGallery = (() => {
     try {
       const t = await MKWTemplates.get(card.dataset.templateId),
         src = await MKWTemplatePreview.render(t);
-      if (current !== generation && !card.isConnected) return;
+      if (
+        !dialog.open ||
+        !card.isConnected ||
+        !$("#templateCards").contains(card)
+      )
+        return;
       const img = card.querySelector("img");
       img.src = src;
       img.hidden = false;

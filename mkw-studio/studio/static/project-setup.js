@@ -20,7 +20,7 @@ const MKWProjectSetup = (() => {
       <div class="new-project-basics"><div class="mode-buttons" role="group" aria-label="Projektmodus"><button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button></div><p id="setupInstructions"></p>
       <div class="setup-project-fields"><label>Projektname<input id="setupName" type="text" maxlength="80" placeholder="Zum Beispiel: Herbstkonzerte" required autofocus></label><label>Kürzel<input id="setupCode" type="text" maxlength="24" placeholder="E2" aria-describedby="setupCodeHint"></label></div><p id="setupCodeHint">Das Kürzel wird für deine Dateinamen verwendet.</p></div>
       <div class="new-project-grid"><section class="new-project-formats" aria-label="Formate einrichten"><div id="postSetup"><div class="new-project-section-heading"><h3>Formate auswählen</h3><span id="setupFormatCount"></span></div><div id="formatChoices"></div><button type="button" id="addFormat">${studioIcon("add")}<span>Eigenes Format hinzufügen</span></button></div>
-      <section id="carouselSetup" hidden><h3>Slides einrichten</h3><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></div></section></section>
+      <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">Zusammenhängende Slides</button><button type="button" data-designer-layout="free" aria-pressed="false">Freie Zeichenflächen</button></div><p id="designerLayoutHint"></p><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></div></section></section>
       <section class="new-project-detail" aria-labelledby="setupDetailTitle"><div class="new-project-section-heading"><h3 id="setupDetailTitle">Schutzzonen</h3><span id="setupDetailDimensions"></span></div><p id="setupDetailScope"></p><div class="setup-safe-diagram"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner"><span>Schutzzone</span></div></div></div><div id="setupSafeFields">${[
         ["top", "Oben"],
         ["bottom", "Unten"],
@@ -32,6 +32,11 @@ const MKWProjectSetup = (() => {
           "",
         )}</div><p id="setupSafeFeedback" class="format-feedback" role="status"></p><p class="setup-safe-hint">Die Hilfslinien zeigen, wo wichtige Texte und Logos genügend Abstand zum Rand haben.</p></section></div>
     </div><div class="setup-actions"><div class="setup-footer-info"><p id="setupSummary"></p><p id="setupError" role="alert"></p></div><div class="setup-footer-buttons"><button type="button" id="cancelSetup">Abbrechen</button><button type="button" id="createProject" class="primary">Projekt erstellen</button></div></div>`;
+  for (const button of dialog.querySelectorAll("[data-designer-layout]"))
+    button.onclick = () => {
+      draft.designer.layout = button.dataset.designerLayout;
+      refresh();
+    };
   const current = () =>
     draft.mode === "carousel"
       ? draft.designer
@@ -90,6 +95,21 @@ const MKWProjectSetup = (() => {
     const f = current(),
       designer = draft.mode === "carousel",
       errors = formatErrors(f);
+    const free = draft.designer.layout === "free";
+    for (const button of dialog.querySelectorAll("[data-designer-layout]"))
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.designerLayout === draft.designer.layout),
+      );
+    $("#designerLayoutHint").textContent = free
+      ? "Einzelne Flächen frei nebeneinander oder untereinander platzieren. Formate und Schutzzonen kannst du später pro Fläche ändern."
+      : "Slides grenzen direkt aneinander und teilen sich ein Format – für einen zusammenhängenden Beitrag.";
+    $("#setupCountHint").textContent = free
+      ? "1–20 Zeichenflächen · Startformat, später einzeln anpassbar"
+      : "1–20 Slides · ein gemeinsames Format";
+    dialog.querySelector('label[for="cn"]').textContent = free
+      ? "Anzahl Zeichenflächen"
+      : "Anzahl Slides";
     if (!designer) validateRows();
     else
       feedback(
@@ -109,7 +129,7 @@ const MKWProjectSetup = (() => {
           (100 * f[key]) / (key === "top" || key === "bottom" ? f.h : f.w) +
             "%",
         );
-      if (designer) MKWDesignerGrid.preview(inner, f);
+      if (designer) MKWDesignerGrid.preview(inner, model.format(f));
       else {
         inner.classList.remove("designer-grid");
         inner.style.cssText = "";
@@ -121,12 +141,16 @@ const MKWProjectSetup = (() => {
     }
     preview.setAttribute("role", "img");
     $("#setupDetailTitle").textContent = designer
-      ? "Schutzzonen · pro Slide"
+      ? free
+        ? "Schutzzonen · Startwerte"
+        : "Schutzzonen · pro Slide"
       : `Schutzzonen · ${ratio(f)}`;
     $("#setupDetailDimensions").textContent =
       Number.isFinite(f.w) && Number.isFinite(f.h) ? `${f.w} × ${f.h} px` : "";
     $("#setupDetailScope").textContent = designer
-      ? "Gilt gemeinsam für alle Slides."
+      ? free
+        ? "Startwerte für die neuen Zeichenflächen. Später im Designer einzeln anpassbar."
+        : "Gilt gemeinsam für alle Slides."
       : f.enabled
         ? "Dieses Format ist ausgewählt."
         : "Dieses Format ist noch nicht ausgewählt.";
@@ -145,8 +169,10 @@ const MKWProjectSetup = (() => {
       $("#setupSlideMinus").disabled = creating || !validCount || f.n <= 1;
       $("#setupSlidePlus").disabled = creating || !validCount || f.n >= 20;
       if (validCount && Object.keys(model.errors(f, true)).length === 0) {
-        $("#carouselArtworkSize").textContent =
-          `${f.w * f.n} × ${f.h} px gesamt`;
+        $("#carouselArtworkSize").textContent = free
+          ? `${f.n} einzelne Zeichenflächen · Startformat ${f.w} × ${f.h} px`
+          : `${f.w * f.n} × ${f.h} px gesamt`;
+        $("#carouselSetupStrip").classList.toggle("is-free", free);
         $("#carouselSetupStrip").innerHTML = Array.from(
           { length: f.n },
           (_, i) =>
@@ -155,7 +181,7 @@ const MKWProjectSetup = (() => {
       }
     }
     $("#setupSummary").textContent = designer
-      ? `Designer · ${MKWCarouselPolicy.validCount(f.n) ? f.n : "–"} ${f.n === 1 ? "Slide" : "Slides"}`
+      ? `Designer · ${MKWCarouselPolicy.validCount(f.n) ? f.n : "–"} ${free ? "freie Zeichenflächen" : f.n === 1 ? "Slide" : "Slides"}`
       : `FD-Kampagnen · ${enabled} ${enabled === 1 ? "Format" : "Formate"}`;
   }
   function detail(id) {
@@ -246,6 +272,7 @@ const MKWProjectSetup = (() => {
         left: 100,
         right: 100,
         n: 4,
+        layout: "slides",
       },
     };
     activeId = draft.formats[0].id;
@@ -336,6 +363,7 @@ const MKWProjectSetup = (() => {
             model.format(draft.designer),
             draft.designer.n,
             meta,
+            draft.designer.layout,
           )
         : fresh();
       if (!designer) {

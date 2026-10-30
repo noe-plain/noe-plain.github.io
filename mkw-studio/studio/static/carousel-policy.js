@@ -25,12 +25,120 @@
       c.left + c.right < c.w
     );
   }
+  function isFree(c) {
+    return c.layout === "free";
+  }
+  function frame(c, slide = 0) {
+    return isFree(c)
+      ? c.artboards?.[slide]
+      : {
+          ...Object.fromEntries(formatKeys.map((key) => [key, c[key]])),
+          x: slide * c.w,
+          y: 0,
+          name: `Slide ${slide + 1}`,
+          bg: c.bg,
+        };
+  }
+  function frames(c) {
+    return Array.from({ length: c.n }, (_, i) => frame(c, i));
+  }
+  function extent(c) {
+    if (!isFree(c)) return { w: c.w * c.n, h: c.h };
+    return c.artboards.reduce(
+      (b, a) => ({ w: Math.max(b.w, a.x + a.w), h: Math.max(b.h, a.y + a.h) }),
+      { w: 0, h: 0 },
+    );
+  }
+  const intersects = (a, b) =>
+    a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  function validBoards(c) {
+    if (!isFree(c)) return c.layout === undefined && c.artboards === undefined;
+    if (
+      !Array.isArray(c.artboards) ||
+      c.artboards.length !== c.n ||
+      !validCount(c.n)
+    )
+      return false;
+    const ids = new Set();
+    for (const [i, a] of c.artboards.entries()) {
+      if (
+        !a ||
+        !validFormat(a) ||
+        !Number.isInteger(a.x) ||
+        !Number.isInteger(a.y) ||
+        a.x < 0 ||
+        a.y < 0 ||
+        a.x + a.w > 100000 ||
+        a.y + a.h > 100000 ||
+        typeof a.id !== "string" ||
+        !/^[-\w]{1,160}$/.test(a.id) ||
+        ids.has(a.id) ||
+        typeof a.name !== "string" ||
+        !a.name.trim() ||
+        a.name.length > 80 ||
+        !/^#[0-9a-f]{6}$/i.test(a.bg)
+      )
+        return false;
+      if (c.artboards.slice(0, i).some((b) => intersects(a, b))) return false;
+      ids.add(a.id);
+    }
+    return true;
+  }
+  function owner(c, bounds) {
+    let best = -1,
+      area = 0;
+    frames(c).forEach((a, i) => {
+      const shared =
+        Math.max(
+          0,
+          Math.min(a.x + a.w, bounds.x + bounds.w) - Math.max(a.x, bounds.x),
+        ) *
+        Math.max(
+          0,
+          Math.min(a.y + a.h, bounds.y + bounds.h) - Math.max(a.y, bounds.y),
+        );
+      if (shared > area) {
+        area = shared;
+        best = i;
+      }
+    });
+    return best;
+  }
+  function nearest(c, bounds) {
+    const assigned = owner(c, bounds);
+    if (assigned >= 0) return assigned;
+    const x = bounds.x + bounds.w / 2,
+      y = bounds.y + bounds.h / 2;
+    let best = 0,
+      distance = Infinity;
+    frames(c).forEach((a, i) => {
+      const d = Math.hypot(
+        Math.max(a.x - x, 0, x - a.x - a.w),
+        Math.max(a.y - y, 0, y - a.y - a.h),
+      );
+      if (d < distance) {
+        best = i;
+        distance = d;
+      }
+    });
+    return best;
+  }
+  function containing(c, bounds) {
+    return frames(c).findIndex(
+      (a) =>
+        bounds.x >= a.x &&
+        bounds.y >= a.y &&
+        bounds.x + bounds.w <= a.x + a.w &&
+        bounds.y + bounds.h <= a.y + a.h,
+    );
+  }
   function safeRect(c, slide = 0) {
+    const a = frame(c, slide);
     return {
-      x: slide * c.w + c.left,
-      y: c.top,
-      w: c.w - c.left - c.right,
-      h: c.h - c.top - c.bottom,
+      x: a.x + a.left,
+      y: a.y + a.top,
+      w: a.w - a.left - a.right,
+      h: a.h - a.top - a.bottom,
     };
   }
   function formatPlan(c, value) {
@@ -89,6 +197,15 @@
   const api = Object.freeze({
     minSlides,
     maxSlides,
+    isFree,
+    frame,
+    frames,
+    extent,
+    validBoards,
+    owner,
+    nearest,
+    containing,
+    intersects,
     validCount,
     formatKeys,
     validFormat,

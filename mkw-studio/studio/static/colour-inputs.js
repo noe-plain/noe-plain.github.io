@@ -28,7 +28,7 @@ function studioOpenColourInput(input) {
     label,
     position: studioColourInputPosition,
     onBegin: () => {
-      if (!owner) checkpoint();
+      if (!owner && !input.hasAttribute("data-colour-draft")) checkpoint();
     },
     isCurrent: () =>
       p === project &&

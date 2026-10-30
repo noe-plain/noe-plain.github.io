@@ -483,8 +483,8 @@ function carouselVectorOverlay() {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.dataset.vectorOverlay = "";
   svg.classList.add("vector-guide");
-  svg.setAttribute("width", p.carousel.w * p.carousel.n * s);
-  svg.setAttribute("height", p.carousel.h * s);
+  svg.setAttribute("width", MKWCarouselPolicy.extent(p.carousel).w * s);
+  svg.setAttribute("height", MKWCarouselPolicy.extent(p.carousel).h * s);
   const local = {
     type: "path",
     w: 1,

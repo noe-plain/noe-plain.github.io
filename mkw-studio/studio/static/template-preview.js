@@ -52,17 +52,21 @@ const MKWTemplatePreview = (() => {
     const result = MKWTemplateModel.instantiate(template, { values }),
       q = MKWTemplates.documentFor(result),
       c = q.carousel;
-    const scale = Math.min(420 / c.w, 520 / c.h),
-      canvas = makeCanvas(Math.ceil(c.w * scale), Math.ceil(c.h * scale));
+    const frame = MKWCarouselPolicy.frame(c, slide),
+      scale = Math.min(420 / frame.w, 520 / frame.h),
+      canvas = makeCanvas(
+        Math.ceil(frame.w * scale),
+        Math.ceil(frame.h * scale),
+      );
     try {
       const objects = c.objects.filter((o) => {
         const b = carouselObjectBounds(o),
           pad = carouselVisualPadding(o);
         return (
-          b.x - pad < (slide + 1) * c.w &&
-          b.x + b.w + pad > slide * c.w &&
-          b.y - pad < c.h &&
-          b.y + b.h + pad > 0
+          b.x - pad < frame.x + frame.w &&
+          b.x + b.w + pad > frame.x &&
+          b.y - pad < frame.y + frame.h &&
+          b.y + b.h + pad > frame.y
         );
       });
       await carouselPaint(

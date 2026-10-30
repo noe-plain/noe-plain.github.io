@@ -15,10 +15,18 @@ function carouselPresentInspector() {
         ? "Formkonstrukteur"
         : items.length > 1
           ? `${items.length} Elemente`
-          : o?.name || (slide !== null ? `Slide ${slide + 1}` : "Dein Design"),
+          : o?.name ||
+            (slide !== null
+              ? MKWCarouselPolicy.frame(p.carousel, slide)?.name ||
+                `Slide ${slide + 1}`
+              : "Dein Design"),
     subtitle = o
       ? `${carouselToolNames[o.type] || "Element"} · ${carouselObjectLocked(o) ? "Gesperrt" : carouselUI.content ? "Bildinhalt bearbeiten" : "Element bearbeiten"}`
-      : `${p.carousel.n} Slides · ${p.carousel.w} × ${p.carousel.h} px`;
+      : MKWCarouselPolicy.isFree(p.carousel)
+        ? slide !== null
+          ? `${MKWCarouselPolicy.frame(p.carousel, slide).w} × ${MKWCarouselPolicy.frame(p.carousel, slide).h} px · einzeln anpassbar`
+          : `${p.carousel.n} freie Zeichenflächen`
+        : `${p.carousel.n} Slides · ${p.carousel.w} × ${p.carousel.h} px`;
   MKWInspectorUI.present({
     root: $("#carouselSidebar"),
     panel: $("#carouselProperties"),
@@ -401,6 +409,16 @@ function carouselPanel() {
       c.bg = e.target.value;
       changed(false);
     };
+  }
+  if (!items.length && carouselUI.slide === null) {
+    if (MKWCarouselPolicy.isFree(c)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.id = "designerManageArtboards";
+      button.textContent = "Zeichenflächen verwalten";
+      button.onclick = () => carouselSlideSelect(0);
+      panel.prepend(button);
+    } else MKWArtboardUI.entry(panel);
   }
   carouselRefinementsPanel(panel, items);
   carouselLayerPanel();

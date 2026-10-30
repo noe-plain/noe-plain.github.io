@@ -25,8 +25,8 @@ const MKWTemplates = (() => {
       logos: [],
       boards: Array.from({ length: c.n }, (_, i) => ({
         carouselSlide: i,
-        w: c.w,
-        h: c.h,
+        w: MKWCarouselPolicy.frame(c, i).w,
+        h: MKWCarouselPolicy.frame(c, i).h,
       })),
     });
     return t;
@@ -83,7 +83,12 @@ const MKWTemplates = (() => {
       },
     ];
     q.boards = Array.from({ length: c.n }, (_, i) => ({
-      ...basicBoard(placeholder, c.w, c.h, q.meta),
+      ...basicBoard(
+        placeholder,
+        MKWCarouselPolicy.frame(c, i).w,
+        MKWCarouselPolicy.frame(c, i).h,
+        q.meta,
+      ),
       carouselSlide: i,
     }));
     return q;

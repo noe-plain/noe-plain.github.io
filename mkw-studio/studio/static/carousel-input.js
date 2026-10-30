@@ -289,13 +289,14 @@ function carouselMarquee(ev, start, add) {
 
 function carouselSnapLines(excluded = [...carouselUI.ids]) {
   const c = p.carousel,
-    xs = [0, c.w * c.n, c.left, c.w * c.n - c.right],
-    ys = [0, c.h, c.h / 2];
+    extent = MKWCarouselPolicy.extent(c),
+    xs = [0, extent.w],
+    ys = [0, extent.h];
   for (let i = 0; i < c.n; i++) {
-    xs.push(i * c.w, (i + 1) * c.w, (i + 0.5) * c.w);
-    xs.push(...MKWDesignerGrid.lines(c, i).x);
+    const a = MKWCarouselPolicy.frame(c, i);
+    xs.push(a.x, a.x + a.w, a.x + a.w / 2, ...MKWDesignerGrid.lines(c, i).x);
+    ys.push(a.y, a.y + a.h, a.y + a.h / 2, ...MKWDesignerGrid.lines(c, i).y);
   }
-  ys.push(...MKWDesignerGrid.lines(c).y);
   for (const o of c.objects)
     if (carouselObjectVisible(o) && !excluded.includes(o.id)) {
       const bounds = carouselObjectBounds(o);
@@ -436,7 +437,7 @@ function carouselDrawSnap() {
   root.innerHTML = carouselUI.snapLines
     .map(
       (line) =>
-        `<div class="carousel-snap-line ${line.axis === "x" ? "vertical" : "horizontal"}" style="${line.axis === "x" ? `left:${line.value * s}px;height:${c.h * s}px` : `top:${line.value * s}px;width:${c.w * c.n * s}px`}"></div>`,
+        `<div class="carousel-snap-line ${line.axis === "x" ? "vertical" : "horizontal"}" style="${line.axis === "x" ? `left:${line.value * s}px;height:${MKWCarouselPolicy.extent(c).h * s}px` : `top:${line.value * s}px;width:${MKWCarouselPolicy.extent(c).w * s}px`}"></div>`,
     )
     .join("");
 }

@@ -58,7 +58,7 @@
       $("#templateLibraryList").innerHTML = items
         .map(
           (t) =>
-            `<div class="template-library-row"><div><strong>${esc(t.name)}</strong><small>${t.n} ${t.n === 1 ? "Slide" : "Slides"} · ${t.w} × ${t.h} px${t.builtIn ? " · Mitgeliefert" : ""}</small></div>${t.builtIn ? "" : `<button data-remove-template="${esc(t.id)}" class="icon-button" aria-label="Vorlage entfernen: ${esc(t.name)}">${studioIcon("trash")}</button>`}</div>`,
+            `<div class="template-library-row"><div><strong>${esc(t.name)}</strong><small>${t.n} ${t.layout === "free" ? "Zeichenflächen" : t.n === 1 ? "Slide" : "Slides"} · ${t.mixed ? "Verschiedene Formate" : `${t.w} × ${t.h} px`}${t.builtIn ? " · Mitgeliefert" : ""}</small></div>${t.builtIn ? "" : `<button data-remove-template="${esc(t.id)}" class="icon-button" aria-label="Vorlage entfernen: ${esc(t.name)}">${studioIcon("trash")}</button>`}</div>`,
         )
         .join("");
       panel.querySelectorAll("[data-remove-template]").forEach((button) => {

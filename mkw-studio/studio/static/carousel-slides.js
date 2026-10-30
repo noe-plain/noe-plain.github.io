@@ -5,6 +5,7 @@ function carouselSlideControls() {
     c = p.carousel,
     s = carouselZoom;
   if (!root) return;
+  if (MKWCarouselPolicy.isFree(c)) return MKWArtboardUI.controls(root);
   if (carouselUI.slide >= c.n) carouselUI.slide = c.n - 1;
   root.innerHTML =
     Array.from(
@@ -37,10 +38,12 @@ function carouselSlideSelect(index) {
 }
 
 function carouselSlidePanel(panel) {
+  if (MKWCarouselPolicy.isFree(p.carousel)) return MKWArtboardUI.panel(panel);
   const c = p.carousel,
     index = carouselUI.slide;
   panel.innerHTML = `<div class="carousel-section-heading"><h3>Slide ${index + 1}</h3><span>${index + 1} von ${c.n}</span></div><div id="carouselSlideFormat"></div><section class="carousel-property-section"><h4>Anordnung</h4><div class="carousel-fields"><button id="carouselSlideBefore" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Davor hinzufügen</button><button id="carouselSlideAfter" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Danach hinzufügen</button><button id="carouselSlideLeft" ${index === 0 ? "disabled" : ""}>← Nach links</button><button id="carouselSlideRight" ${index === c.n - 1 ? "disabled" : ""}>Nach rechts →</button></div></section><section class="carousel-property-section"><h4>Slide bearbeiten</h4><button id="carouselSlideDuplicate" ${c.n >= MKWCarouselPolicy.maxSlides ? "disabled" : ""}>Slide duplizieren</button><button id="carouselSlideDelete" ${c.n <= MKWCarouselPolicy.minSlides ? "disabled" : ""}>Slide entfernen</button><p>Beim Entfernen werden vollständig enthaltene Elemente mit entfernt. Übergreifende Elemente bleiben auf der Montagefläche. Das MKW-Logo bleibt erhalten.</p></section>`;
   carouselSlideFormatPanel($("#carouselSlideFormat"));
+  MKWArtboardUI.entry(panel);
   $("#carouselSlideBefore").onclick = () => carouselSlideInsert(index);
   $("#carouselSlideAfter").onclick = () => carouselSlideInsert(index + 1);
   $("#carouselSlideLeft").onclick = () => carouselSlideMove(-1);
@@ -55,6 +58,8 @@ function carouselBoardIndexes() {
 }
 
 function carouselSlideInsert(index, duplicate = null) {
+  if (MKWCarouselPolicy.isFree(p.carousel))
+    return MKWArtboardUI.insert(index, duplicate);
   const c = p.carousel;
   if (c.n >= MKWCarouselPolicy.maxSlides) return;
   carouselEndText();
@@ -94,6 +99,7 @@ function carouselSlideInsert(index, duplicate = null) {
 }
 
 function carouselSlideDelete() {
+  if (MKWCarouselPolicy.isFree(p.carousel)) return MKWArtboardUI.remove();
   const c = p.carousel,
     index = carouselUI.slide;
   if (index === null || c.n <= MKWCarouselPolicy.minSlides) return;
@@ -122,6 +128,7 @@ function carouselSlideDelete() {
 }
 
 function carouselSlideMove(delta) {
+  if (MKWCarouselPolicy.isFree(p.carousel)) return MKWArtboardUI.reorder(delta);
   const c = p.carousel,
     index = carouselUI.slide,
     next = index + delta;
@@ -144,10 +151,11 @@ function carouselSlideMove(delta) {
 function carouselSlideCenter(index) {
   const v = $("#carouselViewport"),
     r = $("#carouselCanvas").getBoundingClientRect(),
-    vr = v.getBoundingClientRect();
+    vr = v.getBoundingClientRect(),
+    a = MKWCarouselPolicy.frame(p.carousel, index);
   v.scrollLeft +=
-    r.left +
-    (index + 0.5) * p.carousel.w * carouselZoom -
-    vr.left -
-    v.clientWidth / 2;
+    r.left + (a.x + a.w / 2) * carouselZoom - vr.left - v.clientWidth / 2;
+  if (MKWCarouselPolicy.isFree(p.carousel))
+    v.scrollTop +=
+      r.top + (a.y + a.h / 2) * carouselZoom - vr.top - v.clientHeight / 2;
 }

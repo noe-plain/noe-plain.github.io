@@ -156,3 +156,34 @@
 :root[data-density="compact"] .inspector-navigation button {
   min-height: 32px;
 }
+
+#carouselSidebar #carouselProperties label.artboard-move-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+#carouselSidebar
+  #carouselProperties
+  .artboard-move-content
+  input[type="checkbox"] {
+  appearance: auto;
+  accent-color: var(--md-sys-color-primary);
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+  border: 0;
+  flex: 0 0 18px;
+}
+#carouselSidebar #designerAddArtboard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+}

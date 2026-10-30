@@ -6,7 +6,7 @@ let carouselSelection = null,
 
 const carouselActive = () => !!p.carousel;
 
-async function carouselNewDocument(format, count, metadata) {
+async function carouselNewDocument(format, count, metadata, layout = "slides") {
   const q = fresh(),
     { w, h, top, bottom, left, right } = format;
   q.fonts = [...p.fonts];
@@ -28,6 +28,18 @@ async function carouselNewDocument(format, count, metadata) {
     const b = basicBoard(im, w, h, q.meta);
     b.carouselSlide = i;
     q.boards.push(b);
+  }
+  if (layout === "free") {
+    q.carousel.layout = "free";
+    const columns = Math.ceil(Math.sqrt(count));
+    q.carousel.artboards = q.boards.map((b, i) => ({
+      ...format,
+      id: uid(),
+      name: `Zeichenfläche ${i + 1}`,
+      x: (i % columns) * (w + 120),
+      y: Math.floor(i / columns) * (h + 120),
+      bg: q.carousel.bg,
+    }));
   }
   const logo = await image("mkw-logo-bold-neg.svg"),
     lw = Math.min(600, w - left - right);
@@ -59,15 +71,11 @@ function carouselWarning(o) {
   }
   if (o.type !== "text" || !o.text.trim()) return "";
   const bounds = carouselObjectBounds(o),
-    index = Math.floor(bounds.x / c.w);
-  if (
-    index < 0 ||
-    index >= c.n ||
-    bounds.x + bounds.w > (index + 1) * c.w ||
-    bounds.y < 0 ||
-    bounds.y + bounds.h > c.h
-  )
-    return "Text überschreitet eine Slide-Grenze.";
+    index = MKWCarouselPolicy.containing(c, bounds);
+  if (index < 0)
+    return MKWCarouselPolicy.isFree(c)
+      ? "Text überschreitet eine Zeichenflächengrenze oder liegt ausserhalb."
+      : "Text überschreitet eine Slide-Grenze.";
   const safe = MKWCarouselPolicy.safeRect(c, index);
   if (
     bounds.x < safe.x ||
@@ -105,6 +113,7 @@ function validateCarousel(q) {
   if (
     !MKWCarouselPolicy.validFormat(c) ||
     !MKWCarouselPolicy.validCount(c.n) ||
+    !MKWCarouselPolicy.validBoards(c) ||
     !/^#[0-9a-f]{6}$/i.test(c.bg) ||
     !Array.isArray(c.objects) ||
     c.objects.length > 500 ||
@@ -112,7 +121,11 @@ function validateCarousel(q) {
   )
     throw Error("Ungültiges Designer-Projekt.");
   for (const [i, b] of q.boards.entries())
-    if (b.carouselSlide !== i || b.w !== c.w || b.h !== c.h)
+    if (
+      b.carouselSlide !== i ||
+      b.w !== MKWCarouselPolicy.frame(c, i).w ||
+      b.h !== MKWCarouselPolicy.frame(c, i).h
+    )
       throw Error("Ungültige Designer-Slides.");
   carouselValidateFolders(c);
   const ids = new Set();
@@ -381,15 +394,34 @@ function carouselDefault(type, rect = {}) {
   const viewport = $("#carouselViewport"),
     canvasRect = $("#carouselCanvas")?.getBoundingClientRect(),
     viewRect = viewport?.getBoundingClientRect();
-  const x = Math.max(
-    c.left,
-    Math.min(
-      (c.n - 1) * c.w,
+  const center =
       canvasRect && viewRect
-        ? (viewRect.left - canvasRect.left) / carouselZoom
-        : 0,
-    ),
-  );
+        ? {
+            x:
+              (viewRect.left + viewport.clientWidth / 2 - canvasRect.left) /
+              carouselZoom,
+            y:
+              (viewRect.top + viewport.clientHeight / 2 - canvasRect.top) /
+              carouselZoom,
+            w: 1,
+            h: 1,
+          }
+        : { x: 0, y: 0, w: 1, h: 1 },
+    target = MKWCarouselPolicy.frame(
+      c,
+      carouselUI.slide ?? MKWCarouselPolicy.nearest(c, center),
+    );
+  const x = MKWCarouselPolicy.isFree(c)
+    ? target.x + target.left
+    : Math.max(
+        c.left,
+        Math.min(
+          (c.n - 1) * c.w,
+          canvasRect && viewRect
+            ? (viewRect.left - canvasRect.left) / carouselZoom
+            : 0,
+        ),
+      );
   return {
     ...carouselVectorDefaults(type),
     id: uid(),
@@ -403,9 +435,18 @@ function carouselDefault(type, rect = {}) {
       image: "Bildrahmen",
     }[type],
     x,
-    y: c.top,
-    w: Math.min(800, c.w - 200),
-    h: type === "text" ? 200 : 400,
+    y: MKWCarouselPolicy.isFree(c) ? target.y + target.top : c.top,
+    w: MKWCarouselPolicy.isFree(c)
+      ? Math.min(800, target.w - target.left - target.right)
+      : Math.min(800, c.w - 200),
+    h: MKWCarouselPolicy.isFree(c)
+      ? Math.min(
+          type === "text" ? 200 : 400,
+          target.h - target.top - target.bottom,
+        )
+      : type === "text"
+        ? 200
+        : 400,
     visible: true,
     locked: false,
     opacity: 1,
@@ -441,9 +482,9 @@ function carouselDefault(type, rect = {}) {
 
 function carouselObject(type, rect = {}) {
   checkpoint();
+  const o = carouselDefault(type, rect);
   carouselUI.slide = null;
   carouselUI.framePoints = false;
-  const o = carouselDefault(type, rect);
   if (type === "angle" && !rect.w) {
     o.w = 550;
     o.h = 1100;
@@ -491,11 +532,26 @@ async function carouselImport(files, target) {
       p.images.push(im);
       let o = p.carousel.objects.find((o) => o.id === target);
       if (!o) {
-        o = carouselDefault("image", {
-          h: p.carousel.h,
-          w: Math.min((im.width / im.height) * p.carousel.h, 100000),
-          y: 0,
-        });
+        const frame = MKWCarouselPolicy.frame(
+          p.carousel,
+          carouselUI.slide ??
+            MKWCarouselPolicy.nearest(p.carousel, carouselDefault("image")),
+        );
+        o = carouselDefault(
+          "image",
+          MKWCarouselPolicy.isFree(p.carousel)
+            ? {
+                x: frame.x,
+                y: frame.y,
+                h: frame.h,
+                w: Math.min((im.width / im.height) * frame.h, frame.w),
+              }
+            : {
+                h: p.carousel.h,
+                w: Math.min((im.width / im.height) * p.carousel.h, 100000),
+                y: 0,
+              },
+        );
         p.carousel.objects.unshift(o);
       }
       delete o.imageSourceId;

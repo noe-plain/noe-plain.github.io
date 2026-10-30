@@ -253,6 +253,22 @@ function carouselGeometryBounds(o) {
   return { ...bounds, x: bounds.x + o.x, y: bounds.y + o.y };
 }
 function carouselRotatedAngleAlign(o, c = p.carousel) {
+  if (MKWCarouselPolicy.isFree(c)) {
+    const index = MKWCarouselPolicy.nearest(c, carouselObjectBounds(o)),
+      a = MKWCarouselPolicy.frame(c, index < 0 ? 0 : index),
+      local = { ...o, x: o.x - a.x, y: o.y - a.y };
+    carouselRotatedAngleAlign(local, {
+      ...c,
+      layout: undefined,
+      artboards: undefined,
+      w: a.w,
+      h: a.h,
+      n: 1,
+    });
+    o.x = local.x + a.x;
+    o.y = local.y + a.y;
+    return;
+  }
   const tip = carouselAngleTip(o),
     xs = Array.from({ length: c.n }, (_, i) => (i + 0.5) * c.w),
     candidates = [];

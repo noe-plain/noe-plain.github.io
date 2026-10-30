@@ -387,8 +387,14 @@ function carouselConstructorOverlay() {
   if (!ids.length) return;
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("constructor-preview");
-  svg.setAttribute("width", p.carousel.w * p.carousel.n * carouselZoom);
-  svg.setAttribute("height", p.carousel.h * carouselZoom);
+  svg.setAttribute(
+    "width",
+    MKWCarouselPolicy.extent(p.carousel).w * carouselZoom,
+  );
+  svg.setAttribute(
+    "height",
+    MKWCarouselPolicy.extent(p.carousel).h * carouselZoom,
+  );
   svg.innerHTML = ids
     .filter((i) => cache.regions[i])
     .map(

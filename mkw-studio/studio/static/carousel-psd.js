@@ -30,9 +30,18 @@ function carouselPSDBounds(o) {
     top,
     w: Math.max(
       0,
-      Math.min(c.w * c.n, Math.ceil(right + pad + effectPad)) - left,
+      Math.min(
+        MKWCarouselPolicy.extent(c).w,
+        Math.ceil(right + pad + effectPad),
+      ) - left,
     ),
-    h: Math.max(0, Math.min(c.h, Math.ceil(bottom + pad + effectPad)) - top),
+    h: Math.max(
+      0,
+      Math.min(
+        MKWCarouselPolicy.extent(c).h,
+        Math.ceil(bottom + pad + effectPad),
+      ) - top,
+    ),
   };
 }
 async function carouselPSDLayer(o, project = p) {
@@ -77,11 +86,11 @@ async function buildCarouselPSD(progress = () => {}) {
   const project = { ...p, carousel: clone(p.carousel) },
     c = project.carousel,
     sources = MKWPSD.sources(),
-    width = c.w * c.n,
-    height = c.h;
+    width = MKWCarouselPolicy.extent(c).w,
+    height = MKWCarouselPolicy.extent(c).h;
   if (width > 30000 || height > 30000 || width * height > 80000000)
     throw Error(
-      "Dieses Design ist für PSD zu gross (max. 30 000 px je Seite / 80 Mio. Gesamtpixel). Bitte kleinere Slides oder weniger Slides verwenden.",
+      "Dieses Design ist für PSD zu gross (max. 30 000 px je Seite / 80 Mio. Gesamtpixel). Bitte kleinere oder weniger Zeichenflächen verwenden; freie Flächen kannst du auch näher zusammenrücken.",
     );
   await document.fonts.ready;
   carouselKeepLogosOnTop(c);
@@ -97,7 +106,10 @@ async function buildCarouselPSD(progress = () => {}) {
     image,
     project,
   );
-  const background = makeCanvas(width, height),
+  const background = makeCanvas(
+      MKWCarouselPolicy.isFree(c) ? 1 : width,
+      MKWCarouselPolicy.isFree(c) ? 1 : height,
+    ),
     bg = background.getContext("2d");
   bg.fillStyle = c.bg;
   bg.fillRect(0, 0, width, height);
@@ -108,6 +120,29 @@ async function buildCarouselPSD(progress = () => {}) {
       ),
     ],
     bounds = { left: 0, top: 0, right: width, bottom: height };
+  if (MKWCarouselPolicy.isFree(c)) {
+    children.length = 0;
+    background.width = background.height = 1;
+    for (const a of c.artboards) {
+      const bitmap = makeCanvas(a.w, a.h),
+        context = exportContext(bitmap);
+      context.fillStyle = a.bg;
+      context.fillRect(0, 0, a.w, a.h);
+      children.push(
+        MKWPSD.fill(
+          {
+            name: a.name + " · Hintergrund",
+            canvas: bitmap,
+            left: a.x,
+            top: a.y,
+          },
+          a.bg,
+          MKWPSD.rectangle(a.x, a.y, a.w, a.h),
+        ),
+      );
+    }
+  }
+  const backgroundCount = children.length;
   const folders = new Map(),
     entries = new Map();
   const append = (o, entry) => {
@@ -306,7 +341,11 @@ async function buildCarouselPSD(progress = () => {}) {
     .reverse()
     .map((block) => entries.get(block.key))
     .filter(Boolean);
-  children.splice(1, children.length - 1, ...ordered);
+  children.splice(
+    backgroundCount,
+    children.length - backgroundCount,
+    ...ordered,
+  );
 
   const slices = Array.from({ length: c.n }, (_, i) => ({
     id: i + 1,
@@ -315,11 +354,14 @@ async function buildCarouselPSD(progress = () => {}) {
     associatedLayerId: 0,
     name: MKW.projectName(p.meta) + "_" + String(i + 1).padStart(2, "0"),
     type: "image",
-    bounds: { left: i * c.w, top: 0, right: (i + 1) * c.w, bottom: height },
+    bounds: (() => {
+      const a = MKWCarouselPolicy.frame(c, i);
+      return { left: a.x, top: a.y, right: a.x + a.w, bottom: a.y + a.h };
+    })(),
     url: "",
     target: "",
     message: "",
-    altTag: `Slide ${i + 1}`,
+    altTag: MKWCarouselPolicy.frame(c, i).name || `Slide ${i + 1}`,
     cellTextIsHTML: false,
     cellText: "",
     horizontalAlignment: "default",
@@ -335,7 +377,21 @@ async function buildCarouselPSD(progress = () => {}) {
         width,
         height,
         canvas: composite,
-        children,
+        children: MKWCarouselPolicy.isFree(c)
+          ? [
+              {
+                name: "Zeichenflächen",
+                blendMode: "pass through",
+                opened: true,
+                vectorMask: {
+                  paths: c.artboards.flatMap(
+                    (a) => MKWPSD.rectangle(a.x, a.y, a.w, a.h).paths,
+                  ),
+                },
+                children,
+              },
+            ]
+          : children,
         linkedFiles: sources.files,
         imageResources: {
           slices: [{ bounds, groupName: p.meta.title || "Designer", slices }],

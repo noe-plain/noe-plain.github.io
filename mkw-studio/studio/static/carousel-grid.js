@@ -7,9 +7,9 @@ const MKWDesignerGrid = (() => {
   function lines(c, slide = 0) {
     return MKWCarouselPolicy.grid(c, slide, settings);
   }
-  function style(c) {
-    const r = MKWCarouselPolicy.safeRect(c),
-      grid = lines(c);
+  function style(c, slide = 0) {
+    const r = MKWCarouselPolicy.safeRect(c, slide),
+      grid = lines(c, slide);
     if (r.w <= 0 || r.h <= 0) return "";
     return `--grid-cell-x:${(grid.cellWidth / r.w) * 100}%;--grid-cell-y:${(grid.cellHeight / r.h) * 100}%;--grid-gap-x:${(grid.gapX / r.w) * 100}%;--grid-gap-y:${(grid.gapY / r.h) * 100}%`;
   }

@@ -61,7 +61,10 @@ function carouselValidatePDF(settings) {
 async function carouselEncodePDFPage(b, settings) {
   const key = exportKey(b, settings);
   if (exportCache.has(key)) return exportCache.get(key);
-  const opts = settings.pdf;
+  const opts =
+    settings.pdf?.preset === "original" && MKWCarouselPolicy.isFree(p.carousel)
+      ? { ...settings.pdf, w: b.w, h: b.h }
+      : settings.pdf;
   if (!carouselValidatePDF(opts))
     throw Error(
       "PDF-Seitengrösse: 240–4000 px. Bitte die Einstellungen prüfen.",
@@ -171,8 +174,9 @@ function carouselPDFText(board, opts) {
             x: originalLine.x + run.x,
             y: originalLine.y + run.dy + offset,
           }),
-          x = world.x - board.carouselSlide * c.w,
-          y = world.y;
+          frame = MKWCarouselPolicy.frame(c, board.carouselSlide),
+          x = world.x - frame.x,
+          y = world.y - frame.y;
         const runFont = p.fonts.find((font) => font.role === run.font);
         measure.font = `${line.size}px ${fontFamily(run.font)}`;
         measure.letterSpacing = run.letterSpacing + "px";
@@ -359,13 +363,18 @@ function carouselPDFUI() {
     "Eine PDF mit einer Seite je ausgewählter Slide · sRGB · originalgetreues Artwork mit auswählbarem Text.";
   $("#pdfFitHint").textContent =
     p.carousel &&
-    Math.abs(
-      p.carousel.w / p.carousel.h - exportOptions.pdf.w / exportOptions.pdf.h,
-    ) > 0.001
-      ? exportOptions.pdf.fit === "cover"
-        ? "Abweichendes Seitenverhältnis: Die Seiten werden randfüllend beschnitten."
-        : "Abweichendes Seitenverhältnis: Das Artwork wird proportional eingepasst; freie Ränder bleiben in der Seitenfarbe."
-      : "Das Seitenverhältnis entspricht deinem Artwork.";
+    MKWCarouselPolicy.isFree(p.carousel) &&
+    exportOptions.pdf.preset === "original"
+      ? "Originalformat: Jede PDF-Seite behält die Grösse ihrer Zeichenfläche. Unterschiedliche Seitenformate sind möglich."
+      : p.carousel &&
+          Math.abs(
+            p.carousel.w / p.carousel.h -
+              exportOptions.pdf.w / exportOptions.pdf.h,
+          ) > 0.001
+        ? exportOptions.pdf.fit === "cover"
+          ? "Abweichendes Seitenverhältnis: Die Seiten werden randfüllend beschnitten."
+          : "Abweichendes Seitenverhältnis: Das Artwork wird proportional eingepasst; freie Ränder bleiben in der Seitenfarbe."
+        : "Das Seitenverhältnis entspricht deinem Artwork.";
 }
 async function carouselRunPDF() {
   if (busy || !exportPlan.length) return;

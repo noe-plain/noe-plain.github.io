@@ -12,8 +12,37 @@ const MKWTemplateFillPreview = (() => {
       rendered = new Map(),
       timer = null,
       painting = false,
-      active = false;
+      active = false,
+      highlighted = null;
+    function highlight() {
+      for (const mark of track.querySelectorAll(".template-location"))
+        mark.remove();
+      if (!highlighted || !template) return;
+      const a = MKWCarouselPolicy.frame(template.carousel, slide),
+        b = carouselObjectBounds(highlighted);
+      if (!MKWCarouselPolicy.intersects(a, b)) return;
+      const mark = document.createElement("div");
+      mark.className = "template-location";
+      mark.setAttribute("aria-hidden", "true");
+      const x = Math.max(a.x, b.x),
+        y = Math.max(a.y, b.y),
+        right = Math.min(a.x + a.w, b.x + b.w),
+        bottom = Math.min(a.y + a.h, b.y + b.h);
+      Object.assign(mark.style, {
+        left: (100 * (x - a.x)) / a.w + "%",
+        top: (100 * (y - a.y)) / a.h + "%",
+        width: (100 * (right - x)) / a.w + "%",
+        height: (100 * (bottom - y)) / a.h + "%",
+      });
+      track.children[slide]?.append(mark);
+    }
     function controls() {
+      const frame = MKWCarouselPolicy.frame(template.carousel, slide);
+      host.style.setProperty(
+        "--template-preview-ratio",
+        `${frame.w}/${frame.h}`,
+      );
+      highlight();
       host.querySelector("#templatePreviewCount").textContent =
         `${slide + 1} / ${template.carousel.n}`;
       host.querySelector('[data-preview-step="-1"]').disabled = slide === 0;
@@ -118,6 +147,7 @@ const MKWTemplateFillPreview = (() => {
     size.observe(track);
     function show(t, values) {
       template = t;
+      highlighted = null;
       host.style.setProperty(
         "--template-preview-ratio",
         `${t.carousel.w}/${t.carousel.h}`,
@@ -130,7 +160,7 @@ const MKWTemplateFillPreview = (() => {
       track.innerHTML = Array.from(
         { length: t.carousel.n },
         (_, i) =>
-          `<div class="template-artwork-slide" style="aspect-ratio:${t.carousel.w}/${t.carousel.h}" role="group" aria-label="Slide ${i + 1}"><img alt="Dein Design · Slide ${i + 1}" hidden><span>Slide ${i + 1}</span></div>`,
+          `<div class="template-artwork-slide" style="aspect-ratio:${MKWCarouselPolicy.frame(t.carousel, i).w}/${MKWCarouselPolicy.frame(t.carousel, i).h}" role="group" aria-label="${esc(MKWCarouselPolicy.frame(t.carousel, i).name || `Slide ${i + 1}`)}"><img alt="Dein Design · Slide ${i + 1}" hidden><span>Slide ${i + 1}</span></div>`,
       ).join("");
       dots.innerHTML = Array.from(
         { length: t.carousel.n },
@@ -151,6 +181,13 @@ const MKWTemplateFillPreview = (() => {
       if (!template) return;
       const c = template.carousel,
         b = carouselObjectBounds(o);
+      highlighted = o;
+      highlight();
+      if (MKWCarouselPolicy.isFree(c)) {
+        const owner = MKWCarouselPolicy.owner(c, b);
+        if (owner >= 0) jump(owner);
+        return;
+      }
       if (b.w > c.w && b.x <= slide * c.w && b.x + b.w >= (slide + 1) * c.w)
         return;
       jump(Math.floor((b.x + b.w / 2) / c.w));
@@ -165,7 +202,7 @@ const MKWTemplateFillPreview = (() => {
       dots.replaceChildren();
       pruneImageCache();
     }
-    return { show, changed, reveal, close };
+    return { show, changed, reveal, close, jump };
   }
   return { attach };
 })();

@@ -4,7 +4,9 @@ function carouselOutsideObjects(c = p.carousel) {
   return c.objects.filter((object) => {
     if (!carouselObjectVisible(object)) return false;
     const b = carouselObjectBounds(object);
-    return b.x + b.w <= 0 || b.y + b.h <= 0 || b.x >= c.w * c.n || b.y >= c.h;
+    return !MKWCarouselPolicy.frames(c).some((frame) =>
+      MKWCarouselPolicy.intersects(b, frame),
+    );
   });
 }
 function carouselPasteboardSpace(viewport, width, height) {
@@ -146,6 +148,8 @@ async function carouselPaintOutside() {
         job.objects,
         current,
         previewImage,
+        job.project,
+        false,
       );
       if (!current()) return;
       job.canvas.width = job.width;

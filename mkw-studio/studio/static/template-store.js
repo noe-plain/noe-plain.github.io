@@ -43,6 +43,17 @@ const MKWTemplateStore = (() => {
     w: t.carousel.w,
     h: t.carousel.h,
     n: t.carousel.n,
+    layout: t.carousel.layout,
+    mixed:
+      MKWCarouselPolicy.isFree(t.carousel) &&
+      t.carousel.artboards.some(
+        (a) =>
+          a.w !== t.carousel.artboards[0].w ||
+          a.h !== t.carousel.artboards[0].h,
+      ),
+    ...(MKWCarouselPolicy.isFree(t.carousel)
+      ? { w: t.carousel.artboards[0].w, h: t.carousel.artboards[0].h }
+      : {}),
   });
   async function write(items, replace = false) {
     items = items.map(MKWTemplateModel.validate);

@@ -975,3 +975,95 @@
     padding: 12px 8px;
   }
 }
+
+.free-artboards #carouselCanvas {
+  background: transparent;
+  box-shadow: none;
+}
+.free-artboards .designer-artboard-surface {
+  position: absolute;
+  pointer-events: none;
+  box-sizing: border-box;
+  outline: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 2px 8px #1118270b;
+}
+.free-artboards .carousel-slide-tab {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: grab;
+  touch-action: none;
+}
+.free-artboards .carousel-slide-tab:active {
+  cursor: grabbing;
+}
+.artboard-help {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#carouselProperties .artboard-move-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+#carouselProperties .artboard-move-content input {
+  width: 18px;
+  flex: none;
+}
+#designerArtboardError {
+  color: var(--md-sys-color-error);
+  font-size: 12px;
+  line-height: 18px;
+}
+#designerArtboardError:empty {
+  display: none;
+}
+#designerRemoveArtboard {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  border: 0;
+  border-radius: var(--studio-shape-dialog);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+#designerRemoveArtboard h2 {
+  font-size: 22px;
+  line-height: 28px;
+}
+#designerRemoveArtboard p {
+  font-size: 14px;
+  line-height: 22px;
+}
+.designer-arrangement {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+}
+.designer-arrangement button {
+  min-height: 48px;
+  white-space: normal;
+}
+.designer-arrangement button[aria-pressed="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: var(--md-sys-color-primary);
+}
+#designerLayoutHint {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#carouselSetupStrip.is-free {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+#carouselSetupStrip.is-free > div {
+  width: auto;
+  min-width: 0;
+  border: 1px solid var(--md-sys-color-outline-variant);
+}

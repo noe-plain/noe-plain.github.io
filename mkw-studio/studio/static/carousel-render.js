@@ -10,6 +10,7 @@ async function carouselPaint(
   isCurrent = () => true,
   loadImage = image,
   project = p,
+  clipArtwork = true,
 ) {
   const c = project.carousel;
   if (
@@ -23,15 +24,28 @@ async function carouselPaint(
   carouselKeepLogosOnTop(c);
   ctx.save();
   ctx.scale(scale, scale);
+  const frames = MKWCarouselPolicy.frames(c);
   if (slide !== null) {
+    const frame = frames[slide];
     ctx.beginPath();
-    ctx.rect(0, 0, c.w, c.h);
+    ctx.rect(0, 0, frame.w, frame.h);
     ctx.clip();
-    ctx.translate(-slide * c.w, 0);
+    ctx.translate(-frame.x, -frame.y);
+  } else if (MKWCarouselPolicy.isFree(c) && clipArtwork) {
+    ctx.beginPath();
+    for (const frame of frames) ctx.rect(frame.x, frame.y, frame.w, frame.h);
+    ctx.clip();
   }
   if (!transparent) {
-    ctx.fillStyle = c.bg;
-    ctx.fillRect(0, 0, c.w * c.n, c.h);
+    if (MKWCarouselPolicy.isFree(c))
+      for (const frame of frames) {
+        ctx.fillStyle = frame.bg;
+        ctx.fillRect(frame.x, frame.y, frame.w, frame.h);
+      }
+    else {
+      ctx.fillStyle = c.bg;
+      ctx.fillRect(0, 0, c.w * c.n, c.h);
+    }
   }
   for (const o of objects || c.objects) {
     if (!isCurrent()) break;
@@ -156,12 +170,7 @@ async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0, project = p) {
 
 function carouselImageOnSlide(o, slide, c = p.carousel) {
   const b = carouselObjectBounds(o);
-  return (
-    b.x + b.w > slide * c.w &&
-    b.x < (slide + 1) * c.w &&
-    b.y + b.h > 0 &&
-    b.y < c.h
-  );
+  return MKWCarouselPolicy.intersects(b, MKWCarouselPolicy.frame(c, slide));
 }
 
 function carouselToolUI() {
@@ -280,8 +289,8 @@ function carouselRender() {
   if (firstView)
     carouselZoom = Math.min(
       0.6,
-      (viewport.clientWidth - 160) / (c.w * c.n),
-      (viewport.clientHeight - 128) / c.h,
+      (viewport.clientWidth - 160) / MKWCarouselPolicy.extent(c).w,
+      (viewport.clientHeight - 128) / MKWCarouselPolicy.extent(c).h,
     );
   viewport.onscroll = () => {
     c.scrollX = viewport.scrollLeft;
@@ -372,7 +381,10 @@ function carouselFit() {
   const c = p.carousel,
     v = $("#carouselViewport");
   carouselSetZoom(
-    Math.min((v.clientWidth - 160) / (c.w * c.n), (v.clientHeight - 128) / c.h),
+    Math.min(
+      (v.clientWidth - 160) / MKWCarouselPolicy.extent(c).w,
+      (v.clientHeight - 128) / MKWCarouselPolicy.extent(c).h,
+    ),
   );
   carouselCenter();
 }
@@ -389,6 +401,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
       p.carousel.h,
       p.carousel.n,
       p.carousel.bg,
+      p.carousel.artboards,
       p.carousel.objects,
       scale,
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
@@ -475,25 +488,31 @@ async function carouselWaitForPaint() {
 
 function carouselRefresh() {
   if (!carouselActive() || !$("#carouselCanvas")) return;
-  const c = p.carousel;
+  const c = p.carousel,
+    extent = MKWCarouselPolicy.extent(c);
+  $("#carouselEditor").classList.toggle(
+    "free-artboards",
+    MKWCarouselPolicy.isFree(c),
+  );
   carouselKeepLogosOnTop(c);
   carouselZoom = Math.max(0.05, Math.min(carouselZoom, carouselMaxZoom()));
   studioSyncZoomLimits(true, carouselZoom, 0.05, carouselMaxZoom());
   const s = carouselZoom,
     rasterScale = Math.min(
       s,
-      16000 / (c.w * c.n),
-      Math.sqrt(24000000 / (c.w * c.n * c.h)),
+      16000 / extent.w,
+      16000 / extent.h,
+      Math.sqrt(24000000 / (extent.w * extent.h)),
     ),
     canvas = $("#carouselCanvas"),
     generation = ++carouselDraw;
   c.zoom = s;
-  if (canvas.width !== Math.ceil(c.w * c.n * rasterScale))
-    canvas.width = Math.ceil(c.w * c.n * rasterScale);
-  if (canvas.height !== Math.ceil(c.h * rasterScale))
-    canvas.height = Math.ceil(c.h * rasterScale);
-  const width = c.w * c.n * s,
-    height = c.h * s;
+  if (canvas.width !== Math.ceil(extent.w * rasterScale))
+    canvas.width = Math.ceil(extent.w * rasterScale);
+  if (canvas.height !== Math.ceil(extent.h * rasterScale))
+    canvas.height = Math.ceil(extent.h * rasterScale);
+  const width = extent.w * s,
+    height = extent.h * s;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
   $("#carouselArtwork").style.width = width + "px";
@@ -517,6 +536,7 @@ function carouselRefresh() {
     c.w,
     c.h,
     c.n,
+    c.artboards,
     c.top,
     c.bottom,
     c.left,
@@ -527,16 +547,23 @@ function carouselRefresh() {
   ]);
   if ($("#carouselGuides").dataset.layout !== guideKey) {
     $("#carouselGuides").dataset.layout = guideKey;
-    $("#carouselGuides").innerHTML =
-      Array.from(
-        { length: c.n },
-        (_, i) =>
-          `<div class="slide-guide" style="left:${i * c.w * s}px;width:${c.w * s}px;height:${c.h * s}px"><div class="sixths designer-grid" style="left:${c.left * s}px;right:${c.right * s}px;top:${c.top * s}px;bottom:${c.bottom * s}px;${gridStyle}"></div></div>`,
-      ).join("") +
-      `<div class="artwork-safe" style="left:${c.left * s}px;top:${c.top * s}px;width:${(c.w * c.n - c.left - c.right) * s}px;height:${(c.h - c.top - c.bottom) * s}px"></div>`;
+    $("#carouselGuides").innerHTML = MKWCarouselPolicy.isFree(c)
+      ? MKWCarouselPolicy.frames(c)
+          .map(
+            (a, i) =>
+              `<div class="slide-guide" style="left:${a.x * s}px;top:${a.y * s}px;width:${a.w * s}px;height:${a.h * s}px"><div class="sixths designer-grid" style="left:${a.left * s}px;right:${a.right * s}px;top:${a.top * s}px;bottom:${a.bottom * s}px;${MKWDesignerGrid.style(c, i)}"></div></div>`,
+          )
+          .join("")
+      : Array.from(
+          { length: c.n },
+          (_, i) =>
+            `<div class="slide-guide" style="left:${i * c.w * s}px;width:${c.w * s}px;height:${c.h * s}px"><div class="sixths designer-grid" style="left:${c.left * s}px;right:${c.right * s}px;top:${c.top * s}px;bottom:${c.bottom * s}px;${gridStyle}"></div></div>`,
+        ).join("") +
+        `<div class="artwork-safe" style="left:${c.left * s}px;top:${c.top * s}px;width:${(c.w * c.n - c.left - c.right) * s}px;height:${(c.h - c.top - c.bottom) * s}px"></div>`;
     if (
-      carouselSelected().some((o) => o.type === "angle") ||
-      carouselUI.tool === "angle"
+      !MKWCarouselPolicy.isFree(c) &&
+      (carouselSelected().some((o) => o.type === "angle") ||
+        carouselUI.tool === "angle")
     )
       $("#carouselGuides").insertAdjacentHTML(
         "beforeend",
@@ -585,13 +612,14 @@ function carouselDrawSelection() {
     delete root.dataset.selectionKey;
     if (carouselUI.slide !== null) {
       const c = p.carousel,
+        a = MKWCarouselPolicy.frame(c, carouselUI.slide),
         frame = document.createElement("div");
       frame.className = "carousel-slide-selection";
       Object.assign(frame.style, {
-        left: carouselUI.slide * c.w * carouselZoom + "px",
-        top: "0px",
-        width: c.w * carouselZoom + "px",
-        height: c.h * carouselZoom + "px",
+        left: a.x * carouselZoom + "px",
+        top: a.y * carouselZoom + "px",
+        width: a.w * carouselZoom + "px",
+        height: a.h * carouselZoom + "px",
       });
       root.append(frame);
     }

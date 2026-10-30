@@ -79,8 +79,14 @@ function carouselCurvatureOverlay() {
     root.append(svg);
   }
   svg.dataset.key = key;
-  svg.setAttribute("width", p.carousel.w * p.carousel.n * carouselZoom);
-  svg.setAttribute("height", p.carousel.h * carouselZoom);
+  svg.setAttribute(
+    "width",
+    MKWCarouselPolicy.extent(p.carousel).w * carouselZoom,
+  );
+  svg.setAttribute(
+    "height",
+    MKWCarouselPolicy.extent(p.carousel).h * carouselZoom,
+  );
   // A shared scale makes curvature jumps at adjoining segments visible.
   const segments = [];
   let remaining = 600,

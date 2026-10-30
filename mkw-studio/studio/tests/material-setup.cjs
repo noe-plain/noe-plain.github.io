@@ -113,6 +113,16 @@ const { launch, artifact } = require("./browser.cjs");
     );
     await page.setViewportSize({ width: 1500, height: 1100 });
     await page.locator("#startTemplates").click();
+    const choiceTargets = await page
+      .locator(".template-slider-controls button")
+      .evaluateAll((elements) =>
+        elements.map((el) => ({
+          w: el.getBoundingClientRect().width,
+          h: el.getBoundingClientRect().height,
+        })),
+      );
+    assert.equal(choiceTargets.length, 2);
+    assert(choiceTargets.every((t) => t.w >= 40 && t.h >= 40));
     await page.locator("[data-template-id=mkw-winkel-slidepost]").click();
     await page.waitForFunction(
       () => document.querySelectorAll("[data-template-layer]").length === 11,
@@ -146,10 +156,12 @@ const { launch, artifact } = require("./browser.cjs");
                 ...el.querySelectorAll(
                   ".template-slider-controls button,.template-preview-dots button,.template-preview-navigation > button",
                 ),
-              ].map((e) => ({
-                w: e.getBoundingClientRect().width,
-                h: e.getBoundingClientRect().height,
-              })),
+              ]
+                .filter((e) => e.checkVisibility())
+                .map((e) => ({
+                  w: e.getBoundingClientRect().width,
+                  h: e.getBoundingClientRect().height,
+                })),
               footer:
                 el.querySelector("#templateCreate").getBoundingClientRect()
                   .bottom <= el.getBoundingClientRect().bottom,
@@ -164,6 +176,7 @@ const { launch, artifact } = require("./browser.cjs");
           geometry.contrast >= 4.5,
           "Badge has a defined contrasting surface",
         );
+        assert(geometry.targets.length > 0);
         assert(geometry.targets.every((t) => t.w >= 40 && t.h >= 40));
         assert(geometry.footer, "Designer action stays visible");
       }

@@ -9,7 +9,7 @@ const MKWTemplateSave = (() => {
     dialog = document.createElement("dialog");
     dialog.id = "templateSaveDialog";
     dialog.setAttribute("aria-labelledby", "templateSaveTitle");
-    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="templateSaveTitle">Als Vorlage speichern</h2><p>Design und Ebenennamen bleiben erhalten. Fotos werden zu leeren Bildfeldern.</p></div><button class="icon-button" id="closeTemplateSave" aria-label="Vorlage speichern schliessen">${studioIcon("close")}</button></div><form id="templateSaveForm"><label>Name der Vorlage<input id="templateSaveName" maxlength="100" required></label><label>Kurzbeschreibung<input id="templateSaveDescription" maxlength="300" placeholder="Wofür eignet sich dieses Design?"></label><div id="templateFolderNames"></div><h3>Ebenen benennen</h3><p class="template-save-hint">Eindeutige Namen helfen später beim Befüllen. Die Reihenfolge und das Design bleiben erhalten.</p><div id="templateLayerNames"></div><div class="template-footer"><p id="templateSaveStatus" role="status" aria-live="polite"></p><button id="templateSaveConfirm" class="primary" type="submit">Vorlage speichern</button></div></form>`;
+    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="templateSaveTitle">Als Vorlage speichern</h2><p>Design und Ebenennamen bleiben erhalten. Fotos werden zu leeren Bildfeldern.</p></div><button class="icon-button" id="closeTemplateSave" aria-label="Vorlage speichern schliessen">${studioIcon("close")}</button></div><form id="templateSaveForm" novalidate><p id="templateSaveSummary"></p><label>Name der Vorlage<input id="templateSaveName" maxlength="100" required></label><label>Kurzbeschreibung<input id="templateSaveDescription" maxlength="300" placeholder="Wofür eignet sich dieses Design?"></label><div id="templateFolderNames"></div><h3>Ebenen benennen</h3><p class="template-save-hint">Eindeutige Namen helfen später beim Befüllen. Die Reihenfolge und das Design bleiben erhalten.</p><div id="templateLayerNames"></div><div class="template-footer"><p id="templateSaveStatus" role="status" aria-live="polite"></p><button id="templateSaveConfirm" class="primary" type="submit">Vorlage speichern</button></div></form>`;
     document.body.append(dialog);
     $("#closeTemplateSave").onclick = () => {
       if (!running) dialog.close();
@@ -24,6 +24,35 @@ const MKWTemplateSave = (() => {
     $("#templateSaveForm").onsubmit = async (e) => {
       e.preventDefault();
       if (running || !source) return;
+      let first = null;
+      for (const input of dialog.querySelectorAll(
+        "input[required],select[required]",
+      )) {
+        if (!MKWFields.validate(input, true)) first ||= input;
+      }
+      const names = new Set();
+      for (const input of dialog.querySelectorAll("[data-template-name]")) {
+        const name = input.value.trim().toLocaleLowerCase("de");
+        if (!name || names.has(name)) {
+          MKWFields.error(
+            input,
+            name
+              ? "Dieser Ebenenname wird schon verwendet. Bitte eindeutig benennen."
+              : "Gib dieser Ebene einen Namen.",
+          );
+          first ||= input;
+        }
+        names.add(name);
+      }
+      if (first) {
+        MKWFields.notice(
+          $("#templateSaveStatus"),
+          "Bitte die markierten Namen prüfen und Ebenen eindeutig benennen. Dein Design bleibt erhalten.",
+          true,
+        );
+        first.focus();
+        return;
+      }
       running = true;
       const controls = [...dialog.querySelectorAll("input,button,select")];
       controls.forEach((el) => (el.disabled = true));
@@ -80,6 +109,9 @@ const MKWTemplateSave = (() => {
     carouselEndText();
     mount();
     source = project;
+    MKWFields.reset(dialog);
+    $("#templateSaveSummary").textContent =
+      `${project.carousel.n} Zeichenflächen · ${project.carousel.objects.filter(MKWTemplateModel.imageLayer).length} Bildfelder · ${project.carousel.objects.filter((o) => o.type === "text").length} Texte. Die Vorlage speichert die Gestaltung ohne deine Fotos.`;
     own = project === p;
     $("#templateSaveName").value = project.meta.title || "Neue Vorlage";
     $("#templateSaveDescription").value = "";
@@ -94,7 +126,7 @@ const MKWTemplateSave = (() => {
       .map((l) => {
         const o = project.carousel.objects.find((o) => o.id === l.id),
           folder = project.carousel.folders?.find((f) => f.id === o.folderId);
-        return `<div class="template-name-row">${studioIcon(o.type)}<label><span>${esc(folder?.name || "Ohne Ordner")}</span><input data-template-name="${esc(l.id)}" aria-label="Ebenenname: ${esc(o.name)}" value="${esc(l.name)}" maxlength="160" required></label>${o.type === "angle" ? `<label>Bild aus<select data-template-source="${esc(l.id)}" aria-label="Hintergrund für ${esc(l.name)}" required>${images.map((im) => `<option value="${esc(im.id)}" ${im.id === l.sourceId ? "selected" : ""}>${esc(layers.find((l) => l.id === im.id)?.name)}</option>`).join("")}</select></label>` : ""}</div>`;
+        return `<div class="template-name-row">${studioIcon(o.type)}<label><span>${esc([MKWCarouselPolicy.frame(project.carousel, Math.max(0, MKWCarouselPolicy.owner(project.carousel, o))).name, folder?.name].filter(Boolean).join(" · "))}</span><input data-template-name="${esc(l.id)}" aria-label="Ebenenname: ${esc(o.name)}" value="${esc(l.name)}" maxlength="160" required></label>${o.type === "angle" ? `<label>Bild aus<select data-template-source="${esc(l.id)}" aria-label="Hintergrund für ${esc(l.name)}" required>${l.sourceId ? "" : '<option value="">Bildfeld zuordnen</option>'}${images.map((im) => `<option value="${esc(im.id)}" ${im.id === l.sourceId ? "selected" : ""}>${esc(layers.find((l) => l.id === im.id)?.name)}</option>`).join("")}</select></label>` : ""}</div>`;
       })
       .join("");
     dialog.showModal();

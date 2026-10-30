@@ -1,5 +1,9 @@
 (function (root) {
   "use strict";
+  const policy =
+    typeof module !== "undefined"
+      ? require("./carousel-policy.js")
+      : root.MKWCarouselPolicy;
   const copy = (value) => JSON.parse(JSON.stringify(value));
   const kinds = new Set([
     "text",
@@ -39,8 +43,14 @@
     o.type === "image" ||
     (["path", "shape"].includes(o.type) && o.fillMode === "image") ||
     (o.type === "gradient" && o.gradientFillMode === "image");
-  function background(objects) {
-    const images = objects.filter(imageLayer);
+  function background(objects, target, carousel) {
+    let images = objects.filter(imageLayer);
+    if (target && carousel && policy.isFree(carousel)) {
+      const area = policy.owner(carousel, target);
+      images = images.filter(
+        (o) => policy.owner(carousel, o) === area && area >= 0,
+      );
+    }
     return (
       [...images].sort((a, b) => {
         const score = (o) =>
@@ -58,7 +68,7 @@
         1,
         Math.min(
           project.carousel.n,
-          Math.floor((o.x + o.w / 2) / project.carousel.w) + 1,
+          Math.max(0, policy.owner(project.carousel, o)) + 1,
         ),
       );
       if (
@@ -81,8 +91,10 @@
             path: "Pfad",
             shape: "Form",
           }[o.type] || "Ebene") +
-          " · Slide " +
-          slide;
+          " · " +
+          (policy.isFree(project.carousel)
+            ? policy.frame(project.carousel, slide - 1).name
+            : "Slide " + slide);
       const base = name;
       let n = 1;
       while (names.has(name.toLocaleLowerCase("de"))) name = base + " " + ++n;
@@ -92,7 +104,8 @@
         name,
         sourceId:
           o.type === "angle"
-            ? o.imageSourceId || background(project.carousel.objects)
+            ? o.imageSourceId ||
+              background(project.carousel.objects, o, project.carousel)
             : null,
       };
     });
@@ -130,7 +143,8 @@
       kind: o.type,
       sourceId:
         o.type === "angle"
-          ? labels.get(o.id)?.sourceId || background(carousel.objects, o)
+          ? labels.get(o.id)?.sourceId ||
+            background(carousel.objects, o, carousel)
           : null,
     }));
     const fontRoles = new Set(
@@ -170,6 +184,7 @@
       c = item.carousel;
     if (
       !c ||
+      !policy.validBoards(c) ||
       ![c.w, c.h, c.n, c.top, c.bottom, c.left, c.right].every(
         Number.isInteger,
       ) ||
