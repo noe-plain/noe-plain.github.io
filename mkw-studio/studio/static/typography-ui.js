@@ -1,7 +1,8 @@
 "use strict";
 const MKWTypography = (() => {
   const sessions = new WeakMap();
-  let current = null;
+  let current = null,
+    panelSequence = 0;
   const session = (o) => {
     if (!sessions.has(o)) sessions.set(o, {});
     return sessions.get(o);
@@ -36,12 +37,13 @@ const MKWTypography = (() => {
       ? "Gesamter Text"
       : r.end > r.start
         ? `${r.end - r.start} Zeichen markiert`
-        : "Neue Zeichen";
+        : "Neue Zeichen an der Einfügemarke";
   }
   function panel() {
+    const prefix = "typo-" + ++panelSequence;
     const field = (key, label, unit, min, max, step = "any") =>
       `<label>${label}<span class="type-unit"><input data-typo="${key}" aria-label="${label}" type="number" min="${min}" max="${max}" step="${step}"><span>${unit}</span></span></label>`;
-    return `<section class="carousel-property-section typography-inspector"><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Gesamter Text</button></div><div class="typo-tabs" role="tablist" aria-label="Text gestalten"><button role="tab" id="typo-tab-character" aria-controls="typo-character" data-typo-tab="character">Zeichen</button><button role="tab" id="typo-tab-paragraph" aria-controls="typo-paragraph" data-typo-tab="paragraph">Absatz</button></div><div id="typo-character" role="tabpanel" aria-labelledby="typo-tab-character" data-typo-page="character"><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
+    return `<section class="carousel-property-section typography-inspector"><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Gesamter Text</button></div><div class="typo-tabs" role="tablist" aria-label="Text gestalten"><button role="tab" id="${prefix}-typo-tab-character" aria-controls="${prefix}-typo-character" data-typo-tab="character">Schrift & Farbe</button><button role="tab" id="${prefix}-typo-tab-paragraph" aria-controls="${prefix}-typo-paragraph" data-typo-tab="paragraph">Absatz & Abstände</button></div><div id="${prefix}-typo-character" role="tabpanel" aria-labelledby="${prefix}-typo-tab-character" data-typo-page="character"><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
       ["uppercase", "AA", "Grossbuchstaben"],
       ["underline", "U", "Unterstrichen"],
       ["strike", "S", "Durchgestrichen"],
@@ -54,7 +56,7 @@ const MKWTypography = (() => {
       )
       .join(
         "",
-      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div id="typo-paragraph" role="tabpanel" aria-labelledby="typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("paragraphSize", "Schriftgrösse des Absatzes", "px", 1, 5000)}${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-size-auto>Grundgrösse</button><button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
+      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div id="${prefix}-typo-paragraph" role="tabpanel" aria-labelledby="${prefix}-typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("paragraphSize", "Schriftgrösse des Absatzes", "px", 1, 5000)}${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-size-auto>Grundgrösse</button><button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
   }
   function values(key) {
     const { o } = current,
@@ -108,12 +110,14 @@ const MKWTypography = (() => {
       base = record(o),
       r = range(o),
       indices = paragraphIndices();
-    host.querySelector("[data-typo-scope]").textContent = scope(o);
+    host.querySelector("[data-typo-scope]").textContent =
+      "Formatierung: " + scope(o);
+    host.querySelector("[data-typo-all]").hidden = !r;
     host.querySelector("[data-typo-all]").disabled = !r;
     host.querySelector("[data-typo-paragraph-scope]").textContent =
       indices.length === 1
-        ? `Absatz ${indices[0] + 1}`
-        : `${indices.length} Absätze`;
+        ? `Änderungen gelten für Absatz ${indices[0] + 1}.`
+        : `Änderungen gelten für ${indices.length} Absätze.`;
     host.querySelectorAll("[data-typo]").forEach((input) => {
       const key = input.dataset.typo,
         para = [
@@ -135,7 +139,12 @@ const MKWTypography = (() => {
           : values(key);
       let value = common(list);
       if (key === "lineHeight" && value !== null) value *= 100;
-      if (key === "font") {
+      if (
+        key === "font" &&
+        (current.fontValue !== value || current.fontBase !== base.font)
+      ) {
+        current.fontValue = value;
+        current.fontBase = base.font;
         input.innerHTML =
           (value === null ? '<option value="">Gemischt</option>' : "") +
           studioFontOptions(value || base.font);
@@ -242,9 +251,9 @@ const MKWTypography = (() => {
     current.commit({ kind: "character", range: r, values });
     sync();
   }
-  function paragraph(values) {
+  function paragraph(values, checkpointed = false) {
     if (!current || current.locked) return;
-    remember();
+    if (!checkpointed) remember();
     const { o } = current;
     if (current.post) o.typographyVersion = 1;
     const indices = paragraphIndices();
@@ -304,10 +313,17 @@ const MKWTypography = (() => {
             key,
           )
         ) {
-          paragraph({
-            [key === "paragraphSize" ? "size" : key]:
-              key === "lineHeight" ? value / 100 : value,
-          });
+          if (!began) {
+            remember();
+            began = true;
+          }
+          paragraph(
+            {
+              [key === "paragraphSize" ? "size" : key]:
+                key === "lineHeight" ? value / 100 : value,
+            },
+            true,
+          );
           return;
         }
         if (!began) {
@@ -418,10 +434,10 @@ const MKWTypography = (() => {
   }
   function post(b, key, panel) {
     const o = b.elements[key];
-    panel.innerHTML = `<section class="tool-section typo-content"><h3>Text</h3><select data-post-text-layer aria-label="Text auswählen">${options(
+    panel.innerHTML = `<section class="tool-section typo-content"><h3>Text</h3><label class="text-layer-choice">Text auswählen<select data-post-text-layer aria-label="Text auswählen">${options(
       Object.entries(elementNames).filter(([k]) => k !== "logo"),
       key,
-    )}</select><label>Textinhalt<textarea data-post-text rows="3" aria-label="${elementNames[key]} eingeben">${esc(o.text)}</textarea></label><label class="typo-visible"><input type="checkbox" data-post-text-visible ${o.visible ? "checked" : ""}>Auf dem Bild anzeigen</label>${p.textOverrides?.[b.imageId]?.[key] ? `<button data-post-text-reset>Text vom ersten Bild übernehmen</button>` : ""}<button data-post-text-edit>Auf der Fläche bearbeiten</button></section>${panelHTML()}`;
+    )}</select></label><label>Textinhalt<textarea data-post-text rows="3" aria-label="${elementNames[key]} eingeben">${esc(o.text)}</textarea></label><label class="typo-visible"><input type="checkbox" data-post-text-visible ${o.visible ? "checked" : ""}>Auf dem Bild anzeigen</label>${b.imageId !== p.images[0]?.id ? `<button data-post-text-reset ${p.textOverrides?.[b.imageId]?.[key] ? "" : "hidden"}>Text vom ersten Bild übernehmen</button>` : ""}<button data-post-text-edit>Auf der Fläche bearbeiten</button></section>${panelHTML()}`;
     panel.querySelector("[data-post-text-visible]").onchange = (ev) => {
       mutate(() => {
         if (key === "copyright") o.visible = ev.target.checked;
@@ -476,6 +492,7 @@ const MKWTypography = (() => {
       );
       track(o, field.selectionStart, field.selectionEnd);
       changed(false);
+      if (reset) reset.hidden = !p.textOverrides?.[b.imageId]?.[key];
     };
     for (const event of ["select", "keyup", "click"])
       field.addEventListener(event, () =>
@@ -488,12 +505,7 @@ const MKWTypography = (() => {
       renderPanel();
       syncOverlays(true);
     };
-    panel.querySelector("[data-post-text-edit]").onclick = () => {
-      const el = document.querySelector(
-        `.interaction[data-board="${b.id}"] [data-key="${key}"]`,
-      );
-      MKWInlineText.focus(el);
-    };
+    postTextContent(b, key, panel, field);
     bind(panel.querySelector(".typography-inspector"), {
       o,
       post: true,

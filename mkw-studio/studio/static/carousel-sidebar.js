@@ -278,7 +278,22 @@ function carouselPanel() {
     if ($("#carouselReplace"))
       $("#carouselReplace").onclick = () => carouselFile(o.id);
     if ($("#carouselTextEdit"))
-      $("#carouselTextEdit").onclick = () => carouselEditText(o);
+      MKWInlineText.bindPanel({
+        host: panel.querySelector(".type-content"),
+        field: panel.querySelector("[data-prop=text]"),
+        button: $("#carouselTextEdit"),
+        active: () => carouselUI.editing?.id === o.id,
+        locked: carouselObjectLocked(o),
+        start: (selection) => {
+          const range = selection || MKWTypography.range(o);
+          carouselEditText(o);
+          if (range && carouselUI.editing?.id === o.id) {
+            MKWTypography.restoreSelection(carouselUI.editing.el, range);
+            carouselTrackTextCaret(o, carouselUI.editing.el);
+          }
+        },
+        stop: () => carouselEndText(),
+      });
     if (o.type === "text") {
       carouselBindTextStyles(o, panel);
       carouselBindTypography(o, panel);

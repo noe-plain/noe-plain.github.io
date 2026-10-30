@@ -333,3 +333,136 @@
     min-height: 48px;
   }
 }
+
+/* Text content has the same native field and direct-edit command in both editors. */
+:is(#stepPanel, #carouselProperties) .text-content-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.text-content-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.text-content-command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+:is(#stepPanel, #carouselProperties) .text-content-command > label {
+  display: block;
+  margin: 0;
+  font:
+    600 12px/18px "MKW UI",
+    sans-serif;
+  color: var(--md-sys-color-on-surface);
+}
+:is(#stepPanel, #carouselProperties) .text-edit-action {
+  flex: none;
+  min-width: 72px;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font:
+    600 12px/18px "MKW UI",
+    sans-serif;
+}
+:is(#stepPanel, #carouselProperties) .text-edit-action[aria-pressed="true"] {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+:is(#stepPanel, #carouselProperties) .text-content-group textarea {
+  width: 100%;
+  height: 88px;
+  min-height: 80px;
+  max-height: 240px;
+  margin: 0;
+  padding: 10px 12px;
+  resize: vertical;
+  box-sizing: border-box;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+:is(#stepPanel, #carouselProperties) .text-content-group input {
+  box-sizing: border-box;
+  width: 100%;
+}
+:is(#stepPanel, #carouselProperties) .text-edit-help {
+  margin: 0;
+  font:
+    400 12px/18px "MKW UI",
+    sans-serif;
+  color: var(--md-sys-color-on-surface-variant);
+}
+:is(#stepPanel, #carouselProperties) .text-layer-choice {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+}
+.text-layer-choice select {
+  width: 100%;
+  box-sizing: border-box;
+}
+#stepPanel .text-content-editor > .typo-visible {
+  min-height: 40px;
+}
+:is(#stepPanel, #carouselProperties) .typography-inspector {
+  padding: 16px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-low);
+}
+:is(#stepPanel, #carouselProperties) .typo-scope {
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 24px;
+}
+.typo-scope > [data-typo-scope] {
+  flex: 1;
+  min-width: 120px;
+}
+.typo-scope [hidden] {
+  display: none !important;
+}
+:is(#stepPanel, #carouselProperties) .typo-tabs button {
+  padding: 10px 6px;
+  font-size: 12px;
+  line-height: 18px;
+  min-height: 56px;
+}
+:is(#stepPanel, #carouselProperties)
+  .typography-inspector
+  .typo-paragraph-scope {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--md-sys-color-surface-container);
+  font-size: 12px;
+  line-height: 18px;
+}
+:is(#stepPanel, #carouselProperties) .text-content-editor [hidden] {
+  display: none !important;
+}
+@media (pointer: coarse) {
+  :is(#stepPanel, #carouselProperties) .text-edit-action {
+    min-height: 48px;
+  }
+}
+
+#toolsSidebar #stepPanel .text-layer-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+}
+#toolsSidebar #stepPanel .text-layer-choice select {
+  width: 100%;
+  max-width: none;
+}

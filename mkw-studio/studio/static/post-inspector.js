@@ -68,10 +68,10 @@
       const e = b.elements[layer] || b.elements.title,
         first = p.images[0]?.id === b.imageId,
         custom = p.textOverrides?.[b.imageId]?.[layer];
-      panel.innerHTML = `<div class="panel-row text-tools"><section class="tool-section"><h3>Inhalt</h3><select id="textLayer" aria-label="Text auswählen">${options(
+      panel.innerHTML = `<div class="panel-row text-tools"><section class="tool-section"><h3>Inhalt</h3><label class="text-layer-choice">Text auswählen<select id="textLayer" aria-label="Text auswählen">${options(
         Object.entries(elementNames).filter(([k]) => k !== "logo"),
         layer,
-      )}</select><div id="textContentField"></div><label><input id="textVisible" type="checkbox" ${e.visible ? "checked" : ""}> Auf dem Bild anzeigen</label>${!first && custom ? '<button id="resetText">Text vom ersten Bild übernehmen</button>' : ""}</section><section class="tool-section"><h3>Gestaltung</h3><label class="tool-stacked">Schrift<select id="fontRole" aria-label="Schrift">${studioFontOptions(e.role)}</select></label><label>Schriftgrösse (px) <input id="textSize" type="number" min="1" max="5000" value="${Math.round(e.size)}"></label><label class="tool-stacked">Ausrichtung<select id="textAlign" aria-label="Textausrichtung" ${layer === "copyright" ? "disabled" : ""}>${options(
+      )}</select></label><div id="textContentField"></div><label><input id="textVisible" type="checkbox" ${e.visible ? "checked" : ""}> Auf dem Bild anzeigen</label>${!first ? `<button id="resetText" ${custom ? "" : "hidden"}>Text vom ersten Bild übernehmen</button>` : ""}</section><section class="tool-section"><h3>Gestaltung</h3><label class="tool-stacked">Schrift<select id="fontRole" aria-label="Schrift">${studioFontOptions(e.role)}</select></label><label>Schriftgrösse (px) <input id="textSize" type="number" min="1" max="5000" value="${Math.round(e.size)}"></label><label class="tool-stacked">Ausrichtung<select id="textAlign" aria-label="Textausrichtung" ${layer === "copyright" ? "disabled" : ""}>${options(
         [
           ["left", "Links"],
           ["center", "Zentriert"],
@@ -188,6 +188,21 @@
           }
         }, false),
       );
+      const reset = panel.querySelector("#resetText");
+      if (reset) {
+        reset.addEventListener("click", () => {
+          const field = panel.querySelector("#mainTextInput,#copyrightText");
+          if (field) field.value = b.elements[layer].text;
+          reset.hidden = true;
+          present(read());
+        });
+      }
+      const field = panel.querySelector("#mainTextInput,#copyrightText");
+      views.textEditor?.(b, layer, panel, field);
+      field.addEventListener("input", () => {
+        const reset = panel.querySelector("#resetText");
+        if (reset) reset.hidden = !p.textOverrides?.[b.imageId]?.[layer];
+      });
       if (b.family?.enabled)
         panel
           .querySelector(".panel-row")

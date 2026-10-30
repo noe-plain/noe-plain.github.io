@@ -157,6 +157,11 @@ function setImageTextType(imageId, key, enabled) {
   }
   if (enabled) {
     selected = p.boards.find((b) => b.imageId === imageId)?.id;
+    document
+      .querySelectorAll(".board-card")
+      .forEach((card) =>
+        card.classList.toggle("selected", card.dataset.id === selected),
+      );
     layer = key;
     step = "text";
   }
@@ -363,6 +368,7 @@ const postInspector = MKWPostInspector.create({
   },
   views: {
     inspector: (options) => MKWInspectorUI.present(options),
+    textEditor: postTextContent,
     query: $,
     esc,
     options,
@@ -401,6 +407,31 @@ function beginText(b, key, el) {
     .forEach((c) => c.classList.toggle("selected", c.dataset.id === b.id));
   renderPanel();
   draw();
+}
+function postTextContent(b, key, panel, field) {
+  MKWInlineText.bindPanel({
+    host: field.closest(".tool-section"),
+    field,
+    button: panel.querySelector("[data-post-text-edit]"),
+    active: () => editingText?.boardId === b.id && editingText.key === key,
+    available: () => !!b.elements[key].visible,
+    start: (selection) => {
+      const el = document.querySelector(
+          `.interaction[data-board="${b.id}"] .text-editor[data-key="${key}"]`,
+        ),
+        range = selection ||
+          MKWTypography.range(b.elements[key]) || {
+            start: b.elements[key].text.length,
+            end: b.elements[key].text.length,
+          };
+      MKWInlineText.focus(el);
+      if (editingText?.el === el) {
+        MKWTypography.restoreSelection(el, range);
+        MKWTypography.track(b.elements[key], range.start, range.end);
+      }
+    },
+    stop: () => editingText?.el.blur(),
+  });
 }
 function setSharedText(b, key, text) {
   if (key === "copyright") text = MKWLayout.copyrightText(text);
@@ -481,6 +512,7 @@ function endText(b, key, el, ev) {
   syncTextTypes();
   if (!editingText) return;
   editingText = null;
+  MKWInlineText.refreshPanel($("#stepPanel"));
   el.classList.remove("editing");
   el.style.textTransform = "";
   syncOverlays(true);

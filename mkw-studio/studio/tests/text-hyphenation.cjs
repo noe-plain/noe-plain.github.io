@@ -105,7 +105,7 @@ const assert = require("node:assert/strict"),
     });
     await page.locator("[data-typo-tab=paragraph]").click();
     await page
-      .locator("#typo-paragraph .justification-settings")
+      .locator('[data-typo-page="paragraph"] .justification-settings')
       .evaluate((el) => (el.open = true));
     const choose = async (a, b) => {
       await page.locator("[data-prop=text]").focus();

@@ -358,6 +358,7 @@ function carouselEndText(preservePanel = false) {
   const edit = carouselUI.editing;
   if (!edit) return;
   carouselUI.editing = null;
+  MKWInlineText.refreshPanel($("#carouselProperties"));
   if (!preservePanel) {
     const o = p.carousel?.objects.find((o) => o.id === edit.id);
     if (o) MKWTypography.clear(o);
