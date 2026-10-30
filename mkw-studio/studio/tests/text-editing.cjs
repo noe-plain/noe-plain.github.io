@@ -196,6 +196,12 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
             { start: 0, end: 5 },
             "Switching to the canvas preserves the selected source characters",
           );
+          await page.keyboard.insertText("Klang");
+          assert.equal(await page.evaluate(() => p.carousel ? carouselSelected()[0].text : p.boards.find(b => b.id === selected).elements.title.text), "Klang verbindet\nNeue Begegnungen", "Typing replaces exactly the preserved selection");
+          if (mode === "carousel") await page.keyboard.press("Meta+z");
+          else await page.evaluate(() => undo());
+          await page.evaluate(() => { const el = p.carousel ? carouselUI.editing?.el : editingText?.el; if (el) { MKWTypography.restoreSelection(el, { start:0, end:5 }); MKWTypography.track(p.carousel ? carouselSelected()[0] : p.boards.find(b => b.id === selected).elements.title,0,5); } });
+          if(mode === "post") { await field.focus();await field.evaluate(el=>{el.setSelectionRange(0,5);el.dispatchEvent(new Event("select"))}); }
           await page.locator(panel + " [data-typo=size]").fill("76");
           const styled = await page.evaluate(() =>
             p.carousel

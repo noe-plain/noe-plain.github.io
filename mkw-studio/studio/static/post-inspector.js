@@ -342,10 +342,11 @@
         present({ project: p, board: b, step, layer });
         return;
       }
+      if (step === "text" && !views.textKeys().includes(layer))
+        selectLayer("title");
       if (step === "crop") {
         renderCrop({ b, panel });
       } else if (step === "text" && advanced) {
-        if (!views.textKeys().includes(layer)) selectLayer("title");
         views.typography(b, layer, panel);
       } else if (step === "text") {
         renderText({ p, b, layer, panel, elementNames, selectLayer });
