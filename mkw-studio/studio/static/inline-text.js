@@ -111,6 +111,9 @@ const MKWInlineText = (() => {
     command.className = "text-content-command";
     label.htmlFor = field.id;
     label.textContent = "Textinhalt";
+    const accessibleName = field.getAttribute("aria-label");
+    if (accessibleName && !accessibleName.startsWith("Textinhalt"))
+      field.setAttribute("aria-label", "Textinhalt · " + accessibleName);
     help.className = "text-edit-help";
     help.id = field.id + "Help";
     help.setAttribute("role", "status");
