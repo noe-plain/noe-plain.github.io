@@ -362,6 +362,7 @@ const postInspector = MKWPostInspector.create({
       ),
   },
   views: {
+    inspector: (options) => MKWInspectorUI.present(options),
     query: $,
     esc,
     options,

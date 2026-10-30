@@ -8,7 +8,7 @@ const path=require('node:path');
  const root=process.env.STUDIO_ROOT||path.resolve(__dirname,'..');
  await page.goto(process.env.STUDIO_URL||'http://127.0.0.1:8891/mkw-studio/');
  await page.locator('#startNew').waitFor();await page.waitForFunction(()=>!document.querySelector('#startNew').disabled);
- assert(await page.locator('#startDialog').isVisible());assert(await page.locator('#startContinue').isDisabled());await page.keyboard.press('Escape');assert(await page.locator('#startDialog').isVisible());
+ assert(await page.locator('#startDialog').isVisible());assert.equal(await page.locator('#startContinue').count(),0);await page.keyboard.press('Escape');assert(await page.locator('#startDialog').isVisible());
  await page.screenshot({path:require('./browser.cjs').artifact('mkw-startscreen.png')});
  await page.locator('#startNew').click();
  await page.locator('#files').setInputFiles([path.join(root,'testbilder/260831_A1_Probe_c-noe-plain-4.jpg'),path.join(root,'testbilder/260831_A1_Probe_c-noe-plain-5.jpg')]);
@@ -24,8 +24,8 @@ const path=require('node:path');
  const second=page.locator('.text-type-picker').nth(1);await second.locator('summary').click();await second.locator('[data-text-type="title"]').uncheck();await second.locator('summary').click();
  await page.evaluate(()=>{setSharedText(p.boards[0],'title','NEUER TITEL');changed(false)});
  assert.deepEqual(await page.evaluate(()=>p.boards.slice(2).map(b=>[b.elements.title.visible,b.elements.title.text])),[[false,'NEUER TITEL'],[false,'NEUER TITEL']]);
- await page.evaluate(async()=>{p.meta.title='Auswahltest';await autosave()});await page.reload();await page.waitForFunction(()=>!document.querySelector('#startContinue').disabled);
- assert.equal(await page.evaluate(()=>p.images.length),0);await page.locator('#startContinue').click();await page.waitForFunction(()=>p.images.length===2&&!busy);
+ await page.evaluate(async()=>{p.meta.title='Auswahltest';await autosave()});await page.reload();await page.waitForFunction(()=>!document.querySelector('#startOpen').disabled);
+ assert.equal(await page.evaluate(()=>p.images.length),0);await require("./browser.cjs").openLatestProject(page);await page.waitForFunction(()=>p.images.length===2&&!busy);
  assert.deepEqual(await page.evaluate(()=>p.boards.slice(2).map(b=>b.elements.title.enabled)),[false,false]);
  await page.locator('.text-type-picker').nth(1).locator('summary').click();await page.locator('.text-type-picker').nth(1).locator('[data-text-type="title"]').check();await page.locator('#undo').click();assert.equal(await page.locator('.text-type-picker').nth(1).locator('[data-text-type="title"]').isChecked(),false);
  // A shadow-only render must contain soft black alpha, with no original coloured logo or hard silhouette.
@@ -37,7 +37,7 @@ const path=require('node:path');
   const alpha=(x,y)=>d[(y*800+x)*4+3];return{max,coloured,center:alpha(370,304),edge:alpha(310,304),outside:alpha(280,304),far:alpha(20,20)};
  });assert.equal(pixels.coloured,0);assert(pixels.max>10&&pixels.max<180);assert(pixels.center>pixels.edge&&pixels.edge>pixels.outside&&pixels.outside>0);assert.equal(pixels.far,0);
  await page.evaluate(()=>{p.boards.forEach(b=>{b.elements.logo.visible=true;b.elements.logo.source='white'});selected=p.boards[0].id;render()});await page.waitForFunction(()=>!drawing);await page.screenshot({path:require('./browser.cjs').artifact('mkw-textauswahl.png')});
- await page.evaluate(()=>autosave());await page.reload();await page.locator('#startNew').click();assert.equal(await page.evaluate(()=>p.images.length),0);await page.reload();await page.locator('#startContinue').click();await page.waitForFunction(()=>p.images.length===2&&!busy);
+ await page.evaluate(()=>autosave());await page.reload();await page.locator('#startNew').click();assert.equal(await page.evaluate(()=>p.images.length),0);await page.reload();await require("./browser.cjs").openLatestProject(page);await page.waitForFunction(()=>p.images.length===2&&!busy);
  assert.deepEqual(errors,[]);console.log('PASS welcome/new/resume, per-image multi-selection, retained text, hidden propagated text, undo, persistence, soft black alpha shadow, previous autosave preserved until edits');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

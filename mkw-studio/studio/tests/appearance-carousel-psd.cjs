@@ -346,7 +346,7 @@ const assert = require("node:assert/strict");
     assert.equal(tooLarge, true);
     await page.evaluate(() => autosave());
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.locator("#carouselCanvas").waitFor();
     assert.equal(
       await page.evaluate(() => document.documentElement.dataset.theme),

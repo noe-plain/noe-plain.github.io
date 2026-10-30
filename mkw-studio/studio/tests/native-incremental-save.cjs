@@ -156,7 +156,7 @@ const { launch } = require("./browser.cjs");
       ) < 1000,
     );
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(() => !busy && p.images.length === 50);
     const afterReload = await page.evaluate(async () => {
       p.meta.subtitle = "Nach Neustart";

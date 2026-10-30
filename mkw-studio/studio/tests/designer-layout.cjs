@@ -256,7 +256,7 @@ const assert = require("node:assert/strict"),
       ],
     });
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.locator("#carouselCanvas").waitFor();
     assert.deepEqual(
       await page.evaluate(() => studioPreferences.designerGrid),

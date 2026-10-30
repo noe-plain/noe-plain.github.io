@@ -1,87 +1,69 @@
 <!doctype html>
-<html lang="de">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#20242b">
-  <title>Musikkollegium Winterthur · Tools</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="tools.js" defer></script>
-  <script src="main.js" defer></script>
-</head>
-
-<body>
-  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <symbol id="icon-studio" viewBox="0 0 32 32">
-      <rect x="5" y="5" width="22" height="22" rx="3" />
-      <path d="M11 11h10M11 16h10M11 21h6" />
-      <path d="M23 18v5m-2.5-2.5h5" />
-    </symbol>
-    <symbol id="icon-image" viewBox="0 0 32 32">
-      <rect x="4.5" y="5.5" width="23" height="21" rx="3" />
-      <circle cx="11.5" cy="12" r="2" />
-      <path d="m5.5 23 7-7 5 5 3-3 6 6" />
-    </symbol>
-    <symbol id="icon-tool" viewBox="0 0 32 32">
-      <path d="M21 5a7 7 0 0 0-8.3 9l-7.2 7.3a3.2 3.2 0 0 0 4.5 4.5l7.3-7.2A7 7 0 0 0 26 10l-4.5 4.5-4-1-1-4Z" />
-    </symbol>
-    <symbol id="icon-code" viewBox="0 0 32 32">
-      <path d="m12 9-7 7 7 7m8-14 7 7-7 7M18 5l-4 22" />
-    </symbol>
-    <symbol id="icon-download" viewBox="0 0 32 32">
-      <path d="M16 4v17m-6-6 6 6 6-6M5 23v4h22v-4" />
-    </symbol>
-    <symbol id="icon-spark" viewBox="0 0 32 32">
-      <path d="m16 3 2.6 10.4L29 16l-10.4 2.6L16 29l-2.6-10.4L3 16l10.4-2.6L16 3Z" />
-    </symbol>
-  </svg>
-  <header class="topbar">
-    <div class="brand" aria-label="Musikkollegium Winterthur">MUSIKKOLLEGIUM<br>WINTERTHUR</div>
-    <div class="header-divider"></div>
-    <div class="header-context"><span>DEIN ARBEITSPLATZ</span><strong>MKW Tools</strong></div>
-    <div class="header-spacer"></div>
-    <span class="header-badge" id="headerCount">TOOLS</span>
-  </header>
-
-  <main>
-    <section class="hero" aria-labelledby="pageTitle">
-      <div class="hero-inner">
-        <div class="eyebrow"><span class="accent-dot"></span> MKW / WERKZEUGE</div>
-        <h1 id="pageTitle">Deine Tools.<br><span>Ein Ort.</span></h1>
-        <div class="hero-meta"><span id="heroCount">2 Tools</span><span class="meta-line"></span><span>Ein gemeinsamer
-            Arbeitsbereich</span></div>
-      </div>
-    </section>
-
-    <section class="directory" aria-labelledby="directoryTitle">
-      <div class="section-heading">
-        <div><span class="eyebrow">DEINE AUSWAHL</span>
-          <h2 id="directoryTitle">Werkzeuge entdecken</h2>
-        </div>
-        <p>Wähle ein Tool, um loszulegen.</p>
-      </div>
-      <div class="directory-actions">
-        <div id="filters" class="filters" role="group" aria-label="Tools nach Kategorie filtern"></div><label
-          class="search"><svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m15.5 15.5 5 5" />
-          </svg><input id="search" type="search" placeholder="Tools durchsuchen …" aria-label="Tools durchsuchen"
-            autocomplete="off"><kbd>/</kbd></label>
-      </div>
-      <div id="toolsGrid" class="tools-grid" aria-live="polite"></div>
-      <div id="emptyResult" class="empty-result" hidden><svg viewBox="0 0 32 32" aria-hidden="true">
-          <circle cx="14" cy="14" r="9" />
-          <path d="m21 21 7 7" />
+<html lang="de-CH" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fcfcfd" />
+    <title>MKW Studio · Deine Tools. Ein Ort.</title>
+    <link rel="stylesheet" href="studio/static/ui-theme-tokens.css" />
+    <link rel="stylesheet" href="style.css?v=20261030" />
+    <script src="studio/static/ui-colour-model.js" defer></script>
+    <script src="tools.js?v=20261030" defer></script>
+    <script src="main.js?v=20261030" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#toolsTitle">Zu den Tools</a>
+    <header class="hub-header">
+      <a class="hub-brand" href="./" aria-label="MKW Studio · Toolübersicht"
+        ><img
+          id="hubLogo"
+          src="studio/mkw-logo-bold-pos.svg"
+          alt="Musikkollegium Winterthur"
+          width="240"
+          height="46"
+        /><span>MKW Studio</span></a
+      >
+      <button
+        type="button"
+        id="themeToggle"
+        aria-label="Dunkle Darstellung verwenden"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <use href="studio/static/icons/material-symbols.svg#dark_mode"></use>
         </svg>
-        <h3>Kein Tool gefunden.</h3>
-        <p>Versuche einen anderen Suchbegriff oder eine andere Kategorie.</p>
-      </div>
-      <div class="directory-footer"><span class="local-dot">●</span> Diese Übersicht funktioniert auch lokal. <span
-          id="resultCount"></span></div>
-    </section>
-  </main>
-  <footer class="statusbar"><span>● Musikkollegium Winterthur</span><span>MKW TOOLS</span></footer>
-</body>
-
+      </button>
+    </header>
+    <main>
+      <section class="hub-intro" aria-labelledby="pageTitle">
+        <span class="hub-eyebrow">Dein kreativer Arbeitsplatz</span>
+        <h1 id="pageTitle">Deine Tools.<br /><span>Ein Ort.</span></h1>
+        <p>
+          Gestalten, vorbereiten und weiterarbeiten. Wähle das Werkzeug für
+          deine nächste Aufgabe.
+        </p>
+      </section>
+      <section class="hub-directory" aria-labelledby="toolsTitle">
+        <div class="hub-section-heading">
+          <h2 id="toolsTitle">Womit möchtest du arbeiten?</h2>
+          <span id="toolAvailability"></span>
+        </div>
+        <div id="toolsGrid" class="tools-grid"></div>
+        <noscript
+          ><p>
+            <a href="./studio/">MKW Studio öffnen</a> ·
+            <a href="./webp-konverter/">WebP-Konverter öffnen</a>
+          </p>
+          <p>Ein PDF-Editor ist geplant.</p></noscript
+        >
+      </section>
+      <p id="hubStatus" role="status"></p>
+    </main>
+    <footer class="hub-footer">
+      <span>Musikkollegium Winterthur</span
+      ><span
+        >Deine Dateien werden im jeweiligen Tool auf deinem Gerät
+        verarbeitet.</span
+      >
+    </footer>
+  </body>
 </html>

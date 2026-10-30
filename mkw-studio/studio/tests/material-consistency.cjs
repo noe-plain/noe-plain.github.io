@@ -23,6 +23,7 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#projectLibraryList").getAttribute("aria-busy"),
       "true",
     );
+    await page.waitForFunction(() => typeof window.finishList === "function");
     await page.evaluate(() => {
       finishList();
       MKWProjectStore.list = originalList;
@@ -236,9 +237,16 @@ const { launch, artifact } = require("./browser.cjs");
             studioPreferences.density = density;
             studioApplyDensity();
           }, density);
+          const expectedHeight = density === "compact" ? 36 : 48;
+          const field = typo.locator("[data-typo=size]");
           assert.equal(
-            (await typo.locator("[data-typo=size]").boundingBox()).height,
-            density === "compact" ? 36 : 48,
+            await field.evaluate((el) => getComputedStyle(el).height),
+            `${expectedHeight}px`,
+          );
+          assert(
+            Math.abs((await field.boundingBox()).height - expectedHeight) <
+              0.01,
+            "Typography field must keep its density height; allow only subpixel browser rounding",
           );
         }
         await page.locator("#settings").click();

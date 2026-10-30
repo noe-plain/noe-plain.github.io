@@ -307,7 +307,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     await page.evaluate(() => autosave());
     const saved = await page.evaluate(() => JSON.stringify(p.carousel));
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.locator("#carouselCanvas").waitFor();
     assert.equal(await page.evaluate(() => JSON.stringify(p.carousel)), saved);
     assert.equal(await page.evaluate(() => studioPreferences.lineHeight), 120);

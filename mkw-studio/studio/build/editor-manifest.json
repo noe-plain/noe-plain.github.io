@@ -26,6 +26,7 @@
     "static/image-preview.js",
     "static/renderer.js",
     "static/workspace-ui.js",
+    "static/inspector-ui.js",
     "static/post-inspector.js",
     "static/studio.js",
     "static/file-io.js",
@@ -136,6 +137,7 @@
     "static/project-dialogs.css",
     "static/project-setup.css",
     "static/start-home.css",
-    "static/ui-fields.css"
+    "static/ui-fields.css",
+    "static/inspector-ui.css"
   ]
 }

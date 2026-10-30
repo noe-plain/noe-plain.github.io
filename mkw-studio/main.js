@@ -1,50 +1,126 @@
 (() => {
-  'use strict';
-  const $=id=>document.getElementById(id);
-  const source=Array.isArray(window.MKW_TOOLS)?window.MKW_TOOLS:[];
-  const tools=source.filter(t=>t && typeof t.name==='string' && typeof t.path==='string' && /^\.\//.test(t.path));
-  const state={category:'Alle',query:''};
-  const knownIcons=new Set(['studio','image','tool','code','download','spark']);
-  const categories=['Alle',...new Set(tools.map(t=>t.category||'Weitere'))];
-  const countText=n=>`${n} Tool${n===1?'':'s'}`;
-  $('headerCount').textContent=countText(tools.length).toUpperCase();
-  $('heroCount').textContent=countText(tools.length);
-  const normalize=text=>String(text||'').toLocaleLowerCase('de-CH').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  function filters(){
-    $('filters').replaceChildren(...categories.map(category=>{
-      const b=document.createElement('button');b.type='button';b.textContent=category;b.classList.toggle('active',state.category===category);b.setAttribute('aria-pressed',String(state.category===category));
-      b.addEventListener('click',()=>{state.category=category;filters();render()});return b;
-    }));
+  "use strict";
+  const root = document.documentElement,
+    iconPath = "studio/static/icons/material-symbols.svg#",
+    icons = new Set(["shapes", "image", "note_add"]),
+    button = document.getElementById("themeToggle");
+  let theme = "light";
+  const symbol = (name) => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+      use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    use.setAttribute("href", iconPath + name);
+    svg.append(use);
+    return svg;
+  };
+  function appearance() {
+    let preferences = {};
+    try {
+      preferences = JSON.parse(
+        localStorage.getItem("mkw-studio-preferences") || "{}",
+      );
+      theme =
+        localStorage.getItem("mkw-studio-theme") === "dark" ? "dark" : "light";
+    } catch {}
+    const palette = MKWUIColor.palette(
+      preferences?.primaryColour,
+      theme,
+      preferences?.colourMode,
+    );
+    for (const [key, value] of Object.entries(palette))
+      root.style.setProperty("--md-sys-color-" + key, value);
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
+    document.getElementById("hubLogo").src =
+      `studio/mkw-logo-bold-${theme === "dark" ? "neg" : "pos"}.svg`;
+    document.querySelector('meta[name="theme-color"]').content =
+      palette.surface;
+    button.replaceChildren(
+      symbol(theme === "dark" ? "light_mode" : "dark_mode"),
+    );
+    button.setAttribute(
+      "aria-label",
+      theme === "dark"
+        ? "Helle Darstellung verwenden"
+        : "Dunkle Darstellung verwenden",
+    );
   }
-  function card(tool,index){
-    const a=document.createElement('a');a.className='tool-card';a.href=tool.path;a.setAttribute('aria-label',`${tool.name} öffnen`);
-    const top=document.createElement('div');top.className='card-top';
-    const icon=document.createElement('div');icon.className='card-icon';icon.setAttribute('aria-hidden','true');
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');const use=document.createElementNS('http://www.w3.org/2000/svg','use');use.setAttribute('href','#icon-'+(knownIcons.has(tool.icon)?tool.icon:'tool'));svg.append(use);icon.append(svg);
-    const number=document.createElement('span');number.className='card-number';number.textContent=String(index+1).padStart(2,'0');top.append(icon,number);
-    const body=document.createElement('div');body.className='card-content';
-    const label=document.createElement('span');label.className='card-category';label.textContent=tool.category||'Weitere';
-    const title=document.createElement('h3');title.textContent=tool.name;
-    const description=document.createElement('p');description.textContent=tool.description||'';
-    body.append(label,title,description);
-    const bottom=document.createElement('div');bottom.className='card-bottom';
-    const action=document.createElement('span');action.textContent='Tool öffnen';const arrow=document.createElement('span');arrow.className='arrow';arrow.textContent='↗';arrow.setAttribute('aria-hidden','true');bottom.append(action,arrow);
-    a.append(top,body,bottom);return a;
-  }
-  function render(){
-    const matches=tools.filter(t=>{
-      if(state.category!=='Alle'&&(t.category||'Weitere')!==state.category)return false;
-      return normalize([t.name,t.description,t.category,...(Array.isArray(t.tags)?t.tags:[])].join(' ')).includes(normalize(state.query));
-    });
-    $('toolsGrid').replaceChildren(...matches.map(t=>card(t,tools.indexOf(t))));
-    $('emptyResult').hidden=matches.length>0;
-    $('resultCount').textContent=`${matches.length} von ${countText(tools.length)}`;
-    if(!tools.length){$('emptyResult').querySelector('h3').textContent='Noch keine Tools eingetragen.';$('emptyResult').querySelector('p').textContent='Trage die Tools in tools.js ein.'}
-  }
-  $('search').addEventListener('input',e=>{state.query=e.target.value;render()});
-  document.addEventListener('keydown',e=>{
-    if(e.key==='/'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();$('search').focus()}
-    if(e.key==='Escape'&&document.activeElement===$('search')){$('search').value='';state.query='';render();$('search').blur()}
+  button.onclick = () => {
+    try {
+      localStorage.setItem(
+        "mkw-studio-theme",
+        theme === "dark" ? "light" : "dark",
+      );
+      document.getElementById("hubStatus").textContent = "";
+      appearance();
+    } catch {
+      document.getElementById("hubStatus").textContent =
+        "Die Darstellung konnte in diesem Browser nicht gespeichert werden.";
+    }
+  };
+  window.addEventListener("storage", (event) => {
+    if (["mkw-studio-theme", "mkw-studio-preferences"].includes(event.key))
+      appearance();
   });
-  filters();render();
+  appearance();
+  const tools = (
+      Array.isArray(window.MKW_TOOLS) ? window.MKW_TOOLS : []
+    ).filter(
+      (tool) =>
+        tool &&
+        typeof tool.name === "string" &&
+        (tool.status === "planned" ||
+          (typeof tool.path === "string" && /^\.\//.test(tool.path))),
+    ),
+    available = tools.filter((tool) => tool.status !== "planned").length,
+    planned = tools.length - available;
+  document.getElementById("toolAvailability").textContent =
+    `${available} verfügbar · ${planned} geplant`;
+  const card = (tool) => {
+    const article = document.createElement("article"),
+      visual = document.createElement("div"),
+      heading = document.createElement("h3"),
+      description = document.createElement("p"),
+      badge = document.createElement("span");
+    article.className =
+      "tool-card" +
+      (tool.id === "studio" ? " tool-featured" : "") +
+      (tool.status === "planned" ? " tool-planned" : "");
+    article.dataset.tool = tool.id;
+    visual.className = "tool-card-symbol";
+    visual.append(symbol(icons.has(tool.icon) ? tool.icon : "note_add"));
+    badge.className = "tool-status";
+    badge.textContent = tool.note || "Verfügbar";
+    heading.textContent = tool.name;
+    description.textContent = tool.description;
+    article.append(visual, badge, heading, description);
+    if (tool.features?.length) {
+      const features = document.createElement("ul");
+      features.className = "tool-features";
+      for (const label of tool.features) {
+        const feature = document.createElement("li");
+        feature.textContent = label;
+        features.append(feature);
+      }
+      article.append(features);
+    }
+    if (tool.status !== "planned") {
+      const link = document.createElement("a");
+      link.href = tool.path;
+      link.className = "tool-open";
+      link.textContent =
+        tool.id === "studio" ? "Studio öffnen" : "Konverter öffnen";
+      link.setAttribute("aria-label", tool.name + " öffnen");
+      link.append(symbol("chevron_right"));
+      article.append(link);
+    } else {
+      const note = document.createElement("p");
+      note.className = "tool-planning-note";
+      note.textContent = "Noch nicht verfügbar";
+      article.append(note);
+    }
+    return article;
+  };
+  document.getElementById("toolsGrid").replaceChildren(...tools.map(card));
 })();

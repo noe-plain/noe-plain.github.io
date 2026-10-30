@@ -417,7 +417,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#closeSettings").click();
     await page.reload();
     await page.waitForFunction(() => !$("#startNew").disabled);
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(() => !busy);
     await page.locator("#settings").click();
     await page.waitForFunction(

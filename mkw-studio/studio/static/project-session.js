@@ -416,6 +416,8 @@ const MKWProjects = (() => {
     if (!dialog.open) dialog.showModal();
     let records;
     try {
+      await MKWProjectStore.last({ metadataOnly: true });
+      if (generation !== libraryGeneration || !dialog.open) return;
       records = await MKWProjectStore.list();
     } catch (error) {
       if (generation !== libraryGeneration || !dialog.open) return;

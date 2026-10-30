@@ -36,4 +36,16 @@ async function waitForProjectReady(page) {
       !document.querySelector("#startDialog")?.open,
   );
 }
-module.exports = { launch, artifact, waitForProjectReady };
+async function openLatestProject(page) {
+  await page.locator("#startOpen").click();
+  await page.locator("#projectLibraryList[aria-busy=false]").waitFor();
+  const rows = page.locator("#projectLibraryList [data-project-id]");
+  if (!(await rows.count()))
+    throw Error(
+      "No browser project available: " +
+        (await page.locator("#projectOpenStatus").textContent()),
+    );
+  await rows.first().click();
+  await waitForProjectReady(page);
+}
+module.exports = { launch, artifact, waitForProjectReady, openLatestProject };

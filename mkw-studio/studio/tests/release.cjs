@@ -121,7 +121,7 @@ const fs = require("node:fs");
       return autosave();
     });
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(() => p.boards.length === 8 && !busy);
     assert.equal(await page.evaluate(() => p.formats.length), 4);
     await page.locator("#export").click();

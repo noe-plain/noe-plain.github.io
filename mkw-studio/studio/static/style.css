@@ -927,20 +927,6 @@ a:focus-visible {
   font-size: 14px;
   max-width: 410px;
 }
-.start-choices {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: 12px;
-  margin: 30px 0 18px;
-}
-.start-choices button {
-  min-width: 0;
-  padding: 16px 14px;
-  text-align: left;
-  font-size: 14px;
-  line-height: 20px;
-  overflow-wrap: anywhere;
-}
 #startTemplates,
 #startOpen {
   background: var(--md-sys-color-secondary-container);
@@ -1876,16 +1862,6 @@ dialog small {
   flex: 1;
 }
 
-.start-open-options {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  gap: 12px;
-}
-.start-open-options button {
-  height: 100%;
-  line-height: 1.4;
-}
 .add-more-images {
   display: flex;
   align-items: center;
@@ -1910,10 +1886,6 @@ dialog small {
   height: 20px;
 }
 @media (max-width: 480px) {
-  .start-choices button {
-    padding: 12px 10px;
-    font-size: 12px;
-  }
   .add-more-images {
     padding: 20px 14px;
     font-size: 12px;

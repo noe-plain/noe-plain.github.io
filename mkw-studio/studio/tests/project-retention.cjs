@@ -6,6 +6,7 @@ const {launch, artifact} = require('./browser.cjs');
  await page.waitForFunction(()=>!$('#startNew').disabled);
  // Seed an older installation with nine independent backups and one shared photo.
  const seed=await page.evaluate(async()=>{
+  await MKWProjectStore.list();
   const c=makeCanvas(20,20),ctx=c.getContext('2d');
   const im=(colour,id)=>{ctx.fillStyle=colour;ctx.fillRect(0,0,20,20);return{id,name:id,width:20,height:20,data:c.toDataURL()}};
   const shared=im('#ffffff','shared-photo'),entries=[];
@@ -43,7 +44,7 @@ const {launch, artifact} = require('./browser.cjs');
   return{failed,aborted,same:JSON.stringify(before)===JSON.stringify(await MKWProjectStore.list()),sameAssets:JSON.stringify(assets)===JSON.stringify(await retentionAssetKeys())};
  });assert(rollback.failed&&rollback.aborted&&rollback.same&&rollback.sameAssets);
  // An evicted project still open in another tab receives a new identity and loses its file link.
- await page.locator('#startContinue').click();await page.waitForFunction(()=>!busy);
+ await require("./browser.cjs").openLatestProject(page);await page.waitForFunction(()=>!busy);
  const recovery=await page.evaluate(async()=>{
   const record=await MKWProjectStore.open('seed-4');
   // A serializable sentinel catches accidental reuse of a removed file link in either browser.

@@ -481,7 +481,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     const expectedStyles = (await chosen()).textStyles;
     await page.evaluate(() => autosave());
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.locator("#carouselCanvas").waitFor();
     assert.deepEqual(
       await page.evaluate(

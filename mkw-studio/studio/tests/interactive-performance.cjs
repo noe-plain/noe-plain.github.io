@@ -229,7 +229,7 @@ const { launch, artifact } = require("./browser.cjs");
       0,
       "Start screen must not read saved photo/font blobs",
     );
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(() => !busy && p.images.length === 1);
     assert(
       await page.evaluate(() => window.performanceAssetReads > 0),

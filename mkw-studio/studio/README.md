@@ -1,14 +1,14 @@
 # Musikkollegium Winterthur · MKW Studio
 
-Einzelposts und zusammenhängende Carousel-Posts direkt im Browser gestalten. Auf [GitHub Pages](https://noe-plain.github.io/mkw-studio/studio/) ohne Installation nutzbar. Bilder, Projekte und importierte Schriften werden auf dem Gerät verarbeitet.
+Mit **FD-Kampagnen** einheitliche Einzelposts und mit dem **Designer** freie Designs oder zusammenhängende Slides direkt im Browser gestalten. Auf [GitHub Pages](https://noe-plain.github.io/mkw-studio/studio/) ohne Installation nutzbar. Bilder, Projekte und importierte Schriften werden auf dem Gerät verarbeitet.
 
 ## Einrichten und gestalten
 
-Neues Projekt benennen, Einzelposts oder Carousel wählen und Formate/Schutzzonen bestimmen. Bei Einzelposts sind 9:16 und 1:1 vorausgewählt; 4:5, 1080 × 1440 und eigene Formate sind zusätzlich verfügbar. Importierte Bilder erhalten ein weisses MKW-Logo und, soweit die lokale Personenerkennung verfügbar ist, einen passenden Ausschnitt.
+Auf dem Startbildschirm **FD-Kampagnen** oder **Designer** wählen; beide öffnen direkt die passende Einrichtung. Projekt benennen und Formate/Schutzzonen bestimmen. Bei Einzelposts sind 9:16 und 1:1 vorausgewählt; 4:5, 1080 × 1440 und eigene Formate sind zusätzlich verfügbar. Importierte Bilder erhalten ein weisses MKW-Logo und, soweit die lokale Personenerkennung verfügbar ist, einen passenden Ausschnitt.
 
 Das erste Bild trägt die Kennzeichnung **Textvorlage für weitere Bilder**. Seine Texte und Textarten folgen auf weitere Bilder, solange diese keine eigene Anpassung haben. Verknüpfungen lassen sich im Textbereich wiederherstellen. Ausschnitte, Familienkonzert-Design und einzelne Formate bleiben anpassbar.
 
-Im Carousel lassen sich Bildrahmen, Bildwinkel, Texte und Verläufe frei anordnen. Doppelklick auf ein Bild bearbeitet seinen Inhalt. Der Advanced-Modus ergänzt Pfade, Kurven, Formen und Formkonstrukteur. Hilfslinien, Einrasten, Deckkraft und Mischmodi helfen beim Gestalten. Das MKW-Logo bleibt zuoberst.
+Im Designer lassen sich Bildrahmen, Bildwinkel, Texte und Verläufe frei anordnen. **Bildinhalt bearbeiten** in der Seitenleiste oder ein Doppelklick auf das Bild öffnet die Bearbeitung seines Inhalts. Die gemeinsame Seitenleiste zeigt Auswahl und Änderungsumfang; ihre Sprungnavigation führt zu Inhalt, Design, Position und – im Designer – Ebenen, soweit für die Auswahl vorhanden. Der Advanced-Modus ergänzt Pfade, Kurven, Formen und Formkonstrukteur. Hilfslinien, Einrasten, Deckkraft und Mischmodi helfen beim Gestalten. Das MKW-Logo bleibt zuoberst.
 
 ## Sicher speichern
 
@@ -28,11 +28,7 @@ Darstellung, Hilfslinienfarben, Einrastabstand, Advanced-Modus, Schriftbibliothe
 
 JPG, PNG, PNG-8, WebP und Carousel-PDF sind verfügbar. Der Export zeigt Vorschauen, Dateigrössen, Auswahl und Fortschritt. **Exportvorschau** zeigt die gewählten Ergebnisse gross. PDFs haben eine Seite pro Slide und auswählbaren/durchsuchbaren Text; das sichtbare Artwork ist gerastert. PSD enthält bearbeitbare Texte und Slide-Slices. Einfache solide Vektorformen bleiben nativ; komplexe Pfadfüllungen enthalten eine Rasterdarstellung plus separat erhaltenen Pfad.
 
-Datum ist optional. Ohne Datum erscheint ein Hinweis und der Datumspräfix entfällt. Ein eingegebenes Datum muss `TT.MM.JJ` entsprechen. Ein eindeutig erkennbares Datum im Übertitel kann übernommen werden. Dateinamen folgen `JJMMTT_Kürzel_Projektname_Format_Nummer`; MKW und PDF verwenden den gemeinsamen Projektnamen ohne Format/Nummer.
-
-## Projekte öffnen
-
-**Projekt öffnen** auf der Startseite oder im Header führt zu einer gemeinsamen Ansicht. Dort kannst du eine **MKW-Datei öffnen** oder eines der **in diesem Browser** gesicherten Projekte auswählen. Browsersicherungen lassen sich dort auch löschen; die MKW-Datei auf deinem Gerät bleibt erhalten.
+Datum ist optional. Ohne Datum erscheint ein Hinweis und der Datumspräfix entfällt. Erkannt werden unter anderem `TTMMJJ`, `TT.MM.JJ`, `TT.MM.JJJJ` und `JJJJ-MM-TT`. Ein eindeutig erkennbares Datum im Übertitel kann übernommen werden. Dateinamen folgen `JJMMTT_Kürzel_Projektname_Format_Nummer`; MKW und PDF verwenden den gemeinsamen Projektnamen ohne Format/Nummer.
 
 ## Entwicklung
 

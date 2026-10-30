@@ -85,7 +85,7 @@ const { launch, artifact } = require('./browser.cjs');
     assert(exact.png); assert(exact.psd); assert(exact.fonts.includes('Harriet Italic')); assert(exact.chars.length);
     await page.screenshot({ path: artifact('mkw-advanced-typography-carousel.png') });
     const before = await state();
-    await page.evaluate(() => autosave()); await page.reload(); await page.locator('#startContinue').click(); await page.waitForFunction(() => !busy && !!p.carousel);
+    await page.evaluate(() => autosave()); await page.reload(); await require("./browser.cjs").openLatestProject(page); await page.waitForFunction(() => !busy && !!p.carousel);
     await page.evaluate(id => carouselSelect([id]), before.id);
     assert.deepEqual((await state()).characterStyles, before.characterStyles);
     // Single posts use the same inspector and preserve template inheritance.

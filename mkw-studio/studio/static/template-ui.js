@@ -1,10 +1,6 @@
 "use strict";
 (() => {
-  const start = document.createElement("button");
-  start.id = "startTemplates";
-  start.textContent = "Mit Vorlage starten";
-  start.disabled = true;
-  $("#startNew").after(start);
+  const start = $("#startTemplates");
   start.onclick = () => MKWTemplateGallery.open();
   const setup = document.createElement("section");
   setup.className = "designer-template-entry";

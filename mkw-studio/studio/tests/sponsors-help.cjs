@@ -969,7 +969,7 @@ const { launch, artifact } = require("./browser.cjs");
       await autosave();
     });
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(
       () =>
         !busy || $("#startStatus").textContent.includes("Projekt konnte nicht"),

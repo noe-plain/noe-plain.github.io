@@ -357,7 +357,7 @@ const { launch, artifact } = require("./browser.cjs");
       JSON.stringify(p.boards.map((b) => b.angle)),
     );
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(() => !busy && p.images.length === 2);
     assert.equal(
       await page.evaluate(() => JSON.stringify(p.boards.map((b) => b.angle))),

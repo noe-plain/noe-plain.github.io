@@ -98,7 +98,7 @@ const { launch, artifact } = require('./browser.cjs');
     const saved = await object();
     await page.evaluate(() => autosave());
     await page.reload();
-    await page.locator('#startContinue').click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.locator('#carouselCanvas').waitFor();
     assert.equal((await object()).textAlign, saved.textAlign);
     assert.deepEqual((await object()).textStyles, saved.textStyles);

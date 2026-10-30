@@ -5,6 +5,41 @@ function carouselUpdateWarning(o) {
   if (warning) warning.textContent = carouselWarning(o);
 }
 
+function carouselPresentInspector() {
+  const items = carouselSelected(),
+    o = items.at(-1),
+    slide = carouselUI.slide,
+    title = carouselPathDraft
+      ? "Pfad zeichnen"
+      : carouselUI.tool === "builder"
+        ? "Formkonstrukteur"
+        : items.length > 1
+          ? `${items.length} Elemente`
+          : o?.name || (slide !== null ? `Slide ${slide + 1}` : "Dein Design"),
+    subtitle = o
+      ? `${carouselToolNames[o.type] || "Element"} · ${carouselObjectLocked(o) ? "Gesperrt" : carouselUI.content ? "Bildinhalt bearbeiten" : "Element bearbeiten"}`
+      : `${p.carousel.n} Slides · ${p.carousel.w} × ${p.carousel.h} px`;
+  MKWInspectorUI.present({
+    root: $("#carouselSidebar"),
+    panel: $("#carouselProperties"),
+    title,
+    subtitle,
+    scope: o?.imageSourceId
+      ? "Bild mit dem Hintergrund verknüpft. Ersetzen löst die Verbindung."
+      : "",
+    icon: studioIcon(o?.type || (carouselPathDraft ? "path" : "builder")),
+    key: [
+      p.projectId,
+      items.map((o) => o.id).join(),
+      carouselUI.content,
+      slide,
+      !!carouselPathDraft,
+      carouselUI.tool === "builder",
+    ].join(":"),
+    layers: $("#carouselSidebar .carousel-layers-panel"),
+  });
+}
+
 function carouselPanel() {
   carouselCloseEffectMenu();
   carouselCloseEffectEditor();
@@ -21,11 +56,13 @@ function carouselPanel() {
   if (carouselPathDraft) {
     carouselDraftPanel(panel);
     carouselLayerPanel();
+    carouselPresentInspector();
     return;
   }
   if (carouselUI.tool === "builder") {
     carouselConstructorPanel(panel);
     carouselLayerPanel();
+    carouselPresentInspector();
     return;
   }
   const number = (key, label, min = 0, max = 100000) =>
@@ -36,13 +73,10 @@ function carouselPanel() {
     `<label>${label}<select data-prop="${key}">${options(values, o[key])}</select></label>`;
   const section = (title, body) =>
     `<section class="carousel-property-section"><h4>${title}</h4>${body}</section>`;
-  const transparency = (key, label, fallback) => {
-    const value = Math.round((1 - (o[key] ?? fallback)) * 100);
-    return `<div class="carousel-color-stop">${color(key === "startAlpha" ? "color" : "endColor", label)}<label class="carousel-transparency-toggle"><input type="checkbox" data-transparent="${key}" ${value > 0 ? "checked" : ""}> Transparenz</label><label class="carousel-slider"><span>Transparenz <output>${value} %</output></span><input data-prop="${key}" data-transparency="true" type="range" min="0" max="100" step="1" value="${value}" ${value === 0 ? "disabled" : ""}></label></div>`;
-  };
   if (!items.length && carouselUI.slide !== null) {
     carouselSlidePanel(panel);
     carouselLayerPanel();
+    carouselPresentInspector();
     return;
   }
   if (items.length > 1) {
@@ -277,9 +311,17 @@ function carouselPanel() {
     );
     if ($("#carouselGradientEdit"))
       $("#carouselGradientEdit").onclick = () => carouselTool("gradient");
-    if ($("#carouselContentEdit"))
-      $("#carouselContentEdit").onclick = () =>
+    if ($("#carouselContentEdit")) {
+      const content = $("#carouselContentEdit");
+      content.setAttribute("aria-pressed", String(!!carouselUI.content));
+      content.textContent = carouselUI.content
+        ? "Zurück zum Rahmen"
+        : "Bildinhalt bearbeiten";
+      const replace = panel.querySelector("#carouselReplace");
+      if (replace) replace.after(content);
+      content.onclick = () =>
         carouselTool(carouselUI.content ? "select" : "content");
+    }
     panel.querySelectorAll("[data-flip]").forEach(
       (button) =>
         (button.onclick = () => {
@@ -347,6 +389,7 @@ function carouselPanel() {
   }
   carouselRefinementsPanel(panel, items);
   carouselLayerPanel();
+  carouselPresentInspector();
 }
 
 function carouselLegacyLayerPanel() {

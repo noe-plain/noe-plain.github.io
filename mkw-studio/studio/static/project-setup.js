@@ -225,7 +225,7 @@ const MKWProjectSetup = (() => {
         $("#addFormat").focus();
       };
   }
-  function open() {
+  function open(options = {}) {
     if (creating || dialog.open) return;
     wasBusy = busy;
     busy = true;
@@ -255,7 +255,7 @@ const MKWProjectSetup = (() => {
     draft.formats.forEach(appendFormat);
     for (const id of ["cw", "ch", "cn"])
       $("#" + id).value = draft.designer[{ cw: "w", ch: "h", cn: "n" }[id]];
-    mode("post");
+    mode(options.mode === "carousel" ? "carousel" : "post");
     $(".new-project-content").scrollTop = 0;
     dialog.showModal();
   }

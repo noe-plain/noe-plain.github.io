@@ -254,6 +254,39 @@
         }),
       );
     }
+    function present(context) {
+      if (!views.inspector) return;
+      const { project: p, board: b, step, layer } = context,
+        image = b && p.images.find((im) => im.id === b.imageId),
+        first = b && p.images[0]?.id === b.imageId,
+        scope =
+          step === "text" && b
+            ? first
+              ? "Textvorlage · Schriftgrössen folgen nur demselben Format."
+              : p.textOverrides?.[b.imageId]?.[layer]
+                ? "Eigene Textanpassung für dieses Bild."
+                : "Text mit dem ersten Bild verknüpft."
+            : "";
+      views.inspector?.({
+        root: $("#toolsSidebar"),
+        panel: $("#stepPanel"),
+        title: $("#toolTitle").textContent,
+        subtitle: b
+          ? `${image?.name || "Bild"} · ${b.w} × ${b.h} px`
+          : "FD-Kampagnen",
+        scope,
+        icon: studioIcon(
+          step === "crop"
+            ? "crop"
+            : step === "sponsors"
+              ? "sponsors"
+              : step === "logo"
+                ? "logo"
+                : "text",
+        ),
+        key: [p.projectId, b?.id, step, layer].join(":"),
+      });
+    }
     function render() {
       const {
         project: p,
@@ -284,10 +317,14 @@
         step === "export"
           ? "Wähle im Exportfenster deine Formate und Dateinamen."
           : "Wähle ein Bild und ein Werkzeug in der Leiste.";
-      if (!b) return;
+      if (!b) {
+        present({ project: p, board: b, step, layer });
+        return;
+      }
       if (layer === "postAngle" && !b.angle?.enabled) selectLayer("image");
       if (step === "crop" && layer === "postAngle") {
         views.angle(b, panel);
+        present({ project: p, board: b, step, layer });
         return;
       }
       if (step === "crop") {
@@ -324,7 +361,10 @@
         views.stack(b, panel);
       }
       bindFamilyTools(panel);
+      present({ project: p, board: b, step, layer });
     }
+    if (views.inspector)
+      $("#stepPanel").addEventListener("input", () => present(read()));
     return { render };
   }
   const api = { create };

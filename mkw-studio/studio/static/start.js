@@ -6,27 +6,12 @@ startDialog.showModal();
 startDialog.addEventListener("cancel", (event) => event.preventDefault());
 (async () => {
   const finishLoading = MKWUIControls.loading("#startStatus");
-  let saved = null,
-    restoreError = "";
   try {
     await MKWBrowser.init();
     await MKWSetupSession.recover();
-    try {
-      saved = await MKWProjectStore.last({ metadataOnly: true });
-    } catch (error) {
-      restoreError =
-        "Letzter Stand konnte nicht geladen werden: " + error.message;
-    }
     await loadFonts();
     render();
-    MKWFields.notice(
-      $("#startStatus"),
-      saved
-        ? `${saved.title} · ${saved.mode === "carousel" ? "Designer" : "FD-Kampagnen"} · ${new Date(saved.updatedAt).toLocaleString("de-CH", { dateStyle: "medium", timeStyle: "short" })}`
-        : restoreError || "Noch kein gespeichertes Projekt vorhanden.",
-      !!restoreError,
-    );
-    $("#startContinue").disabled = !saved;
+    MKWFields.notice($("#startStatus"), "");
   } catch (error) {
     MKWFields.notice(
       $("#startStatus"),
@@ -38,26 +23,13 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
   $("#startNew").disabled =
     $("#startOpen").disabled =
     $("#startTemplates").disabled =
+    $("#startDesigner").disabled =
       false;
   $("#startOpen").onclick = () =>
     MKWProjects.library().catch((error) => MKWProjects.notice(error.message));
   $("#startNew").onclick = openProjectSetup;
-  $("#startContinue").onclick = async () => {
-    $("#startContinue").disabled = true;
-    const finishLoading = MKWUIControls.loading("#startStatus");
-    try {
-      await MKWProjects.open(MKWProjectStore.open(saved.id));
-    } catch (error) {
-      MKWFields.notice(
-        $("#startStatus"),
-        "Projekt konnte nicht geöffnet werden: " + error.message,
-        true,
-      );
-      $("#startContinue").disabled = false;
-    } finally {
-      finishLoading();
-    }
-  };
+  $("#startDesigner").onclick = () =>
+    MKWProjectSetup.open({ mode: "carousel" });
 })();
 
 MKWTextHyphen.onChange(() => {

@@ -41,7 +41,7 @@ const assert = require("node:assert/strict");
     const second = await context.newPage();
     second.on("pageerror", (error) => errors.push(error.message));
     await second.goto(url);
-    await second.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(second);
     await second.waitForFunction(() => !busy && p.images.length === 1);
     await page.evaluate(async () => {
       p.meta.title = "Projekt A · neuer Stand";
@@ -116,7 +116,7 @@ const assert = require("node:assert/strict");
       assert.equal(saved.meta.subtitle, "Automatisch in derselben Datei");
       assert.equal(downloads, 0);
       await page.reload();
-      await page.locator("#startContinue").click();
+      await require("./browser.cjs").openLatestProject(page);
       await page.waitForFunction(() => !busy);
       assert.equal(
         await page.evaluate(() => MKWProjects.fileLink().handle.name),
@@ -205,7 +205,7 @@ const assert = require("node:assert/strict");
       assert(project.images[0].data.startsWith("data:image/png"));
       assert.equal(await page.evaluate(() => !!MKWProjects.fileLink()), false);
       await page.reload();
-      await page.locator("#startContinue").click();
+      await require("./browser.cjs").openLatestProject(page);
       await page.waitForFunction(() => !busy && p.images.length === 1);
       assert.equal(await page.evaluate(() => p.projectId), id);
       assert.equal(

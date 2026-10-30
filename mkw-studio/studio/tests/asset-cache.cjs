@@ -69,7 +69,7 @@ const assert = require("node:assert/strict"),
       JSON.stringify(MKWProjectAssets.compact(p)),
     );
     await page.reload();
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(
       () =>
         !busy &&

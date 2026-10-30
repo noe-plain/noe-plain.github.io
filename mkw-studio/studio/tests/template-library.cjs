@@ -221,7 +221,7 @@ const { launch, artifact } = require("./browser.cjs");
     const originalId = await page.evaluate(() => p.projectId);
     await page.locator("#closeTemplateGallery").click();
     assert.equal(await page.evaluate(() => p.projectId), originalId);
-    await page.locator("#startContinue").click();
+    await require("./browser.cjs").openLatestProject(page);
     await page.waitForFunction(
       () => !document.querySelector("#startDialog").open,
     );

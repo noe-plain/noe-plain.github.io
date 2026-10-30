@@ -236,19 +236,22 @@ const { launch, artifact } = require("./browser.cjs");
     for (const width of [1450, 360, 320]) {
       await page.setViewportSize({ width, height: 1000 });
       const b = await page.evaluate(() =>
-        ["startNew", "startTemplates", "startContinue", "startOpen"].map(
+        ["startNew", "startDesigner", "startTemplates", "startOpen"].map(
           (id) => {
             const r = document.getElementById(id).getBoundingClientRect();
             return { x: r.x, y: r.y, w: r.width, h: r.height };
           },
         ),
       );
-      assert.equal(b[0].y, b[1].y);
-      assert.equal(b[2].y, b[3].y);
-      assert(Math.abs(b[0].w / b[1].w - 1.5) < 0.01);
-      assert(Math.abs(b[3].w / b[2].w - 1.5) < 0.01);
-      assert.equal(b[0].h, b[1].h);
-      assert.equal(b[2].h, b[3].h);
+      assert(b.every((r) => r.w >= 44 && r.h >= 44 && r.x >= 0));
+      if (width > 600) {
+        assert.equal(b[0].y, b[1].y);
+        assert.equal(b[2].y, b[3].y);
+        assert(Math.abs(b[0].w - b[1].w) < 1);
+        assert(Math.abs(b[2].w - b[3].w) < 1);
+      } else {
+        for (let i = 1; i < b.length; i++) assert(b[i].y >= b[i-1].y + b[i-1].h);
+      }
       assert(
         await page
           .locator("#startDialog")
