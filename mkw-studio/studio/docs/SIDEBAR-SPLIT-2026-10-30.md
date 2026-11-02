@@ -5,7 +5,7 @@
 - **Neue Nutzerin:** Kontext oben, Ebenen unten. Zwei sichtbare Bereiche mit je eigener Scrollfläche; nichts muss erst in einen Tab verschoben werden.
 - **Erfahrener Nutzer:** 70:30 als Startwert, direkt ziehbarer Griff, dauerhaftes persönliches Verhältnis. Änderungen am Inhalt ersetzen den Griff nicht. Doppelklick und Taste 0 setzen 70:30 zurück.
 - **UX/UI:** Die bestehenden Material-Farbrollen und abgerundeten Flächen bleiben Grundlage. Ein dezenter Griff in der Lücke zeigt die verstellbare Grenze. Kurze Fenster erhalten dynamische Mindestgrössen, beide Bereiche bleiben scrollbar.
-- **Barrierefreiheit:** Fokussierbarer Separator mit Orientierung, kontrolliertem Bereich, Wert und verständlicher Prozentansage. Pfeile ändern in 2-Prozent-Schritten, Shift in 10; Pos1/Ende wählen die Grenzen. Escape/Abbruch stellen den vorherigen Zustand wieder her. Keine Zeichenflächen-Shortcuts auslösen, wenn der Griff fokussiert ist.
+- **Barrierefreiheit:** Fokussierbarer Separator mit Orientierung, kontrolliertem Bereich, Wert und verständlicher Prozentansage. Pfeile ändern in 2-Prozent-Schritten, Shift in 10; Pos1/Ende wählen die Grenzen. Escape/Abbruch stellen den vorherigen Zustand wieder her. Pfeile am Griff dürfen keine Objekte verschieben; globale Befehle wie Cmd/Ctrl+Z und Wiederholen bleiben erreichbar.
 - **Entwicklung/QA:** Nur CSS-Tracks ändern; kein Neuaufbau der Ebenen, keine Bilddekodierung, kein Artwork-Repaint und keine Dokument-/Undo-Mutation beim Ziehen. Eine rAF-Schleife fasst Pointer-Ereignisse zusammen; Observer und Listener werden beim Editorwechsel entfernt. Das Verhältnis ist eine validierte Werkzeugeinstellung, Bestandteil des MKW-Setup, nicht der MKW-Projektdatei.
 
 Die FD-Kampagnen haben keine solche freie Ebenenliste. Die Aufteilung wird daher dort aktiviert, wo die gemeinsame Inspector-Oberfläche eine Ebenenliste erhält (Designer, einfach und Advanced).
@@ -36,3 +36,5 @@ Die FD-Kampagnen haben keine solche freie Ebenenliste. Die Aufteilung wird daher
 - Temporäre Firefox-Testumgebung nach Neustart wiederhergestellt; der automatische Browser-Entpacker blieb hängen. Das offizielle, vollständig heruntergeladene Archiv wurde per CRC geprüft und separat entpackt. Diese Vorbereitung betrifft nur die Tests, nicht das Produkt oder die Geräte der Nutzenden.
 
 Nach dem Push werden GitHub-Prüfung, Pages und die isolierte öffentliche Firefox-Kontrolle im Releaseprotokoll des Arbeitsbereichs festgehalten.
+
+Nachkontrolle: Die erste pauschale Shortcut-Sperre am Griff war zu breit. Sie ist auf die Widget-Navigation begrenzt; Cmd/Ctrl+Z und Wiederholen wurden mit fokussiertem Griff in Firefox und Chrome tatsächlich geprüft.

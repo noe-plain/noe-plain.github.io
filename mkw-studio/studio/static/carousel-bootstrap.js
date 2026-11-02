@@ -10,7 +10,26 @@ window.addEventListener(
     )
       return;
     const target = ev.target;
-    if (target.closest('[role="separator"]')) return;
+    if (
+      target.closest('[role="separator"]') &&
+      !ev.metaKey &&
+      !ev.ctrlKey &&
+      [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "Home",
+        "End",
+        "Enter",
+        " ",
+        "0",
+        "Escape",
+        "Backspace",
+        "Delete",
+      ].includes(ev.key)
+    )
+      return;
     const typing =
       target.isContentEditable || target.closest("input,textarea,select");
     if (typing) return;

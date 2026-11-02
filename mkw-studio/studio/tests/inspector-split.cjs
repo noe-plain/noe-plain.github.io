@@ -148,6 +148,27 @@ const {
       before,
       "Resize, keyboard and cancellation must not change artwork/history or repaint the canvas",
     );
+    const countBeforeUndo = await page.evaluate(
+        () => p.carousel.objects.length,
+      ),
+      command = process.platform === "darwin" ? "Meta" : "Control";
+    await separator.focus();
+    await separator.press(command + "+z");
+    await page.waitForFunction(
+      (count) => p.carousel.objects.length === count - 1,
+      countBeforeUndo,
+    );
+    assert.equal(await separator.getAttribute("aria-valuenow"), "70");
+    await separator.focus();
+    await separator.press(command + "+Shift+z");
+    await page.waitForFunction(
+      (count) => p.carousel.objects.length === count,
+      countBeforeUndo,
+    );
+    assert.equal(await separator.getAttribute("aria-valuenow"), "70");
+    await page.evaluate(() =>
+      carouselSelect([p.carousel.objects.find((o) => o.type === "text").id]),
+    );
     await page.addScriptTag({
       content: await fs.readFile(
         require.resolve("axe-core/axe.min.js"),
