@@ -208,6 +208,7 @@ function carouselToolUI() {
 }
 
 function carouselRender() {
+  MKWInspectorSplit.detach();
   MKWUIControls.designer(null);
   carouselPathDraft = null;
   carouselUI.vectorPoints = false;

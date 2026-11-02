@@ -63,6 +63,7 @@
         key: null,
       };
       sessions.set(host, state);
+      if (layers) MKWInspectorSplit.attach(host, header, panel, layers);
     }
     for (const [node, value] of [
       [state.heading, title],

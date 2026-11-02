@@ -7,6 +7,10 @@ try {
   );
 } catch {}
 function studioApplyPreferences() {
+  MKWInspectorSplit.configure(studioPreferences.inspectorSplit, (ratio) => {
+    studioPreferences.inspectorSplit = ratio;
+    studioPersistPreferences();
+  });
   studioApplyColourTheme();
   studioApplyDensity();
   MKWDesignerGrid.sync(studioPreferences.designerGrid);

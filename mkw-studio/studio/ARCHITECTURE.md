@@ -351,3 +351,12 @@ All paint/export consumers resolve the same per-board frame. Whole free-workspac
 ## Template guidance (30 October 2026)
 
 The gallery has choice and fill stages within its existing native modal. Search/origin filtering does not decode assets; preview thumbnails remain lazy/bounded. Returning to choice retains per-template content drafts and project metadata until the gallery closes. Creating is guarded by fill stage and pending imports. Per-artboard field filtering changes visibility only, retaining input state and pending upload identity. Field focus locates its region in the isolated preview; a DOM-only rectangle never reaches project paint/export. Mixed formats resolve the same policy frame as exports. Save validates required/unique layer names before persistence and focuses local errors. The existing template-store/session remain authoritative for rollback, setup portability and image-free designs.
+
+
+## Resizable context/layers inspector (30 October 2026)
+
+`inspector-split.js` owns the transient splitter gesture and layout only. `inspector-ui.js` mounts it when a layer panel exists; FD keeps its existing inspector. Context identity/navigation and properties are wrapped above the original layer-panel node. Existing controls, layer tree and drag/drop handlers are retained. CSS grid tracks divide available height at 70:30 excluding a 24px separator (32px on coarse pointers); each pane retains an independent scroll owner. Dynamic limits leave usable minima in short windows. Mobile overlay stacking keeps the tool pill behind the open inspector.
+
+A focusable horizontal separator exposes context control/percentage semantics, Arrow/Shift-Arrow, Home/End, 0 reset and Escape cancellation. Capturing Designer shortcuts ignore focused separators, preventing accidental object nudges/deletion. Pointer updates are coalesced per frame, final release is flushed, cancellation/blur/lost capture restore the previous preference. A single host ResizeObserver and scoped window listeners disconnect before every Designer replacement or editor switch. No asset decode, paint, document checkpoint or render call is made by the service.
+
+`setup-model` validates `inspectorSplit` as an integer20–85, migrating missing values to70. `appearance` injects value/persistence callbacks. Saved ratio is a tool preference/portable MKW-Setup field; viewport clamping does not overwrite the desired ratio. Drag commits once after release; no-op clicks and duplicate values do not write. Project data and MKW snapshots remain unchanged.

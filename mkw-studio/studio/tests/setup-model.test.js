@@ -189,3 +189,22 @@ test("new UI colour combinations survive a portable setup roundtrip", async () =
     );
   }
 });
+
+test("inspector height is a portable tool preference with a safe legacy default", () => {
+  assert.equal(model.preferences({}).inspectorSplit, 70);
+  for (const value of [20, 55, 70, 85])
+    assert.equal(
+      model.preferences({ inspectorSplit: value }, true).inspectorSplit,
+      value,
+    );
+  for (const value of [19, 86, 70.5, NaN, Infinity, "70", null]) {
+    assert.throws(() => model.preferences({ inspectorSplit: value }, true));
+    assert.equal(
+      model.preferences({ inspectorSplit: value }).inspectorSplit,
+      70,
+    );
+  }
+  const setup = fixture();
+  setup.preferences.inspectorSplit = 55;
+  assert.equal(model.validate(setup).preferences.inspectorSplit, 55);
+});

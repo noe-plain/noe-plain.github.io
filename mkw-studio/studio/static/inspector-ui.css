@@ -187,3 +187,109 @@
   min-height: 44px;
   padding: 10px 12px;
 }
+
+/* Separate scroll owners; the separator changes only these grid tracks. */
+#carouselSidebar.split-inspector {
+  --inspector-divider-size: 24px;
+  display: grid;
+  grid-template-rows:
+    minmax(0, var(--inspector-context-track, 7fr)) var(--inspector-divider-size)
+    minmax(0, var(--inspector-layers-track, 3fr));
+  min-height: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+#carouselSidebar.split-inspector .inspector-context-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--md-sys-color-surface);
+}
+#carouselSidebar.split-inspector #carouselProperties {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+#carouselSidebar.split-inspector > .carousel-layers-panel {
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: 24px;
+  background: var(--md-sys-color-surface-container-low);
+}
+.inspector-splitter {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  cursor: row-resize;
+  touch-action: none;
+  user-select: none;
+  border-radius: 999px;
+  outline-offset: -2px;
+}
+.inspector-splitter > span {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--md-sys-color-outline);
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    width var(--studio-motion-short) var(--studio-ease-effects);
+}
+.inspector-splitter:is(:hover, :focus-visible) > span,
+.is-split-resizing .inspector-splitter > span {
+  width: 48px;
+  background: var(--md-sys-color-primary);
+}
+.inspector-splitter:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+}
+.is-split-resizing {
+  cursor: row-resize;
+  user-select: none;
+}
+@media (pointer: coarse) {
+  #carouselSidebar.split-inspector {
+    --inspector-divider-size: 32px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inspector-splitter > span {
+    transition: none;
+  }
+}
+.sidebar-hidden #carouselSidebar.split-inspector {
+  display: none;
+}
+@media (max-width: 760px) {
+  #carouselSidebar.split-inspector {
+    display: none;
+  }
+  .tools-open:not(.sidebar-hidden) #carouselSidebar.split-inspector {
+    display: grid;
+    z-index: 60;
+  }
+}
+
+html #carouselSidebar.split-inspector {
+  background: transparent;
+  border: 0;
+}
+
+@media (forced-colors: active) {
+  .inspector-splitter > span {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+  .inspector-splitter:focus-visible {
+    outline-color: Highlight;
+  }
+}

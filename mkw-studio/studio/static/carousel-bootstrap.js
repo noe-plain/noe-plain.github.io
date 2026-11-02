@@ -9,9 +9,10 @@ window.addEventListener(
       document.querySelector("dialog[open],[popover]:popover-open")
     )
       return;
-    const target = ev.target,
-      typing =
-        target.isContentEditable || target.closest("input,textarea,select");
+    const target = ev.target;
+    if (target.closest('[role="separator"]')) return;
+    const typing =
+      target.isContentEditable || target.closest("input,textarea,select");
     if (typing) return;
     if (
       target.closest("button,summary,a[href]") &&
