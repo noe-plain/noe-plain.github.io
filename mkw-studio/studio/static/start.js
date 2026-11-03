@@ -30,6 +30,10 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
   $("#startNew").onclick = openProjectSetup;
   $("#startDesigner").onclick = () =>
     MKWProjectSetup.open({ mode: "carousel" });
+  if (window.MKWPageManagementTest) {
+    document.title = "Seitenmanagement testen · Sujet Studio";
+    MKWProjectSetup.open({ mode: "carousel" });
+  }
 })();
 
 MKWTextHyphen.onChange(() => {

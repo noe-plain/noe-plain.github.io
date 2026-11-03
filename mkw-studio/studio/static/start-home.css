@@ -168,6 +168,10 @@
   margin: 0;
   color: var(--md-sys-color-primary);
 }
+#startDialog .start-home-footer a {
+  color: var(--md-sys-color-primary);
+  text-underline-offset: 3px;
+}
 @media (max-width: 600px) {
   #startDialog .start-home-header {
     padding: 20px 20px 8px;

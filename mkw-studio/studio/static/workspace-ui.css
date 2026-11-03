@@ -4,6 +4,7 @@
   --studio-bar-height: 58px;
   --sidebar: var(--studio-inspector-width);
   --studio-inspector-width: 288px;
+  --studio-inspector-splitter-track: 24px;
 }
 svg.ui-icon {
   width: 22px;
@@ -378,12 +379,39 @@ footer #carouselCoordinates {
 
 #carouselEditor {
   inset: var(--studio-header-height) 0 44px;
-  grid-template-columns: minmax(0, 1fr) 48px var(--studio-inspector-width);
+  grid-template-columns:
+    minmax(0, 1fr) var(--studio-inspector-splitter-track)
+    var(--studio-inspector-width);
   grid-template-rows: minmax(0, 1fr);
   background: var(--studio-canvas);
 }
 body.carousel-mode header {
-  right: calc(var(--studio-shell-inset) + var(--sidebar) + 72px);
+  right: calc(
+    var(--studio-shell-inset) + var(--sidebar) +
+      var(--studio-inspector-splitter-track) + 24px
+  );
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  body.carousel-mode header {
+    gap: 8px;
+    padding-inline: 16px;
+  }
+  body.carousel-mode header .brand img {
+    width: 128px;
+  }
+  body.carousel-mode header .header-actions {
+    gap: 3px;
+  }
+  body.carousel-mode header .header-action-group {
+    gap: 0;
+    padding: 0;
+  }
+  body.carousel-mode header .header-action-group .icon-button {
+    width: 32px;
+    min-width: 32px;
+    height: 36px;
+    padding: 6px;
+  }
 }
 .carousel-contextbar.studio-commandbar {
   gap: 12px;
@@ -753,6 +781,7 @@ body.carousel-mode header {
     --studio-header-height: 116px;
     --sidebar: 0px;
     --studio-inspector-width: 0px;
+    --studio-inspector-splitter-track: 0px;
   }
   header {
     padding: 14px 18px;
@@ -812,6 +841,7 @@ body.carousel-mode header {
   }
   #carouselEditor {
     top: var(--studio-header-height);
+    grid-template-columns: minmax(0, 1fr) 0 var(--studio-inspector-width);
   }
   #workspace {
     padding: 24px 18px 120px;

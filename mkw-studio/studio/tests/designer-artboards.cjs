@@ -9,8 +9,9 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       }),
       errors = [];
     page.on("pageerror", (e) => errors.push(e.stack));
-    await page.goto(process.env.STUDIO_URL);
-    await page.locator("#startDesigner").click();
+    await page.goto(
+      new URL("seitenmanagement-test.html", process.env.STUDIO_URL).href,
+    );
     await page.locator("[data-designer-layout=free]").click();
     await page.locator("#setupName").fill("Freie Zeichenflächen");
     await page.locator("#cn").fill("2");

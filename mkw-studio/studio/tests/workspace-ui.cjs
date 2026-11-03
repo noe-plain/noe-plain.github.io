@@ -117,6 +117,8 @@ const assert = require("node:assert/strict");
           };
           return {
             header: rect("header"),
+            brand: rect("header .brand"),
+            headerActions: rect("header .header-actions"),
             footer: rect("footer"),
             workspace: rect(viewport),
             sidebar: rect(sidebar),
@@ -136,16 +138,25 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
       if (boxes.splitter) {
         assert.equal(boxes.splitter.x, boxes.workspace.right);
-        assert.equal(boxes.splitter.width, 72);
+        assert.equal(boxes.splitter.width, 48);
         assert.equal(boxes.sidebar.x, boxes.splitter.right);
       } else {
         assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
       }
       assert(boxes.header.right <= boxes.sidebar.x);
+      assert(boxes.brand.right <= boxes.headerActions.x);
+      assert(boxes.headerActions.right <= boxes.header.right - 12);
       assert.equal(boxes.footer.right, boxes.width - 12);
       assert(boxes.header.radius >= 28);
       assert(boxes.workspace.radius >= 28);
       assert(boxes.footer.radius >= 28);
+      if (boxes.splitter)
+        assert.equal(
+          await page
+            .locator("#carouselEditor > .inspector-width-grip")
+            .evaluate((el) => getComputedStyle(el).backgroundColor),
+          "rgba(0, 0, 0, 0)",
+        );
     };
     await checkBento("#workspace", "#toolsSidebar");
     const beforePixels = await pixels(),
@@ -390,6 +401,7 @@ const assert = require("node:assert/strict");
     assert.equal(await page.evaluate(() => carouselUI.snap), false);
     await page.locator("#footerSnap").click();
     await page.setViewportSize({ width: 1100, height: 800 });
+    await checkBento("#carouselViewport", "#carouselSidebar");
     await page.screenshot({
       path: require("./browser.cjs").artifact("mkw-ui-compact.png"),
     });

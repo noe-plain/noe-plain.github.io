@@ -1,4 +1,6 @@
 "use strict";
+window.MKWPageManagementTest =
+  new URLSearchParams(location.search).get("seitenmanagement-test") === "1";
 const MKWProjectSetup = (() => {
   const dialog = $("#projectSetup"),
     model = MKWNewProjectModel;
@@ -41,6 +43,7 @@ const MKWProjectSetup = (() => {
       refresh();
     };
   $("#setupSplitPageGroup").onclick = () => {
+    if (!window.MKWPageManagementTest) return;
     const groups = draft.designer.groups,
       source = groups.at(-1);
     if (!source || source.pages.length < 2) return;
@@ -214,20 +217,24 @@ const MKWProjectSetup = (() => {
         strip.innerHTML = draft.designer.groups
           .map(
             (group) =>
-              `<section class="setup-page-group" data-page-group="${group.id}" data-orientation="${group.orientation}"><header><strong>${group.name}</strong><label>Anordnung<select data-group-orientation="${group.id}" aria-label="${group.name}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label></header><div class="setup-page-group-cards">${group.pages
+              `<section class="setup-page-group" data-page-group="${group.id}" data-orientation="${group.orientation}"><header><strong>${window.MKWPageManagementTest ? group.name : "Carousel-Slides"}</strong>${window.MKWPageManagementTest ? `<label>Anordnung<select data-group-orientation="${group.id}" aria-label="${group.name}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label>` : ""}</header><div class="setup-page-group-cards">${group.pages
                 .map((source) => {
                   const position = draft.designer.order.indexOf(source);
-                  const targets = draft.designer.groups.filter(
-                    (target) => target.id !== group.id,
-                  );
-                  return `<div><button type="button" class="setup-artboard-card" draggable="${free}" data-setup-artboard="${source}" aria-label="Zeichenfläche ${position + 1}, Position ${position + 1} von ${f.n}; mit Ziehen oder Pfeiltasten neu ordnen" aria-current="${source === draft.designer.order[0] ? "true" : "false"}" style="aspect-ratio:${f.w}/${f.h}"><span>${position + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></button><select data-move-page="${source}" aria-label="Zeichenfläche ${position + 1} in andere Gruppe verschieben" ${targets.length ? "" : "hidden"}>${targets.map((target) => `<option value="${target.id}">${target.name}</option>`).join("")}</select></div>`;
+                  const targets = window.MKWPageManagementTest
+                    ? draft.designer.groups.filter(
+                        (target) => target.id !== group.id,
+                      )
+                    : [];
+                  return `<div><button type="button" class="setup-artboard-card" draggable="${free}" data-setup-artboard="${source}" aria-label="Slide ${position + 1}, Position ${position + 1} von ${f.n}; mit Ziehen oder Pfeiltasten neu ordnen" aria-current="${source === draft.designer.order[0] ? "true" : "false"}" style="aspect-ratio:${f.w}/${f.h}"><span>${position + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></button>${window.MKWPageManagementTest ? `<select data-move-page="${source}" aria-label="Slide ${position + 1} in andere Gruppe verschieben" ${targets.length ? "" : "hidden"}>${targets.map((target) => `<option value="${target.id}">${target.name}</option>`).join("")}</select>` : ""}</div>`;
                 })
                 .join("")}</div></section>`,
           )
           .join("");
-        $("#setupSplitPageGroup").hidden = !free;
+        $("#setupSplitPageGroup").hidden =
+          !free || !window.MKWPageManagementTest;
         $("#setupSplitPageGroup").disabled =
           !free ||
+          !window.MKWPageManagementTest ||
           draft.designer.groups.length >= f.n ||
           draft.designer.groups.at(-1).pages.length < 2;
         bindSetupArtboardOrder(strip, free);
@@ -341,6 +348,7 @@ const MKWProjectSetup = (() => {
       refresh();
     }
     function moveSetupPageToGroup(source, groupId) {
+      if (!window.MKWPageManagementTest) return;
       const sourceGroup = draft.designer.groups.find((group) =>
           group.pages.includes(source),
         ),
@@ -379,9 +387,11 @@ const MKWProjectSetup = (() => {
     $("#postSetup").hidden = value !== "post";
     $("#carouselSetup").hidden = value !== "carousel";
     $("#setupInstructions").textContent =
-      value === "post"
-        ? "Mehrere Fotos mit einheitlichem Layout in verschiedenen Formaten."
-        : "Eine oder mehrere Slides frei gestalten.";
+      window.MKWPageManagementTest && value === "carousel"
+        ? "Testumgebung: Erstelle freie Zeichenflächen, teile sie in Seitengruppen und prüfe das Docking. Änderungen gelten nur für das aktuelle Testprojekt."
+        : value === "post"
+          ? "Mehrere Fotos mit einheitlichem Layout in verschiedenen Formaten."
+          : "Eine zusammenhängende Carousel-Sequenz gestalten.";
     for (const button of dialog.querySelectorAll("[data-project-mode]"))
       button.setAttribute(
         "aria-pressed",

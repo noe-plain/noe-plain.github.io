@@ -281,10 +281,20 @@ const MKWArtboardUI = (() => {
     checkpoint();
     const draggedId = c.artboards[from].id,
       targetId = c.artboards[to].id,
-      groups = policy.pageGroups(c).map((group) => ({
-        ...group,
-        artboardIds: [...group.artboardIds],
-      })),
+      existingGroups = policy.pageGroups(c),
+      groups = window.MKWPageManagementTest
+        ? existingGroups.map((group) => ({
+            ...group,
+            artboardIds: [...group.artboardIds],
+          }))
+        : [
+            {
+              ...existingGroups[0],
+              name: "Carousel-Slides",
+              orientation: "horizontal",
+              artboardIds: c.artboards.map((artboard) => artboard.id),
+            },
+          ],
       source = groups.find((group) => group.artboardIds.includes(draggedId)),
       target = groups.find((group) => group.artboardIds.includes(targetId));
     source.artboardIds.splice(source.artboardIds.indexOf(draggedId), 1);
@@ -308,6 +318,7 @@ const MKWArtboardUI = (() => {
     changed();
   }
   function moveToGroup(index, groupId) {
+    if (!window.MKWPageManagementTest) return;
     const c = p.carousel,
       frame = c.artboards[index];
     if (!frame) return;
@@ -326,6 +337,7 @@ const MKWArtboardUI = (() => {
     changed();
   }
   function splitGroup(index) {
+    if (!window.MKWPageManagementTest) return;
     const c = p.carousel,
       frame = c.artboards[index],
       groups = policy.pageGroups(c).map((group) => ({
@@ -351,6 +363,7 @@ const MKWArtboardUI = (() => {
     changed();
   }
   function setGroupOrientation(groupId, orientation) {
+    if (!window.MKWPageManagementTest) return;
     if (!["horizontal", "vertical"].includes(orientation)) return;
     const groups = policy.pageGroups(p.carousel).map((group) => ({
         ...group,
@@ -364,6 +377,7 @@ const MKWArtboardUI = (() => {
     changed();
   }
   function arrangeGroup(groupId) {
+    if (!window.MKWPageManagementTest) return false;
     const c = p.carousel,
       group = policy.pageGroups(c).find((item) => item.id === groupId);
     if (!group || group.artboardIds.length < 2) return false;
@@ -435,29 +449,43 @@ const MKWArtboardUI = (() => {
       index = carouselUI.slide ?? 0,
       a = c.artboards[index],
       groups = policy.pageGroups(c),
+      visibleGroups = window.MKWPageManagementTest
+        ? groups
+        : [
+            {
+              ...groups[0],
+              name: "Carousel-Slides",
+              orientation: "horizontal",
+              artboardIds: c.artboards.map((frame) => frame.id),
+            },
+          ],
       input = (key, label, min = 0, max = 100000) =>
         `<label>${label} (px)<input data-artboard="${key}" type="number" min="${min}" max="${max}" step="1" value="${a[key]}"></label>`;
-    const groupsMarkup = groups
+    const groupsMarkup = visibleGroups
       .map(
         (group) =>
-          `<section class="designer-page-group" data-page-group="${esc(group.id)}" data-orientation="${group.orientation}"><header><strong>${esc(group.name)}</strong><label>Anordnung<select data-group-orientation="${esc(group.id)}" aria-label="${esc(group.name)}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label></header><ol aria-label="${esc(group.name)} Seiten">${group.artboardIds
+          `<section class="designer-page-group" data-page-group="${esc(group.id)}" data-orientation="${group.orientation}"><header><strong>${esc(group.name)}</strong>${window.MKWPageManagementTest ? `<label>Anordnung<select data-group-orientation="${esc(group.id)}" aria-label="${esc(group.name)}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label>` : ""}</header><ol aria-label="${esc(group.name)} Seiten">${group.artboardIds
             .map((id) => {
               const i = c.artboards.findIndex((f) => f.id === id),
                 f = c.artboards[i];
-              return `<li><button type="button" draggable="true" data-artboard-order="${i}" aria-current="${i === index ? "true" : "false"}" aria-label="${esc(f.name)}, Position ${i + 1} von ${c.n}. Mit Ziehen oder Pfeiltasten neu ordnen">${esc(f.name)}</button><select data-move-page="${i}" aria-label="${esc(f.name)} zu einer anderen Seitengruppe verschieben">${groups
-                .filter((target) => target.id !== group.id)
-                .map(
-                  (target) =>
-                    `<option value="${esc(target.id)}">${esc(target.name)}</option>`,
-                )
-                .join("")}</select></li>`;
+              return `<li><button type="button" draggable="true" data-artboard-order="${i}" aria-current="${i === index ? "true" : "false"}" aria-label="${esc(f.name)}, Position ${i + 1} von ${c.n}. Mit Ziehen oder Pfeiltasten neu ordnen">${esc(f.name)}</button>${
+                window.MKWPageManagementTest
+                  ? `<select data-move-page="${i}" aria-label="${esc(f.name)} zu einer anderen Seitengruppe verschieben">${groups
+                      .filter((target) => target.id !== group.id)
+                      .map(
+                        (target) =>
+                          `<option value="${esc(target.id)}">${esc(target.name)}</option>`,
+                      )
+                      .join("")}</select>`
+                  : ""
+              }</li>`;
             })
             .join(
               "",
-            )}</ol><button type="button" data-group-arrange="${esc(group.id)}" aria-label="${esc(group.name)} auf der Montagefläche ${group.orientation === "horizontal" ? "nebeneinander" : "untereinander"} anordnen" ${group.artboardIds.length < 2 ? "disabled" : ""}>Auf Montagefläche anordnen</button></section>`,
+            )}</ol>${window.MKWPageManagementTest ? `<button type="button" data-group-arrange="${esc(group.id)}" aria-label="${esc(group.name)} auf der Montagefläche ${group.orientation === "horizontal" ? "nebeneinander" : "untereinander"} anordnen" ${group.artboardIds.length < 2 ? "disabled" : ""}>Auf Montagefläche anordnen</button>` : ""}</section>`,
       )
       .join("");
-    host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>Seiten &amp; Carousel-Gruppen</h4><p class="artboard-help">Gruppen legen nur Exportreihenfolge und Nebeneinander-/Untereinander-Anordnung fest. Die Position auf der Montagefläche bleibt unverändert. Ziehe Seiten in eine Gruppe oder nutze die Tastaturauswahl.</p><div class="designer-page-groups">${groupsMarkup}</div><button id="designerSplitGroup" ${groups.length >= c.n || groups.find((group) => group.artboardIds.includes(a.id))?.artboardIds[0] === a.id ? "disabled" : ""}>Ab dieser Seite neue Gruppe</button><div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
+    host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>${window.MKWPageManagementTest ? "Testumgebung: Seitenmanagement" : "Carousel-Slides"}</h4>${window.MKWPageManagementTest ? `<p class="artboard-help">Testbereich für Seitengruppen und Montageflächen-Docking. Exportreihenfolge und Flächenposition bleiben getrennt.</p>` : `<p class="artboard-help">Eine zusammenhängende Slide-Sequenz. Ziehe Seiten oder nutze die Pfeiltasten, um die Reihenfolge zu ändern.</p>`}<div class="designer-page-groups">${groupsMarkup}</div>${window.MKWPageManagementTest ? `<button id="designerSplitGroup" ${groups.length >= c.n || groups.find((group) => group.artboardIds.includes(a.id))?.artboardIds[0] === a.id ? "disabled" : ""}>Ab dieser Seite neue Gruppe</button>` : ""}<div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
     host.querySelector("#designerArtboardChoice").onchange = (e) => {
       carouselSlideSelect(+e.target.value);
       carouselSlideCenter(+e.target.value);
@@ -551,7 +579,9 @@ const MKWArtboardUI = (() => {
     for (const select of host.querySelectorAll("[data-move-page]"))
       select.onchange = () =>
         moveToGroup(+select.dataset.movePage, select.value);
-    host.querySelector("#designerSplitGroup").onclick = () => splitGroup(index);
+    host
+      .querySelector("#designerSplitGroup")
+      ?.addEventListener("click", () => splitGroup(index));
     const fields = [...host.querySelectorAll("[data-artboard]")],
       name = host.querySelector("[data-artboard-name]"),
       bg = host.querySelector("[data-artboard-bg]"),

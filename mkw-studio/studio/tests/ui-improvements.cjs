@@ -50,6 +50,15 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     await page.goto(process.env.STUDIO_URL);
     await page.locator("#startDesigner").click();
     await page.locator("[data-designer-layout=free]").click();
+    assert.equal(
+      await page.locator("#setupSplitPageGroup").isVisible(),
+      false,
+      "normal setup exposes a single carousel sequence, not group splitting",
+    );
+    assert.equal(
+      await page.locator("#projectSetup [data-group-orientation]").count(),
+      0,
+    );
     await page.locator("#setupName").fill("UI-Prüfung");
     await page.locator("#cn").fill("3");
     assert.equal(
@@ -73,6 +82,16 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     }
     await page.locator("#createProject").click();
     await waitForProjectReady(page);
+    assert.equal(
+      await page.locator("#carouselProperties [data-group-arrange]").count(),
+      0,
+      "docking is available only in the dedicated test page",
+    );
+    assert.equal(
+      await page.evaluate(() => p.carousel.pageGroups.length),
+      1,
+      "the normal editor keeps one logical Carousel-Slides group",
+    );
     assert.deepEqual(
       await page.evaluate(() =>
         p.carousel.artboards.map((board) => [board.x, board.y]),
@@ -84,6 +103,13 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       ],
     );
     await page.locator('[data-slide="0"]').click();
+    assert.equal(
+      await page
+        .locator("#carouselProperties h4")
+        .filter({ hasText: "Carousel-Slides" })
+        .count(),
+      1,
+    );
     const beforeOrder = await page.evaluate(() =>
       p.carousel.artboards.map((board) => board.id),
     );
