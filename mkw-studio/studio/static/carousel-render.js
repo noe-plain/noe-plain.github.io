@@ -235,6 +235,8 @@ function carouselRender() {
   $("#savePSD").hidden = false;
   const host = document.createElement("section");
   host.id = "carouselEditor";
+  host.setAttribute("role", "region");
+  host.setAttribute("aria-label", "Designer-Arbeitsbereich");
   host.innerHTML = `
  <nav class="carousel-contextbar studio-commandbar" aria-label="Gestaltungswerkzeuge"><span class="studio-mode-label">Designer</span><span id="carouselToolName"></span><div class="studio-tool-surface"><div class="carousel-toolrail studio-tool-group">${Object.entries(
    carouselToolNames,

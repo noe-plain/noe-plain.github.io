@@ -46,7 +46,11 @@ const { launch, artifact } = require("./browser.cjs");
       const ctx = c.getContext("2d");
       ctx.fillStyle = "#e7b054";
       ctx.fillRect(0, 0, c.width, c.height);
-      for(let y=0;y<c.height;y+=100)for(let x=0;x<c.width;x+=100){ctx.fillStyle=(x+y)%200?'#ffffff':'#111111';ctx.fillRect(x,y,100,100);}
+      for (let y = 0; y < c.height; y += 100)
+        for (let x = 0; x < c.width; x += 100) {
+          ctx.fillStyle = (x + y) % 200 ? "#ffffff" : "#111111";
+          ctx.fillRect(x, y, 100, 100);
+        }
       return c.toDataURL().split(",")[1];
     });
     await page.locator("#startBackgroundFile").setInputFiles({
@@ -112,9 +116,25 @@ const { launch, artifact } = require("./browser.cjs");
       backdrop.includes("blob:"),
       "the actual backdrop must paint the stored image",
     );
-    await page.addScriptTag({content:require('axe-core').source});
-    assert.deepEqual(await page.evaluate(async()=>(await axe.run('#startDialog')).violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))),[]);
-    assert.equal(await page.locator('#startDialog').evaluate(el=>getComputedStyle(el).backgroundColor),await page.locator('header').evaluate(el=>getComputedStyle(el).backgroundColor),'The content stays on an opaque themed surface over a busy image');
+    await page.addScriptTag({ content: require("axe-core").source });
+    assert.deepEqual(
+      await page.evaluate(async () =>
+        (await axe.run("#startDialog")).violations.map((v) => ({
+          id: v.id,
+          nodes: v.nodes.map((n) => n.target),
+        })),
+      ),
+      [],
+    );
+    assert.equal(
+      await page
+        .locator("#startDialog")
+        .evaluate((el) => getComputedStyle(el).backgroundColor),
+      await page
+        .locator("header")
+        .evaluate((el) => getComputedStyle(el).backgroundColor),
+      "The content stays on an opaque themed surface over a busy image",
+    );
     await page.screenshot({ path: artifact("material-start-image-light.png") });
     await page.evaluate(() => studioSetTheme("dark"));
     await page.screenshot({ path: artifact("material-start-image-dark.png") });
@@ -250,7 +270,8 @@ const { launch, artifact } = require("./browser.cjs");
         assert(Math.abs(b[0].w - b[1].w) < 1);
         assert(Math.abs(b[2].w - b[3].w) < 1);
       } else {
-        for (let i = 1; i < b.length; i++) assert(b[i].y >= b[i-1].y + b[i-1].h);
+        for (let i = 1; i < b.length; i++)
+          assert(b[i].y >= b[i - 1].y + b[i - 1].h);
       }
       assert(
         await page
@@ -283,7 +304,9 @@ const { launch, artifact } = require("./browser.cjs");
         await page
           .locator("#workspace")
           .evaluate((el) => getComputedStyle(el).backgroundColor),
-        await page.locator("header").evaluate((el) => getComputedStyle(el).backgroundColor),
+        await page
+          .locator("body > header")
+          .evaluate((el) => getComputedStyle(el).backgroundColor),
       );
     }
     await page.locator("#newproject").click();
@@ -297,7 +320,9 @@ const { launch, artifact } = require("./browser.cjs");
         await page
           .locator("#carouselViewport")
           .evaluate((el) => getComputedStyle(el).backgroundColor),
-        await page.locator("header").evaluate((el) => getComputedStyle(el).backgroundColor),
+        await page
+          .locator("body > header")
+          .evaluate((el) => getComputedStyle(el).backgroundColor),
       );
     }
     assert.deepEqual(errors, []);

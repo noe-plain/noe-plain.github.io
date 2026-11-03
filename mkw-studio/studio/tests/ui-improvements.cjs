@@ -177,7 +177,9 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       );
     }
 
-    const grip = page.locator("#carouselSidebar .inspector-width-grip");
+    const grip = page.locator("#carouselEditor > .inspector-width-grip");
+    assert.equal(await grip.getAttribute("role"), "separator");
+    assert.equal(await grip.getAttribute("aria-orientation"), "vertical");
     await grip.focus();
     await page.keyboard.press("ArrowLeft");
     const gripBox = await grip.boundingBox();

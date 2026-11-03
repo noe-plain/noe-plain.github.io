@@ -51,6 +51,54 @@
   }
   const intersects = (a, b) =>
     a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  function pageGroups(c) {
+    if (Array.isArray(c.pageGroups)) return c.pageGroups;
+    return [
+      {
+        id: "carousel-1",
+        name: "Carousel 1",
+        orientation: "vertical",
+        artboardIds: (c.artboards || []).map((a) => a.id),
+      },
+    ];
+  }
+  function validPageGroups(c) {
+    if (c.pageGroups === undefined) return true;
+    if (
+      !Array.isArray(c.pageGroups) ||
+      !c.pageGroups.length ||
+      c.pageGroups.length > c.n
+    )
+      return false;
+    const boardIds = new Set(c.artboards.map((a) => a.id)),
+      groupIds = new Set(),
+      assigned = [];
+    for (const group of c.pageGroups) {
+      if (
+        !group ||
+        typeof group.id !== "string" ||
+        !/^[-\w]{1,160}$/.test(group.id) ||
+        groupIds.has(group.id) ||
+        typeof group.name !== "string" ||
+        !group.name.trim() ||
+        group.name.length > 80 ||
+        !["horizontal", "vertical"].includes(group.orientation) ||
+        !Array.isArray(group.artboardIds) ||
+        !group.artboardIds.length
+      )
+        return false;
+      groupIds.add(group.id);
+      for (const id of group.artboardIds) {
+        if (typeof id !== "string" || !boardIds.has(id)) return false;
+        assigned.push(id);
+      }
+    }
+    return (
+      assigned.length === c.artboards.length &&
+      new Set(assigned).size === boardIds.size &&
+      assigned.every((id, i) => id === c.artboards[i].id)
+    );
+  }
   function validBoards(c) {
     if (!isFree(c)) return c.layout === undefined && c.artboards === undefined;
     if (
@@ -82,7 +130,7 @@
       if (c.artboards.slice(0, i).some((b) => intersects(a, b))) return false;
       ids.add(a.id);
     }
-    return true;
+    return validPageGroups(c);
   }
   function owner(c, bounds) {
     let best = -1,
@@ -202,6 +250,8 @@
     frames,
     extent,
     validBoards,
+    pageGroups,
+    validPageGroups,
     owner,
     nearest,
     containing,

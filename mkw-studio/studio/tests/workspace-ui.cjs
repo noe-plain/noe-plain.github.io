@@ -111,6 +111,7 @@ const assert = require("node:assert/strict");
               y: r.y,
               right: r.right,
               bottom: r.bottom,
+              width: r.width,
               radius: parseFloat(getComputedStyle(el).borderTopLeftRadius),
             };
           };
@@ -119,6 +120,10 @@ const assert = require("node:assert/strict");
             footer: rect("footer"),
             workspace: rect(viewport),
             sidebar: rect(sidebar),
+            splitter:
+              viewport === "#carouselViewport"
+                ? rect("#carouselEditor > .inspector-width-grip")
+                : null,
             width: innerWidth,
           };
         },
@@ -129,13 +134,18 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.workspace.y, boxes.header.bottom + 12);
       assert.equal(boxes.workspace.bottom, boxes.sidebar.bottom);
       assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
-      assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
-      assert.equal(boxes.header.right, boxes.workspace.right);
+      if (boxes.splitter) {
+        assert.equal(boxes.splitter.x, boxes.workspace.right);
+        assert.equal(boxes.splitter.width, 72);
+        assert.equal(boxes.sidebar.x, boxes.splitter.right);
+      } else {
+        assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
+      }
+      assert(boxes.header.right <= boxes.sidebar.x);
       assert.equal(boxes.footer.right, boxes.width - 12);
-      for (const box of Object.values(boxes).filter(
-        (b) => typeof b === "object",
-      ))
-        assert(box.radius >= 28);
+      assert(boxes.header.radius >= 28);
+      assert(boxes.workspace.radius >= 28);
+      assert(boxes.footer.radius >= 28);
     };
     await checkBento("#workspace", "#toolsSidebar");
     const beforePixels = await pixels(),

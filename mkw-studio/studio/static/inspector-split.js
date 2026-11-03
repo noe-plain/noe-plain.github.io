@@ -190,9 +190,13 @@
     };
     refresh();
   }
-  function attachWidth(host) {
-    if (!host || host.querySelector(":scope > .inspector-width-grip")) return;
-    host.classList.add("inspector-width-resizable");
+  function attachWidth(editor, sidebar) {
+    if (
+      !editor ||
+      !sidebar ||
+      editor.querySelector(":scope > .inspector-width-grip")
+    )
+      return;
     const grip = document.createElement("div");
     grip.className = "inspector-width-grip";
     grip.tabIndex = 0;
@@ -204,10 +208,10 @@
     );
     grip.setAttribute("aria-valuemin", "240");
     grip.setAttribute("aria-valuemax", "420");
-    grip.setAttribute("aria-controls", host.id || "carouselSidebar");
+    grip.setAttribute("aria-controls", sidebar.id || "carouselSidebar");
     grip.title = "Gemeinsame Breite ändern · Ziehen oder ←/→ · 240–420 px";
     grip.innerHTML = '<span aria-hidden="true"></span>';
-    host.prepend(grip);
+    sidebar.before(grip);
     let drag = null,
       width = preferredWidth;
     const set = (value) => {
@@ -227,7 +231,7 @@
       if (!drag) return;
       const previous = drag.width;
       drag = null;
-      host.classList.remove("is-width-resizing");
+      editor.classList.remove("is-width-resizing");
       if (accept) {
         preferredWidth = width;
         if (previous !== width) saveWidth(width);
@@ -239,7 +243,7 @@
       drag = { x: event.clientX, width: preferredWidth };
       grip.focus({ preventScroll: true });
       grip.setPointerCapture(event.pointerId);
-      host.classList.add("is-width-resizing");
+      editor.classList.add("is-width-resizing");
     };
     grip.onpointermove = (event) => {
       if (!drag) return;

@@ -44,6 +44,38 @@ test("free artboards have independent size, position, safe grid and bounds", () 
   assert.equal(policy.containing(q, { x: 1400, y: 1700, w: 100, h: 100 }), 1);
   assert.equal(policy.owner(q, { x: 1100, y: 100, w: 100, h: 100 }), -1);
 });
+test("page groups keep logical export order independent of artboard geometry", () => {
+  const q = free(),
+    geometry = q.artboards.map(({ x, y }) => [x, y]);
+  q.pageGroups = [
+    {
+      id: "carousel-a",
+      name: "Carousel 1",
+      orientation: "horizontal",
+      artboardIds: ["one"],
+    },
+    {
+      id: "carousel-b",
+      name: "Carousel 2",
+      orientation: "vertical",
+      artboardIds: ["two"],
+    },
+  ];
+  assert.equal(policy.validBoards(q), true);
+  assert.deepEqual(
+    policy.pageGroups(q).flatMap((group) => group.artboardIds),
+    q.artboards.map((artboard) => artboard.id),
+  );
+  assert.deepEqual(
+    q.artboards.map(({ x, y }) => [x, y]),
+    geometry,
+  );
+  q.pageGroups[0].orientation = "diagonal";
+  assert.equal(policy.validBoards(q), false);
+  q.pageGroups[0].orientation = "horizontal";
+  q.pageGroups[1].artboardIds = ["one"];
+  assert.equal(policy.validBoards(q), false);
+});
 test("free artboard validation rejects ambiguous, excessive or malformed layouts", () => {
   for (const change of [
     (q) => (q.artboards[1].x = -1),

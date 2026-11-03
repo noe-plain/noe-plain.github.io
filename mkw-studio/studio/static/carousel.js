@@ -12,6 +12,7 @@ async function carouselNewDocument(
   metadata,
   layout = "slides",
   order = [],
+  groups = [],
 ) {
   const q = fresh(),
     { w, h, top, bottom, left, right } = format;
@@ -51,6 +52,41 @@ async function carouselNewDocument(
       y: i * (h + 120),
       bg: q.carousel.bg,
     }));
+    const boardBySource = new Map(
+      sequence.map((source, i) => [source, q.carousel.artboards[i].id]),
+    );
+    q.carousel.pageGroups =
+      groups.length > 0
+        ? groups.map((group) => ({
+            ...group,
+            artboardIds: group.pages.map((source) => boardBySource.get(source)),
+          }))
+        : [
+            {
+              id: uid(),
+              name: "Carousel 1",
+              orientation: "horizontal",
+              artboardIds: q.carousel.artboards.map((a) => a.id),
+            },
+          ];
+    const artboardsById = new Map(
+      q.carousel.artboards.map((artboard) => [artboard.id, artboard]),
+    );
+    let groupTop = 0;
+    for (const group of q.carousel.pageGroups) {
+      let offset = 0,
+        groupHeight = 0;
+      for (const id of group.artboardIds) {
+        const artboard = artboardsById.get(id);
+        artboard.x = group.orientation === "horizontal" ? offset : 0;
+        artboard.y = groupTop + (group.orientation === "vertical" ? offset : 0);
+        offset +=
+          (group.orientation === "horizontal" ? artboard.w : artboard.h) + 120;
+        groupHeight = Math.max(groupHeight, artboard.h);
+      }
+      groupTop +=
+        group.orientation === "horizontal" ? groupHeight + 120 : offset;
+    }
   }
   const logo = await image("mkw-logo-bold-neg.svg"),
     lw = Math.min(600, w - left - right);

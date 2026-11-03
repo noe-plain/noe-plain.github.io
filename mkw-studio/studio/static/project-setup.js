@@ -20,7 +20,7 @@ const MKWProjectSetup = (() => {
       <div class="new-project-basics"><div class="mode-buttons" role="group" aria-label="Projektmodus"><button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button></div><p id="setupInstructions"></p>
       <div class="setup-project-fields"><label>Projektname<input id="setupName" type="text" maxlength="80" placeholder="Zum Beispiel: Herbstkonzerte" required autofocus></label><label>Kürzel<input id="setupCode" type="text" maxlength="24" placeholder="E2" aria-describedby="setupCodeHint"></label></div><p id="setupCodeHint">Das Kürzel wird für deine Dateinamen verwendet.</p></div>
       <div class="new-project-grid"><section class="new-project-formats" aria-label="Formate einrichten"><div id="postSetup"><div class="new-project-section-heading"><h3>Formate auswählen</h3><span id="setupFormatCount"></span></div><div id="formatChoices"></div><button type="button" id="addFormat">${studioIcon("add")}<span>Eigenes Format hinzufügen</span></button></div>
-      <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">Zusammenhängende Slides</button><button type="button" data-designer-layout="free" aria-pressed="false">Freie Zeichenflächen</button></div><p id="designerLayoutHint"></p><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div></div></section></section>
+      <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">Zusammenhängende Slides</button><button type="button" data-designer-layout="free" aria-pressed="false">Freie Zeichenflächen</button></div><p id="designerLayoutHint"></p><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><div id="carouselSetupGroups" role="group" aria-label="Carousel-Gruppen"></div><button type="button" id="setupSplitPageGroup">Letzte Seite in neue Gruppe verschieben</button></div></section></section>
       <section class="new-project-detail" aria-labelledby="setupDetailTitle"><div class="new-project-section-heading"><h3 id="setupDetailTitle">Schutzzonen</h3><span id="setupDetailDimensions"></span></div><p id="setupDetailScope"></p><div class="setup-safe-diagram"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner"><span>Schutzzone</span></div></div></div><div id="setupSafeFields">${[
         ["top", "Oben"],
         ["bottom", "Unten"],
@@ -35,8 +35,25 @@ const MKWProjectSetup = (() => {
   for (const button of dialog.querySelectorAll("[data-designer-layout]"))
     button.onclick = () => {
       draft.designer.layout = button.dataset.designerLayout;
+      if (draft.designer.groups.length === 1)
+        draft.designer.groups[0].orientation =
+          draft.designer.layout === "free" ? "vertical" : "horizontal";
       refresh();
     };
+  $("#setupSplitPageGroup").onclick = () => {
+    const groups = draft.designer.groups,
+      source = groups.at(-1);
+    if (!source || source.pages.length < 2) return;
+    const page = source.pages.pop();
+    groups.push({
+      id: `setup-carousel-${nextId++}`,
+      name: `Carousel ${groups.length + 1}`,
+      orientation: source.orientation,
+      pages: [page],
+    });
+    draft.designer.order = groups.flatMap((group) => group.pages);
+    refresh();
+  };
   const current = () =>
     draft.mode === "carousel"
       ? draft.designer
@@ -174,15 +191,45 @@ const MKWProjectSetup = (() => {
           : `${f.w * f.n} × ${f.h} px gesamt`;
         const strip = $("#carouselSetupStrip");
         strip.classList.toggle("is-free", free);
-        draft.designer.order = draft.designer.order.filter((i) => i < f.n);
+        const groups = draft.designer.groups;
+        for (const group of groups)
+          group.pages = group.pages.filter((source) => source < f.n);
+        draft.designer.groups = groups.filter((group) => group.pages.length);
+        if (!draft.designer.groups.length)
+          draft.designer.groups.push({
+            id: "setup-carousel-1",
+            name: "Carousel 1",
+            orientation: "horizontal",
+            pages: [],
+          });
+        const known = new Set(
+            draft.designer.groups.flatMap((group) => group.pages),
+          ),
+          lastGroup = draft.designer.groups.at(-1);
         for (let i = 0; i < f.n; i++)
-          if (!draft.designer.order.includes(i)) draft.designer.order.push(i);
-        strip.innerHTML = draft.designer.order
+          if (!known.has(i)) lastGroup.pages.push(i);
+        draft.designer.order = draft.designer.groups.flatMap(
+          (group) => group.pages,
+        );
+        strip.innerHTML = draft.designer.groups
           .map(
-            (source, position) =>
-              `<button type="button" class="setup-artboard-card" draggable="${free}" data-setup-artboard="${source}" aria-label="Zeichenfläche ${position + 1}, Position ${position + 1} von ${f.n}; mit Ziehen oder Pfeiltasten neu ordnen" style="aspect-ratio:${f.w}/${f.h}"><span>${position + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></button>`,
+            (group) =>
+              `<section class="setup-page-group" data-page-group="${group.id}" data-orientation="${group.orientation}"><header><strong>${group.name}</strong><label>Anordnung<select data-group-orientation="${group.id}" aria-label="${group.name}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label></header><div class="setup-page-group-cards">${group.pages
+                .map((source) => {
+                  const position = draft.designer.order.indexOf(source);
+                  const targets = draft.designer.groups.filter(
+                    (target) => target.id !== group.id,
+                  );
+                  return `<div><button type="button" class="setup-artboard-card" draggable="${free}" data-setup-artboard="${source}" aria-label="Zeichenfläche ${position + 1}, Position ${position + 1} von ${f.n}; mit Ziehen oder Pfeiltasten neu ordnen" aria-current="${source === draft.designer.order[0] ? "true" : "false"}" style="aspect-ratio:${f.w}/${f.h}"><span>${position + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></button><select data-move-page="${source}" aria-label="Zeichenfläche ${position + 1} in andere Gruppe verschieben" ${targets.length ? "" : "hidden"}>${targets.map((target) => `<option value="${target.id}">${target.name}</option>`).join("")}</select></div>`;
+                })
+                .join("")}</div></section>`,
           )
           .join("");
+        $("#setupSplitPageGroup").hidden = !free;
+        $("#setupSplitPageGroup").disabled =
+          !free ||
+          draft.designer.groups.length >= f.n ||
+          draft.designer.groups.at(-1).pages.length < 2;
         bindSetupArtboardOrder(strip, free);
       }
     }
@@ -218,10 +265,14 @@ const MKWProjectSetup = (() => {
           if (dragging !== null) {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
+            card.classList.add("is-drop-target");
           }
         };
+        card.ondragleave = () => card.classList.remove("is-drop-target");
         card.ondrop = (event) => {
           event.preventDefault();
+          event.stopPropagation();
+          card.classList.remove("is-drop-target");
           const from =
               dragging ?? Number(event.dataTransfer.getData("text/plain")),
             to = draft.designer.order.indexOf(+card.dataset.setupArtboard);
@@ -230,10 +281,79 @@ const MKWProjectSetup = (() => {
         };
         card.ondragend = () => (dragging = null);
       }
+      for (const group of strip.querySelectorAll("[data-page-group]")) {
+        group.ondragover = (event) => {
+          if (dragging === null) return;
+          event.preventDefault();
+          group.classList.add("is-drop-target");
+        };
+        group.ondragleave = (event) => {
+          if (!group.contains(event.relatedTarget))
+            group.classList.remove("is-drop-target");
+        };
+        group.ondrop = (event) => {
+          event.preventDefault();
+          group.classList.remove("is-drop-target");
+          const from =
+            dragging ?? Number(event.dataTransfer.getData("text/plain"));
+          dragging = null;
+          moveSetupPageToGroup(
+            draft.designer.order[from],
+            group.dataset.pageGroup,
+          );
+        };
+      }
+      for (const select of strip.querySelectorAll("[data-group-orientation]"))
+        select.onchange = () => {
+          const group = draft.designer.groups.find(
+            (item) => item.id === select.dataset.groupOrientation,
+          );
+          if (group) group.orientation = select.value;
+          refresh();
+        };
+      for (const select of strip.querySelectorAll("[data-move-page]"))
+        select.onchange = () =>
+          moveSetupPageToGroup(+select.dataset.movePage, select.value);
     }
     function moveSetupArtboard(from, to) {
-      const [item] = draft.designer.order.splice(from, 1);
-      draft.designer.order.splice(to, 0, item);
+      const sourceId = draft.designer.order[from],
+        targetId = draft.designer.order[to],
+        source = draft.designer.groups.find((group) =>
+          group.pages.includes(sourceId),
+        ),
+        target = draft.designer.groups.find((group) =>
+          group.pages.includes(targetId),
+        );
+      if (!source || !target) return;
+      source.pages.splice(source.pages.indexOf(sourceId), 1);
+      const targetIndex = target.pages.indexOf(targetId);
+      target.pages.splice(
+        from < to ? targetIndex + 1 : targetIndex,
+        0,
+        sourceId,
+      );
+      draft.designer.groups = draft.designer.groups.filter(
+        (group) => group.pages.length,
+      );
+      draft.designer.order = draft.designer.groups.flatMap(
+        (group) => group.pages,
+      );
+      refresh();
+    }
+    function moveSetupPageToGroup(source, groupId) {
+      const sourceGroup = draft.designer.groups.find((group) =>
+          group.pages.includes(source),
+        ),
+        target = draft.designer.groups.find((group) => group.id === groupId);
+      if (!sourceGroup || !target || sourceGroup === target) return;
+      sourceGroup.pages.splice(sourceGroup.pages.indexOf(source), 1);
+      target.pages.push(source);
+      draft.designer.groups = draft.designer.groups.filter(
+        (group) => group.pages.length,
+      );
+      draft.designer.order = draft.designer.groups.flatMap(
+        (group) => group.pages,
+      );
       refresh();
     }
     $("#setupSummary").textContent = designer
@@ -330,6 +450,14 @@ const MKWProjectSetup = (() => {
         n: 4,
         layout: "slides",
         order: [0, 1, 2, 3],
+        groups: [
+          {
+            id: "setup-carousel-1",
+            name: "Carousel 1",
+            orientation: "horizontal",
+            pages: [0, 1, 2, 3],
+          },
+        ],
       },
     };
     activeId = draft.formats[0].id;
@@ -422,6 +550,7 @@ const MKWProjectSetup = (() => {
             meta,
             draft.designer.layout,
             draft.designer.order,
+            draft.designer.groups,
           )
         : fresh();
       if (!designer) {

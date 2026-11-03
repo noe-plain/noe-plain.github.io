@@ -9,32 +9,36 @@
   border: 0;
   background: var(--md-sys-color-surface);
 }
-.inspector-width-resizable {
-  position: relative;
-}
 .inspector-width-grip {
-  position: absolute;
+  position: relative;
   z-index: 20;
-  inset: 0 auto 0 0;
-  width: 12px;
-  min-height: 48px;
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  min-height: 100%;
+  margin: 0 -12px;
   cursor: ew-resize;
   touch-action: none;
   display: grid;
   place-items: center;
+  background: var(--studio-panel);
   color: var(--md-sys-color-outline);
 }
 .inspector-width-grip span {
-  width: 3px;
-  height: 40px;
+  width: 4px;
+  height: 36px;
   border-radius: 999px;
   background: currentColor;
   opacity: 0.65;
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    height var(--studio-motion-short) var(--studio-ease-effects);
 }
 .inspector-width-grip:hover span,
 .inspector-width-grip:focus-visible span,
 .is-width-resizing .inspector-width-grip span {
   color: var(--md-sys-color-primary);
+  height: 48px;
   opacity: 1;
 }
 .inspector-width-grip:focus-visible {
@@ -45,6 +49,9 @@
 .is-width-resizing * {
   cursor: ew-resize !important;
   user-select: none !important;
+}
+.sidebar-hidden .inspector-width-grip {
+  display: none;
 }
 .inspector-identity {
   display: flex;
@@ -234,6 +241,70 @@
 .designer-artboard-order button[aria-current="true"] {
   outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 1px;
+}
+.designer-page-groups {
+  display: grid;
+  gap: 12px;
+}
+.designer-page-group {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  background: var(--md-sys-color-surface-container-low);
+  transition:
+    border-color var(--studio-motion-short) var(--studio-ease-effects),
+    background-color var(--studio-motion-short) var(--studio-ease-effects);
+}
+.designer-page-group > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.designer-page-group > header label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.designer-page-group > header select,
+.designer-page-group li select {
+  max-width: 100%;
+}
+.designer-page-group ol {
+  display: flex;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 0 0;
+  margin: 0;
+  list-style: none;
+}
+.designer-page-group[data-orientation="vertical"] ol {
+  flex-direction: column;
+}
+.designer-page-group li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px;
+  border-radius: 8px;
+}
+.designer-page-group li button {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.designer-page-group li.is-drop-target,
+.designer-page-group.is-drop-target {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary-container);
+}
+@media (prefers-reduced-motion: reduce) {
+  .designer-page-group,
+  .inspector-width-grip span {
+    transition: none;
+  }
 }
 @media (max-width: 760px) {
   .inspector-width-grip {

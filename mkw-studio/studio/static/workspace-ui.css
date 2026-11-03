@@ -378,9 +378,12 @@ footer #carouselCoordinates {
 
 #carouselEditor {
   inset: var(--studio-header-height) 0 44px;
-  grid-template-columns: minmax(0, 1fr) var(--studio-inspector-width);
+  grid-template-columns: minmax(0, 1fr) 48px var(--studio-inspector-width);
   grid-template-rows: minmax(0, 1fr);
   background: var(--studio-canvas);
+}
+body.carousel-mode header {
+  right: calc(var(--studio-shell-inset) + var(--sidebar) + 72px);
 }
 .carousel-contextbar.studio-commandbar {
   gap: 12px;
@@ -411,11 +414,15 @@ footer #carouselCoordinates {
   background: var(--studio-canvas);
 }
 #carouselSidebar {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   background: var(--studio-panel);
   border-color: var(--studio-border);
   overflow: hidden;
+}
+.inspector-width-grip {
+  grid-column: 2;
+  grid-row: 1;
 }
 #carouselProperties {
   min-height: 100px;
