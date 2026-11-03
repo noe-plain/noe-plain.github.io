@@ -137,9 +137,9 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.workspace.bottom, boxes.sidebar.bottom);
       assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
       if (boxes.splitter) {
-        assert.equal(boxes.splitter.x, boxes.workspace.right + 8);
-        assert.equal(boxes.splitter.width, 32);
-        assert.equal(boxes.sidebar.x, boxes.splitter.right + 8);
+        assert.equal(boxes.splitter.x, boxes.workspace.right + 14);
+        assert.equal(boxes.splitter.width, 20);
+        assert.equal(boxes.sidebar.x, boxes.splitter.right + 14);
       } else {
         assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
       }

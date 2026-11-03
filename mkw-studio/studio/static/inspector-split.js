@@ -1,7 +1,7 @@
 (function (root) {
   "use strict";
   const defaultRatio = 70,
-    minInspectorWidth = 280,
+    minInspectorWidth = 300,
     maxInspectorWidth = 420;
   let current = null,
     preferred = defaultRatio,

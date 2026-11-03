@@ -206,6 +206,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     const grip = page.locator("#carouselEditor > .inspector-width-grip");
     assert.equal(await grip.getAttribute("role"), "separator");
     assert.equal(await grip.getAttribute("aria-orientation"), "vertical");
+    const widthBeforeResize = await grip.getAttribute("aria-valuenow");
     await grip.focus();
     await page.keyboard.press("ArrowLeft");
     const gripBox = await grip.boundingBox();
@@ -226,16 +227,19 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
         .querySelector("#carouselSidebar .carousel-layers-panel")
         .getBoundingClientRect().width,
     }));
-    assert.equal(widths.variable, 316);
+    assert.equal(
+      widths.variable,
+      Math.min(420, Number(widthBeforeResize) + 28),
+    );
     assert.equal(widths.sidebar, widths.layers);
     assert.equal(
       await page.evaluate(() => studioPreferences.inspectorWidth),
-      316,
+      Math.min(420, Number(widthBeforeResize) + 28),
     );
-    assert.equal(await grip.getAttribute("aria-valuemin"), "280");
+    assert.equal(await grip.getAttribute("aria-valuemin"), "300");
     await grip.focus();
     await page.keyboard.press("Home");
-    assert.equal(await grip.getAttribute("aria-valuenow"), "280");
+    assert.equal(await grip.getAttribute("aria-valuenow"), "300");
     await page.keyboard.press("End");
     assert.equal(await grip.getAttribute("aria-valuenow"), "420");
     assert.deepEqual(errors, []);
