@@ -232,6 +232,12 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       await page.evaluate(() => studioPreferences.inspectorWidth),
       316,
     );
+    assert.equal(await grip.getAttribute("aria-valuemin"), "280");
+    await grip.focus();
+    await page.keyboard.press("Home");
+    assert.equal(await grip.getAttribute("aria-valuenow"), "280");
+    await page.keyboard.press("End");
+    assert.equal(await grip.getAttribute("aria-valuenow"), "420");
     assert.deepEqual(errors, []);
     console.log(
       "PASS free artboards start vertically, setup drag sorting and project ordering, sidebar keyboard sorting, snap toggle, unified typography in both modes, multi-text formatting, and synchronized inspector/layer width",

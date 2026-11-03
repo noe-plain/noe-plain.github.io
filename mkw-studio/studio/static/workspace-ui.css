@@ -748,8 +748,8 @@ body.carousel-mode header {
 }
 @media (max-width: 1050px) {
   :root {
-    --sidebar: 272px;
-    --studio-inspector-width: 272px;
+    --sidebar: 280px;
+    --studio-inspector-width: 280px;
   }
   .sidebar-hidden {
     --sidebar: 0px;

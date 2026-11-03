@@ -1,6 +1,8 @@
 (function (root) {
   "use strict";
-  const defaultRatio = 70;
+  const defaultRatio = 70,
+    minInspectorWidth = 280,
+    maxInspectorWidth = 420;
   let current = null,
     preferred = defaultRatio,
     save = () => {},
@@ -11,7 +13,9 @@
     current?.cancel();
     preferred = Number.isFinite(ratio) ? clamp(ratio, 20, 85) : defaultRatio;
     save = typeof onCommit === "function" ? onCommit : () => {};
-    preferredWidth = Number.isFinite(width) ? clamp(width, 240, 420) : 288;
+    preferredWidth = Number.isFinite(width)
+      ? clamp(width, minInspectorWidth, maxInspectorWidth)
+      : 288;
     saveWidth = typeof onWidthCommit === "function" ? onWidthCommit : () => {};
     document.documentElement.style.setProperty(
       "--studio-inspector-width",
@@ -206,16 +210,20 @@
       "aria-label",
       "Seitenleiste und Ebenen: gemeinsame Breite",
     );
-    grip.setAttribute("aria-valuemin", "240");
-    grip.setAttribute("aria-valuemax", "420");
+    grip.setAttribute("aria-valuemin", String(minInspectorWidth));
+    grip.setAttribute("aria-valuemax", String(maxInspectorWidth));
     grip.setAttribute("aria-controls", sidebar.id || "carouselSidebar");
-    grip.title = "Gemeinsame Breite ändern · Ziehen oder ←/→ · 240–420 px";
+    grip.title = `Gemeinsame Breite ändern · Ziehen oder ←/→ · ${minInspectorWidth}–${maxInspectorWidth} px`;
     grip.innerHTML = '<span aria-hidden="true"></span>';
     sidebar.before(grip);
     let drag = null,
       width = preferredWidth;
     const set = (value) => {
-      width = clamp(Math.round(value), 240, Math.min(420, innerWidth - 360));
+      width = clamp(
+        Math.round(value),
+        minInspectorWidth,
+        Math.min(maxInspectorWidth, innerWidth - 360),
+      );
       document.documentElement.style.setProperty(
         "--studio-inspector-width",
         `${width}px`,
@@ -223,7 +231,7 @@
       grip.setAttribute("aria-valuenow", String(width));
       grip.setAttribute(
         "aria-valuemax",
-        String(Math.min(420, innerWidth - 360)),
+        String(Math.min(maxInspectorWidth, innerWidth - 360)),
       );
       grip.setAttribute("aria-valuetext", `${width} Pixel`);
     };
@@ -260,8 +268,9 @@
       const step = event.shiftKey ? 24 : 8;
       if (event.key === "ArrowLeft") set(width + step);
       else if (event.key === "ArrowRight") set(width - step);
-      else if (event.key === "Home") set(240);
-      else if (event.key === "End") set(Math.min(420, innerWidth - 360));
+      else if (event.key === "Home") set(minInspectorWidth);
+      else if (event.key === "End")
+        set(Math.min(maxInspectorWidth, innerWidth - 360));
       else return;
       event.preventDefault();
       event.stopPropagation();
