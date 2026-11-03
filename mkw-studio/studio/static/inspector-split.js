@@ -3,12 +3,20 @@
   const defaultRatio = 70;
   let current = null,
     preferred = defaultRatio,
-    save = () => {};
+    save = () => {},
+    preferredWidth = 288,
+    saveWidth = () => {};
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  function configure(ratio, onCommit) {
+  function configure(ratio, onCommit, width = preferredWidth, onWidthCommit) {
     current?.cancel();
     preferred = Number.isFinite(ratio) ? clamp(ratio, 20, 85) : defaultRatio;
     save = typeof onCommit === "function" ? onCommit : () => {};
+    preferredWidth = Number.isFinite(width) ? clamp(width, 240, 420) : 288;
+    saveWidth = typeof onWidthCommit === "function" ? onWidthCommit : () => {};
+    document.documentElement.style.setProperty(
+      "--studio-inspector-width",
+      `${preferredWidth}px`,
+    );
     current?.refresh();
   }
   function detach() {
@@ -182,5 +190,81 @@
     };
     refresh();
   }
-  root.MKWInspectorSplit = { attach, detach, configure };
+  function attachWidth(host) {
+    if (!host || host.querySelector(":scope > .inspector-width-grip")) return;
+    host.classList.add("inspector-width-resizable");
+    const grip = document.createElement("div");
+    grip.className = "inspector-width-grip";
+    grip.tabIndex = 0;
+    grip.setAttribute("role", "separator");
+    grip.setAttribute("aria-orientation", "vertical");
+    grip.setAttribute(
+      "aria-label",
+      "Seitenleiste und Ebenen: gemeinsame Breite",
+    );
+    grip.setAttribute("aria-valuemin", "240");
+    grip.setAttribute("aria-valuemax", "420");
+    grip.setAttribute("aria-controls", host.id || "carouselSidebar");
+    grip.title = "Gemeinsame Breite ändern · Ziehen oder ←/→ · 240–420 px";
+    grip.innerHTML = '<span aria-hidden="true"></span>';
+    host.prepend(grip);
+    let drag = null,
+      width = preferredWidth;
+    const set = (value) => {
+      width = clamp(Math.round(value), 240, Math.min(420, innerWidth - 360));
+      document.documentElement.style.setProperty(
+        "--studio-inspector-width",
+        `${width}px`,
+      );
+      grip.setAttribute("aria-valuenow", String(width));
+      grip.setAttribute(
+        "aria-valuemax",
+        String(Math.min(420, innerWidth - 360)),
+      );
+      grip.setAttribute("aria-valuetext", `${width} Pixel`);
+    };
+    const finish = (accept) => {
+      if (!drag) return;
+      const previous = drag.width;
+      drag = null;
+      host.classList.remove("is-width-resizing");
+      if (accept) {
+        preferredWidth = width;
+        if (previous !== width) saveWidth(width);
+      } else set(previous);
+    };
+    grip.onpointerdown = (event) => {
+      if (event.button !== 0 || innerWidth <= 760) return;
+      event.preventDefault();
+      drag = { x: event.clientX, width: preferredWidth };
+      grip.focus({ preventScroll: true });
+      grip.setPointerCapture(event.pointerId);
+      host.classList.add("is-width-resizing");
+    };
+    grip.onpointermove = (event) => {
+      if (!drag) return;
+      set(drag.width - (event.clientX - drag.x));
+    };
+    grip.onpointerup = () => finish(true);
+    grip.onpointercancel = grip.onlostpointercapture = () => finish(false);
+    grip.onkeydown = (event) => {
+      if (event.key === "Escape" && drag) {
+        event.preventDefault();
+        finish(false);
+        return;
+      }
+      const step = event.shiftKey ? 24 : 8;
+      if (event.key === "ArrowLeft") set(width + step);
+      else if (event.key === "ArrowRight") set(width - step);
+      else if (event.key === "Home") set(240);
+      else if (event.key === "End") set(Math.min(420, innerWidth - 360));
+      else return;
+      event.preventDefault();
+      event.stopPropagation();
+      preferredWidth = width;
+      saveWidth(width);
+    };
+    set(preferredWidth);
+  }
+  root.MKWInspectorSplit = { attach, attachWidth, detach, configure };
 })(globalThis);

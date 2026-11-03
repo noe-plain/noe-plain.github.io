@@ -59,6 +59,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       id: carouselSelected()[0].id,
       x: carouselSelected()[0].x,
       y: carouselSelected()[0].y,
+      boardY: p.carousel.artboards[1].y,
     }));
     await page.locator('[data-slide="1"]').click();
     await page.locator("[data-artboard=y]").fill("1600");
@@ -68,7 +69,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
         (id) => p.carousel.objects.find((o) => o.id === id).y,
         shape.id,
       ),
-      shape.y + 1600,
+      shape.y + 1600 - shape.boardY,
     );
     assert.equal(await page.evaluate(() => validate(p) === p), true);
     const pixels = await page.evaluate(async () => {

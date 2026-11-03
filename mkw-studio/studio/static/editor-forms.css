@@ -56,17 +56,6 @@ html[data-theme="light"] #carouselProperties {
   line-height: 1.5;
   color: var(--type-muted);
 }
-#carouselProperties .type-font > label {
-  margin: 0 0 12px;
-}
-#carouselProperties .type-basics {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 70px;
-  gap: 12px;
-}
-#carouselProperties .type-basics label {
-  margin: 0;
-}
 #carouselProperties .type-unit {
   display: flex;
   align-items: center;
@@ -85,10 +74,6 @@ html[data-theme="light"] #carouselProperties {
   pointer-events: none;
   color: var(--type-muted);
   font-size: 11px;
-}
-#carouselProperties .type-basics input[type="color"] {
-  width: 100%;
-  height: 38px;
 }
 #carouselProperties .type-paragraphs {
   display: flex;

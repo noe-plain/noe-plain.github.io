@@ -7,10 +7,18 @@ try {
   );
 } catch {}
 function studioApplyPreferences() {
-  MKWInspectorSplit.configure(studioPreferences.inspectorSplit, (ratio) => {
-    studioPreferences.inspectorSplit = ratio;
-    studioPersistPreferences();
-  });
+  MKWInspectorSplit.configure(
+    studioPreferences.inspectorSplit,
+    (ratio) => {
+      studioPreferences.inspectorSplit = ratio;
+      studioPersistPreferences();
+    },
+    studioPreferences.inspectorWidth,
+    (width) => {
+      studioPreferences.inspectorWidth = width;
+      studioPersistPreferences();
+    },
+  );
   studioApplyColourTheme();
   studioApplyDensity();
   MKWDesignerGrid.sync(studioPreferences.designerGrid);

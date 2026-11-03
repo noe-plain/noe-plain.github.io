@@ -6,6 +6,7 @@
     colourMode: "normal",
     density: "comfortable",
     inspectorSplit: 70,
+    inspectorWidth: 288,
     guideColour: "#93a8ef",
     sponsorColour: "#ffffff",
     snapColour: "#f5a8e8",
@@ -88,18 +89,20 @@
                   ? Number.isInteger(item) && item >= 1 && item <= 40
                   : key === "inspectorSplit"
                     ? Number.isInteger(item) && item >= 20 && item <= 85
-                    : key === "lineHeight"
-                      ? Number.isFinite(item) && item >= 20 && item <= 300
-                      : key === "exportFormat"
-                        ? ["jpg", "png", "webp"].includes(item)
-                        : key === "pdfPreset"
-                          ? [
-                              "linkedin",
-                              "linkedin-square",
-                              "original",
-                              "compact",
-                            ].includes(item)
-                          : false;
+                    : key === "inspectorWidth"
+                      ? Number.isInteger(item) && item >= 240 && item <= 420
+                      : key === "lineHeight"
+                        ? Number.isFinite(item) && item >= 20 && item <= 300
+                        : key === "exportFormat"
+                          ? ["jpg", "png", "webp"].includes(item)
+                          : key === "pdfPreset"
+                            ? [
+                                "linkedin",
+                                "linkedin-square",
+                                "original",
+                                "compact",
+                              ].includes(item)
+                            : false;
       if (valid) result[key] = item;
       else if (strict) throw Error("Ungültige Einstellung: " + key);
     }

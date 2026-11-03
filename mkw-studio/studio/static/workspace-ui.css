@@ -2,7 +2,7 @@
 :root {
   --studio-header-height: 76px;
   --studio-bar-height: 58px;
-  --sidebar: 288px;
+  --sidebar: var(--studio-inspector-width);
   --studio-inspector-width: 288px;
 }
 svg.ui-icon {

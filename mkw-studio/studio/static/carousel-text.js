@@ -29,7 +29,7 @@ function carouselJustificationHint(
   return `<details class="typo-details justification-settings" ${hidden ? "hidden" : ""}><summary>Blocksatz · Satzwerte</summary><label class="justification-hyphen"><input type="checkbox" ${attribute} ${enabled ? "checked" : ""}>Automatische Silbentrennung</label><p>Deutsch (Schweiz) · reformierte Rechtschreibung 2006</p><table><thead><tr><th></th><th>Min.</th><th>Optimal</th><th>Max.</th></tr></thead><tbody><tr><th>Wortabstand</th><td>80 %</td><td>100 %</td><td>120 %</td></tr><tr><th>Zeichenabstand</th><td>−2 %</td><td>0 %</td><td>+2 %</td></tr><tr><th>Glyphenbreite</th><td>98 %</td><td>100 %</td><td>102 %</td></tr></tbody></table><p>Letzte Absatzzeile linksbündig. Bei zu schmalen Zeilen werden die Grenzen eingehalten; ein Hinweis zeigt unvollständig ausgeglichene Zeilen.</p></details>`;
 }
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}${carouselJustificationHint(o.textAlign !== "justify" && !o.textStyles?.some((s) => s?.align === "justify"), "data-text-hyphenate", o.hyphenate !== false)}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button>${studioPreferences.advanced ? `<button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button>` : ""}<button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Ausrichtung des Textfelds</div>${carouselTextAlignButtons(o.textAlign || "left", "data-text-align", "Ausrichtung des gesamten Textfelds", carouselObjectLocked(o))}${carouselJustificationHint(o.textAlign !== "justify" && !o.textStyles?.some((s) => s?.align === "justify"), "data-text-hyphenate", o.hyphenate !== false)}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button><button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
 }
 function carouselBindTextAlignment(o, panel) {
   const hyphen = panel.querySelector("[data-text-hyphenate]");
@@ -374,10 +374,6 @@ function carouselEndText(preservePanel = false) {
 
 function carouselTextContentPanel(o) {
   return `<section class="carousel-property-section type-content"><div class="type-section-heading"><h4>Text</h4><button id="carouselTextEdit" title="Text direkt auf der Zeichenfläche bearbeiten">${studioIcon("text")}<span>Auf der Fläche</span></button></div><label class="type-content-label">Textinhalt<textarea data-prop="text" aria-label="Designer-Text eingeben" placeholder="Dein Text …" rows="3">${esc(o.text)}</textarea></label></section>`;
-}
-
-function carouselTextFontPanel(o) {
-  return `<section class="carousel-property-section type-font"><h4>Schrift</h4><label>Schriftfamilie<select data-prop="font">${studioFontOptions(o.font, false)}</select></label><div class="type-basics"><label>Grundgrösse<span class="type-unit"><input data-prop="size" type="number" aria-label="Grundgrösse des Textes" value="${o.size}" min="1" max="1000" step="any"><span>px</span></span></label></div>${studioPaintCards(o)}</section>`;
 }
 
 function carouselTextStylePanel(o) {
@@ -728,7 +724,6 @@ function carouselSetTextContext(o, offset) {
 function carouselTrackTextCaret(o, el) {
   const selection = carouselEditableSelection(el);
   carouselTypeRange(o, selection.start, selection.end);
-  carouselSyncTypeControls(o);
   if (carouselSetTextContext(o, carouselEditableSelection(el).start))
     carouselRefreshTextStyles(o);
 }

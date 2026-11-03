@@ -9,6 +9,43 @@
   border: 0;
   background: var(--md-sys-color-surface);
 }
+.inspector-width-resizable {
+  position: relative;
+}
+.inspector-width-grip {
+  position: absolute;
+  z-index: 20;
+  inset: 0 auto 0 0;
+  width: 12px;
+  min-height: 48px;
+  cursor: ew-resize;
+  touch-action: none;
+  display: grid;
+  place-items: center;
+  color: var(--md-sys-color-outline);
+}
+.inspector-width-grip span {
+  width: 3px;
+  height: 40px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.65;
+}
+.inspector-width-grip:hover span,
+.inspector-width-grip:focus-visible span,
+.is-width-resizing .inspector-width-grip span {
+  color: var(--md-sys-color-primary);
+  opacity: 1;
+}
+.inspector-width-grip:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
+.is-width-resizing,
+.is-width-resizing * {
+  cursor: ew-resize !important;
+  user-select: none !important;
+}
 .inspector-identity {
   display: flex;
   align-items: flex-start;
@@ -177,6 +214,31 @@
   padding: 0;
   border: 0;
   flex: 0 0 18px;
+}
+.designer-artboard-order {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.designer-artboard-order button {
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  cursor: grab;
+}
+.designer-artboard-order button:active {
+  cursor: grabbing;
+}
+.designer-artboard-order button[aria-current="true"] {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 1px;
+}
+@media (max-width: 760px) {
+  .inspector-width-grip {
+    display: none;
+  }
 }
 #carouselSidebar #designerAddArtboard {
   display: flex;

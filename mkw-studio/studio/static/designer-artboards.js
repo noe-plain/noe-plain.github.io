@@ -224,11 +224,18 @@ const MKWArtboardUI = (() => {
       i = carouselUI.slide,
       j = i + delta;
     if (i === null || j < 0 || j >= c.n) return;
+    reorderTo(i, j);
+  }
+  function reorderTo(from, to) {
+    const c = p.carousel;
+    if (from < 0 || to < 0 || from >= c.n || to >= c.n || from === to) return;
     checkpoint();
-    [c.artboards[i], c.artboards[j]] = [c.artboards[j], c.artboards[i]];
-    [p.boards[i], p.boards[j]] = [p.boards[j], p.boards[i]];
+    const [frame] = c.artboards.splice(from, 1),
+      [board] = p.boards.splice(from, 1);
+    c.artboards.splice(to, 0, frame);
+    p.boards.splice(to, 0, board);
     syncBoards();
-    carouselUI.slide = j;
+    carouselUI.slide = to;
     changed();
   }
   function panel(host) {
@@ -237,7 +244,7 @@ const MKWArtboardUI = (() => {
       a = c.artboards[index],
       input = (key, label, min = 0, max = 100000) =>
         `<label>${label} (px)<input data-artboard="${key}" type="number" min="${min}" max="${max}" step="1" value="${a[key]}"></label>`;
-    host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>Reihenfolge &amp; Aktionen</h4><p class="artboard-help">Die Reihenfolge bestimmt den Export. Positionen auf der Montagefläche bleiben erhalten.</p><div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
+    host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>Seitenreihenfolge &amp; Aktionen</h4><p class="artboard-help">Ziehe eine Fläche an die gewünschte Stelle. Pfeiltasten ändern die Reihenfolge ebenfalls; die Position auf der Montagefläche bleibt unverändert.</p><ol class="designer-artboard-order" aria-label="Seitenreihenfolge">${c.artboards.map((f, i) => `<li><button type="button" draggable="true" data-artboard-order="${i}" aria-current="${i === index ? "true" : "false"}" aria-label="${esc(f.name)}, Position ${i + 1} von ${c.n}. Mit Ziehen oder Pfeiltasten neu ordnen">${esc(f.name)}</button></li>`).join("")}</ol><div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
     host.querySelector("#designerArtboardChoice").onchange = (e) => {
       carouselSlideSelect(+e.target.value);
       carouselSlideCenter(+e.target.value);
@@ -246,6 +253,52 @@ const MKWArtboardUI = (() => {
     host.querySelector("#designerMoveContent").onchange = (e) => {
       moveContent = e.target.checked;
     };
+    host.querySelector("#designerSnapArtboards").onchange = (e) => {
+      carouselUI.snap = e.target.checked;
+      carouselRefresh();
+    };
+    let orderDrag = null;
+    for (const item of host.querySelectorAll("[data-artboard-order]")) {
+      item.onkeydown = (event) => {
+        if (
+          !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
+            event.key,
+          )
+        )
+          return;
+        event.preventDefault();
+        const from = +item.dataset.artboardOrder,
+          to = Math.max(
+            0,
+            Math.min(
+              c.n - 1,
+              from + (["ArrowUp", "ArrowLeft"].includes(event.key) ? -1 : 1),
+            ),
+          );
+        if (from === to) return;
+        reorderTo(from, to);
+        host.querySelector(`[data-artboard-order="${to}"]`)?.focus();
+      };
+      item.ondragstart = (event) => {
+        orderDrag = +item.dataset.artboardOrder;
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", String(orderDrag));
+      };
+      item.ondragover = (event) => {
+        if (orderDrag !== null) {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+        }
+      };
+      item.ondrop = (event) => {
+        event.preventDefault();
+        const from =
+          orderDrag ?? Number(event.dataTransfer.getData("text/plain"));
+        orderDrag = null;
+        reorderTo(from, +item.dataset.artboardOrder);
+      };
+      item.ondragend = () => (orderDrag = null);
+    }
     const fields = [...host.querySelectorAll("[data-artboard]")],
       name = host.querySelector("[data-artboard-name]"),
       bg = host.querySelector("[data-artboard-bg]"),

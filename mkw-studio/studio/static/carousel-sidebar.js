@@ -59,7 +59,7 @@ function carouselPanel() {
     panel = $("#carouselProperties");
   panel.classList.toggle(
     "is-text-inspector",
-    items.length === 1 && o?.type === "text",
+    items.length > 0 && items.every((item) => item.type === "text"),
   );
   if (carouselPathDraft) {
     carouselDraftPanel(panel);
@@ -87,7 +87,12 @@ function carouselPanel() {
     carouselPresentInspector();
     return;
   }
-  if (items.length > 1) {
+  if (items.length > 1 && items.every((item) => item.type === "text")) {
+    panel.innerHTML = `<div class="carousel-section-heading"><h3>${items.length} Textebenen ausgewählt</h3></div>${MKWTypography.panel()}<section class="carousel-property-section"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></section>`;
+    MKWTypography.carousel(o, panel, items);
+    $("#carouselDuplicate").onclick = carouselDuplicate;
+    $("#carouselDelete").onclick = carouselDelete;
+  } else if (items.length > 1) {
     panel.innerHTML = `<h3>${items.length} Elemente ausgewählt</h3><div class="carousel-fields"><button id="carouselDuplicate">Duplizieren</button><button id="carouselDelete">Entfernen</button></div>`;
     $("#carouselDuplicate").onclick = carouselDuplicate;
     $("#carouselDelete").onclick = carouselDelete;
@@ -106,7 +111,7 @@ function carouselPanel() {
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
  ${o.imageSourceId ? `<p class="carousel-linked-source">Bild aus ${esc(c.objects.find((s) => s.id === o.imageSourceId)?.name || "Hintergrund")} · Ersetzen macht das Winkelbild unabhängig.</p>` : ""}
- ${o.type === "text" ? carouselTextContentPanel(o) + (studioPreferences.advanced ? MKWTypography.panel() : carouselTextFontPanel(o) + carouselTypePanel(o) + carouselTextStylePanel(o)) + carouselTextFramePanel(o) : ""}
+ ${o.type === "text" ? carouselTextContentPanel(o) + MKWTypography.panel() + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
  ${
@@ -302,11 +307,8 @@ function carouselPanel() {
         },
         stop: () => carouselEndText(),
       });
-    if (o.type === "text") {
-      carouselBindTextStyles(o, panel);
-      carouselBindTypography(o, panel);
-      if (studioPreferences.advanced) MKWTypography.carousel(o, panel);
-      else carouselTypographyNavigation(panel);
+    if (o.type === "text" && items.length === 1) {
+      MKWTypography.carousel(o, panel);
       carouselBindTextAlignment(o, panel);
       const content = panel.querySelector("[data-prop=text]");
       content.onselect =

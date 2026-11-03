@@ -27,6 +27,7 @@
     layers = null,
   }) {
     if (!host || !panel) return;
+    MKWInspectorSplit.attachWidth(host);
     let state = sessions.get(host);
     if (!state) {
       const header =

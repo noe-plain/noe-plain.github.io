@@ -6,7 +6,13 @@ let carouselSelection = null,
 
 const carouselActive = () => !!p.carousel;
 
-async function carouselNewDocument(format, count, metadata, layout = "slides") {
+async function carouselNewDocument(
+  format,
+  count,
+  metadata,
+  layout = "slides",
+  order = [],
+) {
   const q = fresh(),
     { w, h, top, bottom, left, right } = format;
   q.fonts = [...p.fonts];
@@ -31,13 +37,18 @@ async function carouselNewDocument(format, count, metadata, layout = "slides") {
   }
   if (layout === "free") {
     q.carousel.layout = "free";
-    const columns = Math.ceil(Math.sqrt(count));
-    q.carousel.artboards = q.boards.map((b, i) => ({
+    const sequence = [
+      ...new Set(
+        order.filter((i) => Number.isInteger(i) && i >= 0 && i < count),
+      ),
+    ];
+    for (let i = 0; i < count; i++) if (!sequence.includes(i)) sequence.push(i);
+    q.carousel.artboards = sequence.map((_, i) => ({
       ...format,
       id: uid(),
       name: `Zeichenfläche ${i + 1}`,
-      x: (i % columns) * (w + 120),
-      y: Math.floor(i / columns) * (h + 120),
+      x: 0,
+      y: i * (h + 120),
       bg: q.carousel.bg,
     }));
   }

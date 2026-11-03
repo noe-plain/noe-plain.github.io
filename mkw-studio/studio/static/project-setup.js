@@ -172,13 +172,69 @@ const MKWProjectSetup = (() => {
         $("#carouselArtworkSize").textContent = free
           ? `${f.n} einzelne Zeichenflächen · Startformat ${f.w} × ${f.h} px`
           : `${f.w * f.n} × ${f.h} px gesamt`;
-        $("#carouselSetupStrip").classList.toggle("is-free", free);
-        $("#carouselSetupStrip").innerHTML = Array.from(
-          { length: f.n },
-          (_, i) =>
-            `<div style="aspect-ratio:${f.w}/${f.h}"><span>${i + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></div>`,
-        ).join("");
+        const strip = $("#carouselSetupStrip");
+        strip.classList.toggle("is-free", free);
+        draft.designer.order = draft.designer.order.filter((i) => i < f.n);
+        for (let i = 0; i < f.n; i++)
+          if (!draft.designer.order.includes(i)) draft.designer.order.push(i);
+        strip.innerHTML = draft.designer.order
+          .map(
+            (source, position) =>
+              `<button type="button" class="setup-artboard-card" draggable="${free}" data-setup-artboard="${source}" aria-label="Zeichenfläche ${position + 1}, Position ${position + 1} von ${f.n}; mit Ziehen oder Pfeiltasten neu ordnen" style="aspect-ratio:${f.w}/${f.h}"><span>${position + 1}</span><i style="top:${(100 * f.top) / f.h}%;bottom:${(100 * f.bottom) / f.h}%;left:${(100 * f.left) / f.w}%;right:${(100 * f.right) / f.w}%"></i></button>`,
+          )
+          .join("");
+        bindSetupArtboardOrder(strip, free);
       }
+    }
+    function bindSetupArtboardOrder(strip, free) {
+      let dragging = null;
+      for (const card of strip.querySelectorAll("[data-setup-artboard]")) {
+        card.onkeydown = (event) => {
+          if (
+            !free ||
+            !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
+              event.key,
+            )
+          )
+            return;
+          event.preventDefault();
+          const delta = ["ArrowUp", "ArrowLeft"].includes(event.key) ? -1 : 1,
+            from = draft.designer.order.indexOf(+card.dataset.setupArtboard),
+            to = Math.max(
+              0,
+              Math.min(draft.designer.order.length - 1, from + delta),
+            );
+          if (from === to) return;
+          moveSetupArtboard(from, to);
+          strip.querySelectorAll("[data-setup-artboard]")[to]?.focus();
+        };
+        card.ondragstart = (event) => {
+          if (!free) return event.preventDefault();
+          dragging = draft.designer.order.indexOf(+card.dataset.setupArtboard);
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", String(dragging));
+        };
+        card.ondragover = (event) => {
+          if (dragging !== null) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+          }
+        };
+        card.ondrop = (event) => {
+          event.preventDefault();
+          const from =
+              dragging ?? Number(event.dataTransfer.getData("text/plain")),
+            to = draft.designer.order.indexOf(+card.dataset.setupArtboard);
+          dragging = null;
+          if (from !== to) moveSetupArtboard(from, to);
+        };
+        card.ondragend = () => (dragging = null);
+      }
+    }
+    function moveSetupArtboard(from, to) {
+      const [item] = draft.designer.order.splice(from, 1);
+      draft.designer.order.splice(to, 0, item);
+      refresh();
     }
     $("#setupSummary").textContent = designer
       ? `Designer · ${MKWCarouselPolicy.validCount(f.n) ? f.n : "–"} ${free ? "freie Zeichenflächen" : f.n === 1 ? "Slide" : "Slides"}`
@@ -273,6 +329,7 @@ const MKWProjectSetup = (() => {
         right: 100,
         n: 4,
         layout: "slides",
+        order: [0, 1, 2, 3],
       },
     };
     activeId = draft.formats[0].id;
@@ -364,6 +421,7 @@ const MKWProjectSetup = (() => {
             draft.designer.n,
             meta,
             draft.designer.layout,
+            draft.designer.order,
           )
         : fresh();
       if (!designer) {
