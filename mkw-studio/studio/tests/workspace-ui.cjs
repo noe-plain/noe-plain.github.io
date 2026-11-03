@@ -125,7 +125,7 @@ const assert = require("node:assert/strict");
             splitter:
               viewport === "#carouselViewport"
                 ? rect("#carouselEditor > .inspector-width-grip")
-                : null,
+                : rect("body > .inspector-width-grip"),
             width: innerWidth,
           };
         },
@@ -137,9 +137,14 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.workspace.bottom, boxes.sidebar.bottom);
       assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
       if (boxes.splitter) {
-        assert.equal(boxes.splitter.x, boxes.workspace.right + 14);
         assert.equal(boxes.splitter.width, 20);
-        assert.equal(boxes.sidebar.x, boxes.splitter.right + 14);
+        if (viewport === "#carouselViewport") {
+          assert.equal(boxes.splitter.x, boxes.workspace.right + 14);
+          assert.equal(boxes.sidebar.x, boxes.splitter.right + 14);
+        } else {
+          assert.equal(boxes.splitter.x, boxes.workspace.right - 4);
+          assert.equal(boxes.sidebar.x, boxes.splitter.right - 4);
+        }
       } else {
         assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
       }
@@ -150,7 +155,7 @@ const assert = require("node:assert/strict");
       assert(boxes.header.radius >= 28);
       assert(boxes.workspace.radius >= 28);
       assert(boxes.footer.radius >= 28);
-      if (boxes.splitter)
+      if (boxes.splitter && viewport === "#carouselViewport")
         assert.equal(
           await page
             .locator("#carouselEditor > .inspector-width-grip")
@@ -159,6 +164,28 @@ const assert = require("node:assert/strict");
         );
     };
     await checkBento("#workspace", "#toolsSidebar");
+    const campaignGrip = page.locator("body > .inspector-width-grip");
+    assert.equal(await campaignGrip.getAttribute("role"), "separator");
+    await campaignGrip.focus();
+    await page.keyboard.press("End");
+    const campaignWidthBefore = Number(
+        await campaignGrip.getAttribute("aria-valuenow"),
+      ),
+      campaignWorkspaceBefore = await page.locator("#workspace").boundingBox();
+    await page.keyboard.press("ArrowRight");
+    assert.equal(
+      Number(await campaignGrip.getAttribute("aria-valuenow")),
+      campaignWidthBefore - 8,
+    );
+    assert.equal(
+      (await page.locator("#workspace").boundingBox()).width,
+      campaignWorkspaceBefore.width + 8,
+      "Narrowing the FD inspector gives the artboard workspace the same width",
+    );
+    assert.equal(
+      await page.evaluate(() => studioPreferences.inspectorWidth),
+      campaignWidthBefore - 8,
+    );
     const beforePixels = await pixels(),
       beforeWorkspace = await page.locator("#workspace").boundingBox();
     await page.locator("#toolsToggle").click();
@@ -236,6 +263,7 @@ const assert = require("node:assert/strict");
     await page.locator("#createProject").click();
     await require("./browser.cjs").waitForProjectReady(page);
     await page.locator("#carouselCanvas").waitFor();
+    await page.locator("#carouselEditor > .inspector-width-grip").waitFor();
     await checkBento("#carouselViewport", "#carouselSidebar");
     const carouselBar = await page
       .locator(".carousel-contextbar")

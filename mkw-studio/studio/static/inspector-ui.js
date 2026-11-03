@@ -27,9 +27,11 @@
     layers = null,
   }) {
     if (!host || !panel) return;
-    if (host.id === "carouselSidebar")
+    if (host.id === "carouselSidebar" || host.id === "toolsSidebar")
       MKWInspectorSplit.attachWidth(
-        document.getElementById("carouselEditor"),
+        host.id === "carouselSidebar"
+          ? document.getElementById("carouselEditor")
+          : document.body,
         host,
       );
     let state = sessions.get(host);

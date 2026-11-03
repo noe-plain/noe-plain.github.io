@@ -452,6 +452,19 @@ body.carousel-mode header {
   grid-column: 2;
   grid-row: 1;
 }
+body:not(.carousel-mode) > .inspector-width-grip {
+  position: fixed;
+  top: calc(
+    var(--studio-header-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap)
+  );
+  right: calc(var(--studio-shell-inset) + var(--sidebar) - 6px);
+  bottom: calc(
+    var(--studio-footer-height) + var(--studio-shell-inset) +
+      var(--studio-shell-gap)
+  );
+  min-height: 0;
+}
 #carouselProperties {
   min-height: 100px;
   padding: 20px;
@@ -747,14 +760,6 @@ body.carousel-mode header {
   }
 }
 @media (max-width: 1050px) {
-  :root {
-    --sidebar: 280px;
-    --studio-inspector-width: 280px;
-  }
-  .sidebar-hidden {
-    --sidebar: 0px;
-    --studio-inspector-width: 0px;
-  }
   .studio-commandbar .studio-tool-group > button {
     gap: 5px;
     padding: 9px 8px;
