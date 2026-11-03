@@ -2,12 +2,14 @@
   "use strict";
   const defaultRatio = 70,
     minInspectorWidth = 300,
-    maxInspectorWidth = 420;
+    maxInspectorWidth = 560,
+    maxCampaignInspectorWidth = 420;
   let current = null,
     preferred = defaultRatio,
     save = () => {},
     preferredWidth = 288,
-    saveWidth = () => {};
+    saveWidth = () => {},
+    widthSession = null;
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   function configure(ratio, onCommit, width = preferredWidth, onWidthCommit) {
     current?.cancel();
@@ -195,12 +197,14 @@
     refresh();
   }
   function attachWidth(editor, sidebar) {
+    if (!editor || !sidebar) return;
     if (
-      !editor ||
-      !sidebar ||
-      editor.querySelector(":scope > .inspector-width-grip")
+      widthSession?.editor === editor &&
+      widthSession.sidebar === sidebar &&
+      widthSession.grip.isConnected
     )
       return;
+    widthSession?.dispose();
     const grip = document.createElement("div");
     grip.className = "inspector-width-grip";
     grip.tabIndex = 0;
@@ -211,28 +215,27 @@
       "Seitenleiste und Ebenen: gemeinsame Breite",
     );
     grip.setAttribute("aria-valuemin", String(minInspectorWidth));
-    grip.setAttribute("aria-valuemax", String(maxInspectorWidth));
+    const isDesigner = editor.id === "carouselEditor",
+      maximum = () =>
+        Math.min(
+          isDesigner ? maxInspectorWidth : maxCampaignInspectorWidth,
+          innerWidth - (isDesigner ? 432 : 360),
+        );
+    grip.setAttribute("aria-valuemax", String(maximum()));
     grip.setAttribute("aria-controls", sidebar.id || "carouselSidebar");
-    grip.title = `Gemeinsame Breite ändern · Ziehen oder ←/→ · ${minInspectorWidth}–${maxInspectorWidth} px`;
+    grip.title = `Gemeinsame Breite ändern · Ziehen oder ←/→ · ${minInspectorWidth}–${isDesigner ? maxInspectorWidth : maxCampaignInspectorWidth} px`;
     grip.innerHTML = '<span aria-hidden="true"></span>';
     sidebar.before(grip);
     let drag = null,
       width = preferredWidth;
     const set = (value) => {
-      width = clamp(
-        Math.round(value),
-        minInspectorWidth,
-        Math.min(maxInspectorWidth, innerWidth - 360),
-      );
+      width = clamp(Math.round(value), minInspectorWidth, maximum());
       document.documentElement.style.setProperty(
         "--studio-inspector-width",
         `${width}px`,
       );
       grip.setAttribute("aria-valuenow", String(width));
-      grip.setAttribute(
-        "aria-valuemax",
-        String(Math.min(maxInspectorWidth, innerWidth - 360)),
-      );
+      grip.setAttribute("aria-valuemax", String(maximum()));
       grip.setAttribute("aria-valuetext", `${width} Pixel`);
     };
     const finish = (accept) => {
@@ -248,7 +251,7 @@
     grip.onpointerdown = (event) => {
       if (event.button !== 0 || innerWidth <= 760) return;
       event.preventDefault();
-      drag = { x: event.clientX, width: preferredWidth };
+      drag = { x: event.clientX, width };
       grip.focus({ preventScroll: true });
       grip.setPointerCapture(event.pointerId);
       editor.classList.add("is-width-resizing");
@@ -276,6 +279,25 @@
       event.stopPropagation();
       preferredWidth = width;
       saveWidth(width);
+    };
+    const resize = () => set(width);
+    window.addEventListener("resize", resize);
+    widthSession = {
+      editor,
+      sidebar,
+      grip,
+      dispose() {
+        finish(false);
+        window.removeEventListener("resize", resize);
+        grip.onpointerdown = null;
+        grip.onpointermove = null;
+        grip.onpointerup = null;
+        grip.onpointercancel = null;
+        grip.onlostpointercapture = null;
+        grip.onkeydown = null;
+        grip.remove();
+        if (widthSession?.grip === grip) widthSession = null;
+      },
     };
     set(preferredWidth);
   }

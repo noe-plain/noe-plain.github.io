@@ -265,6 +265,16 @@ const assert = require("node:assert/strict");
     await page.locator("#carouselCanvas").waitFor();
     await page.locator("#carouselEditor > .inspector-width-grip").waitFor();
     await checkBento("#carouselViewport", "#carouselSidebar");
+    assert.equal(
+      await page.locator("body > .inspector-width-grip").count(),
+      0,
+      "Switching to the designer must remove the FD inspector grip",
+    );
+    assert.equal(
+      await page.locator("#carouselEditor > .inspector-width-grip").count(),
+      1,
+      "The designer has one shared inspector/layer grip",
+    );
     const carouselBar = await page
       .locator(".carousel-contextbar")
       .boundingBox();

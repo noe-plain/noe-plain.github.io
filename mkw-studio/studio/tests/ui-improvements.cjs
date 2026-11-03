@@ -229,19 +229,20 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     }));
     assert.equal(
       widths.variable,
-      Math.min(420, Number(widthBeforeResize) + 28),
+      Math.min(560, Number(widthBeforeResize) + 28),
     );
     assert.equal(widths.sidebar, widths.layers);
     assert.equal(
       await page.evaluate(() => studioPreferences.inspectorWidth),
-      Math.min(420, Number(widthBeforeResize) + 28),
+      Math.min(560, Number(widthBeforeResize) + 28),
     );
     assert.equal(await grip.getAttribute("aria-valuemin"), "300");
     await grip.focus();
     await page.keyboard.press("Home");
     assert.equal(await grip.getAttribute("aria-valuenow"), "300");
     await page.keyboard.press("End");
-    assert.equal(await grip.getAttribute("aria-valuenow"), "420");
+    assert.equal(await grip.getAttribute("aria-valuenow"), "560");
+    assert.equal(await grip.getAttribute("aria-valuemax"), "560");
     assert.deepEqual(errors, []);
     console.log(
       "PASS free artboards start vertically, setup drag sorting and project ordering, sidebar keyboard sorting, snap toggle, unified typography in both modes, multi-text formatting, and synchronized inspector/layer width",
