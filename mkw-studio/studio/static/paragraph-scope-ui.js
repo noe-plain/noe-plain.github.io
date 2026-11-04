@@ -35,8 +35,9 @@
         textKey = o.text;
       }
       paragraphs.size = Math.max(2, Math.min(4, values.length));
-      host.querySelector("[data-paragraph-count]").textContent =
-        `${indices.length} von ${values.length} ${values.length === 1 ? "Absatz" : "Absätzen"} ausgewählt`;
+      const count = host.querySelector("[data-paragraph-count]"),
+        countText = `${indices.length} von ${values.length} ${values.length === 1 ? "Absatz" : "Absätzen"} ausgewählt`;
+      if (count.textContent !== countText) count.textContent = countText;
       host.querySelector("[data-paragraph-all]").disabled =
         indices.length === values.length;
       for (const option of paragraphs.options)

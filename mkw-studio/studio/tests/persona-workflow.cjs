@@ -43,7 +43,15 @@ const { launch, artifact, waitForProjectReady } = require('./browser.cjs');
     assert(!(await page.locator('[data-line-scope]').isVisible()));
     await page.locator('[data-paragraph-selection]').selectOption(['0', '2']);
     assert.match(await page.locator('[data-paragraph-count]').textContent(), /2 von 3/);
+    await page.evaluate(() => {
+      window.reviewAnnouncements = 0;
+      window.reviewObserver = new MutationObserver(() => window.reviewAnnouncements++);
+      window.reviewObserver.observe(document.querySelector('[data-paragraph-count]'), { childList: true });
+    });
     await page.locator('[data-typo=paragraphSize]').fill('74');
+    await page.evaluate(() => new Promise(r => requestAnimationFrame(r)));
+    assert.equal(await page.evaluate(() => window.reviewAnnouncements), 0, 'Formatting does not repeat an unchanged selection announcement');
+    await page.evaluate(() => window.reviewObserver.disconnect());
     assert.deepEqual(await page.evaluate(() => carouselSelected()[0].textStyles.map(s => s?.size ?? null)), [74, undefined, 74]);
     await page.locator('[data-paragraph-all]').click();
     assert.match(await page.locator('[data-paragraph-count]').textContent(), /3 von 3/);

@@ -34,7 +34,7 @@ Abschliessende Persona-Matrix und tatsächliche Testergebnisse werden nach der U
 | Neue Nutzerin | Zwei Aufgaben statt unklarer Fachbegriffe; Startformat und freie Masse erkennbar. Textauswahl nennt ihren Umfang; Drop nennt das Ergebnis. | Geprüft: Einrichtung, Auswahl und sichtbare Rückmeldung; keine externe Testperson beteiligt. |
 | Erfahrener Nutzer | Häufige Grössen direkt erreichbar; ungeänderte Schutzzonen bleiben. Entwurf übersteht Inspector-Neuaufbau. Mehrfachauswahl, Kopieren, Abbrechen und Undo erhalten. | Funktionsprüfungen in Firefox und Chrome bestanden. |
 | Senior UX/UI | Weniger doppelte Beschriftung, dichtere Einrichtung, Absatzauswahl vor den Reitern. Zeilen-Spezialregler unter Absatz. Nach Sichtkontrolle Drop-Hinweis im sichtbaren Inspector positioniert. | Hell/Dunkel, schmal und Desktop geprüft; abschliessende Korrekturen umgesetzt. |
-| Barrierefreiheit | Native Listen/Felder, klare Namen und Statusansagen, vorhandene Tastatur-/Menüalternativen erhalten. Drag-Ergebnis nicht nur farbig erkennbar. | Axe und Tastatur geprüft; manueller Screenreader-Test offen. |
+| Barrierefreiheit | Native Listen/Felder, klare Namen und Statusansagen, vorhandene Tastatur-/Menüalternativen erhalten. Drag-Ergebnis nicht nur farbig erkennbar. Unveränderte Auswahlzahlen werden beim Formatieren nicht nochmals angesagt. | Axe und Tastatur geprüft; manueller Screenreader-Test offen. |
 | Entwicklerin/QA | Kein neues Dateiformat, keine neue Laufzeitbibliothek. Flüchtige Entwürfe per WeakMap; Model besitzt weiter alle Strukturmutationen. Identische Drop-Hinweise werden nicht ständig neu gesetzt. | Unit-, Build-, Format- und betroffene Browserprüfungen; Dateiroundtrips und Export-Pixelparität geprüft. |
 
 ## Tatsächliche Prüfungen und Korrekturen
