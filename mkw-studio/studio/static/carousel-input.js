@@ -1,7 +1,12 @@
 "use strict";
 // Designer input: see ARCHITECTURE.md for ownership and load order.
+function carouselOrigin() {
+  return $(
+    MKWSpreadUI.active() ? "#carouselArtwork" : "#carouselCanvas",
+  )?.getBoundingClientRect();
+}
 function carouselPoint(ev) {
-  const rect = $("#carouselCanvas").getBoundingClientRect();
+  const rect = carouselOrigin();
   return {
     x: (ev.clientX - rect.left) / carouselZoom,
     y: (ev.clientY - rect.top) / carouselZoom,
@@ -10,6 +15,17 @@ function carouselPoint(ev) {
 
 function carouselHit(pt) {
   return [...p.carousel.objects].reverse().find((o) => {
+    if (o.pageFragment) {
+      const a = p.carousel.artboards.find((a) => a.id === o.pageId);
+      if (
+        !a ||
+        pt.x < a.x ||
+        pt.x > a.x + a.w ||
+        pt.y < a.y ||
+        pt.y > a.y + a.h
+      )
+        return false;
+    }
     if (!carouselObjectVisible(o) || carouselObjectLocked(o)) return false;
     const local = carouselToLocal(o, pt),
       hit = { x: o.x + local.x, y: o.y + local.y };
@@ -79,6 +95,7 @@ function carouselListen(ev, move, finish, cancel = finish) {
 }
 
 function carouselPointer(ev) {
+  if (!p.carousel.n) return;
   if (
     busy ||
     ev.button !== 0 ||

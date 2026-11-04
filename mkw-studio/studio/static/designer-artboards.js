@@ -1,7 +1,8 @@
 "use strict";
 const MKWArtboardUI = (() => {
   const policy = MKWCarouselPolicy;
-  let moveContent = true;
+  let moveContent = true,
+    selectionController = null;
   const boundsOf = (o) => carouselObjectBounds(o);
   const owned = (c, index) =>
     c.objects.filter((o) => policy.owner(c, boundsOf(o)) === index);
@@ -47,6 +48,17 @@ const MKWArtboardUI = (() => {
     host.append(button);
   }
   function plan(index, values) {
+    if (MKWSpreadUI.active())
+      return MKWSpreadLayoutModel.plan(
+        p.carousel,
+        {
+          type: "edit",
+          ids: [p.carousel.artboards[index].id],
+          values: { ...p.carousel.artboards[index], ...values },
+        },
+        carouselObjectBounds,
+        uid,
+      ).artboards[index];
     const c = p.carousel,
       a = { ...c.artboards[index], ...values },
       candidate = {
@@ -65,6 +77,11 @@ const MKWArtboardUI = (() => {
     return a;
   }
   function apply(index, values, withContent = moveContent) {
+    if (MKWSpreadUI.active())
+      return MKWSpreadUI.commit(
+        { type: "edit", ids: [p.carousel.artboards[index].id], values },
+        "Seite aktualisiert.",
+      );
     const c = p.carousel,
       before = c.artboards[index],
       next = plan(index, values),
@@ -115,6 +132,12 @@ const MKWArtboardUI = (() => {
     );
   }
   function insert(index, duplicate = null) {
+    if (MKWSpreadUI.active())
+      return MKWSpreadUI.commit(
+        duplicate === null
+          ? { type: "add" }
+          : { type: "duplicate", ids: [p.carousel.artboards[duplicate].id] },
+      );
     const c = p.carousel;
     if (c.n >= policy.maxSlides) return;
     const source =
@@ -201,6 +224,7 @@ const MKWArtboardUI = (() => {
     });
   }
   async function remove() {
+    if (MKWSpreadUI.active()) return MKWSpreadUI.action("delete");
     const c = p.carousel,
       index = carouselUI.slide;
     if (index === null || c.n <= 1) return;
@@ -251,6 +275,8 @@ const MKWArtboardUI = (() => {
     carouselSlideCenter(carouselUI.slide);
   }
   function reorder(delta) {
+    if (MKWSpreadUI.active())
+      return MKWSpreadUI.action(delta < 0 ? "previous" : "next");
     const c = p.carousel,
       i = carouselUI.slide,
       j = i + delta;
@@ -445,10 +471,16 @@ const MKWArtboardUI = (() => {
     return true;
   }
   function panel(host) {
-    const c = p.carousel,
-      index = carouselUI.slide ?? 0,
-      a = c.artboards[index],
-      groups = policy.pageGroups(c),
+    selectionController = null;
+    if (MKWSpreadUI.active() && !p.carousel.n) {
+      host.innerHTML = "";
+      MKWSpreadUI.panel(host);
+      return;
+    }
+    const c = p.carousel;
+    let index = carouselUI.slide ?? 0,
+      a = c.artboards[index];
+    const groups = policy.pageGroups(c),
       visibleGroups = window.MKWPageManagementTest
         ? groups
         : [
@@ -456,36 +488,76 @@ const MKWArtboardUI = (() => {
               ...groups[0],
               name: "Carousel-Slides",
               orientation: "horizontal",
-              artboardIds: c.artboards.map((frame) => frame.id),
+              artboardIds: c.artboards.map((f) => f.id),
             },
-          ],
-      input = (key, label, min = 0, max = 100000) =>
+          ];
+    const input = (key, label, min = 0, max = 100000) =>
+      `<label>${label} (px)<input data-artboard="${key}" type="number" min="${min}" max="${max}" step="1" value="${a[key]}"></label>`;
+    if (MKWSpreadUI.active()) {
+      const input = (key, label, min = 0, max = 100000) =>
         `<label>${label} (px)<input data-artboard="${key}" type="number" min="${min}" max="${max}" step="1" value="${a[key]}"></label>`;
-    const groupsMarkup = visibleGroups
-      .map(
-        (group) =>
-          `<section class="designer-page-group" data-page-group="${esc(group.id)}" data-orientation="${group.orientation}"><header><strong>${esc(group.name)}</strong>${window.MKWPageManagementTest ? `<label>Anordnung<select data-group-orientation="${esc(group.id)}" aria-label="${esc(group.name)}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label>` : ""}</header><ol aria-label="${esc(group.name)} Seiten">${group.artboardIds
-            .map((id) => {
-              const i = c.artboards.findIndex((f) => f.id === id),
-                f = c.artboards[i];
-              return `<li><button type="button" draggable="true" data-artboard-order="${i}" aria-current="${i === index ? "true" : "false"}" aria-label="${esc(f.name)}, Position ${i + 1} von ${c.n}. Mit Ziehen oder Pfeiltasten neu ordnen">${esc(f.name)}</button>${
-                window.MKWPageManagementTest
-                  ? `<select data-move-page="${i}" aria-label="${esc(f.name)} zu einer anderen Seitengruppe verschieben">${groups
-                      .filter((target) => target.id !== group.id)
-                      .map(
-                        (target) =>
-                          `<option value="${esc(target.id)}">${esc(target.name)}</option>`,
-                      )
-                      .join("")}</select>`
-                  : ""
-              }</li>`;
-            })
-            .join(
-              "",
-            )}</ol>${window.MKWPageManagementTest ? `<button type="button" data-group-arrange="${esc(group.id)}" aria-label="${esc(group.name)} auf der Montagefläche ${group.orientation === "horizontal" ? "nebeneinander" : "untereinander"} anordnen" ${group.artboardIds.length < 2 ? "disabled" : ""}>Auf Montagefläche anordnen</button>` : ""}</section>`,
-      )
-      .join("");
-    host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>${window.MKWPageManagementTest ? "Testumgebung: Seitenmanagement" : "Carousel-Slides"}</h4>${window.MKWPageManagementTest ? `<p class="artboard-help">Testbereich für Seitengruppen und Montageflächen-Docking. Exportreihenfolge und Flächenposition bleiben getrennt.</p>` : `<p class="artboard-help">Eine zusammenhängende Slide-Sequenz. Ziehe Seiten oder nutze die Pfeiltasten, um die Reihenfolge zu ändern.</p>`}<div class="designer-page-groups">${groupsMarkup}</div>${window.MKWPageManagementTest ? `<button id="designerSplitGroup" ${groups.length >= c.n || groups.find((group) => group.artboardIds.includes(a.id))?.artboardIds[0] === a.id ? "disabled" : ""}>Ab dieser Seite neue Gruppe</button>` : ""}<div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
+      host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>Reihenfolge &amp; Aktionen</h4><p class="artboard-help">Die Reihenfolge bestimmt den Export. Positionen auf der Montagefläche bleiben erhalten.</p><div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
+      if (MKWSpreadUI.active()) {
+        const sections = host.querySelectorAll(":scope > section"),
+          format = document.createElement("section"),
+          fields = document.createElement("div"),
+          details = document.createElement("details"),
+          summary = document.createElement("summary"),
+          slot = document.createElement("div");
+        format.className = "carousel-property-section spread-current-format";
+        format.innerHTML = "<h4>Format dieser Seite</h4>";
+        fields.className = "carousel-fields";
+        for (const key of ["w", "h"])
+          fields.append(
+            host.querySelector(`[data-artboard=${key}]`).closest("label"),
+          );
+        format.append(
+          fields,
+          host.querySelector("#designerArtboardError"),
+          host.querySelector("#designerApplyArtboard"),
+        );
+        sections[0].hidden = true;
+        sections[sections.length - 1].hidden = true;
+        host.querySelector("#designerMoveContent").disabled = true;
+        host.querySelector(".artboard-move-content").hidden = true;
+        host.querySelector(".artboard-help").textContent =
+          "Positionen gelten für den ganzen Bogen. Inhalte bleiben bei ihrer Seite. Grösse und Schutzzonen verändern keine Elementgrössen.";
+        details.className = "spread-page-details";
+        summary.textContent = "Position, Schutzzone & Hintergrund";
+        details.append(summary, sections[1], sections[2]);
+        host.prepend(format, slot);
+        host.append(details);
+        MKWSpreadUI.panel(slot);
+      } else MKWSpreadUI.panel(host);
+    } else {
+      const groupsMarkup = visibleGroups
+        .map(
+          (group) =>
+            `<section class="designer-page-group" data-page-group="${esc(group.id)}" data-orientation="${group.orientation}"><div class="page-group-heading"><strong>${esc(group.name)}</strong>${window.MKWPageManagementTest ? `<label>Anordnung<select data-group-orientation="${esc(group.id)}" aria-label="${esc(group.name)}: Anordnung"><option value="horizontal" ${group.orientation === "horizontal" ? "selected" : ""}>Nebeneinander</option><option value="vertical" ${group.orientation === "vertical" ? "selected" : ""}>Untereinander</option></select></label>` : ""}</div><ol aria-label="${esc(group.name)} Seiten">${group.artboardIds
+              .map((id) => {
+                const i = c.artboards.findIndex((f) => f.id === id),
+                  f = c.artboards[i];
+                return `<li><div role="button" tabindex="0" draggable="true" data-artboard-order="${i}" aria-current="${i === index ? "true" : "false"}" aria-label="${esc(f.name)}, Position ${i + 1} von ${c.n}. Mit Ziehen oder Pfeiltasten neu ordnen">${esc(f.name)}</div>${
+                  window.MKWPageManagementTest
+                    ? `<select data-move-page="${i}" aria-label="${esc(f.name)} zu einer anderen Seitengruppe verschieben">${groups
+                        .filter((target) => target.id !== group.id)
+                        .map(
+                          (target) =>
+                            `<option value="${esc(target.id)}">${esc(target.name)}</option>`,
+                        )
+                        .join("")}</select>`
+                    : ""
+                }</li>`;
+              })
+              .join(
+                "",
+              )}</ol>${window.MKWPageManagementTest ? `<button type="button" data-group-arrange="${esc(group.id)}" aria-label="${esc(group.name)} auf der Montagefläche ${group.orientation === "horizontal" ? "nebeneinander" : "untereinander"} anordnen" ${group.artboardIds.length < 2 ? "disabled" : ""}>Auf Montagefläche anordnen</button>` : ""}</section>`,
+        )
+        .join("");
+      host.innerHTML = `<section class="carousel-property-section"><h4>Zeichenflächen</h4><label>Auswahl<select id="designerArtboardChoice">${c.artboards.map((f, i) => `<option value="${i}" ${i === index ? "selected" : ""}>${esc(f.name)} · ${f.w} × ${f.h}</option>`).join("")}</select></label><button id="designerAddArtboard" ${c.n >= 20 ? "disabled" : ""}>${studioIcon("plus")}Zeichenfläche hinzufügen</button></section><section class="carousel-property-section"><h4>Position &amp; Grösse</h4><label>Name<input type="text" data-artboard-name maxlength="80" value="${esc(a.name)}" required></label><div class="carousel-fields">${input("x", "X")}${input("y", "Y")}${input("w", "Breite", 240, 4000)}${input("h", "Höhe", 240, 4000)}</div><label class="artboard-move-content"><input type="checkbox" id="designerMoveContent" ${moveContent ? "checked" : ""}>Inhalt mitverschieben</label><label class="artboard-move-content"><input type="checkbox" id="designerSnapArtboards" ${carouselUI.snap ? "checked" : ""}>An Zeichenflächen einrasten</label><p class="artboard-help">Zugeordnet sind die Elemente mit der grössten Überschneidung mit dieser Fläche. Ziehe den Namen über der Fläche oder gib die Position ein.</p></section><section class="carousel-property-section"><h4>Schutzzone &amp; Hintergrund</h4><div class="carousel-fields">${input("top", "Oben", 0, 4000)}${input("bottom", "Unten", 0, 4000)}${input("left", "Links", 0, 4000)}${input("right", "Rechts", 0, 4000)}</div><label>Hintergrundfarbe<input type="color" data-artboard-bg data-colour-draft aria-label="Hintergrundfarbe dieser Zeichenfläche" value="${a.bg}"></label></section><p id="designerArtboardError" role="status"></p><button id="designerApplyArtboard" class="primary" disabled>Änderungen übernehmen</button><section class="carousel-property-section"><h4>${window.MKWPageManagementTest ? "Testumgebung: Seitenmanagement" : "Carousel-Slides"}</h4>${window.MKWPageManagementTest ? `<p class="artboard-help">Testbereich für Seitengruppen und Montageflächen-Docking. Exportreihenfolge und Flächenposition bleiben getrennt.</p>` : `<p class="artboard-help">Eine zusammenhängende Slide-Sequenz. Ziehe Seiten oder nutze die Pfeiltasten, um die Reihenfolge zu ändern.</p>`}<div class="designer-page-groups">${groupsMarkup}</div>${window.MKWPageManagementTest ? `<button id="designerSplitGroup" ${groups.length >= c.n || groups.find((group) => group.artboardIds.includes(a.id))?.artboardIds[0] === a.id ? "disabled" : ""}>Ab dieser Seite neue Gruppe</button>` : ""}<div class="carousel-fields"><button id="designerArtboardPrevious" ${index === 0 ? "disabled" : ""}>Im Export vor</button><button id="designerArtboardNext" ${index === c.n - 1 ? "disabled" : ""}>Im Export zurück</button><button id="designerDuplicateArtboard" ${c.n >= 20 ? "disabled" : ""}>Duplizieren</button><button id="designerDeleteArtboard" ${c.n <= 1 ? "disabled" : ""}>Entfernen …</button></div></section>`;
+
+      MKWSpreadUI.panel(host);
+    }
     host.querySelector("#designerArtboardChoice").onchange = (e) => {
       carouselSlideSelect(+e.target.value);
       carouselSlideCenter(+e.target.value);
@@ -500,7 +572,13 @@ const MKWArtboardUI = (() => {
     };
     let orderDrag = null;
     for (const item of host.querySelectorAll("[data-artboard-order]")) {
+      item.onclick = () => carouselSlideSelect(+item.dataset.artboardOrder);
       item.onkeydown = (event) => {
+        if (["Enter", " "].includes(event.key)) {
+          event.preventDefault();
+          carouselSlideSelect(+item.dataset.artboardOrder);
+          return;
+        }
         if (
           !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
             event.key,
@@ -582,7 +660,7 @@ const MKWArtboardUI = (() => {
     host
       .querySelector("#designerSplitGroup")
       ?.addEventListener("click", () => splitGroup(index));
-    const fields = [...host.querySelectorAll("[data-artboard]")],
+    const fields = [...host.querySelectorAll("input[data-artboard]")],
       name = host.querySelector("[data-artboard-name]"),
       bg = host.querySelector("[data-artboard-bg]"),
       button = host.querySelector("#designerApplyArtboard"),
@@ -607,6 +685,26 @@ const MKWArtboardUI = (() => {
         button.disabled = true;
       }
       MKWFields.group([...fields, name], error.textContent, error);
+    };
+    selectionController = {
+      select(next) {
+        if (
+          !host.isConnected ||
+          !name.isConnected ||
+          p.carousel !== c ||
+          !c.artboards[next]
+        )
+          return false;
+        index = next;
+        a = c.artboards[index];
+        for (const f of fields) f.value = a[f.dataset.artboard];
+        name.value = a.name;
+        bg.value = a.bg;
+        const choice = host.querySelector("#designerArtboardChoice");
+        if (choice) choice.value = index;
+        check();
+        return true;
+      },
     };
     for (const field of [...fields, name, bg])
       field.addEventListener("input", check);
@@ -742,5 +840,15 @@ const MKWArtboardUI = (() => {
       },
     );
   }
-  return { enable, entry, panel, controls, insert, remove, reorder, apply };
+  return {
+    selectPage: (index) => selectionController?.select(index),
+    enable,
+    entry,
+    panel,
+    controls,
+    insert,
+    remove,
+    reorder,
+    apply,
+  };
 })();

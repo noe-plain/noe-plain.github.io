@@ -30,6 +30,11 @@ window.addEventListener(
       ].includes(ev.key)
     )
       return;
+    if (
+      target.closest("#spreadPages") &&
+      (!(ev.metaKey || ev.ctrlKey) || ev.key.toLowerCase() === "a")
+    )
+      return;
     const typing =
       target.isContentEditable || target.closest("input,textarea,select");
     if (typing) return;
@@ -49,6 +54,12 @@ window.addEventListener(
       return;
     const key = ev.key.toLowerCase(),
       command = ev.metaKey || ev.ctrlKey;
+    if (command && ev.altKey && key === "n") {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      MKWSpreadUI.addSpread();
+      return;
+    }
     if (studioPicker) return;
     if (carouselVectorKey(ev)) return;
     if (command && key === "z") {
@@ -230,7 +241,7 @@ window.addEventListener(
       { clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 },
     );
     const v = $("#carouselViewport"),
-      r = $("#carouselCanvas").getBoundingClientRect();
+      r = carouselOrigin();
     v.scrollLeft +=
       r.left + carouselUI.pinch.anchor.x * carouselZoom - (a.x + b.x) / 2;
     v.scrollTop +=

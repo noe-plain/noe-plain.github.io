@@ -18,6 +18,7 @@
     "static/text-hyphen.js",
     "static/project-validation.js",
     "static/carousel-policy.js",
+    "static/spread-layout-model.js",
     "static/template-model.js",
     "static/state.js",
     "static/user-fonts.js",
@@ -28,6 +29,7 @@
     "static/renderer.js",
     "static/workspace-ui.js",
     "static/inspector-split.js",
+    "static/inspector-width.js",
     "static/inspector-ui.js",
     "static/post-inspector.js",
     "static/studio.js",
@@ -59,6 +61,9 @@
     "static/carousel-slides.js",
     "static/designer-artboards.js",
     "static/carousel-slide-format.js",
+    "static/page-preview-cache.js",
+    "static/pages-panel.js",
+    "static/spread-layout-ui.js",
     "static/carousel-bootstrap.js",
     "static/carousel-psd-vectors.js",
     "static/psd-editable.js",
@@ -78,6 +83,7 @@
     "static/sponsor-order.js",
     "static/sponsor-ui.js",
     "static/post-angle.js",
+    "static/paragraph-scope-ui.js",
     "static/typography-ui.js",
     "static/ui-colour-model.js",
     "static/ui-theme.js",
@@ -140,6 +146,7 @@
     "static/project-setup.css",
     "static/start-home.css",
     "static/ui-fields.css",
-    "static/inspector-ui.css"
+    "static/inspector-ui.css",
+    "static/spread-layout.css"
   ]
 }

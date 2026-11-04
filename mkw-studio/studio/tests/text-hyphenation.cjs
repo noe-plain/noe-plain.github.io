@@ -38,7 +38,8 @@ const assert = require("node:assert/strict"),
       0,
       "Dictionary must not load for ordinary text",
     );
-    await page.locator("[data-text-align=justify]").click();
+    await page.locator("[data-typo-tab=paragraph]").click();
+    await page.locator("[data-typo-align=justify]").click();
     await page.evaluate(() => MKWTextHyphen.ensure());
     let result = await page.evaluate(() => {
       const o = carouselSelected()[0],
@@ -80,10 +81,10 @@ const assert = require("node:assert/strict"),
           .first()
           .evaluate((el) => (el.open = true));
       });
-    const toggle = page.locator("[data-text-hyphenate]");
+    const toggle = page.locator("[data-typo-hyphenate]");
     await toggle.uncheck();
     assert.equal(
-      await page.evaluate(() => carouselSelected()[0].hyphenate),
+      await page.evaluate(() => carouselSelected()[0].textStyles[0].hyphenate),
       false,
     );
     assert(
@@ -97,7 +98,7 @@ const assert = require("node:assert/strict"),
       .locator(".justification-settings")
       .first()
       .evaluate((el) => (el.open = true));
-    await page.locator("[data-text-hyphenate]").check();
+    await page.locator("[data-typo-hyphenate]").check();
     await page.evaluate(() => {
       studioPreferences.advanced = true;
       studioApplyPreferences();
@@ -123,7 +124,7 @@ const assert = require("node:assert/strict"),
       await page.evaluate(() =>
         carouselSelected()[0].textStyles.map((s) => s?.hyphenate),
       ),
-      [false],
+      [false, true],
     );
     await page.locator("[data-typo-hyphenate]").check();
     await page.locator("#carouselTextEdit").click();
@@ -208,7 +209,8 @@ const assert = require("node:assert/strict"),
       render();
       await MKWTextHyphen.ensure();
     }, source);
-    assert(await post.locator("[data-post-hyphenate]").count());
+    await post.locator("[data-typo-tab=paragraph]").click();
+    assert(await post.locator("[data-typo-hyphenate]").count());
     assert(
       await post.evaluate(() =>
         textBlock(p.boards[0]).mainRecords[0].styled.lines.some(
@@ -217,11 +219,11 @@ const assert = require("node:assert/strict"),
       ),
     );
     await post
-      .locator("#stepPanel>.justification-settings")
+      .locator("#stepPanel .justification-settings")
       .evaluate((el) => (el.open = true));
-    await post.locator("[data-post-hyphenate]").uncheck();
+    await post.locator("[data-typo-hyphenate]").uncheck();
     assert.equal(
-      await post.evaluate(() => p.boards[0].elements.title.hyphenate),
+      await post.evaluate(() => p.boards[0].elements.title.textStyles[0].hyphenate),
       false,
     );
     assert.deepEqual(errors, []);

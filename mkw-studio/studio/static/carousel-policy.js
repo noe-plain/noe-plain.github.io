@@ -28,9 +28,14 @@
   function isFree(c) {
     return c.layout === "free";
   }
+  function validDocumentCount(c) {
+    return c.pageStructure
+      ? Number.isInteger(c.n) && c.n >= 0 && c.n <= 200
+      : validCount(c.n);
+  }
   function frame(c, slide = 0) {
     return isFree(c)
-      ? c.artboards?.[slide]
+      ? c.artboards?.[slide] || { ...c, x: 0, y: 0, name: "Keine Seite" }
       : {
           ...Object.fromEntries(formatKeys.map((key) => [key, c[key]])),
           x: slide * c.w,
@@ -46,7 +51,7 @@
     if (!isFree(c)) return { w: c.w * c.n, h: c.h };
     return c.artboards.reduce(
       (b, a) => ({ w: Math.max(b.w, a.x + a.w), h: Math.max(b.h, a.y + a.h) }),
-      { w: 0, h: 0 },
+      { w: c.n ? 0 : c.w, h: c.n ? 0 : c.h },
     );
   }
   const intersects = (a, b) =>
@@ -104,7 +109,7 @@
     if (
       !Array.isArray(c.artboards) ||
       c.artboards.length !== c.n ||
-      !validCount(c.n)
+      !validDocumentCount(c)
     )
       return false;
     const ids = new Set();
@@ -243,6 +248,7 @@
     };
   }
   const api = Object.freeze({
+    validDocumentCount,
     minSlides,
     maxSlides,
     isFree,

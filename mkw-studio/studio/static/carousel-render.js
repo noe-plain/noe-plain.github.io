@@ -1,5 +1,36 @@
 "use strict";
 // Designer render: see ARCHITECTURE.md for ownership and load order.
+function carouselPaintBounds(o) {
+  let b = carouselObjectBounds(o);
+  if (o.type === "text") {
+    const layout = carouselTextLayout(o),
+      offset = carouselTextOffset(o, layout),
+      left = Math.min(0, ...layout.lines.map((l) => l.x)),
+      right = Math.max(o.w, ...layout.lines.map((l) => l.x + l.width)),
+      top = Math.min(0, offset),
+      bottom = Math.max(o.h, offset + layout.height);
+    const points = [
+      [left, top],
+      [right, top],
+      [right, bottom],
+      [left, bottom],
+    ].map(([x, y]) => carouselToWorld(o, { x, y }));
+    b = {
+      x: Math.min(...points.map((p) => p.x)),
+      y: Math.min(...points.map((p) => p.y)),
+      w:
+        Math.max(...points.map((p) => p.x)) -
+        Math.min(...points.map((p) => p.x)),
+      h:
+        Math.max(...points.map((p) => p.y)) -
+        Math.min(...points.map((p) => p.y)),
+    };
+  }
+  const pad = ["image", "logo"].includes(o.type)
+    ? 0
+    : carouselVisualPadding(o) + carouselEffectValue(o, "blur") * 3;
+  return { x: b.x - pad, y: b.y - pad, w: b.w + 2 * pad, h: b.h + 2 * pad };
+}
 async function carouselPaint(
   ctx,
   slide = null,
@@ -38,7 +69,7 @@ async function carouselPaint(
   }
   if (!transparent) {
     if (MKWCarouselPolicy.isFree(c))
-      for (const frame of frames) {
+      for (const frame of slide === null ? frames : [frames[slide]]) {
         ctx.fillStyle = frame.bg;
         ctx.fillRect(frame.x, frame.y, frame.w, frame.h);
       }
@@ -57,11 +88,22 @@ async function carouselPaint(
       !carouselImageOnSlide(o, slide, c)
     )
       continue;
+    ctx.save();
+    if (o.pageFragment && clipArtwork) {
+      const frame = c.artboards?.find((a) => a.id === o.pageId);
+      if (!frame || (slide !== null && frames[slide].id !== frame.id)) {
+        ctx.restore();
+        continue;
+      }
+      ctx.beginPath();
+      ctx.rect(frame.x, frame.y, frame.w, frame.h);
+      ctx.clip();
+    }
     if (carouselHasEffects(o)) {
       await carouselPaintEffect(ctx, o, scale, loadImage, project);
+      ctx.restore();
       continue;
     }
-    ctx.save();
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
     ctx.translate(o.x, o.y);
@@ -208,6 +250,7 @@ function carouselToolUI() {
 }
 
 function carouselRender() {
+  MKWSpreadUI.dispose();
   MKWInspectorSplit.detach();
   MKWUIControls.designer(null);
   carouselPathDraft = null;
@@ -218,9 +261,16 @@ function carouselRender() {
   window.MKWWorkspaceScroll?.sync();
   $(".carousel-statusbar")?.remove();
   studioSyncFooter();
-  if (!carouselActive()) return false;
+  if (!carouselActive()) {
+    MKWPagePreviewCache.release();
+    if (carouselPaintBuffer)
+      carouselPaintBuffer.width = carouselPaintBuffer.height = 1;
+    return false;
+  }
+  $("#stepPanel")?.replaceChildren();
   const c = p.carousel;
   carouselKeepLogosOnTop(c);
+  if (!c.n) carouselUI.slide = null;
   if (carouselUI.slide !== null)
     carouselUI.slide = Math.max(0, Math.min(c.n - 1, carouselUI.slide));
   const firstView = !Number.isFinite(c.zoom);
@@ -296,6 +346,7 @@ function carouselRender() {
       (viewport.clientHeight - 128) / MKWCarouselPolicy.extent(c).h,
     );
   viewport.onscroll = () => {
+    MKWSpreadUI.scroll();
     c.scrollX = viewport.scrollLeft;
     c.scrollY = viewport.scrollTop;
     carouselScheduleOutside();
@@ -360,14 +411,14 @@ function carouselMaxZoom() {
 function carouselSetZoom(value, event = null) {
   const viewport = $("#carouselViewport"),
     rect = viewport.getBoundingClientRect(),
-    canvasRect = $("#carouselCanvas").getBoundingClientRect(),
+    canvasRect = carouselOrigin(),
     screenX = event ? event.clientX : rect.left + viewport.clientWidth / 2,
     screenY = event ? event.clientY : rect.top + viewport.clientHeight / 2;
   const px = (screenX - canvasRect.left) / carouselZoom,
     py = (screenY - canvasRect.top) / carouselZoom;
   carouselZoom = Math.max(0.05, Math.min(carouselMaxZoom(), value));
   carouselRefresh();
-  const next = $("#carouselCanvas").getBoundingClientRect();
+  const next = carouselOrigin();
   viewport.scrollLeft += next.left + px * carouselZoom - screenX;
   viewport.scrollTop += next.top + py * carouselZoom - screenY;
 }
@@ -406,6 +457,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
       p.carousel.bg,
       p.carousel.artboards,
       p.carousel.objects,
+      canvas._region,
       scale,
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
       MKWTextHyphen.version,
@@ -424,6 +476,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
   carouselPaintPending = {
     canvas,
     scale,
+    region: canvas._region,
     generation,
     key,
     sources,
@@ -441,6 +494,23 @@ async function carouselRunPaint() {
   const job = carouselPaintPending;
   carouselPaintPending = null;
   carouselPaintRunning = true;
+  let loadingTimer = 0,
+    finishLoading = () => {},
+    loadingNode = null;
+  if (job.region)
+    loadingTimer = setTimeout(() => {
+      if (!job.canvas.isConnected || job.project !== p) return;
+      loadingNode = document.querySelector("#spreadLoading");
+      if (!loadingNode) {
+        loadingNode = document.createElement("div");
+        loadingNode.id = "spreadLoading";
+        loadingNode.textContent = "Vorschau wird aufgebaut …";
+        loadingNode.setAttribute("role", "status");
+        $("#carouselViewport").append(loadingNode);
+      }
+      loadingNode.hidden = false;
+      finishLoading = MKWUIControls.loading(loadingNode);
+    }, 150);
   try {
     const current = () =>
       job.generation === carouselDraw &&
@@ -453,14 +523,23 @@ async function carouselRunPaint() {
     if (carouselPaintBuffer.height !== job.canvas.height)
       carouselPaintBuffer.height = job.canvas.height;
     const ctx = carouselPaintBuffer.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, carouselPaintBuffer.width, carouselPaintBuffer.height);
+    if (job.region)
+      ctx.translate(-job.region.x * job.scale, -job.region.y * job.scale);
+    job.canvas.setAttribute("aria-busy", "true");
+    const objects = job.region
+      ? job.project.carousel.objects.filter((o) =>
+          MKWCarouselPolicy.intersects(carouselPaintBounds(o), job.region),
+        )
+      : null;
     await carouselPaint(
       ctx,
       null,
       job.scale,
       false,
       job.editingId,
-      null,
+      objects,
       current,
       previewImage,
     );
@@ -478,6 +557,10 @@ async function carouselRunPaint() {
   } catch (error) {
     status(error.message);
   } finally {
+    clearTimeout(loadingTimer);
+    finishLoading();
+    if (loadingNode) loadingNode.hidden = true;
+    job.canvas.removeAttribute("aria-busy");
     carouselPaintRunning = false;
     if (carouselPaintPending && !carouselPaintFrame)
       carouselPaintFrame = requestAnimationFrame(carouselRunPaint);
@@ -500,6 +583,9 @@ function carouselRefresh() {
   carouselKeepLogosOnTop(c);
   carouselZoom = Math.max(0.05, Math.min(carouselZoom, carouselMaxZoom()));
   studioSyncZoomLimits(true, carouselZoom, 0.05, carouselMaxZoom());
+  const structured = MKWSpreadUI.active();
+  $("#carouselEditor").classList.toggle("structured-pages", structured);
+  $("#carouselExport").disabled = !c.n;
   const s = carouselZoom,
     rasterScale = Math.min(
       s,
@@ -510,18 +596,47 @@ function carouselRefresh() {
     canvas = $("#carouselCanvas"),
     generation = ++carouselDraw;
   c.zoom = s;
-  if (canvas.width !== Math.ceil(extent.w * rasterScale))
-    canvas.width = Math.ceil(extent.w * rasterScale);
-  if (canvas.height !== Math.ceil(extent.h * rasterScale))
-    canvas.height = Math.ceil(extent.h * rasterScale);
   const width = extent.w * s,
     height = extent.h * s;
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
   $("#carouselArtwork").style.width = width + "px";
   $("#carouselArtwork").style.height = height + "px";
   const viewport = $("#carouselViewport");
   carouselPasteboardSpace(viewport, width, height);
+  let drawScale = rasterScale;
+  if (structured) {
+    const v = MKWSpreadUI.visible(),
+      x = Math.max(0, Math.floor(v.x)),
+      y = Math.max(0, Math.floor(v.y)),
+      w = Math.max(1, Math.min(extent.w - x, Math.ceil(v.w))),
+      h = Math.max(1, Math.min(extent.h - y, Math.ceil(v.h)));
+    canvas._region = { x, y, w, h };
+    drawScale = Math.min(
+      s * Math.min(2, devicePixelRatio || 1),
+      Math.sqrt(4000000 / (w * h)),
+    );
+    const rw = Math.max(1, Math.ceil(w * drawScale)),
+      rh = Math.max(1, Math.ceil(h * drawScale));
+    if (canvas.width !== rw) canvas.width = rw;
+    if (canvas.height !== rh) canvas.height = rh;
+    Object.assign(canvas.style, {
+      left: x * s + "px",
+      top: y * s + "px",
+      width: w * s + "px",
+      height: h * s + "px",
+    });
+  } else {
+    canvas._region = null;
+    if (canvas.width !== Math.ceil(extent.w * rasterScale))
+      canvas.width = Math.ceil(extent.w * rasterScale);
+    if (canvas.height !== Math.ceil(extent.h * rasterScale))
+      canvas.height = Math.ceil(extent.h * rasterScale);
+    Object.assign(canvas.style, {
+      left: "",
+      top: "",
+      width: width + "px",
+      height: height + "px",
+    });
+  }
   carouselScheduleOutside();
   const zoomField = $("#carouselZoom"),
     zoomValue = Math.round(MKWZoom.percent(s, studioZoomReference(true)));
@@ -531,7 +646,7 @@ function carouselRefresh() {
   zoomField.max = Math.ceil(
     MKWZoom.percent(carouselMaxZoom(), studioZoomReference(true)),
   );
-  carouselSchedulePaint(canvas, rasterScale, generation);
+  carouselSchedulePaint(canvas, drawScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
   const gridStyle = MKWDesignerGrid.style(c);
   const guideKey = JSON.stringify([
@@ -540,6 +655,7 @@ function carouselRefresh() {
     c.h,
     c.n,
     c.artboards,
+    structured ? canvas._region : null,
     c.top,
     c.bottom,
     c.left,
@@ -552,9 +668,15 @@ function carouselRefresh() {
     $("#carouselGuides").dataset.layout = guideKey;
     $("#carouselGuides").innerHTML = MKWCarouselPolicy.isFree(c)
       ? MKWCarouselPolicy.frames(c)
+          .map((a, i) => ({ ...a, index: i }))
+          .filter(
+            (a) =>
+              !structured ||
+              MKWCarouselPolicy.intersects(a, MKWSpreadUI.visible()),
+          )
           .map(
             (a, i) =>
-              `<div class="slide-guide" style="left:${a.x * s}px;top:${a.y * s}px;width:${a.w * s}px;height:${a.h * s}px"><div class="sixths designer-grid" style="left:${a.left * s}px;right:${a.right * s}px;top:${a.top * s}px;bottom:${a.bottom * s}px;${MKWDesignerGrid.style(c, i)}"></div></div>`,
+              `<div class="slide-guide" style="left:${a.x * s}px;top:${a.y * s}px;width:${a.w * s}px;height:${a.h * s}px"><div class="sixths designer-grid" style="left:${a.left * s}px;right:${a.right * s}px;top:${a.top * s}px;bottom:${a.bottom * s}px;${MKWDesignerGrid.style(c, a.index)}"></div></div>`,
           )
           .join("")
       : Array.from(

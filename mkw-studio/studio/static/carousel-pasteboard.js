@@ -57,7 +57,7 @@ function carouselScheduleOutside() {
     ),
     width = Math.max(1, Math.round(viewport.clientWidth * ratio)),
     height = Math.max(1, Math.round(viewport.clientHeight * ratio)),
-    origin = $("#carouselCanvas").getBoundingClientRect(),
+    origin = carouselOrigin(),
     rect = canvas.getBoundingClientRect(),
     dx = origin.left - rect.left,
     dy = origin.top - rect.top,

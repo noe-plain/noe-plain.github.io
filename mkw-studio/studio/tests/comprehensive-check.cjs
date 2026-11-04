@@ -103,6 +103,7 @@ const { launch, artifact } = require('./browser.cjs');
   await designer.locator('#startNew').click();await designer.locator('[data-project-mode=carousel]').click();
   await designer.locator('#setupName').fill('Designer Prüfung');await designer.locator('#createProject').click();
   await designer.locator('#carouselCanvas').waitFor();
+  await require("./browser.cjs").waitForProjectReady(designer);
   await designer.evaluate(()=>{const o=carouselObject('text',{x:100,y:150,w:500,h:300,text:'Text'});carouselSelect([o.id]);carouselPanel();});
   const oldX=await designer.evaluate(()=>carouselSelected()[0].x);
   await designer.locator('[data-prop=x]').fill('');

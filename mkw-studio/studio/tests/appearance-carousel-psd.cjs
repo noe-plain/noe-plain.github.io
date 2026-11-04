@@ -237,7 +237,7 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator("#exportFormat").inputValue(), "png");
     await page.locator("#closeExport").click();
     const panel = await page
-      .locator("#carouselSidebar")
+      .locator("#designerContextPane")
       .evaluate((el) => getComputedStyle(el).backgroundColor);
     assert(
       panel
@@ -355,6 +355,8 @@ const assert = require("node:assert/strict");
     assert.equal(await page.evaluate(() => p.meta.code), "NEU");
     assert.deepEqual(await page.evaluate(() => ({ ...studioPreferences })), {
       primaryColour: "#315bcc",
+      inspectorSplit: 70,
+      inspectorWidth: 300,
       colourMode: "normal",
       density: "comfortable",
       guideColour: "#1c8e5b",

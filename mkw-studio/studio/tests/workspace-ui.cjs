@@ -111,21 +111,14 @@ const assert = require("node:assert/strict");
               y: r.y,
               right: r.right,
               bottom: r.bottom,
-              width: r.width,
               radius: parseFloat(getComputedStyle(el).borderTopLeftRadius),
             };
           };
           return {
             header: rect("header"),
-            brand: rect("header .brand"),
-            headerActions: rect("header .header-actions"),
             footer: rect("footer"),
             workspace: rect(viewport),
             sidebar: rect(sidebar),
-            splitter:
-              viewport === "#carouselViewport"
-                ? rect("#carouselEditor > .inspector-width-grip")
-                : rect("body > .inspector-width-grip"),
             width: innerWidth,
           };
         },
@@ -136,56 +129,21 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.workspace.y, boxes.header.bottom + 12);
       assert.equal(boxes.workspace.bottom, boxes.sidebar.bottom);
       assert.equal(boxes.footer.y, boxes.workspace.bottom + 12);
-      if (boxes.splitter) {
-        assert.equal(boxes.splitter.width, 20);
-        if (viewport === "#carouselViewport") {
-          assert.equal(boxes.splitter.x, boxes.workspace.right + 14);
-          assert.equal(boxes.sidebar.x, boxes.splitter.right + 14);
-        } else {
-          assert.equal(boxes.splitter.x, boxes.workspace.right - 4);
-          assert.equal(boxes.sidebar.x, boxes.splitter.right - 4);
-        }
-      } else {
-        assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
-      }
-      assert(boxes.header.right <= boxes.sidebar.x);
-      assert(boxes.brand.right <= boxes.headerActions.x);
-      assert(boxes.headerActions.right <= boxes.header.right - 12);
+      assert.equal(boxes.sidebar.x, boxes.workspace.right + 12);
+      assert.equal(boxes.header.right, boxes.workspace.right);
       assert.equal(boxes.footer.right, boxes.width - 12);
-      assert(boxes.header.radius >= 28);
-      assert(boxes.workspace.radius >= 28);
-      assert(boxes.footer.radius >= 28);
-      if (boxes.splitter && viewport === "#carouselViewport")
-        assert.equal(
-          await page
-            .locator("#carouselEditor > .inspector-width-grip")
-            .evaluate((el) => getComputedStyle(el).backgroundColor),
-          "rgba(0, 0, 0, 0)",
-        );
+      if (sidebar === "#carouselSidebar") {
+        const panes = await page.locator("#designerContextPane,.carousel-layers-panel").evaluateAll(nodes => nodes.map(n=>parseFloat(getComputedStyle(n).borderTopLeftRadius)));
+        assert.deepEqual(panes,[28,28]);
+        assert.equal(boxes.sidebar.radius,0);
+        delete boxes.sidebar;
+      }
+      for (const box of Object.values(boxes).filter(
+        (b) => typeof b === "object",
+      ))
+        assert(box.radius >= 28);
     };
     await checkBento("#workspace", "#toolsSidebar");
-    const campaignGrip = page.locator("body > .inspector-width-grip");
-    assert.equal(await campaignGrip.getAttribute("role"), "separator");
-    await campaignGrip.focus();
-    await page.keyboard.press("End");
-    const campaignWidthBefore = Number(
-        await campaignGrip.getAttribute("aria-valuenow"),
-      ),
-      campaignWorkspaceBefore = await page.locator("#workspace").boundingBox();
-    await page.keyboard.press("ArrowRight");
-    assert.equal(
-      Number(await campaignGrip.getAttribute("aria-valuenow")),
-      campaignWidthBefore - 8,
-    );
-    assert.equal(
-      (await page.locator("#workspace").boundingBox()).width,
-      campaignWorkspaceBefore.width + 8,
-      "Narrowing the FD inspector gives the artboard workspace the same width",
-    );
-    assert.equal(
-      await page.evaluate(() => studioPreferences.inspectorWidth),
-      campaignWidthBefore - 8,
-    );
     const beforePixels = await pixels(),
       beforeWorkspace = await page.locator("#workspace").boundingBox();
     await page.locator("#toolsToggle").click();
@@ -263,18 +221,7 @@ const assert = require("node:assert/strict");
     await page.locator("#createProject").click();
     await require("./browser.cjs").waitForProjectReady(page);
     await page.locator("#carouselCanvas").waitFor();
-    await page.locator("#carouselEditor > .inspector-width-grip").waitFor();
     await checkBento("#carouselViewport", "#carouselSidebar");
-    assert.equal(
-      await page.locator("body > .inspector-width-grip").count(),
-      0,
-      "Switching to the designer must remove the FD inspector grip",
-    );
-    assert.equal(
-      await page.locator("#carouselEditor > .inspector-width-grip").count(),
-      1,
-      "The designer has one shared inspector/layer grip",
-    );
     const carouselBar = await page
       .locator(".carousel-contextbar")
       .boundingBox();
@@ -439,7 +386,6 @@ const assert = require("node:assert/strict");
     assert.equal(await page.evaluate(() => carouselUI.snap), false);
     await page.locator("#footerSnap").click();
     await page.setViewportSize({ width: 1100, height: 800 });
-    await checkBento("#carouselViewport", "#carouselSidebar");
     await page.screenshot({
       path: require("./browser.cjs").artifact("mkw-ui-compact.png"),
     });

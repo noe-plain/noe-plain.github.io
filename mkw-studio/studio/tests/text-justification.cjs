@@ -29,7 +29,8 @@ const { launch, artifact } = require("./browser.cjs");
         text,
       });
     }, source);
-    await page.locator("[data-text-align=justify]").click();
+    await page.locator("[data-typo-tab=paragraph]").click();
+    await page.locator("[data-typo-align=justify]").click();
     const layout = () =>
       page.evaluate(() => carouselTextLayout(carouselSelected()[0]));
     await page.evaluate(() => MKWTextHyphen.ensure());
@@ -57,12 +58,12 @@ const { launch, artifact } = require("./browser.cjs");
     }
     assert.equal(
       await page
-        .locator("[data-text-align=justify]")
+        .locator("[data-typo-align=justify]")
         .getAttribute("aria-pressed"),
       "true",
     );
-    await page.locator('[data-paragraph="1"]').click();
-    await page.locator("#carouselParagraphSize").fill("36");
+    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await page.locator("[data-typo=paragraphSize]").fill("36");
     assert.equal(
       await page.evaluate(() => carouselSelected()[0].textStyles[1].size),
       36,
@@ -188,7 +189,7 @@ const { launch, artifact } = require("./browser.cjs");
         pdfRuns: text.length,
         expectedRuns: layout.lines.reduce((n, l) => n + l.runs.length, 0),
         ranges: layout.lines.map((l) => l.justification),
-        align: saved.carousel.objects.find((x) => x.id === o.id).textAlign,
+        align: saved.carousel.objects.find((x) => x.id === o.id).textStyles[0].align,
       };
     });
     assert(exact.png);
@@ -209,6 +210,7 @@ const { launch, artifact } = require("./browser.cjs");
       o.size = 50;
       o.characterStyles = [];
       o.textStyles = [];
+      o.textAlign = "justify";
       const l = carouselTextLayout(o);
       Object.assign(o, before);
       return l.lines.some((l) => l.justification?.limited);
@@ -256,9 +258,10 @@ const { launch, artifact } = require("./browser.cjs");
       step = "text";
       render();
     }, source);
-    await post.locator("#textAlign").selectOption("justify");
+    await post.locator("[data-typo-tab=paragraph]").click();
+    await post.locator("[data-typo-align=justify]").click();
     assert(
-      await post.locator("#stepPanel>.justification-settings").isVisible(),
+      await post.locator("#stepPanel .justification-settings").isVisible(),
     );
     await post.evaluate(() => MKWTextHyphen.ensure());
     const simple = await post.evaluate(
@@ -323,7 +326,7 @@ const { launch, artifact } = require("./browser.cjs");
       return {
         png: a.every((v, i) => v === c[i]),
         psd: a.every((v, i) => v === ps[i]),
-        align: doc.boards[0].elements.title.align,
+        align: doc.boards[0].elements.title.textStyles[0].align,
         size: doc.boards[0].elements.title.textStyles[0].size,
       };
     });

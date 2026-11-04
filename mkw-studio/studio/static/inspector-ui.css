@@ -9,54 +9,6 @@
   border: 0;
   background: var(--md-sys-color-surface);
 }
-.inspector-width-grip {
-  position: relative;
-  z-index: 20;
-  width: 20px;
-  min-width: 20px;
-  max-width: 20px;
-  min-height: 100%;
-  margin: 0 2px;
-  padding: 0;
-  border: 0;
-  box-shadow: none;
-  cursor: ew-resize;
-  touch-action: none;
-  display: grid;
-  place-items: center;
-  background-color: transparent;
-  background-image: none;
-  color: var(--md-sys-color-outline);
-}
-.inspector-width-grip span {
-  width: 4px;
-  height: 36px;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.65;
-  transition:
-    background-color var(--studio-motion-short) var(--studio-ease-effects),
-    height var(--studio-motion-short) var(--studio-ease-effects);
-}
-.inspector-width-grip:hover span,
-.inspector-width-grip:focus-visible span,
-.is-width-resizing .inspector-width-grip span {
-  color: var(--md-sys-color-primary);
-  height: 48px;
-  opacity: 1;
-}
-.inspector-width-grip:focus-visible {
-  outline: 2px solid var(--md-sys-color-primary);
-  outline-offset: -2px;
-}
-.is-width-resizing,
-.is-width-resizing * {
-  cursor: ew-resize !important;
-  user-select: none !important;
-}
-.sidebar-hidden .inspector-width-grip {
-  display: none;
-}
 .inspector-identity {
   display: flex;
   align-items: flex-start;
@@ -260,19 +212,19 @@
     border-color var(--studio-motion-short) var(--studio-ease-effects),
     background-color var(--studio-motion-short) var(--studio-ease-effects);
 }
-.designer-page-group > header {
+.designer-page-group > .page-group-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
-.designer-page-group > header label {
+.designer-page-group > .page-group-heading label {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
 }
-.designer-page-group > header select,
+.designer-page-group > .page-group-heading select,
 .designer-page-group li select {
   max-width: 100%;
 }
@@ -295,7 +247,7 @@
   padding: 4px;
   border-radius: 8px;
 }
-.designer-page-group li button {
+.designer-page-group li [data-artboard-order] {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -305,16 +257,11 @@
   background: var(--md-sys-color-primary-container);
 }
 @media (prefers-reduced-motion: reduce) {
-  .designer-page-group,
-  .inspector-width-grip span {
+  .designer-page-group {
     transition: none;
   }
 }
-@media (max-width: 760px) {
-  .inspector-width-grip {
-    display: none;
-  }
-}
+
 #carouselSidebar #designerAddArtboard {
   display: flex;
   flex-direction: row;
@@ -344,7 +291,7 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 28px;
   background: var(--md-sys-color-surface);
 }
 #carouselSidebar.split-inspector #carouselProperties {
@@ -359,7 +306,7 @@
   overflow: auto;
   overscroll-behavior: contain;
   border: 0;
-  border-radius: 24px;
+  border-radius: 28px;
   background: var(--md-sys-color-surface-container-low);
 }
 .inspector-splitter {
@@ -429,4 +376,84 @@ html #carouselSidebar.split-inspector {
   .inspector-splitter:focus-visible {
     outline-color: Highlight;
   }
+}
+
+/* One shared width controls both the header and its workspace edge. */
+body:not(.sidebar-hidden) {
+  --studio-shell-side: calc(
+    var(--studio-sidebar-size, 300px) + var(--studio-shell-gap)
+  );
+  --sidebar: var(--studio-sidebar-size, 300px);
+  --studio-inspector-width: var(--studio-sidebar-size, 300px);
+}
+.inspector-width-splitter {
+  position: fixed;
+  z-index: 61;
+  width: 24px;
+  height: 56px;
+  top: calc(50dvh - 28px);
+  right: calc(
+    var(--studio-sidebar-size, 300px) + var(--studio-shell-inset) +
+      var(--studio-shell-gap) / 2 - 12px
+  );
+  cursor: col-resize;
+}
+.inspector-width-splitter > span {
+  width: 4px;
+  height: 36px;
+  transition:
+    background-color var(--studio-motion-short) var(--studio-ease-effects),
+    height var(--studio-motion-short) var(--studio-ease-effects);
+}
+.inspector-width-splitter:is(:hover, :focus-visible) > span,
+.is-width-resizing .inspector-width-splitter > span {
+  width: 4px;
+  height: 48px;
+  background: var(--md-sys-color-primary);
+}
+.is-width-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+.sidebar-hidden .inspector-width-splitter {
+  display: none;
+}
+@media (max-width: 760px) {
+  body:not(.sidebar-hidden) {
+    --studio-shell-side: 0px;
+    --sidebar: 0px;
+    --studio-inspector-width: 0px;
+  }
+  .tool-sidebar,
+  #carouselSidebar {
+    width: min(var(--studio-sidebar-size, 300px), calc(100vw - 24px));
+  }
+  .inspector-width-splitter {
+    display: none;
+  }
+  .tools-open:not(.sidebar-hidden) .inspector-width-splitter {
+    display: grid;
+    right: calc(
+      min(var(--studio-sidebar-size, 300px), 100vw - 24px) +
+        var(--studio-shell-inset) - 12px
+    );
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inspector-width-splitter > span {
+    transition: none;
+  }
+}
+
+.designer-page-group [data-artboard-order] {
+  min-height: 44px;
+  padding: 10px;
+  cursor: grab;
+  border-radius: 8px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+}
+.designer-page-group [data-artboard-order]:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }

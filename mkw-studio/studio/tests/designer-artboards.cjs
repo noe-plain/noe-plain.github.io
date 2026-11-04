@@ -237,12 +237,11 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
     );
     await page.locator('[data-slide="1"]').click();
     await page.locator("#designerSplitGroup").click();
-    const targetPage = page.locator(
-      '#carouselProperties [data-artboard-order="1"]',
-    );
-    await page
-      .locator('#carouselProperties [data-artboard-order="0"]')
-      .dragTo(targetPage);
+    await page.evaluate(()=>{studioPreferences.inspectorSplit=85;studioApplyPreferences();});
+    await page.locator('.designer-page-groups').evaluate(el=>el.scrollIntoView({block:'start'}));
+    const sourcePage=page.locator('#carouselProperties [data-artboard-order="0"]'), targetPage=page.locator('#carouselProperties [data-artboard-order="1"]');
+    await sourcePage.scrollIntoViewIfNeeded();const sr=await sourcePage.boundingBox(),tr=await targetPage.boundingBox();
+    await page.mouse.move(sr.x+sr.width/2,sr.y+sr.height/2);await page.mouse.down();await page.mouse.move(sr.x+sr.width/2+12,sr.y+sr.height/2+12,{steps:3});await page.mouse.move(tr.x+tr.width/2,tr.y+tr.height/2,{steps:10});await page.mouse.move(tr.x+tr.width/2+1,tr.y+tr.height/2+1);await page.mouse.up();
     assert.equal(await page.evaluate(() => p.carousel.pageGroups.length), 1);
     assert.deepEqual(
       await page.evaluate(() =>

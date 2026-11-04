@@ -44,8 +44,8 @@
     designer,
     "builder",
     "Designer",
-    "Dein Design. Eine Carousel-Sequenz.",
-    "Bilder, Texte und Formen auf Slides frei gestalten.",
+    "Dein Design. Eine oder mehrere Seiten.",
+    "Bilder, Texte und Formen frei zusammensetzen.",
   );
   modes.append(post, designer);
   returning.className = "start-returning";
@@ -56,10 +56,7 @@
   footer.className = "start-home-footer";
   const local = document.createElement("span");
   local.textContent = "Deine Dateien bleiben auf deinem Gerät.";
-  const pageManagementTest = document.createElement("a");
-  pageManagementTest.href = "seitenmanagement-test.html";
-  pageManagementTest.textContent = "Seitenmanagement testen";
-  footer.append(local, pageManagementTest);
+  footer.append(local);
   if (help) footer.append(help);
   body.append(title, intro, modes, returning, status);
   if (notice) body.append(notice);

@@ -45,6 +45,8 @@ async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
       blend: "source-over",
       visible: true,
       folderId: undefined,
+      pageId: undefined,
+      pageFragment: undefined,
       effects: undefined,
     },
     key = JSON.stringify([shape, o.effects, rasterScale]),
@@ -99,6 +101,7 @@ async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
           () => true,
           loadImage,
           project,
+          false,
         );
       if (carouselEffectValue(o, "blur"))
         out.filter = `blur(${carouselEffectValue(o, "blur") * rasterScale}px)`;
@@ -107,9 +110,10 @@ async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
       if (carouselEffectValue(o, "noise")) {
         const pixels = out.getImageData(0, 0, w, h),
           data = pixels.data;
-        let seed = 2166136261;
-        for (const char of o.id)
-          seed = Math.imul(seed ^ char.charCodeAt(0), 16777619);
+        let seed = o.effectSeed ?? 2166136261;
+        if (o.effectSeed === undefined)
+          for (const char of o.id)
+            seed = Math.imul(seed ^ char.charCodeAt(0), 16777619);
         const amount = (carouselEffectValue(o, "noise") / 100) * 127;
         for (let i = 0; i < data.length; i += 4) {
           if (!data[i + 3]) continue;

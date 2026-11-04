@@ -27,13 +27,7 @@
     layers = null,
   }) {
     if (!host || !panel) return;
-    if (host.id === "carouselSidebar" || host.id === "toolsSidebar")
-      MKWInspectorSplit.attachWidth(
-        host.id === "carouselSidebar"
-          ? document.getElementById("carouselEditor")
-          : document.body,
-        host,
-      );
+    MKWInspectorWidth.context(host);
     let state = sessions.get(host);
     if (!state) {
       const header =
@@ -90,12 +84,6 @@
     const previous = state.key;
     state.key = key;
     state.targets.clear();
-    panel
-      .querySelectorAll(".carousel-property-section > h4")
-      .forEach((heading) => {
-        heading.setAttribute("role", "heading");
-        heading.setAttribute("aria-level", "3");
-      });
     const sections = panel.hidden
       ? []
       : [

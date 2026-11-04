@@ -1,28 +1,14 @@
 (function (root) {
   "use strict";
-  const defaultRatio = 70,
-    minInspectorWidth = 300,
-    maxInspectorWidth = 560,
-    maxCampaignInspectorWidth = 420;
+  const defaultRatio = 70;
   let current = null,
     preferred = defaultRatio,
-    save = () => {},
-    preferredWidth = 288,
-    saveWidth = () => {},
-    widthSession = null;
+    save = () => {};
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  function configure(ratio, onCommit, width = preferredWidth, onWidthCommit) {
+  function configure(ratio, onCommit) {
     current?.cancel();
     preferred = Number.isFinite(ratio) ? clamp(ratio, 20, 85) : defaultRatio;
     save = typeof onCommit === "function" ? onCommit : () => {};
-    preferredWidth = Number.isFinite(width)
-      ? clamp(width, minInspectorWidth, maxInspectorWidth)
-      : 288;
-    saveWidth = typeof onWidthCommit === "function" ? onWidthCommit : () => {};
-    document.documentElement.style.setProperty(
-      "--studio-inspector-width",
-      `${preferredWidth}px`,
-    );
     current?.refresh();
   }
   function detach() {
@@ -53,7 +39,10 @@
     help.textContent =
       "Nach oben oder unten ziehen, um die Höhe der Kontext-Einstellungen und Ebenen aufzuteilen. Mit Pfeil hoch und runter anpassen; Umschalt verändert in grösseren Schritten. Pos1 und Ende wählen die Grenzen. Doppelklick oder Taste 0 stellt 70 zu 30 wieder her. Escape bricht das Ziehen ab.";
     host.prepend(context);
-    context.append(header, panel, help);
+    const heading = host.querySelector(":scope > h3.visually-hidden");
+    context.append(header);
+    if (heading) context.append(heading);
+    context.append(panel, help);
     layers.before(separator);
     host.classList.add("split-inspector");
     layers.setAttribute("aria-label", "Ebenen");
@@ -196,110 +185,5 @@
     };
     refresh();
   }
-  function attachWidth(editor, sidebar) {
-    if (!editor || !sidebar) return;
-    if (
-      widthSession?.editor === editor &&
-      widthSession.sidebar === sidebar &&
-      widthSession.grip.isConnected
-    )
-      return;
-    widthSession?.dispose();
-    const grip = document.createElement("div");
-    grip.className = "inspector-width-grip";
-    grip.tabIndex = 0;
-    grip.setAttribute("role", "separator");
-    grip.setAttribute("aria-orientation", "vertical");
-    grip.setAttribute(
-      "aria-label",
-      "Seitenleiste und Ebenen: gemeinsame Breite",
-    );
-    grip.setAttribute("aria-valuemin", String(minInspectorWidth));
-    const isDesigner = editor.id === "carouselEditor",
-      maximum = () =>
-        Math.min(
-          isDesigner ? maxInspectorWidth : maxCampaignInspectorWidth,
-          innerWidth - (isDesigner ? 432 : 360),
-        );
-    grip.setAttribute("aria-valuemax", String(maximum()));
-    grip.setAttribute("aria-controls", sidebar.id || "carouselSidebar");
-    grip.title = `Gemeinsame Breite ändern · Ziehen oder ←/→ · ${minInspectorWidth}–${isDesigner ? maxInspectorWidth : maxCampaignInspectorWidth} px`;
-    grip.innerHTML = '<span aria-hidden="true"></span>';
-    sidebar.before(grip);
-    let drag = null,
-      width = preferredWidth;
-    const set = (value) => {
-      width = clamp(Math.round(value), minInspectorWidth, maximum());
-      document.documentElement.style.setProperty(
-        "--studio-inspector-width",
-        `${width}px`,
-      );
-      grip.setAttribute("aria-valuenow", String(width));
-      grip.setAttribute("aria-valuemax", String(maximum()));
-      grip.setAttribute("aria-valuetext", `${width} Pixel`);
-    };
-    const finish = (accept) => {
-      if (!drag) return;
-      const previous = drag.width;
-      drag = null;
-      editor.classList.remove("is-width-resizing");
-      if (accept) {
-        preferredWidth = width;
-        if (previous !== width) saveWidth(width);
-      } else set(previous);
-    };
-    grip.onpointerdown = (event) => {
-      if (event.button !== 0 || innerWidth <= 760) return;
-      event.preventDefault();
-      drag = { x: event.clientX, width };
-      grip.focus({ preventScroll: true });
-      grip.setPointerCapture(event.pointerId);
-      editor.classList.add("is-width-resizing");
-    };
-    grip.onpointermove = (event) => {
-      if (!drag) return;
-      set(drag.width - (event.clientX - drag.x));
-    };
-    grip.onpointerup = () => finish(true);
-    grip.onpointercancel = grip.onlostpointercapture = () => finish(false);
-    grip.onkeydown = (event) => {
-      if (event.key === "Escape" && drag) {
-        event.preventDefault();
-        finish(false);
-        return;
-      }
-      const step = event.shiftKey ? 24 : 8;
-      if (event.key === "ArrowLeft") set(width + step);
-      else if (event.key === "ArrowRight") set(width - step);
-      else if (event.key === "Home") set(minInspectorWidth);
-      else if (event.key === "End")
-        set(Math.min(maxInspectorWidth, innerWidth - 360));
-      else return;
-      event.preventDefault();
-      event.stopPropagation();
-      preferredWidth = width;
-      saveWidth(width);
-    };
-    const resize = () => set(width);
-    window.addEventListener("resize", resize);
-    widthSession = {
-      editor,
-      sidebar,
-      grip,
-      dispose() {
-        finish(false);
-        window.removeEventListener("resize", resize);
-        grip.onpointerdown = null;
-        grip.onpointermove = null;
-        grip.onpointerup = null;
-        grip.onpointercancel = null;
-        grip.onlostpointercapture = null;
-        grip.onkeydown = null;
-        grip.remove();
-        if (widthSession?.grip === grip) widthSession = null;
-      },
-    };
-    set(preferredWidth);
-  }
-  root.MKWInspectorSplit = { attach, attachWidth, detach, configure };
+  root.MKWInspectorSplit = { attach, detach, configure };
 })(globalThis);

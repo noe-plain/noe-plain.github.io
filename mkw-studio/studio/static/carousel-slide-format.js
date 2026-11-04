@@ -10,6 +10,7 @@ function carouselSlideFormatPanel(host) {
     `<label>${label} (px)<input data-slide-format="${key}" aria-label="Slide ${label}" type="number" min="${min}" max="4000" step="1" value="${values[key]}"></label>`;
   section.innerHTML = `<h4>Format für alle Slides</h4><div class="carousel-fields">${input("w", "Breite", 240)}${input("h", "Höhe", 240)}</div><h4>Schutzzone</h4>${MKWFormats.editor(values, (_, key, label) => input(key, label))}<p class="slide-format-note">Elementgrössen bleiben erhalten. Die Inhalte jeder Slide behalten ihren Abstand zum linken Slide-Rand.</p><p class="post-safezone-error" role="status"></p><button id="carouselApplyFormat" class="primary" disabled>Für alle Slides übernehmen</button>`;
   host.append(section);
+  MKWSpreadUI.panel(host);
   const preview = section.querySelector(".safe-preview"),
     apply = section.querySelector("#carouselApplyFormat"),
     error = section.querySelector(".post-safezone-error");

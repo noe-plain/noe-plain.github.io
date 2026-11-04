@@ -159,6 +159,8 @@ function carouselPDFText(board, opts) {
     result = [];
   for (const object of c.objects) {
     if (
+      (object.pageFragment &&
+        object.pageId !== MKWCarouselPolicy.frame(c, board.carouselSlide).id) ||
       object.type !== "text" ||
       !carouselObjectVisible(object) ||
       !object.text.trim() ||

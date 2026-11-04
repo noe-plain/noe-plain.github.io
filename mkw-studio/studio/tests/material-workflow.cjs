@@ -15,6 +15,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#cn").fill("1");
     await page.locator("#createProject").click();
     await page.locator("#carouselCanvas").waitFor();
+  await require("./browser.cjs").waitForProjectReady(page);
     const ids = await page.evaluate(() => {
       carouselObject("shape", {
         id: "menu-shape",

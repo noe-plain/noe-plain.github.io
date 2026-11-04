@@ -25,7 +25,7 @@ function carouselPSDBounds(o) {
   }
   const left = Math.max(0, Math.floor(leftEdge - pad - effectPad)),
     top = Math.max(0, Math.floor(geometry.y - pad - effectPad));
-  return {
+  const result = {
     left,
     top,
     w: Math.max(
@@ -43,6 +43,16 @@ function carouselPSDBounds(o) {
       ) - top,
     ),
   };
+  if (o.pageFragment) {
+    const a = c.artboards.find((a) => a.id === o.pageId);
+    const right = Math.min(result.left + result.w, a.x + a.w),
+      bottom = Math.min(result.top + result.h, a.y + a.h);
+    result.left = Math.max(result.left, a.x);
+    result.top = Math.max(result.top, a.y);
+    result.w = Math.max(0, right - result.left);
+    result.h = Math.max(0, bottom - result.top);
+  }
+  return result;
 }
 async function carouselPSDLayer(o, project = p) {
   const bounds = carouselPSDBounds(o);
@@ -69,7 +79,7 @@ async function carouselPSDLayer(o, project = p) {
     image,
     project,
   );
-  return carouselPSDVectorData(o, {
+  const result = {
     name: o.name,
     left: bounds.left,
     top: bounds.top,
@@ -80,7 +90,8 @@ async function carouselPSDLayer(o, project = p) {
       { "source-over": "normal", multiply: "multiply", screen: "screen" }[
         o.blend
       ] || "normal",
-  });
+  };
+  return o.pageFragment ? result : carouselPSDVectorData(o, result);
 }
 async function buildCarouselPSD(progress = () => {}) {
   const project = { ...p, carousel: clone(p.carousel) },
@@ -179,6 +190,11 @@ async function buildCarouselPSD(progress = () => {}) {
   for (const [index, o] of c.objects.entries()) {
     progress(`Ebene ${index + 1} / ${c.objects.length} vorbereiten …`);
     await new Promise((resolve) => setTimeout(resolve, 0));
+    if (o.pageFragment) {
+      const layer = await carouselPSDLayer(o, project);
+      if (layer) append(o, { ...layer, name: o.name + " · Seitenausschnitt" });
+      continue;
+    }
     if (o.type === "text") {
       const layout = carouselTextLayout(o),
         layer = await carouselPSDLayer(o, project);

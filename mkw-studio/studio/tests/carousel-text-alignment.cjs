@@ -21,23 +21,28 @@ const { launch, artifact } = require('./browser.cjs');
     const object = () => page.evaluate(id => clone(p.carousel.objects.find(o => o.id === id)), id);
     const lines = () => page.evaluate(id => carouselTextLayout(p.carousel.objects.find(o => o.id === id)).lines, id);
     assert((await lines()).every(line => line.x === 0), 'Legacy/default text stays left aligned');
+    await page.locator('[data-typo-tab=paragraph]').click();
     for (const align of ['center', 'right', 'left']) {
-      await page.locator(`[data-text-align=${align}]`).click();
-      assert.equal((await object()).textAlign, align);
+      await page.locator(`[data-typo-align=${align}]`).click();
+      assert((await object()).textStyles.every(s=>s.align===align));
       const factor = { left: 0, center: .5, right: 1 }[align];
       assert((await lines()).every(line => Math.abs(line.x - (650 - line.width) * factor) < 1e-8));
-      assert.equal(await page.locator(`[data-text-align=${align}]`).getAttribute('aria-pressed'), 'true');
+      assert.equal(await page.locator(`[data-typo-align=${align}]`).getAttribute('aria-pressed'), 'true');
     }
-    await page.locator('[data-text-align=center]').click();
-    await page.locator('[data-paragraph="1"]').click();
-    await page.locator('[data-paragraph-align=right]').click();
+    await page.locator('[data-typo-align=center]').click();
+    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await page.locator('[data-typo-align=right]').click();
     assert((await lines()).filter(line => line.paragraph === 1).every(line => line.align === 'right'));
-    await page.locator('[data-text-align=left]').click();
-    assert((await lines()).filter(line => line.paragraph === 1).every(line => line.align === 'right'), 'Explicit paragraph alignment survives field changes');
-    await page.locator('#carouselParagraphAlignReset').click();
+    await page.locator('[data-paragraph-selection]').selectOption('0');
+    await page.locator('[data-typo-align=left]').click();
+    assert((await lines()).filter(line => line.paragraph === 1).every(line => line.align === 'right'), 'Only the selected paragraph changes');
+    await page.locator('[data-paragraph-all]').click();
+    await page.locator('[data-typo-align-auto]').click();
     assert((await lines()).every(line => line.align === 'left'));
-    await page.locator('[data-text-align=center]').click();
-    await page.locator('[data-paragraph-align=right]').click();
+    await page.locator('[data-paragraph-selection]').selectOption('0');
+    await page.locator('[data-typo-align=center]').click();
+    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await page.locator('[data-typo-align=right]').click();
     await page.locator('[data-text-anchor=bottom]').click();
     // The image encoders must preserve the same line origins and bottom anchor.
     for (const format of ['png', 'jpg', 'webp']) {
@@ -105,8 +110,8 @@ const { launch, artifact } = require('./browser.cjs');
     await page.locator(`[data-layer="${id}"] [data-action=select]`).click();
     await page.screenshot({ path: artifact('mkw-text-alignment-light.png') });
     await page.evaluate(() => { const o = p.carousel.objects.find(o => o.id === carouselSelection); o.locked = true; carouselPanel(); });
-    assert.equal(await page.locator('[data-text-align]:enabled').count(), 0);
-    assert.equal(await page.locator('[data-paragraph-align]:enabled').count(), 0);
+    assert.equal(await page.locator('[data-typo-align]:enabled').count(), 0);
+    assert(await page.locator('[data-typo=paragraphSize]').isDisabled());
     assert.deepEqual(errors, []);
     console.log('PASS field and paragraph alignment, reset/inheritance, wrapped lines, inline editing, undo, persistence, locked text, legacy validation, exact PNG/JPG/WebP, PDF positions and editable PSD alignment');
   } finally { await browser.close(); }

@@ -38,6 +38,9 @@ async function carouselNewDocument(
   }
   if (layout === "free") {
     q.carousel.layout = "free";
+    const artboardGap = window.MKWPageManagementTest
+      ? 120
+      : MKWSpreadLayoutModel.defaultGap;
     const sequence = [
       ...new Set(
         order.filter((i) => Number.isInteger(i) && i >= 0 && i < count),
@@ -49,7 +52,7 @@ async function carouselNewDocument(
       id: uid(),
       name: `Zeichenfläche ${i + 1}`,
       x: 0,
-      y: i * (h + 120),
+      y: i * (h + artboardGap),
       bg: q.carousel.bg,
     }));
     const boardBySource = new Map(
@@ -81,11 +84,12 @@ async function carouselNewDocument(
         artboard.x = group.orientation === "horizontal" ? offset : 0;
         artboard.y = groupTop + (group.orientation === "vertical" ? offset : 0);
         offset +=
-          (group.orientation === "horizontal" ? artboard.w : artboard.h) + 120;
+          (group.orientation === "horizontal" ? artboard.w : artboard.h) +
+          artboardGap;
         groupHeight = Math.max(groupHeight, artboard.h);
       }
       groupTop +=
-        group.orientation === "horizontal" ? groupHeight + 120 : offset;
+        group.orientation === "horizontal" ? groupHeight + artboardGap : offset;
     }
   }
   const logo = await image("mkw-logo-bold-neg.svg"),
@@ -103,12 +107,24 @@ async function carouselNewDocument(
     locked: false,
     opacity: 1,
   });
+  if (layout === "free" && !window.MKWPageManagementTest)
+    q.carousel = MKWSpreadLayoutModel.plan(
+      q.carousel,
+      { type: "enable" },
+      (o) => o,
+      uid,
+    );
   return q;
 }
 
 function carouselWarning(o) {
   const c = p.carousel;
   if (!carouselObjectVisible(o)) return "";
+  if (o.pageFragment) {
+    const a = c.artboards.find((a) => a.id === o.pageId);
+    if (!MKWCarouselPolicy.intersects(a, carouselObjectBounds(o)))
+      return "Seitenausschnitt liegt ausserhalb seiner Seite. Position prüfen oder Rückgängig verwenden.";
+  }
   if (["image", "angle"].includes(o.type)) {
     if (!o.imageId || !p.images.some((im) => im.id === o.imageId))
       return "Bild im Rahmen fehlt. Bitte ein Bild auswählen.";
@@ -159,7 +175,8 @@ function validateCarousel(q) {
   if (!c) return;
   if (
     !MKWCarouselPolicy.validFormat(c) ||
-    !MKWCarouselPolicy.validCount(c.n) ||
+    !MKWCarouselPolicy.validDocumentCount(c) ||
+    !MKWSpreadLayoutModel.valid(c) ||
     !MKWCarouselPolicy.validBoards(c) ||
     !/^#[0-9a-f]{6}$/i.test(c.bg) ||
     !Array.isArray(c.objects) ||
@@ -194,6 +211,20 @@ function validateCarousel(q) {
       o.opacity > 1
     )
       throw Error("Ungültige Designer-Ebene.");
+    if (
+      (o.pageId !== undefined &&
+        (!MKWSpreadLayoutModel.active(c) ||
+          !c.artboards.some((a) => a.id === o.pageId))) ||
+      (o.pageFragment !== undefined && (o.pageFragment !== true || !o.pageId))
+    )
+      throw Error("Ungültige Seitenzuordnung einer Ebene.");
+    if (
+      o.effectSeed !== undefined &&
+      (!Number.isInteger(o.effectSeed) ||
+        o.effectSeed < 0 ||
+        o.effectSeed > 4294967295)
+    )
+      throw Error("Ungültiger Rauschwert.");
     ids.add(o.id);
     carouselValidateRefinements(o, c, q);
     if (o.type === "angle" && !MKWAnglePolicy.accepts(o.direction))
@@ -439,7 +470,7 @@ function carouselBounds(objects) {
 function carouselDefault(type, rect = {}) {
   const c = p.carousel;
   const viewport = $("#carouselViewport"),
-    canvasRect = $("#carouselCanvas")?.getBoundingClientRect(),
+    canvasRect = carouselOrigin(),
     viewRect = viewport?.getBoundingClientRect();
   const center =
       canvasRect && viewRect
@@ -528,6 +559,10 @@ function carouselDefault(type, rect = {}) {
 }
 
 function carouselObject(type, rect = {}) {
+  if (!p.carousel.n) {
+    status("Füge zuerst eine Seite hinzu.");
+    return null;
+  }
   checkpoint();
   const o = carouselDefault(type, rect);
   carouselUI.slide = null;
@@ -546,6 +581,10 @@ function carouselObject(type, rect = {}) {
 }
 
 function carouselFile(target = null) {
+  if (!p.carousel.n) {
+    status("Füge zuerst eine Seite hinzu, bevor du ein Bild platzierst.");
+    return;
+  }
   const input = $("#carouselFile");
   input.value = "";
   input.multiple = !target;
@@ -554,6 +593,10 @@ function carouselFile(target = null) {
 }
 
 async function carouselImport(files, target) {
+  if (!p.carousel.n) {
+    status("Füge zuerst eine Seite hinzu, bevor du Bilder importierst.");
+    return;
+  }
   if (!files.length || busy) return;
   carouselEndText();
   busy = true;

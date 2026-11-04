@@ -192,16 +192,17 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       [0, 38, 76],
       "Default leading must be 0.95 × the font size",
     );
-    assert.equal(await page.locator("#carouselLineLeading").inputValue(), "38");
+    await page.locator("[data-typo-tab=paragraph]").click();
+    assert.equal(await page.locator("[data-lines-leading]").inputValue(), "38");
     for (const [paragraph, size, leading] of [
       [0, 80, 130],
       [1, 45, 75],
       [2, 28, null],
     ]) {
-      await page.locator(`[data-paragraph="${paragraph}"]`).click();
-      await page.locator("#carouselParagraphSize").fill(String(size));
+      await page.locator('[data-paragraph-selection]').selectOption(String(paragraph));
+      await page.locator("[data-typo=paragraphSize]").fill(String(size));
       if (leading !== null)
-        await page.locator("#carouselLineLeading").fill(String(leading));
+        await page.locator("[data-lines-leading]").fill(String(leading));
     }
     let layout = await page.evaluate(() =>
       carouselTextLayout(
@@ -221,7 +222,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       "Automatic leading must follow the paragraph size",
     );
     assert.equal(
-      await page.locator("#carouselLineLeading").inputValue(),
+      await page.locator("[data-lines-leading]").inputValue(),
       "26.6",
     );
     const exported = await page.evaluate(async () => {
@@ -344,8 +345,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       ) < 0.01,
       "Resizing the frame must preserve the bottom anchor",
     );
-    await page.locator('[data-paragraph="0"]').click();
-    await page.locator("#carouselLineLeading").fill("140");
+    await page.locator('[data-paragraph-selection]').selectOption('0');
+    await page.locator("[data-lines-leading]").fill("140");
     assert(
       Math.abs(
         (await page.evaluate(() =>
@@ -358,7 +359,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       ) < 0.01,
       "Changing a line gap must keep the bottom fixed",
     );
-    await page.locator("#carouselLineLeading").fill("130");
+    await page.locator("[data-lines-leading]").fill("130");
     await page.locator("[data-prop=h]").fill("650");
     await page.locator("[data-text-anchor=top]").click();
     assert.equal(
@@ -393,7 +394,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     await page.keyboard.type("NEU");
     assert((await chosen()).text.endsWith("DANKE!\nNEU"));
     assert.equal(
-      await page.locator("#carouselTextStyles [data-paragraph]").count(),
+      await page.locator("[data-paragraph-selection] option").count(),
       4,
       "New paragraphs must be selectable immediately",
     );
@@ -413,10 +414,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     assert((await chosen()).text.endsWith("DANKE!\nNEU"));
     await page.keyboard.press("Escape");
     await page.locator("[data-prop=w]").fill("250");
-    await page.locator('[data-paragraph="1"]').click();
-    assert((await page.locator("#carouselTextLine option").count()) >= 2);
-    await page.locator("#carouselTextLine").selectOption("1");
-    await page.locator("#carouselLineLeading").fill("90");
+    await page.locator('[data-paragraph-selection]').selectOption('1');
+    assert((await page.locator("[data-line-selection] option").count()) >= 2);
+    await page.locator("[data-line-selection]").selectOption("1:1");
+    await page.locator("[data-lines-leading]").fill("90");
     layout = await page.evaluate(() =>
       carouselTextLayout(
         p.carousel.objects.find((o) => o.id === carouselSelection),
@@ -516,7 +517,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     const content = (await chosen()).text;
     await page.locator("[data-prop=text]").fill(content + "\nZUSATZ");
     assert.equal(
-      await page.locator("#carouselTextStyles [data-paragraph]").count(),
+      await page.locator("[data-paragraph-selection] option").count(),
       5,
       "Sidebar text changes must update paragraph choices",
     );

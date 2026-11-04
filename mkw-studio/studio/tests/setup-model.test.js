@@ -208,3 +208,13 @@ test("inspector height is a portable tool preference with a safe legacy default"
   setup.preferences.inspectorSplit = 55;
   assert.equal(model.validate(setup).preferences.inspectorSplit, 55);
 });
+
+
+test("sidebar width is a portable tool preference, never an unbounded size",()=>{
+ assert.equal(model.preferences({}).inspectorWidth,300);
+ for(const width of [300,375,450])assert.equal(model.preferences({inspectorWidth:width},true).inspectorWidth,width);
+ for(const width of [239,561,300.5,NaN,Infinity,'350',null]){assert.throws(()=>model.preferences({inspectorWidth:width},true));assert.equal(model.preferences({inspectorWidth:width}).inspectorWidth,300);}
+ for(const width of [240,288,299])assert.equal(model.preferences({inspectorWidth:width},true).inspectorWidth,300);
+ for(const width of [451,560])assert.equal(model.preferences({inspectorWidth:width},true).inspectorWidth,450);
+ const setup=fixture();setup.preferences.inspectorWidth=380;assert.equal(model.validate(setup).preferences.inspectorWidth,380);
+});

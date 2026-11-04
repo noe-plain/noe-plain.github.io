@@ -6,7 +6,7 @@
     colourMode: "normal",
     density: "comfortable",
     inspectorSplit: 70,
-    inspectorWidth: 288,
+    inspectorWidth: 300,
     guideColour: "#93a8ef",
     sponsorColour: "#ffffff",
     snapColour: "#f5a8e8",
@@ -37,6 +37,15 @@
     for (const key of Object.keys(defaults)) {
       if (!Object.hasOwn(value, key)) continue;
       const item = value[key];
+      if (
+        key === "inspectorWidth" &&
+        Number.isInteger(item) &&
+        item >= 240 &&
+        item <= 560
+      ) {
+        result[key] = Math.max(300, Math.min(450, item));
+        continue;
+      }
       if (key === "designerGrid") {
         if (!item || typeof item !== "object" || Array.isArray(item)) {
           if (strict) throw Error("Ungültiges Designer-Raster.");
@@ -87,10 +96,10 @@
                 ? typeof item === "boolean"
                 : key === "snapDistance"
                   ? Number.isInteger(item) && item >= 1 && item <= 40
-                  : key === "inspectorSplit"
-                    ? Number.isInteger(item) && item >= 20 && item <= 85
-                    : key === "inspectorWidth"
-                      ? Number.isInteger(item) && item >= 240 && item <= 420
+                  : key === "inspectorWidth"
+                    ? Number.isInteger(item) && item >= 300 && item <= 450
+                    : key === "inspectorSplit"
+                      ? Number.isInteger(item) && item >= 20 && item <= 85
                       : key === "lineHeight"
                         ? Number.isFinite(item) && item >= 20 && item <= 300
                         : key === "exportFormat"

@@ -16,6 +16,7 @@ function carouselPresentInspector() {
         : items.length > 1
           ? `${items.length} Elemente`
           : o?.name ||
+            MKWSpreadUI.selectedBoard()?.name ||
             (slide !== null
               ? MKWCarouselPolicy.frame(p.carousel, slide)?.name ||
                 `Slide ${slide + 1}`
@@ -49,6 +50,7 @@ function carouselPresentInspector() {
 }
 
 function carouselPanel() {
+  MKWSpreadUI.dispose();
   carouselCloseEffectMenu();
   carouselCloseEffectEditor();
   carouselCloseLayerMenu();
@@ -307,7 +309,7 @@ function carouselPanel() {
         },
         stop: () => carouselEndText(),
       });
-    if (o.type === "text" && items.length === 1) {
+    if (o.type === "text") {
       MKWTypography.carousel(o, panel);
       carouselBindTextAlignment(o, panel);
       const content = panel.querySelector("[data-prop=text]");
@@ -413,14 +415,21 @@ function carouselPanel() {
     };
   }
   if (!items.length && carouselUI.slide === null) {
-    if (MKWCarouselPolicy.isFree(c)) {
+    if (MKWSpreadUI.active()) {
+      panel.replaceChildren();
+      MKWSpreadUI.panel(panel);
+    } else if (MKWCarouselPolicy.isFree(c)) {
       const button = document.createElement("button");
       button.type = "button";
       button.id = "designerManageArtboards";
       button.textContent = "Zeichenflächen verwalten";
       button.onclick = () => carouselSlideSelect(0);
       panel.prepend(button);
-    } else MKWArtboardUI.entry(panel);
+      MKWSpreadUI.panel(panel);
+    } else {
+      MKWArtboardUI.entry(panel);
+      MKWSpreadUI.panel(panel);
+    }
   }
   carouselRefinementsPanel(panel, items);
   carouselLayerPanel();

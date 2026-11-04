@@ -42,7 +42,7 @@ const {
       await carouselWaitForPaint();
       await autosave();
     });
-    const separator = page.locator(".inspector-splitter"),
+    const separator = page.locator(".inspector-splitter:not(.inspector-width-splitter)"),
       properties = page.locator("#carouselProperties"),
       layers = page.locator(".carousel-layers-panel");
     const geometry = () =>
@@ -54,7 +54,7 @@ const {
             .querySelector(".carousel-layers-panel")
             .getBoundingClientRect(),
           handle = el
-            .querySelector(".inspector-splitter")
+            .querySelector(".inspector-splitter:not(.inspector-width-splitter)")
             .getBoundingClientRect();
         return {
           ratio: upper.height / (upper.height + lower.height),
@@ -69,7 +69,7 @@ const {
     await page.waitForFunction(
       () =>
         document
-          .querySelector(".inspector-splitter")
+          .querySelector(".inspector-splitter:not(.inspector-width-splitter)")
           .getAttribute("aria-valuenow") === "70",
     );
     const initial = await geometry();
@@ -238,7 +238,7 @@ const {
       assert(g.upper >= 80 && g.lower >= 64, JSON.stringify({ size, g }));
       const accessible = await page.locator("#carouselSidebar").evaluate((el) =>
         [
-          el.querySelector(".inspector-splitter"),
+          el.querySelector(".inspector-splitter:not(.inspector-width-splitter)"),
           el.querySelector("#carouselNewFolder"),
         ].every((target) => {
           const r = target.getBoundingClientRect(),

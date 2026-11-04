@@ -192,8 +192,12 @@
       c.w > 4000 ||
       c.h < 240 ||
       c.h > 4000 ||
-      c.n < 1 ||
-      c.n > 20 ||
+      !policy.validDocumentCount(c) ||
+      !(
+        typeof module !== "undefined"
+          ? require("./spread-layout-model.js")
+          : root.MKWSpreadLayoutModel
+      ).valid(c) ||
       Math.min(c.top, c.bottom, c.left, c.right) < 0 ||
       c.top + c.bottom >= c.h ||
       c.left + c.right >= c.w ||

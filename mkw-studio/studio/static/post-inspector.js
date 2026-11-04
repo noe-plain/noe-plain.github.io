@@ -64,150 +64,6 @@
         }, false),
       );
     }
-    function renderText({ p, b, layer, panel, elementNames, selectLayer }) {
-      const e = b.elements[layer] || b.elements.title,
-        first = p.images[0]?.id === b.imageId,
-        custom = p.textOverrides?.[b.imageId]?.[layer];
-      panel.innerHTML = `<div class="panel-row text-tools"><section class="tool-section"><h3>Inhalt</h3><label class="text-layer-choice">Text auswählen<select id="textLayer" aria-label="Text auswählen">${options(
-        Object.entries(elementNames).filter(([k]) => k !== "logo"),
-        layer,
-      )}</select></label><div id="textContentField"></div><label><input id="textVisible" type="checkbox" ${e.visible ? "checked" : ""}> Auf dem Bild anzeigen</label>${!first ? `<button id="resetText" ${custom ? "" : "hidden"}>Text vom ersten Bild übernehmen</button>` : ""}</section><section class="tool-section"><h3>Gestaltung</h3><label class="tool-stacked">Schrift<select id="fontRole" aria-label="Schrift">${studioFontOptions(e.role)}</select></label><label>Schriftgrösse (px) <input id="textSize" type="number" min="1" max="5000" value="${Math.round(e.size)}"></label><label class="tool-stacked">Ausrichtung<select id="textAlign" aria-label="Textausrichtung" ${layer === "copyright" ? "disabled" : ""}>${options(
-        [
-          ["left", "Links"],
-          ["center", "Zentriert"],
-          ["right", "Rechts"],
-          ["justify", "Blocksatz"],
-        ],
-        e.align,
-      )}</select></label>${
-        b.family?.enabled && layer === "copyright"
-          ? `<label>Copyright-Farbe<select id="textColor" aria-label="Copyright-Farbe">${options(
-              [
-                ["#000000", "Schwarz"],
-                ["#ffffff", "Weiss"],
-              ],
-              views.copyrightColor(e.color),
-            )}</select></label>`
-          : `<label ${b.family?.enabled ? "hidden" : ""}>Textfarbe<input id="textColor" aria-label="Textfarbe" type="color" value="${e.color}"></label>`
-      }${b.family?.enabled && layer !== "copyright" ? "" : ""}<label ${!["date", "title"].includes(layer) ? "hidden" : ""}><input id="uppercase" type="checkbox" ${layer === "date" ? (e.uppercase !== false ? "checked" : "") : e.uppercase ? "checked" : ""}> ${layer === "date" ? "Übertitel in Grossbuchstaben" : "Konzerttitel in Grossbuchstaben"}</label></section></div>`;
-      if (layer === "copyright") {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.id = "copyrightText";
-        input.setAttribute("aria-label", "Copyright eingeben");
-        input.placeholder = "Bildbeschreibung © Name";
-        input.value = e.text;
-        input.onfocus = () => checkpoint();
-        input.oninput = () => {
-          setSharedText(b, "copyright", input.value.replace(/[\r\n]+/g, " "));
-          changed(false);
-        };
-        panel.querySelector("#textContentField").append(input);
-      } else {
-        const input = document.createElement("textarea");
-        input.id = "mainTextInput";
-        input.rows = 3;
-        input.setAttribute("aria-label", elementNames[layer] + " eingeben");
-        input.placeholder = elementNames[layer] + " eingeben …";
-        input.value = e.text;
-        input.onfocus = () => checkpoint();
-        input.oninput = () => {
-          setSharedText(b, layer, input.value);
-          changed(false);
-        };
-        panel.querySelector("#textContentField").append(input);
-      }
-      on(panel, "textLayer", "change", (ev) => {
-        actions.finishText();
-        selectLayer(ev.target.value);
-        render();
-        syncOverlays(true);
-      });
-      on(panel, "textSize", "input", (ev) =>
-        mutate(
-          () =>
-            setSharedTextSize(
-              b,
-              layer,
-              Math.max(1, Math.min(5000, +ev.target.value || 1)),
-            ),
-          false,
-        ),
-      );
-      for (const [id, key] of [
-        ["textColor", "color"],
-        ["textAlign", "align"],
-        ["fontRole", "role"],
-        ["textVisible", "visible"],
-      ])
-        on(panel, id, "change", (ev) =>
-          mutate(() => {
-            if (key === "visible" && textTypes.some(([k]) => k === layer))
-              setImageTextType(b.imageId, layer, ev.target.checked);
-            else {
-              e[key] = key === "visible" ? ev.target.checked : ev.target.value;
-              if (key === "align" && e.textStyles)
-                for (const style of e.textStyles) if (style) delete style.align;
-            }
-            if (key === "align") render();
-          }, false),
-        );
-      on(panel, "uppercase", "change", (ev) =>
-        mutate(() => {
-          if (layer === "date") {
-            const first = b.imageId === p.images[0]?.id;
-            for (const target of p.boards)
-              if (
-                target.imageId === b.imageId ||
-                (first && target.elements.date.text === e.text)
-              )
-                target.elements.date.uppercase = ev.target.checked;
-            if (first) p.meta.headingUppercase = ev.target.checked;
-            return;
-          }
-          p.meta.uppercase = ev.target.checked;
-          for (const x of p.boards)
-            if (
-              x.imageId === b.imageId ||
-              (b.imageId === p.images[0]?.id &&
-                x.elements.title.text === e.text)
-            )
-              x.elements.title.uppercase = ev.target.checked;
-        }, false),
-      );
-      on(panel, "resetText", "click", () =>
-        mutate(() => {
-          delete p.textOverrides[b.imageId][layer];
-          const template = p.boards.find((x) => x.imageId === p.images[0].id)
-            ?.elements[layer];
-          for (const x of p.boards.filter((x) => x.imageId === b.imageId)) {
-            x.elements[layer].text = template?.text || "";
-            x.elements[layer].visible =
-              x.elements[layer].enabled !== false &&
-              (template?.visible || false);
-          }
-        }, false),
-      );
-      const reset = panel.querySelector("#resetText");
-      if (reset) {
-        reset.addEventListener("click", () => {
-          const field = panel.querySelector("#mainTextInput,#copyrightText");
-          if (field) field.value = b.elements[layer].text;
-          reset.hidden = true;
-          present(read());
-        });
-      }
-      const field = panel.querySelector("#mainTextInput,#copyrightText");
-      views.textEditor?.(b, layer, panel, field);
-      field.addEventListener("input", () => {
-        const reset = panel.querySelector("#resetText");
-        if (reset) reset.hidden = !p.textOverrides?.[b.imageId]?.[layer];
-      });
-      if (b.family?.enabled)
-        panel
-          .querySelector(".panel-row")
-          .insertAdjacentHTML("beforeend", familyTools(b));
-    }
     function renderLogo({ p, b, panel }) {
       const e = b.elements.logo;
       panel.innerHTML = `<div class="panel-row logo-panel"><button class="logo-choice ${e.source === "black" && e.visible ? "active" : ""}" data-logo="black" title="Musikkollegium Schwarz"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Schwarz"></button><button class="logo-choice dark ${e.source === "white" && e.visible ? "active" : ""}" data-logo="white" title="Musikkollegium Weiss"><img src="mkw-logo-bold-neg.svg" alt="Musikkollegium Weiss"></button>${p.logos
@@ -307,7 +163,6 @@
         project: p,
         board: b,
         step,
-        advanced,
         elementNames,
         layer: currentLayer,
       } = read();
@@ -346,10 +201,8 @@
         selectLayer("title");
       if (step === "crop") {
         renderCrop({ b, panel });
-      } else if (step === "text" && advanced) {
-        views.typography(b, layer, panel);
       } else if (step === "text") {
-        renderText({ p, b, layer, panel, elementNames, selectLayer });
+        views.typography(b, layer, panel);
       } else if (step === "sponsors") {
         panel.innerHTML = "";
         sponsorPanel(b, panel);
@@ -357,23 +210,6 @@
         renderLogo({ p, b, panel });
       }
       if (step === "text") {
-        if (!advanced && b.elements[layer]?.align === "justify") {
-          panel.insertAdjacentHTML(
-            "beforeend",
-            carouselJustificationHint(
-              false,
-              "data-post-hyphenate",
-              b.elements[layer].hyphenate !== false,
-            ),
-          );
-          panel.querySelector("[data-post-hyphenate]").onchange = (ev) => {
-            const enabled = ev.target.checked;
-            mutate(() => {
-              b.elements[layer].hyphenate = enabled;
-            });
-            if (enabled) actions.hyphenation();
-          };
-        }
         views.stack(b, panel);
       }
       bindFamilyTools(panel);

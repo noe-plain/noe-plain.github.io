@@ -466,3 +466,67 @@
   width: 100%;
   max-width: none;
 }
+.paragraph-scope {
+  padding: 12px;
+  margin: 8px 0 16px;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-low);
+}
+.paragraph-scope h4 {
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+.paragraph-scope-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.paragraph-scope-heading button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.paragraph-scope select[multiple] {
+  min-height: 100px;
+  max-height: 160px;
+  padding: 4px;
+  overflow: auto;
+}
+.paragraph-scope select[multiple] option {
+  padding: 8px;
+  min-height: 32px;
+  font-size: 12px;
+}
+.paragraph-scope :is(input, button) {
+  min-height: 44px;
+}
+.paragraph-scope [data-line-scope] {
+  margin-top: 12px;
+}
+.paragraph-scope select[multiple] option:checked {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+:is(#carouselProperties, #stepPanel)
+  .typography-inspector
+  .type-control-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+:is(#carouselProperties, #stepPanel)
+  .typography-inspector
+  .type-control-heading
+  > button {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.paragraph-scope [data-line-scope] {
+  display: grid;
+  gap: 12px;
+}
+.paragraph-scope [data-line-scope][hidden] {
+  display: none;
+}

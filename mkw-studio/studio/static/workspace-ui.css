@@ -4,7 +4,6 @@
   --studio-bar-height: 58px;
   --sidebar: var(--studio-inspector-width);
   --studio-inspector-width: 288px;
-  --studio-inspector-splitter-track: 24px;
 }
 svg.ui-icon {
   width: 22px;
@@ -379,18 +378,11 @@ footer #carouselCoordinates {
 
 #carouselEditor {
   inset: var(--studio-header-height) 0 44px;
-  grid-template-columns:
-    minmax(0, 1fr) var(--studio-inspector-splitter-track)
-    var(--studio-inspector-width);
+  grid-template-columns: minmax(0, 1fr) var(--studio-inspector-width);
   grid-template-rows: minmax(0, 1fr);
   background: var(--studio-canvas);
 }
-body.carousel-mode header {
-  right: calc(
-    var(--studio-shell-inset) + var(--sidebar) +
-      var(--studio-inspector-splitter-track) + 24px
-  );
-}
+
 @media (max-width: 1100px) and (min-width: 761px) {
   body.carousel-mode header {
     gap: 8px;
@@ -442,28 +434,11 @@ body.carousel-mode header {
   background: var(--studio-canvas);
 }
 #carouselSidebar {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   background: var(--studio-panel);
   border-color: var(--studio-border);
   overflow: hidden;
-}
-.inspector-width-grip {
-  grid-column: 2;
-  grid-row: 1;
-}
-body:not(.carousel-mode) > .inspector-width-grip {
-  position: fixed;
-  top: calc(
-    var(--studio-header-height) + var(--studio-shell-inset) +
-      var(--studio-shell-gap)
-  );
-  right: calc(var(--studio-shell-inset) + var(--sidebar) - 6px);
-  bottom: calc(
-    var(--studio-footer-height) + var(--studio-shell-inset) +
-      var(--studio-shell-gap)
-  );
-  min-height: 0;
 }
 #carouselProperties {
   min-height: 100px;
@@ -786,7 +761,6 @@ body:not(.carousel-mode) > .inspector-width-grip {
     --studio-header-height: 116px;
     --sidebar: 0px;
     --studio-inspector-width: 0px;
-    --studio-inspector-splitter-track: 0px;
   }
   header {
     padding: 14px 18px;
@@ -846,7 +820,7 @@ body:not(.carousel-mode) > .inspector-width-grip {
   }
   #carouselEditor {
     top: var(--studio-header-height);
-    grid-template-columns: minmax(0, 1fr) 0 var(--studio-inspector-width);
+    grid-template-columns: minmax(0, 1fr) var(--studio-inspector-width);
   }
   #workspace {
     padding: 24px 18px 120px;

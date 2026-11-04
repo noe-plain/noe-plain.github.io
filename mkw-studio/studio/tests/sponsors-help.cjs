@@ -479,7 +479,7 @@ const { launch, artifact } = require("./browser.cjs");
       syncOverlays(true);
     });
     await page.locator("#mainTextInput").fill("Aus nächster Nähe");
-    assert(await page.locator("#uppercase").isChecked());
+    assert.equal(await page.locator("[data-typo-toggle=uppercase]").getAttribute("aria-pressed"),"true");
     assert.equal(
       await page.evaluate(() => board().elements.date.text),
       "Aus nächster Nähe",
@@ -490,14 +490,16 @@ const { launch, artifact } = require("./browser.cjs");
       ),
       "AUS NÄCHSTER NÄHE",
     );
-    await page.locator("#uppercase").uncheck();
+    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    await page.locator("[data-typo-toggle=uppercase]").click();
     assert.equal(
       await page.evaluate(
         () => textBlock(board()).mainRecords.find((r) => r.key === "date").text,
       ),
       "Aus nächster Nähe",
     );
-    await page.locator("#uppercase").check();
+    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    await page.locator("[data-typo-toggle=uppercase]").click();
     await page.evaluate(() => {
       const b = board(),
         el = document.querySelector(
@@ -508,7 +510,8 @@ const { launch, artifact } = require("./browser.cjs");
       el.dispatchEvent(new Event("input", { bubbles: true }));
       el.blur();
     });
-    await page.locator("#uppercase").uncheck();
+    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    await page.locator("[data-typo-toggle=uppercase]").click();
     assert.equal(
       await page.evaluate(() => board().elements.date.text),
       "Aus nächster Nähe",

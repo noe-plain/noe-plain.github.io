@@ -11,10 +11,15 @@ const MKWTypography = (() => {
     ...o,
     font: o.font || o.role,
     textAlign: o.textAlign || o.align || "left",
+    uppercase: o.uppercase ?? (o.key === "date" ? true : undefined),
   });
   function track(o, start, end) {
     const s = session(o);
-    if (s.range?.start !== start || s.range?.end !== end) delete s.pending;
+    if (s.range?.start !== start || s.range?.end !== end) {
+      delete s.pending;
+      delete s.paragraphSelection;
+      delete s.lineSelection;
+    }
     s.range = {
       start: Math.max(0, Math.min(o.text.length, start)),
       end: Math.max(0, Math.min(o.text.length, end)),
@@ -43,7 +48,7 @@ const MKWTypography = (() => {
     const prefix = "typo-" + ++panelSequence;
     const field = (key, label, unit, min, max, step = "any") =>
       `<label>${label}<span class="type-unit"><input data-typo="${key}" aria-label="${label}" type="number" min="${min}" max="${max}" step="${step}"><span>${unit}</span></span></label>`;
-    return `<section class="carousel-property-section typography-inspector"><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Gesamter Text</button></div><div class="typo-tabs" role="tablist" aria-label="Text gestalten"><button role="tab" id="${prefix}-typo-tab-character" aria-controls="${prefix}-typo-character" data-typo-tab="character">Schrift & Farbe</button><button role="tab" id="${prefix}-typo-tab-paragraph" aria-controls="${prefix}-typo-paragraph" data-typo-tab="paragraph">Absatz & Abstände</button></div><div id="${prefix}-typo-character" role="tabpanel" aria-labelledby="${prefix}-typo-tab-character" data-typo-page="character"><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
+    return `<section class="carousel-property-section typography-inspector"><h3 class="visually-hidden">Textformatierung</h3><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Gesamter Text</button></div><div class="typo-tabs" role="tablist" aria-label="Text gestalten"><button role="tab" id="${prefix}-typo-tab-character" aria-controls="${prefix}-typo-character" data-typo-tab="character">Schrift & Farbe</button><button role="tab" id="${prefix}-typo-tab-paragraph" aria-controls="${prefix}-typo-paragraph" data-typo-tab="paragraph">Absatz & Abstände</button></div><div id="${prefix}-typo-character" role="tabpanel" aria-labelledby="${prefix}-typo-tab-character" data-typo-page="character"><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
       ["uppercase", "AA", "Grossbuchstaben"],
       ["underline", "U", "Unterstrichen"],
       ["strike", "S", "Durchgestrichen"],
@@ -56,11 +61,18 @@ const MKWTypography = (() => {
       )
       .join(
         "",
-      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div id="${prefix}-typo-paragraph" role="tabpanel" aria-labelledby="${prefix}-typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("paragraphSize", "Schriftgrösse des Absatzes", "px", 1, 5000)}${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-size-auto>Grundgrösse</button><button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
+      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div>${MKWParagraphScopeUI.markup(prefix)}<div id="${prefix}-typo-paragraph" role="tabpanel" aria-labelledby="${prefix}-typo-tab-paragraph" data-typo-page="paragraph" hidden><p class="typo-paragraph-scope" data-typo-paragraph-scope></p><div class="type-control-heading"><span>Ausrichtung der Auswahl</span><button data-typo-align-auto>Vom Textfeld</button></div>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("paragraphSize", "Schriftgrösse des Absatzes", "px", 1, 5000)}${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-size-auto>Grundgrösse</button><button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
   }
   function values(key) {
     return current.targets.flatMap((o) => {
-      const base = record(o),
+      const base = {
+          ...record(o),
+          ...(current.post &&
+          current.textRole === "date" &&
+          o.uppercase === undefined
+            ? { uppercase: true }
+            : {}),
+        },
         r = current.targets.length === 1 ? range(o) : null,
         attrs = session(o).pending,
         runs =
@@ -98,7 +110,13 @@ const MKWTypography = (() => {
     return list.every((v) => v === list[0]) ? list[0] : null;
   }
   function paragraphIndices(o = current.o) {
-    const r = current.targets.length === 1 ? range(o) : null;
+    const r = current.targets.length === 1 ? range(o) : null,
+      chosen =
+        current.targets.length === 1 ? session(o).paragraphSelection : null;
+    if (chosen)
+      return [...chosen]
+        .filter((i) => i >= 0 && i < o.text.split("\n").length)
+        .sort((a, b) => a - b);
     return r
       ? MKWText.paragraphs(o.text, r.start, r.end)
       : o.text.split("\n").map((_, i) => i);
@@ -111,8 +129,16 @@ const MKWTypography = (() => {
       r = range(o),
       indices = paragraphIndices(),
       allIndices = targets.flatMap((target) =>
-        paragraphIndices(target).map((i) => ({ target, index: i })),
+        paragraphIndices(target).map((index) => ({ target, index })),
       );
+    const sizeField = host.querySelector("[data-typo=size]");
+    sizeField.closest("label").firstChild.textContent = r
+      ? "Schriftgrösse"
+      : "Grundgrösse";
+    sizeField.setAttribute(
+      "aria-label",
+      r ? "Schriftgrösse" : "Grundgrösse des Textfelds",
+    );
     host.querySelector("[data-typo-scope]").textContent =
       targets.length > 1
         ? `${targets.length} Textebenen ausgewählt · Formatierung gilt für alle`
@@ -145,7 +171,12 @@ const MKWTypography = (() => {
                     ? (target.lineHeight ?? (current.post ? 1 : 0.95))
                     : 0),
             )
-          : values(key);
+          : key === "uppercase" &&
+              current.post &&
+              current.textRole === "date" &&
+              o.uppercase === undefined
+            ? [true]
+            : values(key);
       let value = common(list);
       if (key === "lineHeight" && value !== null) value *= 100;
       if (
@@ -166,7 +197,7 @@ const MKWTypography = (() => {
               ? Math.round(value * 100) / 100
               : value;
       input.placeholder = value === null ? "Gemischt" : "";
-      input.disabled = locked;
+      input.disabled = locked || (para && !indices.length);
     });
     host.querySelectorAll("[data-typo-toggle]").forEach((button) => {
       const key = button.dataset.typoToggle,
@@ -202,6 +233,8 @@ const MKWTypography = (() => {
       ),
     );
     host.querySelector(".justification-settings").hidden = align !== "justify";
+    host.querySelector("[data-typo-align-auto]").disabled =
+      locked || !indices.some((i) => o.textStyles?.[i]?.align !== undefined);
     const hyphen = host.querySelector("[data-typo-hyphenate]"),
       hyphenValue = common(
         allIndices.map(
@@ -227,6 +260,7 @@ const MKWTypography = (() => {
       "[data-typo-reset], [data-typo-leading-auto]",
     ))
       button.disabled = locked;
+    current.paragraphScope?.update(indices);
     const tab = s.tab || "character";
     host.querySelectorAll("[data-typo-tab]").forEach((b) => {
       b.setAttribute("aria-selected", String(b.dataset.typoTab === tab));
@@ -270,16 +304,23 @@ const MKWTypography = (() => {
       return;
     }
     if (!checkpointed) remember();
+    const preserveSizes =
+      (!r || current.targets.length > 1) && Number.isFinite(values.size);
     for (const target of current.targets) {
       if (current.post) target.typographyVersion = 1;
+      const previous = preserveSizes ? clone(target) : null;
       MKWText.changeCharacters(
         target,
         current.targets.length === 1 ? r : null,
         values,
         current.post ? "role" : "font",
       );
+      if (previous) {
+        MKWText.keepSizes(target, previous);
+        target.size = values.size;
+      }
     }
-    current.commit({ kind: "character", range: r, values });
+    current.commit({ kind: "character", range: r, values, preserveSizes });
     sync();
   }
   function paragraph(values, checkpointed = false) {
@@ -299,11 +340,46 @@ const MKWTypography = (() => {
     sync();
   }
   function bind(host, options) {
-    current = {
-      ...options,
-      host,
-      targets: options.targets || [options.o],
-    };
+    current = { ...options, host, targets: options.targets || [options.o] };
+    host.querySelector(".paragraph-scope").hidden = current.targets.length > 1;
+    current.paragraphScope =
+      current.targets.length > 1
+        ? null
+        : MKWParagraphScopeUI.mount({
+            host,
+            o: options.o,
+            state: session(options.o),
+            locked: options.locked,
+            layout: options.layout || (() => carouselTextLayout(options.o)),
+            remember,
+            select: (indices) => {
+              session(options.o).paragraphSelection = new Set(indices);
+              session(options.o).tab = "paragraph";
+              sync();
+            },
+            leading: (lines, value) => {
+              if (current.post) options.o.typographyVersion = 1;
+              const groups = new Map();
+              for (const line of lines) {
+                if (!groups.has(line.paragraph)) groups.set(line.paragraph, []);
+                groups.get(line.paragraph).push(line.index);
+              }
+              for (const [index, indices] of groups) {
+                const leading = [
+                  ...(options.o.textStyles?.[index]?.leading || []),
+                ];
+                for (const i of indices) leading[i] = value;
+                MKWText.changeParagraphs(options.o, [index], { leading });
+                current.commit({
+                  kind: "paragraph",
+                  indices: [index],
+                  values: { leading },
+                  lineSpecific: true,
+                });
+              }
+              sync();
+            },
+          });
     host.querySelector("[data-typo=size]").max = options.post ? 5000 : 1000;
     host.querySelector("[data-typo=paragraphSize]").max = options.post
       ? 5000
@@ -341,6 +417,7 @@ const MKWTypography = (() => {
         const key = input.dataset.typo,
           numeric = input.type === "number";
         let value = numeric ? Number(input.value) : input.value;
+        if (numeric && !MKWFields.validate(input, true)) return;
         if (
           !input.value ||
           (numeric &&
@@ -389,6 +466,8 @@ const MKWTypography = (() => {
           });
         }),
     );
+    host.querySelector("[data-typo-align-auto]").onclick = () =>
+      paragraph({ align: undefined });
     host
       .querySelectorAll("[data-typo-align]")
       .forEach(
@@ -449,8 +528,7 @@ const MKWTypography = (() => {
     const host = panel.querySelector(".typography-inspector");
     if (!host) return;
     if (targets.length === 1) {
-      host.querySelector("[data-typo-extra]").innerHTML =
-        `<details class="typo-details"><summary>Einzelne Absätze & Zeilen</summary>${carouselTextStylePanel(o)}</details>`;
+      host.querySelector("[data-typo-extra]").replaceChildren();
       host
         .querySelector("[data-typo-page=character]")
         .insertAdjacentHTML(
@@ -458,7 +536,6 @@ const MKWTypography = (() => {
           `<details class="typo-details"><summary>Textfeldfarbe & Deckkraft</summary>${studioPaintCards(o)}</details>`,
         );
       studioBindPaintCards(host, o);
-      carouselBindTextStyles(o, panel);
     }
     bind(host, {
       o,
@@ -489,6 +566,7 @@ const MKWTypography = (() => {
       }, false);
     };
     const reset = panel.querySelector("[data-post-text-reset]");
+    if (reset) reset.id = "resetText";
     if (reset)
       reset.onclick = () => {
         mutate(() => {
@@ -520,6 +598,11 @@ const MKWTypography = (() => {
         renderPanel();
       };
     const field = panel.querySelector("[data-post-text]");
+    field.id = key === "copyright" ? "copyrightText" : "mainTextInput";
+    panel.querySelector("[data-post-text-layer]").id = "textLayer";
+    panel.querySelector("[data-post-text-visible]").id = "textVisible";
+    panel.querySelector("[data-typo=size]").id = "textSize";
+    panel.querySelector("[data-typo=font]").id = "fontRole";
     let began = false;
     field.onfocus = () => (began = false);
     field.oninput = () => {
@@ -553,6 +636,21 @@ const MKWTypography = (() => {
     bind(panel.querySelector(".typography-inspector"), {
       o,
       post: true,
+      textRole: key,
+      layout: () => {
+        const item = textBlock(b, key).records.find((r) => r.key === key),
+          factor = item?.size / o.size || 1,
+          layout =
+            item?.styled || postLayout({ ...o, key }, item?.w || b.w, factor);
+        return {
+          ...layout,
+          lines: layout.lines.map((l) => ({
+            ...l,
+            leading: l.leading / factor,
+            size: l.size / factor,
+          })),
+        };
+      },
       family: !!b.family?.enabled,
       copyright: key === "copyright",
       commit: (change) => {
@@ -568,13 +666,19 @@ const MKWTypography = (() => {
             continue;
           const sameFormat = target.w === b.w && target.h === b.h,
             values = { ...change.values };
+          if (!sameFormat && change.lineSpecific) continue;
           if (!sameFormat) delete values.size;
           if (!Object.keys(values).length) continue;
           const e = target.elements[key];
           e.typographyVersion = 1;
-          if (change.kind === "character")
+          if (change.kind === "character") {
+            const previous = change.preserveSizes ? clone(e) : null;
             MKWText.changeCharacters(e, change.range, values, "role");
-          else MKWText.changeParagraphs(e, change.indices, values);
+            if (previous) {
+              MKWText.keepSizes(e, previous);
+              if (Number.isFinite(values.size)) e.size = values.size;
+            }
+          } else MKWText.changeParagraphs(e, change.indices, values);
         }
         changed(false);
         if (

@@ -88,9 +88,9 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       "docking is available only in the dedicated test page",
     );
     assert.equal(
-      await page.evaluate(() => p.carousel.pageGroups.length),
-      1,
-      "the normal editor keeps one logical Carousel-Slides group",
+      await page.evaluate(() => p.carousel.pageStructure.groups.length),
+      3,
+      "independent artboards retain independent groups",
     );
     assert.deepEqual(
       await page.evaluate(() =>
@@ -98,24 +98,23 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       ),
       [
         [0, 0],
-        [0, 1470],
-        [0, 2940],
+        [0, 1590],
+        [0, 3180],
       ],
     );
     await page.locator('[data-slide="0"]').click();
     assert.equal(
       await page
         .locator("#carouselProperties h4")
-        .filter({ hasText: "Carousel-Slides" })
+        .filter({ hasText: "Seiten & Artboards" })
         .count(),
       1,
     );
     const beforeOrder = await page.evaluate(() =>
       p.carousel.artboards.map((board) => board.id),
     );
-    await page
-      .locator("#carouselProperties [data-artboard-order='0']")
-      .press("ArrowDown");
+    await page.locator('.pages-thumb').first().click();
+    await page.locator('#spreadPages').focus();await page.keyboard.press('Space');await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
     assert.deepEqual(
       await page.evaluate(() => p.carousel.artboards.map((board) => board.id)),
       [beforeOrder[1], beforeOrder[0], beforeOrder[2]],
@@ -124,6 +123,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       await page.evaluate((value) => studioSetTheme(value), theme);
       await audit("#carouselSidebar");
     }
+    await page.locator(".spread-page-details").evaluate(el=>el.open=true);
     const snap = page.locator("#designerSnapArtboards");
     await snap.uncheck();
     assert.equal(await page.evaluate(() => carouselUI.snap), false);
@@ -203,7 +203,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       );
     }
 
-    const grip = page.locator("#carouselEditor > .inspector-width-grip");
+    const grip = page.locator(".inspector-width-splitter");
     assert.equal(await grip.getAttribute("role"), "separator");
     assert.equal(await grip.getAttribute("aria-orientation"), "vertical");
     const widthBeforeResize = await grip.getAttribute("aria-valuenow");
@@ -217,7 +217,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     const widths = await page.evaluate(() => ({
       variable: parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue(
-          "--studio-inspector-width",
+          "--studio-sidebar-size",
         ),
       ),
       sidebar: document
@@ -229,20 +229,20 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     }));
     assert.equal(
       widths.variable,
-      Math.min(560, Number(widthBeforeResize) + 28),
+      Math.min(450, Number(widthBeforeResize) + 25),
     );
     assert.equal(widths.sidebar, widths.layers);
     assert.equal(
       await page.evaluate(() => studioPreferences.inspectorWidth),
-      Math.min(560, Number(widthBeforeResize) + 28),
+      Math.min(450, Number(widthBeforeResize) + 25),
     );
     assert.equal(await grip.getAttribute("aria-valuemin"), "300");
     await grip.focus();
     await page.keyboard.press("Home");
     assert.equal(await grip.getAttribute("aria-valuenow"), "300");
     await page.keyboard.press("End");
-    assert.equal(await grip.getAttribute("aria-valuenow"), "560");
-    assert.equal(await grip.getAttribute("aria-valuemax"), "560");
+    assert.equal(await grip.getAttribute("aria-valuenow"), "450");
+    assert.equal(await grip.getAttribute("aria-valuemax"), "450");
     assert.deepEqual(errors, []);
     console.log(
       "PASS free artboards start vertically, setup drag sorting and project ordering, sidebar keyboard sorting, snap toggle, unified typography in both modes, multi-text formatting, and synchronized inspector/layer width",

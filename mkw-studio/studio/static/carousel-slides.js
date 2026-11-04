@@ -5,6 +5,7 @@ function carouselSlideControls() {
     c = p.carousel,
     s = carouselZoom;
   if (!root) return;
+  if (MKWSpreadUI.active()) return MKWSpreadUI.canvas(root);
   if (MKWCarouselPolicy.isFree(c)) return MKWArtboardUI.controls(root);
   if (carouselUI.slide >= c.n) carouselUI.slide = c.n - 1;
   root.innerHTML =
@@ -150,7 +151,7 @@ function carouselSlideMove(delta) {
 
 function carouselSlideCenter(index) {
   const v = $("#carouselViewport"),
-    r = $("#carouselCanvas").getBoundingClientRect(),
+    r = carouselOrigin(),
     vr = v.getBoundingClientRect(),
     a = MKWCarouselPolicy.frame(p.carousel, index);
   v.scrollLeft +=

@@ -7,18 +7,21 @@ try {
   );
 } catch {}
 function studioApplyPreferences() {
-  MKWInspectorSplit.configure(
-    studioPreferences.inspectorSplit,
-    (ratio) => {
-      studioPreferences.inspectorSplit = ratio;
-      studioPersistPreferences();
-    },
+  MKWInspectorWidth.configure(
     studioPreferences.inspectorWidth,
     (width) => {
       studioPreferences.inspectorWidth = width;
       studioPersistPreferences();
     },
+    () => {
+      if (carouselActive()) carouselRefresh();
+      else draw();
+    },
   );
+  MKWInspectorSplit.configure(studioPreferences.inspectorSplit, (ratio) => {
+    studioPreferences.inspectorSplit = ratio;
+    studioPersistPreferences();
+  });
   studioApplyColourTheme();
   studioApplyDensity();
   MKWDesignerGrid.sync(studioPreferences.designerGrid);
