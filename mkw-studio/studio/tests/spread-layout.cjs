@@ -77,7 +77,7 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
   await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});const a11y=await page.evaluate(async()=>{const r=await axe.run('#carouselSidebar');return r.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.html)}));});assert.deepEqual(a11y,[]);
   await page.evaluate(()=>studioSetTheme('dark'));await page.waitForTimeout(350);assert.deepEqual(await page.evaluate(async()=>(await axe.run('#carouselSidebar')).violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({html:n.html,failure:n.failureSummary}))}))),[]);await page.evaluate(()=>studioSetTheme('light'));
   await page.screenshot({path:artifact('spread-layout-120-pages.png')});
-  await page.locator('[data-spread-action=edit-spread]').click();assert.deepEqual(await page.evaluate(async()=>(await axe.run('#spreadEditDialog')).violations.map(v=>v.id)),[]);await page.locator('[data-bogen-cancel]').click();
+  await page.locator('[data-spread-action=edit-spread]').click();await page.locator('#spreadEditDialog').evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})));});assert.deepEqual(await page.evaluate(async()=>(await axe.run('#spreadEditDialog')).violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({html:n.html,failure:n.failureSummary}))}))),[]);await page.locator('[data-bogen-cancel]').click();
   // Portable backup and migration/validation.
   await page.evaluate(()=>{validate(p);validateCarousel(p);});await page.evaluate(()=>autosave());await page.reload();await openLatestProject(page);assert.equal(await page.evaluate(()=>p.carousel.n),120);
   await page.evaluate(()=>{carouselSlideSelect(0);});

@@ -22,7 +22,7 @@ const MKWProjectSetup = (() => {
       <div class="new-project-basics"><div class="mode-buttons" role="group" aria-label="Projektmodus"><button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button></div><p id="setupInstructions"></p>
       <div class="setup-project-fields"><label>Projektname<input id="setupName" type="text" maxlength="80" placeholder="Zum Beispiel: Herbstkonzerte" required autofocus></label><label>Kürzel<input id="setupCode" type="text" maxlength="24" placeholder="E2" aria-describedby="setupCodeHint"></label></div><p id="setupCodeHint">Das Kürzel wird für deine Dateinamen verwendet.</p></div>
       <div class="new-project-grid"><section class="new-project-formats" aria-label="Formate einrichten"><div id="postSetup"><div class="new-project-section-heading"><h3>Formate auswählen</h3><span id="setupFormatCount"></span></div><div id="formatChoices"></div><button type="button" id="addFormat">${studioIcon("add")}<span>Eigenes Format hinzufügen</span></button></div>
-      <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">Zusammenhängende Slides</button><button type="button" data-designer-layout="free" aria-pressed="false">Unabhängige Artboards</button></div><p id="designerLayoutHint"></p><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><div id="carouselSetupGroups" role="group" aria-label="Carousel-Gruppen"></div><button type="button" id="setupSplitPageGroup">Letzte Seite in neue Gruppe verschieben</button></div></section></section>
+      <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">${studioIcon("layers")}<span><strong>Zusammenhängende Slides</strong><small>Eine Bildstrecke, Seite an Seite</small></span></button><button type="button" data-designer-layout="free" aria-pressed="false">${studioIcon("builder")}<span><strong>Unabhängige Artboards</strong><small>Einzelne Entwürfe mit eigenen Formaten</small></span></button></div><p id="designerLayoutHint"></p><label class="setup-designer-preset">Startformat<select id="designerSetupPreset"><option value="custom">Eigene Grösse</option><option value="1080x1350">4:5 · 1080 × 1350 px</option><option value="1080x1920">9:16 · 1080 × 1920 px</option><option value="1080x1080">1:1 · 1080 × 1080 px</option><option value="1080x1440">3:4 · 1080 × 1440 px</option></select></label><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><div id="carouselSetupGroups" role="group" aria-label="Carousel-Gruppen"></div><button type="button" id="setupSplitPageGroup">Letzte Seite in neue Gruppe verschieben</button></div></section></section>
       <section class="new-project-detail" aria-labelledby="setupDetailTitle"><div class="new-project-section-heading"><h3 id="setupDetailTitle">Schutzzonen</h3><span id="setupDetailDimensions"></span></div><p id="setupDetailScope"></p><div class="setup-safe-diagram"><div class="safe-preview" id="carouselSafePreview"><div class="safe-preview-inner"><span>Schutzzone</span></div></div></div><div id="setupSafeFields">${[
         ["top", "Oben"],
         ["bottom", "Unten"],
@@ -42,6 +42,15 @@ const MKWProjectSetup = (() => {
           draft.designer.layout === "free" ? "vertical" : "horizontal";
       refresh();
     };
+  $("#designerSetupPreset").onchange = (event) => {
+    if (event.target.value === "custom") return;
+    const [w, h] = event.target.value.split("x").map(Number);
+    Object.assign(draft.designer, { w, h });
+    $("#cw").value = w;
+    $("#ch").value = h;
+    notice();
+    refresh();
+  };
   $("#setupSplitPageGroup").onclick = () => {
     if (!window.MKWPageManagementTest) return;
     const groups = draft.designer.groups,
@@ -116,19 +125,41 @@ const MKWProjectSetup = (() => {
       designer = draft.mode === "carousel",
       errors = formatErrors(f);
     const free = draft.designer.layout === "free";
+    for (const [id, label] of [
+      ["cw", "Breite"],
+      ["ch", "Höhe"],
+    ]) {
+      const input = $("#" + id),
+        title = `${label} ${free ? "pro Artboard" : "pro Slide"} (px)`;
+      input.parentElement.firstChild.textContent = title;
+      input.setAttribute("aria-label", title);
+    }
+    const preset = $("#designerSetupPreset"),
+      dimensions = `${draft.designer.w}x${draft.designer.h}`;
+    preset.value = [...preset.options].some((o) => o.value === dimensions)
+      ? dimensions
+      : "custom";
+    $("#setupSlideMinus").setAttribute(
+      "aria-label",
+      free ? "Ein Artboard weniger" : "Eine Slide weniger",
+    );
+    $("#setupSlidePlus").setAttribute(
+      "aria-label",
+      free ? "Ein Artboard mehr" : "Eine Slide mehr",
+    );
     for (const button of dialog.querySelectorAll("[data-designer-layout]"))
       button.setAttribute(
         "aria-pressed",
         String(button.dataset.designerLayout === draft.designer.layout),
       );
     $("#designerLayoutHint").textContent = free
-      ? "Für unabhängige Entwürfe: Artboards mit eigenen Seiten, Formaten und Schutzzonen. Später im Panel „Seiten & Artboards“ verwalten."
-      : "Für Slideposts: bis zu 20 Seiten direkt aneinander. Weitere Artboards und Druckbögen kannst du später unter „Seiten & Artboards“ ergänzen.";
+      ? "Jedes Artboard kann ein eigenes Format erhalten. Später unter „Seiten & Artboards“ anpassen."
+      : "Bis zu 20 Seiten bilden eine Bildstrecke. Später unter „Seiten & Artboards“ erweitern oder trennen.";
     $("#setupCountHint").textContent = free
-      ? "1–20 Zeichenflächen · Startformat, später einzeln anpassbar"
+      ? "1–20 Artboards · später einzeln anpassbar"
       : "1–20 Slides · ein gemeinsames Format";
     dialog.querySelector('label[for="cn"]').textContent = free
-      ? "Anzahl Zeichenflächen"
+      ? "Anzahl Artboards"
       : "Anzahl Slides";
     if (!designer) validateRows();
     else

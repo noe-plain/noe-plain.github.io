@@ -372,3 +372,9 @@ The 3 November legacy `pageGroups` schema remains readable and the separate page
 ## Spacing refinement (4 November 2026)
 
 The preferred canonical artboard overview remains the product baseline. New independent documents use the model-owned `defaultGap` of240 document pixels. Explicit activation of an existing free document preserves its coordinates; later structural commands remain intentional layout changes with content carry. The virtual panel's184px expanded /68px collapsed rows and24px inter-card whitespace match its padded outlined cards. No extra thumbnail rendering or new observer was added. At overview zoom, single-page artboard labels move beside the paper when the scaled gap cannot accommodate an upper tab; tiny canvas controls hide while the complete sidebar selection remains available. Coupled-page labels stay above and bounded to their page width. These controls never enter exports. The PDF editor work is paused; its research is a document only.
+
+## Designer setup and transient format drafts
+
+Designer setup presets update only draft width/height; safe zones and source-page ordering remain explicit. Described layout choices retain the existing slide/free modes. The shared typography scope precedes character/paragraph tabs; per-line controls live inside the paragraph tab without changing the source-indexed formatting model.
+
+`carousel-slide-format.js` keeps unapplied numeric values in a WeakMap keyed by the carousel model and base-format signature. Unrelated inspector rebuilds preserve the draft; a changed base format or replaced model (undo/project switch) starts fresh. Drafts never enter persistence or exports. Page drag feedback updates only when its target/operation changes and remains inside the visible inspector; model transactions still own all mutations.

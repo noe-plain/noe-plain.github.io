@@ -50,8 +50,13 @@ const assert = require("node:assert/strict"),
       left: 70,
       right: 190,
     };
-    for (const [key, value] of Object.entries(values))
+    for (const [key, value] of Object.entries(values)) {
       await page.locator(`[data-slide-format="${key}"]`).fill(String(value));
+      if (key === "w") {
+        await page.evaluate(() => carouselPanel());
+        assert.equal(await page.locator('[data-slide-format="w"]').inputValue(), "1200", "Draft survives a panel refresh before applying");
+      }
+    }
     assert.equal(
       await page.evaluate(() => p.carousel.w),
       1080,

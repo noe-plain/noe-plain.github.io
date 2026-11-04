@@ -1,10 +1,15 @@
 "use strict";
+const carouselSlideFormatDrafts = new WeakMap();
 function carouselSlideFormatPanel(host) {
   const c = p.carousel,
-    values = Object.fromEntries(
+    base = Object.fromEntries(
       MKWCarouselPolicy.formatKeys.map((key) => [key, c[key]]),
     ),
+    signature = JSON.stringify(base),
     section = document.createElement("section");
+  if (carouselSlideFormatDrafts.get(c)?.signature !== signature)
+    carouselSlideFormatDrafts.set(c, { signature, values: { ...base } });
+  const { values } = carouselSlideFormatDrafts.get(c);
   section.className = "carousel-property-section carousel-slide-format";
   const input = (key, label, min = 0) =>
     `<label>${label} (px)<input data-slide-format="${key}" aria-label="Slide ${label}" type="number" min="${min}" max="4000" step="1" value="${values[key]}"></label>`;

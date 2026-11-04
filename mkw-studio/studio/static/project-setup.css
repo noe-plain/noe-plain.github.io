@@ -233,6 +233,73 @@
 #projectSetup .setup-designer-size {
   margin-top: 16px;
 }
+#projectSetup .designer-arrangement {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+#projectSetup .designer-arrangement button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 100px;
+  padding: 16px 12px;
+  text-align: start;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+}
+#projectSetup .designer-arrangement button[aria-pressed="true"] {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#projectSetup .designer-arrangement button span {
+  display: grid;
+  gap: 6px;
+}
+#projectSetup .designer-arrangement strong {
+  font-size: 13px;
+  line-height: 18px;
+}
+#projectSetup .designer-arrangement small {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+}
+#projectSetup .designer-arrangement .ui-icon {
+  flex: 0 0 24px;
+}
+#projectSetup .setup-designer-preset {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+#projectSetup .setup-designer-preset select {
+  width: 100%;
+  min-height: 48px;
+}
+#projectSetup #carouselSetup {
+  gap: 12px;
+  margin: 0;
+}
+#projectSetup #carouselSetup .setup-designer-size {
+  margin-top: 0;
+}
+#projectSetup #carouselSetup .setup-count {
+  margin-top: 8px;
+}
+@media (max-width: 500px) {
+  #projectSetup .designer-arrangement {
+    grid-template-columns: 1fr;
+  }
+  #projectSetup .designer-arrangement button {
+    min-height: 80px;
+  }
+}
 #projectSetup .setup-count {
   display: grid;
   grid-template-columns: 1fr auto;

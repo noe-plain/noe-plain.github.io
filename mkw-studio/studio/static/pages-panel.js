@@ -12,7 +12,8 @@
       drag = null,
       moving = null,
       disposed = false,
-      renderKey = null;
+      renderKey = null,
+      dropTarget = null;
     const groups = s.groups.map((ids, i) => ({ ids, info: s.artboardInfo[i] }));
     const alive = new Set(s.artboardInfo.map((a) => a.id));
     for (const id of collapsed) if (!alive.has(id)) collapsed.delete(id);
@@ -20,20 +21,55 @@
     trash.className = "pages-drop-delete";
     trash.hidden = true;
     trash.textContent = "Hier ablegen, um ausgewählte Seiten zu löschen";
-    box.after(trash);
+    const feedback = document.createElement("p");
+    feedback.className = "pages-drag-feedback";
+    feedback.setAttribute("role", "status");
+    feedback.setAttribute("aria-live", "polite");
+    feedback.hidden = true;
+    box.after(feedback, trash);
+    const placeFeedback = () => {
+      const r = box.getBoundingClientRect(),
+        panel = box.closest("#carouselProperties").getBoundingClientRect();
+      feedback.style.left = `${r.left + 8}px`;
+      feedback.style.width = `${Math.max(0, r.width - 16)}px`;
+      feedback.style.top = `${Math.max(r.top, Math.min(r.bottom, panel.bottom) - feedback.offsetHeight - 8)}px`;
+    };
+    const reportDrop = (node, kind, message, copy = false) => {
+      if (
+        dropTarget?.node === node &&
+        dropTarget.kind === kind &&
+        dropTarget.message === message &&
+        dropTarget.copy === copy
+      )
+        return;
+      cleanDrop();
+      dropTarget = { node, kind, message, copy };
+      node.classList.add(kind);
+      feedback.hidden = false;
+      feedback.textContent = (copy ? "Kopie: " : "") + message;
+      placeFeedback();
+    };
     const stopDrag = () => {
       drag = null;
       trash.hidden = true;
+      feedback.hidden = true;
+      for (const node of box.querySelectorAll(".is-dragging"))
+        node.classList.remove("is-dragging");
       cleanDrop();
     };
     trash.onclick = () => api.remove();
     trash.ondragover = (e) => {
       if (drag) {
         e.preventDefault();
-        trash.classList.add("drop-join");
+        e.dataTransfer.dropEffect = "move";
+        reportDrop(
+          trash,
+          "drop-join",
+          "Ausgewählte Seiten löschen – danach Inhalt behalten oder löschen wählen.",
+        );
       }
     };
-    trash.ondragleave = () => trash.classList.remove("drop-join");
+    trash.ondragleave = () => cleanDrop();
     trash.ondrop = (e) => {
       if (!drag) return;
       e.preventDefault();
@@ -97,6 +133,8 @@
       draw();
     }
     const cleanDrop = () => {
+      dropTarget?.node?.classList.remove(dropTarget.kind);
+      dropTarget = null;
       for (const node of box.querySelectorAll(
         ".drop-join,.drop-before,.drop-after",
       ))
@@ -169,8 +207,14 @@
         heading.ondragover = (e) => {
           if (!drag) return;
           e.preventDefault();
-          cleanDrop();
-          heading.classList.add("drop-join");
+          const copy = drag.copy || e.altKey;
+          e.dataTransfer.dropEffect = copy ? "copy" : "move";
+          reportDrop(
+            heading,
+            "drop-join",
+            `Mit „${g.info.name}“ verbinden.`,
+            copy,
+          );
         };
         heading.ondrop = (e) => {
           if (!drag) return;
@@ -182,7 +226,9 @@
             copy
               ? { type: "duplicate-to", artboardId: g.info.id, ids: moved }
               : { type: "move-to-artboard", id: g.info.id, ids: moved },
-            "Seiten in dieses Artboard verschoben.",
+            copy
+              ? "Seiten in dieses Artboard kopiert."
+              : "Seiten in dieses Artboard verschoben.",
           );
         };
       }
@@ -213,17 +259,39 @@
           );
           e.dataTransfer.effectAllowed = "copyMove";
           trash.hidden = false;
+          feedback.hidden = false;
+          feedback.textContent =
+            "Am Rand einsortieren · in der Mitte mit dem Artboard verbinden. Option/Alt erstellt eine Kopie.";
+          placeFeedback();
+          for (const item of box.querySelectorAll("[data-page]"))
+            item.classList.toggle(
+              "is-dragging",
+              drag.ids.includes(item.dataset.page),
+            );
           state();
         };
         node.ondragover = (e) => {
           if (!drag) return;
           e.preventDefault();
           e.stopPropagation();
-          cleanDrop();
           const r = node.getBoundingClientRect(),
-            f = (e.clientX - r.left) / r.width;
-          node.classList.add(
+            f = (e.clientX - r.left) / r.width,
+            copy = drag.copy || e.altKey,
+            index = c.artboards.findIndex((a) => a.id === id),
+            group = groups.find((g) => g.ids.includes(id)),
+            message = drag.detach
+              ? "Aus dem bisherigen Artboard lösen."
+              : f < 0.25
+                ? `Vor Seite ${s.startNumber + index} einfügen.`
+                : f > 0.75
+                  ? `Nach Seite ${s.startNumber + index} einfügen.`
+                  : `Mit „${group.info.name}“ verbinden.`;
+          e.dataTransfer.dropEffect = copy ? "copy" : "move";
+          reportDrop(
+            node,
             f < 0.25 ? "drop-before" : f > 0.75 ? "drop-after" : "drop-join",
+            message,
+            copy,
           );
         };
         node.ondrop = (e) => {
@@ -253,7 +321,10 @@
                     index: index + (f > 0.75 ? 1 : 0),
                   };
           stopDrag();
-          api.commit(command, "Seitenstruktur aktualisiert.");
+          api.commit(
+            command,
+            copy ? "Seiten kopiert und einsortiert." : "Seiten verschoben.",
+          );
         };
         node.ondragend = stopDrag;
         const canvas = node.querySelector("canvas");
@@ -270,6 +341,12 @@
       const node = box.querySelector(`[data-page="${CSS.escape(id)}"]`);
       node?.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
+    box.ondragleave = (e) => {
+      if (drag && !box.contains(e.relatedTarget)) {
+        cleanDrop();
+        feedback.hidden = true;
+      }
+    };
     box.onscroll = () => {
       if (!frame) frame = requestAnimationFrame(draw);
     };
@@ -400,6 +477,7 @@
       disposed = true;
       observer.disconnect();
       trash.remove();
+      feedback.remove();
       cancelAnimationFrame(frame);
     };
   }

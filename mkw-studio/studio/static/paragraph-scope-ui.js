@@ -1,7 +1,7 @@
 (function (root) {
   "use strict";
   function markup(prefix) {
-    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4><div class="paragraph-scope-heading"><label for="${prefix}-paragraphSelection">Absätze auswählen</label><button data-paragraph-all>Alle</button></div><select id="${prefix}-paragraphSelection" data-paragraph-selection multiple size="4" aria-describedby="${prefix}-paragraphMultiHint"></select><p id="${prefix}-paragraphMultiHint" class="type-hint">Mit ⌘/Strg oder Umschalt mehrere wählen.</p><div data-line-scope><label for="${prefix}-lineSelection">Zeilen in der Auswahl</label><select id="${prefix}-lineSelection" data-line-selection multiple size="3"></select><label>Abstand der ausgewählten Zeilen (px)<input data-lines-leading type="number" min="1" max="3000" step="any"></label><button data-lines-auto>Automatischen Zeilenabstand verwenden</button></div></section>`;
+    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4><div class="paragraph-scope-heading"><label class="visually-hidden" for="${prefix}-paragraphSelection">Absätze auswählen</label><output data-paragraph-count role="status" aria-live="polite"></output><button data-paragraph-all>Alle</button></div><select id="${prefix}-paragraphSelection" data-paragraph-selection multiple size="4" aria-describedby="${prefix}-paragraphMultiHint"></select><p id="${prefix}-paragraphMultiHint" class="type-hint">Mit ⌘/Strg oder Umschalt mehrere wählen.</p><section data-line-scope class="typo-line-controls"><h4>Einzelne Zeilen</h4><label for="${prefix}-lineSelection">Zeilen in der Auswahl</label><select id="${prefix}-lineSelection" data-line-selection multiple size="3"></select><label>Abstand der ausgewählten Zeilen (px)<input data-lines-leading type="number" min="1" max="3000" step="any"></label><button data-lines-auto>Automatischen Zeilenabstand verwenden</button></section></section>`;
   }
   function mount({
     host,
@@ -34,6 +34,11 @@
         );
         textKey = o.text;
       }
+      paragraphs.size = Math.max(2, Math.min(4, values.length));
+      host.querySelector("[data-paragraph-count]").textContent =
+        `${indices.length} von ${values.length} ${values.length === 1 ? "Absatz" : "Absätzen"} ausgewählt`;
+      host.querySelector("[data-paragraph-all]").disabled =
+        indices.length === values.length;
       for (const option of paragraphs.options)
         option.selected = indices.includes(+option.value);
       const result = layout(),
