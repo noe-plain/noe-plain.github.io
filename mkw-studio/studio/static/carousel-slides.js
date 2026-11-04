@@ -159,4 +159,6 @@ function carouselSlideCenter(index) {
   if (MKWCarouselPolicy.isFree(p.carousel))
     v.scrollTop +=
       r.top + (a.y + a.h / 2) * carouselZoom - vr.top - v.clientHeight / 2;
+  p.carousel.scrollX = v.scrollLeft;
+  p.carousel.scrollY = v.scrollTop;
 }

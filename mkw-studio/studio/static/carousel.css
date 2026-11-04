@@ -1067,3 +1067,26 @@
   min-width: 0;
   border: 1px solid var(--md-sys-color-outline-variant);
 }
+
+#carouselArtwork {
+  isolation: isolate;
+}
+#carouselCanvas {
+  position: relative;
+  z-index: 0;
+}
+#carouselGuides {
+  z-index: 2;
+}
+#carouselSnapOverlay {
+  z-index: 3;
+}
+#carouselSelectionOverlay {
+  z-index: 4;
+}
+#carouselEditingOverlay {
+  z-index: 5;
+}
+#carouselSlideControls {
+  z-index: 6;
+}

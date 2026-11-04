@@ -451,10 +451,14 @@ function carouselDrawSnap() {
   if (!root) return;
   const c = p.carousel,
     s = carouselZoom;
+  const extent = MKWCarouselPolicy.extent(c),
+    key = JSON.stringify([s, extent.w, extent.h, carouselUI.snapLines]);
+  if (root.dataset.lines === key) return;
+  root.dataset.lines = key;
   root.innerHTML = carouselUI.snapLines
     .map(
       (line) =>
-        `<div class="carousel-snap-line ${line.axis === "x" ? "vertical" : "horizontal"}" style="${line.axis === "x" ? `left:${line.value * s}px;height:${MKWCarouselPolicy.extent(c).h * s}px` : `top:${line.value * s}px;width:${MKWCarouselPolicy.extent(c).w * s}px`}"></div>`,
+        `<div class="carousel-snap-line ${line.axis === "x" ? "vertical" : "horizontal"}" style="${line.axis === "x" ? `left:${line.value * s}px;height:${extent.h * s}px` : `top:${line.value * s}px;width:${extent.w * s}px`}"></div>`,
     )
     .join("");
 }

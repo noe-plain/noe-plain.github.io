@@ -62,7 +62,7 @@ const { launch, artifact } = require("./browser.cjs");
         .getAttribute("aria-pressed"),
       "true",
     );
-    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '1');
     await page.locator("[data-typo=paragraphSize]").fill("36");
     assert.equal(
       await page.evaluate(() => carouselSelected()[0].textStyles[1].size),

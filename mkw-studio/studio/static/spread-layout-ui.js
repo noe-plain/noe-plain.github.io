@@ -85,8 +85,11 @@ const MKWSpreadUI = (() => {
       p.carousel = next;
       p.boards = boards;
       p.images = candidate.images;
-      if (added.length) selected = new Set(added.map((a) => a.id));
-      else
+      if (added.length) {
+        selected = new Set(added.map((a) => a.id));
+        focusedPage = added[0].id;
+        selectedArtboard = null;
+      } else
         selected = new Set(
           [...selected].filter((id) => next.artboards.some((a) => a.id === id)),
         );
@@ -100,6 +103,8 @@ const MKWSpreadUI = (() => {
       if (carouselUI.slide < 0) carouselUI.slide = null;
       pendingMove = null;
       changed();
+      if (added.length && carouselUI.slide !== null)
+        carouselSlideCenter(carouselUI.slide);
       announce(message);
       if (focus)
         requestAnimationFrame(() => {
@@ -144,16 +149,21 @@ const MKWSpreadUI = (() => {
     reset();
     const c = p.carousel,
       s = c.pageStructure,
+      initialMode = s?.mode || (policy.isFree(c) ? "single" : "spreads"),
       section = document.createElement("section");
     section.className = "carousel-property-section spread-panel";
-    section.innerHTML = `<h4 id="spreadTitle">Seiten &amp; Artboards</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${!s || s.mode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Verbindet bis zu 20 Seiten zu einer gemeinsamen Arbeitsfläche, zum Beispiel für eine digitale Bildstrecke."><input type="radio" name="spreadMode" value="spreads" ${s?.mode === "spreads" ? "checked" : ""}>Druckbögen (2–20 Seiten)</label></div>${!s ? '<p class="spread-note">Seiten getrennt oder zu Bögen anordnen. Beim Umstellen bleiben die sichtbaren Seiteninhalte erhalten.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">${s.shuffle ? "Neue Seiten rücken nach." : "Gruppen selbst zusammenstellen."}</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}Neues Artboard</button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Artboard bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Auswahl gemeinsam formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
+    section.innerHTML = `<h4 id="spreadTitle">Seiten &amp; Artboards</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${initialMode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Ermöglicht bis zu 20 verbundene Seiten. Die vorhandene Gestaltung bleibt unverändert; Seiten mit Zusammenfügen verbinden."><input type="radio" name="spreadMode" value="spreads" ${initialMode === "spreads" ? "checked" : ""}>Druckbögen (2–20 Seiten)</label></div>${!s ? '<p class="spread-note">Seiten verwalten, ohne die vorhandene Gestaltung zu verändern.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">${s.shuffle ? "Neue Seiten rücken nach." : "Seiten auswählen und mit „Zusammenfügen“ verbinden."}</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}<span>Neues Artboard</span></button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Artboard bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Auswahl gemeinsam formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
     host.append(section);
-    for (const radio of section.querySelectorAll("[name=spreadMode]"))
-      radio.onchange = () =>
-        commit(
-          { type: "mode", mode: radio.value },
-          "Seitenanordnung geändert.",
-        );
+    for (const radio of section.querySelectorAll("[name=spreadMode]")) {
+      const applyMode = () => {
+        if (p.carousel === c)
+          commit({ type: "mode", mode: radio.value }, "Seitenmodus geändert.");
+      };
+      radio.onchange = applyMode;
+      radio.onclick = () => {
+        if (!s && radio.checked) applyMode();
+      };
+    }
     if (!s) {
       section.querySelector("#spreadEnable").onclick = () =>
         commit({ type: "enable" }, "Seitenverwaltung aktiviert.");
@@ -177,7 +187,7 @@ const MKWSpreadUI = (() => {
         });
     section.querySelector("#spreadAdd").onclick = () =>
       commit(
-        { type: "add", count: 1, spread: true },
+        { type: "add", count: 1, spread: true, ids: [...selected] },
         "Neues Artboard hinzugefügt.",
       );
     for (const b of section.querySelectorAll("[data-spread-action]"))
@@ -271,6 +281,7 @@ const MKWSpreadUI = (() => {
       pageMenu: menu,
       renameBoard,
       boardMenu,
+      addPage,
     });
   }
   async function previewPage(id, canvas, current) {
@@ -416,6 +427,16 @@ const MKWSpreadUI = (() => {
     dialog.querySelector("input").focus();
     dialog.querySelector("input").select();
   }
+  function addPage(info) {
+    const c = p.carousel,
+      index = c.pageStructure.artboardInfo.findIndex((a) => a.id === info.id),
+      group = c.pageStructure.groups[index];
+    if (group)
+      commit(
+        { type: "append-page", ids: [group[0]] },
+        "Seite in diesem Artboard hinzugefügt.",
+      );
+  }
   function boardMenu(info, event, trigger) {
     document.querySelector("#artboardContextMenu")?.remove();
     const menu = document.createElement("div");
@@ -437,16 +458,7 @@ const MKWSpreadUI = (() => {
       b.onclick = () => {
         menu.hidePopover();
         if (key === "add-page") {
-          const g =
-            p.carousel.pageStructure.groups[
-              p.carousel.pageStructure.artboardInfo.findIndex(
-                (a) => a.id === info.id,
-              )
-            ];
-          commit(
-            { type: "resize-spread", ids: [g[0]], count: g.length + 1 },
-            "Seite im Artboard hinzugefügt.",
-          );
+          addPage(info);
         } else if (key === "rename") renameBoard(info);
         else if (key === "edit") editSpread();
         else if (key === "duplicate")
@@ -818,6 +830,25 @@ const MKWSpreadUI = (() => {
         height: rect.h * s + "px",
       });
       root.append(surface);
+      const info = c.pageStructure.artboardInfo[groups.indexOf(group)],
+        add = document.createElement("button");
+      add.className = "spread-add-page";
+      if (!root.querySelector("#carouselAddSlide")) add.id = "carouselAddSlide";
+      add.dataset.addToArtboard = info.id;
+      add.innerHTML = studioIcon("plus");
+      add.setAttribute("aria-label", `Seite zu „${info.name}“ hinzufügen`);
+      add.title = "Seite in diesem Artboard hinzufügen";
+      add.disabled =
+        group.length >= model.maxSpreadPages || c.n >= model.maxPages;
+      Object.assign(add.style, {
+        left: (rect.x + rect.w) * s + 12 + "px",
+        top: rect.y * s + "px",
+      });
+      add.onclick = (e) => {
+        e.stopPropagation();
+        addPage(info);
+      };
+      root.append(add);
       for (const a of pages) {
         if (!policy.intersects(a, view)) continue;
         const button = document.createElement("button");
@@ -869,6 +900,7 @@ const MKWSpreadUI = (() => {
         }
       }
     }
+    if (c.n) return;
     const add = document.createElement("button");
     add.id = "carouselAddSlide";
     add.innerHTML = studioIcon("plus");

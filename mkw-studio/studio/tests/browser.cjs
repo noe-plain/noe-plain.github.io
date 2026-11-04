@@ -48,4 +48,12 @@ async function openLatestProject(page) {
   await rows.first().click();
   await waitForProjectReady(page);
 }
-module.exports = { launch, artifact, waitForProjectReady, openLatestProject };
+async function selectTextScope(page, selector, values) {
+  const desired = new Set((Array.isArray(values) ? values : [values]).map(String)),
+    inputs = page.locator(selector).locator('input[type="checkbox"]');
+  for (let i = 0; i < await inputs.count(); i++) {
+    const input = inputs.nth(i), value = await input.inputValue();
+    await input.setChecked(desired.has(value));
+  }
+}
+module.exports = { launch, artifact, waitForProjectReady, openLatestProject, selectTextScope };

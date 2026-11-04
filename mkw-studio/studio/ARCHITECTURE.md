@@ -378,3 +378,11 @@ The preferred canonical artboard overview remains the product baseline. New inde
 Designer setup presets update only draft width/height; safe zones and source-page ordering remain explicit. Described layout choices retain the existing slide/free modes. The shared typography scope precedes character/paragraph tabs; per-line controls live inside the paragraph tab without changing the source-indexed formatting model.
 
 `carousel-slide-format.js` keeps unapplied numeric values in a WeakMap keyed by the carousel model and base-format signature. Unrelated inspector rebuilds preserve the draft; a changed base format or replaced model (undo/project switch) starts fresh. Drafts never enter persistence or exports. Page drag feedback updates only when its target/operation changes and remains inside the visible inspector; model transactions still own all mutations.
+
+### Non-destructive structure changes and guide layers
+
+Enabling a continuous slide document preserves its existing strip as one spread, with original objects and frame positions. Choosing spreads on a structured/free document changes mode only and turns off automatic redistribution. Explicit join/split/shuffle remain separate actions. `append-page` extends only the addressed spread without repacking existing content, rejects overlap/limits atomically, and backs the per-artboard canvas/sidebar/menu add controls. Adding an independent artboard preserves existing coordinates too.
+
+Programmatic page centring writes viewport coordinates synchronously, avoiding delayed scroll-event mutations during reorder cancellation. Grid culling reads the viewport once per refresh and keys on visible page IDs, retaining guide nodes across pointer paints. Snap overlays retain unchanged lines; explicit overlay stacking keeps all guides above artwork pixels. None of these UI layers enter exports.
+
+Paragraph/line scopes now use one bounded HTML/CSS checkbox-list renderer with native checkbox semantics, 44 px rows, wrapping excerpts, Shift range selection and stable nodes. No hidden native select or duplicate selection model remains. Imported text and formatting models are unchanged.

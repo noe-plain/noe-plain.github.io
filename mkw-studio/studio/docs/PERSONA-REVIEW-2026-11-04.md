@@ -46,3 +46,21 @@ Der neue `persona-workflow`-Test benutzt echte Mausgesten für Reihenfolge, Opti
 Auswahlfarben werden in Sichtaufnahmen nach dem Zustandsübergang beurteilt; in der Prüfung mit reduzierter Bewegung bereits vor dem Seitenaufruf. Eine Aufnahme mitten in einer noch laufenden Farbtransition gilt nicht als fertiger Zustand. Die anfänglich zu luftige Einrichtung und der unter den sichtbaren Bereich fallende Drop-Hinweis wurden nach der Sichtkontrolle korrigiert.
 
 GitHub-Veröffentlichung und vollständige Tests werden nach dem Push separat auf ihren tatsächlichen Abschluss geprüft. Der PDF-Modus bleibt pausiert; sein recherchierter Plan ist unverändert erhalten.
+
+## Ergänzungen während der Schlussprüfung
+
+Die nachgereichten Wünsche sind Teil derselben Überarbeitung: Raster und magnetische Hilfslinien beim Verschieben stabil halten; Wechsel zu Druckbögen ohne Zerlegen/Umordnen; ein direktes Plus pro Artboard; sauber ausgerichtetes „Neues Artboard“; feste HTML/CSS-Listen für Absätze/Zeilen ohne horizontalen Überlauf.
+
+- **Neue Nutzerin:** Strukturmodus ändert bestehende Gestaltung nicht überraschend. Das lokale Plus ergänzt den gewählten Bogen, „Neues Artboard“ bleibt eine unabhängige Seite. Auswahllisten besitzen sichtbare Kästchen statt eines browserspezifischen Mehrfach-Selects.
+- **Erfahrener Nutzer:** Hilfslinien bleiben über dem Artwork; unveränderte Linien werden nicht ständig neu erstellt. Mehrfachwahl und Umschalt-Bereich bleiben möglich. Veränderte Viewportkoordinaten werden sofort gemerkt, nicht erst in einem späteren Scroll-Ereignis.
+- **UX/UI:** Icon und Beschriftung der Hinzufügen-Aktionen sind zentriert. Feste Panelbreiten, umbrochene Textauszüge und ein vertikaler Scrollbereich verhindern horizontalen Überlauf auch bei langen Wörtern.
+- **Barrierefreiheit:** Native Checkboxen, benannte Gruppen, sichtbare Häkchen und 44-px-Zeilen; Tastatur-/Menüalternativen bleiben. Warnung bei fehlendem Platz enthält eine nächste Handlung.
+- **Entwicklerin/QA:** Modellaktionen erhalten bestehende Objekte/Koordinaten. Ergänzen prüft 20/200-Seiten-Limits und Überlappung vor dem Commit. Neue Tests prüfen tatsächliche Mausbewegung, unveränderte Exportpixel, Undo und lange Textlisten in beiden Editoren. PDF-Arbeit bleibt pausiert.
+
+Diese Ergänzungen werden vor der Veröffentlichung nochmals mit Unit-, Firefox- und Chrome-Prüfungen abgeglichen. Die ältere fehlgeschlagene GitHub-Prüfung zeigte verzögert aktualisierte Scrollmetadaten nach einer bereits erfolgten Zentrierung; die Quelle synchronisiert diese jetzt unmittelbar. Der Abbruchtest bleibt vollständig erhalten.
+
+### Abschluss der Ergänzungen
+
+155 Unit-Tests bestanden. Der abschliessende Firefoxlauf besteht 14/14 Suiten; Chrome 7/7. Zusätzlich bestand davor die vollständige Migration der Absatz-/Zeilenprüfungen (u.a. Blocksatz, Ausrichtung und Rahmen-/Zeilentypografie) in Firefox mit 11/11 Suiten. Die 42-Kontext-Axe-Prüfung besteht auch mit den HTML-Checkboxlisten und den lokalen Artboard-Buttons. Sichtaufnahmen geprüft: Hilfslinien während echter Bewegung, Textlisten mit langen Wörtern, 300/450 px und helle Oberfläche. Neue Tests prüfen die identischen Exportpixel vor/nach dem Druckbogen-Wechsel und unveränderte Nachbar-Artboards beim Ergänzen. Der neue Inhalt wird nach dem Hinzufügen ausgewählt und sichtbar zentriert.
+
+Die finale Prüfung findet keine offenen Funktionsfehler in den untersuchten Abläufen. Manueller Screenreader-Test und externe Persona-Nutzertests bleiben ausdrücklich ungetestet. Die GitHub-Ergebnisse gelten erst nach abgeschlossenem Lauf für den dazugehörigen Commit.

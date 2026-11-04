@@ -648,14 +648,22 @@ function carouselRefresh() {
   );
   carouselSchedulePaint(canvas, drawScale, generation);
   $("#carouselGuides").hidden = !carouselUI.guides;
-  const gridStyle = MKWDesignerGrid.style(c);
+  const gridStyle = MKWDesignerGrid.style(c),
+    guideView = structured ? MKWSpreadUI.visible() : null,
+    guideFrames = MKWCarouselPolicy.isFree(c)
+      ? MKWCarouselPolicy.frames(c)
+          .map((a, index) => ({ ...a, index }))
+          .filter(
+            (a) => !guideView || MKWCarouselPolicy.intersects(a, guideView),
+          )
+      : null;
   const guideKey = JSON.stringify([
     gridStyle,
     c.w,
     c.h,
     c.n,
     c.artboards,
-    structured ? canvas._region : null,
+    guideFrames?.map((a) => a.index),
     c.top,
     c.bottom,
     c.left,
@@ -667,13 +675,7 @@ function carouselRefresh() {
   if ($("#carouselGuides").dataset.layout !== guideKey) {
     $("#carouselGuides").dataset.layout = guideKey;
     $("#carouselGuides").innerHTML = MKWCarouselPolicy.isFree(c)
-      ? MKWCarouselPolicy.frames(c)
-          .map((a, i) => ({ ...a, index: i }))
-          .filter(
-            (a) =>
-              !structured ||
-              MKWCarouselPolicy.intersects(a, MKWSpreadUI.visible()),
-          )
+      ? guideFrames
           .map(
             (a, i) =>
               `<div class="slide-guide" style="left:${a.x * s}px;top:${a.y * s}px;width:${a.w * s}px;height:${a.h * s}px"><div class="sixths designer-grid" style="left:${a.left * s}px;right:${a.right * s}px;top:${a.top * s}px;bottom:${a.bottom * s}px;${MKWDesignerGrid.style(c, a.index)}"></div></div>`,

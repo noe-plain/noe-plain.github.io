@@ -30,18 +30,18 @@ const { launch, artifact } = require('./browser.cjs');
       assert.equal(await page.locator(`[data-typo-align=${align}]`).getAttribute('aria-pressed'), 'true');
     }
     await page.locator('[data-typo-align=center]').click();
-    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '1');
     await page.locator('[data-typo-align=right]').click();
     assert((await lines()).filter(line => line.paragraph === 1).every(line => line.align === 'right'));
-    await page.locator('[data-paragraph-selection]').selectOption('0');
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '0');
     await page.locator('[data-typo-align=left]').click();
     assert((await lines()).filter(line => line.paragraph === 1).every(line => line.align === 'right'), 'Only the selected paragraph changes');
     await page.locator('[data-paragraph-all]').click();
     await page.locator('[data-typo-align-auto]').click();
     assert((await lines()).every(line => line.align === 'left'));
-    await page.locator('[data-paragraph-selection]').selectOption('0');
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '0');
     await page.locator('[data-typo-align=center]').click();
-    await page.locator('[data-paragraph-selection]').selectOption('1');
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '1');
     await page.locator('[data-typo-align=right]').click();
     await page.locator('[data-text-anchor=bottom]').click();
     // The image encoders must preserve the same line origins and bottom anchor.

@@ -15,10 +15,12 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
    window.pageHashes=async()=>{const values=[];for(let i=0;i<p.carousel.n;i++){const a=MKWCarouselPolicy.frame(p.carousel,i),cv=makeCanvas(a.w,a.h);await carouselPaint(exportContext(cv),i);const b=new Uint8Array(await(await new Promise(r=>cv.toBlob(r))).arrayBuffer());values.push([...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].join(','));cv.width=cv.height=1;}return values;};
   });
   const before=await page.evaluate(()=>pageHashes());
-  await page.locator('#spreadEnable').click();await page.locator('#spreadPages').waitFor();
+  await page.locator('#spreadEnable').click();await page.locator('#spreadPages').waitFor();await page.locator('.spread-modes label').first().click();
   assert.deepEqual(await page.evaluate(()=>pageHashes()),before,'explicit conversion preserves each page');
   assert.equal(await page.evaluate(()=>p.carousel.objects.filter(o=>o.imageId==='spread-photo').length),2);
   await page.locator('.spread-modes label').nth(1).click();assert(await page.locator('[name=spreadMode][value=spreads]').isChecked());
+  assert.deepEqual(await page.evaluate(()=>p.carousel.pageStructure.groups.map(g=>g.length)),[1,1,1], 'Mode change leaves existing artboards intact');
+  await page.evaluate(()=>MKWSpreadUI.commit({type:'join',ids:p.carousel.artboards.slice(0,2).map(a=>a.id)}));
   assert.deepEqual(await page.evaluate(()=>p.carousel.pageStructure.groups.map(g=>g.length)),[2,1]);
   assert.deepEqual(await page.evaluate(()=>pageHashes()),before,'joining retains page appearance');
   assert.equal(await page.locator('.spread-fold').count(),1);
@@ -32,6 +34,7 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
   await page.evaluate(()=>redo());assert.equal(await page.evaluate(()=>p.carousel.pageStructure.groups[0].length),1);
   // Cancelled reorder does not mutate model or undo history.
   await rows.nth(0).click();await page.locator('#spreadPages').focus();
+  assert(await page.evaluate(()=>p.carousel.scrollX===document.querySelector('#carouselViewport').scrollLeft&&p.carousel.scrollY===document.querySelector('#carouselViewport').scrollTop), 'Programmatic selection synchronizes the saved view immediately');
   const snapshot=await page.evaluate(()=>({c:JSON.stringify(p.carousel),h:history.length}));
   await page.keyboard.press('Space');await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');
   assert.deepEqual(await page.evaluate(()=>({c:JSON.stringify(p.carousel),h:history.length})),snapshot);

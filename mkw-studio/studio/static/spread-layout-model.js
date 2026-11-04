@@ -302,11 +302,22 @@
       reorder = false;
     switch (action.type) {
       case "enable":
+        if (!policy.isFree(source)) {
+          s.mode = "spreads";
+          s.shuffle = false;
+          s.groups = [existing];
+          return c;
+        }
         break;
       case "mode":
         if (!["single", "spreads"].includes(action.mode))
           fail("Wähle einen gültigen Seitenmodus.");
         s.mode = action.mode;
+        if (s.mode === "spreads") {
+          s.shuffle = false;
+          if (!active(source) && !policy.isFree(source)) s.groups = [existing];
+          return c;
+        }
         s.groups = groups(existing, s.mode);
         break;
       case "settings": {
@@ -421,6 +432,47 @@
         reorder = true;
         break;
       }
+      case "append-page": {
+        const group = s.groups.find((g) => g.some((v) => selected.has(v)));
+        if (!group || group.length >= maxSpreadPages || c.n >= maxPages)
+          fail(
+            "Ein Artboard kann höchstens 20 Seiten enthalten; ein Projekt höchstens 200.",
+          );
+        const members = group.map((v) => c.artboards.find((a) => a.id === v)),
+          base = members.at(-1),
+          page = {
+            ...base,
+            id: id(),
+            name: `Seite ${c.n + 1}`,
+            x:
+              s.binding === "right"
+                ? Math.min(...members.map((a) => a.x)) - base.w
+                : Math.max(...members.map((a) => a.x + a.w)),
+            y: members[0].y,
+          };
+        if (page.x < 0 || page.x + page.w > 100000 || page.y + page.h > 100000)
+          fail(
+            "Neben diesem Bogen fehlt Platz. Verschiebe ihn zuerst weiter in die Montagefläche.",
+          );
+        if (
+          c.artboards.some(
+            (a) => !group.includes(a.id) && sharedArea(a, page) > 0,
+          )
+        )
+          fail(
+            "Die neue Seite würde ein anderes Artboard überdecken. Verschiebe dieses zuerst, oder erstelle ein unabhängiges Artboard.",
+          );
+        c.artboards.splice(
+          c.artboards.findIndex((a) => a.id === group.at(-1)) + 1,
+          0,
+          page,
+        );
+        group.push(page.id);
+        c.n++;
+        s.mode = "spreads";
+        s.shuffle = false;
+        return c;
+      }
       case "add": {
         const count = action.count ?? 1;
         if (
@@ -442,9 +494,33 @@
         }));
         c.artboards.push(...added);
         if (action.spread) {
-          s.mode = "spreads";
+          if (count > maxSpreadPages)
+            fail("Ein Artboard kann höchstens 20 Seiten enthalten.");
+          const extent = policy.extent(source),
+            width = added.reduce((sum, a) => sum + a.w, 0),
+            height = Math.max(...added.map((a) => a.h));
+          let x = 0,
+            y = source.n ? extent.h + s.gap : 0;
+          if (y + height > 100000) {
+            x = extent.w + s.gap;
+            y = 0;
+          }
+          if (x + width > 100000 || y + height > 100000)
+            fail(
+              "Für ein weiteres Artboard fehlt Platz auf der Montagefläche.",
+            );
+          for (const a of s.binding === "right"
+            ? [...added].reverse()
+            : added) {
+            a.x = x;
+            a.y = y;
+            x += a.w;
+          }
+          if (count > 1) s.mode = "spreads";
           s.shuffle = false;
           s.groups.push(added.map((a) => a.id));
+          c.n = c.artboards.length;
+          return c;
         } else s.groups.push(...added.map((a) => [a.id]));
         break;
       }

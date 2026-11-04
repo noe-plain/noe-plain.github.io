@@ -41,7 +41,7 @@ const { launch, artifact, waitForProjectReady } = require('./browser.cjs');
     assert(await page.locator('.paragraph-scope').evaluate(el => !!el.nextElementSibling?.classList.contains('typo-tabs')));
     assert(await page.locator('[data-line-scope]').evaluate(el => el.closest('[data-typo-page]')?.dataset.typoPage === 'paragraph'));
     assert(!(await page.locator('[data-line-scope]').isVisible()));
-    await page.locator('[data-paragraph-selection]').selectOption(['0', '2']);
+    await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', ['0', '2']);
     assert.match(await page.locator('[data-paragraph-count]').textContent(), /2 von 3/);
     await page.evaluate(() => {
       window.reviewAnnouncements = 0;
