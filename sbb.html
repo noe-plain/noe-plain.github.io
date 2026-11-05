@@ -63,42 +63,72 @@ button.primary:active{background:#c60018}input{border-radius:4px;background:var(
 }
 @media(max-width:191px){.rail-dot{display:none}.connection-main{padding:10px 8px}.menu-item{padding:12px 10px}.menu-copy strong{font-size:.875rem}.leg-route{padding-left:12px}.leg-point{grid-template-columns:1fr;gap:2px}.leg-point:before{left:-12px}.leg-point:not(:last-child):after{left:-8px}.screen-head h1{font-size:1rem}}
 
+
+.time-kind{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.time-kind button{min-height:48px;padding:10px 4px;font-size:.8125rem;border-radius:24px}
+.time-kind .selected{border:2px solid var(--text);background:var(--raised)}
+.results-route{font-size:.875rem;line-height:1.4;margin:0 4px 6px;overflow-wrap:anywhere}
+.journey-list{list-style:none;padding:0;margin:12px 0 0;background:var(--surface);border-radius:8px;overflow:hidden}
+.journey-list>li+li{border-top:1px solid var(--line)}
+.journey-row{display:block;width:100%;min-height:88px;text-align:left;padding:12px 10px;border:0;border-radius:0;background:transparent}
+.journey-row:focus-visible{outline-offset:-3px}.journey-row:active{background:var(--raised)}
+.journey-date{display:block;font-size:.6875rem;color:var(--muted);margin-bottom:5px}
+.journey-times{display:flex;align-items:center;gap:6px;font-size:1.25rem;line-height:1.3;font-weight:700;font-variant-numeric:tabular-nums}
+.journey-times time{white-space:nowrap;flex:0 0 auto}
+.journey-arrow{flex:0 0 auto;font-size:.875rem;font-weight:400;color:var(--muted)}
+.journey-meta,.journey-transport{display:block;margin-top:4px;color:var(--muted);font-size:.75rem;line-height:1.4;overflow-wrap:anywhere}
+.journey-transport{color:var(--text)}
+@media(max-width:210px){.journey-times{font-size:1.125rem}}
+@media(max-width:175px){.time-kind{grid-template-columns:1fr}.journey-times{font-size:1rem;gap:4px}}
+
+
+/* One shared header: identical geometry across screens and no layout-changing title wrap. */
+.app-header{position:relative;height:48px;min-height:48px;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;margin:0 0 12px;background:var(--red);color:#fff}
+.app-header h1{margin:0;padding:0 8px 0 0;font-size:1rem;font-weight:400;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-header .back{height:48px;min-height:48px;display:grid;place-items:center;align-self:center;padding:0;line-height:1}.app-header .back svg{display:block;width:20px;height:20px}.app-header .back:disabled{opacity:1}
+button,input,summary{scroll-margin-top:8px}
+
+.journey-day{padding:9px 10px 5px;font-size:.6875rem;color:var(--muted)}
+.journey-list>.journey-day+li{border-top:0}
+.footer{margin-top:16px;padding-top:0;border:0}
 </style>
 </head>
 <body>
 <main class="app">
+<header class="app-header"><button type="button" id="header-back" class="back" aria-label="Zurück" disabled style="visibility:hidden"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 5 8.5 12 15.5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><h1 id="header-title" tabindex="-1">Fahrplan</h1></header>
 <noscript><p class="status error">Diese Fahrplansuche benötigt JavaScript. Wenn die Watch-Webansicht es nicht ausführt, öffne die Seite auf dem iPhone.</p></noscript>
 <section id="home-screen" class="screen" aria-labelledby="home-title">
-<div class="home-head"><h1 id="home-title" tabindex="-1">Fahrplan</h1></div>
+<h2 id="home-title" tabindex="-1" class="sr-only">Fahrplan</h2>
 <nav class="menu" aria-label="Hauptmenü">
-<button class="menu-item" id="go-search"><span class="menu-copy"><strong>Verbindung suchen</strong><small>Start und Ziel wählen</small></span><span class="chevron" aria-hidden="true">›</span></button>
+<button class="menu-item" id="go-search"><span class="menu-copy"><strong>Verbindung suchen</strong></span><span class="chevron" aria-hidden="true">›</span></button>
 <button class="menu-item" id="go-last"><span class="menu-copy"><strong>Letzte Fahrt</strong><small id="last-description">Noch keine Fahrt gesucht</small></span><span class="chevron" aria-hidden="true">›</span></button>
 <button class="menu-item" id="go-saved"><span class="menu-copy"><strong>Gespeicherte Strecke</strong><small id="saved-description">Noch keine Strecke gespeichert</small></span><span class="chevron" aria-hidden="true">›</span></button>
 </nav>
-<div id="home-preview" class="saved-preview hidden"><p class="preview-label">ZULETZT ANGESEHEN</p><p class="preview-route" id="preview-route"></p><p class="preview-time" id="preview-time"></p><button id="open-last" class="small-action">Letzte Fahrt öffnen</button></div>
 </section>
 <section id="search-screen" class="screen hidden" aria-labelledby="search-title">
-<div class="screen-head"><button class="back" data-home aria-label="Zurück zum Menü">‹</button><h1 id="search-title" tabindex="-1">Suche</h1></div>
+<div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="search-title" tabindex="-1" class="sr-only">Suche</h2>
 <form id="search-form" novalidate>
 <div class="panel"><div class="fields">
 <div class="field-origin"><label for="from-input">Von</label><input id="from-input" type="text" placeholder="Startort" autocomplete="off" autocapitalize="words" enterkeyhint="next" required maxlength="160"></div>
 <div class="field-destination"><label for="to-input">Nach</label><input id="to-input" type="text" placeholder="Zielort" autocomplete="off" autocapitalize="words" enterkeyhint="search" required maxlength="160"></div>
 </div>
 <div class="inline-tools"><button id="swap-button" class="ghost" type="button" aria-label="Start und Ziel tauschen">↑↓ Tauschen</button></div>
-<details class="quick-picks"><summary>Häufige Orte</summary><div class="quick"><button type="button" data-place="Winterthur">Winterthur</button><button type="button" data-place="Zürich HB">Zürich HB</button><button type="button" data-place="Gibswil">Gibswil</button><button type="button" data-place="Basel SBB">Basel SBB</button></div><p class="hint">Füllt das zuletzt gewählte Feld, sonst zuerst Von, dann Nach.</p></details>
-<div class="time-options" role="group" aria-label="Abfahrt"><button type="button" id="now-button" class="selected" aria-pressed="true">Jetzt</button><button type="button" id="later-button" aria-pressed="false" aria-controls="time-fields">Zeit wählen</button></div>
-<div id="time-fields" class="time-fields hidden"><div><label for="time-input">Abfahrt · HH:MM</label><input id="time-input" type="text" inputmode="numeric" placeholder="14:30" maxlength="5" autocomplete="off" aria-describedby="time-hint"><p class="hint" id="time-hint">Schweizer Ortszeit. Auch 1430 für 14:30 möglich.</p></div><div><label for="date-input">Datum (opt.) · JJJJ-MM-TT</label><input id="date-input" type="text" inputmode="numeric" maxlength="10" placeholder="2026-11-05" autocomplete="off" aria-describedby="date-hint"><p class="hint" id="date-hint">Leer für heute. Auch 20261105 möglich.</p></div></div>
+<details class="quick-picks"><summary>Häufige Orte</summary><div class="quick"><button type="button" data-place="Winterthur">Winterthur</button><button type="button" data-place="Zürich HB">Zürich HB</button><button type="button" data-place="Gibswil">Gibswil</button><button type="button" data-place="Basel SBB">Basel SBB</button></div></details>
+<div class="time-options" role="group" aria-label="Zeitwahl"><button type="button" id="now-button" class="selected" aria-pressed="true">Jetzt</button><button type="button" id="later-button" aria-pressed="false" aria-controls="time-fields">Zeit wählen</button></div>
+<div id="time-fields" class="time-fields hidden"><div class="time-kind" role="group" aria-label="Gesuchte Uhrzeit"><button type="button" id="departure-button" class="selected" aria-pressed="true">Abfahrt</button><button type="button" id="arrival-button" aria-pressed="false">Ankunft</button></div><div><label id="time-label" for="time-input">Abfahrt · HH:MM</label><input id="time-input" type="text" inputmode="numeric" placeholder="14:30" maxlength="5" autocomplete="off"></div><div><label for="date-input">Datum (opt.) · JJJJ-MM-TT</label><input id="date-input" type="text" inputmode="numeric" maxlength="10" placeholder="2026-11-05" autocomplete="off" aria-describedby="date-hint"><p class="hint" id="date-hint">Leer = heute.</p></div></div>
 </div>
 <button id="search-button" type="submit" class="primary">Suchen</button>
+<p class="hint">Alle Verkehrsmittel</p>
 <p id="form-status" class="status hidden" role="alert"></p>
 </form></section>
-<section id="loading-screen" class="screen hidden" aria-labelledby="loading-title"><div class="loading"><span class="loading-mark" aria-hidden="true"></span><h1 id="loading-title" tabindex="-1">Fahrplan wird geladen …</h1><p>Verbindungen werden abgefragt.</p><button id="cancel-search" type="button">Abbrechen</button></div></section>
-<section id="results-screen" class="screen hidden" aria-labelledby="results-title"><div class="screen-head"><button class="back" data-home aria-label="Zurück zum Menü">‹</button><h1 id="results-title" tabindex="-1">Fahrten</h1></div><p class="screen-note">Schweizer Ortszeit</p><div id="connection-list"></div><div class="nav-actions"><button id="previous-button">‹ Davor</button><button id="next-button">Danach ›</button></div><p id="counter" class="counter" aria-live="polite" aria-atomic="true"></p><p id="result-status" class="status hidden" role="status"></p><button id="edit-search" class="wide">Suche ändern</button></section>
-<section id="last-screen" class="screen hidden" aria-labelledby="last-title"><div class="screen-head"><button class="back" data-home aria-label="Zurück zum Menü">‹</button><h1 id="last-title" tabindex="-1">Letzte Fahrt</h1></div><p class="screen-note">Gespeicherter Stand, keine Live-Aktualisierung.</p><div id="last-content"></div><button id="repeat-last" class="primary">Neu suchen</button></section>
-<section id="saved-screen" class="screen hidden" aria-labelledby="saved-title"><div class="screen-head"><button class="back" data-home aria-label="Zurück zum Menü">‹</button><h1 id="saved-title" tabindex="-1">Strecke</h1></div><div id="saved-content"></div><button id="search-saved" class="primary">Jetzt suchen</button><button id="delete-saved" class="wide">Strecke entfernen</button></section>
+<section id="loading-screen" class="screen hidden" aria-labelledby="loading-title"><div class="loading"><span class="loading-mark" aria-hidden="true"></span><h2 id="loading-title" class="sr-only">Laden</h2><button id="cancel-search" type="button">Abbrechen</button></div></section>
+<section id="results-screen" class="screen hidden" aria-labelledby="results-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="results-title" tabindex="-1" class="sr-only">Fahrten</h2><p id="results-query" class="screen-note"></p><p class="sr-only">Abfahrt → Ankunft · Schweizer Zeit</p><ol id="connection-overview" class="journey-list" aria-label="Gefundene Fahrten"></ol><div class="nav-actions"><button id="previous-button">‹ Früher</button><button id="next-button">Später ›</button></div><p id="counter" class="counter" aria-live="polite" aria-atomic="true"></p><p id="results-route" class="results-route"></p><p id="result-status" class="status hidden" role="status"></p><button id="edit-search" class="wide">Suche ändern</button></section>
+<section id="trip-screen" class="screen hidden" aria-labelledby="trip-title"><div class="legacy-navigation" hidden><button id="back-results" class="back" aria-label="Zurück zur Fahrtenliste">‹</button></div><h2 id="trip-title" tabindex="-1" class="sr-only">Fahrt</h2><div id="connection-list"></div><button id="show-overview" class="wide">Alle Fahrten</button></section>
+<section id="last-screen" class="screen hidden" aria-labelledby="last-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="last-title" tabindex="-1" class="sr-only">Letzte Fahrt</h2><p class="screen-note">Gespeicherter Stand</p><div id="last-content"></div><button id="repeat-last" class="primary">Aktualisieren</button></section>
+<section id="saved-screen" class="screen hidden" aria-labelledby="saved-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="saved-title" tabindex="-1" class="sr-only">Strecke</h2><div id="saved-content"></div><button id="search-saved" class="primary">Jetzt suchen</button><button id="delete-saved" class="wide">Strecke entfernen</button></section>
 <p id="storage-status" class="status hidden" role="status"></p>
 <p id="app-message" class="sr-only" role="status" aria-atomic="true"></p>
-<footer class="footer"><p>Unabhängige Fahrplan-Webapp.<br>Kein Angebot der SBB.</p><p>API: <a href="https://transport.opendata.ch/">transport.opendata.ch</a><br>Fahrplandaten: opentransportdata.swiss</p><details class="help"><summary>Zur Watch-Nutzung</summary><p>Als Webseite über eine HTTPS-Adresse öffnen, etwa über einen Link in Nachrichten oder Mail. Die heruntergeladene HTML-Datei muss dafür zuerst auf einem Webserver bereitgestellt werden.</p><p>Die Webansicht muss JavaScript und Internetzugriff erlauben. Eingabe und lokales Speichern hängen von Browser und watchOS-Version ab. Kein Hintergrundabruf, keine Komplikationen, keine native App. Daten werden nur beim Suchen nachgeladen.</p><p>Letzte Fahrt und gemerkte Strecke bleiben nur bei verfügbarem Browserspeicher auf demselben Gerät und unter derselben Webadresse erhalten. Sie werden nicht mit dem iPhone synchronisiert. Fahrplan- und Gleisangaben bitte vor Ort prüfen.</p></details></footer>
+<footer class="footer"><details class="help"><summary>Info</summary><p>Unabhängige Webapp. Kein Angebot der SBB.</p><p>API: <a href="https://transport.opendata.ch/">transport.opendata.ch</a><br>Fahrplandaten: opentransportdata.swiss</p><p>Live-Suche braucht Internet. Lokale Daten werden nicht mit anderen Geräten synchronisiert. Für die Watch über HTTPS öffnen. Keine native watchOS-App.</p></details></footer>
 </main>
 <script>
 (() => {
@@ -107,8 +137,8 @@ const API = 'https://transport.opendata.ch/v1/connections';
 // Keep the original keys so a deployment at the same origin retains existing data.
 const KEY_LAST = 'watchSbbLastTripV2', KEY_SAVED = 'watchSbbSavedRouteV2', KEY_ROUTE = 'watchSbbRouteV2';
 const $ = id => document.getElementById(id);
-const screens = ['home', 'search', 'loading', 'results', 'last', 'saved'];
-const state = {route:null, connections:[], index:0, scheduled:false, busy:false, earlier:true, later:true, generation:0, controller:null, target:null};
+const screens = ['home', 'search', 'loading', 'results', 'trip', 'last', 'saved'];
+const state = {route:null, connections:[], index:0, scheduled:false, arrival:false, busy:false, earlier:true, later:true, generation:0, controller:null, target:null, screen:'home'};
 const memory = new Map();
 let cardId = 0;
 function node(tag, cls, text) {
@@ -118,9 +148,14 @@ function node(tag, cls, text) {
   return el;
 }
 function show(name) {
+  state.screen = name;
   screens.forEach(s => $(`${s}-screen`).classList.toggle('hidden', s !== name));
-  const heading = $(`${name}-screen`).querySelector('h1');
-  try { heading.focus({preventScroll:true}); } catch (_) { heading.focus(); }
+  const title = {home:'Fahrplan',search:'Suche',loading:'Laden …',results:'Fahrten',trip:'Fahrt',last:'Letzte Fahrt',saved:'Strecke'}[name];
+  $('header-title').textContent = title;
+  $('header-back').disabled = name === 'home';
+  $('header-back').style.visibility = name === 'home' ? 'hidden' : 'visible';
+  $('header-back').setAttribute('aria-label',name === 'trip' ? 'Zurück zur Fahrtenliste' : name === 'loading' ? 'Suche abbrechen' : name === 'results' ? 'Zurück zur Suche' : 'Zurück zum Menü');
+  try { $('header-title').focus({preventScroll:true}); } catch (_) { $('header-title').focus(); }
   window.scrollTo(0, 0);
 }
 function announce(message) { $('app-message').textContent = message; }
@@ -129,7 +164,7 @@ function status(id, message, error = false) {
   el.classList.toggle('hidden', !message); el.classList.toggle('error', !!message && error);
 }
 function storageWarning() {
-  status('storage-status', 'Browserspeicher nicht verfügbar oder voll. Änderungen bleiben nur für diese geöffnete Seite erhalten.');
+  status('storage-status', 'Speichern nicht möglich. Daten bleiben nur bis zum Schliessen der Seite.');
 }
 function validRoute(v) { return v && typeof v.from === 'string' && v.from.trim() && typeof v.to === 'string' && v.to.trim(); }
 function validConnection(c) { return c && typeof c === 'object' && c.from && c.to && Array.isArray(c.sections); }
@@ -180,7 +215,7 @@ function info(j = {}) {
   if (/^(BAT|BOAT|SCHIFF)/.test(c)) type = 'Schiff';
   else if (/^(BUS|B$|NFB|TROL)/.test(c)) type = 'Bus';
   else if (/^(TRAM|T$)/.test(c)) type = 'Tram';
-  else if (/^(FUN|GB|LB|PB|CABLE)/.test(c)) type = 'Bahn';
+  else if (/^(FUN|GB|LB|PB|CABLE)/.test(c)) type = 'Bergbahn';
   const line = c === 'S' && j.number ? `S${j.number}` : type !== 'Zug' ? (j.number || j.subcategory || j.category) : [j.category, j.number].filter(Boolean).join(' ');
   return {type, line:line || j.name || type, direction:j.to || ''};
 }
@@ -203,7 +238,7 @@ function addDelay(box, stop, kind) { const message = delayText(stop, kind); if (
 function renderStops(section, ti) {
   const passList = Array.isArray(section.journey.passList) ? section.journey.passList : [];
   const stops = passList.slice(1, -1).filter(Boolean);
-  if (!stops.length) return node('p', 'hint', 'Keine Zwischenhalte gemeldet.');
+  if (!stops.length) return node('p', 'hint', 'Keine Halte gemeldet.');
   const d = node('details', 'stops'); d.append(node('summary', '', `${stops.length} Zwischenhalte`));
   const list = node('ol', 'stop-list');
   stops.forEach(s => { const li = node('li'); li.append(timeNode(s.arrival || s.departure, ''), node('span', '', s.station?.name || 'Halt')); if (s.platform || s.prognosis?.platform) li.append(node('span', 'stop-platform', platform(s, ti.type))); list.append(li); });
@@ -254,14 +289,14 @@ function renderCard(c, allowSave = true) {
   main.append(timeline,chips);
   const toggle = node('button','detail-button'), detail = node('div','details hidden');
   detail.id = `details-${++cardId}`; toggle.type = 'button'; toggle.setAttribute('aria-controls',detail.id); toggle.setAttribute('aria-expanded','false');
-  toggle.append(node('span','','Details und Gleise'),node('span','','+')); toggle.lastChild.setAttribute('aria-hidden','true');
+  toggle.append(node('span','','Details'),node('span','','+')); toggle.lastChild.setAttribute('aria-hidden','true');
   let previous = null;
   (c.sections || []).forEach(s => {
     if (!s || !s.departure || !s.arrival) return;
     if (s.journey) { if (previous) detail.append(renderTransfer(previous,s)); detail.append(renderLeg(s)); previous = s; }
     else if (s.walk) detail.append(renderWalk(s));
   });
-  if (!detail.childNodes.length) detail.append(node('p','hint','Keine Abschnittsdetails verfügbar.'));
+  if (!detail.childNodes.length) detail.append(node('p','hint','Keine Details verfügbar.'));
   toggle.addEventListener('click', () => { const open = detail.classList.toggle('hidden') === false; toggle.setAttribute('aria-expanded',String(open)); toggle.lastChild.textContent = open ? '−' : '+'; });
   card.append(main,toggle,detail);
   if (allowSave) {
@@ -278,21 +313,54 @@ function saveLast(c) {
   const r = getRoute(c);
   write(KEY_LAST,{from:state.route?.from || r.from,to:state.route?.to || r.to,shownFrom:r.from,shownTo:r.to,departure:r.departure,arrival:r.arrival,savedAt:new Date().toISOString(),connection:c});
 }
+function openTrip(index) {
+  if (!state.connections[index]) return;
+  state.index = index;
+  renderResult(); saveLast(state.connections[index]); refreshHome(); show('trip');
+}
+function returnToOverview() {
+  show('results');
+  const button = $('connection-overview').querySelector(`[data-index="${state.index}"]`);
+  if (button) button.focus();
+}
+function renderOverviewRow(c, index) {
+  const r = getRoute(c), item = node('li'), button = node('button','journey-row');
+  button.type = 'button'; button.dataset.index = String(index);
+  button.setAttribute('aria-label', `${r.from} nach ${r.to}: Abfahrt ${day(r.departure)} ${time(r.departure)}, Ankunft ${day(r.arrival)} ${time(r.arrival)}, ${r.duration}, ${r.transfers ? r.transfers + ' Umstiege' : 'direkt'}. Details öffnen.`);
+  const times = node('span','journey-times');
+  times.append(timeNode(r.departure,''),node('span','journey-arrow','→'),timeNode(r.arrival,''));
+  const meta = node('span','journey-meta',`${r.duration || 'Dauer unbekannt'} · ${r.transfers ? r.transfers + ' × Umsteigen' : 'Direkt'}`);
+  const legs = rides(c), first = legs[0], line = first ? info(first.journey).line : 'Zu Fuss';
+  const transport = node('span','journey-transport',`${line}${first ? ' · ' + platform(first.departure,info(first.journey).type) : ''}`);
+  button.append(times,meta,transport);
+  if (day(r.arrival) !== day(r.departure)) button.append(node('span','journey-meta',`Ankunft ${day(r.arrival)}`));
+  const delay = delayText(c.from,'departure'); if (delay) button.append(node('span','delay',delay));
+  button.addEventListener('click', () => openTrip(index)); item.append(button); return item;
+}
 function renderResult() {
-  const list = $('connection-list'); list.replaceChildren();
-  if (!state.connections.length) { list.append(node('div','connection empty','Keine Verbindung gefunden.')); $('counter').textContent = '0 Verbindungen'; $('previous-button').disabled = $('next-button').disabled = true; return; }
-  const c = state.connections[state.index]; list.append(renderCard(c));
-  $('counter').textContent = `${state.index + 1} von ${state.connections.length} geladenen Verbindungen`;
-  $('previous-button').disabled = state.busy || (state.index === 0 && !state.earlier);
-  $('next-button').disabled = state.busy || (state.index === state.connections.length-1 && !state.later);
-  saveLast(c); refreshHome();
+  const overview = $('connection-overview'), detail = $('connection-list');
+  overview.replaceChildren(); detail.replaceChildren();
+  $('results-route').textContent = state.route ? `${state.route.from} → ${state.route.to}${state.route.date ? ' · ' + state.route.date : ''} · Schweizer Zeit` : '';
+  $('results-query').textContent = state.route?.time ? `${state.route.arrival ? 'Ankunft' : 'Abfahrt'} ${state.route.time}` : 'Abfahrt ab jetzt';
+  $('counter').textContent = `${state.connections.length} Verbindungen`;
+  $('previous-button').disabled = state.busy || !state.connections.length || !state.earlier;
+  $('next-button').disabled = state.busy || !state.connections.length || !state.later;
+  if (!state.connections.length) { overview.append(node('li','connection empty','Keine Verbindung gefunden.')); return; }
+  let previousDay = '';
+  state.connections.forEach((c,index) => {
+    const currentDay = day(c.from?.departure);
+    if (currentDay !== previousDay) { overview.append(node('li','journey-day',currentDay)); previousDay = currentDay; }
+    overview.append(renderOverviewRow(c,index));
+  });
+  detail.append(renderCard(state.connections[state.index]));
 }
 async function request(params = {}) {
+  // Omit transportations: keep every transport mode supported by the provider enabled.
   const q = new URLSearchParams({from:state.route.from,to:state.route.to,limit:String(params.limit || 5)});
   if (params.anchor) {
     const p = swissParts(params.anchor); if (!p) throw Error('Ungültiger Zeitanker');
     q.set('date',p.date); q.set('time',p.time); q.set('isArrivalTime',params.arrival ? '1' : '0');
-  } else if (state.route.time) { q.set('time',state.route.time); q.set('date',state.route.date); }
+  } else if (state.route.time) { q.set('time',state.route.time); q.set('date',state.route.date); q.set('isArrivalTime',state.route.arrival ? '1' : '0'); }
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   state.controller = controller;
   let timeout;
@@ -308,44 +376,49 @@ async function request(params = {}) {
     })(),expired]);
   } finally { clearTimeout(timeout); if (state.controller === controller) state.controller = null; }
 }
+function setTimeMode(arrival) {
+  state.arrival = !!arrival;
+  $('departure-button').classList.toggle('selected',!arrival); $('arrival-button').classList.toggle('selected',!!arrival);
+  $('departure-button').setAttribute('aria-pressed',String(!arrival)); $('arrival-button').setAttribute('aria-pressed',String(!!arrival));
+  $('time-label').textContent = `${arrival ? 'Ankunft' : 'Abfahrt'} · HH:MM`;
+}
 function setScheduled(value) {
   state.scheduled = value;
+  if (!value) setTimeMode(false);
   $('now-button').classList.toggle('selected',!value); $('later-button').classList.toggle('selected',value);
   $('now-button').setAttribute('aria-pressed',String(!value)); $('later-button').setAttribute('aria-pressed',String(value));
   $('time-fields').classList.toggle('hidden',!value);
 }
 function errorField(id,message) { show('search'); $(id).setAttribute('aria-invalid','true'); $(id).setAttribute('aria-describedby','form-status'); status('form-status',message,true); $(id).focus(); }
-function clearValidation() { ['from-input','to-input','time-input','date-input'].forEach(id => { $(id).removeAttribute('aria-invalid'); $(id).removeAttribute('aria-describedby'); }); $('time-input').setAttribute('aria-describedby','time-hint'); $('date-input').setAttribute('aria-describedby','date-hint'); }
+function clearValidation() { ['from-input','to-input','time-input','date-input'].forEach(id => { $(id).removeAttribute('aria-invalid'); $(id).removeAttribute('aria-describedby'); }); $('date-input').setAttribute('aria-describedby','date-hint'); }
 function validDate(value) { return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number(value.slice(0,4)) >= 2000 && date(`${value}T12:00:00Z`)?.toISOString().slice(0,10) === value; }
-async function search(from, to, chosenTime = '', chosenDate = '') {
+async function search(from, to, chosenTime = '', chosenDate = '', arrival = false) {
   if (state.busy) return;
   clearValidation();
   if (!from?.trim()) return errorField('from-input','Bitte einen Startort eingeben.');
   if (!to?.trim()) return errorField('to-input','Bitte einen Zielort eingeben.');
   if (from.trim().toLocaleLowerCase() === to.trim().toLocaleLowerCase()) return errorField('to-input','Bitte ein anderes Ziel als den Startort wählen.');
-  if (chosenTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(chosenTime)) return errorField('time-input','Abfahrt als HH:MM eingeben, zum Beispiel 14:30.');
+  if (chosenTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(chosenTime)) return errorField('time-input','Uhrzeit als HH:MM eingeben, zum Beispiel 14:30.');
   if (chosenDate && !validDate(chosenDate)) return errorField('date-input','Datum als JJJJ-MM-TT eingeben, zum Beispiel 2026-11-05.');
-  state.route = {from:from.trim(),to:to.trim(),time:chosenTime,date:chosenTime ? chosenDate || swissParts(new Date()).date : ''};
+  state.route = {from:from.trim(),to:to.trim(),time:chosenTime,date:chosenTime ? chosenDate || swissParts(new Date()).date : '',arrival:!!chosenTime && arrival};
   $('from-input').value = state.route.from; $('to-input').value = state.route.to;
-  setScheduled(!!chosenTime);
+  setScheduled(!!chosenTime); setTimeMode(state.route.arrival);
+  if (chosenTime) $('time-input').value = chosenTime;
   write(KEY_ROUTE,{from:state.route.from,to:state.route.to});
   const generation = ++state.generation; state.busy = true; status('form-status',''); show('loading');
   try {
     const connections = await request({limit:5}); if (generation !== state.generation) return;
-    state.connections = connections; state.index = 0; state.earlier = state.later = !!connections.length;
-    state.busy = false; status('result-status',''); renderResult(); show('results');
+    state.connections = connections.sort((a,b) => (date(a.from.departure) || 0) - (date(b.from.departure) || 0)); state.index = 0; state.earlier = state.later = !!connections.length;
+    state.busy = false; status('result-status',''); renderResult(); if (state.connections[0]) { saveLast(state.connections[0]); refreshHome(); } show('results');
   } catch (_) {
     if (generation !== state.generation) return;
-    show('search'); status('form-status','Fahrplan nicht erreichbar. Internetverbindung prüfen und erneut suchen.',true);
+    show('search'); status('form-status','Fahrplan nicht erreichbar. Erneut versuchen.',true);
   } finally { if (generation === state.generation) state.busy = false; }
 }
 function cancel() { state.generation++; if (state.controller) state.controller.abort(); state.busy = false; }
 function connectionKey(c) { return [c.from?.departure,c.to?.arrival,(c.sections || []).map(s => s.journey?.name || s.journey?.number || '').join('|')].join('/'); }
 async function adjacent(dir) {
   if (state.busy || !state.connections.length) return;
-  if ((dir === 'prev' && state.index > 0) || (dir === 'next' && state.index < state.connections.length - 1)) {
-    state.index += dir === 'prev' ? -1 : 1; renderResult(); $('results-title').focus(); window.scrollTo(0,0); return;
-  }
   const earlier = dir === 'prev';
   if (earlier ? !state.earlier : !state.later) return;
   const edge = earlier ? state.connections[0] : state.connections[state.connections.length-1], anchor = date(edge.from?.departure);
@@ -355,7 +428,7 @@ async function adjacent(dir) {
   const shifted = new Date(queryAnchor.getTime() + (earlier ? -60000 : 60000));
   const generation = state.generation;
   state.busy = true; $('previous-button').disabled = $('next-button').disabled = true;
-  $('connection-list').setAttribute('aria-busy','true'); status('result-status','Weitere Fahrten werden geladen …');
+  $('connection-overview').setAttribute('aria-busy','true'); status('result-status','Weitere Fahrten werden geladen …');
   try {
     const candidates = await request({anchor:shifted,arrival:earlier,limit:8});
     if (generation !== state.generation) return;
@@ -363,35 +436,38 @@ async function adjacent(dir) {
     const items = candidates.filter(c => { const d = date(c.from?.departure); const key = connectionKey(c); if (!d || known.has(key)) return false; known.add(key); return earlier ? d < anchor : d > anchor; }).sort((a,b) => date(a.from.departure)-date(b.from.departure));
     if (!items.length) { if (earlier) state.earlier = false; else state.later = false; status('result-status',earlier ? 'Keine früheren Fahrten gefunden.' : 'Keine späteren Fahrten gefunden.'); }
     else {
-      if (earlier) { const part = items.slice(-3); state.connections = [...part,...state.connections]; state.index = part.length - 1; }
-      else { const part = items.slice(0,3); state.connections.push(...part); state.index++; }
-      status('result-status',''); $('results-title').focus(); window.scrollTo(0,0);
+      if (earlier) { const part = items.slice(-3); state.connections = [...part,...state.connections]; state.index += part.length; }
+      else { const part = items.slice(0,3); state.connections.push(...part); }
+      status('result-status',''); $('header-title').focus({preventScroll:true}); window.scrollTo(0,0);
     }
   } catch (_) { if (generation === state.generation) status('result-status','Weitere Fahrten nicht erreichbar. Bitte erneut versuchen.',true); }
-  finally { if (generation === state.generation) { state.busy = false; renderResult(); } $('connection-list').removeAttribute('aria-busy'); }
+  finally { if (generation === state.generation) { state.busy = false; renderResult(); } $('connection-overview').removeAttribute('aria-busy'); }
 }
 function refreshHome() {
   const last = read(KEY_LAST), saved = read(KEY_SAVED);
   $('last-description').textContent = last ? `${last.from} → ${last.to}` : 'Noch keine Fahrt gesucht';
   $('saved-description').textContent = saved ? `${saved.from} → ${saved.to}` : 'Noch keine Strecke gespeichert';
-  $('home-preview').classList.toggle('hidden',!last);
-  if (last) { $('preview-route').textContent = `${last.from} → ${last.to}`; $('preview-time').textContent = `${day(last.departure)} · Ab ${time(last.departure)}`; }
 }
 function showLast() {
   const last = read(KEY_LAST), box = $('last-content'); box.replaceChildren(); $('repeat-last').disabled = !last;
-  if (last) { box.append(renderCard(last.connection,false),node('p','status',`Stand: ${day(last.savedAt)} · ${time(last.savedAt)}. Für aktuelle Angaben neu suchen.`)); }
-  else box.append(node('div','connection empty','Noch keine Fahrt angesehen. Suche zuerst eine Verbindung.'));
+  if (last) { box.append(renderCard(last.connection,false),node('p','status',`Stand: ${day(last.savedAt)} · ${time(last.savedAt)}`)); }
+  else box.append(node('div','connection empty','Keine letzte Fahrt.'));
   show('last');
 }
 function showSaved() {
   const saved = read(KEY_SAVED), box = $('saved-content'); box.replaceChildren();
   $('search-saved').disabled = $('delete-saved').disabled = !saved;
-  if (saved) { const card = node('div','panel'); card.append(node('p','preview-label','GEMERKTE STRECKE'),node('p','preview-route',`${saved.from} → ${saved.to}`),node('p','hint','Aktuelle Fahrten ab jetzt suchen.')); box.append(card); }
-  else box.append(node('div','connection empty','Noch keine Strecke gemerkt. Du kannst sie bei einer gefundenen Verbindung speichern.'));
+  if (saved) { const card = node('div','panel'); card.append(node('p','preview-route',`${saved.from} → ${saved.to}`)); box.append(card); }
+  else box.append(node('div','connection empty','Keine Strecke gespeichert.'));
   show('saved');
 }
+$('header-back').addEventListener('click', () => {
+  if (state.screen === 'trip') { returnToOverview(); return; }
+  const target = state.screen === 'loading' || state.screen === 'results' ? 'search' : 'home';
+  cancel(); refreshHome(); show(target);
+});
 $('go-search').addEventListener('click', () => { const old = read(KEY_ROUTE); if (old) { $('from-input').value = old.from; $('to-input').value = old.to; } show('search'); });
-$('go-last').addEventListener('click',showLast); $('open-last').addEventListener('click',showLast); $('go-saved').addEventListener('click',showSaved);
+$('go-last').addEventListener('click',showLast); $('go-saved').addEventListener('click',showSaved);
 document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { cancel(); refreshHome(); show('home'); }));
 $('edit-search').addEventListener('click', () => { cancel(); show('search'); });
 $('cancel-search').addEventListener('click', () => { cancel(); show('search'); announce('Suche abgebrochen.'); });
@@ -399,9 +475,13 @@ $('search-form').addEventListener('submit', e => {
   e.preventDefault(); const rawTime = $('time-input').value.trim(), rawDate = $('date-input').value.trim();
   const chosenTime = /^\d{4}$/.test(rawTime) ? `${rawTime.slice(0,2)}:${rawTime.slice(2)}` : rawTime;
   const chosenDate = /^\d{8}$/.test(rawDate) ? `${rawDate.slice(0,4)}-${rawDate.slice(4,6)}-${rawDate.slice(6)}` : rawDate;
-  if (state.scheduled && !chosenTime) { clearValidation(); return errorField('time-input','Bitte die gewünschte Abfahrtszeit als HH:MM eingeben.'); }
-  search($('from-input').value,$('to-input').value,state.scheduled ? chosenTime : '',state.scheduled ? chosenDate : '');
+  if (state.scheduled && !chosenTime) { clearValidation(); return errorField('time-input','Bitte die gewünschte Uhrzeit als HH:MM eingeben.'); }
+  search($('from-input').value,$('to-input').value,state.scheduled ? chosenTime : '',state.scheduled ? chosenDate : '',state.scheduled && state.arrival);
 });
+$('back-results').addEventListener('click', returnToOverview);
+$('show-overview').addEventListener('click', returnToOverview);
+$('departure-button').addEventListener('click', () => setTimeMode(false));
+$('arrival-button').addEventListener('click', () => setTimeMode(true));
 $('previous-button').addEventListener('click', () => adjacent('prev')); $('next-button').addEventListener('click', () => adjacent('next'));
 $('swap-button').addEventListener('click', () => { const value = $('from-input').value; $('from-input').value = $('to-input').value; $('to-input').value = value; announce('Start und Ziel getauscht.'); });
 ['from-input','to-input'].forEach(id => $(id).addEventListener('focus', () => { state.target = id; }));
