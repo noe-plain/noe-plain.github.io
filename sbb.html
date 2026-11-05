@@ -91,11 +91,56 @@ button,input,summary{scroll-margin-top:8px}
 .journey-day{padding:9px 10px 5px;font-size:.6875rem;color:var(--muted)}
 .journey-list>.journey-day+li{border-top:0}
 .footer{margin-top:16px;padding-top:0;border:0}
+
+/* Edge-to-edge header; the content keeps its watch-safe insets. */
+body{padding-left:0;padding-right:0}
+.app{max-width:none;width:100%;margin:0}
+.screen{width:100%;max-width:380px;margin:0 auto;padding:0 10px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+.app-header{width:100%;display:block}
+.header-inner{height:48px;width:100%;max-width:380px;margin:0 auto;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;padding:0 10px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+.footer{max-width:380px;margin:16px auto 0;padding:0 14px}
+#storage-status{max-width:360px;width:calc(100% - 20px);margin:12px auto 0}
+/* Open trip: one itinerary, no duplicated start/end summary. */
+.connection-main{padding:10px}
+.trip-glance{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:baseline;margin-bottom:12px;color:var(--muted)}
+.trip-date{font-size:.6875rem;margin:0}.trip-meta{font-size:.75rem;margin:0}
+.itinerary .leg{border:0;margin:0;padding:0}
+.leg-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:0 0 10px}
+.line{font-size:.8125rem;padding:2px 5px}.direction{font-size:.75rem;line-height:1.35;margin:0;overflow-wrap:anywhere}
+.leg-route{padding-left:14px}
+.leg-point{grid-template-columns:43px minmax(0,1fr);gap:6px;margin-top:10px}
+.leg-point:first-child{margin-top:0}.leg-time{font-size:1.125rem;line-height:1.25;letter-spacing:0}
+.leg-station{font-size:.8125rem;font-weight:500;line-height:1.3;overflow-wrap:anywhere}
+.leg-point .platform{font-size:.75rem;font-weight:600;line-height:1.3;margin-top:3px}
+.leg-point:before{left:-14px;top:6px}
+.leg-point:not(:last-child):after{left:-10px;top:10px;bottom:-20px}
+.leg-day{display:block;font-size:.6875rem;color:var(--muted);margin-top:3px}
+.transfer{border:0;border-left:2px solid var(--line);padding:0 0 0 8px;margin:14px 0 14px 3px}
+.transfer-head{font-size:.75rem;font-weight:600}.transfer-sub{font-size:.75rem;margin-top:2px;line-height:1.3}
+.itinerary>.leg+.leg{margin-top:14px}
+.stops-heading{font-size:.8125rem;font-weight:600;margin:12px 0 6px}
+.actions{padding-top:8px}.actions button{text-align:center}
+.fallback-point{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;margin-top:12px}
+@media(max-width:191px){.leg-point{grid-template-columns:1fr;gap:2px}.leg-time{font-size:1.25rem}.trip-glance{display:block}.trip-meta{margin-top:3px}}
+
+
+/* The header starts at the top; keep only an actual device safe inset inside it. */
+body{padding-top:0}
+.app-header{height:48px;min-height:48px;height:calc(48px + env(safe-area-inset-top));min-height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
+.leg-service{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;margin:0 0 8px;padding:6px 0;border:0;border-radius:0;background:transparent;text-align:left}
+.leg-service:active{background:var(--raised)}.leg-service:focus-visible{outline-offset:1px}
+.service-copy{display:block;min-width:0}.service-copy .direction{display:block;margin-top:3px}.service-chevron{flex:0 0 20px;align-self:center;text-align:center;font-size:20px;line-height:1}
+.leg-intermediates{margin-top:10px}
+.leg-intermediates .leg-point:after{content:"";position:absolute;left:-10px;top:10px;bottom:-20px;width:1px;background:var(--muted)}
+.intermediate-point .leg-time{font-size:.8125rem;font-weight:400}.intermediate-point .leg-station{font-weight:400}.intermediate-point .platform{font-weight:400;color:var(--muted)}
+@media(max-width:175px){.intermediate-point .leg-time{font-size:.875rem}}
+
+.trip-refresh{margin-top:8px}.trip-refresh .hint{margin:5px 4px 0}
 </style>
 </head>
 <body>
 <main class="app">
-<header class="app-header"><button type="button" id="header-back" class="back" aria-label="Zurück" disabled style="visibility:hidden"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 5 8.5 12 15.5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><h1 id="header-title" tabindex="-1">Fahrplan</h1></header>
+<header class="app-header"><div class="header-inner"><button type="button" id="header-back" class="back" aria-label="Zurück" disabled style="visibility:hidden"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 5 8.5 12 15.5 19" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><h1 id="header-title" tabindex="-1">Fahrplan</h1></div></header>
 <noscript><p class="status error">Diese Fahrplansuche benötigt JavaScript. Wenn die Watch-Webansicht es nicht ausführt, öffne die Seite auf dem iPhone.</p></noscript>
 <section id="home-screen" class="screen" aria-labelledby="home-title">
 <h2 id="home-title" tabindex="-1" class="sr-only">Fahrplan</h2>
@@ -123,12 +168,12 @@ button,input,summary{scroll-margin-top:8px}
 </form></section>
 <section id="loading-screen" class="screen hidden" aria-labelledby="loading-title"><div class="loading"><span class="loading-mark" aria-hidden="true"></span><h2 id="loading-title" class="sr-only">Laden</h2><button id="cancel-search" type="button">Abbrechen</button></div></section>
 <section id="results-screen" class="screen hidden" aria-labelledby="results-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="results-title" tabindex="-1" class="sr-only">Fahrten</h2><p id="results-query" class="screen-note"></p><p class="sr-only">Abfahrt → Ankunft · Schweizer Zeit</p><ol id="connection-overview" class="journey-list" aria-label="Gefundene Fahrten"></ol><div class="nav-actions"><button id="previous-button">‹ Früher</button><button id="next-button">Später ›</button></div><p id="counter" class="counter" aria-live="polite" aria-atomic="true"></p><p id="results-route" class="results-route"></p><p id="result-status" class="status hidden" role="status"></p><button id="edit-search" class="wide">Suche ändern</button></section>
-<section id="trip-screen" class="screen hidden" aria-labelledby="trip-title"><div class="legacy-navigation" hidden><button id="back-results" class="back" aria-label="Zurück zur Fahrtenliste">‹</button></div><h2 id="trip-title" tabindex="-1" class="sr-only">Fahrt</h2><div id="connection-list"></div><button id="show-overview" class="wide">Alle Fahrten</button></section>
+<section id="trip-screen" class="screen hidden" aria-labelledby="trip-title"><div class="legacy-navigation" hidden><button id="back-results" class="back" aria-label="Zurück zur Fahrtenliste">‹</button></div><h2 id="trip-title" tabindex="-1" class="sr-only">Fahrt</h2><div id="connection-list"></div><div class="trip-refresh"><button id="refresh-trip" class="wide">Aktualisieren</button><p id="trip-update-time" class="hint"></p><p id="trip-live-note" class="hint hidden">Keine Echtzeit-Prognose</p><p id="trip-update-status" class="status hidden" role="status"></p></div><button id="show-overview" class="wide">Alle Fahrten</button></section>
 <section id="last-screen" class="screen hidden" aria-labelledby="last-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="last-title" tabindex="-1" class="sr-only">Letzte Fahrt</h2><p class="screen-note">Gespeicherter Stand</p><div id="last-content"></div><button id="repeat-last" class="primary">Aktualisieren</button></section>
 <section id="saved-screen" class="screen hidden" aria-labelledby="saved-title"><div class="legacy-navigation" hidden><button class="back" data-home aria-label="Zurück zum Menü">‹</button></div><h2 id="saved-title" tabindex="-1" class="sr-only">Strecke</h2><div id="saved-content"></div><button id="search-saved" class="primary">Jetzt suchen</button><button id="delete-saved" class="wide">Strecke entfernen</button></section>
 <p id="storage-status" class="status hidden" role="status"></p>
 <p id="app-message" class="sr-only" role="status" aria-atomic="true"></p>
-<footer class="footer"><details class="help"><summary>Info</summary><p>Unabhängige Webapp. Kein Angebot der SBB.</p><p>API: <a href="https://transport.opendata.ch/">transport.opendata.ch</a><br>Fahrplandaten: opentransportdata.swiss</p><p>Live-Suche braucht Internet. Lokale Daten werden nicht mit anderen Geräten synchronisiert. Für die Watch über HTTPS öffnen. Keine native watchOS-App.</p></details></footer>
+<footer class="footer"><details class="help"><summary>Info</summary><p>Unabhängige Webapp. Kein Angebot der SBB.</p><p>API: <a href="https://transport.opendata.ch/">transport.opendata.ch</a><br>Fahrplandaten: opentransportdata.swiss</p><p>Live-Suche braucht Internet. Lokale Daten werden nicht mit anderen Geräten synchronisiert. Für die Watch über HTTPS öffnen. Keine native watchOS-App. Die offene Fahrt wird bei sichtbarer Seite jede Minute geprüft. Prognosen hängen vom Datenanbieter ab.</p></details></footer>
 </main>
 <script>
 (() => {
@@ -138,7 +183,7 @@ const API = 'https://transport.opendata.ch/v1/connections';
 const KEY_LAST = 'watchSbbLastTripV2', KEY_SAVED = 'watchSbbSavedRouteV2', KEY_ROUTE = 'watchSbbRouteV2';
 const $ = id => document.getElementById(id);
 const screens = ['home', 'search', 'loading', 'results', 'trip', 'last', 'saved'];
-const state = {route:null, connections:[], index:0, scheduled:false, arrival:false, busy:false, earlier:true, later:true, generation:0, controller:null, target:null, screen:'home'};
+const state = {route:null, connections:[], index:0, scheduled:false, arrival:false, busy:false, earlier:true, later:true, generation:0, controller:null, target:null, screen:'home', checkedAt:new Map(), pinned:null, refreshTimer:null, refreshController:null, refreshing:false, refreshEpoch:0};
 const memory = new Map();
 let cardId = 0;
 function node(tag, cls, text) {
@@ -148,6 +193,7 @@ function node(tag, cls, text) {
   return el;
 }
 function show(name) {
+  if (state.screen === 'trip' && name !== 'trip') stopTripRefresh();
   state.screen = name;
   screens.forEach(s => $(`${s}-screen`).classList.toggle('hidden', s !== name));
   const title = {home:'Fahrplan',search:'Suche',loading:'Laden …',results:'Fahrten',trip:'Fahrt',last:'Letzte Fahrt',saved:'Strecke'}[name];
@@ -157,6 +203,7 @@ function show(name) {
   $('header-back').setAttribute('aria-label',name === 'trip' ? 'Zurück zur Fahrtenliste' : name === 'loading' ? 'Suche abbrechen' : name === 'results' ? 'Zurück zur Suche' : 'Zurück zum Menü');
   try { $('header-title').focus({preventScroll:true}); } catch (_) { $('header-title').focus(); }
   window.scrollTo(0, 0);
+  if (name === 'trip') startTripRefresh();
 }
 function announce(message) { $('app-message').textContent = message; }
 function status(id, message, error = false) {
@@ -235,77 +282,89 @@ function delayText(stop, kind) {
   return Number.isFinite(delay) && delay > 0 ? `+${delay} min${expected ? ` · erwartet ${time(expected)}` : ''}` : '';
 }
 function addDelay(box, stop, kind) { const message = delayText(stop, kind); if (message) box.append(node('span', 'delay', message)); }
-function renderStops(section, ti) {
-  const passList = Array.isArray(section.journey.passList) ? section.journey.passList : [];
-  const stops = passList.slice(1, -1).filter(Boolean);
-  if (!stops.length) return node('p', 'hint', 'Keine Halte gemeldet.');
-  const d = node('details', 'stops'); d.append(node('summary', '', `${stops.length} Zwischenhalte`));
-  const list = node('ol', 'stop-list');
-  stops.forEach(s => { const li = node('li'); li.append(timeNode(s.arrival || s.departure, ''), node('span', '', s.station?.name || 'Halt')); if (s.platform || s.prognosis?.platform) li.append(node('span', 'stop-platform', platform(s, ti.type))); list.append(li); });
-  d.append(list); return d;
-}
-function renderLeg(s) {
-  const ti = info(s.journey), leg = node('div', 'leg'), top = node('div', 'leg-top');
-  top.append(node('span', 'line', `${ti.type} ${ti.line}`));
-  if (ti.direction) top.append(node('span', 'direction', `Richtung ${ti.direction}`));
-  leg.append(top);
-  const routeLine = node('div','leg-route');
-  [[s.departure,'departure','Ab'], [s.arrival,'arrival','An']].forEach(([p, kind, label]) => {
-    const row = node('div', 'leg-point'), text = node('div');
-    const timestamp = node('span', 'leg-time'); timestamp.append(node('span','sr-only',`${label} `), timeNode(p[kind], ''));
-    text.append(node('span','leg-station',p.station?.name || 'Haltestelle'), node('span','platform',platform(p, ti.type)));
-    addDelay(text, p, kind); row.append(timestamp,text); routeLine.append(row);
+function renderLeg(section) {
+  const ti = info(section.journey), leg = node('div','leg'), route = node('div','leg-route');
+  const stops = (Array.isArray(section.journey.passList) ? section.journey.passList : []).slice(1,-1).filter(Boolean);
+  const top = node('button','leg-service'), copy = node('span','service-copy'), chevron = node('span','service-chevron','⌄');
+  top.type = 'button';chevron.setAttribute('aria-hidden','true');
+  copy.append(node('span','line',ti.type === 'Zug' ? ti.line : `${ti.type} ${ti.line}`));
+  if (ti.direction) copy.append(node('span','direction',`→ ${ti.direction}`));
+  top.append(copy,chevron);
+  const group = node('div','leg-intermediates hidden');group.id = `stops-${++cardId}`;
+  top.setAttribute('aria-controls',group.id);top.setAttribute('aria-expanded','false');
+  top.setAttribute('aria-label',`${ti.type} ${ti.line}${ti.direction ? ' Richtung ' + ti.direction : ''}. Haltestellen anzeigen.`);
+  function point(stop,kind,label,endpoint) {
+    const row = node('div',endpoint ? 'leg-point' : 'leg-point intermediate-point'), stamp = node('span','leg-time'), text = node('div','leg-info');
+    stamp.append(node('span','sr-only',`${label} `),timeNode(stop[kind],''));
+    text.append(node('span','leg-station',stop.station?.name || 'Haltestelle'));
+    if (endpoint || stop.platform || stop.prognosis?.platform) text.append(node('span','platform',platform(stop,ti.type)));
+    if (kind === 'arrival' && day(stop.arrival) !== day(section.departure.departure)) text.append(node('span','leg-day',day(stop.arrival)));
+    addDelay(text,stop,kind);row.append(stamp,text);return row;
+  }
+  route.append(point(section.departure,'departure','Abfahrt',true));
+  stops.forEach(stop => group.append(point(stop,stop.departure ? 'departure' : 'arrival','Halt',false)));
+  if (!stops.length) group.append(node('p','hint','Keine weiteren Haltestellen gemeldet.'));
+  route.append(group,point(section.arrival,'arrival','Ankunft',true));
+  top.addEventListener('click',() => {
+    const open = !group.classList.toggle('hidden');top.setAttribute('aria-expanded',String(open));
+    top.setAttribute('aria-label',`${ti.type} ${ti.line}${ti.direction ? ' Richtung ' + ti.direction : ''}. Haltestellen ${open ? 'ausblenden' : 'anzeigen'}.`);
+    chevron.textContent = open ? '⌃' : '⌄';
   });
-  leg.append(routeLine,renderStops(s,ti)); return leg;
+  leg.append(top,route);return leg;
 }
-function renderWalk(s) {
-  const box = node('div', 'leg');
-  box.append(node('span', 'line', 'Zu Fuss'), node('p', 'direction', `${s.departure?.station?.name || 'Start'} → ${s.arrival?.station?.name || 'Ziel'}`), node('p','hint',duration(s.departure?.departure,s.arrival?.arrival) || 'Dauer nicht gemeldet'));
+function renderWalk(section) {
+  const leg = node('div','leg'), top = node('div','leg-top'), route = node('div','leg-route');
+  const walkDuration = duration(section.departure?.departure,section.arrival?.arrival);
+  top.append(node('span','line','Zu Fuss'));
+  if (walkDuration) top.append(node('span','direction',walkDuration));
+  [[section.departure,'departure','Abfahrt'],[section.arrival,'arrival','Ankunft']].forEach(([stop,kind,label]) => {
+    const row = node('div','leg-point'), stamp = node('span','leg-time');
+    stamp.append(node('span','sr-only',`${label} `),timeNode(stop?.[kind],''));
+    row.append(stamp,node('span','leg-station',stop?.station?.name || (kind === 'departure' ? 'Start' : 'Ziel')));route.append(row);
+  });
+  leg.append(top,route);return leg;
+}
+function renderTransfer(a,b) {
+  const x = a.arrival, y = b.departure, box = node('div','transfer');
+  box.append(node('p','transfer-head',`${duration(x.arrival,y.departure) || 'Umstieg'}${duration(x.arrival,y.departure) ? ' · Umstieg' : ''}`));
+  const fromPlatform = platform(x,info(a.journey).type), toPlatform = platform(y,info(b.journey).type);
+  if (fromPlatform !== toPlatform) box.append(node('p','transfer-sub',`${fromPlatform} → ${toPlatform}`));
   return box;
 }
-function renderTransfer(a, b) {
-  const x = a.arrival, y = b.departure, tx = info(a.journey), ty = info(b.journey), box = node('div','transfer');
-  box.append(node('p','transfer-head',`Umstieg · ${x.station?.name || y.station?.name || 'Haltestelle'}`));
-  const gap = duration(x.arrival,y.departure);
-  box.append(node('p','transfer-sub',`${gap ? gap + ' Umsteigezeit\n' : ''}An ${time(x.arrival)} · ${platform(x,tx.type)}\nWeiter ${time(y.departure)} · ${platform(y,ty.type)}`)); return box;
+function endpointRealtime(stop,overall,kind) {
+  const station = value => String(value?.station?.id || value?.station?.name || '');
+  if (!stop || !overall || station(stop) !== station(overall) || date(stop[kind])?.getTime() !== date(overall[kind])?.getTime()) return stop;
+  const prognosis = {...(stop.prognosis || {})};
+  ['departure','arrival','platform'].forEach(key => {if (overall.prognosis?.[key] !== null && overall.prognosis?.[key] !== undefined) prognosis[key] = overall.prognosis[key];});
+  return {...stop,platform:overall.platform ?? stop.platform,delay:overall.delay ?? stop.delay,prognosis};
 }
-function renderCard(c, allowSave = true) {
+function renderCard(c,allowSave = true) {
   const r = getRoute(c), sections = rides(c), card = node('article','connection'), main = node('div','connection-main');
-  card.setAttribute('aria-label', `${r.from} nach ${r.to}, Abfahrt ${time(r.departure)}`);
-  main.append(node('p','trip-date',day(r.departure)));
-  const timeline = node('div','timeline');
-  [[c.from,'departure',r.from,r.departure,'Abfahrt',sections[0]], [c.to,'arrival',r.to,r.arrival,'Ankunft',sections[sections.length-1]]].forEach(([stop,kind,station,value,label,section]) => {
-    const row = node('div','point'), stamp = node('div'); stamp.append(node('span','sr-only',`${label} `),timeNode(value,'time'));
-    const dot = node('span','rail-dot'); dot.setAttribute('aria-hidden','true');
-    const text = node('div','point-info'); text.append(node('span','station',station));
-    // Overall endpoints can be walking stops; only show a platform at a matching ride stop.
-    const rideStop = kind === 'departure' ? section?.departure : section?.arrival;
-    if (rideStop && (rideStop.station?.id ? rideStop.station.id === stop?.station?.id : rideStop.station?.name === station)) text.append(node('span','platform',platform(rideStop,info(section.journey).type)));
-    if (kind === 'arrival' && day(value) !== day(r.departure)) text.append(node('span','platform',day(value)));
-    addDelay(text,stop,kind); row.append(stamp,dot,text); timeline.append(row);
+  card.setAttribute('aria-label',`${r.from} nach ${r.to}, Abfahrt ${time(r.departure)}`);
+  const glance = node('div','trip-glance');
+  glance.append(node('p','trip-date',day(r.departure)),node('p','trip-meta',`${r.duration || 'Dauer unbekannt'} · ${r.transfers ? r.transfers + ' × Umsteigen' : 'Direkt'}`));
+  main.append(glance);
+  const itinerary = node('div','itinerary');
+  const validSections = (c.sections || []).filter(x => x && x.departure && x.arrival);
+  validSections.forEach((source,index) => {
+    const section = {...source,departure:index === 0 ? endpointRealtime(source.departure,c.from,'departure') : source.departure,arrival:index === validSections.length-1 ? endpointRealtime(source.arrival,c.to,'arrival') : source.arrival};
+    if (section.journey) {
+      itinerary.append(renderLeg(section));
+      const next = validSections.slice(index+1).find(x => x.journey);
+      if (next) itinerary.append(renderTransfer(section,next));
+    } else if (section.walk) itinerary.append(renderWalk(section));
   });
-  const chips = node('div','chips'); chips.append(node('span','chip',r.duration || 'Dauer unbekannt'), node('span','chip',r.transfers ? `${r.transfers} × Umsteigen` : 'Direkt'));
-  if (sections[0]) { const t = info(sections[0].journey); chips.append(node('span','chip red',t.line)); }
-  main.append(timeline,chips);
-  const toggle = node('button','detail-button'), detail = node('div','details hidden');
-  detail.id = `details-${++cardId}`; toggle.type = 'button'; toggle.setAttribute('aria-controls',detail.id); toggle.setAttribute('aria-expanded','false');
-  toggle.append(node('span','','Details'),node('span','','+')); toggle.lastChild.setAttribute('aria-hidden','true');
-  let previous = null;
-  (c.sections || []).forEach(s => {
-    if (!s || !s.departure || !s.arrival) return;
-    if (s.journey) { if (previous) detail.append(renderTransfer(previous,s)); detail.append(renderLeg(s)); previous = s; }
-    else if (s.walk) detail.append(renderWalk(s));
-  });
-  if (!detail.childNodes.length) detail.append(node('p','hint','Keine Details verfügbar.'));
-  toggle.addEventListener('click', () => { const open = detail.classList.toggle('hidden') === false; toggle.setAttribute('aria-expanded',String(open)); toggle.lastChild.textContent = open ? '−' : '+'; });
-  card.append(main,toggle,detail);
+  if (!itinerary.childNodes.length) {
+    [[r.departure,r.from,'Abfahrt'],[r.arrival,r.to,'Ankunft']].forEach(([value,station,label]) => {
+      const row = node('div','fallback-point'); row.append(node('span','sr-only',label),timeNode(value,'leg-time'),node('span','leg-station',station)); itinerary.append(row);
+    });
+  }
+  main.append(itinerary);card.append(main);
   if (allowSave) {
-    const actions = node('div','actions'), save = node('button','','Strecke speichern'), last = node('button','','Letzte Fahrt ansehen');
-    const saved = read(KEY_SAVED);
-    if (saved && saved.from === r.from && saved.to === r.to) { save.textContent = '✓ Gespeichert'; save.classList.add('active'); }
-    save.addEventListener('click', () => { const persisted = write(KEY_SAVED,{from:r.from,to:r.to}); refreshHome(); save.textContent = persisted ? '✓ Gespeichert' : '✓ Für Sitzung gemerkt'; save.classList.add('active'); announce(persisted ? 'Strecke gespeichert.' : 'Strecke für diese Sitzung gemerkt.'); });
-    last.addEventListener('click', () => { saveLast(c); showLast(); });
-    actions.append(save,last); card.append(actions);
+    const actions = node('div','actions'), save = node('button','','Strecke speichern'), saved = read(KEY_SAVED);
+    if (saved && saved.from === r.from && saved.to === r.to) {save.textContent = '✓ Gespeichert';save.classList.add('active');}
+    save.addEventListener('click',() => {const persisted = write(KEY_SAVED,{from:r.from,to:r.to});refreshHome();save.textContent = persisted ? '✓ Gespeichert' : '✓ Für Sitzung gemerkt';save.classList.add('active');announce(persisted ? 'Strecke gespeichert.' : 'Strecke für diese Sitzung gemerkt.');});
+    actions.append(save);card.append(actions);
   }
   return card;
 }
@@ -315,8 +374,13 @@ function saveLast(c) {
 }
 function openTrip(index) {
   if (!state.connections[index]) return;
+  if (state.busy) cancel();
   state.index = index;
-  renderResult(); saveLast(state.connections[index]); refreshHome(); show('trip');
+  stopTripRefresh();
+  const selected = state.connections[index], identity = tripIdentity(selected), checkedAt = state.checkedAt.get(identity) || Date.now();
+  state.pinned = {identity,route:{from:state.route.from,to:state.route.to},checkedAt,lastAttemptAt:checkedAt};
+  status('trip-update-status','');
+  renderResult(); saveLast(selected); refreshHome(); updateRefreshLabel(); show('trip');
 }
 function returnToOverview() {
   show('results');
@@ -356,25 +420,27 @@ function renderResult() {
 }
 async function request(params = {}) {
   // Omit transportations: keep every transport mode supported by the provider enabled.
-  const q = new URLSearchParams({from:state.route.from,to:state.route.to,limit:String(params.limit || 5)});
+  const route = params.route || state.route;
+  const q = new URLSearchParams({from:route.from,to:route.to,limit:String(params.limit || 5)});
   if (params.anchor) {
     const p = swissParts(params.anchor); if (!p) throw Error('Ungültiger Zeitanker');
     q.set('date',p.date); q.set('time',p.time); q.set('isArrivalTime',params.arrival ? '1' : '0');
-  } else if (state.route.time) { q.set('time',state.route.time); q.set('date',state.route.date); q.set('isArrivalTime',state.route.arrival ? '1' : '0'); }
+  } else if (route.time) { q.set('time',route.time); q.set('date',route.date); q.set('isArrivalTime',route.arrival ? '1' : '0'); }
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  state.controller = controller;
+  const controllerKey = params.refresh ? 'refreshController' : 'controller';
+  state[controllerKey] = controller;
   let timeout;
   const expired = new Promise((_,reject) => { timeout = setTimeout(() => { if (controller) controller.abort(); reject(Error('Zeitüberschreitung')); },20000); });
   try {
     return await Promise.race([(async () => {
-      const options = {headers:{Accept:'application/json'}}; if (controller) options.signal = controller.signal;
+      const options = {headers:{Accept:'application/json'}}; if (params.refresh) options.cache = 'no-store'; if (controller) options.signal = controller.signal;
       const response = await fetch(`${API}?${q}`,options);
       if (!response.ok) throw Error(`API ${response.status}`);
       const data = await response.json();
       if (!Array.isArray(data.connections)) throw Error('Ungültige API-Antwort');
       return data.connections.filter(validConnection);
     })(),expired]);
-  } finally { clearTimeout(timeout); if (state.controller === controller) state.controller = null; }
+  } finally { clearTimeout(timeout); if (state[controllerKey] === controller) state[controllerKey] = null; }
 }
 function setTimeMode(arrival) {
   state.arrival = !!arrival;
@@ -409,6 +475,7 @@ async function search(from, to, chosenTime = '', chosenDate = '', arrival = fals
   try {
     const connections = await request({limit:5}); if (generation !== state.generation) return;
     state.connections = connections.sort((a,b) => (date(a.from.departure) || 0) - (date(b.from.departure) || 0)); state.index = 0; state.earlier = state.later = !!connections.length;
+    state.checkedAt.clear(); connections.forEach(c => state.checkedAt.set(tripIdentity(c),Date.now()));
     state.busy = false; status('result-status',''); renderResult(); if (state.connections[0]) { saveLast(state.connections[0]); refreshHome(); } show('results');
   } catch (_) {
     if (generation !== state.generation) return;
@@ -432,6 +499,7 @@ async function adjacent(dir) {
   try {
     const candidates = await request({anchor:shifted,arrival:earlier,limit:8});
     if (generation !== state.generation) return;
+    candidates.forEach(c => state.checkedAt.set(tripIdentity(c),Date.now()));
     const known = new Set(state.connections.map(connectionKey));
     const items = candidates.filter(c => { const d = date(c.from?.departure); const key = connectionKey(c); if (!d || known.has(key)) return false; known.add(key); return earlier ? d < anchor : d > anchor; }).sort((a,b) => date(a.from.departure)-date(b.from.departure));
     if (!items.length) { if (earlier) state.earlier = false; else state.later = false; status('result-status',earlier ? 'Keine früheren Fahrten gefunden.' : 'Keine späteren Fahrten gefunden.'); }
@@ -443,6 +511,77 @@ async function adjacent(dir) {
   } catch (_) { if (generation === state.generation) status('result-status','Weitere Fahrten nicht erreichbar. Bitte erneut versuchen.',true); }
   finally { if (generation === state.generation) { state.busy = false; renderResult(); } $('connection-overview').removeAttribute('aria-busy'); }
 }
+// Match the selected service and every transfer by planned departure, not by
+// prognosis, arrival prediction or platform. An ambiguous response is never substituted.
+function tripIdentity(connection) {
+  const station = stop => String(stop?.station?.id || stop?.station?.name || '');
+  const planned = value => date(value)?.toISOString() || '';
+  const legs = rides(connection);
+  if (!legs.length) return JSON.stringify(['walk',station(connection.from),station(connection.to),planned(connection.from?.departure),planned(connection.to?.arrival)]);
+  return JSON.stringify(legs.map(leg => [
+    String(leg.journey.name || ''),String(leg.journey.category || ''),String(leg.journey.number || ''),String(leg.journey.operator || ''),
+    station(leg.departure),station(leg.arrival),planned(leg.departure.departure)
+  ]));
+}
+function tripIsVisible() { return document.visibilityState === 'visible'; }
+function hasRealtime(connection) {
+  const stops = [connection.from,connection.to,...rides(connection).flatMap(leg => [leg.departure,leg.arrival])];
+  return stops.some(stop => stop && (date(stop.prognosis?.departure) || date(stop.prognosis?.arrival) || (stop.delay !== null && stop.delay !== undefined && stop.delay !== '' && Number.isFinite(Number(stop.delay)))));
+}
+function updateRefreshLabel() {
+  if (!state.pinned) return;
+  const el = $('trip-update-time');
+  el.textContent = `Geprüft ${time(new Date(state.pinned.checkedAt))}`;
+  el.dataset.checkedAt = String(state.pinned.checkedAt);
+  $('trip-live-note').classList.toggle('hidden',hasRealtime(state.connections[state.index]));
+}
+function stopTripRefresh() {
+  clearTimeout(state.refreshTimer);state.refreshTimer = null;state.refreshEpoch++;
+  if (state.refreshController) state.refreshController.abort();
+  state.refreshing = false;$('refresh-trip').disabled = false;$('refresh-trip').textContent = 'Aktualisieren';
+}
+function queueTripRefresh() {
+  clearTimeout(state.refreshTimer);state.refreshTimer = null;
+  if (state.screen !== 'trip' || !state.pinned || !tripIsVisible() || state.refreshing) return;
+  const delay = Math.max(1000,60000 - (Date.now() - state.pinned.lastAttemptAt));
+  state.refreshTimer = setTimeout(() => {state.refreshTimer = null;refreshTrip(true);},delay);
+}
+function startTripRefresh() {
+  if (state.screen !== 'trip' || !state.pinned || !tripIsVisible()) return;
+  if (Date.now() - state.pinned.checkedAt >= 60000 && Date.now() - state.pinned.lastAttemptAt >= 1000) refreshTrip(true);
+  else queueTripRefresh();
+}
+async function refreshTrip(automatic = false) {
+  if (state.screen !== 'trip' || !state.pinned || state.refreshing || !tripIsVisible()) return;
+  const selected = state.connections[state.index], pinned = state.pinned, anchor = date(selected?.from?.departure);
+  if (!anchor) {status('trip-update-status','Diese Fahrt kann nicht geprüft werden.',true);return;}
+  clearTimeout(state.refreshTimer);state.refreshTimer = null;
+  const epoch = ++state.refreshEpoch;state.refreshing = true;pinned.lastAttemptAt = Date.now();
+  $('refresh-trip').disabled = true;$('refresh-trip').textContent = 'Prüfen …';status('trip-update-status','');
+  try {
+    const candidates = await request({route:pinned.route,anchor:new Date(anchor.getTime()-60000),arrival:false,limit:16,refresh:true});
+    if (epoch !== state.refreshEpoch || state.screen !== 'trip' || state.pinned !== pinned || !tripIsVisible()) return;
+    const matches = candidates.filter(c => tripIdentity(c) === pinned.identity);
+    if (matches.length !== 1) {status('trip-update-status','Fahrt nicht eindeutig gefunden. Bisheriger Stand bleibt.',true);return;}
+    const openLegs = [...$('connection-list').querySelectorAll('.leg-service')].map(button => button.getAttribute('aria-expanded') === 'true');
+    const focused = document.activeElement, focusedLeg = [...$('connection-list').querySelectorAll('.leg-service')].indexOf(focused);
+    const scrollTop = window.scrollY || 0;
+    state.connections[state.index] = matches[0];pinned.checkedAt = Date.now();state.checkedAt.set(pinned.identity,pinned.checkedAt);
+    renderResult();
+    const services = [...$('connection-list').querySelectorAll('.leg-service')];
+    openLegs.forEach((open,index) => {if (!open || !services[index]) return;const button = services[index];$(button.getAttribute('aria-controls')).classList.remove('hidden');button.setAttribute('aria-expanded','true');button.lastChild.textContent = '⌃';button.setAttribute('aria-label',button.getAttribute('aria-label').replace('anzeigen.','ausblenden.'));});
+    if (focusedLeg >= 0 && services[focusedLeg]) {try {services[focusedLeg].focus({preventScroll:true});} catch (_) {services[focusedLeg].focus();}}
+    window.scrollTo(0,scrollTop);saveLast(matches[0]);refreshHome();updateRefreshLabel();
+    if (!automatic) announce('Fahrt aktualisiert.');
+  } catch (_) {
+    if (epoch === state.refreshEpoch && state.screen === 'trip') status('trip-update-status','Aktualisierung fehlgeschlagen. Bisheriger Stand bleibt.',true);
+  } finally {
+    if (epoch === state.refreshEpoch) {state.refreshing = false;$('refresh-trip').disabled = false;$('refresh-trip').textContent = 'Aktualisieren';queueTripRefresh();}
+  }
+}
+document.addEventListener('visibilitychange',() => {if (!tripIsVisible()) stopTripRefresh();else startTripRefresh();});
+window.addEventListener('pagehide',stopTripRefresh);
+window.addEventListener('pageshow',startTripRefresh);
 function refreshHome() {
   const last = read(KEY_LAST), saved = read(KEY_SAVED);
   $('last-description').textContent = last ? `${last.from} → ${last.to}` : 'Noch keine Fahrt gesucht';
@@ -478,6 +617,7 @@ $('search-form').addEventListener('submit', e => {
   if (state.scheduled && !chosenTime) { clearValidation(); return errorField('time-input','Bitte die gewünschte Uhrzeit als HH:MM eingeben.'); }
   search($('from-input').value,$('to-input').value,state.scheduled ? chosenTime : '',state.scheduled ? chosenDate : '',state.scheduled && state.arrival);
 });
+$('refresh-trip').addEventListener('click',() => refreshTrip(false));
 $('back-results').addEventListener('click', returnToOverview);
 $('show-overview').addEventListener('click', returnToOverview);
 $('departure-button').addEventListener('click', () => setTimeMode(false));
