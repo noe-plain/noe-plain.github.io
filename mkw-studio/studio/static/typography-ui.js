@@ -234,7 +234,10 @@ const MKWTypography = (() => {
     );
     host.querySelector(".justification-settings").hidden = align !== "justify";
     host.querySelector("[data-typo-align-auto]").disabled =
-      locked || !indices.some((i) => o.textStyles?.[i]?.align !== undefined);
+      locked ||
+      !allIndices.some(
+        ({ target, index }) => target.textStyles?.[index]?.align !== undefined,
+      );
     const hyphen = host.querySelector("[data-typo-hyphenate]"),
       hyphenValue = common(
         allIndices.map(
@@ -245,21 +248,23 @@ const MKWTypography = (() => {
       );
     hyphen.checked = hyphenValue !== false;
     hyphen.indeterminate = hyphenValue === null;
-    hyphen.disabled = locked || copyright;
+    hyphen.disabled = locked || copyright || !allIndices.length;
 
     host.querySelector("[data-typo-size-auto]").disabled =
       locked ||
-      !targets.some((target) =>
-        target.textStyles?.some((style) => style?.size !== undefined),
+      !allIndices.some(
+        ({ target, index }) => target.textStyles?.[index]?.size !== undefined,
       );
     host.querySelectorAll("[data-typo-align]").forEach((b) => {
       b.setAttribute("aria-pressed", String(b.dataset.typoAlign === align));
-      b.disabled = locked || copyright;
+      b.disabled = locked || copyright || !allIndices.length;
     });
     for (const button of host.querySelectorAll(
       "[data-typo-reset], [data-typo-leading-auto]",
     ))
-      button.disabled = locked;
+      button.disabled =
+        locked ||
+        (button.hasAttribute("data-typo-leading-auto") && !allIndices.length);
     current.paragraphScope?.update(indices);
     const tab = s.tab || "character";
     host.querySelectorAll("[data-typo-tab]").forEach((b) => {
@@ -324,7 +329,12 @@ const MKWTypography = (() => {
     sync();
   }
   function paragraph(values, checkpointed = false) {
-    if (!current || current.locked) return;
+    if (
+      !current ||
+      current.locked ||
+      !current.targets.some((target) => paragraphIndices(target).length)
+    )
+      return;
     if (!checkpointed) remember();
     const { o, targets } = current,
       indices = paragraphIndices();

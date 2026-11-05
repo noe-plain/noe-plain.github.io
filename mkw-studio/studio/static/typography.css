@@ -490,8 +490,10 @@
 .paragraph-scope :is(input, button) {
   min-height: 44px;
 }
-.paragraph-scope [data-paragraph-count] {
+.typography-inspector :is([data-paragraph-count], [data-lines-count]) {
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 12px;
   line-height: 18px;
   color: var(--md-sys-color-on-surface-variant);

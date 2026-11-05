@@ -1,7 +1,7 @@
 (function (root) {
   "use strict";
   function markup(prefix) {
-    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4><div class="paragraph-scope-heading"><output data-paragraph-count role="status" aria-live="polite"></output><button data-paragraph-all>Alle</button></div><fieldset data-paragraph-selection class="scope-options" aria-label="Absätze auswählen" aria-describedby="${prefix}-paragraphMultiHint"></fieldset><p id="${prefix}-paragraphMultiHint" class="type-hint">Mehrere Kästchen wählen. Umschalt wählt einen Bereich.</p><section data-line-scope class="typo-line-controls"><h4>Einzelne Zeilen</h4><fieldset data-line-selection class="scope-options" aria-label="Zeilen in der Auswahl"></fieldset><label>Abstand der ausgewählten Zeilen (px)<input data-lines-leading type="number" min="1" max="3000" step="any"></label><button data-lines-auto>Automatischen Zeilenabstand verwenden</button></section></section>`;
+    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4><div class="paragraph-scope-heading"><output data-paragraph-count role="status" aria-live="polite"></output><button data-paragraph-all>Alle</button></div><fieldset data-paragraph-selection class="scope-options" aria-label="Absätze auswählen" aria-describedby="${prefix}-paragraphMultiHint"></fieldset><p id="${prefix}-paragraphMultiHint" class="type-hint">Mehrere Kästchen wählen. Umschalt wählt einen Bereich.</p><section data-line-scope class="typo-line-controls"><h4>Einzelne Zeilen</h4><div class="paragraph-scope-heading"><output data-lines-count role="status" aria-live="polite"></output><button data-lines-all aria-label="Alle Zeilen auswählen">Alle</button></div><fieldset data-line-selection class="scope-options" aria-label="Zeilen in der Auswahl"></fieldset><label>Abstand der ausgewählten Zeilen (px)<input data-lines-leading type="number" min="1" max="3000" step="any"></label><button data-lines-auto>Automatischen Zeilenabstand verwenden</button></section></section>`;
   }
   function options(host, items, chosen) {
     const signature = JSON.stringify(items);
@@ -91,6 +91,12 @@
           [...state.lineSelection].filter((key) => valid.has(key)),
         );
       const chosen = state.lineSelection || valid;
+      const lineCount = host.querySelector("[data-lines-count]"),
+        lineCountText = `${chosen.size} von ${lineRows.length} ${lineRows.length === 1 ? "Zeile" : "Zeilen"} ausgewählt`;
+      if (lineCount.textContent !== lineCountText)
+        lineCount.textContent = lineCountText;
+      host.querySelector("[data-lines-all]").disabled =
+        chosen.size === lineRows.length;
       options(
         lines,
         lineRows.map((l) => ({
@@ -106,7 +112,11 @@
           .map((l) => Math.round(l.leading * 100) / 100),
       );
       if (document.activeElement !== input) input.value = value ?? "";
-      input.placeholder = value === null ? "Gemischt" : "";
+      input.placeholder = !chosen.size
+        ? "Keine Auswahl"
+        : value === null
+          ? "Gemischt"
+          : "";
       input.disabled = locked || !chosen.size;
       host.querySelector("[data-lines-auto]").disabled = locked || !chosen.size;
       host.querySelector("[data-line-scope]").hidden = !lineRows.length;
@@ -124,6 +134,10 @@
       state.lineSelection = new Set(values);
       update(selection(paragraphs).map(Number));
     });
+    host.querySelector("[data-lines-all]").onclick = () => {
+      delete state.lineSelection;
+      update(selection(paragraphs).map(Number));
+    };
     const targets = () =>
       lineRows.filter(
         (l) => !state.lineSelection || state.lineSelection.has(l.key),
