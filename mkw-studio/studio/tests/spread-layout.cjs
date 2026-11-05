@@ -56,7 +56,16 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
   // Shortcut creates a two-page spread with one undo checkpoint after activation.
   await page.locator('#carouselViewport').focus();const n=await page.evaluate(()=>p.carousel.n);await page.keyboard.press('Control+Alt+n');assert.equal(await page.evaluate(()=>p.carousel.n),n+2);await page.evaluate(()=>undo());
   // Drag cancel restores exact original; detach is also exposed by click action.
-  const tab=page.locator('[data-slide="0"]');await tab.scrollIntoViewIfNeeded();const r=await tab.boundingBox();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));const orig=await page.evaluate(()=>({c:JSON.stringify(p.carousel),h:history.length}));
+  // Select through the page list first: canvas headers are culled and replaced after scrolling.
+  await rows.first().click();
+  const header=await page.waitForFunction(()=>{
+    const el=document.querySelector('[data-slide="0"]'),viewport=document.querySelector('#carouselViewport');
+    if(!el||el.hidden||!viewport)return false;
+    const r=el.getBoundingClientRect(),v=viewport.getBoundingClientRect();
+    return r.width>0&&r.height>0&&r.right>v.left&&r.left<v.right&&r.bottom>v.top&&r.top<v.bottom?{x:r.x,y:r.y,width:r.width,height:r.height}:false;
+  });
+  const r=await header.jsonValue();
+  const orig=await page.evaluate(()=>({c:JSON.stringify(p.carousel),h:history.length}));
   await page.mouse.move(r.x+30,r.y+20);await page.mouse.down();await page.mouse.move(r.x+100,r.y+100);await page.keyboard.press('Escape');await page.mouse.up();assert.deepEqual(await page.evaluate(()=>({c:JSON.stringify(p.carousel),h:history.length})),orig);
   console.log('rename, numbering, format, shortcut and drag cancel passed');
   // Each digital spread can be configured separately; drafts/cancel preserve content.
