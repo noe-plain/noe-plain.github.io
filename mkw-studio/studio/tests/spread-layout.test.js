@@ -151,3 +151,28 @@ test('new independent artboard does not repack manually positioned existing cont
  const right=model.plan(c,{type:'settings',binding:'right'}),pair=model.plan(right,{type:'add',count:2,spread:true}),added=pair.artboards.slice(-2);assert(added[0].x>added[1].x);assert.deepEqual(pair.objects,right.objects);
 
 });
+
+
+test('moving pages anchors spanning images to the first page without splitting or resizing',()=>{
+ let c=model.plan(source(),{type:'enable'},o=>o,ids());
+ c=model.plan(c,{type:'add',count:1,spread:true});
+ const first=c.artboards[0],second=c.artboards[1],target=c.pageStructure.artboardInfo[1];
+ const q=model.plan(c,{type:'move-to-artboard',id:target.id,ids:[first.id]});
+ assert.equal(q.objects.length,1);assert(!q.objects[0].pageFragment);
+ assert.equal(q.objects[0].pageId,first.id);assert.equal(q.objects[0].w,2160);
+ const owner=q.artboards.find(a=>a.id===first.id);
+ assert.equal(q.objects[0].x-owner.x,0);assert.equal(q.objects[0].y-owner.y,0);
+ const r=model.plan(q,{type:'move-to-artboard',id:q.pageStructure.artboardInfo[0].id,ids:[second.id]});
+ assert.equal(r.objects.length,1);assert.equal(r.objects[0].pageId,first.id);
+ assert.deepEqual(source().objects[0],{id:'photo',type:'image',imageId:'one-asset',x:0,y:0,w:2160,h:1350});
+});
+test('cross-artboard insertion retains target identity and chosen before/after order',()=>{
+ const c=individual({...source(),objects:[]}),[a,b,d]=pages(c),target=c.pageStructure.artboardInfo[2];
+ const q=model.plan(c,{type:'move-to-artboard',id:target.id,ids:[a],beforeId:d});
+ assert.deepEqual(q.pageStructure.groups,[[b],[a,d]]);
+ assert.equal(q.pageStructure.artboardInfo[1].id,target.id);
+ const r=model.plan(q,{type:'move-to-artboard',id:target.id,ids:[a]});
+ assert.deepEqual(r.pageStructure.groups,[[b],[d,a]]);
+ assert.deepEqual(model.plan(r,{type:'move-to-artboard',id:target.id,ids:[a],beforeId:a}),r);
+ assert.throws(()=>model.plan(r,{type:'move-to-artboard',id:target.id,ids:['missing']}));
+});

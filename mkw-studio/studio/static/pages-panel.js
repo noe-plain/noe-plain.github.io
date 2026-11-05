@@ -108,6 +108,21 @@
       else box.removeAttribute("aria-activedescendant");
       api.actionsState();
     }
+    function contextAction(event, run) {
+      event.preventDefault();
+      event.stopPropagation();
+      // Firefox dispatches the context menu before the releasing pointerup.
+      // Opening afterwards avoids immediately light-dismissing the popover.
+      if (event.buttons)
+        window.addEventListener(
+          "pointerup",
+          () => {
+            setTimeout(run, 0);
+          },
+          { once: true },
+        );
+      else run();
+    }
     function selectPage(id, e) {
       api.choose(id, e);
       focused = id;
@@ -194,11 +209,18 @@
         heading.ondblclick = (e) => {
           if (!e.target.closest("button")) api.renameBoard(g.info);
         };
-        heading.oncontextmenu = (e) => {
-          e.preventDefault();
-          selectBoard(g);
-          api.boardMenu(g.info, e, menu);
-        };
+        heading.oncontextmenu = (e) =>
+          contextAction(e, () => {
+            if (!heading.isConnected) return;
+            selectBoard(g);
+            api.boardMenu(
+              g.info,
+              e,
+              document.querySelector(
+                `[data-board-row="${g.info.id}"] .pages-board-menu`,
+              ) || menu,
+            );
+          });
         disclosure.onclick = (e) => {
           e.stopPropagation();
           toggle(g);
@@ -206,7 +228,13 @@
         menu.onclick = (e) => {
           e.stopPropagation();
           selectBoard(g);
-          api.boardMenu(g.info, e, menu);
+          api.boardMenu(
+            g.info,
+            e,
+            document.querySelector(
+              `[data-board-row="${g.info.id}"] .pages-board-menu`,
+            ) || menu,
+          );
         };
         heading.ondragover = (e) => {
           if (!drag) return;
@@ -243,13 +271,14 @@
           selectPage(id, e);
         };
         node.ondblclick = () => api.renamePage(id);
-        node.oncontextmenu = (e) => {
-          e.preventDefault();
-          if (!selected.has(id)) api.choose(id, e);
-          focused = id;
-          state();
-          api.pageMenu(e, id);
-        };
+        node.oncontextmenu = (e) =>
+          contextAction(e, () => {
+            if (!node.isConnected) return;
+            if (!selected.has(id)) api.choose(id, e);
+            focused = id;
+            state();
+            api.pageMenu(e, id, node);
+          });
         node.ondragstart = (e) => {
           if (!selected.has(id)) api.choose(id, e);
           drag = {
@@ -307,23 +336,24 @@
             f = (e.clientX - r.left) / r.width,
             group = groups.find((g) => g.ids.includes(id));
           const copy = drag.copy || e.altKey;
+          const targetIndex = group.ids.indexOf(id) + (f > 0.75 ? 1 : 0),
+            beforeId =
+              f >= 0.25 && f <= 0.75 ? undefined : group.ids[targetIndex];
           const command = copy
             ? {
                 type: "duplicate-to",
                 ids: drag.ids,
-                ...(f >= 0.25 && f <= 0.75
-                  ? { artboardId: group.info.id }
-                  : { index: index + (f > 0.75 ? 1 : 0) }),
+                artboardId: group.info.id,
+                beforeId,
               }
             : drag.detach
               ? { type: "detach", ids: drag.ids }
-              : f >= 0.25 && f <= 0.75
-                ? { type: "move-to-artboard", id: group.info.id, ids: drag.ids }
-                : {
-                    type: "move",
-                    ids: drag.ids,
-                    index: index + (f > 0.75 ? 1 : 0),
-                  };
+              : {
+                  type: "move-to-artboard",
+                  id: group.info.id,
+                  ids: drag.ids,
+                  beforeId,
+                };
           stopDrag();
           api.commit(
             command,

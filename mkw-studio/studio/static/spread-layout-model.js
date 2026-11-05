@@ -140,6 +140,7 @@
     id,
     deleteIds = new Set(),
     deleteContent = false,
+    anchorImages = false,
   ) {
     const oldFrames = policy.frames(before),
       frames = new Map(after.artboards.map((a) => [a.id, a])),
@@ -153,6 +154,27 @@
         hits = oldFrames
           .map((a, i) => ({ a, id: oldIds[i], area: sharedArea(a, b) }))
           .filter((v) => (o.pageFragment ? o.pageId === v.id : v.area > 0));
+      if (anchorImages && o.type === "image" && !o.pageFragment) {
+        const owner = oldFrames.findIndex((a, i) => oldIds[i] === o.pageId);
+        const first =
+          owner >= 0 ? { a: oldFrames[owner], id: oldIds[owner] } : hits[0];
+        if (first && frames.has(first.id)) {
+          const frame = frames.get(first.id);
+          const item = {
+            ...copy(o),
+            pageId: first.id,
+            x: o.x + frame.x - first.a.x,
+            y: o.y + frame.y - first.a.y,
+          };
+          if (Math.abs(item.x) > 100000 || Math.abs(item.y) > 100000)
+            fail(
+              "Das Bild würde ausserhalb des unterstützten Bereichs liegen.",
+            );
+          sourceMap.set(`${o.id}:${first.id}`, item.id);
+          result.push(item);
+          continue;
+        }
+      }
       const kept = hits.filter((v) => frames.has(v.id));
       if (!kept.length) {
         if (
@@ -569,7 +591,7 @@
         const resize = policy.formatKeys.some((k) => a[k] !== changes[k]);
         Object.assign(a, changes);
         if (resize) pack(c);
-        carry(before, c, bounds, id);
+        carry(before, c, bounds, id, new Set(), false, true);
         if (!policy.validBoards(c))
           fail("Die Änderung passt nicht in den Arbeitsbereich.");
         return c;
@@ -596,7 +618,7 @@
           fail(
             "Der Bogen überschneidet eine andere Seite oder liegt zu weit ausserhalb.",
           );
-        carry(before, c, bounds, id);
+        carry(before, c, bounds, id, new Set(), false, true);
         return c;
       }
       case "rename": {
@@ -643,7 +665,15 @@
         "Ungültige Seitenangaben. Abstand: 32–1000 px, Anschnitt: 0–100 px, Seitennummer: 1–999999.",
       );
     if (action.type !== "enable" || !policy.isFree(source)) pack(c);
-    carry(before, c, bounds, id, removed, deleteContent);
+    carry(
+      before,
+      c,
+      bounds,
+      id,
+      removed,
+      deleteContent,
+      action.type === "move",
+    );
     if (action.type === "duplicate") {
       const originals = before.artboards.filter((a) => selected.has(a.id)),
         added = c.artboards.slice(-originals.length);
@@ -720,7 +750,12 @@
       return plan(
         c,
         action.artboardId
-          ? { type: "move-to-artboard", id: action.artboardId, ids }
+          ? {
+              type: "move-to-artboard",
+              id: action.artboardId,
+              ids,
+              beforeId: action.beforeId,
+            }
           : { type: "move", ids, index: action.index },
         bounds,
         makeId,
@@ -732,32 +767,40 @@
       if (index === undefined || index < 0)
         fail("Wähle ein vorhandenes Ziel-Artboard.");
       const target = source.pageStructure.groups[index],
-        ids = [...new Set([...target, ...action.ids])];
-      if (ids.length > maxSpreadPages)
+        selected = new Set(action.ids || []),
+        moving = pageIds(source).filter((id) => selected.has(id));
+      if (!moving.length || moving.length !== selected.size)
+        fail("Wähle vorhandene Seiten zum Verschieben.");
+      const remaining = target.filter((id) => !selected.has(id));
+      if (remaining.length + moving.length > maxSpreadPages)
         fail("In einem Artboard sind höchstens 20 Seiten möglich.");
-      if (action.ids.every((id) => target.includes(id))) return copy(source);
-      const result = plan(source, { type: "join", ids }, bounds, makeId),
-        at = result.pageStructure.groups.findIndex((g) =>
-          g.includes(target[0]),
-        );
-      result.pageStructure.artboardInfo[at] = { ...info[index] };
-      const usedNames = new Set([info[index].id]);
-      result.pageStructure.groups.forEach((g, i) => {
-        if (i === at) return;
-        let best = -1,
-          score = 0;
-        source.pageStructure.groups.forEach((old, j) => {
-          const shared = old.filter((id) => g.includes(id)).length;
-          if (!usedNames.has(info[j].id) && shared > score) {
-            best = j;
-            score = shared;
-          }
-        });
-        if (best >= 0) {
-          result.pageStructure.artboardInfo[i] = { ...info[best] };
-          usedNames.add(info[best].id);
+      if (action.beforeId && selected.has(action.beforeId)) return copy(source);
+      const offset = action.beforeId
+        ? remaining.indexOf(action.beforeId)
+        : remaining.length;
+      if (offset < 0) fail("Die Zielseite ist nicht mehr vorhanden.");
+      remaining.splice(offset, 0, ...moving);
+      const result = copy(source),
+        groups = [],
+        metadata = [];
+      source.pageStructure.groups.forEach((group, i) => {
+        const next =
+          i === index ? remaining : group.filter((id) => !selected.has(id));
+        if (next.length) {
+          groups.push(next);
+          metadata.push({ ...info[i] });
         }
       });
+      result.pageStructure.groups = groups;
+      result.pageStructure.artboardInfo = metadata;
+      result.pageStructure.shuffle = false;
+      result.pageStructure.mode = "spreads";
+      const byId = new Map(result.artboards.map((a) => [a.id, a]));
+      result.artboards = groups.flat().map((id) => byId.get(id));
+      pack(result);
+      carry(source, result, bounds, makeId, new Set(), false, true);
+      if (!valid(result) || !policy.validBoards(result))
+        fail("Die Seiten passen nicht in den Arbeitsbereich.");
       return result;
     }
     if (action.type === "rename-artboard") {

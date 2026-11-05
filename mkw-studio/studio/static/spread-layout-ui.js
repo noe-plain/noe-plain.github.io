@@ -441,7 +441,7 @@ const MKWSpreadUI = (() => {
     document.querySelector("#artboardContextMenu")?.remove();
     const menu = document.createElement("div");
     menu.id = "artboardContextMenu";
-    menu.className = "carousel-effect-menu";
+    menu.className = "carousel-effect-menu pages-action-menu";
     menu.setAttribute("role", "menu");
     menu.setAttribute("popover", "auto");
     menu.setAttribute("aria-label", "Artboard-Aktionen");
@@ -455,6 +455,7 @@ const MKWSpreadUI = (() => {
       const b = document.createElement("button");
       b.setAttribute("role", "menuitem");
       b.textContent = label;
+      if (key === "delete") b.classList.add("pages-delete-action");
       b.onclick = () => {
         menu.hidePopover();
         if (key === "add-page") {
@@ -471,7 +472,12 @@ const MKWSpreadUI = (() => {
       menu.append(b);
     }
     document.body.append(menu);
-    MKWUIMenu.open(menu, trigger);
+    MKWUIMenu.open(
+      menu,
+      document.querySelector(
+        `[data-board-row="${CSS.escape(info.id)}"] .pages-board-menu`,
+      ) || trigger,
+    );
   }
   function rename(id = [...selected][0]) {
     const row = document.querySelector(`[data-page="${CSS.escape(id || "")}"]`),
@@ -590,7 +596,7 @@ const MKWSpreadUI = (() => {
     document.querySelector("#spreadContextMenu")?.remove();
     const menu = document.createElement("div");
     menu.id = "spreadContextMenu";
-    menu.className = "carousel-effect-menu";
+    menu.className = "carousel-effect-menu pages-action-menu";
     menu.setAttribute("role", "menu");
     menu.setAttribute("popover", "auto");
     menu.setAttribute("aria-label", "Seitenaktionen");
@@ -609,6 +615,15 @@ const MKWSpreadUI = (() => {
       b.setAttribute("role", "menuitem");
       b.textContent = label;
       if (key === "join" && selected.size < 2) b.disabled = true;
+      if (key === "rename" && selected.size !== 1) b.disabled = true;
+      if (
+        key === "split" &&
+        !p.carousel.pageStructure.groups.some(
+          (g) => g.length > 1 && g.some((id) => selected.has(id)),
+        )
+      )
+        b.disabled = true;
+      if (key === "delete") b.classList.add("pages-delete-action");
       b.onclick = () => {
         menu.hidePopover();
         action(key);
@@ -616,7 +631,10 @@ const MKWSpreadUI = (() => {
       menu.append(b);
     }
     document.body.append(menu);
-    MKWUIMenu.open(menu, anchor);
+    MKWUIMenu.open(
+      menu,
+      document.querySelector(`[data-page="${CSS.escape(id || "")}"]`) || anchor,
+    );
   }
   function moveToArtboard() {
     const identity = p,
@@ -624,16 +642,29 @@ const MKWSpreadUI = (() => {
       dialog = document.createElement("dialog");
     dialog.id = "movePagesDialog";
     dialog.setAttribute("aria-labelledby", "movePagesTitle");
-    dialog.innerHTML = `<h2 id="movePagesTitle">${ids.length} Seiten verschieben</h2><label>Ziel-Artboard<select id="movePagesTarget">${p.carousel.pageStructure.artboardInfo.map((a) => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></label><p>Die Seiten werden an das Ziel gekoppelt. Inhalte bleiben erhalten; maximal 20 Seiten pro Artboard.</p><div class="studio-feedback-actions"><button data-move-cancel autofocus>Abbrechen</button><button data-move-apply class="primary">Verschieben</button></div>`;
+    const structure = p.carousel.pageStructure;
+    const targets = structure.artboardInfo
+      .map((a, i) => ({
+        ...a,
+        count: structure.groups[i].length,
+        added: ids.filter((id) => !structure.groups[i].includes(id)).length,
+      }))
+      .filter((a) => a.added > 0 && a.count + a.added <= 20);
+    dialog.innerHTML = `<h2 id="movePagesTitle">${ids.length === 1 ? "Seite verschieben" : `${ids.length} Seiten verschieben`}</h2><p>Wähle das Ziel. Die Seiten werden dort am Ende angefügt. Bilder bleiben ganz und folgen ihrer ersten Seite.</p><label>Ziel-Artboard<select id="movePagesTarget">${targets.map((a) => `<option value="${esc(a.id)}">${esc(a.name)} · ${a.count} → ${a.count + a.added} Seiten</option>`).join("")}</select></label><p id="movePagesError" role="status">${targets.length ? "" : "Kein anderes Artboard mit genügend Platz vorhanden. Erstelle zuerst ein neues Artboard (maximal 20 Seiten pro Artboard)."}</p><div class="studio-feedback-actions"><button data-move-cancel autofocus>Abbrechen</button><button data-move-apply class="primary" ${targets.length ? "" : "disabled"}>Verschieben</button></div>`;
     dialog.querySelector("[data-move-cancel]").onclick = () => dialog.close();
     dialog.querySelector("[data-move-apply]").onclick = () => {
       if (p !== identity) return;
       const id = dialog.querySelector("select").value;
-      dialog.close();
-      commit(
-        { type: "move-to-artboard", id, ids },
-        "Seiten in das Ziel-Artboard verschoben.",
-      );
+      if (
+        commit(
+          { type: "move-to-artboard", id, ids },
+          "Seiten in das Ziel-Artboard verschoben.",
+        )
+      )
+        dialog.close();
+      else
+        dialog.querySelector("#movePagesError").textContent =
+          "Die Seiten konnten nicht verschoben werden. Prüfe das Ziel und versuche es erneut. Dein Layout bleibt erhalten.";
     };
     dialog.addEventListener(
       "close",

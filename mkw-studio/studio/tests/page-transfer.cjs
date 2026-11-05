@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict');
+const {launch,artifact,waitForProjectReady}=require('./browser.cjs');
+(async()=>{const browser=await launch();try{
+ const page=await browser.newPage({viewport:{width:1500,height:1100}}),errors=[];page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto(process.env.STUDIO_URL);await page.locator('#startDesigner').click();await page.locator('#setupName').fill('Seiten verschieben');await page.locator('#cn').fill('3');await page.locator('#createProject').click();await waitForProjectReady(page);
+ await page.evaluate(()=>{const canvas=makeCanvas(2160,1350),ctx=canvas.getContext('2d');ctx.fillStyle='#c13d24';ctx.fillRect(0,0,1080,1350);ctx.fillStyle='#265ba8';ctx.fillRect(1080,0,1080,1350);const data=canvas.toDataURL(),id=uid();p.images.push({id,name:'Panorama',data,original:data,width:2160,height:1350});carouselObject('image',{id:'panorama',imageId:id,x:0,y:0,w:2160,h:1350});carouselSlideSelect(0);MKWSpreadUI.commit({type:'enable'});MKWSpreadUI.commit({type:'add',count:1,spread:true});});
+ const original=await page.evaluate(()=>({ids:p.carousel.artboards.map(a=>a.id),target:p.carousel.pageStructure.artboardInfo[1].id}));
+ await page.locator('.pages-thumb').first().click({button:'right'});await page.getByRole('menuitem',{name:'In Artboard verschieben …',exact:true}).click();
+ assert.equal(await page.locator('#movePagesTarget option').count(),1);assert.equal(await page.locator('#movePagesTarget').inputValue(),original.target);
+ await page.screenshot({path:artifact('page-transfer-dialog.png')});await page.locator('[data-move-apply]').click();await page.locator('#movePagesDialog').waitFor({state:'detached'});
+ const result=await page.evaluate(async()=>{const o=p.carousel.objects.find(o=>o.id==='panorama'),a=p.carousel.artboards.find(a=>a.id===o.pageId);const q=MKWProjectAssets.hydrate(await MKWProjectFile.decode(await MKWProjectFile.encode(snapshot())));validate(q);validateCarousel(q);return {count:p.carousel.objects.filter(o=>o.type==='image').length,fragment:!!o.pageFragment,owner:o.pageId,w:o.w,offset:[o.x-a.x,o.y-a.y],roundtrip:q.carousel.objects.find(o=>o.id==='panorama')?.w};});
+ assert.equal(result.count,1);assert(!result.fragment);assert.equal(result.owner,original.ids[0]);assert.equal(result.w,2160);assert.equal(result.roundtrip,2160);assert.deepEqual(result.offset,[0,0]);
+ await page.evaluate(()=>undo());
+ // Edge drop also enters the destination artboard, rather than merely changing global order.
+ const target=page.locator('.pages-thumb').last();await page.locator('.pages-thumb').first().dragTo(target,{targetPosition:{x:3,y:30}});
+ assert(await page.evaluate(v=>{const i=p.carousel.pageStructure.artboardInfo.findIndex(a=>a.id===v.target);return p.carousel.pageStructure.groups[i][0]===v.ids[0];},original));
+ for(let i=0;i<3;i++){await page.locator('.pages-board-menu').first().click();await page.getByRole('menu',{name:'Artboard-Aktionen'}).waitFor({state:'visible'});await page.keyboard.press('Escape');}
+ await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});assert.deepEqual(await page.evaluate(async()=>(await axe.run('#carouselSidebar')).violations.map(v=>v.id)),[]);
+ await page.screenshot({path:artifact('page-transfer-sidebar.png')});assert.deepEqual(errors,[]);console.log('PASS first-page image ownership, real cross-artboard edge drag, target dialog, menu reopen/Escape, file roundtrip and accessibility');
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
