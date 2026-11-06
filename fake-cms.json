@@ -358,5 +358,10 @@
         "name": "Xoyondo – Umfragen",
         "url": "https://xoyondo.com/de",
         "category": "suche"
+    },
+    {
+        "name": "Swisstransfer",
+        "url": "https://www.swisstransfer.com/de",
+        "category": "suche"
     }
 ]
