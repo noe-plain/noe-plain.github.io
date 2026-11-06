@@ -403,16 +403,31 @@ const MKWSpreadUI = (() => {
       dialog = document.createElement("dialog");
     dialog.id = "artboardRenameDialog";
     dialog.setAttribute("aria-labelledby", "artboardRenameTitle");
-    dialog.innerHTML = `<h2 id="artboardRenameTitle">Artboard umbenennen</h2><label>Name<input id="artboardNameInput" value="${esc(info.name)}" maxlength="80" required></label><div class="studio-feedback-actions"><button data-board-cancel>Abbrechen</button><button data-board-apply class="primary">Umbenennen</button></div>`;
+    dialog.innerHTML = `<form novalidate><h2 id="artboardRenameTitle">Artboard umbenennen</h2><label>Name<input id="artboardNameInput" value="${esc(info.name)}" maxlength="80" required></label><div class="studio-feedback-actions"><button type="button" data-board-cancel>Abbrechen</button><button type="submit" data-board-apply class="primary">Umbenennen</button></div></form>`;
+    const input = dialog.querySelector("input");
+    input.oninput = () => MKWFields.clear(input);
     dialog.querySelector("[data-board-cancel]").onclick = () => dialog.close();
-    dialog.querySelector("[data-board-apply]").onclick = () => {
-      const name = dialog.querySelector("input").value.trim();
-      if (!name || p !== identity) return;
-      dialog.close();
-      commit(
-        { type: "rename-artboard", id: info.id, name },
-        "Artboard umbenannt.",
-      );
+    dialog.querySelector("form").onsubmit = (event) => {
+      event.preventDefault();
+      if (p !== identity) return;
+      const name = input.value.trim();
+      if (!MKWFields.validate(input, true)) {
+        input.focus();
+        return;
+      }
+      if (name.length > 80) {
+        MKWFields.error(input, "Verwende einen Namen mit 1–80 Zeichen.");
+        input.focus();
+        return;
+      }
+      if (
+        name === info.name ||
+        commit(
+          { type: "rename-artboard", id: info.id, name },
+          "Artboard umbenannt.",
+        )
+      )
+        dialog.close();
     };
     dialog.addEventListener(
       "close",

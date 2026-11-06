@@ -517,19 +517,19 @@
   color: var(--md-sys-color-error);
   border-top: 1px solid var(--md-sys-color-outline-variant);
 }
-#movePagesDialog {
+:is(#movePagesDialog, #artboardRenameDialog) {
   width: min(440px, calc(100vw - 32px));
 }
-#movePagesDialog label {
+:is(#movePagesDialog, #artboardRenameDialog) label {
   display: grid;
   gap: 8px;
   margin-block: 20px;
 }
-#movePagesDialog select {
+:is(#movePagesDialog select, #artboardRenameDialog input) {
   width: 100%;
   min-width: 0;
 }
-#movePagesDialog {
+:is(#movePagesDialog, #artboardRenameDialog) {
   font-family: var(--studio-font, inherit);
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
@@ -543,7 +543,7 @@
   line-height: 1.5;
   color: var(--md-sys-color-on-surface-variant);
 }
-#movePagesDialog select {
+:is(#movePagesDialog select, #artboardRenameDialog input) {
   min-height: 48px;
   padding: 10px 12px;
   border: 1px solid var(--md-sys-color-outline);

@@ -63,8 +63,6 @@ function carouselSlideInsert(index, duplicate = null) {
     return MKWArtboardUI.insert(index, duplicate);
   const c = p.carousel;
   if (c.n >= MKWCarouselPolicy.maxSlides) return;
-  carouselEndText();
-  checkpoint();
   const copies =
     duplicate === null
       ? []
@@ -77,6 +75,18 @@ function carouselSlideInsert(index, duplicate = null) {
             id: uid(),
             x: o.x + (index - duplicate) * c.w,
           }));
+  if (!carouselCanAddObjects(copies.length)) return;
+  if (
+    c.objects.some((o) => o.x >= index * c.w && o.x + c.w > 100000) ||
+    copies.some((o) => Math.abs(o.x) > 100000)
+  ) {
+    status(
+      "Für eine weitere Slide fehlt Platz. Verschiebe weit aussen liegende Ebenen zuerst näher an die Slides.",
+    );
+    return;
+  }
+  carouselEndText();
+  checkpoint();
   if (duplicate !== null)
     MKWTemplateModel.remapLinks(
       c.objects.filter(

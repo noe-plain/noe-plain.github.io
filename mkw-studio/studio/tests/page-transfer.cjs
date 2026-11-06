@@ -12,7 +12,7 @@ const {launch,artifact,waitForProjectReady}=require('./browser.cjs');
  assert.equal(result.count,1);assert(!result.fragment);assert.equal(result.owner,original.ids[0]);assert.equal(result.w,2160);assert.equal(result.roundtrip,2160);assert.deepEqual(result.offset,[0,0]);
  await page.evaluate(()=>undo());
  // Edge drop also enters the destination artboard, rather than merely changing global order.
- const target=page.locator('.pages-thumb').last();await page.locator('.pages-thumb').first().dragTo(target,{targetPosition:{x:3,y:30}});
+ await page.evaluate(()=>{studioPreferences.inspectorSplit=85;studioApplyPreferences();});await page.locator('#spreadPages').scrollIntoViewIfNeeded();const target=page.locator('.pages-thumb').last();await page.locator('.pages-thumb').first().dragTo(target,{targetPosition:{x:3,y:30}});
  assert(await page.evaluate(v=>{const i=p.carousel.pageStructure.artboardInfo.findIndex(a=>a.id===v.target);return p.carousel.pageStructure.groups[i][0]===v.ids[0];},original));
  for(let i=0;i<3;i++){await page.locator('.pages-board-menu').first().click();await page.getByRole('menu',{name:'Artboard-Aktionen'}).waitFor({state:'visible'});await page.keyboard.press('Escape');}
  await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});assert.deepEqual(await page.evaluate(async()=>(await axe.run('#carouselSidebar')).violations.map(v=>v.id)),[]);

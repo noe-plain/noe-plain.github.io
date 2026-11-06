@@ -258,6 +258,7 @@ function carouselCreateDrag(ev, type, start) {
       });
       carouselUI.tool = type === "shape" ? "shape" : "select";
       carouselToolUI();
+      if (!o) return;
       if (type === "text") carouselEditText(o);
       else if (type === "image") carouselFile(o.id);
     },
@@ -472,25 +473,33 @@ function carouselMove(ev) {
       objects.length === 1 &&
       carouselHasImage(objects[0]);
   let begun = false,
+    rejected = false,
     original,
     bounds,
     anchors;
   carouselListen(
     ev,
     (e) => {
+      if (rejected) return;
       const pt = carouselPoint(e);
       let dx = pt.x - start.x,
         dy = pt.y - start.y;
       if (!begun && Math.hypot(dx, dy) * carouselZoom < 3) return;
       if (!begun) {
+        if (ev.altKey && !content && !carouselCanAddObjects(objects.length)) {
+          rejected = true;
+          return;
+        }
         checkpoint();
         if (ev.altKey && !content) {
-          objects = objects.map((o) => {
+          const originals = objects;
+          objects = originals.map((o) => {
             const copy = clone(o);
             copy.id = uid();
             p.carousel.objects.push(copy);
             return copy;
           });
+          MKWTemplateModel.remapLinks(originals, objects);
           carouselUI.ids = new Set(objects.map((o) => o.id));
           carouselSelection = objects.at(-1).id;
         }

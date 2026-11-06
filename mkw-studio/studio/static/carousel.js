@@ -563,6 +563,7 @@ function carouselObject(type, rect = {}) {
     status("Füge zuerst eine Seite hinzu.");
     return null;
   }
+  if (!carouselCanAddObjects(1)) return null;
   checkpoint();
   const o = carouselDefault(type, rect);
   carouselUI.slide = null;
@@ -598,6 +599,11 @@ async function carouselImport(files, target) {
     return;
   }
   if (!files.length || busy) return;
+  if (
+    !p.carousel.objects.some((o) => o.id === target) &&
+    !carouselCanAddObjects(files.length)
+  )
+    return;
   carouselEndText();
   busy = true;
   $("#importDialog").showModal();
@@ -669,10 +675,16 @@ async function carouselImport(files, target) {
   }
 }
 
-function carouselDuplicate() {
-  const objects = carouselSelected().filter((o) => !carouselObjectLocked(o));
-  if (!objects.length) return;
-  checkpoint();
+function carouselCanAddObjects(count) {
+  if (p.carousel.objects.length + count <= 500) return true;
+  status(
+    "Ein Projekt kann höchstens 500 Ebenen enthalten. Entferne nicht benötigte Ebenen oder kopiere eine kleinere Auswahl.",
+  );
+  return false;
+}
+
+function carouselInsertCopies(objects, images = [], fonts = []) {
+  if (!objects.length || !carouselCanAddObjects(objects.length)) return false;
   const copies = objects.map((o) => ({
     ...clone(o),
     id: uid(),
@@ -680,10 +692,45 @@ function carouselDuplicate() {
     y: o.y + 30,
   }));
   MKWTemplateModel.remapLinks(objects, copies);
+  const candidate = {
+    ...p,
+    images: [
+      ...p.images,
+      ...images.filter((im) => !p.images.some((a) => a.id === im.id)),
+    ],
+    fonts: [
+      ...p.fonts,
+      ...fonts.filter((font) => !p.fonts.some((f) => f.role === font.role)),
+    ],
+    carousel: { ...p.carousel, objects: [...p.carousel.objects, ...copies] },
+  };
+  try {
+    if (copies.some((o) => Math.abs(o.x) > 100000 || Math.abs(o.y) > 100000))
+      throw Error(
+        "Verschiebe die Auswahl vor dem Kopieren näher an die Mitte der Montagefläche.",
+      );
+    validate(candidate);
+    validateCarousel(candidate);
+  } catch (error) {
+    status("Kopie nicht eingefügt: " + error.message);
+    return false;
+  }
+  checkpoint();
+  const addedFonts = candidate.fonts.length !== p.fonts.length;
+  p.images = candidate.images;
+  p.fonts = candidate.fonts;
   p.carousel.objects.push(...copies);
+  if (addedFonts) loadFonts();
   carouselUI.ids = new Set(copies.map((o) => o.id));
   carouselSelection = copies.at(-1).id;
   changed();
+  return true;
+}
+
+function carouselDuplicate() {
+  return carouselInsertCopies(
+    carouselSelected().filter((o) => !carouselObjectLocked(o)),
+  );
 }
 
 function carouselDelete() {

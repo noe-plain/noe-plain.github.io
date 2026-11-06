@@ -92,26 +92,11 @@ window.addEventListener(
     }
     if (command && key === "v") {
       ev.preventDefault();
-      if (carouselUI.clipboard.length) {
-        checkpoint();
-        for (const im of carouselUI.clipboardAssets || [])
-          if (!p.images.some((item) => item.id === im.id)) p.images.push(im);
-        for (const font of carouselUI.clipboardFonts || [])
-          if (!p.fonts.some((item) => item.role === font.role))
-            p.fonts.push(font);
-        loadFonts();
-        const copies = carouselUI.clipboard.map((o) => ({
-          ...clone(o),
-          id: uid(),
-          x: o.x + 30,
-          y: o.y + 30,
-        }));
-        MKWTemplateModel.remapLinks(carouselUI.clipboard, copies);
-        p.carousel.objects.push(...copies);
-        carouselUI.ids = new Set(copies.map((o) => o.id));
-        carouselSelection = copies.at(-1).id;
-        changed();
-      }
+      carouselInsertCopies(
+        carouselUI.clipboard,
+        carouselUI.clipboardAssets,
+        carouselUI.clipboardFonts,
+      );
       return;
     }
     if (ev.code === "Space") {
