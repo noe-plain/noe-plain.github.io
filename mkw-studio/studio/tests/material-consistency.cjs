@@ -196,9 +196,13 @@ const { launch, artifact } = require("./browser.cjs");
           await typo.evaluate((el) => getComputedStyle(el).gap),
           "16px",
         );
+        // Firefox's protocol bounding box subtracts rounded viewport coordinates
+        // (39.999969px for a native 40px DOMRect). Measure the rendered DOMRect
+        // directly so the minimum stays strict, without loosening target sizes.
         assert(
-          (await typo.locator(".typo-format button").first().boundingBox())
-            .height >= 40,
+          (await typo.locator(".typo-format button").first().evaluate(
+            el => el.getBoundingClientRect().height,
+          )) >= 40,
         );
         assert.equal(await typo.locator('[role="tablist"]').count(),0);
         assert(await typo.locator('[data-typo="font"]').isVisible());

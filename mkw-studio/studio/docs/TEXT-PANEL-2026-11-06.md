@@ -47,9 +47,11 @@ Die Veröffentlichung des gemeinsamen Panels (`3ee3674`) wurde erfolgreich über
 
 Testvorbereitungen warten auf abgeschlossenen Projektstart, vorbereitende Sicherungen und asynchrone Rückgängig-Aktionen. Nach der Umstellung auf aufklappbare Auswahllisten öffnen Bedienprüfungen diese vor der Auswahl. Inhaltliche Vergleiche, Pixelvergleiche und Toleranzen bleiben erhalten.
 
-Formatierung, Build und 163 Modelltests sind erfolgreich. Lokal bestehen 23 der 24 ausgewählten Chrome-Suiten. In Firefox bestehen alle elf verschiedenen ausgewählten Suiten über Hauptlauf und gezielte Wiederholung; `unified-text-tools` hatte beim parallelen Lauf eine Zeitüberschreitung beim Bildimport und bestand anschliessend allein. Die neue UX-Prüfung und die komplette Textbearbeitung bestehen in beiden Browsern.
+Formatierung, Build und 163 Modelltests sind erfolgreich. Alle 24 verschiedenen ausgewählten Chrome-Suiten sowie die zwölf verschiedenen ausgewählten Firefox-Suiten sind lokal erfolgreich durchlaufen, einschliesslich gezielter Wiederholungen nach Zeitüberschreitungen. Die breite Prüfung `seven-perspectives` bestand abschliessend mit 42 Ansichten; ihre vorherigen Zeitüberschreitungen werden nicht als bestandene Läufe gezählt. Die neue UX-Prüfung und die komplette Textbearbeitung bestehen in beiden Browsern.
 
-Die zusätzliche breite Chrome-Prüfung `seven-perspectives` lief lokal zweimal in eine Zeitüberschreitung im Einstellungsdialog, bevor die neuen Textfunktionen erreicht wurden. Dieser Lauf wird nicht als bestanden gezählt. Die vollständigen GitHub-Prüfungen und die Live-Veröffentlichung werden separat nachverfolgt; ihr Ergebnis wird im Abschlussbericht eindeutig genannt.
+`972f663` wurde erfolgreich über GitHub Pages veröffentlicht. Live stimmen HTML, JS- und CSS-Bundle bytegenau mit dem geprüften Stand überein. Die drei Live-Suiten `text-panel-ux`, `text-selection-panel` und `designer-copy-safety` sind erfolgreich. Die vollständige Chromium-Prüfung auf GitHub ist ebenfalls erfolgreich.
+
+Die vollständige Firefox-Prüfung meldete nur einen Fehler bei einer Mindesthöhenmessung. Die lokale Diagnose reproduziert ihn: Native DOMRect und berechneter Stil messen exakt **40 px**, keine Transformation oder Animation ist aktiv; die Playwright-Koordinatenumrechnung liefert dagegen **39.999969482421875 px**. Die Prüfung misst jetzt direkt die gerenderte DOMRect-Höhe und behält die strenge Mindestgrenze **≥ 40 px** bei. Die betreffende Prüfung besteht danach lokal in Firefox und Chrome. Keine Schaltfläche verkleinert und keine Toleranz gelockert.
 
 Keine externe Studie mit sechs Testpersonen; Tablet-Sichtprüfung im Browser, keine physische iPad-Abnahme. GitHub-Prüfungen und Live-Abschluss werden für den veröffentlichten Commit separat nachverfolgt.
 
