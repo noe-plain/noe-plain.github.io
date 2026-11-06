@@ -49,11 +49,25 @@ async function openLatestProject(page) {
   await waitForProjectReady(page);
 }
 async function selectTextScope(page, selector, values) {
-  const desired = new Set((Array.isArray(values) ? values : [values]).map(String)),
+  if (
+    selector === "[data-paragraph-selection]" &&
+    (await page.locator("[data-typo-all]").isVisible())
+  )
+    await page.locator("[data-typo-all]").click();
+  const desired = new Set(
+      (Array.isArray(values) ? values : [values]).map(String),
+    ),
     inputs = page.locator(selector).locator('input[type="checkbox"]');
-  for (let i = 0; i < await inputs.count(); i++) {
-    const input = inputs.nth(i), value = await input.inputValue();
+  for (let i = 0; i < (await inputs.count()); i++) {
+    const input = inputs.nth(i),
+      value = await input.inputValue();
     await input.setChecked(desired.has(value));
   }
 }
-module.exports = { launch, artifact, waitForProjectReady, openLatestProject, selectTextScope };
+module.exports = {
+  launch,
+  artifact,
+  waitForProjectReady,
+  openLatestProject,
+  selectTextScope,
+};

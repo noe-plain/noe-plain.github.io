@@ -29,7 +29,7 @@ const { launch, artifact } = require("./browser.cjs");
         text,
       });
     }, source);
-    await page.locator("[data-typo-tab=paragraph]").click();
+
     await page.locator("[data-typo-align=justify]").click();
     const layout = () =>
       page.evaluate(() => carouselTextLayout(carouselSelected()[0]));
@@ -63,7 +63,7 @@ const { launch, artifact } = require("./browser.cjs");
       "true",
     );
     await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', '1');
-    await page.locator("[data-typo=paragraphSize]").fill("36");
+    await page.locator("[data-typo=size]").fill("36");
     assert.equal(
       await page.evaluate(() => carouselSelected()[0].textStyles[1].size),
       36,
@@ -84,9 +84,9 @@ const { launch, artifact } = require("./browser.cjs");
         [a, b],
       );
     };
-    await choose(0, source.indexOf("\n"));
-    await page.locator("[data-typo-tab=paragraph]").click();
-    await page.locator("[data-typo=paragraphSize]").fill("47");
+    await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
+
+    await page.locator("[data-typo=size]").fill("47");
     assert.deepEqual(
       await page.evaluate(() =>
         carouselSelected()[0].textStyles.map((s) => s?.size),
@@ -102,8 +102,8 @@ const { launch, artifact } = require("./browser.cjs");
         .locator(".typography-inspector .justification-settings table")
         .isVisible(),
     );
-    await choose(source.indexOf("\n") + 1, source.length);
-    await page.locator("[data-typo=paragraphSize]").fill("40");
+    await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["1"]);
+    await page.locator("[data-typo=size]").fill("40");
     await page.locator("[data-typo-size-auto]").click();
     assert.equal(
       await page.evaluate(
@@ -111,7 +111,7 @@ const { launch, artifact } = require("./browser.cjs");
       ),
       null,
     );
-    await page.locator("[data-typo-tab=character]").click();
+
     await choose(0, 5);
     await page.locator("[data-typo=font]").selectOption("Harriet Italic");
     await page.locator("[data-typo=tracking]").fill("15");
@@ -198,7 +198,7 @@ const { launch, artifact } = require("./browser.cjs");
     assert(exact.pdfSize > 1000);
     assert.equal(exact.pdfRuns, exact.expectedRuns);
     assert.equal(exact.align, "justify");
-    await page.locator("[data-typo-tab=paragraph]").click();
+
     await page.screenshot({ path: artifact("justification-carousel.png") });
     // A deliberately impossible short line reports the constraint, rather than breaking it.
     const limited = await page.evaluate(() => {
@@ -258,7 +258,7 @@ const { launch, artifact } = require("./browser.cjs");
       step = "text";
       render();
     }, source);
-    await post.locator("[data-typo-tab=paragraph]").click();
+
     await post.locator("[data-typo-align=justify]").click();
     assert(
       await post.locator("#stepPanel .justification-settings").isVisible(),
@@ -283,8 +283,9 @@ const { launch, artifact } = require("./browser.cjs");
       el.setSelectionRange(0, end);
       el.dispatchEvent(new Event("select"));
     }, source.indexOf("\n"));
-    await post.locator("[data-typo-tab=paragraph]").click();
-    await post.locator("[data-typo=paragraphSize]").fill("51");
+
+    await require("./browser.cjs").selectTextScope(post,"[data-paragraph-selection]",["0"]);
+    await post.locator("[data-typo=size]").fill("51");
     await post.locator("[data-typo-align=justify]").click();
     assert.deepEqual(
       await post.evaluate(() =>

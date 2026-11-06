@@ -192,7 +192,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       [0, 38, 76],
       "Default leading must be 0.95 × the font size",
     );
-    await page.locator("[data-typo-tab=paragraph]").click();
+
     assert.equal(await page.locator("[data-lines-leading]").inputValue(), "38");
     for (const [paragraph, size, leading] of [
       [0, 80, 130],
@@ -200,7 +200,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
       [2, 28, null],
     ]) {
       await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', String(paragraph));
-      await page.locator("[data-typo=paragraphSize]").fill(String(size));
+      await page.locator("[data-typo=size]").fill(String(size));
       if (leading !== null)
         await page.locator("[data-lines-leading]").fill(String(leading));
     }

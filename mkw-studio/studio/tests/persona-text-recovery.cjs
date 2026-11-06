@@ -23,18 +23,19 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
       carouselPanel();
       return [first.id, second.id];
     });
-    await page.locator('[data-typo-tab=paragraph]').click();
+
     assert(await page.locator('[data-typo-align-auto]').isEnabled(), 'An override on another selected layer must be resettable');
-    const beforeReset = await page.evaluate(() => ({ objects: clone(p.carousel.objects), history: history.length }));
+    const beforeReset = await page.evaluate(() => ({ objects: clone(p.carousel.objects), history: history.length, revision }));
     await page.locator('[data-typo-align-auto]').click();
     assert(await page.evaluate(() => carouselSelected().every(o => !o.textStyles?.some(s => s?.align !== undefined))));
     assert(await page.locator('[data-typo-align-auto]').isDisabled());
     assert.equal(await page.evaluate(() => history.length), beforeReset.history + 1);
     await page.locator('#undo').click();
+    await page.waitForFunction(previous => revision === previous + 2, beforeReset.revision);
     assert.deepEqual(await page.evaluate(() => p.carousel.objects), beforeReset.objects);
 
     await page.evaluate(id => carouselSelect([id]), ids[0]);
-    await page.locator('[data-typo-tab=paragraph]').click();
+
     const original = await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision }));
     await selectTextScope(page, '[data-paragraph-selection]', []);
     for (const selector of ['[data-typo-align=right]', '[data-typo-leading-auto]', '[data-typo-size-auto]'])
@@ -51,10 +52,12 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
     assert.deepEqual(await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision })), original, 'Selection recovery must not change the document or history');
     await page.locator('[data-lines-leading]').fill('85');
     assert.deepEqual(await page.evaluate(() => carouselSelected()[0].textStyles.map(s => s.leading[0])), [85, 85, 85]);
+    const beforeUndo = await page.evaluate(() => revision);
     await page.locator('#undo').click();
+    await page.waitForFunction(previous => revision === previous + 1, beforeUndo);
     assert.deepEqual(await page.evaluate(() => p.carousel.objects), beforeReset.objects);
     await page.evaluate(id => carouselSelect([id]), ids[0]);
-    await page.locator('[data-typo-tab=paragraph]').click();
+
     for (const theme of ['light', 'dark']) {
       await page.evaluate(theme => studioSetTheme(theme), theme);
       await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
@@ -85,7 +88,7 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
       chooseStep('text');
     });
     await page.locator('#mainTextInput').fill('Oben\nMitte\nUnten');
-    await page.locator('[data-typo-tab=paragraph]').click();
+
     await page.locator('[data-paragraph-all]').click();
     const fdBefore = await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision }));
     await selectTextScope(page, '[data-line-selection]', []);

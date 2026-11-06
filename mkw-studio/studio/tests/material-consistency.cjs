@@ -200,21 +200,12 @@ const { launch, artifact } = require("./browser.cjs");
           (await typo.locator(".typo-format button").first().boundingBox())
             .height >= 40,
         );
-        await typo.locator('[data-typo-tab="character"]').focus();
-        await page.keyboard.press("ArrowRight");
-        assert.equal(
-          await typo
-            .locator('[data-typo-tab="paragraph"]')
-            .getAttribute("aria-selected"),
-          "true",
-        );
-        await page.keyboard.press("ArrowLeft");
-        assert.equal(
-          await typo
-            .locator('[data-typo-tab="character"]')
-            .getAttribute("aria-selected"),
-          "true",
-        );
+        assert.equal(await typo.locator('[role="tablist"]').count(),0);
+        assert(await typo.locator('[data-typo="font"]').isVisible());
+        assert(await typo.locator('[data-typo="spaceAfter"]').isVisible());
+        await typo.locator('[data-typo="font"]').focus();
+        await page.keyboard.press("Tab");
+        assert(await typo.locator('[data-typo="size"]').evaluate(el => el === document.activeElement));
         const summary = typo.locator(".typo-details summary").first();
         assert((await summary.boundingBox()).height >= 48);
         await summary.focus();

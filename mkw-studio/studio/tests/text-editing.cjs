@@ -210,7 +210,8 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           );
           assert.equal(styled.characterStyles[0].size, 76);
           assert.equal(styled.characterStyles[0].end, 5);
-          await page.locator(panel + " [data-typo-tab=paragraph]").click();
+
+          await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
           const original = await page.evaluate(() =>
             clone(
               (p.carousel

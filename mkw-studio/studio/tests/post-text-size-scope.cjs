@@ -109,9 +109,9 @@ const { launch } = require("./browser.cjs");
       ).every((v) => v === 25),
     );
     assert.deepEqual(await sizes(), [95, 60, 95, 67, 80, 60]);
-    await choose(0, 12);
-    await page.locator("[data-typo-tab=paragraph]").click();
-    await page.locator("[data-typo=paragraphSize]").fill("102");
+    await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
+
+    await page.locator("[data-typo=size]").fill("102");
     assert.deepEqual(
       await page.evaluate(() =>
         p.boards.map((b) => b.elements.title.textStyles?.[0]?.size ?? null),
@@ -133,9 +133,9 @@ const { launch } = require("./browser.cjs");
       ),
       [102, null, 102, null, null, null],
     );
-    // Typing with a pending character size does not leak it into the other output format.
+    // A collapsed caret follows the normal paragraph scope; new text inherits that paragraph’s size without changing other formats.
     await choose(5, 5);
-    await page.locator("[data-typo-tab=character]").click();
+
     await page.locator("[data-typo=size]").fill("123");
     await page.locator("[data-post-text-edit]").click();
     await page.evaluate(() => {
@@ -147,9 +147,9 @@ const { launch } = require("./browser.cjs");
     const inserted = await page.evaluate(() =>
       p.boards
         .slice(0, 4)
-        .map((b) => MKWText.at(b.elements.title, 5).size ?? null),
+        .map((b) => MKWTextScope.values(b.elements.title,MKWTextScope.resolve(b.elements.title,{range:{start:5,end:6}}),"size")[0]),
     );
-    assert.deepEqual(inserted, [123, null, 123, null]);
+    assert.deepEqual(inserted, [123, 60, 123, 67]);
     const inherited = await page.evaluate(() => {
       const im = { ...p.images[0], id: uid() },
         vertical = createBoard(im, 1080, 1920);
@@ -165,10 +165,8 @@ const { launch } = require("./browser.cjs");
       };
     });
     assert.equal(inherited.vertical.size, 95);
-    assert.equal(
-      inherited.vertical.characterStyles.find((s) => s.start === 0).size,
-      115,
-    );
+    assert.equal(inherited.vertical.textStyles[0].size,123);
+    assert(!inherited.vertical.characterStyles.some(s => s.size !== undefined));
     assert.equal(inherited.square.size, 60);
     assert(!inherited.square.characterStyles.some((s) => s.size !== undefined));
     assert.equal(inherited.novel.size, inherited.defaults);

@@ -21,7 +21,7 @@ const { launch, artifact } = require('./browser.cjs');
     const object = () => page.evaluate(id => clone(p.carousel.objects.find(o => o.id === id)), id);
     const lines = () => page.evaluate(id => carouselTextLayout(p.carousel.objects.find(o => o.id === id)).lines, id);
     assert((await lines()).every(line => line.x === 0), 'Legacy/default text stays left aligned');
-    await page.locator('[data-typo-tab=paragraph]').click();
+
     for (const align of ['center', 'right', 'left']) {
       await page.locator(`[data-typo-align=${align}]`).click();
       assert((await object()).textStyles.every(s=>s.align===align));
@@ -111,7 +111,7 @@ const { launch, artifact } = require('./browser.cjs');
     await page.screenshot({ path: artifact('mkw-text-alignment-light.png') });
     await page.evaluate(() => { const o = p.carousel.objects.find(o => o.id === carouselSelection); o.locked = true; carouselPanel(); });
     assert.equal(await page.locator('[data-typo-align]:enabled').count(), 0);
-    assert(await page.locator('[data-typo=paragraphSize]').isDisabled());
+    assert(await page.locator('[data-typo=size]').isDisabled());
     assert.deepEqual(errors, []);
     console.log('PASS field and paragraph alignment, reset/inheritance, wrapped lines, inline editing, undo, persistence, locked text, legacy validation, exact PNG/JPG/WebP, PDF positions and editable PSD alignment');
   } finally { await browser.close(); }

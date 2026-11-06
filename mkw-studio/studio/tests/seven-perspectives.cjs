@@ -361,7 +361,7 @@ const { launch, artifact } = require("./browser.cjs");
       carouselPanel();
     });
     await capture("designer-advanced-text", true);
-    await page.locator('[data-typo-tab="paragraph"]').click();
+
     await capture("typography-paragraph");
     await page.evaluate(() => {
       carouselSelect(["audit-shape"]);

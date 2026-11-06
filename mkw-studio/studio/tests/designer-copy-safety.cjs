@@ -27,6 +27,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       changed();
       return { id: o.id };
     });
+    await page.evaluate(() => autosave({ writeFile: false }));
     const state = () =>
       page.evaluate(() => ({
         doc: JSON.stringify(snapshot()),

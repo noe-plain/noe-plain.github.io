@@ -38,7 +38,7 @@ const assert = require("node:assert/strict"),
       0,
       "Dictionary must not load for ordinary text",
     );
-    await page.locator("[data-typo-tab=paragraph]").click();
+
     await page.locator("[data-typo-align=justify]").click();
     await page.evaluate(() => MKWTextHyphen.ensure());
     let result = await page.evaluate(() => {
@@ -104,7 +104,7 @@ const assert = require("node:assert/strict"),
       studioApplyPreferences();
       carouselPanel();
     });
-    await page.locator("[data-typo-tab=paragraph]").click();
+
     await page
       .locator('[data-typo-page="paragraph"] .justification-settings')
       .evaluate((el) => (el.open = true));
@@ -118,7 +118,7 @@ const assert = require("node:assert/strict"),
         [a, b],
       );
     };
-    await choose(0, source.indexOf("\n"));
+    await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
     await page.locator("[data-typo-hyphenate]").uncheck();
     assert.deepEqual(
       await page.evaluate(() =>
@@ -209,7 +209,7 @@ const assert = require("node:assert/strict"),
       render();
       await MKWTextHyphen.ensure();
     }, source);
-    await post.locator("[data-typo-tab=paragraph]").click();
+
     assert(await post.locator("[data-typo-hyphenate]").count());
     assert(
       await post.evaluate(() =>

@@ -18,6 +18,8 @@ const assert = require("node:assert/strict"),
     await page.locator("#cn").fill("3");
     await page.locator("#createProject").click();
     await page.locator("#carouselCanvas").waitFor();
+    await require("./browser.cjs").waitForProjectReady(page);
+    await page.waitForFunction(() => !!fontStatus["Replica LL"]);
     const base = await page.evaluate(() => {
       const a = carouselObject("image", { x: 1200, y: 350, w: 300, h: 250 }),
         b = carouselObject("path", {

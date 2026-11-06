@@ -14,6 +14,7 @@
     "static/angle-policy.js",
     "static/post-angle-model.js",
     "static/text-model.js",
+    "static/text-scope-model.js",
     "static/text-justify.js",
     "static/text-hyphen.js",
     "static/project-validation.js",

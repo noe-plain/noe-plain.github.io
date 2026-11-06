@@ -163,7 +163,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       ),
       [true, true],
     );
-    await page.locator("#carouselProperties [data-typo-tab=paragraph]").click();
+
     await page
       .locator("#carouselProperties [data-typo=lineHeight]")
       .fill("140");

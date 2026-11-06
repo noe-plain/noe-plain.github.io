@@ -180,7 +180,7 @@ const { launch, artifact } = require("./browser.cjs");
     });
     assert.equal(
       (await page.locator("#typographyInspector").count()) ||
-        (await page.locator(".typo-tabs").count()),
+        (await page.locator(".typography-inspector").count()),
       1,
     );
     await input("title:subtitle").fill("52");

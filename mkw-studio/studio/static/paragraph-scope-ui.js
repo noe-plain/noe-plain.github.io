@@ -57,6 +57,7 @@
     leading,
     remember,
     locked,
+    changedScope = () => {},
   }) {
     const paragraphs = host.querySelector("[data-paragraph-selection]"),
       lines = host.querySelector("[data-line-selection]"),
@@ -133,10 +134,12 @@
     bindSelection(lines, (values) => {
       state.lineSelection = new Set(values);
       update(selection(paragraphs).map(Number));
+      changedScope();
     });
     host.querySelector("[data-lines-all]").onclick = () => {
       delete state.lineSelection;
       update(selection(paragraphs).map(Number));
+      changedScope();
     };
     const targets = () =>
       lineRows.filter(

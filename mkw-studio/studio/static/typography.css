@@ -21,37 +21,16 @@
   min-height: 40px;
   padding: 8px 12px;
 }
-.typo-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border-bottom: 1px solid var(--line);
-}
-.typo-tabs button {
-  position: relative;
-  border: 0;
-  background: transparent;
-  border-radius: var(--studio-shape-medium) var(--studio-shape-medium) 0 0;
-  min-height: 48px;
-}
-.typo-tabs button[aria-selected="true"] {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-.typo-tabs button[aria-selected="true"]::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: calc(50% - 20px);
-  width: 40px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--md-sys-color-primary);
-}
-.typography-inspector [role="tabpanel"] {
+.typography-inspector .typo-control-group {
   display: flex;
   flex-direction: column;
   gap: var(--studio-space-4);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  padding-top: 16px;
+}
+.typo-control-group > h4 {
+  margin: 0;
+  font-size: 13px;
 }
 .typography-inspector [hidden] {
   display: none !important;
@@ -431,12 +410,7 @@
 .typo-scope [hidden] {
   display: none !important;
 }
-:is(#stepPanel, #carouselProperties) .typo-tabs button {
-  padding: 10px 6px;
-  font-size: 12px;
-  line-height: 18px;
-  min-height: 56px;
-}
+
 :is(#stepPanel, #carouselProperties)
   .typography-inspector
   .typo-paragraph-scope {

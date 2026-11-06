@@ -317,6 +317,7 @@ function carouselPanel() {
         content.onkeyup =
         content.onclick =
           () => {
+            if (document.activeElement !== content) return;
             carouselTypeRange(o, content.selectionStart, content.selectionEnd);
             if (carouselSetTextContext(o, content.selectionStart))
               carouselRefreshTextStyles(o);

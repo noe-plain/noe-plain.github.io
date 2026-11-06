@@ -41,16 +41,16 @@ const { launch, artifact } = require('./browser.cjs');
     const layout = await page.evaluate(() => carouselTextLayout(carouselSelected()[0]));
     assert.equal(layout.lines[0].runs[0].font, 'Harriet Italic');
     assert(layout.lines[0].runs[0].size < 92);
-    await choose(14, 25);
-    await page.locator('[data-typo-tab=paragraph]').click();
+    await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["1"]);
+
     await page.locator('[data-typo=lineHeight]').fill('120');
     await page.locator('[data-typo=spaceBefore]').fill('24');
     await page.locator('[data-typo-align=right]').click();
     assert.equal((await state()).textStyles[1].lineHeight, 1.2);
     assert.equal((await state()).textStyles[1].align, 'right');
     assert.equal((await state()).textStyles[0] ?? null, null);
-    await page.locator('[data-typo-tab=character]').click();
-    await page.locator('[data-typo-all]').click();
+
+    await page.locator('[data-paragraph-all]').click();
     await page.locator('[data-typo-toggle=uppercase]').click();
     assert.equal((await state()).uppercase, true);
     assert.equal((await state()).text, 'Musik erleben\nZweite Zeile');
