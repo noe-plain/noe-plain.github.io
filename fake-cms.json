@@ -363,5 +363,10 @@
         "name": "Swisstransfer",
         "url": "https://www.swisstransfer.com/de",
         "category": "suche"
+    },
+    {
+        "name": "Contao – Musikkollegium",
+        "url": "https://www.musikkollegium.ch/contao",
+        "category": "suche"
     }
 ]
