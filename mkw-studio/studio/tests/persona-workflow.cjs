@@ -40,7 +40,7 @@ const { launch, artifact, waitForProjectReady } = require('./browser.cjs');
     await page.evaluate(() => carouselObject('text', { text: 'Erster Absatz\nZweiter Absatz\nDritter Absatz', x: 100, y: 300, w: 600, h: 600, size: 60, color: '#202020' }));
     assert(await page.locator('.paragraph-scope').evaluate(el => !!el.nextElementSibling?.classList.contains('typo-control-group')));
     assert(await page.locator('[data-line-scope]').evaluate(el => !!el.closest('.paragraph-scope')));
-    assert(await page.locator('[data-line-scope]').isVisible());
+    assert(await page.locator('[data-line-scope] summary').isVisible());
     await require("./browser.cjs").selectTextScope(page, '[data-paragraph-selection]', ['0', '2']);
     assert.match(await page.locator('[data-paragraph-count]').textContent(), /2 von 3/);
     await page.evaluate(() => {

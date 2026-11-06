@@ -25,7 +25,14 @@
   }
   function resolve(o, selection = {}) {
     const all = paragraphs(o.text),
-      range = selection.range,
+      clamp = (value) =>
+        Number.isFinite(value)
+          ? Math.max(0, Math.min(o.text.length, value))
+          : 0,
+      range = selection.range && {
+        start: clamp(selection.range.start),
+        end: clamp(selection.range.end),
+      },
       direct = !!range && range.end > range.start,
       indices = direct
         ? textModel.paragraphs(o.text, range.start, range.end)

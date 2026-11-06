@@ -43,12 +43,12 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
     await page.locator('[data-paragraph-all]').click();
     await selectTextScope(page, '[data-line-selection]', []);
     assert(await page.locator('[data-lines-leading]').isDisabled());
-    assert.match(await page.locator('[data-lines-count]').textContent(), /^0 von 3 Zeilen/);
+    assert.match(await page.locator('[data-lines-count]').getAttribute('aria-label'), /^0 von 3 Zeilen/);
     await page.locator('[data-lines-all]').focus();
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('[data-line-selection] input:checked').count(), 3);
     assert(await page.locator('[data-lines-all]').isDisabled());
-    assert.match(await page.locator('[data-lines-count]').textContent(), /^3 von 3 Zeilen/);
+    assert.match(await page.locator('[data-lines-count]').getAttribute('aria-label'), /^3 von 3 Zeilen/);
     assert.deepEqual(await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision })), original, 'Selection recovery must not change the document or history');
     await page.locator('[data-lines-leading]').fill('85');
     assert.deepEqual(await page.evaluate(() => carouselSelected()[0].textStyles.map(s => s.leading[0])), [85, 85, 85]);
@@ -58,6 +58,7 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
     assert.deepEqual(await page.evaluate(() => p.carousel.objects), beforeReset.objects);
     await page.evaluate(id => carouselSelect([id]), ids[0]);
 
+    await page.locator('[data-scope-picker=line]').evaluate(el => el.open=true);
     for (const theme of ['light', 'dark']) {
       await page.evaluate(theme => studioSetTheme(theme), theme);
       await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
@@ -88,17 +89,18 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
       chooseStep('text');
     });
     await page.locator('#mainTextInput').fill('Oben\nMitte\nUnten');
+    await page.locator('[data-scope-picker=paragraph] summary').click();
 
     await page.locator('[data-paragraph-all]').click();
     const fdBefore = await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision }));
     await selectTextScope(page, '[data-line-selection]', []);
-    assert.match(await page.locator('[data-lines-count]').textContent(), /^0 von 3 Zeilen/);
+    assert.match(await page.locator('[data-lines-count]').getAttribute('aria-label'), /^0 von 3 Zeilen/);
     await page.locator('[data-lines-all]').focus();
     await page.keyboard.press('Space');
     assert.equal(await page.locator('[data-line-selection] input:checked').count(), 3);
     assert.deepEqual(await page.evaluate(() => ({ snapshot: JSON.stringify(snapshot()), history: history.length, revision })), fdBefore);
     await selectTextScope(page, '[data-paragraph-selection]', ['1']);
-    assert.match(await page.locator('[data-lines-count]').textContent(), /^1 von 1 Zeile ausgewählt$/);
+    assert.match(await page.locator('[data-lines-count]').getAttribute('aria-label'), /^1 von 1 Zeile ausgewählt$/);
     assert(await page.locator('[data-lines-all]').isDisabled());
     await page.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
     assert.deepEqual(await page.evaluate(async () => (await axe.run('#stepPanel')).violations.map(v => v.id)), []);

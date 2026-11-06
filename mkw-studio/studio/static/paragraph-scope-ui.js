@@ -1,7 +1,9 @@
 (function (root) {
   "use strict";
-  function markup(prefix) {
-    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4><div class="paragraph-scope-heading"><output data-paragraph-count role="status" aria-live="polite"></output><button data-paragraph-all>Alle</button></div><fieldset data-paragraph-selection class="scope-options" aria-label="Absätze auswählen" aria-describedby="${prefix}-paragraphMultiHint"></fieldset><p id="${prefix}-paragraphMultiHint" class="type-hint">Mehrere Kästchen wählen. Umschalt wählt einen Bereich.</p><section data-line-scope class="typo-line-controls"><h4>Einzelne Zeilen</h4><div class="paragraph-scope-heading"><output data-lines-count role="status" aria-live="polite"></output><button data-lines-all aria-label="Alle Zeilen auswählen">Alle</button></div><fieldset data-line-selection class="scope-options" aria-label="Zeilen in der Auswahl"></fieldset><label>Abstand der ausgewählten Zeilen (px)<input data-lines-leading type="number" min="1" max="3000" step="any"></label><button data-lines-auto>Automatischen Zeilenabstand verwenden</button></section></section>`;
+  function markup(prefix, icon) {
+    const picker = (kind, label, count, body) =>
+      `<details class="scope-picker" data-scope-picker="${kind}"><summary><span>${label}</span><output ${count} role="status" aria-live="polite"></output><span class="scope-picker-arrow" aria-hidden="true">${icon("down")}</span></summary><div class="scope-picker-body">${body}</div></details>`;
+    return `<section class="paragraph-scope"><h4>Einzelne Absätze &amp; Zeilen</h4>${picker("paragraph", "Absätze", "data-paragraph-count", `<div class="scope-picker-actions"><p id="${prefix}-paragraphMultiHint" class="type-hint">Kästchen kombinieren. Umschalt wählt einen Bereich.</p><button data-paragraph-all aria-label="Alle Absätze auswählen">Alle</button></div><fieldset data-paragraph-selection class="scope-options" aria-label="Absätze auswählen" aria-describedby="${prefix}-paragraphMultiHint"></fieldset>`)}<section data-line-scope>${picker("line", "Zeilen", "data-lines-count", `<div class="scope-picker-actions"><p class="type-hint">Zeilen der gewählten Absätze.</p><button data-lines-all aria-label="Alle Zeilen auswählen">Alle</button></div><fieldset data-line-selection class="scope-options" aria-label="Zeilen in der Auswahl"></fieldset>`)}</section></section>`;
   }
   function options(host, items, chosen) {
     const signature = JSON.stringify(items);
@@ -64,6 +66,13 @@
       input = host.querySelector("[data-lines-leading]");
     let lineRows = [],
       began = false;
+    for (const picker of host.querySelectorAll("[data-scope-picker]")) {
+      picker.open = !!state.pickers?.[picker.dataset.scopePicker];
+      picker.ontoggle = () => {
+        state.pickers ??= {};
+        state.pickers[picker.dataset.scopePicker] = picker.open;
+      };
+    }
     const common = (values) =>
       values.length && values.every((v) => v === values[0]) ? values[0] : null;
     function update(indices) {
@@ -80,7 +89,10 @@
       );
       const count = host.querySelector("[data-paragraph-count]"),
         countText = `${indices.length} von ${values.length} ${values.length === 1 ? "Absatz" : "Absätzen"} ausgewählt`;
-      if (count.textContent !== countText) count.textContent = countText;
+      const shortCount = `${indices.length} von ${values.length}`;
+      if (count.textContent !== shortCount) count.textContent = shortCount;
+      if (count.getAttribute("aria-label") !== countText)
+        count.setAttribute("aria-label", countText);
       host.querySelector("[data-paragraph-all]").disabled =
         indices.length === values.length;
       const result = layout(),
@@ -94,8 +106,11 @@
       const chosen = state.lineSelection || valid;
       const lineCount = host.querySelector("[data-lines-count]"),
         lineCountText = `${chosen.size} von ${lineRows.length} ${lineRows.length === 1 ? "Zeile" : "Zeilen"} ausgewählt`;
-      if (lineCount.textContent !== lineCountText)
-        lineCount.textContent = lineCountText;
+      const shortLineCount = `${chosen.size} von ${lineRows.length}`;
+      if (lineCount.textContent !== shortLineCount)
+        lineCount.textContent = shortLineCount;
+      if (lineCount.getAttribute("aria-label") !== lineCountText)
+        lineCount.setAttribute("aria-label", lineCountText);
       host.querySelector("[data-lines-all]").disabled =
         chosen.size === lineRows.length;
       options(
@@ -119,9 +134,8 @@
           ? "Gemischt"
           : "";
       input.disabled = locked || !chosen.size;
-      host.querySelector("[data-lines-auto]").disabled = locked || !chosen.size;
       host.querySelector("[data-line-scope]").hidden = !lineRows.length;
-      lines.hidden = lineRows.length < 2;
+      lines.hidden = !lineRows.length;
     }
     bindSelection(paragraphs, (values) => {
       delete state.lineSelection;
@@ -155,11 +169,6 @@
         began = true;
       }
       leading(targets(), input.valueAsNumber);
-    };
-    host.querySelector("[data-lines-auto]").onclick = () => {
-      if (locked) return;
-      remember();
-      leading(targets(), null);
     };
     return { update };
   }

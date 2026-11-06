@@ -89,3 +89,23 @@ test("only complete marked paragraphs admit paragraph-wide controls; size reset 
   assert.equal(o.textStyles[1].size, 70);
   assert.equal(o.size, 50);
 });
+
+test("stale direct selections are clamped before classification after deletion or replacement", () => {
+  for (const content of ["", "A", "Short"]) {
+    const o = { ...doc(), text: content };
+    const s = scope.resolve(o, { range: { start: 10, end: 40 } });
+    assert.equal(s.direct, false);
+    assert.deepEqual(
+      s.ranges,
+      content ? [{ start: 0, end: content.length, index: 0 }] : [],
+    );
+    assert.doesNotThrow(() => scope.values(o, s, "size"));
+  }
+  const o = { ...doc(), text: "Short" },
+    s = scope.resolve(o, { range: { start: 2, end: 40 } });
+  assert(s.direct);
+  assert.deepEqual(s.ranges, [{ start: 2, end: 5 }]);
+  scope.apply(o, s, { size: 80 });
+  assert.equal(text.at(o, 1).size, undefined);
+  assert.equal(text.at(o, 2).size, 80);
+});

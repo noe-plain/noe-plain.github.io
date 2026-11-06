@@ -37,7 +37,7 @@ const {
     );
     assert(await page.locator("[data-typo=font]").isVisible());
     assert(await page.locator("[data-typo=spaceAfter]").isVisible());
-    assert(await page.locator("[data-line-selection]").isVisible());
+    assert(await page.locator('[data-scope-picker="line"] > summary').isVisible());
     await selectTextScope(page, "[data-paragraph-selection]", ["0", "2"]);
     await page.locator("[data-typo=font]").selectOption("Georgia");
     await page.locator("[data-typo=size]").fill("80");

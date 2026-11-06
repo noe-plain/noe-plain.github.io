@@ -103,7 +103,12 @@
       if (section.dataset.inspectorGroup !== category)
         section.dataset.inspectorGroup = category;
       if (!state.targets.has(category))
-        state.targets.set(category, heading || section);
+        state.targets.set(
+          category,
+          heading?.classList.contains("visually-hidden")
+            ? section
+            : heading || section,
+        );
     }
     if (layers)
       state.targets.set("layers", layers.querySelector("h3") || layers);

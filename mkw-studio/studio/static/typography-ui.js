@@ -70,16 +70,18 @@ const MKWTypography = (() => {
     if (selection.direct)
       return `${selection.ranges[0].end - selection.ranges[0].start} Zeichen markiert`;
     if (selection.lineScoped)
-      return `${session(o).lineSelection.size} Zeilen ausgewählt`;
+      return `${session(o).lineSelection.size} ${session(o).lineSelection.size === 1 ? "Zeile" : "Zeilen"} ausgewählt`;
     return selection.whole
       ? "Alle Absätze & Zeilen"
-      : `${selection.paragraphs.length} Absätze ausgewählt`;
+      : `${selection.paragraphs.length} ${selection.paragraphs.length === 1 ? "Absatz" : "Absätze"} ausgewählt`;
   }
   function panel() {
     const prefix = "typo-" + ++panelSequence;
-    const field = (key, label, unit, min, max, step = "any") =>
-      `<label>${label}<span class="type-unit"><input data-typo="${key}" aria-label="${label}" type="number" min="${min}" max="${max}" step="${step}"><span>${unit}</span></span></label>`;
-    return `<section class="carousel-property-section typography-inspector"><h3 class="visually-hidden">Textformatierung</h3><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Absätze &amp; Zeilen verwenden</button></div>${MKWParagraphScopeUI.markup(prefix)}<div class="typo-control-group" data-typo-page="character"><h4>Schrift &amp; Farbe</h4><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><button data-typo-size-auto>Grösse zurücksetzen</button><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
+    const field = (key, label, unit, min, max, step = "any") => {
+      const input = `<span class="type-unit"><input id="${prefix}-${key}" data-typo="${key}" aria-label="${label}" type="number" min="${min}" max="${max}" step="${step}"><span>${unit}</span></span>`;
+      return `<label for="${prefix}-${key}">${label}${input}</label>`;
+    };
+    return `<section class="carousel-property-section typography-inspector"><h3 class="visually-hidden">Textformatierung</h3><div class="typo-scope"><span data-typo-scope role="status"></span><button data-typo-all>Absatz-/Zeilenauswahl verwenden</button></div>${MKWParagraphScopeUI.markup(prefix, studioIcon)}<div class="typo-control-group" data-typo-page="character"><h4>Schrift &amp; Farbe</h4><label>Schriftfamilie<select data-typo="font" aria-label="Schriftfamilie"></select></label><div class="typo-grid">${field("size", "Schriftgrösse", "px", 1, 5000)}${field("tracking", "Laufweite", "‰", -500, 2000)}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><div class="typo-format" role="group" aria-label="Zeichenformatierung">${[
       ["uppercase", "AA", "Grossbuchstaben"],
       ["underline", "U", "Unterstrichen"],
       ["strike", "S", "Durchgestrichen"],
@@ -92,7 +94,7 @@ const MKWTypography = (() => {
       )
       .join(
         "",
-      )}</div><div class="typo-colour-row"><span>Textfarbe</span><button data-typo-colour aria-label="Textfarbe wählen"><i></i><span data-typo-colour-label></span></button></div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div class="typo-control-group" data-typo-page="paragraph"><h4>Absatz &amp; Abstände</h4><p class="typo-paragraph-scope" data-typo-paragraph-scope></p><div class="type-control-heading"><span>Ausrichtung der Auswahl</span><button data-typo-align-auto>Vom Textfeld</button></div>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<button data-typo-leading-auto>Automatisch · 95 %</button>${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
+      )}</div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-size-auto>Schriftgrösse zurücksetzen</button><button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div class="typo-control-group" data-typo-page="paragraph"><h4>Absatz &amp; Abstände</h4><p class="typo-paragraph-scope" data-typo-paragraph-scope></p><div class="type-control-heading"><span>Ausrichtung der Auswahl</span><button data-typo-align-auto>Vom Textfeld</button></div>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<div class="typo-grid">${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<label data-line-spacing>Zeilenabstand (px)<span class="type-unit"><input data-lines-leading aria-label="Zeilenabstand in Pixeln" type="number" min="1" max="3000" step="any"><span>px</span></span></label></div><button data-typo-leading-auto>Automatischen Zeilenabstand verwenden</button><div class="typo-grid">${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
   }
   function values(key) {
     return current.targets.flatMap((o) => {
@@ -141,17 +143,23 @@ const MKWTypography = (() => {
       paragraphEnabled =
         (!selection.direct || selection.completeParagraphs) &&
         !selection.lineScoped;
+    host.querySelector(".typo-scope").hidden =
+      targets.length === 1 && !selection.direct && hasSelection;
     host.querySelector("[data-typo-scope]").textContent =
       targets.length > 1
         ? `${targets.length} Textebenen ausgewählt · Formatierung gilt für alle`
-        : "Formatierung: " + scope(o);
+        : hasSelection
+          ? "Gilt für: " + scope(o)
+          : "Keine Auswahl. Wähle Absätze oder Zeilen.";
     host.querySelector("[data-typo-all]").hidden =
       targets.length > 1 || !selection.direct;
     host.querySelector("[data-typo-all]").disabled =
       targets.length > 1 || !selection.direct;
+    host.querySelector("[data-typo-paragraph-scope]").hidden =
+      paragraphEnabled && targets.length === 1;
     host.querySelector("[data-typo-paragraph-scope]").textContent =
       selection.direct && !selection.completeParagraphs
-        ? "Absatzoptionen über die Absatz- und Zeilenauswahl ändern. Die Schriftoptionen gelten nur für die markierten Zeichen."
+        ? "Für Ausrichtung und Absatzabstände ganze Absätze auswählen. Schriftänderungen gelten nur für die markierten Zeichen."
         : selection.lineScoped
           ? "Zeilenabstand gilt nur für die ausgewählten Zeilen. Absatzoptionen sind für ganze Absätze verfügbar."
           : targets.length > 1
@@ -299,7 +307,6 @@ const MKWTypography = (() => {
       (selection.direct && !selection.completeParagraphs);
     if (selection.direct && !selection.completeParagraphs) {
       host.querySelector("[data-lines-leading]").disabled = true;
-      host.querySelector("[data-lines-auto]").disabled = true;
     }
   }
   function remember() {
@@ -420,6 +427,8 @@ const MKWTypography = (() => {
     host.querySelector(".paragraph-scope").hidden = current.targets.length > 1;
     const lineScope = host.querySelector("[data-line-scope]");
     lineScope.hidden = current.targets.length > 1;
+    host.querySelector("[data-line-spacing]").hidden =
+      current.targets.length > 1;
     current.paragraphScope =
       current.targets.length > 1
         ? null

@@ -54,6 +54,10 @@ async function selectTextScope(page, selector, values) {
     (await page.locator("[data-typo-all]").isVisible())
   )
     await page.locator("[data-typo-all]").click();
+  await page.locator(selector).evaluate((el) => {
+    const picker = el.closest("details");
+    if (picker) picker.open = true;
+  });
   const desired = new Set(
       (Array.isArray(values) ? values : [values]).map(String),
     ),

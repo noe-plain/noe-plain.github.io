@@ -104,7 +104,7 @@ const { launch, artifact } = require("./browser.cjs");
     );
     await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["1"]);
     await page.locator("[data-typo=size]").fill("40");
-    await page.locator("[data-typo-size-auto]").click();
+    await page.locator(".typo-details").first().evaluate(el=>el.open=true);await page.locator("[data-typo-size-auto]").click();
     assert.equal(
       await page.evaluate(
         () => carouselSelected()[0].textStyles[1].size ?? null,
