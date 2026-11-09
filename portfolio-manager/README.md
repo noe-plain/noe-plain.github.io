@@ -72,3 +72,14 @@ Die Kundenseite entschlüsselt Manifest, Vorschaubilder und Downloadbilder erst 
 Zum Pausieren die Freigabe im Veranstaltungsdialog abwählen, speichern und die Änderungen pushen. Ein neues Passwort verschlüsselt alle aktuellen Dateien neu. Git-Verlauf, Caches und bereits empfangene Downloads lassen sich damit nicht zurückholen; bei GitHub Pages ist keine personenbezogene Zugriffskontrolle oder echte nachträgliche Download-Sperre möglich. Kundinnen mit dem Passwort können Bilder speichern und weitergeben.
 
 Prüfung: `node --test client-galleries.test.js`. Der Test verwendet ausschliesslich temporäre Uploads und prüft Authentifizierung, falsche Passwörter, Browser-kompatible Entschlüsselung, Metadaten, Versionskonflikte, Passwortwechsel, Pausieren und gültige ZIP-Dateien.
+
+
+## Startseite bearbeiten
+
+Unter **Startseite** gibt es die Bereiche **Hero-Bereich**, **Das bin ich** und **Lebenslauf**. Die Vorschau zeigt den Entwurf im Originaldesign; gespeichert wird ausschliesslich lokal. **Cmd/Strg+S** speichert den aktiven Bereich. Die Freigabe erfolgt anschliessend wie bisher über **Änderungen prüfen**.
+
+Im Hero sind bis zu sieben unterschiedliche Projekte möglich. Jedes Bild verlinkt auf sein Projekt. Bilder, Bildausschnitt, Reihenfolge, Überschrift, Name, Untertitel und Bewegungsstärke lassen sich ändern. `&shy;` wird als bedingter Trennstrich unterstützt. Bei reduzierter Bewegung und auf Touch-Geräten entfallen die Animationen. Alternativ lässt sich das bisherige Titelbild aktivieren.
+
+**Das bin ich** wird als HTML in einem abgegrenzten Abschnitt der Startseite bearbeitet. Der Lebenslauf verwendet einzelne Stationen mit Zeitraum, Titel, Organisation und Beschreibung. Eine Vorschau schreibt keine dieser Dateien. Veraltete Speicherstände werden mit einem Konflikthinweis abgewiesen.
+
+Die Prüfung anhand der sechs Personas und der Testbefehl stehen in [HOMEPAGE-REVIEW.md](HOMEPAGE-REVIEW.md).

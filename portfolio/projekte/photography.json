@@ -583,9 +583,9 @@
     },
     {
         "id": "mkw",
-        "title": "Musikkollegium Winterthur",
+        "title": "Klassische Konzerte",
         "description": "",
-        "tabTitle": "Musikkollegium Winterthur",
+        "tabTitle": "Konzerte",
         "hero-image": "../../images/portfolio/projects/mkw/260831_A1_Probe_c-noe-plain-2.jpg",
         "blocks": [
             {
@@ -673,6 +673,6 @@
                 ]
             }
         ],
-        "sectionTitle": "Musikkollegium Winterthur"
+        "sectionTitle": "Klassische Konzerte"
     }
 ]

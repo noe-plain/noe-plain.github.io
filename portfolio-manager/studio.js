@@ -25,7 +25,7 @@ module.exports = function studio(app, root) {
         return full;
     }
     const isPage = p => typeof p === 'string' && /^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.html$/.test(p) && !p.startsWith('portfolio-manager/');
-    const allowed = p => /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['.gitignore','common.js','lebenslauf.js','lebenslauf.json'].includes(p);
+    const allowed = p => /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+(?:\.test)?\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['.gitignore','common.js','lebenslauf.js','lebenslauf.json'].includes(p);
     function write(relative, content, revision) {
         const full = resolve(relative);
         const before = fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : '';
@@ -53,6 +53,7 @@ module.exports = function studio(app, root) {
     }
     require('./media-library').register(app, root, route);
     require('./client-galleries').register(app, root, route);
+    const homepage = require('./homepage').register(app, root, route, { resolve, write, hash });
     app.get('/api/studio/session', (req, res) => res.json({ token }));
     app.get('/api/studio/content/:type', route(async (req, res) => {
         const file = files[req.params.type]; if (!file) throw fail('Unbekannter Inhalt.');
@@ -79,17 +80,24 @@ module.exports = function studio(app, root) {
         res.json({ revision: write(file, html, revision) });
     }));
     app.post('/api/studio/preview', route(async (req, res) => {
-        const { id, type, data, file, html } = req.body;
+        let { id, type, data, file, html, homeSection } = req.body;
         if (!/^[a-z0-9-]{1,80}$/.test(id)) throw fail('Ungültige Vorschau.');
-        if (file ? !isPage(file) || typeof html !== 'string' : !files[type] || !Array.isArray(data)) throw fail('Ungültige Vorschau.');
+        if (homeSection !== undefined) {
+            if (homeSection === 'hero') data = homepage.hero(data);
+            else if (homeSection === 'resume') data = homepage.resume(data);
+            else if (homeSection === 'about') { html = homepage.about(data); file = 'index.html'; }
+            else throw fail('Unbekannter Startseitenbereich.');
+        } else if (file ? !isPage(file) || typeof html !== 'string' : !files[type] || !Array.isArray(data)) throw fail('Ungültige Vorschau.');
         for (const [key, value] of drafts) if (Date.now() - value.time > 3600000) drafts.delete(key);
         if (!drafts.has(id) && drafts.size >= 50) throw fail('Zu viele Vorschauen. Bitte Server neu starten.');
-        drafts.set(id, { type, data, file, html, time: Date.now() }); res.json({ prefix: `/preview/${id}/` });
+        drafts.set(id, { type, data, file, html, homeSection, time: Date.now() }); res.json({ prefix: `/preview/${id}/` });
     }));
     app.get('/preview/:id/*', route(async (req, res) => {
         const draft = drafts.get(req.params.id); if (!draft) throw fail('Vorschau abgelaufen. Bitte Editor neu laden.', 404);
         const relative = req.params[0]; const full = resolve(relative);
         if (relative.startsWith('portfolio-manager/') || !allowed(relative)) throw fail('Datei nicht freigegeben.', 403);
+        if (draft.homeSection === 'hero' && relative === 'portfolio/home-hero.json') return res.json(draft.data);
+        if (draft.homeSection === 'resume' && relative === 'lebenslauf.json') return res.json(draft.data);
         if (relative === draft.file) return res.type('html').send(draft.html);
         if (relative === files[draft.type]) return res.json(draft.data);
         res.sendFile(full);

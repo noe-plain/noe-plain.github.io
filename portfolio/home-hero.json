@@ -1,0 +1,45 @@
+{
+  "enabled": true,
+  "motion": 32,
+  "title": "Medien von",
+  "name": "Noé",
+  "subtitle": "Mediamatiker EFZ mit BM",
+  "projects": [
+    {
+      "type": "photography",
+      "id": "street",
+      "image": "",
+      "fit": "cover"
+    },
+    {
+      "type": "photography",
+      "id": "mkw",
+      "image": "",
+      "fit": "cover"
+    },
+    {
+      "type": "design",
+      "id": "iwish",
+      "image": "",
+      "fit": "cover"
+    },
+    {
+      "type": "illustration",
+      "id": "lamaLami",
+      "image": "",
+      "fit": "cover"
+    },
+    {
+      "type": "photography",
+      "id": "aviation",
+      "image": "",
+      "fit": "cover"
+    },
+    {
+      "type": "design",
+      "id": "ipa-techday",
+      "image": "",
+      "fit": "cover"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
@@ -9,24 +9,27 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/lebenslauf.css">
+    <link rel="stylesheet" href="css/home-hero.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="common.js" defer></script>
+    <script src="portfolio/home-hero-model.js" defer></script>
+    <script src="portfolio/home-hero.js" defer></script>
     <script src="lebenslauf.js" defer></script>
     <meta name="description"
         content="Portfolio von Mediamatiker EFZ mit BM, Noé Plain. Fotografie, Videografie, Illustration und Design. Arbeiten aus den Bereichen Fotografie, Videografie, Illustration und Design.">
     <meta http-equiv="cache-control" content="max-age=604800" />
 </head>
 
-<body style="
+<body class="home-page" style="
     background-color: #1f0033;
-    background-image: url(../images/kategorien/noe-background.jpg);
+    background-image: url(./images/kategorien/noe-background.jpg);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;">
     <header>
         <nav class="header-nav">
-            <a class="logo-a" href="../index.html">Medien von <span>Noé</span></a>
+            <a class="logo-a" href="./index.html">Medien von <span>Noé</span></a>
             <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menü öffnen">
                 <span></span>
                 <span></span>
@@ -56,24 +59,29 @@
                         <li><a class="hamburger-nav-link sub-link" href="./portfolio/design.html">Design</a></li>
                     </ul>
                 </div>
-                <a class="hamburger-nav-link" href="../index.html#about">Das bin ich</a>
-                <a class="hamburger-nav-link" href="../index.html#cv">Lebenslauf</a>
-                <a class="hamburger-nav-link" href="../index.html#contact">Kontakt</a>
+                <a class="hamburger-nav-link" href="./index.html#about">Das bin ich</a>
+                <a class="hamburger-nav-link" href="./index.html#cv">Lebenslauf</a>
+                <a class="hamburger-nav-link" href="./index.html#contact">Kontakt</a>
             </div>
         </nav>
     </header>
 
+    <section id="home-hero" class="home-hero" aria-label="Willkommen und ausgewählte Projekte">
     <div class="hero-image z-index-hero-image"
         style="background-image: url(./images/noe-plain-bench.jpg); background-position: 35% 0%; background-size: cover; border: 1.5px solid #fff">
     </div>
 
     <div class="hero-text">
+        <span class="hero-eyebrow">Fotografie · Design · Illustration · Video</span>
         <h1 class="hero-h1">Medien von <span>Noé</span></h1>
         <h2 class="hero-h2 h-klein">Mediamatiker EFZ mit BM</h2>
+        <a class="hero-discover" href="#portfolio">Projekte entdecken <span aria-hidden="true">↓</span></a>
     </div>
+    </section>
 
     <main class="main-homepage">
         <div class="about-section max-width" id="about">
+            <!-- home:about:start -->
             <div class="signature-form">
                 <h2>
                     Das bin ich
@@ -96,6 +104,7 @@
                     professionelles und überzeugendes Ergebnis zu erzielen.
                 </p>
             </div>
+            <!-- home:about:end -->
         </div>
 
         <div id="portfolio">
