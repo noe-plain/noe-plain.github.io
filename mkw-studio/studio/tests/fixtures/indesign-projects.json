@@ -1,0 +1,192 @@
+[
+  {
+    "id": "designer-typography",
+    "name": "IDML Quelle · Typografie",
+    "mode": "carousel",
+    "layout": "slides",
+    "pages": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 1080,
+        "h": 1350
+      },
+      {
+        "x": 1080,
+        "y": 0,
+        "w": 1080,
+        "h": 1350
+      }
+    ],
+    "expectedPagePoints": [
+      [
+        810,
+        1012.5
+      ],
+      [
+        810,
+        1012.5
+      ]
+    ],
+    "objects": [
+      {
+        "type": "text",
+        "properties": {
+          "name": "Unicode und Bereichsformatierung",
+          "text": "Musik & Klang <live> 🎶\nZürich – nächste Zeile",
+          "x": 80,
+          "y": 120,
+          "w": 800,
+          "h": 600,
+          "size": 60,
+          "font": "Arial",
+          "color": "#202020",
+          "textStyles": [
+            {
+              "size": 72,
+              "spaceAfter": 16
+            },
+            {
+              "align": "right",
+              "lineHeight": 1.2
+            }
+          ],
+          "characterStyles": [
+            {
+              "start": 0,
+              "end": 5,
+              "font": "Georgia",
+              "color": "#c52242",
+              "underline": true
+            }
+          ]
+        }
+      },
+      {
+        "type": "text",
+        "properties": {
+          "text": "Zweite Seite",
+          "x": 1160,
+          "y": 120,
+          "w": 800,
+          "h": 400,
+          "size": 60,
+          "font": "Arial",
+          "color": "#202020",
+          "rotation": 12
+        }
+      }
+    ]
+  },
+  {
+    "id": "fd-formats-crop",
+    "name": "IDML Quelle · FD und Ausschnitt",
+    "mode": "post",
+    "pages": [
+      {
+        "w": 1080,
+        "h": 1350
+      },
+      {
+        "w": 1080,
+        "h": 1080
+      }
+    ],
+    "expectedPagePoints": [
+      [
+        810,
+        1012.5
+      ],
+      [
+        810,
+        810
+      ]
+    ],
+    "text": "Musik & Klang <live>\nZürich 🎶",
+    "image": {
+      "scale": 30,
+      "angle": 12,
+      "flipX": -1,
+      "flipY": 1
+    }
+  },
+  {
+    "id": "designer-free-effects",
+    "name": "IDML Quelle · Freie Seiten und Effekte",
+    "mode": "carousel",
+    "layout": "free",
+    "asset": true,
+    "pages": [
+      {
+        "x": 0,
+        "y": 60,
+        "w": 800,
+        "h": 1000
+      },
+      {
+        "x": 960,
+        "y": 180,
+        "w": 1200,
+        "h": 900
+      }
+    ],
+    "expectedPagePoints": [
+      [
+        600,
+        750
+      ],
+      [
+        900,
+        675
+      ]
+    ],
+    "objects": [
+      {
+        "type": "gradient",
+        "properties": {
+          "name": "Verlauf mit Rastereffekten",
+          "x": -100,
+          "y": 80,
+          "w": 500,
+          "h": 650,
+          "color": "#c5228a",
+          "endColor": "#2359cc",
+          "endAlpha": 1,
+          "blur": 6,
+          "noise": 8
+        }
+      },
+      {
+        "type": "image",
+        "properties": {
+          "name": "Gespiegelter Ausschnitt",
+          "imageId": "$image",
+          "x": 1040,
+          "y": 220,
+          "w": 700,
+          "h": 500,
+          "scale": 1.25,
+          "panX": 20,
+          "panY": -30,
+          "rotation": 15,
+          "flipX": -1
+        }
+      },
+      {
+        "type": "text",
+        "properties": {
+          "name": "Ausgeblendeter Text bleibt Quelle",
+          "text": "Nicht verlieren 🎶",
+          "x": 1040,
+          "y": 760,
+          "w": 700,
+          "h": 200,
+          "size": 50,
+          "font": "Arial",
+          "color": "#202020",
+          "visible": false
+        }
+      }
+    ]
+  }
+]

@@ -387,26 +387,31 @@ const MKWTypography = (() => {
       current.locked ||
       !current.targets.some((target) => paragraphIndices(target).length)
     )
-      return;
+      return false;
     const selection = formattingScope();
-    if (selection.direct && !selection.completeParagraphs) return;
+    if (selection.direct && !selection.completeParagraphs) return false;
     if (selection.lineScoped) {
       if (Object.keys(values).length !== 1 || values.lineHeight === undefined)
-        return;
+        return false;
       const lines = selectedLines(),
+        // FD layout converts display sizes back to source pixels. Remove
+        // floating-point residue before testing the inclusive 1–3000px limits.
         leading = (line) =>
-          Math.max(line.size, ...(line.runs || []).map((r) => r.size)) *
-          values.lineHeight;
+          Math.round(
+            Math.max(line.size, ...(line.runs || []).map((r) => r.size)) *
+              values.lineHeight *
+              1e9,
+          ) / 1e9;
       if (lines.some((line) => leading(line) < 1 || leading(line) > 3000)) {
         MKWFields.error(
           current.host.querySelector('[data-typo="lineHeight"]'),
           "Der ausgewählte Zeilenabstand muss zwischen 1 und 3000 px liegen.",
         );
-        return;
+        return false;
       }
       if (!checkpointed) remember();
       lineLeading(lines, leading);
-      return;
+      return true;
     }
     if (!checkpointed) remember();
     const { o, targets } = current,
@@ -421,6 +426,7 @@ const MKWTypography = (() => {
     }
     current.commit({ kind: "paragraph", indices, values });
     sync();
+    return true;
   }
   function bind(host, options) {
     current = { ...options, host, targets: options.targets || [options.o] };
@@ -476,16 +482,13 @@ const MKWTypography = (() => {
         )
           return;
         if (["lineHeight", "spaceBefore", "spaceAfter"].includes(key)) {
-          if (!began) {
-            remember();
+          if (
+            paragraph(
+              { [key]: key === "lineHeight" ? value / 100 : value },
+              began,
+            )
+          )
             began = true;
-          }
-          paragraph(
-            {
-              [key]: key === "lineHeight" ? value / 100 : value,
-            },
-            true,
-          );
           return;
         }
         if (!began) {

@@ -21,7 +21,17 @@ Je bestehendem Montag-/Donnerstag-Review einen überschaubaren nächsten Meilens
 
 - [x] Nutzerwunsch und schrittweise Umsetzung dokumentiert.
 - [x] Bestehende Wochen-Automation um diese Arbeitsfolge ergänzt; Termine unverändert.
-- [ ] Fachliche Abnahme und repräsentative Quelldateien/Testfälle festgelegt.
+- [x] Technische Anforderungen, drei reproduzierbare Quellprojekt-Rezepte und Abnahmekriterien festgelegt (9. November 2026).
+- [ ] Offizielle vollständige Paket-/Schema-Referenz verfügbar und am Referenzpaket geprüft.
+- [ ] Fachliche Abnahme durch den Nutzer und echte InDesign-Dateiabnahme.
 - [ ] IDML-Export implementiert und tatsächlich in InDesign geprüft.
 
 Quellen: [Adobe: unterstützte Dateiformate](https://helpx.adobe.com/au/indesign/desktop/get-started/system-and-product-info/supported-file-formats.html), [Adobe: IDML öffnen und als INDD speichern](https://helpx.adobe.com/indesign/desktop/troubleshoot/file-and-output-issues/cant-open-in-previous-versions.html), [Adobe: IDML-Exportformat](https://developer.adobe.com/indesign/uxp/dom/api/e/export-format/).
+
+## Fortschritt · 9. November 2026
+
+Erster begrenzter Meilenstein: [Anforderungen und Abnahmebasis](INDESIGN-EXPORT-ACCEPTANCE.md), drei synthetische Projekt-Rezepte und eine Browserprüfung, die daraus echte Studio-Projekte erzeugt, validiert und über MKW speichert/liest/wiederherstellt. Es wurde kein IDML-Exporter und kein nativer INDD-Export implementiert; PSD und MKW bleiben verfügbar.
+
+Die aktuelle offizielle Adobe-DOM-Referenz wurde geprüft. Die historische vollständige IDML-PDF ist identifiziert, ihre bisherigen offiziellen Downloadadressen liefern jedoch 404. Die installierten Adobe-Parsermodule wurden als ergänzende Herstellerreferenz gelesen; sie wurden nicht übernommen. Die Spezifikations-/Schemafrage bleibt ausdrücklich offen.
+
+Nächster Schritt: offizielle Schema-/Referenzbasis klären, anschliessend ein minimales Einseiten-Paket erstellen und sowohl maschinell als auch durch tatsächliches Öffnen in InDesign prüfen. Ein vollständiger bearbeitbarer Export ist noch nicht verfügbar.
