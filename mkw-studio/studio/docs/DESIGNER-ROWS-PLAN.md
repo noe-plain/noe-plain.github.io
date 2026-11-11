@@ -82,3 +82,18 @@ Alte bereits gemischte Dateien bleiben ohne automatische Verformung lesbar. Die 
 ## Wartbarkeit und sechs Personas
 
 Verbindliche Ergänzung des Nutzers: Regeln zentral im vorhandenen zuständigen Modell halten, keine duplizierten Sonderfälle je Schaltfläche, keine zweite Dokumentstruktur. Kleine nachvollziehbare Änderungen, klare Verantwortungen und aussagekräftige Regressionstests verwenden. Vor Veröffentlichung aus allen sechs Perspektiven prüfen: neue Nutzerin, erfahrener Designer, Senior UX-Experte, UI-Expertin, QA-Entwicklerin und destruktiver Fehlersucher. Findings und tatsächlich offene UX-Schritte dokumentieren; die sechs Personas ersetzen keine Tests und sind keine behauptete Nutzerstudie.
+
+
+## Weitere beauftragte Editor- und Farbwerkzeuge
+
+Diese Funktionen sind geplant, noch nicht implementiert. Exportauswahl direkt mit dem verbleibenden Reihen-/Export-Umbau verbinden; die anderen vier Werkzeuge nach der stabilen Reihenbasis in begrenzten, prüfbaren Schritten umsetzen. Die geltenden Guthabengrenzen und sechs-Persona-Prüfungen gelten weiterhin.
+
+| Funktion | Gewünschtes Verhalten / Abnahme |
+| --- | --- |
+| Auswahl in der Exportvorschau | Reihen/Slides direkt in der Vorschau ein-/ausschliessen und Auswahl anpassen, ohne Einstellungen zu verlieren. Vorschau, Anzahl, Namen und echte Exportdateien zeigen stets dieselbe Auswahl; leere Auswahl und schnelle Wechsel/Abbrechen berücksichtigen. |
+| Tatsächliche Formvorschau beim Ziehen | Vor dem Loslassen die ausgewählte Form mit Füllung/Kontur/Proportionen zeigen, nicht nur einen allgemeinen Rahmen. Vorhandene Geometrie/Zeichenlogik wiederverwenden. Entwurf ohne laufende Dokument-/Undo-Einträge; Escape/Pointer-Abbruch hinterlässt keine Änderung. Zoom und Touch prüfen. |
+| Winkel mit Farbfüllung | Zusätzlich zu Bildinhalt eine klare Farbfüllung mit Farbe/Deckkraft ermöglichen. Bisherige Winkel, Dateien und Effekte bewahren; Darstellung, Vorlagen, MKW sowie PNG/PDF/PSD prüfen und tatsächliche Bearbeitbarkeit ehrlich benennen. |
+| Pipette im Farbpicker | Sichtbare Farben direkt aus dem Arbeitsbereich aufnehmen; Zoom, Bildausschnitte und Abbrechen korrekt behandeln. Passenden lokalen Weg für unterstützte Desktop-/Tablet-Browser anbieten, ohne ausschliessliche Abhängigkeit von einer eventuell nicht verfügbaren Bildschirm-Pipetten-API. |
+| Farbhilfe-Fenster mit fünf Farben | Fünf Farben aus Bildern der aktiven Reihe zusammenstellen, als fünf bearbeitbare Farbfelder zeigen und gezielt übernehmen. Zu einer ausgewählten Farbe mehrere passende Vorschläge unter Berücksichtigung des restlichen Dokuments anbieten. Keine ungefragte Umfärbung; sichtbare Ausschnitte, ähnliche Farben, Transparenz, fehlende und grosse Bilder beachten. Lokale Analyse ohne zusätzliche API-Kosten bevorzugen. |
+
+Neue Vorlagen weiterhin vorlegen und nur nach ausdrücklicher Nutzerfreigabe mitliefern. Keine dieser Wunschfunktionen allein durch diese Planung als erledigt darstellen.

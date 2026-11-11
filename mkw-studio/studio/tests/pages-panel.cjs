@@ -16,6 +16,8 @@ const assert=require('node:assert/strict');const {launch,artifact,waitForProject
  await page.evaluate(()=>undo());
  // A real Firefox pointer drag also reaches the model (no synthetic-only demo).
  await page.evaluate(()=>{studioPreferences.inspectorSplit=85;studioApplyPreferences();});
+ // Keep both endpoints visible before the native gesture; scrolling mid-drag can cancel Chrome dragstart.
+ await page.locator('#spreadPages').scrollIntoViewIfNeeded();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
  const nativeBefore=await page.evaluate(()=>p.carousel.pageStructure.groups.map(g=>[...g]));
  await page.locator('.pages-thumb').first().dragTo(page.locator('.pages-artboard-heading').nth(1));
  assert.notDeepEqual(await page.evaluate(()=>p.carousel.pageStructure.groups),nativeBefore,'native pointer drag changes target membership');

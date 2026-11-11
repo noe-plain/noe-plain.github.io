@@ -94,3 +94,8 @@ Auf erneuten Fortsetzungsauftrag wurde die verbindliche Formatregel technisch er
 | Fehlersucher | Gemischte Formate beim Join, Transfer, Shuffle oder Altbestand-Duplikat dürfen keine stillen Änderungen erzeugen. | Ungültige Aktionen atomar abgewiesen; explizite Altbestandsreparatur geprüft. |
 
 Zusätzliche Nutzeraufträge sind im Restplan festgehalten: UX für Einrichtung, Seitenleiste, Fläche, Eigenschaften, Speichern/Öffnen/Export als vollständige Nutzerwege gestalten; neue Vorlagen nach Gestaltungsgrundsätzen entwerfen, visuell vorlegen und nur nach ausdrücklicher Zustimmung in die mitgelieferte Bibliothek aufnehmen. Keine neuen Vorlagen oder Freigaben wurden in diesem Lauf behauptet.
+
+
+Die vollständige Chrome-Prüfung deckte anschliessend eine fehlende Voraussetzung im vorhandenen nativen Drag-Test auf: Durch den längeren Formathinweis lagen Quelle und Ziel nicht gemeinsam im sichtbaren Ausschnitt. Chrome begann beim automatischen Scrollen während der Testgeste keinen Drag. Die Ereignisspur zeigte keine `dragstart`-Nachricht; bei vorab sichtbarer Übersicht wurden echte `dragstart`-/`dragover`-/`drop`-Ereignisse und die erwartete Mitgliedschaftsänderung nachgewiesen. Der Test scrollt nun die Übersicht vor der Geste in den sichtbaren Bereich und wartet zwei Renderframes. Die ursprüngliche Prüfung der tatsächlichen Modelländerung bleibt unverändert; keine abgeschwächte Erwartung und keine neue Produktlogik für diesen Test.
+
+Die fünf weiteren Nutzerwünsche (Exportvorschau-Auswahl, Live-Formvorschau, farbgefüllter Winkel, Pipette, Fünf-Farben-Farbhilfe mit passenden Vorschlägen) sind ebenfalls im dauerhaften Restplan dokumentiert. Es wurden damit keine zusätzlichen Werkzeuge implementiert.
