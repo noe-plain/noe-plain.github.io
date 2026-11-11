@@ -72,7 +72,7 @@ window.addEventListener(
     if (command && key === "a") {
       ev.preventDefault();
       carouselSelect(
-        p.carousel.objects
+        carouselRowObjects()
           .filter((o) => !carouselObjectLocked(o) && o.visible !== false)
           .map((o) => o.id),
       );
@@ -86,6 +86,7 @@ window.addEventListener(
     if (command && key === "c") {
       ev.preventDefault();
       carouselUI.clipboard = carouselSelected().map(clone);
+      carouselUI.clipboardOrigin = carouselCopyOrigin(carouselSelected());
       carouselUI.clipboardAssets = [...p.images];
       carouselUI.clipboardFonts = [...p.fonts];
       return;
@@ -96,6 +97,7 @@ window.addEventListener(
         carouselUI.clipboard,
         carouselUI.clipboardAssets,
         carouselUI.clipboardFonts,
+        carouselUI.clipboardOrigin,
       );
       return;
     }

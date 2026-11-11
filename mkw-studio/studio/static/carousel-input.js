@@ -171,6 +171,15 @@ function carouselPointer(ev) {
     return;
   }
   const hit = carouselHit(pt);
+  if (p.carousel.pageStructure) {
+    const page = MKWCarouselPolicy.frames(p.carousel).find(
+      (a) => pt.x >= a.x && pt.x < a.x + a.w && pt.y >= a.y && pt.y < a.y + a.h,
+    );
+    if (page) {
+      carouselUI.slide = null;
+      carouselRow({ pageId: page.id });
+    }
+  }
   if (tool === "text" && hit?.type === "text") {
     carouselSelect([hit.id]);
     carouselEditText(hit);

@@ -59,3 +59,20 @@ Dies ist eine leere Exportbasis, **kein Export der Studio-Inhalte**. Texte/Bilde
 Das tatsächliche Fünf-Stunden- und Wochenkontingent wurde zu Beginn und nach Arbeitsschritten geprüft. Startverbrauch: 2 % / 0 %. Keine Zusatzcredits, API-Abrechnung, Reset-Gutscheine, Zusatzagenten oder Modellwechsel. Verbleibendes Guthaben ist kontoweit geteilt; aus Plus wird keine feste Tokenmenge abgeleitet. Kein weiteres Feature wird heute begonnen.
 
 Morgen folgt wieder der normale Montag-/Donnerstag-Review ab diesem dokumentierten Stand. Die abgeschlossene leere Einseiten-Basis wird nicht erneut begonnen; eine nächste begrenzte Inhaltsstufe bleibt dem nächsten Review vorbehalten.
+
+## Nachtrag: bestätigtes Reihenverhalten und sofortiger Teilschritt
+
+Der Nutzer präzisierte anschliessend: Jede Reihe soll sich durchgehend wie ein bisheriges Designer-Projekt mit normalen Slides verhalten. Die bisherige Veröffentlichung erfüllt das noch nicht vollständig. Nach zunächst beauftragter Umsetzung aller sechs Punkte am Donnerstag wurde die sofortige Umsetzung eines sauberen Teils mit Planung des Rests beauftragt.
+
+Zusätzlich umgesetzt: dauerhafter, rein vorübergehender Reihenbezug für neue Objekte/Bildimporte und Strg/⌘A; aktive Reihe nach Objekt- und leerer Slide-Auswahl; Einfügen in eine andere Reihe relativ zu deren Ursprung statt um 30 px am ursprünglichen Ort. Einzelne kopierte Ebenen erhalten die Zielzuordnung und unabhängige geerbte Sichtbarkeit/Sperren; ein Quellordner wird dabei noch nicht als Zielordner kopiert. Explizites Duplizieren einer gemischten Auswahl behält die ursprünglichen Reihen bei; das Übertragen einer gemischten Auswahl in eine andere Reihe wird ohne Änderung am Verlauf abgewiesen.
+
+Die Ebenen-/Ordneroberfläche ist weiterhin dokumentweit. Die übrigen fünf Punkte sind offen. Die vollständige, priorisierte Restliste und Abnahme stehen in [DESIGNER-ROWS-PLAN.md](DESIGNER-ROWS-PLAN.md); der bestehende Donnerstag-Termin wurde auf diesen Restauftrag ausgerichtet und der nächste IDML-Text-Meilenstein dafür verschoben. Kein vollständiges Designer-Gleichverhalten behaupten.
+
+| Persona | Nachtragsprüfung | Status |
+| --- | --- | --- |
+| Neue Nutzerin | Weitere neue Elemente bleiben nach der ersten Auswahl in derselben Reihe. | Funktional gelöst; sichtbare Reihenführung/Ebenenliste noch offen. |
+| Erfahrener Designer | Strg/⌘A bleibt in der aktiven Reihe; echtes Kopieren/Einfügen erreicht die Zielreihe; Undo/Redo bleiben korrekt. | In Chrome/Firefox geprüft; restliche gewohnte Slide-Aktionen offen. |
+| Senior UX-Experte | Fokuswechsel darf nicht verdeckt andere Reihen ändern. | Kernablauf geprüft; Ordner-/Ebenenaktionen weiterhin Teil der Restliste. |
+| UI-Expertin | Reihenbezug in der Oberfläche verständlich und konsistent sichtbar machen. | Offen für Donnerstag; keine umfassende UI-Überarbeitung in diesem Teilschritt. |
+| QA-Entwicklerin | Temporärer Reihen-/Clipboard-Zustand darf nicht in MKW-Dateien gelangen. | MKW-Rundlauf, unverändertes Dokument bei Reihenauflösung und bestehende Kopier-/Seitenprüfungen bestanden. |
+| Fehlersucher | Gemischte Auswahl, verdeckte/gesperrte Quellordner und abgewiesenes Einfügen dürfen keine Daten oder Redo verlieren. | Geerbte Zustände und atomare Abweisung in beiden Browsern geprüft. |
