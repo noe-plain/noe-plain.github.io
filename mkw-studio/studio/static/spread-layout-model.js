@@ -943,6 +943,7 @@
           item = {
             ...copy(o),
             id: layerMap.get(o.id),
+            effectSeed: effectSeed(o),
             pageId: pageMap.get(owner),
             artboardScoped: true,
             x: o.x + dx,

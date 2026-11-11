@@ -23,7 +23,7 @@ const contentFrame = MKWCarouselPolicy.contentFrame(c, object);
 // pageFragment: einzelne Seite; artboardScoped: gesamte zugehörige Reihe.
 ```
 
-Beim finalen Persona-Durchgang fiel die mit 20 Slides horizontal scrollbare Übersicht auf: Sie war mit der Tastatur nicht direkt fokussierbar. `pages-panel.js` erhält dafür einen nativen Fokuspunkt; die abschliessende axe-Prüfung besteht. Zusätzlich wurden Positionsänderungen per Zahlenfeld und Pfeiltaste an dieselbe Eigentümerzuordnung angebunden.
+Beim finalen Persona-Durchgang fiel die mit 20 Slides horizontal scrollbare Übersicht auf: Sie war mit der Tastatur nicht direkt fokussierbar. `pages-panel.js` erhält dafür einen nativen Fokuspunkt; die abschliessende axe-Prüfung besteht. Zusätzlich wurden Positionsänderungen per Zahlenfeld und Pfeiltaste an dieselbe Eigentümerzuordnung angebunden. Ein zusätzlicher exakter Pixelvergleich deckte verändertes Effektrauschen beim ganzen Artboard-Duplikat auf. Die Kopie übernimmt nun den bestehenden Effekt-Startwert; der zunächst scheiternde Pixelvergleich besteht anschliessend.
 
 ### Minimale eigene IDML-Datei, wirklich in InDesign geöffnet
 

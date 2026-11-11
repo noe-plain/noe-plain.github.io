@@ -29,6 +29,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         color: "#cc3333",
         endColor: "#3333cc",
         opacity: 1,
+        effects: { noise: 12 },
       });
       carouselSlideSelect(0);
     });
@@ -158,6 +159,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     const beforeCopy = await page.evaluate(() =>
       JSON.stringify(p.carousel.objects),
     );
+    const beforeCopyPixels = await bitmap(0);
     await page.evaluate(() => carouselSlideSelect(0));
     await page.locator(".pages-board-menu").first().click();
     await page
@@ -176,6 +178,10 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
           .filter((o) => o.name === "Panorama")
           .every((o) => !o.pageFragment),
       ),
+    );
+    assert(
+      (await bitmap(4)) === beforeCopyPixels,
+      "Duplicating an Artboard preserves exact effect pixels",
     );
     await page.evaluate(async () => {
       await undo();
