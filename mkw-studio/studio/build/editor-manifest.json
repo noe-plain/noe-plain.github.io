@@ -7,6 +7,7 @@
     "static/date-fields.js",
     "static/ui-feedback.js",
     "static/family.js",
+    "static/idml-package.js",
     "static/project-assets.js",
     "static/project-blocks.js",
     "static/project-file.js",

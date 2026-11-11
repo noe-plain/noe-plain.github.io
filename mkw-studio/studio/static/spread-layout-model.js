@@ -154,7 +154,21 @@
         hits = oldFrames
           .map((a, i) => ({ a, id: oldIds[i], area: sharedArea(a, b) }))
           .filter((v) => (o.pageFragment ? o.pageId === v.id : v.area > 0));
-      if (anchorImages && o.type === "image" && !o.pageFragment) {
+      const oldRow = before.pageStructure?.groups.find((g) =>
+          g.includes(o.pageId),
+        ),
+        newRow = after.pageStructure?.groups.find((g) => g.includes(o.pageId)),
+        sameRow =
+          oldRow &&
+          newRow &&
+          oldRow
+            .filter((id) => frames.has(id))
+            .every((id) => newRow.includes(id));
+      if (
+        ((anchorImages && o.type === "image") ||
+          (o.artboardScoped && sameRow)) &&
+        !o.pageFragment
+      ) {
         const owner = oldFrames.findIndex((a, i) => oldIds[i] === o.pageId);
         const first =
           owner >= 0 ? { a: oldFrames[owner], id: oldIds[owner] } : hits[0];
@@ -196,6 +210,7 @@
         }
         delete item.pageId;
         delete item.pageFragment;
+        delete item.artboardScoped;
         result.push(item);
         continue;
       }
@@ -221,7 +236,10 @@
         if (split) {
           item.pageFragment = true;
           item.effectSeed = effectSeed(o);
-        } else delete item.pageFragment;
+        } else {
+          delete item.pageFragment;
+          item.artboardScoped = true;
+        }
         if (Math.abs(item.x) > 100000 || Math.abs(item.y) > 100000)
           fail(
             "Ein Inhalt würde ausserhalb des unterstützten Bereichs liegen. Verschiebe ihn zuerst näher an seine Seite.",
@@ -252,6 +270,56 @@
       return () => `spread-${++n}`;
     })(),
   ) {
+    if (action.type === "format-artboard") {
+      const group = source.pageStructure?.groups.find((g) =>
+        g.includes(action.ids?.[0]),
+      );
+      if (!group || !policy.validFormat(action.format))
+        fail("Wähle ein Artboard und ein gültiges Slideformat.");
+      const before = copy(source),
+        c = copy(source),
+        selected = new Set(group);
+      for (const o of before.objects) {
+        if (o.pageFragment) continue;
+        const owner = o.artboardScoped
+          ? before.artboards.find((a) => a.id === o.pageId)
+          : policy.sourcePage(before, bounds(o));
+        if (owner && selected.has(owner.id)) {
+          o.pageId = owner.id;
+          o.artboardScoped = true;
+        }
+      }
+      const members = c.artboards.filter((a) => selected.has(a.id)),
+        x = Math.min(...members.map((a) => a.x)),
+        y = Math.min(...members.map((a) => a.y));
+      let left = x;
+      for (const a of c.pageStructure.binding === "right"
+        ? [...members].reverse()
+        : members) {
+        Object.assign(a, action.format, { x: left, y });
+        left += a.w;
+      }
+      // Keep manual positions unless a taller/wider row would collide. Following
+      // rows then move down as whole units, preserving their local geometry.
+      const occupied = [...members];
+      for (const ids of c.pageStructure.groups) {
+        if (ids === undefined || ids.some((id) => selected.has(id))) continue;
+        const row = c.artboards.filter((a) => ids.includes(a.id));
+        let dy = 0;
+        for (const a of row)
+          for (const other of occupied)
+            if (policy.intersects({ ...a, y: a.y + dy }, other))
+              dy = Math.max(dy, other.y + other.h + c.pageStructure.gap - a.y);
+        for (const a of row) a.y += dy;
+        occupied.push(...row);
+      }
+      if (!policy.validBoards(c))
+        fail(
+          "Das Artboard passt mit diesem Format nicht in den Arbeitsbereich.",
+        );
+      carry(before, c, bounds, id);
+      return c;
+    }
     if (action.type === "edit-spread") {
       const base = action.ids?.[0],
         group = source.pageStructure?.groups.find((g) => g.includes(base));
@@ -522,7 +590,17 @@
             width = added.reduce((sum, a) => sum + a.w, 0),
             height = Math.max(...added.map((a) => a.h));
           let x = 0,
-            y = source.n ? extent.h + s.gap : 0;
+            y = source.n
+              ? Math.max(
+                  extent.h,
+                  ...source.objects
+                    .filter((o) => !o.artboardScoped && !o.pageFragment)
+                    .map((o) => {
+                      const b = bounds(o);
+                      return b.y + b.h;
+                    }),
+                ) + s.gap
+              : 0;
           if (y + height > 100000) {
             x = extent.w + s.gap;
             y = 0;
@@ -726,6 +804,7 @@
       [
         ...(source.artboards || []),
         ...(source.objects || []),
+        ...(source.folders || []),
         ...(source.pageStructure?.artboardInfo || []),
       ].map((v) => v.id),
     );
@@ -820,15 +899,88 @@
       const s = source.pageStructure,
         index = s?.artboardInfo?.findIndex((a) => a.id === action.id);
       if (index === undefined || index < 0) fail("Wähle ein Artboard.");
-      const originals = new Set(pageIds(source)),
-        group = s.groups[index];
-      let c = plan(source, { type: "duplicate", ids: group }, bounds, makeId);
-      const added = pageIds(c).filter((v) => !originals.has(v));
-      if (added.length > 1)
-        c = plan(c, { type: "join", ids: added }, bounds, makeId);
-      const i = c.pageStructure.groups.findIndex((g) => g.includes(added[0]));
-      c.pageStructure.artboardInfo[i].name =
+      const group = s.groups[index],
+        c = plan(
+          source,
+          { type: "add", count: group.length, spread: true, ids: group },
+          bounds,
+          makeId,
+        ),
+        added = c.pageStructure.groups.at(-1),
+        originalFrames = group.map((id) =>
+          source.artboards.find((a) => a.id === id),
+        ),
+        newFrames = added.map((id) => c.artboards.find((a) => a.id === id)),
+        x = Math.min(...originalFrames.map((a) => a.x)),
+        y = Math.min(...originalFrames.map((a) => a.y)),
+        dx = newFrames[0].x - x,
+        dy = newFrames[0].y - y,
+        pageMap = new Map(group.map((id, i) => [id, added[i]]));
+      originalFrames.forEach((a, i) =>
+        Object.assign(newFrames[i], a, {
+          id: added[i],
+          x: a.x + dx,
+          y: a.y + dy,
+        }),
+      );
+      const members = source.objects.filter((o) =>
+        o.pageId
+          ? group.includes(o.pageId)
+          : group.includes(policy.sourcePage(source, bounds(o))?.id),
+      );
+      if (c.objects.length + members.length > 500)
+        fail(
+          "Die Kopie würde mehr als 500 Ebenen erzeugen. Es wurde nichts verändert.",
+        );
+      const layerMap = new Map(members.map((o) => [o.id, makeId()])),
+        folderMap = new Map(
+          (source.folders || [])
+            .filter((f) => members.some((o) => o.folderId === f.id))
+            .map((f) => [f.id, makeId()]),
+        );
+      const copies = members.map((o) => {
+        const owner = o.pageId || policy.sourcePage(source, bounds(o)).id,
+          item = {
+            ...copy(o),
+            id: layerMap.get(o.id),
+            pageId: pageMap.get(owner),
+            artboardScoped: true,
+            x: o.x + dx,
+            y: o.y + dy,
+          };
+        if (item.folderId && folderMap.has(item.folderId))
+          item.folderId = folderMap.get(item.folderId);
+        if (item.imageSourceId) {
+          if (layerMap.has(item.imageSourceId))
+            item.imageSourceId = layerMap.get(item.imageSourceId);
+          else delete item.imageSourceId;
+        }
+        return item;
+      });
+      c.objects.push(...copies);
+      if (folderMap.size)
+        c.folders.push(
+          ...source.folders
+            .filter((f) => folderMap.has(f.id))
+            .map((f) => {
+              const item = { ...copy(f), id: folderMap.get(f.id) };
+              if (item.before) {
+                const [kind, key] = item.before.split(":"),
+                  next =
+                    kind === "folder" ? folderMap.get(key) : layerMap.get(key);
+                if (next) item.before = kind + ":" + next;
+                else delete item.before;
+              }
+              return item;
+            }),
+        );
+      c.pageStructure.artboardInfo.at(-1).name =
         `${s.artboardInfo[index].name} Kopie`.slice(0, 80);
+      if (
+        !policy.validBoards(c) ||
+        copies.some((o) => Math.abs(o.x) > 100000 || Math.abs(o.y) > 100000)
+      )
+        fail("Die Artboard-Kopie passt nicht in den Arbeitsbereich.");
       return c;
     }
     const next = execute(source, action, bounds, makeId);

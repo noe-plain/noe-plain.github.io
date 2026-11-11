@@ -250,6 +250,7 @@ function carouselPanel() {
           delete o.gradientStart;
           delete o.gradientEnd;
         }
+        if (["x", "y"].includes(input.dataset.prop)) carouselAssignArtboard(o);
         changed(false);
         carouselUpdateWarning(o);
         if (carouselUI.editing?.id === o.id && input.dataset.prop === "text")

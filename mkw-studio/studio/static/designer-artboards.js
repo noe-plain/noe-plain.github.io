@@ -527,6 +527,11 @@ const MKWArtboardUI = (() => {
         details.append(summary, sections[1], sections[2]);
         host.prepend(format, slot);
         host.append(details);
+        if (MKWSpreadUI.selectedBoard()) {
+          format.hidden = true;
+          carouselArtboardFormatPanel(host, index);
+          host.prepend(host.lastElementChild);
+        }
         MKWSpreadUI.panel(slot);
       } else MKWSpreadUI.panel(host);
     } else {

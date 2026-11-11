@@ -182,7 +182,7 @@
             return `<div class="pages-artboard" style="top:${g.top}px;height:${g.h}px" data-board-row="${g.info.id}"><div class="pages-artboard-heading" id="board-option-${g.info.id}" role="treeitem" aria-expanded="${!closed}" aria-level="1" aria-setsize="${groups.length}" aria-posinset="${groups.findIndex((v) => v.info.id === g.info.id) + 1}" aria-selected="${g.ids.every((id) => selected.has(id))}" data-artboard="${g.info.id}" ${closed ? "" : `aria-controls="board-pages-${g.info.id}"`}><span class="pages-disclosure" aria-hidden="true" data-expanded="${!closed}">${api.icon("down")}</span><strong class="pages-board-name">${api.esc(g.info.name)}</strong><span class="pages-board-count">${g.ids.length}<span class="visually-hidden"> Seiten</span></span><button class="pages-board-add" aria-label="Seite zu ${api.esc(g.info.name)} hinzufügen" title="Seite in diesem Artboard hinzufügen" ${g.ids.length >= 20 || c.n >= 200 ? "disabled" : ""}>${api.icon("plus")}</button><button class="pages-board-menu" aria-label="Aktionen für ${api.esc(g.info.name)}" aria-haspopup="menu">${api.icon("more")}</button></div>${
               closed
                 ? ""
-                : `<div class="pages-strip" id="board-pages-${g.info.id}" role="group" aria-label="Seiten in ${api.esc(g.info.name)}">${g.ids
+                : `<div class="pages-strip" id="board-pages-${g.info.id}" role="group" tabindex="0" aria-label="Seiten in ${api.esc(g.info.name)}">${g.ids
                     .map((id, j) => {
                       const a = c.artboards.find((a) => a.id === id),
                         index = c.artboards.indexOf(a),

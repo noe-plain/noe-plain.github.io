@@ -152,7 +152,7 @@ const MKWSpreadUI = (() => {
       initialMode = s?.mode || (policy.isFree(c) ? "single" : "spreads"),
       section = document.createElement("section");
     section.className = "carousel-property-section spread-panel";
-    section.innerHTML = `<h4 id="spreadTitle">Seiten &amp; Artboards</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${initialMode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Ermöglicht bis zu 20 verbundene Seiten. Die vorhandene Gestaltung bleibt unverändert; Seiten mit Zusammenfügen verbinden."><input type="radio" name="spreadMode" value="spreads" ${initialMode === "spreads" ? "checked" : ""}>Druckbögen (2–20 Seiten)</label></div>${!s ? '<p class="spread-note">Seiten verwalten, ohne die vorhandene Gestaltung zu verändern.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">${s.shuffle ? "Neue Seiten rücken nach." : "Seiten auswählen und mit „Zusammenfügen“ verbinden."}</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}<span>Neues Artboard</span></button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Artboard bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Auswahl gemeinsam formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
+    section.innerHTML = `<h4 id="spreadTitle">Seiten &amp; Artboards</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${initialMode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Ermöglicht bis zu 20 verbundene Seiten. Die vorhandene Gestaltung bleibt unverändert; Seiten mit Zusammenfügen verbinden."><input type="radio" name="spreadMode" value="spreads" ${initialMode === "spreads" ? "checked" : ""}>Artboards (1–20 Slides)</label></div>${!s ? '<p class="spread-note">Seiten verwalten, ohne die vorhandene Gestaltung zu verändern.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">${s.shuffle ? "Neue Seiten rücken nach." : "Seiten auswählen und mit „Zusammenfügen“ verbinden."}</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}<span>Neues Artboard</span></button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Artboard bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Auswahl gemeinsam formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
     host.append(section);
     for (const radio of section.querySelectorAll("[name=spreadMode]")) {
       const applyMode = () => {
@@ -226,6 +226,7 @@ const MKWSpreadUI = (() => {
       announce,
       actionsState: () => actionsState(host),
       openPage: (id) => {
+        const wasArtboard = !!selectedArtboard;
         const index = c.artboards.findIndex((a) => a.id === id);
         if (index < 0) return;
         selectedArtboard = null;
@@ -233,7 +234,8 @@ const MKWSpreadUI = (() => {
         carouselUI.slide = index;
         carouselUI.ids.clear();
         carouselSelection = null;
-        if (!MKWArtboardUI.selectPage(carouselUI.slide)) carouselPanel();
+        if (wasArtboard || !MKWArtboardUI.selectPage(carouselUI.slide))
+          carouselPanel();
         const scroll = $("#carouselProperties").scrollTop;
         carouselPresentInspector();
         $("#carouselProperties").scrollTop = scroll;
@@ -257,7 +259,7 @@ const MKWSpreadUI = (() => {
         carouselUI.slide = c.artboards.findIndex((a) => a.id === ids[0]);
         carouselSelection = null;
         carouselUI.ids.clear();
-        if (!MKWArtboardUI.selectPage(carouselUI.slide)) carouselPanel();
+        carouselPanel();
         const scroll = $("#carouselProperties").scrollTop;
         carouselPresentInspector();
         $("#carouselProperties").scrollTop = scroll;
@@ -294,6 +296,8 @@ const MKWSpreadUI = (() => {
       relevant = c.objects.filter(
         (o) =>
           carouselObjectVisible(o, c) &&
+          (!MKWCarouselPolicy.contentFrame(c, o) ||
+            policy.intersects(MKWCarouselPolicy.contentFrame(c, o), a)) &&
           (!o.pageFragment || o.pageId === id) &&
           MKWCarouselPolicy.intersects(carouselPaintBounds(o), a),
       );
@@ -708,7 +712,7 @@ const MKWSpreadUI = (() => {
     dialog.setAttribute("aria-labelledby", "spreadEditTitle");
     const field = (key, label, value, min, max) =>
       `<label>${label}<input data-bogen="${key}" type="number" step="1" min="${min}" max="${max}" value="${value}" required></label>`;
-    dialog.innerHTML = `<h2 id="spreadEditTitle">${esc(c.pageStructure.artboardInfo[c.pageStructure.groups.indexOf(group)].name)} bearbeiten</h2><p>Die Änderungen gelten nur für diesen Bogen. Überzählige Seiten werden abgetrennt und bleiben erhalten.</p>${field("count", "Seiten aneinander (1–20)", group.length, 1, 20)}<div class="carousel-fields">${field("x", "Position X (px)", x, 0, 100000)}${field("y", "Position Y (px)", y, 0, 100000)}</div><label class="spread-format-toggle"><input id="spreadUniform" type="checkbox">Für alle Seiten dieses Bogens dasselbe Format verwenden</label><div id="spreadUniformFields" class="carousel-fields" hidden>${policy.formatKeys.map((k) => field(k, { w: "Breite (px)", h: "Höhe (px)", top: "Schutzzone oben", bottom: "Schutzzone unten", left: "Schutzzone links", right: "Schutzzone rechts" }[k], base[k], k === "w" || k === "h" ? 240 : 0, 4000)).join("")}</div><p id="spreadEditError" role="status"></p><div class="studio-feedback-actions"><button data-bogen-cancel autofocus>Abbrechen</button><button data-bogen-apply class="primary">Bogen übernehmen</button></div>`;
+    dialog.innerHTML = `<h2 id="spreadEditTitle">${esc(c.pageStructure.artboardInfo[c.pageStructure.groups.indexOf(group)].name)} bearbeiten</h2><p>Die Änderungen gelten nur für diesen Bogen. Überzählige Seiten werden abgetrennt und bleiben erhalten.</p>${field("count", "Slides nebeneinander (1–20)", group.length, 1, 20)}<div class="carousel-fields">${field("x", "Position X (px)", x, 0, 100000)}${field("y", "Position Y (px)", y, 0, 100000)}</div><label class="spread-format-toggle"><input id="spreadUniform" type="checkbox">Für alle Seiten dieses Bogens dasselbe Format verwenden</label><div id="spreadUniformFields" class="carousel-fields" hidden>${policy.formatKeys.map((k) => field(k, { w: "Breite (px)", h: "Höhe (px)", top: "Schutzzone oben", bottom: "Schutzzone unten", left: "Schutzzone links", right: "Schutzzone rechts" }[k], base[k], k === "w" || k === "h" ? 240 : 0, 4000)).join("")}</div><p id="spreadEditError" role="status"></p><div class="studio-feedback-actions"><button data-bogen-cancel autofocus>Abbrechen</button><button data-bogen-apply class="primary">Artboard übernehmen</button></div>`;
     const uniform = dialog.querySelector("#spreadUniform"),
       button = dialog.querySelector("[data-bogen-apply]"),
       error = dialog.querySelector("#spreadEditError");
@@ -1107,6 +1111,10 @@ const MKWSpreadUI = (() => {
         (a) => a.id === selectedArtboard,
       ),
     panel,
+    editArtboard: (id) => {
+      selected = new Set([id]);
+      editSpread();
+    },
     commit,
     active,
     canvas,

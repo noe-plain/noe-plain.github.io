@@ -150,6 +150,7 @@ window.addEventListener(
         if (key === "arrowright") o.x += delta;
         if (key === "arrowup") o.y -= delta;
         if (key === "arrowdown") o.y += delta;
+        carouselAssignArtboard(o);
       });
       changed(false);
       carouselPanel();

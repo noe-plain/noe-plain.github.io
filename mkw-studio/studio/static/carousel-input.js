@@ -15,8 +15,9 @@ function carouselPoint(ev) {
 
 function carouselHit(pt) {
   return [...p.carousel.objects].reverse().find((o) => {
-    if (o.pageFragment) {
-      const a = p.carousel.artboards.find((a) => a.id === o.pageId);
+    const contentFrame = MKWCarouselPolicy.contentFrame(p.carousel, o);
+    if (contentFrame) {
+      const a = contentFrame;
       if (
         !a ||
         pt.x < a.x ||
@@ -556,6 +557,7 @@ function carouselMove(ev) {
     },
     () => {
       if (begun) {
+        for (const o of objects) carouselAssignArtboard(o);
         changed(false);
       }
       carouselPanel();

@@ -43,8 +43,9 @@ function carouselPSDBounds(o) {
       ) - top,
     ),
   };
-  if (o.pageFragment) {
-    const a = c.artboards.find((a) => a.id === o.pageId);
+  const contentFrame = MKWCarouselPolicy.contentFrame(c, o);
+  if (contentFrame) {
+    const a = contentFrame;
     const right = Math.min(result.left + result.w, a.x + a.w),
       bottom = Math.min(result.top + result.h, a.y + a.h);
     result.left = Math.max(result.left, a.x);
@@ -53,6 +54,18 @@ function carouselPSDBounds(o) {
     result.h = Math.max(0, bottom - result.top);
   }
   return result;
+}
+function carouselPSDScopedCrop(o, c) {
+  if (o.pageFragment) return true;
+  const frame = MKWCarouselPolicy.contentFrame(c, o),
+    bounds = carouselPaintBounds(o);
+  return (
+    !!frame &&
+    (bounds.x < frame.x ||
+      bounds.y < frame.y ||
+      bounds.x + bounds.w > frame.x + frame.w ||
+      bounds.y + bounds.h > frame.y + frame.h)
+  );
 }
 async function carouselPSDLayer(o, project = p) {
   const bounds = carouselPSDBounds(o);
@@ -91,7 +104,9 @@ async function carouselPSDLayer(o, project = p) {
         o.blend
       ] || "normal",
   };
-  return o.pageFragment ? result : carouselPSDVectorData(o, result);
+  return carouselPSDScopedCrop(o, project.carousel)
+    ? result
+    : carouselPSDVectorData(o, result);
 }
 async function buildCarouselPSD(progress = () => {}) {
   const project = { ...p, carousel: clone(p.carousel) },
@@ -190,9 +205,15 @@ async function buildCarouselPSD(progress = () => {}) {
   for (const [index, o] of c.objects.entries()) {
     progress(`Ebene ${index + 1} / ${c.objects.length} vorbereiten …`);
     await new Promise((resolve) => setTimeout(resolve, 0));
-    if (o.pageFragment) {
+    if (carouselPSDScopedCrop(o, c)) {
       const layer = await carouselPSDLayer(o, project);
-      if (layer) append(o, { ...layer, name: o.name + " · Seitenausschnitt" });
+      if (layer)
+        append(o, {
+          ...layer,
+          name:
+            o.name +
+            (o.pageFragment ? " · Seitenausschnitt" : " · Artboard-Ausschnitt"),
+        });
       continue;
     }
     if (o.type === "text") {

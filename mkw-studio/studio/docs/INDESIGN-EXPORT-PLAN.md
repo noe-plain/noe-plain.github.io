@@ -1,6 +1,6 @@
 # Geplant: schrittweiser InDesign-Export
 
-Auftrag vom 6. November 2026: Die PSD-Speichermöglichkeit soll künftig durch einen InDesign-Export ersetzt werden. Der Nutzer hat ausdrücklich klargestellt, dass dies derzeit geplant ist und schrittweise mit den bestehenden Wochen-Updates umgesetzt werden soll. Kein neuer Export ist mit diesem Plan implementiert.
+Auftrag vom 6. November 2026: Die PSD-Speichermöglichkeit soll künftig durch einen InDesign-Export ersetzt werden. Der Nutzer hat ausdrücklich klargestellt, dass dies derzeit geplant ist und schrittweise mit den bestehenden Wochen-Updates umgesetzt werden soll. Seit 11. November besteht eine experimentelle, tatsächlich in InDesign geprüfte Einseiten-Basis; ein vollständiger Projekt-Export ist noch nicht verfügbar.
 
 ## Ziel
 
@@ -24,7 +24,8 @@ Je bestehendem Montag-/Donnerstag-Review einen überschaubaren nächsten Meilens
 - [x] Technische Anforderungen, drei reproduzierbare Quellprojekt-Rezepte und Abnahmekriterien festgelegt (9. November 2026).
 - [ ] Offizielle vollständige Paket-/Schema-Referenz verfügbar und am Referenzpaket geprüft.
 - [ ] Fachliche Abnahme durch den Nutzer und echte InDesign-Dateiabnahme.
-- [ ] IDML-Export implementiert und tatsächlich in InDesign geprüft.
+- [x] Eigener minimaler IDML-Paketschreiber: leere Einseiten-Datei tatsächlich in InDesign geöffnet und erneut exportiert (11. November).
+- [ ] Vollständiger Projekt-IDML-Export mit bearbeitbaren Inhalten implementiert und repräsentativ in InDesign abgenommen.
 
 Quellen: [Adobe: unterstützte Dateiformate](https://helpx.adobe.com/au/indesign/desktop/get-started/system-and-product-info/supported-file-formats.html), [Adobe: IDML öffnen und als INDD speichern](https://helpx.adobe.com/indesign/desktop/troubleshoot/file-and-output-issues/cant-open-in-previous-versions.html), [Adobe: IDML-Exportformat](https://developer.adobe.com/indesign/uxp/dom/api/e/export-format/).
 
@@ -35,3 +36,21 @@ Erster begrenzter Meilenstein: [Anforderungen und Abnahmebasis](INDESIGN-EXPORT-
 Die aktuelle offizielle Adobe-DOM-Referenz wurde geprüft. Die historische vollständige IDML-PDF ist identifiziert, ihre bisherigen offiziellen Downloadadressen liefern jedoch 404. Die installierten Adobe-Parsermodule wurden als ergänzende Herstellerreferenz gelesen; sie wurden nicht übernommen. Die Spezifikations-/Schemafrage bleibt ausdrücklich offen.
 
 Nächster Schritt: offizielle Schema-/Referenzbasis klären, anschliessend ein minimales Einseiten-Paket erstellen und sowohl maschinell als auch durch tatsächliches Öffnen in InDesign prüfen. Ein vollständiger bearbeitbarer Export ist noch nicht verfügbar.
+
+
+## Fortschritt · 11. November 2026 (Donnerstag-Meilenstein vorgezogen)
+
+**Abgeschlossen:** eigener deterministischer, lokaler Paketschreiber `static/idml-package.js`, ohne Laufzeitabhängigkeit, Server oder Projektänderung. Acht Paketbestandteile, erste unkomprimierte `mimetype`-Datei, Container, Designmap, Ressourcen und genau eine leere Seite. Die neue Beispieldatei [idml-empty-page.idml](../examples/idml-empty-page.idml) wurde vom eigenen Schreiber erzeugt. Das eigene, neu in InDesign erzeugte Referenzpaket diente ausschliesslich zur Strukturklärung; persönliche InDesign-Vorgaben wurden nicht übernommen oder veröffentlicht. Die vollständige historische Schema-PDF bleibt nicht verfügbar; die Basis orientiert sich am tatsächlich erzeugten Referenzpaket (DOMVersion 21.5).
+
+**Echter Öffnungstest:** Adobe InDesign 2026, Version **21.6.0.57**, lokal auf macOS. `node tests/verify-idml-indesign.mjs <neuer Testordner>` erzeugte zwei unabhängige eigene Dateien, öffnete sie jeweils in InDesign und exportierte sie dort erneut als IDML. Ausschliesslich eigene neue Testdokumente wurden geschlossen, ohne bestehende Nutzerdateien zu verändern.
+
+| Eigene Datei | Ergebnis in InDesign | Seitengrösse (pt) | Seiten / Objekte | Fehler / Reparatur |
+| --- | --- | --- | --- | --- |
+| 800 × 1000 px | Geöffnet und nativ erneut exportiert | 600 × 750 | 1 / 0 | Keine gemeldete Fehler- oder Reparaturmeldung; synchroner Öffnungs-/Exportvorgang erfolgreich |
+| 1080 × 1350 px | Geöffnet und nativ erneut exportiert | 810 × 1012,5 | 1 / 0 | Keine gemeldete Fehler- oder Reparaturmeldung; synchroner Öffnungs-/Exportvorgang erfolgreich |
+
+Zeitpunkt und SHA-256-Werte: [IDML-VERIFICATION-2026-11-11.json](IDML-VERIFICATION-2026-11-11.json). Die Beispieldatei entspricht bytegenau der in InDesign geprüften 800×1000-Datei. Zusätzlich unabhängig mit Python-Standardbibliothek geprüft: ZIP/CRC, erste unkomprimierte MIME-Datei, XML, eindeutige IDs, Paketpfade/Referenzen, genau eine leere Seite und passende Dokument-/Seitengrösse. Modelltests prüfen Grenzen und defekte Eingaben; der Browser liefert dieselben Bytes ohne Änderung von Projekt, Revision, Undo oder Redo. ZIP-/XML-Prüfung und echter InDesign-Test werden ausdrücklich getrennt nachgewiesen.
+
+**Grenzen:** nur leere Einseiten-Basis, kein Export der geöffneten Studio-Inhalte, keine öffentliche allgemeine Export-Schaltfläche, keine Texte/Bilder/Schriftverpackung/komplexen Effekte und kein nativer INDD-Browserexport. Nur die genannte installierte InDesign-Version ist tatsächlich geprüft. Die leere Datei ersetzt keine der drei repräsentativen Inhaltsabnahmen. **PSD bleibt vollständig verfügbar; MKW bleibt Studio-Projektformat.**
+
+**Nächster begrenzter Schritt:** im normalen Wochenreview eine einzige einfache bearbeitbare Textgeschichte mit Textrahmen und Basisschrift übertragen, im eigenen Dokument automatisiert prüfen und tatsächlich in InDesign öffnen; die vorhandene Einseiten-Aufgabe nicht erneut beginnen. Bei kritischen Produktfehlern diese vorziehen. Kein Mehrseiten-/Bild-/Effektausbau im selben Schritt. Heute wurde dieser nächste Schritt nicht begonnen.

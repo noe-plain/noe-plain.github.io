@@ -215,7 +215,10 @@ function validateCarousel(q) {
       (o.pageId !== undefined &&
         (!MKWSpreadLayoutModel.active(c) ||
           !c.artboards.some((a) => a.id === o.pageId))) ||
-      (o.pageFragment !== undefined && (o.pageFragment !== true || !o.pageId))
+      (o.pageFragment !== undefined &&
+        (o.pageFragment !== true || !o.pageId)) ||
+      (o.artboardScoped !== undefined &&
+        (o.artboardScoped !== true || !o.pageId || !c.pageStructure))
     )
       throw Error("Ungültige Seitenzuordnung einer Ebene.");
     if (
@@ -558,6 +561,18 @@ function carouselDefault(type, rect = {}) {
   };
 }
 
+function carouselAssignArtboard(o) {
+  if (!p.carousel.pageStructure || o.pageFragment) return;
+  const page = MKWCarouselPolicy.sourcePage(
+    p.carousel,
+    carouselObjectBounds(o),
+  );
+  if (page) {
+    o.pageId = page.id;
+    o.artboardScoped = true;
+  }
+}
+
 function carouselObject(type, rect = {}) {
   if (!p.carousel.n) {
     status("Füge zuerst eine Seite hinzu.");
@@ -566,6 +581,7 @@ function carouselObject(type, rect = {}) {
   if (!carouselCanAddObjects(1)) return null;
   checkpoint();
   const o = carouselDefault(type, rect);
+  carouselAssignArtboard(o);
   carouselUI.slide = null;
   carouselUI.framePoints = false;
   if (type === "angle" && !rect.w) {

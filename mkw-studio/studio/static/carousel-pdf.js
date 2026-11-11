@@ -158,9 +158,13 @@ function carouselPDFText(board, opts) {
     measure = makeCanvas(1, 1).getContext("2d"),
     result = [];
   for (const object of c.objects) {
+    const contentFrame = MKWCarouselPolicy.contentFrame(c, object);
     if (
-      (object.pageFragment &&
-        object.pageId !== MKWCarouselPolicy.frame(c, board.carouselSlide).id) ||
+      (contentFrame &&
+        !MKWCarouselPolicy.intersects(
+          contentFrame,
+          MKWCarouselPolicy.frame(c, board.carouselSlide),
+        )) ||
       object.type !== "text" ||
       !carouselObjectVisible(object) ||
       !object.text.trim() ||

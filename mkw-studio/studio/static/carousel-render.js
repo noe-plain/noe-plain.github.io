@@ -89,9 +89,13 @@ async function carouselPaint(
     )
       continue;
     ctx.save();
-    if (o.pageFragment && clipArtwork) {
-      const frame = c.artboards?.find((a) => a.id === o.pageId);
-      if (!frame || (slide !== null && frames[slide].id !== frame.id)) {
+    const contentFrame = MKWCarouselPolicy.contentFrame(c, o);
+    if (contentFrame && clipArtwork) {
+      const frame = contentFrame;
+      if (
+        slide !== null &&
+        !MKWCarouselPolicy.intersects(frames[slide], frame)
+      ) {
         ctx.restore();
         continue;
       }
