@@ -76,3 +76,21 @@ Die Ebenen-/Ordneroberfläche ist weiterhin dokumentweit. Die übrigen fünf Pun
 | UI-Expertin | Reihenbezug in der Oberfläche verständlich und konsistent sichtbar machen. | Offen für Donnerstag; keine umfassende UI-Überarbeitung in diesem Teilschritt. |
 | QA-Entwicklerin | Temporärer Reihen-/Clipboard-Zustand darf nicht in MKW-Dateien gelangen. | MKW-Rundlauf, unverändertes Dokument bei Reihenauflösung und bestehende Kopier-/Seitenprüfungen bestanden. |
 | Fehlersucher | Gemischte Auswahl, verdeckte/gesperrte Quellordner und abgewiesenes Einfügen dürfen keine Daten oder Redo verlieren. | Geerbte Zustände und atomare Abweisung in beiden Browsern geprüft. |
+
+
+## Zweiter Nachtrag: ein Format je Artboard und weitere Planung
+
+Auf erneuten Fortsetzungsauftrag wurde die verbindliche Formatregel technisch ergänzt: Breite/Höhe ändern sich auch aus den bisherigen Einzel-Slide-Feldern für die ganze Gruppe. Neu erzeugter Formatmix durch Zusammenfügen, Übertragen oder automatische Neuverteilung wird atomar abgewiesen. Die gemeinsame Regel liegt im bestehenden reinen Modell; der parallele Einzel-Formatzweig wurde entfernt. Andere Reihen behalten ihre Formate. Alte gemischte Dateien werden unverändert geöffnet und mit einem Hinweis zur bewussten Vereinheitlichung versehen, statt Inhalte beim Öffnen zu verformen. Das ist ausdrücklich eine Kompatibilitätsbehandlung, keine Behauptung bereits reparierter Altbestände.
+
+173 Modell-/Pakettests bestehen. Der neue Browserfall prüft die tatsächlichen bisherigen Seitenfelder, ganze Reihe statt einzelne Slide, unverändertes Nachbarformat, zusammenhängende Ebene, Undo/Redo, abgewiesenen Formatmix ohne Verlaufsschaden, MKW-Rundlauf und axe. Vorhandene Reihen-/Datei-/Seitenregressionen werden in Chrome/Firefox wiederverwendet; GitHub-/Live-Endstatus wird erst nach tatsächlichem Abschluss im Ausführungsbericht genannt.
+
+| Persona | Prüfung / Feedback | Status |
+| --- | --- | --- |
+| Neue Nutzerin | Formatfelder müssen ihren tatsächlichen Wirkungsbereich erklären. | Gruppentitel und Hinweis ergänzt; vollständiger Einrichtungs-/Reihenablauf bleibt offen. |
+| Erfahrener Designer | Einzelne Seitenfelder dürfen eine Reihe nicht versehentlich verformen; Panoramen bleiben zusammenhängend. | Ganze Reihe geändert, Nachbarreihe unverändert, Undo/Redo geprüft. |
+| Senior UX-Experte | Unterschiedliche Bedienwege müssen dieselbe Formatregel durchsetzen. | Zentraler Modellzugang; Einzel-/Auswahl-/Strukturaktionen abgeglichen. |
+| UI-Expertin | Gleichlautende Formatbegriffe und verständliche Altbestands-/Fehlermeldungen. | Betroffene Felder/Hinweise angeglichen; umfassender UI-Umbau bleibt im Restplan. |
+| QA-Entwicklerin | Wartbare Zuständigkeit, Datei-Kompatibilität und belastbare Regressionen. | Gemeinsame reine Prüfgrenze, alter paralleler Formatpfad entfernt, drei neue Modelltests und Browserfall. |
+| Fehlersucher | Gemischte Formate beim Join, Transfer, Shuffle oder Altbestand-Duplikat dürfen keine stillen Änderungen erzeugen. | Ungültige Aktionen atomar abgewiesen; explizite Altbestandsreparatur geprüft. |
+
+Zusätzliche Nutzeraufträge sind im Restplan festgehalten: UX für Einrichtung, Seitenleiste, Fläche, Eigenschaften, Speichern/Öffnen/Export als vollständige Nutzerwege gestalten; neue Vorlagen nach Gestaltungsgrundsätzen entwerfen, visuell vorlegen und nur nach ausdrücklicher Zustimmung in die mitgelieferte Bibliothek aufnehmen. Keine neuen Vorlagen oder Freigaben wurden in diesem Lauf behauptet.

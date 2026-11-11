@@ -710,14 +710,6 @@
         c.artboards.find((a) => selected.has(a.id)).name = action.name.trim();
         return c;
       }
-      case "format":
-        if (!selected.size || !policy.validFormat(action.format))
-          fail(
-            "Wähle Seiten und ein gültiges Format (240–4000 px); die Schutzzonen müssen in die Seite passen.",
-          );
-        for (const a of c.artboards)
-          if (selected.has(a.id)) Object.assign(a, action.format);
-        break;
       default:
         fail("Unbekannte Seitenaktion.");
     }
@@ -798,7 +790,94 @@
       );
     return c;
   }
+  function sameSize(a, b) {
+    return a.w === b.w && a.h === b.h;
+  }
+  function mixedGroups(c) {
+    return (c.pageStructure?.groups || []).filter((ids) => {
+      const members = ids.map((id) => c.artboards.find((a) => a.id === id));
+      return members.some((a) => !sameSize(a, members[0]));
+    });
+  }
   function plan(source, action, bounds = (o) => o, id) {
+    // Every format entry point edits complete rows, including legacy page fields.
+    if (active(source) && action.type === "format") {
+      if (
+        !action.ids?.length ||
+        !action.ids.every((id) => source.artboards.some((a) => a.id === id)) ||
+        !policy.validFormat(action.format)
+      )
+        fail("Wähle vorhandene Slides und ein gültiges Artboard-Format.");
+      let result = source;
+      for (const group of source.pageStructure.groups.filter((g) =>
+        g.some((id) => action.ids.includes(id)),
+      ))
+        result = plan(
+          result,
+          { type: "format-artboard", ids: [group[0]], format: action.format },
+          bounds,
+          id,
+        );
+      return result;
+    }
+    if (active(source) && action.type === "edit" && action.ids?.length === 1) {
+      const page = source.artboards.find((a) => a.id === action.ids[0]);
+      if (
+        page &&
+        policy.validFormat(action.values) &&
+        policy.formatKeys.some((k) => page[k] !== action.values[k])
+      ) {
+        const formatted = plan(
+          source,
+          {
+            type: "format-artboard",
+            ids: [page.id],
+            format: Object.fromEntries(
+              policy.formatKeys.map((k) => [k, action.values[k]]),
+            ),
+          },
+          bounds,
+          id,
+        );
+        const moved = formatted.artboards.find((a) => a.id === page.id);
+        return plan(
+          formatted,
+          {
+            ...action,
+            values: {
+              ...action.values,
+              x: moved.x + action.values.x - page.x,
+              y: moved.y + action.values.y - page.y,
+            },
+          },
+          bounds,
+          id,
+        );
+      }
+    }
+    const next = transition(source, action, bounds, id);
+    for (const group of mixedGroups(next)) {
+      // Old mixed files remain readable without resizing or cropping any content.
+      // They cannot create/extend a mixed row; explicit whole-row format repairs it.
+      const old = source.pageStructure?.groups.find(
+        (ids) =>
+          ids.length === group.length && ids.every((id, i) => id === group[i]),
+      );
+      const unchanged =
+        old &&
+        group.every((id) => {
+          const a = source.artboards.find((a) => a.id === id),
+            b = next.artboards.find((a) => a.id === id);
+          return sameSize(a, b);
+        });
+      if (!unchanged)
+        fail(
+          "Alle Slides eines Artboards müssen dieselbe Breite und Höhe haben. Gleiche zuerst die Artboard-Formate an; es wurde nichts verändert.",
+        );
+    }
+    return next;
+  }
+  function transition(source, action, bounds = (o) => o, id) {
     let n = 0;
     const used = new Set(
       [
@@ -1012,6 +1091,7 @@
   const api = Object.freeze({
     active,
     valid,
+    mixedGroups,
     plan,
     maxPages,
     maxSpreadPages,
