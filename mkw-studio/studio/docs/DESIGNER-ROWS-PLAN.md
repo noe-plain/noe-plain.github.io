@@ -37,6 +37,10 @@ Nachweis: echtes ZIP heruntergeladen, unabhängig mit Python ZIP/CRC und sichere
 
 Nutzerwunsch vom 12. November umgesetzt: Klick auf **„Ebenen – N“** in der Ebenenüberschrift öffnet die Reihenwahl; N ist die aktuelle Reihennummer. Vollständige Namen stehen im Menü/Tooltip. Die separate Reihenauswahl darunter ist entfernt. Tastatur, Escape, Fokus, unveränderte Dokumentrevision/Undo, gefilterte Ebenen und iPad-Mini-Ansicht geprüft. Exportvorschau zusätzlich auf leere Auswahl/Wiederwahl und eindeutige Reihen-/Slide-Beschriftung korrigiert.
 
+### Schlussprüfung: echte Gesten weiterhin nachweisen
+
+Erster vollständiger CI-Lauf `43182083492`: Chrome erfolgreich, Firefox mit einem Fehler am alten Drehgriff-Test. Dessen echte Pointer-Geste erhielt in `55cb80b` explizite Startbedingungen (Projekt/Fonts bereit, Griff stabil/erreichbar, Hit-Test auf tatsächlichen Griff); die Assertion auf geänderten Winkel bleibt unverändert. Lokal kompletter Firefox-Fall mit 50-Bilder-Rundlauf sowie gezielter Chrome-Fall bestanden. Endlauf an aktuellem Quellcommit prüfen; kein Erfolg allein aus lokalem Bestehen oder dem alten Chrome-Teil ableiten.
+
 ### Nächste begrenzte Aufgaben
 
 1. Neue Reihenabläufe anhand tatsächlicher Rückmeldungen nachprüfen, bei Bedarf gezielt korrigieren; nicht die abgeschlossene Grundarbeit wiederholen.
@@ -144,3 +148,14 @@ Neue Vorlagen weiterhin vorlegen und nur nach ausdrücklicher Nutzerfreigabe mit
 Nutzerauftrag vom 12. November: Anzahl und Grösse der Studio-Dateien reduzieren. Alles für Bearbeitung, Öffnen/Speichern bestehender MKW-Dateien, Vorlagen und Exporte Nötige behalten; tatsächlich unbenötigte Bestandteile entfernen. Vorher Abhängigkeiten erfassen und Grössen/Dateianzahl messen. Besonders veraltete oder doppelte Artefakte, ungenutzte Assets und vermeidbare Auslieferungsduplikate prüfen. Quellcode, notwendige Build-/Prüfgrundlagen sowie benötigte Bilder, Schriften, Logos und Bibliotheken nicht aufgrund einer einfachen Textsuche als ungenutzt einstufen. Auch dynamische Referenzen, Vorlagen und ältere Projektdateien berücksichtigen.
 
 Nur das Studio bearbeiten, keine projektfremden Ordner oder Nutzerdateien entfernen. Git als nachvollziehbare Rückfallebene nutzen. Keine Bearbeitungsfunktion opfern und PSD nicht vor der tatsächlichen InDesign-Abnahme entfernen. Erst nach gezielter Regression und Prüfung des ausgelieferten Builds veröffentlichen; vorher/nachher Dateianzahl, Speicher-/Auslieferungsgrösse und echte Grenzen berichten. Dies ist eine geplante Folgeaufgabe, keine bereits durchgeführte Bereinigung und kein zusätzlicher Bonus zum heutigen Reihenumbau.
+
+
+## Neuer Folgeauftrag: eine Werkzeugleiste ohne Advanced Mode
+
+Nutzerpräzisierung vom 12. November: Die Werkzeugleiste vereinheitlichen und den Advanced-Mode-Schalter als Voraussetzung für Funktionen abschaffen. Alle Funktionen sollen ab Beginn erreichbar sein. Die Oberfläche auf Computer als Hauptgerät ausrichten; Tablets werden nur gelegentlich genutzt und bleiben sekundär unterstützt. Platz sparen und gleichzeitig Anfängern verständliche Wege anbieten.
+
+Vor der Umsetzung die tatsächlich modeabhängigen Werkzeuge, Eigenschaften, Menüs, Shortcuts, Einstellungen und Setup-Voreinstellungen erfassen. Nicht nur den Schalter verstecken oder pauschal mehr Knöpfe nebeneinander stellen. Gemeinsam mit den sechs Personas die Aufgabenfolge, Gruppierung, Platzierung/Form der Werkzeugleiste, Auswahlzustände, Beschriftung/Hilfe und das Nutzungsverhalten entwerfen. Alle Funktionen ohne Moduswechsel zugänglich machen; aufgabenbezogene Gruppen und nachvollziehbare Kontextmenüs sind mit einer platzsparenden Oberfläche vereinbar. Ein Kontext darf fachlich unpassende Aktionen mit verständlichem Grund deaktivieren, aber keine Funktionsklasse hinter einer globalen Expertenfreigabe verstecken.
+
+Bestehende Zeichen-/Text-/Bild-/Reihenfunktionen, Shortcuts sowie Auswahl-/Abbruch-/Undo-Abläufe erhalten. Alte Advanced-Mode-/MKW-Setup-Präferenzen verträglich einlesen, ohne Dokumentinhalte oder gespeicherte Gestaltung ungefragt zu ändern; ihre fachlich noch nötigen Daten nicht blind löschen. Erst Benutzerwege/Entwurf, dann zentral vorhandene Toolbar-/Inspector-Zuständigkeiten anpassen; keine zweite parallele Werkzeugleiste. Desktop bei üblichen und kleineren Fenstergrössen sowie Maus/Tastatur priorisieren; gelegentliche Nutzung ab iPad Mini und Touch nicht beschädigen. Sechs-Persona-Matrix, relevante Browser-/Datei-/Exportregressionen und Platzbedarf/Erreichbarkeit prüfen.
+
+Dies ist ausdrücklich ein geplanter Folgeauftrag. Der heutige Editor besitzt den Advanced Mode noch; noch keine Entfernung oder fertige neue Werkzeugleiste behaupten. Den Auftrag im nächsten passenden begrenzten Review nach tatsächlichem Guthaben umsetzen, nicht zusätzlich auf Kosten der laufenden Schlussprüfung.
