@@ -274,14 +274,7 @@ document.querySelectorAll("[data-export-format]").forEach(
     }),
 );
 function selectExports(checked) {
-  if (busy) return;
-  p.boards.forEach((b) => (b.checked = checked));
-  document
-    .querySelectorAll("[data-export-id]")
-    .forEach((input) => (input.checked = checked));
-  changed(false);
-  updateExportNames();
-  updateExportTotal();
+  exportSetSelection(checked ? p.boards.map((b) => b.id) : []);
 }
 $("#selectAllExports").onclick = () => selectExports(true);
 $("#deselectAllExports").onclick = () => selectExports(false);
@@ -554,6 +547,7 @@ $("#exportDialog").addEventListener("close", () => {
 });
 $("#folder").hidden = !window.showDirectoryPicker;
 function exportSetSelection(ids) {
+  if (busy) return;
   const selected = new Set(ids),
     dirty = p.boards.some((b) => b.checked !== selected.has(b.id));
   for (const b of p.boards) b.checked = selected.has(b.id);
@@ -590,8 +584,11 @@ async function showReview() {
   const b = boards[reviewIndex],
     index = reviewIndex;
   document.querySelector(".review-stage").classList.remove("checkerboard");
+  const label = p.carousel
+    ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label
+    : asset(b).name;
   $("#reviewPosition").textContent =
-    `${index + 1} / ${boards.length} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
+    `${index + 1} / ${boards.length} · ${label}${b.checked ? "" : " · Nicht ausgewählt"} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
   $("#reviewImage").hidden = true;
   $("#reviewMessage").textContent = "Vorschau wird erstellt …";
   const finishLoading = MKWUIControls.loading("#reviewMessage");
@@ -599,15 +596,15 @@ async function showReview() {
     const entry = await encodedBoard(clone(b), exportSettings()),
       blob = entry.previewBlob || entry.blob,
       hasTransparency = entry.hasTransparency;
-    document
-      .querySelector(".review-stage")
-      .classList.toggle("checkerboard", hasTransparency);
     if (
       generation !== reviewGeneration ||
       index !== reviewIndex ||
       !$("#reviewDialog").open
     )
       return;
+    document
+      .querySelector(".review-stage")
+      .classList.toggle("checkerboard", hasTransparency);
     URL.revokeObjectURL(reviewURL);
     reviewURL = URL.createObjectURL(blob);
     $("#reviewImage").src = reviewURL;

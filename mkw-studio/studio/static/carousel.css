@@ -1091,13 +1091,23 @@
   z-index: 6;
 }
 
-#carouselRowContext label {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+#carouselRowPicker {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
 }
-#carouselRowContext select {
-  min-width: 0;
-  width: 100%;
+#carouselRowPicker .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+#carouselRowPicker:hover {
+  background: var(--md-sys-color-surface-container-high);
 }

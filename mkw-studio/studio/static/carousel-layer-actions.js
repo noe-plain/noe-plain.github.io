@@ -79,7 +79,11 @@ function carouselRenameItem(item, kind) {
   input.select();
 }
 function carouselCloseLayerMenu() {
-  for (const id of ["carouselLayerMenu", "carouselFolderMenu"]) {
+  for (const id of [
+    "carouselLayerMenu",
+    "carouselFolderMenu",
+    "carouselRowMenu",
+  ]) {
     const menu = $("#" + id);
     if (menu?.matches(":popover-open")) menu.hidePopover();
     menu?.remove();

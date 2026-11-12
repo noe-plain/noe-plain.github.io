@@ -10,7 +10,7 @@ Der zusammenhängende Sechspunkte-Auftrag ist für den normalen Reihenablauf imp
 
 | Punkt | Tatsächlich umgesetzt | Prüfung / Grenze |
 | --- | --- | --- |
-| 1. Aktive Reihe | Sichtbare Reihenauswahl über der Ebenenliste; gefilterte Ebenen/Ordner, lokale Reihenfolge und Ordneraktionen. Neue leere Ordner haben eine validierte Seitenzuordnung. Gemeinsame Altordner können explizit und rückgängig machbar für die aktive Reihe unabhängig gemacht werden. | Andere Reihen und geerbte Sichtbarkeit/Sperren bleiben erhalten. Gemeinsame Altordner werden bis zur bewussten Trennung nicht mutiert. Gemischte Objektauswahlen dürfen keine versteckten reihenfremden Ordneränderungen auslösen. |
+| 1. Aktive Reihe | Platzsparende klickbare Ebenenüberschrift „Ebenen – N“ als Reihenauswahl; gefilterte Ebenen/Ordner, lokale Reihenfolge und Ordneraktionen. Neue leere Ordner haben eine validierte Seitenzuordnung. Gemeinsame Altordner können explizit und rückgängig machbar für die aktive Reihe unabhängig gemacht werden. | Andere Reihen und geerbte Sichtbarkeit/Sperren bleiben erhalten. Gemeinsame Altordner werden bis zur bewussten Trennung nicht mutiert. Gemischte Objektauswahlen dürfen keine versteckten reihenfremden Ordneränderungen auslösen. |
 | 2. Slide-Aktionen | Davor/danach einfügen, duplizieren, links/rechts verschieben, entfernen in Seitenkontextmenü und Eigenschaften. Gemeinsamer reiner Modellbefehl, 1–20 Slides je Reihe, maximal 200 insgesamt. | Vollständig enthaltene Ebenen wandern/kopieren wie im bisherigen Designer; übergreifende Gestaltung bleibt eine durchgehende Ebene. Ganze Reihen kopieren weiterhin ihre Panoramen und Effekte. |
 | 3. Gemeinsames Format | Gruppenweite Breite/Höhe/Schutzzonen bleiben zentral erzwungen. Hintergrund bewusst für die ganze Reihe bearbeiten; neue Slides übernehmen das Reihenformat. Normale Strukturaktionen ordnen die Reihe bündig horizontal an. | Andere Reihen behalten ihr Format. Alte gemischte Dateien werden nicht ungefragt umformatiert; Reparatur ausdrücklich über gemeinsames Artboard-Format. Ein blosses Umbenennen vereinheitlicht keine alten Hintergründe. |
 | 4. Verkleinern/Entfernen | Überzählige Slides werden nach Bestätigung entfernt, nicht als neue Reihen abgetrennt. Dialog nennt Anzahl und Beispiele vollständig entfernter Ebenen; übergreifende Ebenen bleiben erhalten. Abbrechen ohne Dokument-/Verlaufsänderung; ein Undo/Redo-Schritt. | Bestehende Markenlogik bleibt: notwendiges Logo erhalten, entfernte Duplikate nicht übereinander stapeln. Erweiterte historische Druckbogenbefehle behalten ihre ausdrücklich andere Semantik. |
@@ -27,11 +27,15 @@ Nachweis: echtes ZIP heruntergeladen, unabhängig mit Python ZIP/CRC und sichere
 
 - 183 reine Modell-/Pakettests, darunter neue `row-slides.test.js` und `row-scope.test.js`.
 - Vier neue echte Browserfälle: `row-folders`, `row-workflow`, `row-export`, `row-psd`, in Chrome und Firefox. Bestehende Prüfungen für alte Dateien, Kopiersicherheit, Artboard-Parität, Formatregel, MKW, PDF, PSD und Bilder wiederverwendet.
-- Vollständige lokale Chrome-/Firefox-Regression ausgeführt; an die neue Oberfläche angepasste Erwartungen und die echte Drag-Geste danach gezielt in beiden Browsern erneut bestanden. Vollständiger GitHub-/Live-Endstatus wird im Persona-Bericht nach tatsächlicher Veröffentlichung ergänzt.
+- Vollständige lokale Chrome-/Firefox-Regression ausgeführt; an die neue Oberfläche angepasste Erwartungen und die echte Drag-Geste danach gezielt in beiden Browsern erneut bestanden. Vollständiger GitHub-/Live-Endstatus wird im Ausführungsbericht mit dem konkreten Quellcommit genannt; im nächsten Lauf vor weiterer Arbeit direkt prüfen.
 - Keine neue Dokumentstruktur und keine Erhöhung der globalen 200-Slide-/500-Ebenen-/500-Ordner-Grenzen. Text-/Absatz-/Zeilenformatierung bleibt erhalten.
 - Alte gemeinsame Ordner und gemischte Formate verlangen einen bewussten, verlustfreien Übergang. Kein automatisches Normalisieren beim Öffnen und keine Behauptung einer rückwirkend vereinheitlichten Altdatei.
 - Die sechs Personas sind eine strukturierte Expertenprüfung, keine durchgeführte Nutzerstudie. Details: [Persona-Bericht](PERSONA-REVIEW-2026-11-12.md).
 - Guthaben heute zu Beginn: 99 % im Fünf-Stunden-Fenster und 81 % in der Woche frei. Kontostand mehrfach geprüft; keine zusätzlichen Credits, Agenten oder zweites Fenster verwendet. Nach Implementierung keine unabhängigen Bonusfunktionen begonnen.
+
+### Präzisierung am Ende des Laufs: kompakte Reihenauswahl
+
+Nutzerwunsch vom 12. November umgesetzt: Klick auf **„Ebenen – N“** in der Ebenenüberschrift öffnet die Reihenwahl; N ist die aktuelle Reihennummer. Vollständige Namen stehen im Menü/Tooltip. Die separate Reihenauswahl darunter ist entfernt. Tastatur, Escape, Fokus, unveränderte Dokumentrevision/Undo, gefilterte Ebenen und iPad-Mini-Ansicht geprüft. Exportvorschau zusätzlich auf leere Auswahl/Wiederwahl und eindeutige Reihen-/Slide-Beschriftung korrigiert.
 
 ### Nächste begrenzte Aufgaben
 

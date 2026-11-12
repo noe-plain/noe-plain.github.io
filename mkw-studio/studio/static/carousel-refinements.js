@@ -179,6 +179,41 @@ function carouselAssignFolder(o, id) {
   if (wasEmpty) carouselMoveFolder(id, folder.before || null, false, false);
   changed();
 }
+function carouselOpenRowMenu(button) {
+  carouselCloseLayerMenu();
+  const project = p,
+    c = p.carousel,
+    row = carouselRow();
+  if (!row) return;
+  const menu = document.createElement("div");
+  menu.id = "carouselRowMenu";
+  menu.className = "carousel-effect-menu carousel-layer-menu";
+  menu.setAttribute("popover", "auto");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Aktive Reihe wählen");
+  menu.innerHTML = c.pageStructure.artboardInfo
+    .map(
+      (a, i) =>
+        `<button type="button" role="menuitem" data-row-target="${esc(a.id)}" ${row.info.id === a.id ? 'aria-current="true"' : ""}><span>Reihe ${i + 1} · ${esc(a.name)}</span>${row.info.id === a.id ? studioIcon("check") : ""}</button>`,
+    )
+    .join("");
+  menu.querySelectorAll("[data-row-target]").forEach((item) => {
+    item.onclick = () => {
+      carouselCloseLayerMenu();
+      if (p !== project) return;
+      MKWSpreadUI.activateBoard(item.dataset.rowTarget);
+      document
+        .querySelector("#carouselRowPicker")
+        ?.focus({ preventScroll: true });
+    };
+  });
+  menu.addEventListener("toggle", (event) => {
+    button.setAttribute("aria-expanded", String(event.newState === "open"));
+    if (event.newState === "closed") menu.remove();
+  });
+  document.body.append(menu);
+  MKWUIMenu.open(menu, button);
+}
 function carouselLayerPanel() {
   carouselArrangeFolders();
   carouselLegacyLayerPanel();
@@ -197,21 +232,40 @@ function carouselLayerPanel() {
     b.onclick = carouselCreateFolder;
     heading.append(b);
   }
+  const row = scope.ids ? carouselRow() : null,
+    title = heading.querySelector("h3");
+  if (row) {
+    let picker = title.querySelector("button");
+    if (!picker) {
+      picker = document.createElement("button");
+      picker.id = "carouselRowPicker";
+      picker.type = "button";
+      picker.setAttribute("aria-haspopup", "menu");
+      picker.setAttribute("aria-expanded", "false");
+      title.replaceChildren(picker);
+      MKWUIMenu.trigger(picker);
+    }
+    const number = c.pageStructure.groups.indexOf(row.ids) + 1;
+    picker.innerHTML = `<span>Ebenen – ${number}</span>${studioIcon("down")}`;
+    picker.setAttribute(
+      "aria-label",
+      `Ebenen – ${number}: ${row.info.name}. Aktive Reihe wechseln`,
+    );
+    picker.title = `Aktive Reihe wechseln · ${row.info.name}`;
+    picker.onclick = () => carouselOpenRowMenu(picker);
+  } else title.textContent = "Ebenen";
   let context = document.querySelector("#carouselRowContext");
-  if (scope.ids) {
+  if (scope.shared.length) {
     if (!context) {
       context = document.createElement("section");
       context.id = "carouselRowContext";
       context.className = "carousel-property-section";
       root.before(context);
     }
-    const row = carouselRow();
-    context.innerHTML = `<label>Aktive Reihe<select aria-label="Aktive Reihe">${c.pageStructure.artboardInfo.map((a, i) => `<option value="${a.id}" ${row.ids === c.pageStructure.groups[i] ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></label>${scope.shared.length ? "<p>Diese Reihe verwendet noch geteilte Ordner.</p><button data-isolate-row>Ordner für diese Reihe unabhängig machen</button>" : ""}`;
-    context.querySelector("select").onchange = (e) =>
-      MKWSpreadUI.activateBoard(e.target.value);
-    context
-      .querySelector("[data-isolate-row]")
-      ?.addEventListener("click", carouselIsolateRowFolders);
+    context.innerHTML =
+      "<p>Diese Reihe verwendet noch geteilte Ordner.</p><button data-isolate-row>Ordner für diese Reihe unabhängig machen</button>";
+    context.querySelector("[data-isolate-row]").onclick =
+      carouselIsolateRowFolders;
   } else context?.remove();
   const rows = new Map(
       [...root.children].map((row) => [row.dataset.layer, row]),

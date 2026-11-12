@@ -100,7 +100,39 @@ const assert = require("node:assert/strict"),
     const target = await page.evaluate(
       () => p.carousel.pageStructure.artboardInfo[1].id,
     );
-    await page.locator("#carouselRowContext select").selectOption(target);
+    const picker = page.locator("#carouselRowPicker");
+    assert.equal(
+      await picker.locator("span").first().textContent(),
+      "Ebenen – 1",
+    );
+    assert.equal(await page.locator("#carouselRowContext").count(), 0);
+    const switchBefore = await page.evaluate(() => ({
+      history: history.length,
+      revision,
+    }));
+    await picker.click();
+    assert.equal(
+      await page.locator("#carouselRowMenu [aria-current=true]").count(),
+      1,
+    );
+    await page.keyboard.press("Escape");
+    assert(await picker.evaluate((el) => el === document.activeElement));
+    await picker.focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("End");
+    assert.equal(
+      await page.evaluate(() => document.activeElement.dataset.rowTarget),
+      target,
+    );
+    await page.keyboard.press("Enter");
+    assert.equal(
+      await picker.locator("span").first().textContent(),
+      "Ebenen – 2",
+    );
+    assert.deepEqual(
+      await page.evaluate(() => ({ history: history.length, revision })),
+      switchBefore,
+    );
     assert.equal(
       await page.locator("#carouselLayers [data-layer=first]").count(),
       0,

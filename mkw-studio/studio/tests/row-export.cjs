@@ -64,6 +64,22 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     await page.locator("[data-review-export-id]").first().check();
     assert.equal(await page.locator("#exportNames input:checked").count(), 2);
     await page.locator("[data-review-export-id]").first().uncheck();
+    await page.locator("[data-review-export-id]").last().uncheck();
+    assert.equal(await page.locator("#exportNames input:checked").count(), 0);
+    assert(await page.locator("#zip").isDisabled());
+    await page.locator("#reviewSelection summary").click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector("#reviewPosition").textContent ===
+        "Keine Auswahl",
+    );
+    assert(await page.locator("#reviewImage").isHidden());
+    await page.locator("#reviewSelection summary").click();
+    await page.locator("[data-review-export-id]").last().check();
+    await page.locator("#reviewSelection summary").click();
+    await page.waitForFunction(() =>
+      /Slide 1/.test(document.querySelector("#reviewPosition").textContent),
+    );
     await page.locator("#closeReview").click();
     assert.equal(await page.locator("#exportNames input:checked").count(), 1);
     const before = await page.evaluate(() => ({

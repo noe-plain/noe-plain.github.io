@@ -11,6 +11,12 @@ Statisches MKW Studio in `mkw-studio/studio`, auf Basis von `f17cac22f087ad7ed1f
 
 Quellen sind direkt überarbeitet; gebündelte Dateien wurden aus dem Manifest erzeugt. Die neuen reinen Modellgrenzen verhindern parallele Sonderlogik pro Schaltfläche. Bestehende Texteinstellungen, Assetgraph, MKW-Identität und globalen Grenzen bleiben erhalten. Kein vollständiges Neuschreiben des Editors.
 
+### Letztes Tuning nach Nutzerrückmeldung
+
+Die aktive Reihe wird platzsparend direkt über die klickbare Ebenenüberschrift gewählt: **„Ebenen – 1“, „Ebenen – 2“ …**. Der Klick öffnet das vorhandene Material-Menü mit Nummer und vollständigem Reihennamen. Die separate Auswahlzeile entfällt; nur ein notwendiger Altordner-Hinweis kann zusätzlich erscheinen. Tastatur (Pfeile/Enter/Escape), Fokus-Rückgabe, Auswahlmarkierung, unveränderte Revision/Undo und die Tablet-Ansicht wurden geprüft. Die normale Ebenen-Navigation bleibt erhalten.
+
+Die Exportvorschau nennt jetzt ebenfalls Reihe/Slide und den Auswahlstatus; eine leere Auswahl blendet das alte Bild aus und sperrt den Export. Alle Auswahlwege nutzen denselben Besitzer, veraltete asynchrone Ergebnisse dürfen auch den Transparenzhintergrund nicht mehr überschreiben. Leere Auswahl, Wiederwahl und bestehende PDF-/Export-Panels zusätzlich in Chrome und Firefox geprüft.
+
 ## Strukturierte Persona-Prüfung
 
 | Persona | Identifiziertes Feedback / Problem | Status |
@@ -30,7 +36,7 @@ Diese Matrix ist eine Expertenprüfung anhand der sechs Perspektiven, keine beha
 
 ZIP wirklich heruntergeladen, unabhängig entpackt/CRC-geprüft und vollständige enthaltene MKW mit vorhandenem Leser validiert: auch nicht exportierte andere Reihe, Text und Bild erhalten. PSD wirklich aus Speicherdialog heruntergeladen und auf Abmessungen, Slices, Pixel und bearbeitbare Textdaten geprüft. Desktop und 768×1024-Ansicht visuell geprüft, relevante Seitenleiste zusätzlich mit axe geprüft. Kein realer Touch-Hardwaretest und kein neuer nativer Photoshop-/InDesign-Test behauptet.
 
-Veröffentlichung und vollständige GitHub-/Live-Prüfung: noch im Abschluss; diesen Absatz erst nach tatsächlichem Ergebnis ergänzen.
+Veröffentlichungsnachweise: [vollständige GitHub-Prüfungen](https://github.com/noe-plain/noe-plain.github.io/actions/workflows/mkw-studio.yml) und [Live-Studio](https://noe-plain.github.io/mkw-studio/studio/). Der Ausführungsbericht nennt den konkreten Quellcommit und das tatsächliche Endergebnis; beim nächsten Review diesen aktuellen Stand direkt abgleichen. Die vier neuen Fälle wurden bereits auf der Live-Seite des ersten Änderungscommits 15b4540 bestanden, HTML/JS/CSS und IDML-Beispiel waren bytegleich. Die anschliessende kompakte Reihenwahl und Vorschaukorrektur wurden zusätzlich in beiden Browsern geprüft und werden mit dem abschliessenden Quellcommit erneut veröffentlicht/geprüft.
 
 ## IDML und nächste Aufgaben
 
