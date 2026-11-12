@@ -198,3 +198,23 @@ Benötigte SVG-Inhalte im gemeinsamen MKW-Assetgraph erhalten, normale Bildaussc
 ## Abgenommener Code-Endstand dieses Laufs
 
 **f5120b374c4e40ea751d53ac766698f3579f2b42** veröffentlicht und vollständig geprüft: [GitHub 43190905005](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43190905005), Chrome und Firefox erfolgreich, 183 Modell-/Pakettests. Echte Live-Prüfungen und bytegleiche Auslieferung bestätigt; siehe [Nachweis](REVIEW-VERIFICATION-2026-11-12.json) und [Persona-Bericht](PERSONA-REVIEW-2026-11-12.md). Danach nur Folgeplanung/Dokumentation ergänzt. Beim nächsten Review von diesem tatsächlichen Stand ausgehen. Bildkommentare, Toolbar ohne Advanced Mode, Bereinigung, SVG, Farbwerkzeuge, Vorlagenfreigabe und Startseitenvorschau bleiben wie jeweils angegeben geplant; IDML-Text bleibt nächster begrenzter InDesign-Inhaltsmeilenstein, PSD bleibt verfügbar.
+
+
+## Fortsetzung · 12. November: Speichervertrag für Bildnotizen geprüft
+
+Erster begrenzter Grundlagen-Schritt, noch keine sichtbare Kommentarfunktion: `tests/review-comment-storage.test.js` verwendet den bestehenden echten MKW-Schreiber/-Leser und das vorhandene reine Reihenmodell. Drei neue Prüfungen bestehen; insgesamt 186 Modell-/Pakettests.
+
+Technisch geprüfter Vorschlag: optionale reine Textmetadaten `reviewComment` am FD-Quellbild (für dessen verknüpfte Formate) beziehungsweise an der kanonischen Designer-Slide mit stabiler ID. Unicode/Zeilenumbrüche und HTML-artiger Text bleiben unverändert als Daten erhalten. Verschieben behält die Notiz an derselben Slide-ID, Duplizieren kopiert sie, Entfernen entfernt sie mit der Slide. Der vollständige MKW-Schreiber erhält auch die Notiz einer nicht zur Ausgabe gewählten Reihe; dabei entstehen keine Gestaltungsebenen. Quellen werden durch die reinen Operationen nicht verändert. Kein neuer Dateischreiber und keine zweite Projektstruktur erforderlich.
+
+Grenzen: synthetische Datenrezepte, keine neue Eingabe-/Validierungsoberfläche, keine Legacy-Slide-Migration, keine Arbeitsflächenanzeige und keine neue Exportpixel-Abnahme. Die Testdaten sind keine als reale Bilddateien freigegebenen Beispiele. Ein bestandener Speichervertrag ist kein fertig implementiertes Kommentarsystem.
+
+Nächster Schritt: Zuordnung im tatsächlichen Vorschauablauf einschliesslich bisheriger Designer-Dateien abschliessen; begrenzte validierte Texteingabe mit einem Undo-Schritt und sicherem Abbrechen, diskrete Material-3-Notiz auf der Fläche, echter Browser-/MKW-/ZIP-Rundlauf und unveränderte PNG/PDF/PSD-Pixel. Den Speicher-Grundlagenschritt nicht erneut als neue Gesamtfunktion beginnen.
+
+| Persona | Ergebnis dieses Teilschritts | Offen |
+| --- | --- | --- |
+| Neue Nutzerin | Notizdaten gehen beim Dateiwechsel nicht verloren. | Verständliche Eingabe und Anzeige. |
+| Erfahrener Designer | Stabile Slide-Zuordnung bei Bewegung/Kopie nachgewiesen. | Bedienung, Undo/Redo und alte Dateien. |
+| Senior UX-Experte | Vorschauindex wird nicht als dauerhafte Slide-Identität verwendet. | Durchgängiger Vorschau-/Flächenablauf. |
+| UI-Expertin | Keine ungeprüfte zusätzliche Bedienfläche ausgeliefert. | Material-3-Entwurf und visuelle Abnahme. |
+| QA-Entwicklerin | Drei echte Modell-/Dateischreiber-Verträge, 186 Tests bestanden. | Vollständige Browser-/Datei-/Pixelabnahme. |
+| Fehlersucher | Sonderzeichen bleiben reine Metadaten, Quellzustand unverändert. | Längenbegrenzung, Escaping der Anzeige und Abbruchfälle. |
