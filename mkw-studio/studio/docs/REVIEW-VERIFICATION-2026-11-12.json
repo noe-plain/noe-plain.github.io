@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-12",
+  "testedSourceCommit": "f5120b374c4e40ea751d53ac766698f3579f2b42",
+  "unitTests": 183,
+  "fullBrowserSuites": {
+    "chromium": 102,
+    "firefox": 87
+  },
+  "github": [
+    {
+      "name": "pages build and deployment",
+      "id": 43190904543,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43190904543"
+    },
+    {
+      "name": "MKW Studio checks",
+      "id": 43190905005,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43190905005"
+    }
+  ],
+  "live": {
+    "url": "https://noe-plain.github.io/mkw-studio/studio/",
+    "byteComparisons": [
+      {
+        "file": "index.html",
+        "equal": true,
+        "sha256": "b8943a7c7f72c78ee596bc7fadc6c719bd443eaded282b3e86bcbaf93cde8d63"
+      },
+      {
+        "file": "static/editor.bundle.js",
+        "equal": true,
+        "sha256": "70e2335f1c1805f0d2c55d0f5027ab26928bb540572fac0eb92c97d7f4ec8488"
+      },
+      {
+        "file": "static/editor.bundle.css",
+        "equal": true,
+        "sha256": "f7364ef2f07408fab1a889a2f009d16bbce820aa0365804108895e450d45b8af"
+      },
+      {
+        "file": "examples/idml-empty-page.idml",
+        "equal": true,
+        "sha256": "e38b3e42cc49a1904629d7fe09dc16f5f03877772482c4cf65e8edba485b5cd5"
+      }
+    ],
+    "chromiumSuites": [
+      "row-folders",
+      "row-workflow",
+      "row-export",
+      "row-psd"
+    ],
+    "firefoxSuites": [
+      "row-folders",
+      "row-export"
+    ]
+  },
+  "actualDownloadChecks": [
+    "ZIP CRC and safe paths",
+    "complete embedded MKW decoded/hydrated/validated including unselected text and image",
+    "row PSD dimensions/slices/composite/editable text"
+  ],
+  "nativeApplicationChecksToday": {
+    "InDesign": false,
+    "Photoshop": false
+  },
+  "limitations": [
+    "Internal image comments remain planned",
+    "No new IDML content milestone today",
+    "Legacy mixed formats require explicit repair",
+    "Shared legacy folders require explicit isolation",
+    "No physical touch-device test"
+  ]
+}

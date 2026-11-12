@@ -186,3 +186,15 @@ Die Budgetbasis wurde am Ende des Laufs durch den Nutzer präzisiert. Das begren
 Nutzerauftrag vom 12. November: Das auf der Startseite auswählbare Bild besser darstellen und die UI dieses Bereichs dafür etwas umgestalten. Als spätere, bewusst niedrig priorisierte Aufgabe aufnehmen; nicht vor Bildnotizen, den bereits priorisierten Editoraufgaben oder notwendigen Fehlerkorrekturen beginnen.
 
 Beim Startseiten-Review den tatsächlichen Bildauswahl-/Vorschaubereich gezielt prüfen und anschliessend Anordnung, Grösse, Hierarchie und Zusammenspiel von Auswahl und Vorschau verbessern. Das ausgewählte Bild soll deutlicher erkennbar sein; Seitenverhältnis/Ausschnitt verständlich vermitteln und den Einstieg weiterhin einfach und platzsparend halten. Computer priorisieren, Material-3-Farbrollen/Typografie/Formen/Zustände und die sechs Personas verwenden. Vorhandene Start-/Öffnen-/Auswahlabläufe und Bilddaten nicht ungefragt verändern. Entwurf und tatsächliche Desktop-/Browserprüfung vor einer Veröffentlichung. Noch keine neue Startseiten-UI umgesetzt oder abgenommen.
+
+
+## Geplant: SVG als reguläre Bilder unterstützen
+
+Nutzerauftrag vom 12. November: SVG-Dateien als Bilder importieren, platzieren und ersetzen können. Vorhandene Bild-/Asset-/Renderer-Zuständigkeiten nutzen und die tatsächlichen Importwege zuerst abgleichen. SVG nicht als ungeprüftes HTML in die Oberfläche einsetzen. Intrinsische Masse/ViewBox, Seitenverhältnis, Transparenz, Skalierung sowie defekte oder extern abhängige Dateien verständlich behandeln. Bestehende Bild-/Dateigrössenlimits nicht pauschal erhöhen und keine bezahlte externe Konvertierung voraussetzen.
+
+Benötigte SVG-Inhalte im gemeinsamen MKW-Assetgraph erhalten, normale Bildausschnitte/Transformationen/Effekte und den vollständigen MKW-/ZIP-Rundlauf prüfen. Reale PNG/PDF/PSD-Ausgaben kontrollieren; native Vektor-Bearbeitbarkeit oder verlustfreien SVG-Einzelexport nur behaupten, wenn tatsächlich implementiert und abgenommen. Logos und alte Projekte unverändert nutzbar halten. Neue Auswahl-/Fehler-/Fortschrittszustände in der gemeinsamen Material-3-Designsprache und aus sechs Persona-Perspektiven prüfen. Dies ist ein geplanter Auftrag; heute keine neu implementierte allgemeine SVG-Bildunterstützung behaupten.
+
+
+## Abgenommener Code-Endstand dieses Laufs
+
+**f5120b374c4e40ea751d53ac766698f3579f2b42** veröffentlicht und vollständig geprüft: [GitHub 43190905005](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43190905005), Chrome und Firefox erfolgreich, 183 Modell-/Pakettests. Echte Live-Prüfungen und bytegleiche Auslieferung bestätigt; siehe [Nachweis](REVIEW-VERIFICATION-2026-11-12.json) und [Persona-Bericht](PERSONA-REVIEW-2026-11-12.md). Danach nur Folgeplanung/Dokumentation ergänzt. Beim nächsten Review von diesem tatsächlichen Stand ausgehen. Bildkommentare, Toolbar ohne Advanced Mode, Bereinigung, SVG, Farbwerkzeuge, Vorlagenfreigabe und Startseitenvorschau bleiben wie jeweils angegeben geplant; IDML-Text bleibt nächster begrenzter InDesign-Inhaltsmeilenstein, PSD bleibt verfügbar.

@@ -71,3 +71,12 @@ Weitere Werkzeuge bleiben geplant: echte Formvorschau beim Ziehen, Winkel mit Fa
 Zusätzlich mit niedriger Priorität geplant: Startseite so überarbeiten, dass das dort auswählbare Bild besser dargestellt wird; Anordnung und Vorschau an die gemeinsame Material-3-Designsprache anpassen. Noch nicht umgesetzt.
 
 Details und verbleibende Kompatibilitätsgrenzen: [Reihenplan](DESIGNER-ROWS-PLAN.md), [InDesign-Plan](INDESIGN-EXPORT-PLAN.md).
+
+Weitere Planergänzung: SVG als reguläre Bilddatei für Import/Platzieren/Ersetzen, mit Transparenz, korrekter Skalierung, MKW-/ZIP-Rundlauf und Prüfung tatsächlicher PNG/PDF/PSD-Ausgaben. Noch nicht umgesetzt.
+
+
+## Tatsächlicher Abschlussnachweis
+
+Der funktionale Endstand **f5120b374c4e40ea751d53ac766698f3579f2b42** ist veröffentlicht. Der vollständige [GitHub-Endlauf 43190905005](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43190905005) ist erfolgreich: 183 Modell-/Pakettests, 102 Chrome- und 87 Firefox-Suiten, Format-/Build-Prüfungen. Die zwei früheren fehlgeschlagenen Zwischenläufe sind damit durch den bestandenen Endlauf ersetzt. Auf der tatsächlichen Live-Seite bestanden zusätzlich vier Chrome- und zwei Firefox-Fälle, einschliesslich echter Theme-/Kontrastprüfung, direkter Exportcheckbox und ZIP/MKW-Rundlauf. HTML, JS, CSS und unverändertes IDML-Beispiel stimmen bytegenau mit dem geprüften Quellstand überein.
+
+Maschinenlesbarer Nachweis: [REVIEW-VERIFICATION-2026-11-12.json](REVIEW-VERIFICATION-2026-11-12.json). Anschliessende Planergänzungen zu Startseite/SVG und dieser Bericht ändern keine Laufzeitdateien. Quellstand und spätere Dokumentationscommits bei der Abnahme unterscheiden; keinen noch laufenden neuen Dokumentationsjob als abgeschlossen behaupten.
