@@ -58,3 +58,10 @@ Zeitpunkt und SHA-256-Werte: [IDML-VERIFICATION-2026-11-11.json](IDML-VERIFICATI
 ## Prioritätsänderung · 11. November, nach bestätigtem Reihenauftrag
 
 Der Nutzer hat die noch fehlende Gleichheit jeder Reihe mit dem bisherigen Designer konkret in sechs Punkten bestätigt und zuerst für Donnerstag, dann als sofortigen Teilschritt mit Restplanung beauftragt. Der nächste IDML-Text-Meilenstein wird dafür auf einen späteren normalen Review verschoben. Am 12. November hat die dokumentierte Restliste in [DESIGNER-ROWS-PLAN.md](DESIGNER-ROWS-PLAN.md) Vorrang; keinen zusätzlichen IDML-Ausbau in dasselbe Guthabenfenster packen. Die tatsächlich geöffnete leere Einseiten-Basis bleibt erreicht, PSD und MKW bleiben verfügbar.
+
+
+## Fortschritt · 12. November 2026
+
+Heute bewusst kein zusätzlicher IDML-Inhaltsmeilenstein: der bestätigte zusammenhängende Reihen-/Exportauftrag hatte Vorrang. Die selbst erzeugte leere Einseiten-Datei und der dokumentierte echte InDesign-Öffnungstest vom 11. November bleiben unverändert. Die vorhandenen Paket-/Browserprüfungen laufen als Regression weiter; sie sind kein erneuter nativer Öffnungstest. PSD bleibt vollständig verfügbar und kann nun zusätzlich auf eine aktive Reihe begrenzt werden. MKW bleibt Projektformat und liegt vollständig in Bild-ZIP-Exporten bei.
+
+Nächster begrenzter normaler Review: genau eine einfache bearbeitbare Textgeschichte mit Textrahmen und Basisschrift, eigenes neues Testdokument, Paketprüfung und tatsächliches Öffnen/Bearbeiten in InDesign dokumentieren. Kein erneutes leeres Einseiten-Paket, kein gleichzeitiger Mehrseiten-/Bild-/Effektausbau und kein nativer INDD-Browserexport.

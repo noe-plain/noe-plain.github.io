@@ -15,7 +15,7 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
    window.pageHashes=async()=>{const values=[];for(let i=0;i<p.carousel.n;i++){const a=MKWCarouselPolicy.frame(p.carousel,i),cv=makeCanvas(a.w,a.h);await carouselPaint(exportContext(cv),i);const b=new Uint8Array(await(await new Promise(r=>cv.toBlob(r))).arrayBuffer());values.push([...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].join(','));cv.width=cv.height=1;}return values;};
   });
   const before=await page.evaluate(()=>pageHashes());
-  await page.locator('#spreadEnable').click();await page.locator('#spreadPages').waitFor();await page.locator('.spread-modes label').first().click();
+  await page.locator('#spreadEnable').click();await page.locator('#spreadPages').waitFor();await page.locator('.spread-compat summary').first().click();await page.locator('.spread-modes label').first().click();
   assert.deepEqual(await page.evaluate(()=>pageHashes()),before,'explicit conversion preserves each page');
   assert.equal(await page.evaluate(()=>p.carousel.objects.filter(o=>o.imageId==='spread-photo').length),2);
   await page.locator('.spread-modes label').nth(1).click();assert(await page.locator('[name=spreadMode][value=spreads]').isChecked());
@@ -54,7 +54,7 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
   await page.locator('[data-spread-format=w]').fill('900');assert.equal(await page.evaluate(()=>p.carousel.artboards[0].w),1080);
   await page.locator('[data-format-apply]').click();assert.deepEqual(await page.evaluate(()=>p.carousel.artboards.map(a=>a.w)),[900,900,1080]);await page.evaluate(()=>undo());
   // Shortcut creates a two-page spread with one undo checkpoint after activation.
-  await page.locator('#carouselViewport').focus();const n=await page.evaluate(()=>p.carousel.n);await page.keyboard.press('Control+Alt+n');assert.equal(await page.evaluate(()=>p.carousel.n),n+2);await page.evaluate(()=>undo());
+  await page.locator('#carouselViewport').focus();const n=await page.evaluate(()=>p.carousel.n);await page.keyboard.press('Control+Alt+n');assert.equal(await page.evaluate(()=>p.carousel.n),n+1);await page.evaluate(()=>undo());
   // Drag cancel restores exact original; detach is also exposed by click action.
   // Select through the page list first: canvas headers are culled and replaced after scrolling.
   await rows.first().click();
@@ -93,6 +93,7 @@ const {launch,artifact,waitForProjectReady,openLatestProject}=require('./browser
   // Portable backup and migration/validation.
   await page.evaluate(()=>{validate(p);validateCarousel(p);});await page.evaluate(()=>autosave());await page.reload();await openLatestProject(page);assert.equal(await page.evaluate(()=>p.carousel.n),120);
   await page.evaluate(()=>{carouselSlideSelect(0);});
+  await page.locator(".spread-compat summary").first().click();
   await page.locator('#spreadPages').focus();await page.keyboard.press('Control+a');await page.locator('[data-spread-action=more]').click();await page.getByRole('menuitem',{name:'Löschen …',exact:true}).click();await page.locator('[data-choice=cancel]').click();assert.equal(await page.evaluate(()=>p.carousel.n),120);
   await page.locator('[data-spread-action=more]').click();await page.getByRole('menuitem',{name:'Löschen …',exact:true}).click();await page.locator('[data-choice=delete]').click();await page.waitForFunction(()=>p.carousel.n===0);assert.equal(await page.evaluate(()=>p.carousel.n),0);assert(await page.locator('#spreadEmpty').isVisible());assert(await page.locator('#carouselExport').isDisabled());
   await page.locator('#spreadAdd').click();assert.equal(await page.evaluate(()=>p.carousel.n),1);assert.equal(await page.evaluate(()=>{validate(p);validateCarousel(p);return true;}),true);

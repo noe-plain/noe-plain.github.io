@@ -438,6 +438,46 @@ function carouselRowObjects() {
     ),
   );
 }
+function carouselRowScope() {
+  return MKWRowScope.scope(
+    p.carousel,
+    carouselRow()?.page.id,
+    carouselObjectBounds,
+  );
+}
+function carouselCanEditRowFolders() {
+  const scope = carouselRowScope(),
+    ids = new Set(scope.view.objects.map((o) => o.id));
+  if (scope.ids && carouselSelected().some((o) => !ids.has(o.id))) {
+    status(
+      "Wähle für Ordner- und Ebenenaktionen nur Elemente der aktiven Reihe.",
+    );
+    return false;
+  }
+  if (!scope.shared.length) return true;
+  status("Mache die geteilten Ordner zuerst für diese Reihe unabhängig.");
+  return false;
+}
+function carouselIsolateRowFolders() {
+  try {
+    const next = MKWRowScope.isolate(
+      p.carousel,
+      carouselRow()?.page.id,
+      carouselObjectBounds,
+      uid,
+    );
+    if (next === p.carousel) return false;
+    validateCarousel({ ...p, carousel: next });
+    checkpoint();
+    p.carousel = next;
+    carouselUI.folder = null;
+    changed();
+    return true;
+  } catch (e) {
+    status(e.message);
+    return false;
+  }
+}
 function carouselCopyOrigin(objects) {
   const object = objects.at(-1);
   if (!object || !p.carousel.pageStructure) return null;
@@ -883,8 +923,10 @@ function carouselLayerOrder(direction) {
       .map((o) => o.id),
   );
   if (!selectedIds.size) return;
-  let a = p.carousel.objects.filter((o) => o.type !== "logo");
-  const logos = p.carousel.objects.filter((o) => o.type === "logo");
+  if (!carouselCanEditRowFolders()) return;
+  const view = carouselRowScope().view;
+  let a = view.objects.filter((o) => o.type !== "logo");
+  const logos = view.objects.filter((o) => o.type === "logo");
   if (direction === "front" || direction === "back") {
     const chosen = a.filter((o) => selectedIds.has(o.id)),
       rest = a.filter((o) => !selectedIds.has(o.id));
@@ -899,9 +941,9 @@ function carouselLayerOrder(direction) {
         [a[i], a[i - 1]] = [a[i - 1], a[i]];
   }
   const next = [...a, ...logos];
-  if (next.every((o, i) => o === p.carousel.objects[i])) return;
+  if (next.every((o, i) => o === view.objects[i])) return;
   checkpoint();
-  p.carousel.objects = next;
+  p.carousel = MKWRowScope.mergeOrder(p.carousel, { ...view, objects: next });
   changed();
 }
 

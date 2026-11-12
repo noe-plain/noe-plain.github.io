@@ -80,11 +80,12 @@ function carouselArtboardFormatPanel(host, index) {
     values = Object.fromEntries(
       MKWCarouselPolicy.formatKeys.map((key) => [key, first[key]]),
     );
+  values.bg = first.bg;
   const section = document.createElement("section");
   section.className = "carousel-property-section carousel-row-format";
   const field = (key, label) =>
     `<label>${label} (px)<input data-row-format="${key}" aria-label="Artboard ${label}" type="number" min="${key === "w" || key === "h" ? 240 : 0}" max="4000" step="1" value="${values[key]}"></label>`;
-  section.innerHTML = `<h4>Format für dieses Artboard</h4><p>${esc(info.name)} · ${ids.length} ${ids.length === 1 ? "Slide" : "Slides"}</p><button data-row-slides>Slides bearbeiten (1–20) …</button><div class="carousel-fields">${field("w", "Breite")}${field("h", "Höhe")}</div><h4>Schutzzonen</h4><div class="carousel-fields">${field("top", "Oben")}${field("bottom", "Unten")}${field("left", "Links")}${field("right", "Rechts")}</div><p class="slide-format-note">Gilt für alle Slides dieses Artboards. Elementgrössen bleiben erhalten; andere Artboards behalten ihr Format. Darunterliegende Artboards rücken bei Bedarf nach.</p><p data-row-error class="post-safezone-error" role="status"></p><button data-row-apply class="primary" disabled>Für dieses Artboard übernehmen</button>`;
+  section.innerHTML = `<h4>Format für dieses Artboard</h4><p>${esc(info.name)} · ${ids.length} ${ids.length === 1 ? "Slide" : "Slides"}</p><button data-row-slides>Slides bearbeiten (1–20) …</button><div class="carousel-fields">${field("w", "Breite")}${field("h", "Höhe")}</div><label>Reihenhintergrund<input type="color" data-row-background aria-label="Reihenhintergrund" value="${first.bg}"></label><h4>Schutzzonen</h4><div class="carousel-fields">${field("top", "Oben")}${field("bottom", "Unten")}${field("left", "Links")}${field("right", "Rechts")}</div><p class="slide-format-note">Gilt für alle Slides dieses Artboards. Elementgrössen bleiben erhalten; andere Artboards behalten ihr Format. Darunterliegende Artboards rücken bei Bedarf nach.</p><p data-row-error class="post-safezone-error" role="status"></p><button data-row-apply class="primary" disabled>Für dieses Artboard übernehmen</button>`;
   host.append(section);
   const button = section.querySelector("[data-row-apply]"),
     error = section.querySelector("[data-row-error]");
@@ -108,11 +109,15 @@ function carouselArtboardFormatPanel(host, index) {
       error,
     );
   }
-  for (const input of section.querySelectorAll("input"))
+  for (const input of section.querySelectorAll("[data-row-format]"))
     input.oninput = () => {
       values[input.dataset.rowFormat] = input.valueAsNumber;
       refresh();
     };
+  section.querySelector("[data-row-background]").oninput = (e) => {
+    values.bg = e.target.value;
+    refresh();
+  };
   section.querySelector("[data-row-slides]").onclick = () =>
     MKWSpreadUI.editArtboard(first.id);
   button.onclick = () =>

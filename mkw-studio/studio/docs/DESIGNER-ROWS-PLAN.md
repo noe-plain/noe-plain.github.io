@@ -4,15 +4,52 @@ Bestätigt am 11. November 2026: Eine Reihe entspricht einem bisherigen Designer
 
 Der Nutzer bat zuerst um Umsetzung der sechs Punkte am Donnerstag, 12. November, dann um sofortige Umsetzung dessen, was innerhalb des aktuellen Guthabens sauber möglich ist, und Planung des Rests. Ein gesamter Lauf inklusive Prüfung, Korrekturen, Veröffentlichung und Bericht bleibt auf das Guthaben EINES Fünf-Stunden-Fensters begrenzt. Keine Zusatzcredits, API-Abrechnung, automatischen Reset-Gutscheine, Zusatzagenten oder Nutzung eines weiteren Fensters. Geteilte Fünf-Stunden- und Wochenlimits jeweils tatsächlich prüfen; unbekannte Werte nicht als Kapazität behandeln. Mindestens ein Drittel des anfänglichen verfügbaren Rests für Abschluss/Prüfung behalten; spätestens bei etwa 20 % verbleibendem Kontingent keine Funktion mehr anfangen.
 
-## Tatsächlicher Stand am 11. November
+## Aktueller Fortschritt · 12. November 2026
+
+Der zusammenhängende Sechspunkte-Auftrag ist für den normalen Reihenablauf implementiert; die Kompatibilitätsgrenzen unten bleiben ausdrücklich bestehen. Dieser Abschnitt ersetzt die historische Restliste vom 11. November als aktuelle Arbeitsgrundlage. Nicht beim nächsten Review erneut mit den sechs Punkten anfangen.
+
+| Punkt | Tatsächlich umgesetzt | Prüfung / Grenze |
+| --- | --- | --- |
+| 1. Aktive Reihe | Sichtbare Reihenauswahl über der Ebenenliste; gefilterte Ebenen/Ordner, lokale Reihenfolge und Ordneraktionen. Neue leere Ordner haben eine validierte Seitenzuordnung. Gemeinsame Altordner können explizit und rückgängig machbar für die aktive Reihe unabhängig gemacht werden. | Andere Reihen und geerbte Sichtbarkeit/Sperren bleiben erhalten. Gemeinsame Altordner werden bis zur bewussten Trennung nicht mutiert. Gemischte Objektauswahlen dürfen keine versteckten reihenfremden Ordneränderungen auslösen. |
+| 2. Slide-Aktionen | Davor/danach einfügen, duplizieren, links/rechts verschieben, entfernen in Seitenkontextmenü und Eigenschaften. Gemeinsamer reiner Modellbefehl, 1–20 Slides je Reihe, maximal 200 insgesamt. | Vollständig enthaltene Ebenen wandern/kopieren wie im bisherigen Designer; übergreifende Gestaltung bleibt eine durchgehende Ebene. Ganze Reihen kopieren weiterhin ihre Panoramen und Effekte. |
+| 3. Gemeinsames Format | Gruppenweite Breite/Höhe/Schutzzonen bleiben zentral erzwungen. Hintergrund bewusst für die ganze Reihe bearbeiten; neue Slides übernehmen das Reihenformat. Normale Strukturaktionen ordnen die Reihe bündig horizontal an. | Andere Reihen behalten ihr Format. Alte gemischte Dateien werden nicht ungefragt umformatiert; Reparatur ausdrücklich über gemeinsames Artboard-Format. Ein blosses Umbenennen vereinheitlicht keine alten Hintergründe. |
+| 4. Verkleinern/Entfernen | Überzählige Slides werden nach Bestätigung entfernt, nicht als neue Reihen abgetrennt. Dialog nennt Anzahl und Beispiele vollständig entfernter Ebenen; übergreifende Ebenen bleiben erhalten. Abbrechen ohne Dokument-/Verlaufsänderung; ein Undo/Redo-Schritt. | Bestehende Markenlogik bleibt: notwendiges Logo erhalten, entfernte Duplikate nicht übereinander stapeln. Erweiterte historische Druckbogenbefehle behalten ihre ausdrücklich andere Semantik. |
+| 5. Reihen-UI | Einrichtung erklärt erste Reihe und 1–20-Grenze. Direkte Aktion „Neue Reihe“, daneben Slide hinzufügen / Reihe bearbeiten, lokale Slide-Aktionen und klare aktive Reihe. Alte Druckbogen-/Nachrück-/Zusammenführungswege in geschlossener erweiterter Verwaltung. | Alte freie Dokumente und ihre erweiterten Werkzeuge bleiben unterstützt. Die Bearbeitungsstruktur bleibt dieselbe; keine eingebetteten Einzelprojekte. Desktop und 768×1024-Ansicht geprüft. |
+| 6. Nummerierung/Export | Lokale Slide-Nummern ab 1 in Übersicht, Fläche und Export. Exportauswahl: diese Reihe / ausgewählte Slides / alle Reihen. Auswahl direkt in der Vorschau ändern; eindeutige R01/S01-Dateinamen. PSD zusätzlich für aktive Reihe oder ganzes Projekt. | PNG-/PDF-/PSD-Regressionsprüfungen und tatsächliche Browserdownloads. PSD wurde maschinell auf Pixel, Dimensionen, Slices und nativen Text geprüft; kein neuer Photoshop-Anwendungsnachweis. |
+
+### ZIP enthält das vollständige MKW-Projekt
+
+Seit diesem Lauf enthalten Bild-ZIP-Exporte unter `Projekt/<Projektname>.mkw` zusätzlich die vollständige bearbeitbare gemeinsame Datei – auch bei nur einer exportierten Slide. Der bestehende binäre MKW-Schreiber wird mit einem konsistenten Snapshot zum Exportstart verwendet; kein vereinfachtes Nebenformat. Alle Reihen und benötigten Inhalte/Bilder/Schriften werden nach den bestehenden Regeln gespeichert. Projekt, Undo/Redo und bestehende Dateiverknüpfung werden dafür nicht verändert.
+
+Nachweis: echtes ZIP heruntergeladen, unabhängig mit Python ZIP/CRC und sichere Pfade geprüft; enthaltene MKW-Datei mit vorhandenem Leser dekodiert, hydratisiert und validiert. Nicht exportierter Text und ein echtes Bild in der anderen Reihe sind erhalten. Direkter PDF-Download bleibt PDF; es wird kein ZIP behauptet, wo keines entsteht.
+
+### Prüfung und verbleibende Grenzen
+
+- 183 reine Modell-/Pakettests, darunter neue `row-slides.test.js` und `row-scope.test.js`.
+- Vier neue echte Browserfälle: `row-folders`, `row-workflow`, `row-export`, `row-psd`, in Chrome und Firefox. Bestehende Prüfungen für alte Dateien, Kopiersicherheit, Artboard-Parität, Formatregel, MKW, PDF, PSD und Bilder wiederverwendet.
+- Vollständige lokale Chrome-/Firefox-Regression ausgeführt; an die neue Oberfläche angepasste Erwartungen und die echte Drag-Geste danach gezielt in beiden Browsern erneut bestanden. Vollständiger GitHub-/Live-Endstatus wird im Persona-Bericht nach tatsächlicher Veröffentlichung ergänzt.
+- Keine neue Dokumentstruktur und keine Erhöhung der globalen 200-Slide-/500-Ebenen-/500-Ordner-Grenzen. Text-/Absatz-/Zeilenformatierung bleibt erhalten.
+- Alte gemeinsame Ordner und gemischte Formate verlangen einen bewussten, verlustfreien Übergang. Kein automatisches Normalisieren beim Öffnen und keine Behauptung einer rückwirkend vereinheitlichten Altdatei.
+- Die sechs Personas sind eine strukturierte Expertenprüfung, keine durchgeführte Nutzerstudie. Details: [Persona-Bericht](PERSONA-REVIEW-2026-11-12.md).
+- Guthaben heute zu Beginn: 99 % im Fünf-Stunden-Fenster und 81 % in der Woche frei. Kontostand mehrfach geprüft; keine zusätzlichen Credits, Agenten oder zweites Fenster verwendet. Nach Implementierung keine unabhängigen Bonusfunktionen begonnen.
+
+### Nächste begrenzte Aufgaben
+
+1. Neue Reihenabläufe anhand tatsächlicher Rückmeldungen nachprüfen, bei Bedarf gezielt korrigieren; nicht die abgeschlossene Grundarbeit wiederholen.
+2. Nächster normaler IDML-Schritt: genau ein einfacher bearbeitbarer Textrahmen mit echtem InDesign-Test. Bestehende leere Datei nicht erneut beginnen, PSD behalten.
+3. Zeichen-/Farbwerkzeuge getrennt umsetzen: echte Formvorschau, Winkel-Farbfüllung, Pipette, anschliessend fünfteilige Farbhilfe. Keine Umsetzung allein aus der Planung ableiten.
+4. Studio-Bereinigung mit Abhängigkeits-/Grösseninventar und Regression planen, siehe unten. Alles für Bearbeitung und bestehende Dateien Nötige erhalten.
+5. Vorlagenentwürfe nach Gestaltungsgrundsätzen visuell vorlegen; nur ausdrücklich freigegebene Entwürfe mitliefern.
+
+## Historischer Ausgangsstand am 11. November
 
 Bereits veröffentlicht: 1–20 Slides pro Gruppe, mehrere Reihen, gemeinsames Artboard-Format/Schutzzonen, ganze Reihen duplizieren mit zusammenhängenden Ebenen und identischem Effektrauschen, Begrenzung von Inhalten zu anderen Reihen. Das ergibt noch keine vollständige Gleichheit mit dem bisherigen Designer. Die vorherige Kurzformulierung war dafür zu weitgehend.
 
 **Jetzt ergänzter begrenzter Teil von Punkt 1:** aktive Reihe als reine Bedieninformation; sie bleibt nach der Objektauswahl erhalten. Neue Elemente/Bildimporte und Strg/⌘A richten sich nach der aktiven Reihe. Klick auf eine leere Slide wechselt den Bearbeitungsbereich. Kopieren/Einfügen in eine andere Reihe überträgt die relative Position und setzt die Zielzuordnung neu, statt die Kopie um 30 px in der ursprünglichen Reihe einzufügen. Innerhalb derselben Reihe bleibt der bisherige 30-px-Versatz erhalten. Beim Übertragen einzelner Ebenen werden Ordnerzuordnungen gelöst und geerbte Sichtbarkeit/Sperren übernommen, damit keine globale Ordnerkopplung neu entsteht. Ganze Ordner werden damit noch nicht als unabhängige Zielordner kopiert. Explizite Auswahlen aus mehreren Reihen behalten beim Duplizieren ihre Zuordnungen; Einfügen einer solchen gemischten Auswahl in eine andere Reihe wird verständlich und ohne Verlaufseintrag abgewiesen.
 
-Die Ebenenliste und Ordneraktionen bleiben derzeit dokumentweit. Auch die übrigen fünf Punkte sind noch nicht vollständig umgesetzt. Nicht als sechs erledigte Aufgaben berichten.
+Zum damaligen Zwischenstand blieben Ebenenliste und Ordneraktionen dokumentweit. Auch die übrigen fünf Punkte sind noch nicht vollständig umgesetzt. Nicht als sechs erledigte Aufgaben berichten.
 
-## Verbindliche Restliste für Donnerstag, 12. November
+## Historische Restliste vor dem Lauf vom 12. November
 
 | Punkt | Ziel / notwendige Änderung | Stand |
 | --- | --- | --- |
@@ -70,7 +107,7 @@ Präzisierung vom 11. November: Die UI muss überall zum Modell „mehrere bishe
 - Speichern, Öffnen und Export: gemeinsame MKW-Datei und Reihen-/Slide-Auswahl verständlich vermitteln; echte Ausgabedimensionen und Dateinamen zeigen, damit Reihen nicht verwechselt oder Ausgaben überschrieben werden. Leere/ungültige Zustände sowie Fehler und Fortschritt berücksichtigen.
 - Konsistenz und Abnahme: vorhandene Material-3-Komponenten und klare Begriffe wiederverwenden, normale/erweiterte Bedienwege abstimmen. Desktop und iPad-Mini-Grösse mit Tastatur und Touch berücksichtigen. Die sechs Personas entlang der vollständigen Abläufe prüfen, nicht nur einzelne Panels.
 
-Der komplette UI-Umbau ist weiterhin Teil des priorisierten Restauftrags und wurde mit dem heutigen technischen Format-Fix noch nicht als erledigt abgenommen.
+Der damalige technische Format-Fix allein erfüllte diesen UI-Auftrag noch nicht. Der folgende Fortschrittsabschnitt vom 12. November dokumentiert den anschliessenden Umbau.
 
 
 ## Weiterer technischer Schritt: gruppenweit einheitliche Formate
@@ -86,7 +123,7 @@ Verbindliche Ergänzung des Nutzers: Regeln zentral im vorhandenen zuständigen 
 
 ## Weitere beauftragte Editor- und Farbwerkzeuge
 
-Diese Funktionen sind geplant, noch nicht implementiert. Exportauswahl direkt mit dem verbleibenden Reihen-/Export-Umbau verbinden; die anderen vier Werkzeuge nach der stabilen Reihenbasis in begrenzten, prüfbaren Schritten umsetzen. Die geltenden Guthabengrenzen und sechs-Persona-Prüfungen gelten weiterhin.
+Stand 12. November: Die Auswahl in der Exportvorschau ist implementiert und browsergeprüft. Die übrigen Funktionen bleiben geplant. Exportauswahl ist mit dem Reihen-/Export-Umbau verbunden; die anderen vier Werkzeuge nach der stabilen Reihenbasis in begrenzten, prüfbaren Schritten umsetzen. Die geltenden Guthabengrenzen und sechs-Persona-Prüfungen gelten weiterhin.
 
 | Funktion | Gewünschtes Verhalten / Abnahme |
 | --- | --- |
@@ -97,3 +134,9 @@ Diese Funktionen sind geplant, noch nicht implementiert. Exportauswahl direkt mi
 | Farbhilfe-Fenster mit fünf Farben | Fünf Farben aus Bildern der aktiven Reihe zusammenstellen, als fünf bearbeitbare Farbfelder zeigen und gezielt übernehmen. Zu einer ausgewählten Farbe mehrere passende Vorschläge unter Berücksichtigung des restlichen Dokuments anbieten. Keine ungefragte Umfärbung; sichtbare Ausschnitte, ähnliche Farben, Transparenz, fehlende und grosse Bilder beachten. Lokale Analyse ohne zusätzliche API-Kosten bevorzugen. |
 
 Neue Vorlagen weiterhin vorlegen und nur nach ausdrücklicher Nutzerfreigabe mitliefern. Keine dieser Wunschfunktionen allein durch diese Planung als erledigt darstellen.
+
+## Neuer Folgeauftrag: Studio-Dateien und Datenmenge aufräumen
+
+Nutzerauftrag vom 12. November: Anzahl und Grösse der Studio-Dateien reduzieren. Alles für Bearbeitung, Öffnen/Speichern bestehender MKW-Dateien, Vorlagen und Exporte Nötige behalten; tatsächlich unbenötigte Bestandteile entfernen. Vorher Abhängigkeiten erfassen und Grössen/Dateianzahl messen. Besonders veraltete oder doppelte Artefakte, ungenutzte Assets und vermeidbare Auslieferungsduplikate prüfen. Quellcode, notwendige Build-/Prüfgrundlagen sowie benötigte Bilder, Schriften, Logos und Bibliotheken nicht aufgrund einer einfachen Textsuche als ungenutzt einstufen. Auch dynamische Referenzen, Vorlagen und ältere Projektdateien berücksichtigen.
+
+Nur das Studio bearbeiten, keine projektfremden Ordner oder Nutzerdateien entfernen. Git als nachvollziehbare Rückfallebene nutzen. Keine Bearbeitungsfunktion opfern und PSD nicht vor der tatsächlichen InDesign-Abnahme entfernen. Erst nach gezielter Regression und Prüfung des ausgelieferten Builds veröffentlichen; vorher/nachher Dateianzahl, Speicher-/Auslieferungsgrösse und echte Grenzen berichten. Dies ist eine geplante Folgeaufgabe, keine bereits durchgeführte Bereinigung und kein zusätzlicher Bonus zum heutigen Reihenumbau.

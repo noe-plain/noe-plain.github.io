@@ -187,7 +187,7 @@
                       const a = c.artboards.find((a) => a.id === id),
                         index = c.artboards.indexOf(a),
                         ratio = Math.min(56 / a.w, 64 / a.h);
-                      return `<div class="pages-thumb" id="page-option-${id}" data-page="${id}" role="treeitem" aria-level="2" aria-posinset="${j + 1}" aria-setsize="${g.ids.length}" aria-selected="${selected.has(id)}" draggable="true"><span class="pages-paper" style="width:${Math.round(a.w * ratio)}px;height:${Math.round(a.h * ratio)}px;background:${a.bg}" aria-hidden="true"><canvas width="1" height="1"></canvas></span><span class="pages-thumb-title" title="${s.startNumber + index} · ${api.esc(a.name)}"><strong>${s.startNumber + index}</strong> · ${api.esc(a.name)}</span><span class="visually-hidden">${a.w} × ${a.h}</span></div>`;
+                      return `<div class="pages-thumb" id="page-option-${id}" data-page="${id}" role="treeitem" aria-level="2" aria-posinset="${j + 1}" aria-setsize="${g.ids.length}" aria-selected="${selected.has(id)}" draggable="true"><span class="pages-paper" style="width:${Math.round(a.w * ratio)}px;height:${Math.round(a.h * ratio)}px;background:${a.bg}" aria-hidden="true"><canvas width="1" height="1"></canvas></span><span class="pages-thumb-title" title="${api.esc(MKWCarouselPolicy.slideInfo(c, index).label)} · ${api.esc(a.name)}"><strong>${j + 1}</strong> · ${api.esc(MKWCarouselPolicy.slideInfo(c, index).title)}</span><span class="visually-hidden">${a.w} × ${a.h}</span></div>`;
                     })
                     .join("")}</div>`
             }</div>`;

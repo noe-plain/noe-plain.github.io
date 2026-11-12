@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');const {launch,artifact,waitForProjectReady}=require('./browser.cjs');
 (async()=>{const browser=await launch();try{
  const page=await browser.newPage({viewport:{width:1500,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.stack));await page.goto(process.env.STUDIO_URL);await page.locator('#startDesigner').click();await page.locator('#setupName').fill('Seiten und Artboards');await page.locator('#cn').fill('3');await page.locator('#createProject').click();await waitForProjectReady(page);
- await page.evaluate(()=>{carouselObject('gradient',{x:0,y:0,w:1080,h:1350,color:'#ff9933',endColor:'#dd2233',opacity:1});carouselSlideSelect(0);});await page.locator('#spreadEnable').click();await page.locator('.spread-modes label').first().click();
+ await page.evaluate(()=>{carouselObject('gradient',{x:0,y:0,w:1080,h:1350,color:'#ff9933',endColor:'#dd2233',opacity:1});carouselSlideSelect(0);});await page.locator('#spreadEnable').click();await page.locator('.spread-compat summary').first().click();await page.locator('.spread-modes label').first().click();
  await page.locator('#spreadPages[role=tree]').waitFor();assert.equal(await page.locator('.pages-artboard').count(),3);
  const vertical=await page.evaluate(()=>p.carousel.artboards.map(a=>[a.x,a.y]));assert.deepEqual(vertical.map(a=>a[0]),[0,0,0]);assert(vertical[1][1]>vertical[0][1]);
  await page.waitForFunction(()=>MKWPagePreviewCache.stats().entries>=2&&MKWPagePreviewCache.stats().pending===0);const cached=await page.evaluate(()=>MKWPagePreviewCache.stats().entries);

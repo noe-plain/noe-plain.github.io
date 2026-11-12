@@ -38,6 +38,32 @@ const MKWExportPanel = (() => {
     "Bilder auswählen, Einstellungen prüfen und herunterladen.";
   function sync() {
     const designer = !!p.carousel;
+    document.querySelector("#exportRowScopeLabel")?.remove();
+    if (p.carousel?.pageStructure) {
+      const label = document.createElement("label"),
+        row = carouselRow();
+      label.id = "exportRowScopeLabel";
+      label.innerHTML = `Exportauswahl<select id="exportRowScope"><option value="custom">Ausgewählte Slides</option><option value="row">Diese Reihe: ${esc(row?.info.name || "")}</option><option value="all">Alle Reihen</option></select>`;
+      label.querySelector("select").onchange = (e) => {
+        const value = e.target.value;
+        if (value === "custom") return;
+        const group = carouselRow();
+        exportSetSelection(
+          p.boards
+            .filter(
+              (b) =>
+                value === "all" ||
+                group.ids.includes(
+                  MKWCarouselPolicy.frame(p.carousel, b.carouselSlide).id,
+                ),
+            )
+            .map((b) => b.id),
+        );
+        e.target.value = value;
+      };
+      dialog.querySelector(".export-selection h3").after(label);
+    }
+
     dialog.querySelector(".export-selection h3").textContent = designer
       ? "Slides auswählen"
       : "Bilder auswählen";

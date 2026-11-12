@@ -653,3 +653,25 @@ html.studio-theme-changing #exportDialog .export-card {
     margin-top: 8px;
   }
 }
+
+#reviewSelection {
+  margin: 12px 24px;
+}
+.review-selection-list {
+  max-height: 24vh;
+  overflow: auto;
+  display: grid;
+  gap: 4px;
+}
+.review-selection-list label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 4px 12px;
+}
+#exportRowScopeLabel {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}

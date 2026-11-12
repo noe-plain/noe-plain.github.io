@@ -18,15 +18,19 @@ function carouselPresentInspector() {
           : o?.name ||
             MKWSpreadUI.selectedBoard()?.name ||
             (slide !== null
-              ? MKWCarouselPolicy.frame(p.carousel, slide)?.name ||
+              ? (p.carousel.pageStructure
+                  ? MKWCarouselPolicy.slideInfo(p.carousel, slide).title
+                  : MKWCarouselPolicy.frame(p.carousel, slide)?.name) ||
                 `Slide ${slide + 1}`
               : "Dein Design"),
     subtitle = o
       ? `${carouselToolNames[o.type] || "Element"} · ${carouselObjectLocked(o) ? "Gesperrt" : carouselUI.content ? "Bildinhalt bearbeiten" : "Element bearbeiten"}`
       : MKWCarouselPolicy.isFree(p.carousel)
         ? slide !== null
-          ? `${MKWCarouselPolicy.frame(p.carousel, slide).w} × ${MKWCarouselPolicy.frame(p.carousel, slide).h} px · einzeln anpassbar`
-          : `${p.carousel.n} freie Zeichenflächen`
+          ? `${MKWCarouselPolicy.frame(p.carousel, slide).w} × ${MKWCarouselPolicy.frame(p.carousel, slide).h} px · ${p.carousel.pageStructure ? "gemeinsames Slideformat" : "einzeln anpassbar"}`
+          : p.carousel.pageStructure
+            ? `${p.carousel.pageStructure.groups.length} Reihen · ${p.carousel.n} Slides`
+            : `${p.carousel.n} freie Zeichenflächen`
         : `${p.carousel.n} Slides · ${p.carousel.w} × ${p.carousel.h} px`;
   MKWInspectorUI.present({
     root: $("#carouselSidebar"),
@@ -442,7 +446,7 @@ function carouselLegacyLayerPanel() {
   const c = p.carousel;
   carouselKeepLogosOnTop(c);
   const ids = new Set(carouselSelected().map((o) => o.id));
-  $("#carouselLayers").innerHTML = [...c.objects]
+  $("#carouselLayers").innerHTML = [...carouselRowScope().view.objects]
     .reverse()
     .map(
       (o) =>
@@ -469,7 +473,8 @@ function carouselLegacyLayerPanel() {
         row.classList.remove("drop-target");
         const source = carouselUI.layerDrag,
           target = row.dataset.layer;
-        if (!source || source === target) return;
+        if (!source || source === target || !carouselCanEditRowFolders())
+          return;
         const index = c.objects.findIndex((o) => o.id === source);
         if (
           index < 0 ||

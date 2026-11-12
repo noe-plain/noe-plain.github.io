@@ -4,6 +4,10 @@
     typeof module !== "undefined"
       ? require("./carousel-policy.js")
       : root.MKWCarouselPolicy;
+  const rows =
+    typeof module !== "undefined"
+      ? require("./row-scope-model.js")
+      : root.MKWRowScope;
   const copy = (v) => JSON.parse(JSON.stringify(v));
   const maxPages = 200,
     maxSpreadPages = 20,
@@ -261,6 +265,185 @@
       );
     after.objects = result;
   }
+  function rowSlides(source, action, bounds, id) {
+    const base = source.artboards.find((a) => a.id === action.ids?.[0]),
+      group = source.pageStructure?.groups.find((g) => g.includes(base?.id));
+    if (!group || mixedGroups(source).some((g) => g === group))
+      fail("Wähle eine Reihe mit einheitlichem Slideformat.");
+    const scoped = rows.scope(source, base.id, bounds);
+    if (scoped.shared.length)
+      fail("Mache die geteilten Ordner zuerst für diese Reihe unabhängig.");
+    const c = copy(source),
+      groupIndex = source.pageStructure.groups.indexOf(group),
+      old = group.map((key) => source.artboards.find((a) => a.id === key)),
+      order = [...group],
+      created = [],
+      removed = new Set(),
+      selectedIndex = group.indexOf(base.id),
+      op = action.operation;
+    let insertion = action.index ?? selectedIndex + 1;
+    if (["insert", "duplicate"].includes(op)) {
+      if (
+        !Number.isInteger(insertion) ||
+        insertion < 0 ||
+        insertion > order.length
+      )
+        fail("Ungültige Slideposition.");
+      if (order.length >= 20 || c.n >= 200)
+        fail(
+          "Eine Reihe kann höchstens 20 Slides enthalten; ein Projekt höchstens 200.",
+        );
+      const page = { ...copy(base), id: id(), name: "Neue Slide" };
+      created.push(page);
+      order.splice(insertion, 0, page.id);
+    } else if (op === "move") {
+      const target = selectedIndex + action.delta;
+      if (
+        ![-1, 1].includes(action.delta) ||
+        target < 0 ||
+        target >= order.length
+      )
+        fail(
+          "Die Slide kann innerhalb dieser Reihe nicht weiter verschoben werden.",
+        );
+      [order[selectedIndex], order[target]] = [
+        order[target],
+        order[selectedIndex],
+      ];
+    } else if (op === "remove" || op === "resize") {
+      const count = op === "remove" ? order.length - 1 : action.count;
+      if (!Number.isInteger(count) || count < 1 || count > 20)
+        fail("Eine Reihe enthält 1–20 Slides.");
+      if (count > order.length) {
+        if (c.n + count - order.length > 200)
+          fail("Ein Projekt kann höchstens 200 Slides enthalten.");
+        while (order.length < count) {
+          const page = { ...copy(base), id: id(), name: "Neue Slide" };
+          created.push(page);
+          order.push(page.id);
+        }
+      } else if (count === order.length) return copy(source);
+      else if (op === "remove") {
+        removed.add(base.id);
+        order.splice(selectedIndex, 1);
+      } else for (const key of order.splice(count)) removed.add(key);
+    } else fail("Unbekannte Slideaktion.");
+    const left = Math.min(...old.map((a) => a.x)),
+      top = Math.min(...old.map((a) => a.y)),
+      byId = new Map([...c.artboards, ...created].map((a) => [a.id, a]));
+    let x = left;
+    for (const key of c.pageStructure.binding === "right"
+      ? [...order].reverse()
+      : order) {
+      const a = byId.get(key);
+      a.x = x;
+      a.y = top;
+      x += a.w;
+    }
+    c.pageStructure.groups[groupIndex] = order;
+    c.artboards = c.pageStructure.groups.flat().map((key) => byId.get(key));
+    c.n = c.artboards.length;
+    const after = order.map((key) => byId.get(key)),
+      rowObjects = new Set(scoped.view.objects.map((o) => o.id)),
+      contains = (a, b) =>
+        b.x >= a.x &&
+        b.y >= a.y &&
+        b.x + b.w <= a.x + a.w &&
+        b.y + b.h <= a.y + a.h;
+    const stableLogo = source.objects.some(
+      (o) =>
+        rowObjects.has(o.id) &&
+        o.type === "logo" &&
+        !removed.has(old.find((a) => contains(a, bounds(o)))?.id),
+    );
+    let relocatedLogo = false;
+    const kept = [];
+    for (const original of source.objects) {
+      if (!rowObjects.has(original.id)) {
+        kept.push(copy(original));
+        continue;
+      }
+      const b = bounds(original),
+        owner = old.find((a) =>
+          original.pageFragment ? a.id === original.pageId : contains(a, b),
+        );
+      if (owner && removed.has(owner.id) && original.type !== "logo") continue;
+      if (
+        owner &&
+        removed.has(owner.id) &&
+        original.type === "logo" &&
+        (stableLogo || relocatedLogo)
+      )
+        continue;
+      const o = copy(original),
+        nextOwner = owner && byId.get(owner.id);
+      if (owner && !removed.has(owner.id)) {
+        o.x += nextOwner.x - owner.x;
+        o.y += nextOwner.y - owner.y;
+      } else if (op !== "move") {
+        const anchor = policy.sourcePage(
+            { ...source, n: old.length, artboards: old },
+            b,
+          ),
+          next = anchor && !removed.has(anchor.id) && byId.get(anchor.id);
+        if (next) {
+          o.x += next.x - anchor.x;
+          o.y += next.y - anchor.y;
+        }
+      }
+      if (original.type === "logo" && owner && removed.has(owner.id)) {
+        relocatedLogo = true;
+        const a = after[0];
+        o.x = a.x + a.w - a.right - o.w;
+        o.y = a.y + a.top;
+      }
+      if (!o.pageFragment || removed.has(o.pageId)) {
+        const a = policy.sourcePage(
+          { ...c, n: after.length, artboards: after },
+          bounds(o),
+        );
+        o.pageId = a.id;
+        o.artboardScoped = true;
+        delete o.pageFragment;
+      }
+      kept.push(o);
+    }
+    if (op === "duplicate") {
+      const originals = source.objects.filter(
+          (o) =>
+            rowObjects.has(o.id) &&
+            (o.pageFragment ? o.pageId === base.id : contains(base, bounds(o))),
+        ),
+        target = created[0],
+        map = new Map(originals.map((o) => [o.id, id()]));
+      for (const o of originals)
+        kept.push({
+          ...copy(o),
+          id: map.get(o.id),
+          effectSeed: effectSeed(o),
+          x: o.x + target.x - base.x,
+          y: o.y + target.y - base.y,
+          pageId: target.id,
+          artboardScoped: true,
+          ...(map.has(o.imageSourceId)
+            ? { imageSourceId: map.get(o.imageSourceId) }
+            : {}),
+        });
+    }
+    c.objects = kept;
+    for (const folder of c.folders || [])
+      if (removed.has(folder.pageId)) folder.pageId = after[0].id;
+    if (
+      c.objects.length > 500 ||
+      c.objects.some((o) => Math.abs(o.x) > 100000 || Math.abs(o.y) > 100000) ||
+      !policy.validBoards(c)
+    )
+      fail(
+        "Die Slideänderung passt nicht in den Arbeitsbereich oder überschreitet 500 Ebenen. Es wurde nichts verändert.",
+      );
+    return c;
+  }
+
   function execute(
     source,
     action,
@@ -274,7 +457,12 @@
       const group = source.pageStructure?.groups.find((g) =>
         g.includes(action.ids?.[0]),
       );
-      if (!group || !policy.validFormat(action.format))
+      if (
+        !group ||
+        !policy.validFormat(action.format) ||
+        (action.format.bg !== undefined &&
+          !/^#[0-9a-f]{6}$/i.test(action.format.bg))
+      )
         fail("Wähle ein Artboard und ein gültiges Slideformat.");
       const before = copy(source),
         c = copy(source),
@@ -667,7 +855,11 @@
             other.y += dy;
           }
         const resize = policy.formatKeys.some((k) => a[k] !== changes[k]);
+        const backgroundChanged = a.bg !== changes.bg;
         Object.assign(a, changes);
+        if (backgroundChanged)
+          for (const other of c.artboards)
+            if (group.includes(other.id)) other.bg = changes.bg;
         if (resize) pack(c);
         carry(before, c, bounds, id, new Set(), false, true);
         if (!policy.validBoards(c))
@@ -856,6 +1048,9 @@
       }
     }
     const next = transition(source, action, bounds, id);
+    for (const folder of next.folders || [])
+      if (folder.pageId && !next.artboards.some((a) => a.id === folder.pageId))
+        delete folder.pageId;
     for (const group of mixedGroups(next)) {
       // Old mixed files remain readable without resizing or cropping any content.
       // They cannot create/extend a mixed row; explicit whole-row format repairs it.
@@ -896,6 +1091,49 @@
       used.add(value);
       return value;
     };
+    if (action.type === "row-slide")
+      return rowSlides(source, action, bounds, makeId);
+    if (action.type === "edit-row") {
+      let c = plan(
+        source,
+        {
+          type: "row-slide",
+          ids: action.ids,
+          operation: "resize",
+          count: action.count,
+        },
+        bounds,
+        makeId,
+      );
+      if (action.format)
+        c = plan(
+          c,
+          { type: "format-artboard", ids: action.ids, format: action.format },
+          bounds,
+          makeId,
+        );
+      const group = c.pageStructure.groups.find((g) =>
+          g.includes(action.ids[0]),
+        ),
+        members = group.map((id) => c.artboards.find((a) => a.id === id)),
+        first = members[0];
+      if (
+        action.x === Math.min(...members.map((a) => a.x)) &&
+        action.y === Math.min(...members.map((a) => a.y))
+      )
+        return c;
+      return plan(
+        c,
+        {
+          type: "position",
+          ids: action.ids,
+          x: first.x + action.x - Math.min(...members.map((a) => a.x)),
+          y: first.y + action.y - Math.min(...members.map((a) => a.y)),
+        },
+        bounds,
+        makeId,
+      );
+    }
     if (action.type === "duplicate-to") {
       const originals = new Set(pageIds(source));
       const c = plan(
@@ -1044,6 +1282,8 @@
             .filter((f) => folderMap.has(f.id))
             .map((f) => {
               const item = { ...copy(f), id: folderMap.get(f.id) };
+              if (item.pageId)
+                item.pageId = pageMap.get(item.pageId) || added[0];
               if (item.before) {
                 const [kind, key] = item.before.split(":"),
                   next =

@@ -1,6 +1,6 @@
 "use strict";
-function carouselPSDBounds(o) {
-  const c = p.carousel,
+function carouselPSDBounds(o, project = p) {
+  const c = project.carousel,
     pad = carouselVisualPadding(o);
   const geometry = carouselObjectBounds(o);
   const effectPad = carouselEffectValue(o, "blur") * 3;
@@ -68,7 +68,7 @@ function carouselPSDScopedCrop(o, c) {
   );
 }
 async function carouselPSDLayer(o, project = p) {
-  const bounds = carouselPSDBounds(o);
+  const bounds = carouselPSDBounds(o, project);
   if (!bounds.w || !bounds.h) return null;
   const canvas = makeCanvas(bounds.w, bounds.h),
     ctx = exportContext(canvas);
@@ -108,8 +108,8 @@ async function carouselPSDLayer(o, project = p) {
     ? result
     : carouselPSDVectorData(o, result);
 }
-async function buildCarouselPSD(progress = () => {}) {
-  const project = { ...p, carousel: clone(p.carousel) },
+async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
+  const project = { ...sourceProject, carousel: clone(sourceProject.carousel) },
     c = project.carousel,
     sources = MKWPSD.sources(),
     width = MKWCarouselPolicy.extent(c).w,
@@ -234,7 +234,7 @@ async function buildCarouselPSD(progress = () => {}) {
       project.images.some((im) => im.id === o.imageId)
     ) {
       const source = project.images.find((im) => im.id === o.imageId),
-        bounds = carouselPSDBounds(o);
+        bounds = carouselPSDBounds(o, project);
       if (!bounds.w || !bounds.h) continue;
       const canvas = makeCanvas(bounds.w, bounds.h),
         ctx = exportContext(canvas);
@@ -389,7 +389,7 @@ async function buildCarouselPSD(progress = () => {}) {
     groupId: 1,
     origin: "userGenerated",
     associatedLayerId: 0,
-    name: MKW.projectName(p.meta) + "_" + String(i + 1).padStart(2, "0"),
+    name: MKW.projectName(project.meta) + "_" + String(i + 1).padStart(2, "0"),
     type: "image",
     bounds: (() => {
       const a = MKWCarouselPolicy.frame(c, i);
@@ -431,7 +431,9 @@ async function buildCarouselPSD(progress = () => {}) {
           : children,
         linkedFiles: sources.files,
         imageResources: {
-          slices: [{ bounds, groupName: p.meta.title || "Designer", slices }],
+          slices: [
+            { bounds, groupName: project.meta.title || "Designer", slices },
+          ],
           versionInfo: {
             hasRealMergedData: true,
             writerName: "MKW Studio",

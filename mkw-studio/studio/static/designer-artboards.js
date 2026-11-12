@@ -533,6 +533,7 @@ const MKWArtboardUI = (() => {
           carouselArtboardFormatPanel(host, index);
           host.prepend(host.lastElementChild);
         }
+        if (!MKWSpreadUI.selectedBoard()) MKWSpreadUI.slidePanel(host, a.id);
         MKWSpreadUI.panel(slot);
       } else MKWSpreadUI.panel(host);
     } else {

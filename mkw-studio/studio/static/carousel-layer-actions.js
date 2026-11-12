@@ -3,6 +3,7 @@ function carouselSetItemName(item, name) {
   const c = p.carousel;
   if (!c || (!c.objects.includes(item) && !c.folders?.includes(item)))
     return false;
+  if (c.folders?.includes(item) && !carouselCanEditRowFolders()) return false;
   name = String(name).trim();
   if (!name || name === item.name) return false;
   name = name.slice(0, 160);
@@ -116,7 +117,7 @@ function carouselFolderActions(root) {
         c = p.carousel,
         folder = c.folders.find((f) => f.id === row.dataset.folder);
       if (!folder) return;
-      const blocks = carouselLayerBlocks(c),
+      const blocks = carouselLayerBlocks(carouselRowScope().view),
         index = blocks.findIndex((b) => b.folder?.id === folder.id),
         front = blocks[index - 1]?.key,
         back = blocks[index + 1]?.key,
@@ -241,7 +242,7 @@ function carouselLayerActions(root) {
   });
 }
 function carouselRequestDeleteFolder(folder) {
-  if (folder.locked) return;
+  if (folder.locked || !carouselCanEditRowFolders()) return;
   $("#carouselDeleteFolderDialog")?.remove();
   const project = p,
     members = p.carousel.objects.filter((o) => o.folderId === folder.id),

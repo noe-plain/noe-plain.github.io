@@ -1090,3 +1090,14 @@
 #carouselSlideControls {
   z-index: 6;
 }
+
+#carouselRowContext label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+#carouselRowContext select {
+  min-width: 0;
+  width: 100%;
+}

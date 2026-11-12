@@ -216,6 +216,23 @@
     );
     return all[index < 0 ? nearest(c, object) : index];
   }
+  function slideInfo(c, index) {
+    const page = frame(c, index),
+      group = c.pageStructure?.groups.find((g) => g.includes(page.id));
+    const row = group ? c.pageStructure.groups.indexOf(group) : 0,
+      local = group ? group.indexOf(page.id) : index;
+    return {
+      row,
+      local,
+      title: /^(Seite |Zeichenfläche )\d+$|^Neue Slide$/.test(page.name || "")
+        ? `Slide ${local + 1}`
+        : page.name || `Slide ${local + 1}`,
+      name: group ? c.pageStructure.artboardInfo[row].name : "Designer",
+      label: group
+        ? `${c.pageStructure.artboardInfo[row].name} · Slide ${local + 1}`
+        : `Slide ${local + 1}`,
+    };
+  }
   function safeRect(c, slide = 0) {
     const a = frame(c, slide);
     return {
@@ -300,6 +317,7 @@
     safeRect,
     contentFrame,
     sourcePage,
+    slideInfo,
     grid,
   });
   if (typeof module !== "undefined") module.exports = api;

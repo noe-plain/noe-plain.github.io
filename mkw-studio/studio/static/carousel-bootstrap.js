@@ -73,7 +73,7 @@ window.addEventListener(
       ev.preventDefault();
       carouselSelect(
         carouselRowObjects()
-          .filter((o) => !carouselObjectLocked(o) && o.visible !== false)
+          .filter((o) => !carouselObjectLocked(o) && carouselObjectVisible(o))
           .map((o) => o.id),
       );
       return;
