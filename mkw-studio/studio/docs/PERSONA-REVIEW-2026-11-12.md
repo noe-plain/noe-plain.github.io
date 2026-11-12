@@ -68,4 +68,6 @@ Heute kein neuer IDML-Meilenstein. Die leere Einseiten-Basis vom 11. November wu
 
 Weitere Werkzeuge bleiben geplant: echte Formvorschau beim Ziehen, Winkel mit Farbfüllung, Arbeitsbereich-Pipette, Fünf-Farben-Hilfe. Neue Vorlagen erst zeigen und nach ausdrücklicher Zustimmung mitliefern. Neu aufgenommen: Studio-Dateien und Auslieferungsgrösse mit vorherigem Abhängigkeitsinventar reduzieren, alles für Bearbeitung/Altdateien Nötige erhalten. Heute keine ungeprüfte Löschung. Ebenfalls neu geplant: einheitliche, platzsparende und anfängertaugliche Werkzeugleiste ohne Advanced Mode; alle Funktionen von Anfang an erreichbar, Computer als Hauptgerät und Tablets als sekundäre Nutzung. Der Mode-Schalter ist heute noch vorhanden.
 
+Zusätzlich mit niedriger Priorität geplant: Startseite so überarbeiten, dass das dort auswählbare Bild besser dargestellt wird; Anordnung und Vorschau an die gemeinsame Material-3-Designsprache anpassen. Noch nicht umgesetzt.
+
 Details und verbleibende Kompatibilitätsgrenzen: [Reihenplan](DESIGNER-ROWS-PLAN.md), [InDesign-Plan](INDESIGN-EXPORT-PLAN.md).

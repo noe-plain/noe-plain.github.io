@@ -179,3 +179,10 @@ Vor Umsetzung stabile Bild-/Slide-Zuordnung statt Vorschauindex klären und die 
 Die Bildnotizen sind konkret beauftragt und als nächster begrenzter Editor-Meilenstein priorisiert. Sie wurden in diesem Lauf zugunsten der Schlussprüfung und des verbindlich begrenzten Guthabens nicht als halb gespeicherte UI-Skizze implementiert. Kein fertiges Kommentarsystem behaupten. Die übrigen Folgeaufträge inklusive Toolbar ohne Advanced Mode, Bereinigung, Farbwerkzeugen, Vorlagenfreigabe und IDML-Text bleiben erhalten.
 
 Die Budgetbasis wurde am Ende des Laufs durch den Nutzer präzisiert. Das begrenzte Wochenkontingent und die Abschlussreserve bleiben verbindlich; bei späteren Läufen beide Werte neu prüfen und die heutigen Zahlen nicht übernehmen.
+
+
+## Niedrige Priorität: Startseite und Bildvorschau
+
+Nutzerauftrag vom 12. November: Das auf der Startseite auswählbare Bild besser darstellen und die UI dieses Bereichs dafür etwas umgestalten. Als spätere, bewusst niedrig priorisierte Aufgabe aufnehmen; nicht vor Bildnotizen, den bereits priorisierten Editoraufgaben oder notwendigen Fehlerkorrekturen beginnen.
+
+Beim Startseiten-Review den tatsächlichen Bildauswahl-/Vorschaubereich gezielt prüfen und anschliessend Anordnung, Grösse, Hierarchie und Zusammenspiel von Auswahl und Vorschau verbessern. Das ausgewählte Bild soll deutlicher erkennbar sein; Seitenverhältnis/Ausschnitt verständlich vermitteln und den Einstieg weiterhin einfach und platzsparend halten. Computer priorisieren, Material-3-Farbrollen/Typografie/Formen/Zustände und die sechs Personas verwenden. Vorhandene Start-/Öffnen-/Auswahlabläufe und Bilddaten nicht ungefragt verändern. Entwurf und tatsächliche Desktop-/Browserprüfung vor einer Veröffentlichung. Noch keine neue Startseiten-UI umgesetzt oder abgenommen.
