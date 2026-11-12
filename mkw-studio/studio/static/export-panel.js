@@ -77,5 +77,24 @@ const MKWExportPanel = (() => {
       ? "Slides auswählen, Format prüfen und herunterladen."
       : "Bilder auswählen, Format prüfen und herunterladen.";
   }
-  return { sync };
+  function selection(boards) {
+    const card = (b) =>
+      `<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}> <small>${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px</small>${p.carousel?.pageStructure ? `<strong>${esc(MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label)}</strong>` : ""}<span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`;
+    if (!p.carousel?.pageStructure) return boards.map(card).join("");
+    const rows = new Map();
+    for (const b of boards) {
+      const info = MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide);
+      if (!rows.has(info.row))
+        rows.set(info.row, { name: info.name, boards: [] });
+      rows.get(info.row).boards.push(b);
+    }
+    return [...rows]
+      .sort(([a], [b]) => a - b)
+      .map(
+        ([index, row]) =>
+          `<section class="export-row" aria-labelledby="exportRowTitle${index}"><h4 id="exportRowTitle${index}">Reihe ${index + 1} · ${esc(row.name)}</h4><div class="export-row-cards">${row.boards.map(card).join("")}</div></section>`,
+      )
+      .join("");
+  }
+  return { sync, selection };
 })();

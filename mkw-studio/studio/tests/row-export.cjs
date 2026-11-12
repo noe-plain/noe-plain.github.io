@@ -58,7 +58,40 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     await page.locator("[data-export-format=png]").click();
     await page.locator("#exportRowScope").selectOption("row");
     assert.equal(await page.locator("#exportNames input:checked").count(), 1);
+    assert.equal(await page.locator(".export-row").count(), 2);
+    assert.deepEqual(
+      await page
+        .locator(".export-row-cards")
+        .evaluateAll((rows) =>
+          rows.map((row) => row.querySelectorAll(".export-card").length),
+        ),
+      [2, 1],
+    );
+    await page
+      .locator(".export-preview img")
+      .last()
+      .waitFor({ state: "visible" });
+    assert(
+      await page.locator(".export-card > strong").evaluateAll((labels) =>
+        labels.every((label) => {
+          const r = label.getBoundingClientRect();
+          return r.width >= 100 && r.height <= 48;
+        }),
+      ),
+      "Short slide labels remain readable across the card width",
+    );
+    await page.screenshot({ path: artifact("row-export-rows-desktop.png") });
     await page.locator("#reviewExport").click();
+    const current = page.locator("#reviewCurrentExport");
+    const viewed = await current.getAttribute("data-board-id");
+    await current.uncheck();
+    assert.equal(await page.locator("#exportNames input:checked").count(), 0);
+    assert(await page.locator("#zip").isDisabled());
+    assert.equal(await current.getAttribute("data-board-id"), viewed);
+    await page.locator("#reviewImage").waitFor({ state: "visible" });
+    await current.check();
+    assert.equal(await page.locator("#exportNames input:checked").count(), 1);
+    assert.equal(await current.getAttribute("data-board-id"), viewed);
     await page.locator("#reviewSelection summary").click();
     assert.equal(await page.locator("[data-review-export-id]").count(), 3);
     await page.locator("[data-review-export-id]").first().check();
@@ -68,12 +101,12 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     assert.equal(await page.locator("#exportNames input:checked").count(), 0);
     assert(await page.locator("#zip").isDisabled());
     await page.locator("#reviewSelection summary").click();
-    await page.waitForFunction(
-      () =>
-        document.querySelector("#reviewPosition").textContent ===
-        "Keine Auswahl",
+    assert.equal(await current.isChecked(), false);
+    assert.match(
+      await page.locator("#reviewSelectedCount").textContent(),
+      /^0 von/,
     );
-    assert(await page.locator("#reviewImage").isHidden());
+    await page.locator("#reviewImage").waitFor({ state: "visible" });
     await page.locator("#reviewSelection summary").click();
     await page.locator("[data-review-export-id]").last().check();
     await page.locator("#reviewSelection summary").click();

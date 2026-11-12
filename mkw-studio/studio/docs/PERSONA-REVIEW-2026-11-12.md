@@ -15,7 +15,7 @@ Quellen sind direkt überarbeitet; gebündelte Dateien wurden aus dem Manifest e
 
 Die aktive Reihe wird platzsparend direkt über die klickbare Ebenenüberschrift gewählt: **„Ebenen – 1“, „Ebenen – 2“ …**. Der Klick öffnet das vorhandene Material-Menü mit Nummer und vollständigem Reihennamen. Die separate Auswahlzeile entfällt; nur ein notwendiger Altordner-Hinweis kann zusätzlich erscheinen. Tastatur (Pfeile/Enter/Escape), Fokus-Rückgabe, Auswahlmarkierung, unveränderte Revision/Undo und die Tablet-Ansicht wurden geprüft. Die normale Ebenen-Navigation bleibt erhalten.
 
-Die Exportvorschau nennt jetzt ebenfalls Reihe/Slide und den Auswahlstatus; eine leere Auswahl blendet das alte Bild aus und sperrt den Export. Alle Auswahlwege nutzen denselben Besitzer, veraltete asynchrone Ergebnisse dürfen auch den Transparenzhintergrund nicht mehr überschreiben. Leere Auswahl, Wiederwahl und bestehende PDF-/Export-Panels zusätzlich in Chrome und Firefox geprüft.
+Die Exportvorschau nennt jetzt ebenfalls Reihe/Slide und den Auswahlstatus; eine leere Exportauswahl sperrt den Export; nach der letzten Nutzerpräzisierung bleibt das betrachtete Bild zum Wiederwählen sichtbar. Alle Auswahlwege nutzen denselben Besitzer, veraltete asynchrone Ergebnisse dürfen auch den Transparenzhintergrund nicht mehr überschreiben. Leere Auswahl, Wiederwahl und bestehende PDF-/Export-Panels zusätzlich in Chrome und Firefox geprüft.
 
 ## Strukturierte Persona-Prüfung
 
@@ -51,6 +51,16 @@ Letztes visuelles Tuning: Ebenenüberschrift erbt wieder die passende Überschri
 Prüfung: echte Reihenwahl, leere/wiederhergestellte Exportauswahl, 160-Zeichen-Name, helle/dunkle Darstellung und axe sowie bestehende Material-Controls-/Material-Consistency-Fälle in Chrome und Firefox. Kein Anspruch einer externen Material-Zertifizierung oder einer vollumfänglichen Neugestaltung aller unveränderten Altflächen.
 
 Verbindlich für spätere Updates: Material Design 3 über Farben hinaus anwenden – klare visuelle Hierarchie, stimmige Form-/Abstands-/Typografiesprache und konsistentes funktionales Verhalten. Auch die geplante gemeinsame Werkzeugleiste muss diese Regel erfüllen.
+
+### Exportauswahl nach letzter Nutzerpräzisierung
+
+Ein direkter Haken „Dieses Bild exportieren“ gehört jetzt zum gerade angezeigten Vorschaubild. Abwählen lässt dieses Bild sichtbar, Wiederwahl bleibt unmittelbar möglich. Alle Bilder sind in der Vorschau durchblätterbar; der Einstieg folgt der ersten ausgewählten Ausgabe. Die Hauptübersicht ist nach allen Reihen gegliedert, mit jeweiligem Titel, Bildern und Trennlinie. Der vorhandene Auswahlzustand bleibt die einzige Grundlage für Zähler/Plan/Dateien. Nullauswahl, Wiederwahl desselben Bildes, zwei sichtbare Gruppen, echte ZIP/MKW-Datei sowie PDF und kleine Desktopfenster in beiden Browsern geprüft.
+
+Bildkommentare sind als nächster konkreter Editor-Meilenstein im Reihenplan festgehalten: Eingabe in der Vorschau, zurückhaltende Anzeige beim Bild auf der Arbeitsfläche, dauerhafte MKW-Speicherung und keine Veränderung der Exportpixel. Sie sind noch nicht implementiert. Abschluss innerhalb eines Guthabenfensters hat Vorrang vor einem unvollständig gespeicherten Notizfeld.
+
+### Tatsächliche Theme-/Kontrastprüfung
+
+Der Material-3-CI-Lauf `43187766345` bestand in Chrome, meldete in Firefox beim neuen Reihenmenü einen Kontrastbefund. Die neue Prüfung wechselte bislang nur das HTML-Themeattribut und umging damit die echte Farbschema-Aktualisierung. Sie verwendet nun den tatsächlichen Studio-Themewechsel und wartet endliche Menü-/Farbtransitionen ab; die vollständige axe-Kontrastprüfung bleibt erhalten und liefert bei Fehlern zusätzlich die betroffenen Knoten. Der nachfolgende Endlauf ist entscheidend, nicht der fehlerhafte Zwischenlauf.
 
 ## IDML und nächste Aufgaben
 

@@ -182,12 +182,20 @@ const assert = require("node:assert/strict"),
       carouselPanel();
     });
     for (const theme of ["light", "dark"]) {
-      await page.evaluate(
-        (value) => (document.documentElement.dataset.theme = value),
-        theme,
-      );
+      await page.evaluate((value) => studioSetTheme(value), theme);
       await picker.click();
       const menu = page.locator("#carouselRowMenu");
+      await menu.evaluate(async (el) => {
+        await Promise.allSettled(
+          el
+            .getAnimations({ subtree: true })
+            .filter(
+              (animation) =>
+                animation.effect.getTiming().iterations !== Infinity,
+            )
+            .map((animation) => animation.finished),
+        );
+      });
       assert(await menu.evaluate((el) => el.scrollWidth <= el.clientWidth + 1));
       assert(
         await menu.locator("[aria-current=true]").evaluate((el) => {
@@ -205,14 +213,20 @@ const assert = require("node:assert/strict"),
       );
       assert.deepEqual(
         await page.evaluate(async () =>
-          (await axe.run("#carouselRowMenu")).violations.map((v) => v.id),
+          (await axe.run("#carouselRowMenu")).violations.map((v) => ({
+            id: v.id,
+            nodes: v.nodes.map((n) => ({
+              html: n.html,
+              failure: n.failureSummary,
+            })),
+          })),
         ),
         [],
       );
       await page.keyboard.press("Escape");
     }
     await page.evaluate(() => {
-      document.documentElement.dataset.theme = "light";
+      studioSetTheme("light");
       p.carousel.pageStructure.artboardInfo[1].name = "Zweite Reihe";
       carouselPanel();
     });

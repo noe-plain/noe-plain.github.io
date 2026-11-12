@@ -199,12 +199,7 @@ async function openExport() {
   $("#png8").checked = exportOptions.png8;
   $("#pngColours").value = exportOptions.colours;
   $("#exportTransparent").checked = exportOptions.transparent;
-  $("#exportNames").innerHTML = orderedBoards()
-    .map(
-      (b) =>
-        `<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}> <small>${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px</small>${p.carousel?.pageStructure ? `<strong>${esc(MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label)}</strong>` : ""}<span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`,
-    )
-    .join("");
+  $("#exportNames").innerHTML = MKWExportPanel.selection(orderedBoards());
   $("#exportNames").onchange = (ev) => {
     if (ev.target.dataset.exportId) {
       exportSetSelection(
@@ -565,13 +560,15 @@ function exportSetSelection(ids) {
   if ($("#reviewDialog").open) showReview();
 }
 function reviewBoards() {
-  return orderedBoards().filter(
-    (b) => $("#reviewSelection")?.open || b.checked,
-  );
+  return orderedBoards();
 }
 async function showReview() {
   const generation = ++reviewGeneration,
     boards = reviewBoards();
+  const current = $("#reviewCurrentExport");
+  current.disabled = !boards.length;
+  $("#reviewSelectedCount").textContent =
+    `${p.boards.filter((b) => b.checked).length} von ${p.boards.length} ausgewählt`;
   $("#reviewPrevious").disabled = $("#reviewNext").disabled = boards.length < 2;
   if (!boards.length) {
     $("#reviewImage").hidden = true;
@@ -583,6 +580,8 @@ async function showReview() {
   reviewIndex = (reviewIndex + boards.length) % boards.length;
   const b = boards[reviewIndex],
     index = reviewIndex;
+  current.dataset.boardId = b.id;
+  current.checked = b.checked;
   document.querySelector(".review-stage").classList.remove("checkerboard");
   const label = p.carousel
     ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label
@@ -619,7 +618,25 @@ async function showReview() {
   }
 }
 $("#reviewExport").onclick = () => {
-  reviewIndex = 0;
+  reviewIndex = Math.max(
+    0,
+    orderedBoards().findIndex((b) => b.checked),
+  );
+  if (!$("#reviewCurrentExport")) {
+    const actions = document.createElement("div");
+    actions.className = "review-current-actions";
+    actions.innerHTML =
+      '<label><input id="reviewCurrentExport" type="checkbox"><span>Dieses Bild exportieren</span></label><span id="reviewSelectedCount" role="status"></span>';
+    document.querySelector(".review-stage").before(actions);
+    $("#reviewCurrentExport").onchange = (e) =>
+      exportSetSelection(
+        p.boards
+          .filter((b) =>
+            b.id === e.target.dataset.boardId ? e.target.checked : b.checked,
+          )
+          .map((b) => b.id),
+      );
+  }
   let selection = $("#reviewSelection");
   if (!selection) {
     selection = document.createElement("details");
@@ -648,7 +665,6 @@ $("#reviewExport").onclick = () => {
       );
   };
   selection.ontoggle = () => {
-    reviewIndex = 0;
     if ($("#reviewDialog").open) showReview();
   };
   $("#reviewDialog").showModal();

@@ -31,7 +31,7 @@ Nachweis: echtes ZIP heruntergeladen, unabhängig mit Python ZIP/CRC und sichere
 - Keine neue Dokumentstruktur und keine Erhöhung der globalen 200-Slide-/500-Ebenen-/500-Ordner-Grenzen. Text-/Absatz-/Zeilenformatierung bleibt erhalten.
 - Alte gemeinsame Ordner und gemischte Formate verlangen einen bewussten, verlustfreien Übergang. Kein automatisches Normalisieren beim Öffnen und keine Behauptung einer rückwirkend vereinheitlichten Altdatei.
 - Die sechs Personas sind eine strukturierte Expertenprüfung, keine durchgeführte Nutzerstudie. Details: [Persona-Bericht](PERSONA-REVIEW-2026-11-12.md).
-- Guthaben heute zu Beginn: 99 % im Fünf-Stunden-Fenster und 81 % in der Woche frei. Kontostand mehrfach geprüft; keine zusätzlichen Credits, Agenten oder zweites Fenster verwendet. Nach Implementierung keine unabhängigen Bonusfunktionen begonnen.
+- Guthaben zu Beginn und an Implementierungsschritten tatsächlich geprüft; keine zusätzlichen Credits, Agenten oder zweites Fenster verwendet. Nach Implementierung keine unabhängigen Bonusfunktionen begonnen.
 
 ### Präzisierung am Ende des Laufs: kompakte Reihenauswahl
 
@@ -166,3 +166,16 @@ Dies ist ausdrücklich ein geplanter Folgeauftrag. Der heutige Editor besitzt de
 Nutzerpräzisierung vom 12. November gilt für alle jetzt und künftig bearbeiteten oder neuen Bedienelemente: Material Design 3 und eine schöne, funktional konsistente Designsprache gemeinsam umsetzen. Vorhandene semantische Farb-/Oberflächenrollen, Form-/Abstands-/Typografietokens, Hierarchie, Menü-/Dialog-/Feld-/Button-Zuständigkeiten und Zustände wiederverwenden. Auswahl, Fokus, Hover/Druck, Deaktivierung, Fehler/Laden und Abbruch müssen verständlich und im ganzen Ablauf konsistent sein; nicht bloss runde Knöpfe als M3 ausgeben. Computer und Platzersparnis priorisieren, seltene Tablet-/Touch-Nutzung erhalten. Mit sechs Personas und tatsächlichen hellen/dunklen Browseransichten prüfen.
 
 Heute entsprechend nachgestimmt: kompakte Ebenenüberschrift mit korrekter Typografie/Zuständen, aktive Reihe im Menü markiert, lange Namen ohne Überlauf, einheitliche Auswahlflächen/-zustände in der Exportvorschau. Bestehende Material-/axe-Regressionen und die neuen Reihenprüfungen verwendet. Die künftige Toolbar ohne Advanced Mode bleibt geplant, diese Gestaltungsregel ist Teil ihrer Abnahme.
+
+
+## Export-Präzisierungen und Bildnotizen · 12. November
+
+**Umgesetzt:** In der Einzelvorschau kann „Dieses Bild exportieren“ direkt an-/abgehakt werden. Das gerade betrachtete Bild bleibt beim Abwählen sichtbar und kann sofort wieder gewählt werden; die Vorschau dient nun zum Durchsehen aller Bilder, beginnend bei der ersten ausgewählten Ausgabe. Anzahl, Gesamtauswahl und echte Exportdateien bleiben synchron; null ausgewählte Bilder sperren den Export. Die Exportübersicht zeigt Bilder ALLER Reihen, jeweils unter eigenem Reihentitel und mit einer visuellen Trennlinie zur folgenden Reihe. Das begrenzt nur die Ausgabewahl, nicht die Sichtbarkeit der übrigen Bilder. PNG-/ZIP-/PDF-Regressionsprüfungen in Chrome/Firefox verwenden.
+
+**Nächster beauftragter Schritt: interne Bildkommentare (noch offen).** Kommentar direkt in der Vorschau hinzufügen, bearbeiten und entfernen; auf der Arbeitsfläche beim zugehörigen Bild/Slide anzeigen, ohne Motiv, Auswahlgriffe oder Designprozess zu verdecken. Eine kleine zurückhaltende Notiz am Rand mit zugänglicher, ausklappbarer vollständiger Anzeige entwerfen, in der vorhandenen Material-3-Designsprache. Es handelt sich um eine interne Notiz, nicht um sichtbaren Motivtext.
+
+Vor Umsetzung stabile Bild-/Slide-Zuordnung statt Vorschauindex klären und die bestehenden Modell-/Speicherzuständigkeiten nutzen. Kommentar dauerhaft mit der gemeinsamen MKW-Datei und der vollständigen Projektbeigabe im ZIP speichern. Eingabegrenzen, reiner Text/HTML-Escaping, leere/lange Kommentare, Undo/Redo, Autosave, Öffnen/Speichern sowie Duplizieren/Ersetzen/Löschen berücksichtigen. Kommentare dürfen keine Exportpixel verändern und nicht versehentlich als Gestaltungsebene gerendert werden; PNG/PDF/PSD sowie MKW-Dateirundlauf tatsächlich prüfen. Zoom/Reihenwechsel/Tastatur und gelegentliches Tablet dürfen die Notiz nicht falsch zuordnen oder den Editor blockieren. Keine zweite Projektvariante oder kostenpflichtige Cloud-Kommentarfunktion.
+
+Die Bildnotizen sind konkret beauftragt und als nächster begrenzter Editor-Meilenstein priorisiert. Sie wurden in diesem Lauf zugunsten der Schlussprüfung und des verbindlich begrenzten Guthabens nicht als halb gespeicherte UI-Skizze implementiert. Kein fertiges Kommentarsystem behaupten. Die übrigen Folgeaufträge inklusive Toolbar ohne Advanced Mode, Bereinigung, Farbwerkzeugen, Vorlagenfreigabe und IDML-Text bleiben erhalten.
+
+Die Budgetbasis wurde am Ende des Laufs durch den Nutzer präzisiert. Das begrenzte Wochenkontingent und die Abschlussreserve bleiben verbindlich; bei späteren Läufen beide Werte neu prüfen und die heutigen Zahlen nicht übernehmen.

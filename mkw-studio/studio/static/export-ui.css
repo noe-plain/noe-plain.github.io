@@ -764,3 +764,65 @@ html.studio-theme-changing #exportDialog .export-card {
 .review-controls button {
   flex: none;
 }
+
+.export-row {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-block: 16px;
+}
+.export-row + .export-row {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+.export-row h4 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.export-row-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: 16px;
+}
+.review-current-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+.review-current-actions label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border-radius: var(--studio-shape-full);
+  background: var(--md-sys-color-surface-container-low);
+}
+.review-current-actions label:has(input:checked) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#reviewSelectedCount {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+@media (pointer: coarse) {
+  .review-current-actions label {
+    min-height: 48px;
+  }
+}
+
+#exportDialog .export-card > strong {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
