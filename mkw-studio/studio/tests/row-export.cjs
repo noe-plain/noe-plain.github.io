@@ -80,6 +80,21 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     await page.waitForFunction(() =>
       /Slide 1/.test(document.querySelector("#reviewPosition").textContent),
     );
+    await page.locator("#reviewImage").waitFor({ state: "visible" });
+    await page.locator("#reviewSelection summary").click();
+    for (const viewport of [
+      { width: 1500, height: 1100 },
+      { width: 1100, height: 700 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const controls = await page.locator(".review-controls").boundingBox();
+      assert(
+        controls.y >= 0 && controls.y + controls.height <= viewport.height - 8,
+        "Review navigation remains visible with the selection open",
+      );
+    }
+    await page.setViewportSize({ width: 1500, height: 1100 });
+    await page.screenshot({ path: artifact("row-export-review-desktop.png") });
     await page.locator("#closeReview").click();
     assert.equal(await page.locator("#exportNames input:checked").count(), 1);
     const before = await page.evaluate(() => ({

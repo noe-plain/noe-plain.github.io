@@ -175,6 +175,48 @@ const assert = require("node:assert/strict"),
       ),
       [],
     );
+    // Long names retain one compact menu row; selected state and focus use
+    // the existing semantic Material roles in both themes.
+    await page.evaluate(() => {
+      p.carousel.pageStructure.artboardInfo[1].name = "L".repeat(160);
+      carouselPanel();
+    });
+    for (const theme of ["light", "dark"]) {
+      await page.evaluate(
+        (value) => (document.documentElement.dataset.theme = value),
+        theme,
+      );
+      await picker.click();
+      const menu = page.locator("#carouselRowMenu");
+      assert(await menu.evaluate((el) => el.scrollWidth <= el.clientWidth + 1));
+      assert(
+        await menu.locator("[aria-current=true]").evaluate((el) => {
+          const selected = getComputedStyle(el),
+            root = getComputedStyle(document.documentElement);
+          const probe = document.createElement("span");
+          probe.style.color = root.getPropertyValue(
+            "--md-sys-color-on-secondary-container",
+          );
+          document.body.append(probe);
+          const same = selected.color === getComputedStyle(probe).color;
+          probe.remove();
+          return same;
+        }),
+      );
+      assert.deepEqual(
+        await page.evaluate(async () =>
+          (await axe.run("#carouselRowMenu")).violations.map((v) => v.id),
+        ),
+        [],
+      );
+      await page.keyboard.press("Escape");
+    }
+    await page.evaluate(() => {
+      document.documentElement.dataset.theme = "light";
+      p.carousel.pageStructure.artboardInfo[1].name = "Zweite Reihe";
+      carouselPanel();
+    });
+    await page.screenshot({ path: artifact("row-folders-desktop.png") });
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.screenshot({ path: artifact("row-folders-tablet.png") });
     assert.deepEqual(errors, []);

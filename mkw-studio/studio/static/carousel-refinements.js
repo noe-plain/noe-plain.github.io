@@ -194,7 +194,7 @@ function carouselOpenRowMenu(button) {
   menu.innerHTML = c.pageStructure.artboardInfo
     .map(
       (a, i) =>
-        `<button type="button" role="menuitem" data-row-target="${esc(a.id)}" ${row.info.id === a.id ? 'aria-current="true"' : ""}><span>Reihe ${i + 1} · ${esc(a.name)}</span>${row.info.id === a.id ? studioIcon("check") : ""}</button>`,
+        `<button type="button" role="menuitem" title="${esc(a.name)}" data-row-target="${esc(a.id)}" ${row.info.id === a.id ? 'aria-current="true"' : ""}><span>Reihe ${i + 1} · ${esc(a.name)}</span>${row.info.id === a.id ? studioIcon("check") : ""}</button>`,
     )
     .join("");
   menu.querySelectorAll("[data-row-target]").forEach((item) => {

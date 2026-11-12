@@ -655,7 +655,7 @@ html.studio-theme-changing #exportDialog .export-card {
 }
 
 #reviewSelection {
-  margin: 12px 24px;
+  margin: 12px 0 16px;
 }
 .review-selection-list {
   max-height: 24vh;
@@ -674,4 +674,93 @@ html.studio-theme-changing #exportDialog .export-card {
   display: grid;
   gap: 8px;
   margin-block: 12px;
+}
+
+#reviewSelection {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+}
+#reviewSelection summary {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: var(--studio-shape-medium);
+}
+.review-selection-list label {
+  border-radius: var(--studio-shape-small);
+}
+.review-selection-list label > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.review-selection-list label:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+.review-selection-list label:has(input:checked) {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+@media (pointer: coarse) {
+  .review-selection-list label {
+    min-height: 48px;
+  }
+}
+
+#reviewSelection summary:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+#reviewSelection summary:active,
+.review-selection-list label:active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 12%,
+    transparent
+  );
+}
+.review-selection-list label:has(input:checked):hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 8%,
+    var(--md-sys-color-secondary-container)
+  );
+}
+.review-selection-list label:has(input:checked):active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 12%,
+    var(--md-sys-color-secondary-container)
+  );
+}
+
+/* Selection expands inside the same bounded dialog, keeping navigation visible. */
+#reviewDialog[open] {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+#reviewDialog > :is(.dialog-heading, #reviewSelection, .review-controls) {
+  flex: none;
+}
+#reviewDialog .review-stage {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+#reviewPosition {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.review-controls button {
+  flex: none;
 }

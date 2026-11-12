@@ -39,7 +39,7 @@ Nutzerwunsch vom 12. November umgesetzt: Klick auf **„Ebenen – N“** in der
 
 ### Schlussprüfung: echte Gesten weiterhin nachweisen
 
-Erster vollständiger CI-Lauf `43182083492`: Chrome erfolgreich, Firefox mit einem Fehler am alten Drehgriff-Test. Dessen echte Pointer-Geste erhielt in `55cb80b` explizite Startbedingungen (Projekt/Fonts bereit, Griff stabil/erreichbar, Hit-Test auf tatsächlichen Griff); die Assertion auf geänderten Winkel bleibt unverändert. Lokal kompletter Firefox-Fall mit 50-Bilder-Rundlauf sowie gezielter Chrome-Fall bestanden. Endlauf an aktuellem Quellcommit prüfen; kein Erfolg allein aus lokalem Bestehen oder dem alten Chrome-Teil ableiten.
+Erster vollständiger CI-Lauf `43182083492`: Chrome erfolgreich, Firefox mit einem Fehler am alten Drehgriff-Test. Dessen echte Pointer-Geste erhielt in `55cb80b` explizite Startbedingungen (Projekt/Fonts bereit, Griff stabil/erreichbar, Hit-Test auf tatsächlichen Griff); die Assertion auf geänderten Winkel bleibt unverändert. Lokal kompletter Firefox-Fall mit 50-Bilder-Rundlauf sowie gezielter Chrome-Fall bestanden. Vollständiger Folgelauf 43184759168 für 55cb80b erfolgreich, beide Browser bestanden. Nach anschliessenden Material-3-Feinkorrekturen den neuesten Endlauf ebenfalls direkt prüfen.
 
 ### Nächste begrenzte Aufgaben
 
@@ -159,3 +159,10 @@ Vor der Umsetzung die tatsächlich modeabhängigen Werkzeuge, Eigenschaften, Men
 Bestehende Zeichen-/Text-/Bild-/Reihenfunktionen, Shortcuts sowie Auswahl-/Abbruch-/Undo-Abläufe erhalten. Alte Advanced-Mode-/MKW-Setup-Präferenzen verträglich einlesen, ohne Dokumentinhalte oder gespeicherte Gestaltung ungefragt zu ändern; ihre fachlich noch nötigen Daten nicht blind löschen. Erst Benutzerwege/Entwurf, dann zentral vorhandene Toolbar-/Inspector-Zuständigkeiten anpassen; keine zweite parallele Werkzeugleiste. Desktop bei üblichen und kleineren Fenstergrössen sowie Maus/Tastatur priorisieren; gelegentliche Nutzung ab iPad Mini und Touch nicht beschädigen. Sechs-Persona-Matrix, relevante Browser-/Datei-/Exportregressionen und Platzbedarf/Erreichbarkeit prüfen.
 
 Dies ist ausdrücklich ein geplanter Folgeauftrag. Der heutige Editor besitzt den Advanced Mode noch; noch keine Entfernung oder fertige neue Werkzeugleiste behaupten. Den Auftrag im nächsten passenden begrenzten Review nach tatsächlichem Guthaben umsetzen, nicht zusätzlich auf Kosten der laufenden Schlussprüfung.
+
+
+## Verbindliche UI-Regel: Material Design 3 und stimmige Designsprache
+
+Nutzerpräzisierung vom 12. November gilt für alle jetzt und künftig bearbeiteten oder neuen Bedienelemente: Material Design 3 und eine schöne, funktional konsistente Designsprache gemeinsam umsetzen. Vorhandene semantische Farb-/Oberflächenrollen, Form-/Abstands-/Typografietokens, Hierarchie, Menü-/Dialog-/Feld-/Button-Zuständigkeiten und Zustände wiederverwenden. Auswahl, Fokus, Hover/Druck, Deaktivierung, Fehler/Laden und Abbruch müssen verständlich und im ganzen Ablauf konsistent sein; nicht bloss runde Knöpfe als M3 ausgeben. Computer und Platzersparnis priorisieren, seltene Tablet-/Touch-Nutzung erhalten. Mit sechs Personas und tatsächlichen hellen/dunklen Browseransichten prüfen.
+
+Heute entsprechend nachgestimmt: kompakte Ebenenüberschrift mit korrekter Typografie/Zuständen, aktive Reihe im Menü markiert, lange Namen ohne Überlauf, einheitliche Auswahlflächen/-zustände in der Exportvorschau. Bestehende Material-/axe-Regressionen und die neuen Reihenprüfungen verwendet. Die künftige Toolbar ohne Advanced Mode bleibt geplant, diese Gestaltungsregel ist Teil ihrer Abnahme.
