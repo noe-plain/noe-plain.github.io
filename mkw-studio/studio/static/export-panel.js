@@ -37,9 +37,9 @@ const MKWExportPanel = (() => {
   dialog.querySelector(".dialog-heading p").textContent =
     "Bilder auswählen, Einstellungen prüfen und herunterladen.";
   function sync() {
-    const designer = !!p.carousel;
+    const designer = !!p.carousel && !p.campaign;
     document.querySelector("#exportRowScopeLabel")?.remove();
-    if (p.carousel?.pageStructure) {
+    if (p.carousel?.pageStructure && !p.campaign) {
       const label = document.createElement("label"),
         row = carouselRow();
       label.id = "exportRowScopeLabel";
@@ -79,7 +79,17 @@ const MKWExportPanel = (() => {
   }
   function selection(boards) {
     const card = (b) =>
-      `<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}> <small>${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px</small>${p.carousel?.pageStructure ? `<strong>${esc(MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label)}</strong>` : ""}<span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`;
+      `<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}> <small>${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px</small>${p.carousel?.pageStructure && !p.campaign ? `<strong>${esc(MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label)}</strong>` : ""}<span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`;
+    if (p.campaign)
+      return p.campaign.rows
+        .map(
+          (row, i) =>
+            `<section class="export-row"><h4>Bild ${i + 1} · ${esc(p.images.find((im) => im.id === row.imageId)?.name)}</h4><div class="export-row-cards">${boards
+              .filter((b) => row.pages.includes(b.campaignPage))
+              .map(card)
+              .join("")}</div></section>`,
+        )
+        .join("");
     if (!p.carousel?.pageStructure) return boards.map(card).join("");
     const rows = new Map();
     for (const b of boards) {

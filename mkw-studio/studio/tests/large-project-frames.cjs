@@ -167,8 +167,8 @@ const { launch, artifact } = require("./browser.cjs");
       carouselTool("select");
     });
     assert.equal(
-      await carousel.evaluate(() => studioPreferences.advanced),
-      false,
+      await carousel.locator("[data-tool=path]").count(),
+      1,
     );
     assert.equal(await carousel.locator(".carousel-rotate-handle").count(), 1);
     // Unlike raw mouse coordinates, hover waits for stable geometry and a
@@ -247,7 +247,7 @@ const { launch, artifact } = require("./browser.cjs");
     // Both pen and curve modes keep anchors/handles after real undo/redo shortcuts.
     await carousel.locator("#settings").click();
     await carousel.locator("#settings-tab-workflow").click();
-    await carousel.locator("#advancedMode").check();
+
     await carousel.locator("#closeSettings").click();
     await carousel.evaluate(() => {
       p.carousel.objects = [];

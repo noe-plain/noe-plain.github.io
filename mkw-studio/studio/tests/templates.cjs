@@ -21,12 +21,12 @@ const { launch, artifact } = require("./browser.cjs");
       "No template downloads on startup",
     );
     await page.locator("#startNew").click();
-    assert.equal(await page.locator("[data-project-mode]").count(), 2);
+    assert.equal(await page.locator("[data-project-mode]").count(), 3);
     assert.deepEqual(
       await page
         .locator("[data-project-mode] svg")
         .evaluateAll((nodes) => nodes.map((el) => el.dataset.googleIcon)),
-      ["image", "shapes"],
+      ["image", "image", "shapes"],
     );
     await page.locator('[data-project-mode="carousel"]').click();
     await page.locator("#setupName").fill("Designer-Vorlage");

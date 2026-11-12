@@ -49,7 +49,7 @@ function carouselCurvatureOverlay() {
         (o) => o.type === "path" && carouselObjectVisible(o),
       )
     : [];
-  button.hidden = !carouselActive() || !studioPreferences.advanced;
+  button.hidden = !carouselActive();
   button.setAttribute("aria-pressed", String(!!studioPreferences.curvature));
   let svg = $("#carouselCurvatureOverlay");
   if (button.hidden || !studioPreferences.curvature || !paths.length) {

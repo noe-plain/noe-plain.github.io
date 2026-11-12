@@ -218,3 +218,10 @@ Nächster Schritt: Zuordnung im tatsächlichen Vorschauablauf einschliesslich bi
 | UI-Expertin | Keine ungeprüfte zusätzliche Bedienfläche ausgeliefert. | Material-3-Entwurf und visuelle Abnahme. |
 | QA-Entwicklerin | Drei echte Modell-/Dateischreiber-Verträge, 186 Tests bestanden. | Vollständige Browser-/Datei-/Pixelabnahme. |
 | Fehlersucher | Sonderzeichen bleiben reine Metadaten, Quellzustand unverändert. | Längenbegrenzung, Escaping der Anzeige und Abbruchfälle. |
+
+
+## Aktuelle Fortsetzung: Kampagnen-Vorschau und einheitliche Werkzeuge
+
+Der inzwischen zusätzlich beauftragte FD-Kampagnen-Vorschauablauf wurde vor den übrigen geplanten Erweiterungen umgesetzt. Der alte FD-Modus bleibt als Backup; eine bewusste Konvertierung erstellt eine separate Vorschau-Kopie. Der Advanced-Schalter entfällt, alle Designer-Werkzeuge sind grundsätzlich verfügbar. Fläche/Kontur behalten die kompakten überlappenden Farbfelder; Tausch/Ein-Aus rechts daneben. Exportvorschau ohne „Auswahl anpassen“, mit festen Vor-/Zurückpositionen. Verknüpfung nur gleicher Formate, Abweichungen je Eigenschaft, Familienfarben und frei positionierbarer Copyright-Text sind dokumentiert und geprüft.
+
+Aktueller Umsetzungs-/Persona- und Prüfnachweis: [FD-Kampagnen-Vorschau](FD-CAMPAIGN-PREVIEW-2026-11-12.md). Dieser Abschnitt ersetzt die älteren „Toolbar ohne Advanced Mode noch offen“-Einträge; diese Arbeit nicht erneut beginnen. Bildnotizen bleiben nach dem geprüften Speichervertrag noch als sichtbarer Ablauf offen. IDML-Textrahmen, SVG, weitere Farbwerkzeuge und die übrigen ausdrücklich vorgemerkten Schritte sind nicht automatisch mitimplementiert. PDF-Editor bleibt pausiert.

@@ -123,10 +123,12 @@ function studioFitCommandbars() {
       }
     });
     bar.classList.remove("studio-icons-only");
-    const group = bar.querySelector(".studio-tool-group");
+    const group = bar.querySelector(".studio-tool-group"),
+      surface = bar.querySelector(".studio-tool-surface");
     bar.classList.toggle(
       "studio-icons-only",
       group.scrollWidth > group.clientWidth + 1 ||
+        (surface && surface.scrollWidth > surface.clientWidth + 1) ||
         bar.scrollWidth > bar.clientWidth + 1,
     );
   }

@@ -1,7 +1,7 @@
 "use strict";
 // Parametric primitives become ordinary paths when their points are edited.
 function carouselCapturePointEditing() {
-  if (!carouselActive() || !studioPreferences.advanced) return null;
+  if (!carouselActive()) return null;
   const items = carouselSelected(),
     object = items[0];
   if (
@@ -34,12 +34,7 @@ function carouselRestorePointEditing(state) {
   carouselPanel();
 }
 function carouselStartPointEditing(o) {
-  if (
-    !studioPreferences.advanced ||
-    !carouselIsVector(o) ||
-    carouselObjectLocked(o)
-  )
-    return;
+  if (!carouselIsVector(o) || carouselObjectLocked(o)) return;
   if (o.type === "shape") {
     const converted = carouselPaperObject(carouselPaperItem(o), o, o.id);
     if (!converted) return;

@@ -240,7 +240,9 @@ const MKWTypography = (() => {
       ? copyright
         ? "Schwarz / Weiss"
         : "Familienpalette"
-      : colour || "Gemischt";
+      : common(values("family")) === true
+        ? "Familienkonzert"
+        : colour || "Gemischt";
     colourButton.setAttribute(
       "aria-label",
       "Textfarbe wählen · " +
@@ -561,10 +563,14 @@ const MKWTypography = (() => {
         colour: common(values("color")) || o.color,
         label: "Textfarbe",
         onBegin: remember,
+        onFamily: owner.copyright
+          ? null
+          : () => character({ family: true }, true, scopes),
         isCurrent: () => current === owner && host.isConnected,
         onChange: (value) =>
           character(
             {
+              family: false,
               color:
                 owner.family && owner.copyright
                   ? MKWFamily.copyrightColor(value)
@@ -594,6 +600,7 @@ const MKWTypography = (() => {
       o,
       targets,
       locked: targets.some((target) => carouselObjectLocked(target)),
+      copyright: targets.some((target) => target.campaignRole === "copyright"),
       commit: () => {
         changed(false);
         targets.forEach(carouselUpdateWarning);
@@ -923,7 +930,19 @@ const MKWTypography = (() => {
       postInline(b, key, el, true);
     });
   }
+  function familyText(target) {
+    if (
+      !current ||
+      current.post ||
+      !current.host?.isConnected ||
+      !current.targets.includes(target)
+    )
+      return false;
+    if (!current.copyright) character({ family: true });
+    return true;
+  }
   return {
+    familyText,
     panel,
     bind,
     carousel,

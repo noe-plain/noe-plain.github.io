@@ -43,7 +43,7 @@ const MKWSpreadUI = (() => {
     message = "Seitenstruktur aktualisiert.",
     focus = true,
   ) {
-    if (busy) return false;
+    if (busy || p.campaign) return false;
     try {
       carouselEndText();
       const previous = p.carousel,
@@ -184,7 +184,7 @@ const MKWSpreadUI = (() => {
     advanced.className = "spread-compat";
     summary.textContent = "Erweiterte Seitenverwaltung";
     advanced.append(summary);
-    advanced.open = advancedOpen || !!studioPreferences.advanced;
+    advanced.open = advancedOpen;
     advanced.ontoggle = () => {
       if (advanced.isConnected) advancedOpen = advanced.open;
     };

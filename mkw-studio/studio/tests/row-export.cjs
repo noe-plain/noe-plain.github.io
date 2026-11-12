@@ -92,29 +92,18 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     await current.check();
     assert.equal(await page.locator("#exportNames input:checked").count(), 1);
     assert.equal(await current.getAttribute("data-board-id"), viewed);
-    await page.locator("#reviewSelection summary").click();
-    assert.equal(await page.locator("[data-review-export-id]").count(), 3);
-    await page.locator("[data-review-export-id]").first().check();
-    assert.equal(await page.locator("#exportNames input:checked").count(), 2);
-    await page.locator("[data-review-export-id]").first().uncheck();
-    await page.locator("[data-review-export-id]").last().uncheck();
-    assert.equal(await page.locator("#exportNames input:checked").count(), 0);
-    assert(await page.locator("#zip").isDisabled());
-    await page.locator("#reviewSelection summary").click();
-    assert.equal(await current.isChecked(), false);
-    assert.match(
-      await page.locator("#reviewSelectedCount").textContent(),
-      /^0 von/,
-    );
-    await page.locator("#reviewImage").waitFor({ state: "visible" });
-    await page.locator("#reviewSelection summary").click();
-    await page.locator("[data-review-export-id]").last().check();
-    await page.locator("#reviewSelection summary").click();
-    await page.waitForFunction(() =>
-      /Slide 1/.test(document.querySelector("#reviewPosition").textContent),
-    );
-    await page.locator("#reviewImage").waitFor({ state: "visible" });
-    await page.locator("#reviewSelection summary").click();
+    assert.equal(await page.locator('#reviewSelection').count(),0);
+    const fixed=await page.locator('#reviewNext').boundingBox();
+    await page.locator('#reviewNext').click();
+    await page.locator('#reviewImage').waitFor({state:'visible'});
+    const after=await page.locator('#reviewNext').boundingBox();
+    assert(Math.abs(fixed.x-after.x)<.5&&Math.abs(fixed.y-after.y)<.5,'Navigation stays fixed while label changes');
+    await current.check();
+    assert.equal(await page.locator('#exportNames input:checked').count(),2);
+    await current.uncheck();
+    await page.locator('#reviewPrevious').click();
+    await page.locator('#reviewImage').waitFor({state:'visible'});
+    assert(await current.isChecked());
     for (const viewport of [
       { width: 1500, height: 1100 },
       { width: 1100, height: 700 },
@@ -123,7 +112,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       const controls = await page.locator(".review-controls").boundingBox();
       assert(
         controls.y >= 0 && controls.y + controls.height <= viewport.height - 8,
-        "Review navigation remains visible with the selection open",
+        "Review navigation remains visible without a selection dropdown",
       );
     }
     await page.setViewportSize({ width: 1500, height: 1100 });

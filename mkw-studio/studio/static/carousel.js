@@ -141,10 +141,11 @@ function carouselWarning(o) {
       : "Text überschreitet eine Slide-Grenze.";
   const safe = MKWCarouselPolicy.safeRect(c, index);
   if (
-    bounds.x < safe.x ||
-    bounds.x + bounds.w > safe.x + safe.w ||
-    bounds.y < safe.y ||
-    bounds.y + bounds.h > safe.y + safe.h
+    o.campaignRole !== "copyright" &&
+    (bounds.x < safe.x ||
+      bounds.x + bounds.w > safe.x + safe.w ||
+      bounds.y < safe.y ||
+      bounds.y + bounds.h > safe.y + safe.h)
   )
     return "Text liegt ausserhalb der empfohlenen Safezone.";
   if (carouselTextHeight(o) > o.h + 1)
@@ -171,6 +172,8 @@ function carouselGradientPoints(o) {
 }
 
 function validateCarousel(q) {
+  if (!MKWCampaignModel.valid(q))
+    throw Error("Ungültige Kampagnen-Verknüpfung.");
   const c = q.carousel;
   if (!c) return;
   if (
@@ -700,6 +703,14 @@ function carouselObject(type, rect = {}) {
     return null;
   }
   if (!carouselCanAddObjects(1)) return null;
+  if (
+    p.campaign &&
+    !MKWCampaignUI.room(
+      type,
+      MKWCarouselPolicy.sourcePage(p.carousel, rect) || carouselRow()?.page,
+    )
+  )
+    return null;
   checkpoint();
   const o = carouselDefault(type, rect);
   carouselAssignArtboard(o);
@@ -711,7 +722,22 @@ function carouselObject(type, rect = {}) {
   }
   if (type === "angle" && rect.x === undefined && rect.y === undefined)
     carouselInitialAngle(o);
-  p.carousel.objects.push(o);
+  if (
+    p.campaign &&
+    type === "gradient" &&
+    !p.carousel.objects.some(
+      (item) => item.type === "gradient" && item.pageId === o.pageId,
+    )
+  ) {
+    const firstText = p.carousel.objects.findIndex(
+      (item) => item.pageId === o.pageId && item.type === "text",
+    );
+    p.carousel.objects.splice(
+      firstText < 0 ? p.carousel.objects.length : firstText,
+      0,
+      o,
+    );
+  } else p.carousel.objects.push(o);
   carouselUI.ids = new Set([o.id]);
   carouselSelection = o.id;
   changed();

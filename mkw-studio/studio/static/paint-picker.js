@@ -86,9 +86,7 @@ function studioSyncPaintControls() {
     studioClosePicker(false);
   }
   let group = $("#advancedColours");
-  if (!studioPreferences.advanced) {
-    group?.remove();
-  } else {
+  {
     if (!group) {
       group = document.createElement("div");
       group.id = "advancedColours";
@@ -133,6 +131,29 @@ function studioSyncPaintControls() {
       button.classList.toggle("is-disabled", button.disabled);
     }
     const pickerButton = $("#toolPaintPicker");
+    if (p.campaign) {
+      pickerButton.setAttribute(
+        "aria-description",
+        "Pfeil links: Fläche. Pfeil rechts: Kontur. Eingabetaste öffnet die Farbwahl.",
+      );
+      pickerButton.onkeydown = (e) => {
+        if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const channel = e.key === "ArrowRight" ? "stroke" : "fill";
+        if (
+          !$("#" + (channel === "fill" ? "toolFillColour" : "toolStrokeColour"))
+            .disabled
+        ) {
+          studioPaintFront = channel;
+          studioSyncPaintControls();
+          pickerButton.setAttribute(
+            "aria-label",
+            (channel === "fill" ? "Fläche" : "Kontur") + " bearbeiten",
+          );
+        }
+      };
+    }
     pickerButton.disabled =
       $("#toolFillColour").disabled && $("#toolStrokeColour").disabled;
     pickerButton.setAttribute(
@@ -252,6 +273,7 @@ function studioOpenColourPicker({
   label = "Farbe",
   onChange,
   onBegin,
+  onFamily = null,
   isCurrent = () => true,
   position = null,
 }) {
@@ -274,7 +296,7 @@ function studioOpenColourPicker({
     ),
     rect: anchor.getBoundingClientRect(),
     editing: false,
-    adapter: { onChange, onBegin, isCurrent, label },
+    adapter: { onChange, onBegin, onFamily, isCurrent, label },
     position,
   };
   studioPicker.hsv = studioRGBToHSV(colour);
@@ -404,6 +426,32 @@ function studioCreatePicker() {
  <span id="paintSVHelp" class="visually-hidden">Links und rechts ändern die Sättigung, oben und unten die Helligkeit.</span><div class="picker-colour-values"><span id="paintPreview" class="paint-chip"></span><label>HEX<input id="paintHex" type="text" maxlength="7" pattern="#?[0-9a-fA-F]{6}" title="Bitte sechs Farbzeichen eingeben, zum Beispiel #3B7A71." spellcheck="false" aria-label="HEX-Farbwert"></label><label>Transparenz<span class="picker-unit"><input id="paintAlpha" type="number" min="0" max="100" aria-label="Transparenz"><span>%</span></span></label></div></div>
  <div id="paintGradientPanel"><div class="picker-gradient-kind" role="group" aria-label="Verlaufsform"><button data-gradient-kind="linear">Linear</button><button data-gradient-kind="radial">Radial</button><label>Winkel<span class="picker-unit"><input id="paintAngle" type="number" min="-360" max="360" aria-label="Verlaufswinkel"><span>°</span></span></label></div><div id="paintGradientTrack" role="group" aria-label="Verlaufsfarbwerte"><div id="paintGradientBar"></div><div id="paintGradientHandles"></div></div><div class="picker-stop-options"><label>Position<span class="picker-unit"><input id="paintStopPosition" type="number" min="0" max="100" step=".1" aria-label="Position des Farbwertes"><span>%</span></span></label><label>Mitte<span class="picker-unit"><input id="paintMidPosition" type="number" min="5" max="95" step="1" aria-label="Verlaufsmitte"><span>%</span></span></label><button id="paintDeleteStop" class="icon-button" title="Farbwert entfernen" aria-label="Farbwert entfernen">${studioIcon("trash")}</button></div></div>
  <div id="paintImagePanel"><div id="paintImagePreview"></div><button id="paintPlaceImage" class="primary">Bild auswählen / ersetzen</button></div><p id="paintMessage" role="status"></p>`;
+  const familyButton = document.createElement("button");
+  familyButton.id = "paintFamilyText";
+  familyButton.type = "button";
+  familyButton.innerHTML =
+    "<span>Familienkonzert</span><small>Bunte Buchstaben mit Kontur</small>";
+  el.append(familyButton);
+  familyButton.onclick = () => {
+    const state = studioPicker;
+    if (!state) return;
+    if (state.adapter) {
+      if (!state.adapter.onFamily || !state.adapter.isCurrent()) return;
+      studioPickerBegin();
+      state.adapter.onFamily();
+    } else if (
+      state.object.type === "text" &&
+      state.object.campaignRole !== "copyright"
+    ) {
+      if (!MKWTypography.familyText(state.object)) {
+        checkpoint();
+        MKWText.changeCharacters(state.object, null, { family: true });
+        changed(false);
+        carouselPanel();
+      }
+    }
+    studioClosePicker();
+  };
   document.body.append(el);
   el.addEventListener("mkw-field-feedback", studioPositionPicker);
   $("#paintClose").onclick = () => studioClosePicker();
@@ -722,6 +770,9 @@ function studioRenderPicker(refreshHandles = true) {
   $("#paintPickerTitle").textContent =
     state.adapter?.label || (state.channel === "stroke" ? "Kontur" : "Fläche");
   $("#studioPaintPicker").classList.toggle("is-opaque-colour", !!state.adapter);
+  $("#paintFamilyText").hidden = state.adapter
+    ? !state.adapter.onFamily
+    : state.object.type !== "text" || state.object.campaignRole === "copyright";
   $("#paintMode").disabled = !!state.adapter;
   $("#paintMode").value = gradient ? "gradient" : value.kind;
   $("#paintMode").querySelector("[value=gradient]").disabled = $(

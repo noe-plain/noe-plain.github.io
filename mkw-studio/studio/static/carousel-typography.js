@@ -20,11 +20,35 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   const runs = [],
     previousSpacing = ctx.letterSpacing;
   let x = 0;
-  for (const style of MKWText.segments(
+  const styles = MKWText.segments(
     { ...o, text: o.text || raw },
     start,
     start + raw.length,
-  )) {
+  ).flatMap((style) => {
+    if (
+      !(style.family ?? o.family) ||
+      o.key === "copyright" ||
+      o.campaignRole === "copyright"
+    )
+      return [{ ...style, family: false }];
+    let at = style.start;
+    const offset = MKWFamily.count((o.text || raw).slice(0, at));
+    return MKWFamily.runs(
+      (o.text || raw).slice(style.start, style.end),
+      offset,
+    ).map((g) => {
+      const run = {
+        ...style,
+        start: at,
+        end: at + g.text.length,
+        color: g.color,
+        family: true,
+      };
+      at = run.end;
+      return run;
+    });
+  });
+  for (const style of styles) {
     const run = {
         ...style,
         raw: raw.slice(style.start - start, style.end - start),
@@ -62,7 +86,7 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   if (previousSpacing !== undefined) ctx.letterSpacing = previousSpacing;
   return { runs, width: x };
 }
-function carouselPaintTextRun(ctx, run, x, y, color) {
+function carouselPaintTextRun(ctx, run, x, y, color, family = false) {
   const horizontal = run.glyphScale ?? 1;
   if (horizontal !== 1) {
     ctx.save();
@@ -73,6 +97,12 @@ function carouselPaintTextRun(ctx, run, x, y, color) {
   ctx.font = `${run.size}px ${fontFamily(run.font)}`;
   if ("letterSpacing" in ctx) ctx.letterSpacing = run.letterSpacing + "px";
   if (color || run.color) ctx.fillStyle = color || run.color;
+  if (family || run.family) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = MKWFamily.outline;
+    ctx.lineJoin = "round";
+    ctx.strokeText(run.text, x, y);
+  }
   ctx.fillText(run.text, x, y);
   if (run.underline)
     ctx.fillRect(

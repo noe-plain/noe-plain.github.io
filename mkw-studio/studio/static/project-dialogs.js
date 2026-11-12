@@ -20,7 +20,12 @@ const MKWProjectDialogs = (() => {
       ? records
           .map((record) => {
             const current = record.id === currentId,
-              mode = record.mode === "carousel" ? "Designer" : "FD-Kampagnen",
+              mode =
+                record.mode === "campaign"
+                  ? "FD-Kampagnen (Vorschau)"
+                  : record.mode === "carousel"
+                    ? "Designer"
+                    : "FD-Kampagnen",
               time = new Date(record.updatedAt).toLocaleString("de-CH", {
                 dateStyle: "medium",
                 timeStyle: "short",

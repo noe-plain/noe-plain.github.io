@@ -707,3 +707,48 @@
     min-height: 48px;
   }
 }
+#paintFamilyText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 16px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font: inherit;
+}
+#paintFamilyText small {
+  font-size: 12px;
+  font-weight: 400;
+}
+#paintFamilyText[hidden] {
+  display: none;
+}
+/* One compact horizontal toolbar for all Designer tools. */
+.carousel-contextbar #advancedColours {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  flex: none;
+  padding: 0 12px;
+  border: 0;
+  border-left: 1px solid var(--md-sys-color-outline-variant);
+  margin-left: 4px;
+}
+.carousel-contextbar #advancedColours .paint-actions {
+  display: flex;
+  width: auto;
+  gap: 4px;
+}
+.carousel-contextbar #advancedColours .paint-actions button {
+  width: 40px;
+  min-width: 40px;
+  height: 44px;
+}

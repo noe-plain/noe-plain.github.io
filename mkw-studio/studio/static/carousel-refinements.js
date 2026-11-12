@@ -396,7 +396,7 @@ function carouselRefinementsPanel(panel, items) {
     $("#carouselFolderChoice").onchange = (e) =>
       carouselAssignFolder(o, e.target.value);
   }
-  if (studioPreferences.advanced && items.length === 1) {
+  if (items.length === 1) {
     const section = panel.querySelector('[data-prop="w"]')?.closest("section");
     if (section) {
       const label = document.createElement("label");

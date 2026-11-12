@@ -19,7 +19,7 @@ const MKWProjectSetup = (() => {
     `<label>${label} (px)<input ${id ? `id="${id}"` : ""} data-format-key="${key}" type="number" min="${key === "w" || key === "h" ? 240 : 0}" ${key === "w" || key === "h" ? `max="${max}"` : ""} step="1" required></label>`;
   dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="setupTitle">Neues Projekt</h2><p>Wähle deinen Arbeitsbereich und die passenden Formate.</p></div></div>
     <div class="new-project-content">
-      <div class="new-project-basics"><div class="mode-buttons" role="group" aria-label="Projektmodus"><button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button></div><p id="setupInstructions"></p>
+      <div class="new-project-basics"><div class="mode-buttons" role="group" aria-label="Projektmodus"><button type="button" data-project-mode="post" aria-pressed="true">${studioIcon("image")}<span>FD-Kampagnen (Backup)</span></button><button type="button" data-project-mode="preview" aria-pressed="false">${studioIcon("image")}<span>FD-Kampagnen (Vorschau)</span></button><button type="button" data-project-mode="carousel" aria-pressed="false">${studioIcon("builder")}<span>Designer</span></button></div><p id="setupInstructions"></p>
       <div class="setup-project-fields"><label>Projektname<input id="setupName" type="text" maxlength="80" placeholder="Zum Beispiel: Herbstkonzerte" required autofocus></label><label>Kürzel<input id="setupCode" type="text" maxlength="24" placeholder="E2" aria-describedby="setupCodeHint"></label></div><p id="setupCodeHint">Das Kürzel wird für deine Dateinamen verwendet.</p></div>
       <div class="new-project-grid"><section class="new-project-formats" aria-label="Formate einrichten"><div id="postSetup"><div class="new-project-section-heading"><h3>Formate auswählen</h3><span id="setupFormatCount"></span></div><div id="formatChoices"></div><button type="button" id="addFormat">${studioIcon("add")}<span>Eigenes Format hinzufügen</span></button></div>
       <section id="carouselSetup" hidden><h3>Designer einrichten</h3><div class="designer-arrangement" role="group" aria-label="Anordnung der Zeichenflächen"><button type="button" data-designer-layout="slides" aria-pressed="true">${studioIcon("layers")}<span><strong>Erste Slide-Reihe</strong><small>1–20 Slides nebeneinander; weitere Reihen später hinzufügen</small></span></button><button type="button" data-designer-layout="free" aria-pressed="false">${studioIcon("builder")}<span><strong>Unabhängige Artboards</strong><small>Einzelne Entwürfe mit eigenen Formaten</small></span></button></div><p id="designerLayoutHint"></p><label class="setup-designer-preset">Startformat<select id="designerSetupPreset"><option value="custom">Eigene Grösse</option><option value="1080x1350">4:5 · 1080 × 1350 px</option><option value="1080x1920">9:16 · 1080 × 1920 px</option><option value="1080x1080">1:1 · 1080 × 1080 px</option><option value="1080x1440">3:4 · 1080 × 1440 px</option></select></label><div class="setup-designer-size">${inputHTML("w", "Breite pro Slide", "cw", 4000)}${inputHTML("h", "Höhe pro Slide", "ch", 4000)}</div><p id="carouselFormatFeedback" class="format-feedback" role="status"></p><div class="setup-count"><label for="cn">Anzahl Slides</label><div><button type="button" id="setupSlideMinus" class="icon-button" aria-label="Eine Slide weniger">${studioIcon("minus")}</button><input id="cn" type="number" min="1" max="20" step="1" required aria-describedby="setupCountHint"><button type="button" id="setupSlidePlus" class="icon-button" aria-label="Eine Slide mehr">${studioIcon("add")}</button></div><small id="setupCountHint">1–20 Slides je Reihe · ein gemeinsames Format</small></div><p id="carouselCountFeedback" class="format-feedback" role="status"></p><div class="setup-slide-overview"><strong id="carouselArtworkSize"></strong><div id="carouselSetupStrip" aria-label="Vorschau der Slide-Anordnung"></div><div id="carouselSetupGroups" role="group" aria-label="Carousel-Gruppen"></div><button type="button" id="setupSplitPageGroup">Letzte Seite in neue Gruppe verschieben</button></div></section></section>
@@ -75,8 +75,11 @@ const MKWProjectSetup = (() => {
     $("#setupError").textContent = message;
   }
   function formatErrors(f) {
-    const result = model.errors(f, draft.mode === "carousel");
-    if (draft.mode === "post" && model.duplicateIds(draft.formats).has(f.id))
+    const result = model.errors(f, draft.mode !== "post");
+    if (
+      draft.mode !== "carousel" &&
+      model.duplicateIds(draft.formats).has(f.id)
+    )
       result.w = result.h =
         "Diese Bildgrösse ist mehrfach ausgewählt. Bitte nur einmal auswählen.";
     return result;
@@ -415,12 +418,12 @@ const MKWProjectSetup = (() => {
   }
   function mode(value) {
     draft.mode = value;
-    $("#postSetup").hidden = value !== "post";
+    $("#postSetup").hidden = value === "carousel";
     $("#carouselSetup").hidden = value !== "carousel";
     $("#setupInstructions").textContent =
       window.MKWPageManagementTest && value === "carousel"
         ? "Testumgebung: Erstelle freie Zeichenflächen, teile sie in Seitengruppen und prüfe das Docking. Änderungen gelten nur für das aktuelle Testprojekt."
-        : value === "post"
+        : value !== "carousel"
           ? "Mehrere Fotos mit einheitlichem Layout in verschiedenen Formaten."
           : "Einzelne Designs oder zusammenhängende Slides frei gestalten.";
     for (const button of dialog.querySelectorAll("[data-project-mode]"))
@@ -508,7 +511,9 @@ const MKWProjectSetup = (() => {
     draft.formats.forEach(appendFormat);
     for (const id of ["cw", "ch", "cn"])
       $("#" + id).value = draft.designer[{ cw: "w", ch: "h", cn: "n" }[id]];
-    mode(options.mode === "carousel" ? "carousel" : "post");
+    mode(
+      ["carousel", "preview"].includes(options.mode) ? options.mode : "post",
+    );
     $(".new-project-content").scrollTop = 0;
     dialog.showModal();
   }
@@ -598,6 +603,8 @@ const MKWProjectSetup = (() => {
         document.fonts = [...p.fonts];
         Object.assign(document.meta, meta);
         document.formats = formats.map(model.format);
+        if (draft.mode === "preview")
+          document.campaign = MKWCampaignUI.newState();
       }
       carouselSelection = null;
       carouselUI.ids.clear();

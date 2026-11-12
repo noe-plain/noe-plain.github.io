@@ -13,7 +13,6 @@
     snapDistance: 6,
     exportFormat: "jpg",
     autoSaveFile: true,
-    advanced: false,
     curvature: false,
     pdfPreset: "linkedin",
     lineHeight: 95,
@@ -29,6 +28,12 @@
   function preferences(value = {}, strict = false) {
     if (!value || typeof value !== "object" || Array.isArray(value))
       throw Error("Ungültige Werkzeugeinstellungen.");
+    if (
+      strict &&
+      value.advanced !== undefined &&
+      typeof value.advanced !== "boolean"
+    )
+      throw Error("Ungültige frühere Werkzeugeinstellung.");
     const result = {
       ...defaults,
       textSizes: { ...defaults.textSizes },

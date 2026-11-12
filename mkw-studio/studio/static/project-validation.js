@@ -37,6 +37,8 @@
           throw Error("Ungültige Bilddaten.");
         ids.add(i.id);
       }
+      if (typeof MKWCampaignModel !== "undefined" && !MKWCampaignModel.valid(q))
+        throw Error("Ungültige Kampagnen-Verknüpfung.");
       family(q);
       const bids = new Set();
       for (const b of q.boards) {

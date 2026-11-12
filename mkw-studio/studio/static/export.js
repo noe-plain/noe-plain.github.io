@@ -360,7 +360,11 @@ function updateExportNames() {
       names = MKW.names(p.meta, bs).map((name) =>
         name.replace(/\.jpg$/, "." + exportOptions.format),
       );
-    if (p.carousel?.pageStructure && exportOptions.format !== "pdf")
+    if (
+      p.carousel?.pageStructure &&
+      !p.campaign &&
+      exportOptions.format !== "pdf"
+    )
       names = names.map((name, i) => {
         const info = MKWCarouselPolicy.slideInfo(
           p.carousel,
@@ -574,7 +578,7 @@ async function showReview() {
     $("#reviewImage").hidden = true;
     $("#reviewPosition").textContent = "Keine Auswahl";
     $("#reviewMessage").textContent =
-      "Wähle unter Auswahl anpassen mindestens eine Slide aus.";
+      "Im Projekt sind noch keine Bilder vorhanden.";
     return;
   }
   reviewIndex = (reviewIndex + boards.length) % boards.length;
@@ -583,9 +587,10 @@ async function showReview() {
   current.dataset.boardId = b.id;
   current.checked = b.checked;
   document.querySelector(".review-stage").classList.remove("checkerboard");
-  const label = p.carousel
-    ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label
-    : asset(b).name;
+  const label =
+    p.carousel && !p.campaign
+      ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label
+      : asset(b).name;
   $("#reviewPosition").textContent =
     `${index + 1} / ${boards.length} · ${label}${b.checked ? "" : " · Nicht ausgewählt"} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
   $("#reviewImage").hidden = true;
@@ -637,36 +642,6 @@ $("#reviewExport").onclick = () => {
           .map((b) => b.id),
       );
   }
-  let selection = $("#reviewSelection");
-  if (!selection) {
-    selection = document.createElement("details");
-    selection.id = "reviewSelection";
-    selection.innerHTML =
-      '<summary>Auswahl anpassen</summary><div class="review-selection-list"></div>';
-    document.querySelector(".review-stage").before(selection);
-  }
-  selection.open = false;
-  selection.querySelector("div").innerHTML = orderedBoards()
-    .map(
-      (b) =>
-        `<label><input type="checkbox" data-review-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}><span>${esc(p.carousel ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label : asset(b).name)} · ${b.w} × ${b.h}</span></label>`,
-    )
-    .join("");
-  selection.onchange = (e) => {
-    if (e.target.dataset.reviewExportId)
-      exportSetSelection(
-        p.boards
-          .filter((b) =>
-            b.id === e.target.dataset.reviewExportId
-              ? e.target.checked
-              : b.checked,
-          )
-          .map((b) => b.id),
-      );
-  };
-  selection.ontoggle = () => {
-    if ($("#reviewDialog").open) showReview();
-  };
   $("#reviewDialog").showModal();
   showReview();
 };

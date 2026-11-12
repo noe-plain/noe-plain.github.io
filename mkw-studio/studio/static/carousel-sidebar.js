@@ -63,6 +63,11 @@ function carouselPanel() {
     items = carouselSelected(),
     o = items.at(-1),
     panel = $("#carouselProperties");
+  if (p.campaign && MKWCampaignUI.panel(panel, items)) {
+    carouselLayerPanel();
+    carouselPresentInspector();
+    return;
+  }
   panel.classList.toggle(
     "is-text-inspector",
     items.length > 0 && items.every((item) => item.type === "text"),
@@ -406,7 +411,7 @@ function carouselPanel() {
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
   } else {
-    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><section class="designer-template-shortcut"><button type="button" id="carouselTemplates">${studioIcon("layers")}<span>Aus Vorlage starten</span></button><small>Erstellt ein neues Designer-Projekt.</small></section><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
+    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", "path", "shape"].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><section class="designer-template-shortcut"><button type="button" id="carouselTemplates">${studioIcon("layers")}<span>Aus Vorlage starten</span></button><small>Erstellt ein neues Designer-Projekt.</small></section><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
     panel
       .querySelectorAll("[data-quick-tool]")
       .forEach(
@@ -437,6 +442,7 @@ function carouselPanel() {
       MKWSpreadUI.panel(panel);
     }
   }
+  if (p.campaign) MKWCampaignUI.scopePanel(panel, items);
   carouselRefinementsPanel(panel, items);
   carouselLayerPanel();
   carouselPresentInspector();

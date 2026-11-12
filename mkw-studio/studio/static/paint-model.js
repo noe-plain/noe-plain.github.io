@@ -117,6 +117,7 @@ function studioPaintWrite(o, channel, value) {
   } else {
     o.color = value.colour;
     o.textAlpha = value.alpha;
+    if (o.type === "text") MKWText.changeCharacters(o, null, { family: false });
   }
 }
 function studioSampleStops(stops, at) {

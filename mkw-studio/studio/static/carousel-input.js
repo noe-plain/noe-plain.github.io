@@ -100,7 +100,9 @@ function carouselPointer(ev) {
   if (
     busy ||
     ev.button !== 0 ||
-    ev.target.closest("textarea,button,input,.carousel-inline-text")
+    ev.target.closest(
+      "textarea,button,input,select,.carousel-inline-text,.campaign-card",
+    )
   )
     return;
   carouselEndText();
@@ -254,13 +256,19 @@ function carouselCreateDrag(ev, type, start) {
         height: rect.h * carouselZoom + "px",
       });
     },
-    () => {
+    async () => {
       if (rect.w * carouselZoom < 5 || rect.h * carouselZoom < 5) {
         sketch.remove();
         status("Rahmen mit gedrückter Maustaste aufziehen.");
         return;
       }
+      const inherited =
+        p.campaign && type === "text"
+          ? await MKWCampaignUI.textChoice(rect)
+          : {};
+      if (inherited === null) return;
       const o = carouselObject(type, {
+        ...inherited,
         x: rect.x,
         y: rect.y,
         w: rect.w,

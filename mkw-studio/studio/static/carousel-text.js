@@ -576,6 +576,10 @@ function carouselWrapText(text, width, measure) {
 }
 
 function carouselFormatEditable(el, o) {
+  if (p.campaign) o = MKWCampaignUI.decorate(o);
+  el.style.webkitTextStroke = o.campaignFamily
+    ? `${2 * carouselZoom}px ${MKWFamily.outline}`
+    : "";
   const layout = carouselTextLayout(o),
     paragraphs = o.text.split("\n");
   el.innerHTML = paragraphs

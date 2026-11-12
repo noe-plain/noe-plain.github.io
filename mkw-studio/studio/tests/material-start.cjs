@@ -256,7 +256,7 @@ const { launch, artifact } = require("./browser.cjs");
     for (const width of [1450, 360, 320]) {
       await page.setViewportSize({ width, height: 1000 });
       const b = await page.evaluate(() =>
-        ["startNew", "startDesigner", "startTemplates", "startOpen"].map(
+        ["startCampaignPreview", "startDesigner", "startTemplates", "startOpen", "startNew"].map(
           (id) => {
             const r = document.getElementById(id).getBoundingClientRect();
             return { x: r.x, y: r.y, w: r.width, h: r.height };
@@ -269,6 +269,7 @@ const { launch, artifact } = require("./browser.cjs");
         assert.equal(b[2].y, b[3].y);
         assert(Math.abs(b[0].w - b[1].w) < 1);
         assert(Math.abs(b[2].w - b[3].w) < 1);
+        assert(b[4].y >= b[3].y + b[3].h, "Legacy backup stays secondary");
       } else {
         for (let i = 1; i < b.length; i++)
           assert(b[i].y >= b[i - 1].y + b[i - 1].h);
