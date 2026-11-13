@@ -253,7 +253,12 @@ function drawText(ctx, layout, opts = {}) {
           if (opts.family?.enabled && e.key !== "copyright" && run.family) {
             let glyphX = x + line.x + run.x;
             for (const glyph of MKWFamily.runs(run.text, paletteOffset)) {
-              const part = { ...run, text: glyph.text, width: 0 };
+              const part = {
+                ...run,
+                family: false,
+                text: glyph.text,
+                width: 0,
+              };
               carouselPaintTextRun(
                 ctx,
                 part,
