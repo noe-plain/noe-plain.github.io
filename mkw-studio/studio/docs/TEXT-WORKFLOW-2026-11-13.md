@@ -18,7 +18,7 @@ Erste Veröffentlichung: `55e7ff92ca7558cfb1f2150b5c38ac48f8fe3172`. [Pages erfo
 - [x] Sichere native HTML-/Plain-Zwischenablage in Designer, neuem FD und Backup. Browserrechte nur auf ausdrückliche Aktion; bei Ablehnung normale Tastenkombination anbieten, nichts verändern.
 - [x] Vollständige typografische Skalierung über Griffe und numerisch; Rahmenänderung bleibt Standard. Modus ist Ansichtszustand, nicht Dokumentinhalt.
 - [x] FD-Verknüpfungen bei kürzerem/längerem Text und lokal geänderter Typografie robust anpassen.
-- [ ] Regressionen, Wiki und Schlussprüfung, danach zweite Veröffentlichung.
+- [x] Regressionen, Wiki und Schlussprüfung sowie zweite Veröffentlichung.
 
 Native Zwischenablage: https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData , https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read , https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/write . Browserberechtigungen und Formate variieren; eigene Logik fällt auf die nativen Paste-/Copy-Ereignisse zurück. Keine pauschale Office-/Photoshop-Kompatibilität behaupten.
 
@@ -54,3 +54,12 @@ Dies ist ein überprüfter Produkt-/Code-Review anhand der Personas, keine Studi
 ## GitHub-Freigabe und Firefox-Testkorrektur
 
 Kandidat `cbbf9209b6e3a41371428f5814820ef2ca276eaf`: Chromium vollständig erfolgreich (108 Browser-Suiten). Firefox lief vollständig durch; ausschliesslich der neue `text-workflow` scheiterte beim Prüfen eines synthetischen Copy-Ereignisses, das den ursprünglich übergebenen DataTransfer auslas. Die App schreibt korrekt in den tatsächlichen Event-Datencontainer. [Mozilla Bug 2027025](https://bugzilla.mozilla.org/show_bug.cgi?id=2027025) dokumentiert die abweichende ClipboardEvent-Konstruktorbehandlung. Der synthetische Test stellt seinen Datencontainer nun explizit am Test-Event bereit. Alle Inhalts-/Format-/Undo-Assertions bleiben erhalten; die zusätzlichen echten nativen Kopier-/Einfügetasten in allen drei Arbeitsbereichen bleiben unverändert. Keine Runtime-Änderung dafür erforderlich. Die vollständige Firefox-Wiederholung erfolgt nach dieser Testkorrektur auf main; Ergebnisse im finalen Arbeits-Handoff/Abschlussbericht.
+
+
+## Bestätigte zweite Veröffentlichung und anschliessender Absatz-Fix
+
+`ab7e6136eb587a348ce409b23868175264400922`: [Chromium, Firefox und Sammeljob erfolgreich](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43438725054), [Pages erfolgreich](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43438724371). Live-Index und beide Bundles sind SHA256-identisch; drei echte Live-Suiten für Hero/Karten, native Zwischenablage/Skalierung und direkte Texteingabe erfolgreich.
+
+Danach meldete der Nutzer: Schriftvergrösserung nach Dreifachklick behält die alte Grundlinie und wächst in den vorherigen Absatz. Ursache: Vollständig direkt markierte Absätze wurden wie einzelne Zeichen formatiert. `text-scope-model.apply` verwendet nun auch für vollständige direkte Absatzauswahlen die vorhandene Absatzgrössen-Logik und entfernt ausschliesslich dort konkurrierende Zeichen-Grössen. Teilmarkierungen bleiben Zeichenformatierung; Zeilenabstände, Schriftfarben und andere Absätze unverändert. Keine Migration und keine Änderung vorhandener Dokumente beim Öffnen. Ein erneutes Anwenden der Absatzgrösse repariert auch bestehende abweichende Zeichen-Grössen in der gewählten Auswahl.
+
+Akzeptanz: echter Dreifachklick ohne Menü, Absatzoberkante und vorige Absätze unverändert, nachfolgende Absätze folgen der neuen Höhe, Undo/Redo und MKW erhalten das Ergebnis. Neue Modell- und Browserprüfungen in allen drei Modi; bestehende Inline-/Auswahl-/Clipboard-Prüfungen zusätzlich wiederholt. Ergebnisse nach Abschluss im Handoff.

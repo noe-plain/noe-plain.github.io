@@ -105,7 +105,10 @@
   }
   function apply(o, scope, values, fontKey = "font") {
     const patch = { ...values };
-    if (!scope.direct && !scope.lineScoped && Object.hasOwn(values, "size")) {
+    if (
+      ((!scope.direct && !scope.lineScoped) || scope.completeParagraphs) &&
+      Object.hasOwn(values, "size")
+    ) {
       if (values.size === null || !scope.whole) {
         textModel.changeParagraphs(o, scope.paragraphs, {
           size: values.size === null ? undefined : values.size,

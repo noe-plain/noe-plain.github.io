@@ -109,3 +109,25 @@ test("stale direct selections are clamped before classification after deletion o
   assert.equal(text.at(o, 1).size, undefined);
   assert.equal(text.at(o, 2).size, 80);
 });
+
+test("complete directly selected paragraphs size their line boxes like the paragraph picker", () => {
+  for (const end of [20, 21]) {
+    const o = doc(),
+      picker = doc();
+    o.characterStyles = [{ start: 11, end: 15, size: 75, underline: true }];
+    picker.characterStyles = structuredClone(o.characterStyles);
+    const selected = scope.resolve(o, { range: { start: 11, end } });
+    assert(selected.completeParagraphs);
+    scope.apply(o, selected, { size: 120 });
+    scope.apply(picker, scope.resolve(picker, { paragraphs: [1] }), {
+      size: 120,
+    });
+    assert.deepEqual(o, picker);
+    assert.equal(o.textStyles[1].size, 120);
+    assert.equal(o.size, 50);
+    assert.equal(text.at(o, 11).size, undefined);
+    assert.equal(text.at(o, 11).underline, true);
+    assert.equal(o.textStyles[0] ?? null, null);
+    assert.equal(o.textStyles[2] ?? null, null);
+  }
+});
