@@ -290,6 +290,7 @@
 .mkw-inline-input[data-canvas-text="true"]:not(.mkw-composing) * {
   color: transparent !important;
   -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-color: transparent !important;
   text-decoration-color: transparent !important;
   text-shadow: none !important;
 }

@@ -236,6 +236,17 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         });
         await page.locator("#paintClose").click();
       }
+      if(mode!=="post") {
+        await page.evaluate(()=>{const o=carouselSelected()[0];MKWTypography.track(o,0,o.text.length);});
+        await page.locator("#toolPaintPicker").click();
+        assert.equal(await page.locator("#paintFamilyText").getAttribute("aria-pressed"),"false");
+        await page.locator("#paintFamilyText").click();
+        assert.equal(await page.locator("#paintFamilyText").getAttribute("aria-pressed"),"true");
+        await page.screenshot({path:artifact("family-toolbar-selected-"+mode+".png")});
+        await page.locator("#paintFamilyText").click();
+        assert.equal(await page.locator("#paintFamilyText").getAttribute("aria-pressed"),"false");
+        await page.locator("#paintClose").click();
+      }
       console.log(
         "PASS selected family text colour, untouched neighbors, source, history and file:",
         mode,
