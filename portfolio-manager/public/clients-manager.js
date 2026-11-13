@@ -8,7 +8,7 @@ async function loadClients() {
 function renderClients() {
     const root = managerShell('KUNDENGALERIEN', 'Bilder für deine Kundinnen');
     root.querySelector('.manager-heading').append(button('＋ Veranstaltung erstellen', () => editClient(), 'primary'));
-    const hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Eigener Upload mit Passwortschutz. Veranstaltungsnamen und Datum sind öffentlich sichtbar. Bilder werden verschlüsselt bereitgestellt und danach über „Änderungen prüfen“ veröffentlicht.';
+    const hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Eigener Upload mit Passwortschutz. Veranstaltungsnamen und Datum sind öffentlich sichtbar. Bilder werden verschlüsselt und über „Änderungen prüfen“ in kleinen Paketen an GitHub übertragen. Bereits übertragene Pakete werden nach einem Abbruch wiederverwendet.';
     root.querySelector('.manager-toolbar').append(hint);
     const access = document.createElement('div'); access.className = 'client-access-links';
     const entry = document.createElement('a'); entry.href = ClientGalleryLinks.galleryLink(clientSite); entry.target = '_blank'; entry.rel = 'noopener'; entry.textContent = 'Feste Kundenseite: ' + entry.href;
@@ -22,7 +22,7 @@ function renderClients() {
         for (const event of events) {
             const card = document.createElement('article'); card.className = 'client-manager-card';
             const heading = document.createElement('h3'); heading.textContent = event.title;
-            const info = document.createElement('p'); info.className = 'hint'; info.textContent = `${event.date || 'Ohne Datum'} · ${event.images.length} Bilder · ${event.active ? 'Freigegeben (lokaler Stand)' : 'Pausiert'}`;
+            const info = document.createElement('p'); info.className = 'hint'; info.textContent = `${event.date || 'Ohne Datum'} · ${event.images.length} Bilder · ${event.active ? (event.publication === 'published' ? 'An GitHub übertragen' : 'Lokal gespeichert · Übertragung ausstehend') : 'Pausiert (lokaler Stand)'}`;
             const tools = document.createElement('div'); tools.className = 'manager-actions';
             tools.append(button('Bearbeiten & Bilder', () => editClient(event)), button('Link kopieren', async () => {
                 const link = clientLink(event.slug); await navigator.clipboard.writeText(link); notice('Link kopiert. Er funktioniert online nach Commit und Push.');
@@ -120,12 +120,13 @@ function editClient(original) {
         clientEvents = await api('/api/studio/clients'); if (type === 'clients') renderClients(); return true;
     }
     async function run(fn) {
+        if (!form.reportValidity()) return;
         message.classList.remove('error'); operationProgress.hidden = true;
-        managerBusy = true; for (const b of form.querySelectorAll('button')) b.disabled = true;
+        managerBusy = true; form.setAttribute('aria-busy', 'true'); const controls = [...form.querySelectorAll('button,input,textarea,select')].map(control => [control, control.disabled]); for (const [control] of controls) control.disabled = true;
         try { await fn(); } catch (error) { message.textContent = error.message; message.classList.add('error'); }
-        finally { managerBusy = false; for (const b of form.querySelectorAll('button')) b.disabled = false; upload.disabled = !event; renderImages(); }
+        finally { managerBusy = false; form.removeAttribute('aria-busy'); for (const [control, disabled] of controls) control.disabled = disabled; upload.disabled = !event; renderImages(); }
     }
-    form.onsubmit = event => { event.preventDefault(); run(saveEvent); };
+    form.onsubmit = event => { event.preventDefault(); if (form.reportValidity()) run(saveEvent); };
     files.onchange = () => run(async () => {
         const selected = [...files.files]; if (!selected.length) return;
         if (selected.length > 500 || images.length + selected.length > 500) {

@@ -8,6 +8,8 @@ const sharp = require('sharp');
 const multer = require('multer');
 const { photoMetadata } = require('./photo-metadata');
 const { assignSlugs, slugify } = require('../portfolio/kunden/links');
+const { inside } = require('./safe-files');
+const { githubRepository, baseURL } = require('./gallery-delivery');
 const execFile = promisify(require('node:child_process').execFile);
 const derive = promisify(crypto.pbkdf2);
 const iterations = 310000;
@@ -21,6 +23,10 @@ function register(app, root, route) {
     const privateDir = path.join(root, 'portfolio-manager/.client-galleries');
     const publicDir = path.join(root, 'portfolio/kunden/data');
     const stateFile = path.join(privateDir, 'events.json');
+    const deliveryDir = path.join(privateDir, 'delivery');
+    const catalogFile = path.join(root, 'portfolio/kunden/catalog.json');
+    const deliveredFile = path.join(privateDir, 'delivery-base.json');
+    const publishedFile = path.join(privateDir, 'published-revisions.json');
     // Persist legacy link names once, without re-encrypting image files.
     // Include paused events so the same name resolves in the CMS and public index.
     if (fs.existsSync(stateFile)) {
@@ -48,39 +54,100 @@ function register(app, root, route) {
     }
     function read() { return fs.existsSync(stateFile) ? assignSlugs(JSON.parse(fs.readFileSync(stateFile, 'utf8'))) : []; }
     function event(id) { const found = read().find(e => e.id === id); if (!found) throw fail('Veranstaltung nicht gefunden.', 404); return found; }
-    const safe = e => ({ id: e.id, slug: e.slug, title: e.title, date: e.date, description: e.description, active: e.active, revision: e.revision, images: e.images.map(({ id, name, width, height, size }) => ({ id, name, width, height, size })) });
+    const publication = e => { try { return JSON.parse(fs.readFileSync(publishedFile, 'utf8'))[e.id] === e.revision ? 'published' : 'pending'; } catch { return 'pending'; } };
+    const safe = e => ({ publication: publication(e), id: e.id, slug: e.slug, title: e.title, date: e.date, description: e.description, active: e.active, revision: e.revision, images: e.images.map(({ id, name, width, height, size }) => ({ id, name, width, height, size })) });
     async function atomic(file, value) { await fsp.mkdir(path.dirname(file), { recursive: true, mode: 0o700 }); const tmp = file + '.cms-tmp'; await fsp.writeFile(tmp, value, { mode: 0o600 }); await fsp.rename(tmp, file); }
+    function deliveryBase() {
+        if (fs.existsSync(deliveredFile)) return JSON.parse(fs.readFileSync(deliveredFile, 'utf8')).base;
+        let remote = '';
+        try { remote = require('node:child_process').execFileSync('git', ['config', '--get', 'remote.origin.url'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch {}
+        const repository = githubRepository(remote);
+        return repository ? baseURL(repository) : '/portfolio/kunden/data/';
+    }
+    function entries(all = read(), base = deliveryBase()) {
+        return all.filter(e => e.active).map(e => ({ id: e.id, slug: e.slug, title: e.title, date: e.date, count: (e.images || []).length, salt: e.salt, iterations, bundle: e.id + '/' + e.release + '/gallery.bin', deliveryBase: base }));
+    }
+    function ensureCatalog() {
+        if (!fs.existsSync(stateFile)) return;
+        const content = JSON.stringify(entries(), null, 2) + '\n';
+        if (fs.existsSync(catalogFile) && fs.readFileSync(catalogFile, 'utf8') === content) return;
+        fs.mkdirSync(path.dirname(catalogFile), { recursive: true });
+        fs.writeFileSync(catalogFile + '.cms-tmp', content); fs.renameSync(catalogFile + '.cms-tmp', catalogFile);
+    }
+    function deliveryFile(relative) {
+        if (!/^[a-f0-9-]+\/(?:[a-zA-Z0-9_-]+\/){1,3}[a-zA-Z0-9.-]+\.bin$/.test(relative)) throw fail('Ungültiger Galeriepfad.', 404);
+        const current = read().find(e => e.active && e.id === relative.split('/')[0]);
+        const permitted = current && (relative === current.id + '/' + current.release + '/gallery.bin' || current.images.some(image => image.delivery && ['full', 'preview', 'thumb'].some(kind => image.delivery[kind] === relative)) || relative.startsWith(current.id + '/' + current.release + '/') && /-[a-z]+\.bin$/.test(relative));
+        if (!permitted) throw fail('Diese Freigabe ist nicht verfügbar.', 404);
+        const local = inside(deliveryDir, relative);
+        return fs.existsSync(local) ? local : inside(publicDir, relative);
+    }
+    function deliveryFiles() {
+        const files = new Map();
+        for (const current of read().filter(e => e.active)) {
+            const relative = current.id + '/' + current.release + '/gallery.bin';
+            const source = deliveryFile(relative);
+            const gallery = JSON.parse(unseal(fs.readFileSync(source), Buffer.from(current.key, 'base64')));
+            files.set(relative, { relative, source });
+            for (const image of gallery.images) for (const kind of ['full', 'preview', 'thumb']) {
+                const name = (gallery.version === 2 ? '' : current.id + '/' + current.release + '/') + image[kind];
+                files.set(name, { relative: name, source: deliveryFile(name) });
+            }
+        }
+        return [...files.values()];
+    }
+    function unseal(buffer, key) {
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, buffer.subarray(0, 12));
+        decipher.setAuthTag(buffer.subarray(-16));
+        return Buffer.concat([decipher.update(buffer.subarray(12, -16)), decipher.final()]);
+    }
     async function publish(next, all) {
-        await fsp.mkdir(publicDir, { recursive: true });
-        const destination = path.join(publicDir, next.id), release = crypto.randomUUID();
-        const temp = path.join(privateDir, 'release-' + release);
+        const release = crypto.randomUUID(), key = Buffer.from(next.key, 'base64');
+        const keyId = crypto.createHash('sha256').update(key).digest('hex').slice(0, 32);
+        let previous;
+        if (next.release) {
+            const relative = next.id + '/' + next.release + '/gallery.bin';
+            for (const directory of [deliveryDir, publicDir]) {
+                try { previous = JSON.parse(unseal(await fsp.readFile(inside(directory, relative)), key)); break; } catch {}
+            }
+        }
+        const images = [], created = [];
+        const manifest = inside(deliveryDir, next.id + '/' + release + '/gallery.bin');
         try {
             if (next.active) {
-                await fsp.mkdir(temp, { recursive: true });
                 stage('encrypting', next.images.length);
-                const key = Buffer.from(next.key, 'base64'), images = [];
                 for (const image of next.images) {
-                    const source = path.join(privateDir, next.id, image.id + '.jpg');
-                    const original = await fsp.readFile(source);
-                    const preview = await sharp(original).resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
-                    const thumb = await sharp(original).resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
-                    for (const [kind, buffer] of [['full', original], ['preview', preview], ['thumb', thumb]]) await fsp.writeFile(path.join(temp, image.id + '-' + kind + '.bin'), seal(buffer, key));
-                    images.push({ ...image, full: image.id + '-full.bin', preview: image.id + '-preview.bin', thumb: image.id + '-thumb.bin' });
-                    progress.completed = images.length;
+                    let cached = image.delivery?.keyId === keyId ? image.delivery : null;
+                    const old = previous?.images.find(item => item.id === image.id && item.size === image.size);
+                    if (!cached && old) {
+                        const base = previous.version === 2 ? '' : next.id + '/' + next.release + '/';
+                        cached = { keyId, full: base + old.full, preview: base + old.preview, thumb: base + old.thumb };
+                    }
+                    if (!cached) {
+                        const original = await fsp.readFile(inside(privateDir, next.id + '/' + image.id + '.jpg'));
+                        const preview = await sharp(original, { limitInputPixels: 100_000_000 }).resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
+                        const thumb = await sharp(original, { limitInputPixels: 100_000_000 }).resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+                        cached = { keyId };
+                        for (const [kind, bytes] of [['full', original], ['preview', preview], ['thumb', thumb]]) {
+                            const relative = next.id + '/assets/' + keyId + '/' + image.id + '-' + kind + '.bin';
+                            const file = inside(deliveryDir, relative); await fsp.mkdir(path.dirname(file), { recursive: true, mode: 0o700 });
+                            await fsp.writeFile(file, seal(bytes, key), { mode: 0o600 }); created.push(file); cached[kind] = relative;
+                        }
+                    }
+                    image.delivery = cached;
+                    const { delivery, ...metadata } = image;
+                    images.push({ ...metadata, full: cached.full, preview: cached.preview, thumb: cached.thumb });
+                    progress.completed++;
                 }
-                await fsp.writeFile(path.join(temp, 'gallery.bin'), seal(Buffer.from(JSON.stringify({ title: next.title, description: next.description, images })), key));
-                await fsp.mkdir(destination, { recursive: true });
-                await fsp.rename(temp, path.join(destination, release));
+                await atomic(manifest, seal(Buffer.from(JSON.stringify({ version: 2, title: next.title, description: next.description, images })), key)); created.push(manifest);
             }
             stage('saving');
             next.release = release; next.revision = crypto.randomUUID();
-            const entries = all.filter(e => e.active).map(e => ({ id: e.id, slug: e.slug, title: e.title, date: e.date, count: e.images.length, salt: e.salt, iterations, bundle: e.id + '/' + e.release + '/gallery.bin' }));
+            const before = fs.existsSync(stateFile) ? await fsp.readFile(stateFile) : null;
             await atomic(stateFile, JSON.stringify(all, null, 2));
-            await atomic(path.join(publicDir, 'index.json'), JSON.stringify(entries, null, 2));
-            // Old encrypted releases must disappear from the current published tree.
-            if (fs.existsSync(destination)) for (const name of await fsp.readdir(destination)) if (!next.active || name !== release) await fsp.rm(path.join(destination, name), { recursive: true, force: true });
+            try { ensureCatalog(); } catch (error) { if (before) await atomic(stateFile, before); else await fsp.rm(stateFile, { force: true }); throw error; }
             return safe(next);
-        } finally { await fsp.rm(temp, { recursive: true, force: true }); }
+        } catch (error) { for (const file of created) await fsp.rm(file, { force: true }); throw error; }
     }
     function validate(req, all) {
         const id = req.body.id;
@@ -141,8 +208,8 @@ function register(app, root, route) {
                 stage('optimizing', files.length);
                 await fsp.mkdir(path.join(privateDir, next.id), { recursive: true, mode: 0o700 });
                 for (const file of files) {
-                    const meta = await sharp(file.path).metadata(), id = crypto.randomUUID();
-                    let pipeline = sharp(file.path).rotate().flatten({ background: '#fff' });
+                    const meta = await sharp(file.path, { limitInputPixels: 100_000_000, failOn: 'warning' }).metadata(), id = crypto.randomUUID();
+                    let pipeline = sharp(file.path, { limitInputPixels: 100_000_000, failOn: 'warning' }).rotate().flatten({ background: '#fff' });
                     const exif = photoMetadata(meta.exif); if (Object.keys(exif).length) pipeline = pipeline.withExif(exif);
                     const buffer = await pipeline.jpeg({ quality: 100, chromaSubsampling: '4:4:4' }).toBuffer();
                     if (buffer.length > 90 * 1024 * 1024) throw fail('Das optimierte Bild ist zu gross für GitHub. Bitte eine kleinere Datei verwenden.');
@@ -165,7 +232,17 @@ function register(app, root, route) {
         if (!uuid.test(req.params.id) || !uuid.test(req.params.image) || !event(req.params.id).images.some(i => i.id === req.params.image)) throw fail('Bild nicht gefunden.', 404);
         res.type('webp').send(await sharp(path.join(privateDir, req.params.id, req.params.image + '.jpg')).resize({ width: 240, height: 240, fit: 'inside' }).webp().toBuffer());
     }));
+    app.get('/portfolio/kunden/catalog.json', route(async (req, res) => res.json(entries(read(), '/portfolio/kunden/data/'))));
+    app.get('/portfolio/kunden/data/*', route(async (req, res) => res.sendFile(deliveryFile(req.params[0]))));
     app.get('/kunden.html', (req, res) => res.sendFile(path.join(root, 'kunden.html')));
     app.get('/common.js', (req, res) => res.sendFile(path.join(root, 'common.js')));
+    ensureCatalog();
+    return {
+        ensureCatalog, deliveryFile, deliveryFiles,
+        localCatalog: (prefix = '/') => entries(read(), prefix + 'portfolio/kunden/data/'),
+        isBusy: () => busy,
+        markDelivered: async base => { await atomic(deliveredFile, JSON.stringify({ base })); ensureCatalog(); },
+        markPublished: async () => atomic(publishedFile, JSON.stringify(Object.fromEntries(read().map(e => [e.id, e.revision]))))
+    };
 }
 module.exports = { register, seal, iterations };

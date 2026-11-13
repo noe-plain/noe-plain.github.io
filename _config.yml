@@ -3,7 +3,7 @@
 exclude:
   - PUBLISHING.md
   - portfolio/kunden/data
-  - portfolio-manager/node_modules
+  - portfolio-manager
   - mkw-studio/.venv
   - mkw-studio/studio/node_modules
   - mkw-studio/studio/backups
@@ -15,3 +15,8 @@ exclude:
   - node_modules
   - Gemfile
   - Gemfile.lock
+
+  # Unfiltered legacy originals are not website assets.
+  - images/portfolio/projects/mkw/raw
+  - images/portfolio/projects/raw
+  - images/portfolio/uploads/raw

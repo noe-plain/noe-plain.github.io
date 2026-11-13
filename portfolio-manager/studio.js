@@ -5,12 +5,15 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const execFile = promisify(require('child_process').execFile);
 const express = require('express');
+const { publishDelivery, pushChecked } = require('./gallery-delivery');
 
 module.exports = function studio(app, root) {
     const token = crypto.randomBytes(32).toString('hex');
     const drafts = new Map();
     const files = { design: 'portfolio/projekte/designs.json', illustration: 'portfolio/projekte/illustrations.json', video: 'portfolio/projekte/video-projects.json', photography: 'portfolio/projekte/photography.json', links: 'fake-cms.json' };
     let publishing = false;
+    let publicationProgress = { active: false };
+    const reportPublication = value => { publicationProgress = { active: publishing, ...value }; };
     let lastFetch = null, fetchError = null;
     const hash = value => crypto.createHash('sha256').update(value).digest('hex');
     const fail = (message, status = 400) => Object.assign(new Error(message), { status });
@@ -25,7 +28,7 @@ module.exports = function studio(app, root) {
         return full;
     }
     const isPage = p => typeof p === 'string' && /^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.html$/.test(p) && !p.startsWith('portfolio-manager/');
-    const allowed = p => /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+(?:\.test)?\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['.gitignore','common.js','lebenslauf.js','lebenslauf.json'].includes(p);
+    const allowed = p => !p.startsWith('portfolio/kunden/data/') && ( /^portfolio-manager\/(?:public\/)?[a-zA-Z0-9_-]+(?:\.test)?\.(?:js|css|html|md)$/.test(p) || /^portfolio-manager\/package(?:-lock)?\.json$/.test(p) || isPage(p) || Object.values(files).includes(p) || /^(images|fonts|css|portfolio)\//.test(p) && !p.includes('/raw/') && !p.includes('/temp/') || ['.gitignore','_config.yml','PUBLISHING.md','common.js','lebenslauf.js','lebenslauf.json'].includes(p));
     function write(relative, content, revision) {
         const full = resolve(relative);
         const before = fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : '';
@@ -40,6 +43,7 @@ module.exports = function studio(app, root) {
         if (!/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) return res.status(403).json({ error: 'Das CMS ist nur über localhost erreichbar.' });
         res.setHeader('Cache-Control', 'no-store');
         res.setHeader('X-Content-Type-Options', 'nosniff');
+        if (['/', '/index.html', '/legacy.html'].includes(req.path)) res.setHeader('Content-Security-Policy', "script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; frame-src http://127.0.0.1:* http://localhost:*");
         if (req.path.startsWith('/api/') && !['GET', 'HEAD'].includes(req.method)) {
             if (publishing) return res.status(409).json({ error: 'Veröffentlichung läuft. Bitte warten.' });
             if (req.headers.origin !== `http://${host}` || req.headers['x-cms-token'] !== token) return res.status(403).json({ error: 'Ungültige lokale Sitzung. Bitte CMS neu laden.' });
@@ -52,7 +56,9 @@ module.exports = function studio(app, root) {
         catch { fetchError = 'GitHub ist nicht erreichbar oder die Anmeldung fehlt. Angezeigt wird der zuletzt lokal bekannte Stand.'; }
     }
     require('./media-library').register(app, root, route);
-    require('./client-galleries').register(app, root, route);
+    const clients = require('./client-galleries').register(app, root, route);
+    const preview = require('./preview-server').previewServer({ drafts, files, resolve, allowed, clients });
+    app.locals.closePreview = preview.close;
     const homepage = require('./homepage').register(app, root, route, { resolve, write, hash });
     app.get('/api/studio/session', (req, res) => res.json({ token }));
     app.get('/api/studio/content/:type', route(async (req, res) => {
@@ -63,7 +69,7 @@ module.exports = function studio(app, root) {
         const file = files[req.params.type]; if (!file || !Array.isArray(req.body.data)) throw fail('Ungültige Inhalte.');
         if (req.params.type !== 'links') {
             const ids = new Set();
-            for (const p of req.body.data) { if (!p || !/^[a-z0-9][a-z0-9_-]*$/.test(p.id) || !String(p.title || '').trim() || ids.has(p.id) || (p.blocks && !Array.isArray(p.blocks))) throw fail('Titel und eindeutige URL-Kürzel sind erforderlich.'); ids.add(p.id); }
+            for (const p of req.body.data) { if (!p || typeof p.id !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$/.test(p.id) || typeof p.title !== 'string' || !p.title.trim() || p.title.length > 250 || ids.has(p.id) || (p.blocks && !Array.isArray(p.blocks))) throw fail('Titel und eindeutige URL-Kürzel sind erforderlich.'); ids.add(p.id); }
         }
         const newRevision = write(file, JSON.stringify(req.body.data, null, 4), req.body.revision);
         res.json({ revision: newRevision });
@@ -90,17 +96,12 @@ module.exports = function studio(app, root) {
         } else if (file ? !isPage(file) || typeof html !== 'string' : !files[type] || !Array.isArray(data)) throw fail('Ungültige Vorschau.');
         for (const [key, value] of drafts) if (Date.now() - value.time > 3600000) drafts.delete(key);
         if (!drafts.has(id) && drafts.size >= 50) throw fail('Zu viele Vorschauen. Bitte Server neu starten.');
-        drafts.set(id, { type, data, file, html, homeSection, time: Date.now() }); res.json({ prefix: `/preview/${id}/` });
+        drafts.set(id, { type, data, file, html, homeSection, time: Date.now() }); res.json({ prefix: (await preview.origin()) + `/preview/${id}/` });
     }));
     app.get('/preview/:id/*', route(async (req, res) => {
-        const draft = drafts.get(req.params.id); if (!draft) throw fail('Vorschau abgelaufen. Bitte Editor neu laden.', 404);
-        const relative = req.params[0]; const full = resolve(relative);
-        if (relative.startsWith('portfolio-manager/') || !allowed(relative)) throw fail('Datei nicht freigegeben.', 403);
-        if (draft.homeSection === 'hero' && relative === 'portfolio/home-hero.json') return res.json(draft.data);
-        if (draft.homeSection === 'resume' && relative === 'lebenslauf.json') return res.json(draft.data);
-        if (relative === draft.file) return res.type('html').send(draft.html);
-        if (relative === files[draft.type]) return res.json(draft.data);
-        res.sendFile(full);
+        const relative = req.params[0]; resolve(relative);
+        if (relative.startsWith('portfolio-manager/') || !allowed(relative)) return res.status(403).json({ error: 'Datei nicht freigegeben.' });
+        res.redirect(307, (await preview.origin()) + req.originalUrl);
     }));
     for (const folder of ['css', 'portfolio']) app.use('/' + folder, express.static(path.join(root, folder), { dotfiles: 'deny' }));
     async function history(refs) {
@@ -112,6 +113,7 @@ module.exports = function studio(app, root) {
         }));
     }
     async function status() {
+        clients.ensureCatalog();
         const branch = await git('symbolic-ref', '--short', 'HEAD');
         const raw = await git('status', '--porcelain=v1', '-z', '--untracked-files=all');
         const entries = raw ? raw.split('\0').filter(Boolean) : [];
@@ -119,6 +121,7 @@ module.exports = function studio(app, root) {
         for (let i = 0; i < entries.length; i++) {
             const entry = entries[i], state = entry.slice(0, 2), file = entry.slice(3);
             const renamed = /[RC]/.test(state); const previous = renamed ? entries[++i] : null;
+            if (file.startsWith('portfolio/kunden/data/')) continue;
             const conflicted = /U/.test(state) || ['AA','DD'].includes(state);
             changes.push({ file, previous, state, allowed: allowed(file) && !renamed && !conflicted,
                 label: conflicted ? 'Konflikt' : renamed ? 'Umbenannt · separat abschliessen' : state === '??' ? 'Neu' : state.includes('D') ? 'Gelöscht' : 'Geändert' });
@@ -129,8 +132,20 @@ module.exports = function studio(app, root) {
             [ahead, behind] = (await git('rev-list', '--left-right', '--count', 'HEAD...@{upstream}')).split(/\s+/).map(Number);
             [pending, pushed] = await Promise.all([history(['HEAD','--not','@{upstream}']), history(['@{upstream}'])]);
         } else pending = await history(['HEAD']);
-        const signature = hash(JSON.stringify({ head: await git('rev-parse', 'HEAD'), changes: changes.map(c => ({ ...c, hash: c.allowed && fs.existsSync(resolve(c.file)) && fs.statSync(resolve(c.file)).isFile() ? hash(fs.readFileSync(resolve(c.file))) : '' })) }));
-        return { branch, upstream, ahead, behind, pending, pushed, changes, signature, lastFetch, fetchError };
+        const snapshots = await Promise.all(changes.map(async change => {
+            const full = change.allowed ? resolve(change.file) : null;
+            let checksum = '';
+            if (full && fs.existsSync(full) && fs.statSync(full).isFile()) {
+                const digest = crypto.createHash('sha256');
+                for await (const chunk of fs.createReadStream(full)) digest.update(chunk);
+                checksum = digest.digest('hex');
+            }
+            return { ...change, hash: checksum };
+        }));
+        const head = await git('rev-parse', 'HEAD');
+        const signature = hash(JSON.stringify({ head, changes: snapshots }));
+        const contentSignature = hash(JSON.stringify({ head, changes: snapshots.filter(c => c.file !== 'portfolio/kunden/catalog.json') }));
+        return { branch, upstream, ahead, behind, pending, pushed, changes, signature, contentSignature, lastFetch, fetchError };
     }
     app.get('/api/studio/git', route(async (req, res) => {
         if (req.query.refresh === '1') await refreshRemote();
@@ -144,8 +159,10 @@ module.exports = function studio(app, root) {
         const diff = tracked ? await git('diff', 'HEAD', '--', file) : 'Neue Datei: ' + file;
         res.json({ diff: diff || 'Kein Text-Diff verfügbar (zum Beispiel bei binären Dateien).' });
     }));
+    app.get('/api/studio/publish/progress', (req, res) => res.json(publicationProgress));
     app.post('/api/publish', route(async (req, res) => {
-        publishing = true;
+        if (clients.isBusy() || app.locals.mediaBusy) throw fail('Bitte warten, bis der laufende Upload oder die Verschlüsselung abgeschlossen ist.', 409);
+        publishing = true; reportPublication({ stage: 'preparing', message: 'Veröffentlichung wird geprüft …' });
         let committed = false;
         try {
             const current = await status();
@@ -158,14 +175,32 @@ module.exports = function studio(app, root) {
             if (fetchError) throw fail(fetchError, 502);
             if ((await status()).signature !== current.signature) throw fail('Dateien wurden während der Prüfung verändert. Bitte erneut prüfen.', 409);
             if (Number(await git('rev-list', '--count', 'HEAD..@{upstream}')) > 0) throw fail('Auf GitHub gibt es neue Commits. Bitte zuerst lokal synchronisieren.', 409);
+            if (selected.includes('portfolio/kunden/catalog.json')) {
+                const result = await publishDelivery(root, clients.deliveryFiles(), reportPublication);
+                await clients.markDelivered(result.base);
+                // The upload only changes the expected delivery-base field. Any
+                // other externally changed source must still invalidate review.
+                const after = await status();
+                if (after.contentSignature !== current.contentSignature) throw fail('Dateien wurden während der Übertragung verändert. Bitte erneut prüfen.', 409);
+            }
             if (selected.length) {
+                reportPublication({ stage: 'committing', message: 'Website-Änderungen lokal sichern …' });
                 await git('add', '--', ...selected);
                 try { await git('commit', '--only', '-m', String(req.body.message), '--', ...selected); committed = true; } catch (e) { e.message = 'Commit fehlgeschlagen. Ausgewählte Dateien bleiben vorgemerkt und können erneut committed werden. ' + e.message; throw e; }
             }
-            await git('push');
+            const localBranch = await git('symbolic-ref', '--short', 'HEAD');
+            const remote = await git('config', `branch.${localBranch}.remote`);
+            const remoteRef = await git('config', `branch.${localBranch}.merge`);
+            const pending = (await git('rev-list', '--reverse', '@{upstream}..HEAD')).split('\n').filter(Boolean);
+            for (const [index, commit] of pending.entries()) {
+                reportPublication({ stage: 'publishing', completed: index, total: pending.length, message: `Website übertragen · Commit ${index + 1} von ${pending.length}` });
+                await pushChecked(root, remote, commit, remoteRef);
+            }
             await refreshRemote();
+            try { const publishedCatalog = await git('show', 'HEAD:portfolio/kunden/catalog.json'); if (publishedCatalog === fs.readFileSync(path.join(root, 'portfolio/kunden/catalog.json'), 'utf8').trimEnd()) await clients.markPublished(); } catch {}
+            reportPublication({ stage: 'done', message: 'Übertragung von GitHub bestätigt. Die Website wird anschliessend bereitgestellt.' });
             res.json({ state: await status(), success: true, committed, message: 'An GitHub übertragen. Der GitHub-Pages-Build wird hier nicht überwacht.' });
-        } catch (error) { if (committed) error.message = 'Der Commit wurde lokal erstellt, der Push ist fehlgeschlagen. Erneut prüfen und Push wiederholen. ' + error.message; throw error; }
-        finally { publishing = false; }
+        } catch (error) { reportPublication({ stage: 'failed', message: error.message }); if (committed) error.message = 'Der Commit wurde lokal erstellt, der Push ist fehlgeschlagen. Erneut prüfen und Push wiederholen. ' + error.message; throw error; }
+        finally { publishing = false; publicationProgress.active = false; }
     }));
 };
