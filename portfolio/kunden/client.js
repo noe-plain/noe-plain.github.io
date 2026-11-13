@@ -5,11 +5,14 @@
     const { assignSlugs, galleryLink, selectedEvent } = ClientGalleryLinks;
     const decoder = new TextDecoder();
     const folder = new URL('./data/', document.currentScript.src);
+    const catalogURL = new URL('./catalog.json', document.currentScript.src);
     const status = text => { $('client-status').textContent = text; };
     const make = (tag, text, cls) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (cls) node.className = cls; return node; };
     function urlFor(file) {
-        if (!/^[a-f0-9-]+\/(?:[a-f0-9-]+\/)?[a-zA-Z0-9.-]+$/.test(file)) throw Error('Ungültiger Galeriepfad.');
-        return new URL(file, folder);
+        if (!/^[a-zA-Z0-9_-]+\/(?:[a-zA-Z0-9_-]+\/){0,3}[a-zA-Z0-9.-]+$/.test(file) || file.split('/').some(part => part === '..' || part === '.')) throw Error('Ungültiger Galeriepfad.');
+        const base = new URL(state.event?.deliveryBase || folder, location.href);
+        if (base.username || base.password || !(base.origin === location.origin || base.protocol === 'https:' && base.hostname === 'raw.githubusercontent.com')) throw Error('Ungültige Galerieadresse.');
+        return new URL(file, base);
     }
     async function fetchBytes(url) { const response = await fetch(url, { cache: 'no-store' }); if (!response.ok) throw Error('Die Datei konnte nicht geladen werden. Bitte die Verbindung prüfen und erneut versuchen.'); return response.arrayBuffer(); }
     async function decrypt(buffer, key = state.key) { const bytes = new Uint8Array(buffer); return crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, key, bytes.slice(12)); }
@@ -74,7 +77,7 @@
         const heights = Array(cols).fill(0);
         [...grid.children].forEach((cell, index) => { const image = state.gallery.images[index], span = image.width / image.height < .8 ? 2 : 1; const col = heights.indexOf(Math.min(...heights)); cell.style.gridColumn = String(col + 1); cell.style.gridRow = `${heights[col] + 1} / span ${span}`; heights[col] += span; });
     }
-    async function imageData(image, kind) { const base = state.event.bundle.replace(/gallery\.bin$/, ''); return decrypt(await fetchBytes(urlFor(base + image[kind]))); }
+    async function imageData(image, kind) { const base = state.gallery.version === 2 ? '' : state.event.bundle.replace(/gallery\.bin$/, ''); return decrypt(await fetchBytes(urlFor(base + image[kind]))); }
     function renderGrid() {
         const grid = $('client-grid'), seq = state.generation; grid.replaceChildren();
         const jobs = [];
@@ -197,7 +200,10 @@
     async function load() {
         status('Veranstaltungen werden geladen …');
         try {
-            state.events = assignSlugs(JSON.parse(decoder.decode(await fetchBytes(new URL('index.json', folder)))));
+            let response = await fetch(catalogURL, { cache: 'no-store' });
+            if (response.status === 404) response = await fetch(new URL('index.json', folder), { cache: 'no-store' });
+            if (!response.ok) throw Error('Die Galerieübersicht ist noch nicht verfügbar.');
+            state.events = assignSlugs(await response.json());
             $('page-nav').replaceChildren();
             for (const event of state.events) {
                 const link = make('a', event.title, 'tab-btn'); link.href = '?' + encodeURIComponent(event.slug); link.dataset.id = event.id;

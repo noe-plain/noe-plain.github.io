@@ -16,9 +16,7 @@ async function open(entry, password, dir) {
     return { gallery: JSON.parse(new TextDecoder().decode(await decrypt(entry.bundle))), decrypt };
 }
 test('Secure customer upload, browser-compatible password, updates and pause', async t => {
-    const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'noe-clients-')); const manager = path.join(root, 'portfolio-manager'); await fsp.mkdir(manager);
-    for (const file of ['studio.js', 'media-library.js', 'client-galleries.js', 'photo-metadata.js']) await fsp.copyFile(path.join(__dirname, file), path.join(manager, file));
-    await fsp.mkdir(path.join(root, 'portfolio/kunden'), { recursive: true }); await fsp.copyFile(path.join(__dirname, '../portfolio/kunden/links.js'), path.join(root, 'portfolio/kunden/links.js'));
+    const root = await fsp.mkdtemp(path.join(os.tmpdir(), 'noe-clients-')); const manager = require('./test-support').copyRuntime(root);
     const { execFileSync } = require('node:child_process');
     execFileSync('git', ['init'], { cwd: root, stdio: 'ignore' }); execFileSync('git', ['remote', 'add', 'origin', 'git@github.com:noe-plain/noe-plain.github.io.git'], { cwd: root });
     const app = express(); require(path.join(manager, 'studio'))(app, root);
@@ -39,27 +37,40 @@ test('Secure customer upload, browser-compatible password, updates and pause', a
     assert.equal((await send({ title: 'Anderer Anlass', slug: '../bad', password: 'Ein-langes-Testpasswort' })).status, 400);
     result = await send({ ...event, title: 'Neuer Titel', slug: undefined, password: '' }); assert.equal(result.status, 200); event = await result.json(); assert.equal(event.slug, 'firmenfest');
     result = await send({ ...event, slug: 'firmenfest-2026', password: '' }); assert.equal(result.status, 200); event = await result.json();
-    assert.equal(JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/data/index.json')))[0].slug, 'firmenfest-2026');
+    assert.equal(JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/catalog.json')))[0].slug, 'firmenfest-2026');
     const form = new FormData(); form.append('revision', event.revision);
     const image = await sharp({ create: { width: 120, height: 80, channels: 3, background: '#ddcfe6' } }).jpeg().withExif({ IFD0: { Model: 'ILCE-7CM2', Artist: 'PRIVATE ARTIST' }, IFD2: { FNumber: '28/10', ISOSpeedRatings: '400' } }).toBuffer();
     form.append('images', new Blob([image], { type: 'image/jpeg' }), 'Testbild.jpg');
     result = await fetch(origin + `/api/studio/clients/${event.id}/upload`, { method: 'POST', headers: { Origin: origin, 'X-CMS-Token': token }, body: form }); assert.equal(result.status, 200); event = await result.json(); assert.equal(event.images.length, 1);
-    const dir = path.join(root, 'portfolio/kunden/data'); let entries = JSON.parse(await fsp.readFile(path.join(dir, 'index.json'))); let entry = entries[0];
+    const dir = path.join(root, 'portfolio-manager/.client-galleries/delivery'); const catalog = path.join(root, 'portfolio/kunden/catalog.json'); let entries = JSON.parse(await fsp.readFile(catalog)); let entry = entries[0];
     await assert.rejects(open(entry, 'Falsches-Passwort', dir));
     const unlocked = await open(entry, 'Ein-langes-Testpasswort', dir); assert.equal(unlocked.gallery.images[0].name, 'Testbild.jpg');
-    const full = await unlocked.decrypt(entry.bundle.replace('gallery.bin', unlocked.gallery.images[0].full));
+    const full = await unlocked.decrypt(unlocked.gallery.images[0].full);
     const meta = await sharp(Buffer.from(full)).metadata(); assert.equal(meta.width, 120); assert.ok(!meta.exif.includes(Buffer.from('PRIVATE ARTIST')));
     const allPublic = await fsp.readdir(path.join(dir, event.id, event.release || entry.bundle.split('/')[1])); assert.ok(allPublic.every(file => file.endsWith('.bin')));
-    assert.ok(!(await fsp.readFile(path.join(dir, 'index.json'), 'utf8')).includes('Testbild'));
+    assert.ok(!(await fsp.readFile(catalog, 'utf8')).includes('Testbild'));
     assert.ok(!(await (await fetch(origin + '/api/studio/clients')).text()).includes('Ein-langes-Testpasswort'));
     const stale = await send({ ...event, revision: 'old', password: '' }); assert.equal(stale.status, 409);
+    // A metadata-only save must work even while the plaintext original is unavailable.
+    const original = path.join(root, 'portfolio-manager/.client-galleries', event.id, event.images[0].id + '.jpg');
+    const imagePaths = ['full', 'preview', 'thumb'].map(kind => unlocked.gallery.images[0][kind]);
+    const encryptedBefore = imagePaths.map(name => fs.readFileSync(path.join(dir, name)));
+    fs.renameSync(original, original + '.held');
+    try {
+        result = await send({ ...event, images: event.images.map(image => image.id), description: 'Nur eine neue Nachricht', password: '' });
+        assert.equal(result.status, 200); event = await result.json();
+    } finally { fs.renameSync(original + '.held', original); }
+    entry = JSON.parse(await fsp.readFile(catalog))[0];
+    const metadataUpdate = await open(entry, 'Ein-langes-Testpasswort', dir);
+    assert.deepEqual(['full', 'preview', 'thumb'].map(kind => metadataUpdate.gallery.images[0][kind]), imagePaths);
+    for (const [index, name] of imagePaths.entries()) assert.deepEqual(fs.readFileSync(path.join(dir, name)), encryptedBefore[index]);
     const oldEntry = entry;
     result = await send({ ...event, images: event.images.map(i => i.id), password: 'Ein-neues-Testpasswort' }); assert.equal(result.status, 200); event = await result.json();
-    entries = JSON.parse(await fsp.readFile(path.join(dir, 'index.json'))); entry = entries[0];
+    entries = JSON.parse(await fsp.readFile(catalog)); entry = entries[0];
     await assert.rejects(open(entry, 'Ein-langes-Testpasswort', dir)); await open(entry, 'Ein-neues-Testpasswort', dir);
-    assert.ok(!fs.existsSync(path.join(dir, oldEntry.bundle)));
+    assert.equal((await fetch(origin + '/portfolio/kunden/data/' + oldEntry.bundle)).status, 404);
     result = await send({ ...event, images: event.images.map(i => i.id), active: false, password: '' }); assert.equal(result.status, 200);
-    assert.deepEqual(JSON.parse(await fsp.readFile(path.join(dir, 'index.json'))), []); assert.ok(!fs.existsSync(path.join(dir, entry.bundle)));
+    assert.deepEqual(JSON.parse(await fsp.readFile(catalog)), []); assert.equal((await fetch(origin + '/portfolio/kunden/data/' + entry.bundle)).status, 404);
 });
 test('ZIP selection preserves bytes and disambiguates duplicate filenames', async () => {
     const zip = createZip([{ name: 'Bild.jpg', data: new Uint8Array([1, 2, 3]) }, { name: 'Bild.jpg', data: new Uint8Array([4, 5]) }]);
@@ -134,7 +145,7 @@ test('Customer upload accepts 500 files at once and rejects larger batches or a 
     const done = await (await fetch(origin + '/api/studio/clients/progress?operation=' + operation)).json(); assert.equal(done.stage, 'done'); assert.equal(done.active, false);
     assert.deepEqual(Object.keys(done).sort(), ['active', 'completed', 'operation', 'stage', 'total']);
     assert.equal(await (await fetch(origin + '/api/studio/clients/progress?operation=' + crypto.randomUUID())).json(), null);
-    const index = JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/data/index.json'))); assert.equal(index[0].count, 500);
+    const index = JSON.parse(await fsp.readFile(path.join(root, 'portfolio/kunden/catalog.json'))); assert.equal(index[0].count, 500);
     const additional = await upload(1); assert.equal(additional.status, 400); assert.match((await additional.json()).error, /Galerie.*500/);
     const current = await (await fetch(origin + '/api/studio/clients')).json(); assert.equal(current[0].images.length, 500); assert.equal(current[0].revision, event.revision);
 });

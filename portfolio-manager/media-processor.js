@@ -32,8 +32,8 @@ function getSharpSettings(format) {
 }
 
 /** Four public variants per image; the source is kept separately in raw/. */
-async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standardExt = null) {
-    const rawDestDir = path.join(destDir, 'raw');
+async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standardExt = null, options = {}) {
+    const rawDestDir = options.sourceDir || path.join(destDir, 'raw');
     ensureDir(rawDestDir);
     ensureDir(destDir);
     const rawFilePath = path.join(rawDestDir, `${baseNameWithoutExt}${rawExt}`);
@@ -43,17 +43,23 @@ async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standa
     const mobileJpegPath = path.join(destDir, `${baseNameWithoutExt}-mobile.jpg`);
     const webpPath = path.join(destDir, `${baseNameWithoutExt}.webp`);
     const mobileWebpPath = path.join(destDir, `${baseNameWithoutExt}-mobile.webp`);
-    const metadata = photoMetadata((await sharp(rawFilePath).metadata()).exif);
-    const image = () => {
-        const pipeline = sharp(rawFilePath).rotate().flatten({ background: '#ffffff' });
-        // Replace EXIF rather than merging it; other source metadata stays stripped.
-        return Object.keys(metadata).length ? pipeline.withExif(metadata) : pipeline;
-    };
-    // Full dimensions and maximum JPEG quality. Smaller variants never upscale.
-    await image().jpeg({ quality: 100, chromaSubsampling: '4:4:4' }).toFile(standardPath);
-    await image().resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 85 }).toFile(mobileJpegPath);
-    await image().resize({ width: 2560, withoutEnlargement: true }).webp({ quality: 85, effort: 4 }).toFile(webpPath);
-    await image().resize({ width: 640, withoutEnlargement: true }).webp({ quality: 80, effort: 4 }).toFile(mobileWebpPath);
+    const outputs = [standardPath, mobileJpegPath, webpPath, mobileWebpPath];
+    try {
+        const metadata = photoMetadata((await sharp(rawFilePath, { limitInputPixels: 100_000_000, failOn: 'warning' }).metadata()).exif);
+        const image = () => {
+            const pipeline = sharp(rawFilePath, { limitInputPixels: 100_000_000, failOn: 'warning' }).rotate().flatten({ background: '#ffffff' });
+            // Replace EXIF rather than merging it; other source metadata stays stripped.
+            return Object.keys(metadata).length ? pipeline.withExif(metadata) : pipeline;
+        };
+        // Full dimensions and maximum JPEG quality. Smaller variants never upscale.
+        await image().jpeg({ quality: 100, chromaSubsampling: '4:4:4' }).toFile(standardPath);
+        await image().resize({ width: 640, withoutEnlargement: true }).jpeg({ quality: 85 }).toFile(mobileJpegPath);
+        await image().resize({ width: 2560, withoutEnlargement: true }).webp({ quality: 85, effort: 4 }).toFile(webpPath);
+        await image().resize({ width: 640, withoutEnlargement: true }).webp({ quality: 80, effort: 4 }).toFile(mobileWebpPath);
+    } catch (error) {
+        for (const file of [...outputs, rawFilePath]) await fs.promises.rm(file, { force: true });
+        throw error;
+    }
     return { success: true, rawPath: rawFilePath, standardPath, mobileJpegPath, webpPath, mobileWebpPath };
 }
 
@@ -64,8 +70,8 @@ async function processImage(srcPath, destDir, baseNameWithoutExt, rawExt, standa
  * - Transcodes in background to H.264 MP4, Apple HEVC/H.265 MP4, HLS segments
  * - Extracts a WebP poster frame
  */
-function processVideo(srcPath, destDir, baseNameWithoutExt, originalExt) {
-    const rawDestDir = path.join(destDir, 'raw');
+function processVideo(srcPath, destDir, baseNameWithoutExt, originalExt, options = {}) {
+    const rawDestDir = options.sourceDir || path.join(destDir, 'raw');
     const hlsDestDir = path.join(destDir, 'hls');
     ensureDir(rawDestDir);
     ensureDir(hlsDestDir);
@@ -153,7 +159,8 @@ function processVideo(srcPath, destDir, baseNameWithoutExt, originalExt) {
         success: true,
         statusUrl: `/api/media/status/${baseNameWithoutExt}`,
         rawPath: rawFilePath,
-        posterPath: `../../images/portfolio/${path.basename(destDir)}/${baseNameWithoutExt}-poster.webp`
+        statusFilePath,
+        posterUrl: options.posterUrl || `../../images/portfolio/${path.basename(destDir)}/${baseNameWithoutExt}-poster.webp`
     };
 }
 

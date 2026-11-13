@@ -4,3 +4,14 @@ node_modules/
 
 # Private customer sources and encryption keys must stay on this Mac.
 portfolio-manager/.client-galleries/
+
+# Local originals and recoverable media deletion; never publish these.
+portfolio-manager/.media-sources/
+portfolio-manager/.media-trash/
+images/**/raw/
+images/**/temp/
+# Legacy encrypted files remain intact; new deliveries use a separate Git branch.
+portfolio/kunden/data/
+.env
+.env.*
+!.env.example
