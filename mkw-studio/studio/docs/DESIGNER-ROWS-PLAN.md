@@ -1,5 +1,36 @@
 # Designer-Reihen: Ziel und verbleibender Auftrag
 
+## Verbindliche Priorisierung · 13. November 2026
+
+Die folgende vom Nutzer bestätigte Reihenfolge ist die aktuelle Arbeitsgrundlage. Sie ersetzt ältere Prioritäts-/„Nächster Schritt“-Angaben in diesem Dokument, im InDesign-Plan und in bisherigen Berichten. Die darunterstehenden technischen Anforderungen und Nachweise bleiben erhalten. Bereits umgesetzte Schritte vor Arbeitsbeginn mit aktuellem origin/main und dem neuesten Bericht abgleichen; keine Arbeit erneut bei null beginnen.
+
+### Phase 1: Bestehendes Studio vervollständigen
+
+1. **Bildkommentare fertigstellen:** sichtbare Material-3-UI in der Vorschau, Hinzufügen/Bearbeiten/Entfernen, diskrete Anzeige beim zugehörigen Bild auf der Fläche, stabile Zuordnung, validierte Eingabe, Undo/Redo/Abbruch und vollständige Speicherung. MKW-/ZIP-Rundlauf sowie tatsächliche PNG/PDF/PSD-Ausgaben auf unveränderte Motivpixel prüfen. Der nachgewiesene Speichervertrag ist eine Grundlage, keine fertige Kommentarfunktion.
+2. **FD-Backup-Modus entfernen:** Abhängigkeiten und benötigte Features aller verbleibenden Modi analysieren, gemeinsame Fähigkeiten erhalten, ungenutzten Code/UI/Assets bereinigen und die verbleibenden Abläufe inklusive Dateikompatibilität regressionsprüfen. Details im Abschnitt zum FD-Backup-Auftrag unten.
+
+### Phase 2: Editor verbessern
+
+1. **Formvorschau beim Zeichnen** – tatsächliche Form/Füllung/Kontur während der Geste, sicherer Abbruch ohne Dokumentänderung.
+2. **Winkel mit Farbfüllung** – vorhandene Bildfüllung und alte Dateien erhalten, Farbe/Deckkraft ergänzen und Darstellung/Exporte prüfen.
+3. **Pipette** – Farbe aus dem Arbeitsbereich mit korrekten Koordinaten und sicherem Abbrechen übernehmen.
+4. **Fünfteilige Farbhilfe** – fünf Bildfarben der aktiven Reihe und passende Vorschläge unter Berücksichtigung des Dokuments, gezielte Übernahme.
+
+### Phase 3: Dateiformate erweitern
+
+1. **Bearbeitbare IDML** – auf der tatsächlich in InDesign abgenommenen leeren Basis aufbauen; erster begrenzter Inhaltsschritt ein einfacher bearbeitbarer Textrahmen mit echtem InDesign-Test. Danach schrittweise nach dem InDesign-Plan fortfahren. PSD bleibt bis zur vollständigen repräsentativen Abnahme verfügbar; MKW bleibt Projektformat.
+2. **SVG als reguläres Bildformat** – Import/Platzieren/Ersetzen, Masse/Transparenz/Skalierung, Assetrundlauf und bestehende Exporte abnehmen.
+
+### Phase 4: Gestaltung
+
+1. **Neue Vorlagen entwerfen und zur Freigabe vorlegen** – visuelle Vorschauen mit Gestaltungsbegründung; erst ausdrücklich gutgeheissene Entwürfe in die mitgelieferte Bibliothek übernehmen.
+2. **Startseite und Bildvorschau verbessern** – das auswählbare Bild deutlicher darstellen und den betreffenden UI-Bereich entsprechend überarbeiten.
+
+**Arbeitsregel:** Innerhalb jeder Phase die angegebene Reihenfolge einhalten und zunächst den vorherigen Schritt im relevanten Umfang fertigstellen, prüfen und dokumentieren. Pro begrenztem Guthabenfenster nur einen sauber abschliessbaren Teil umsetzen; die Phasen sind kein Versprechen, alles in einem Lauf zu erledigen. Notwendige kritische Fehlerkorrekturen dürfen vorgezogen werden und sind im Bericht zu begründen. Material Design 3, wartbarer Code, Computer als Hauptgerät, die sechs Personas und die bestehenden Guthaben-/Freigaberegeln gelten durchgehend.
+
+**Einordnung weiterer bisheriger Aufgaben:** Die vereinheitlichte Werkzeugleiste ohne Advanced-Schalter ist im aktuellen Kampagnen-Vorschau-Bericht bereits als umgesetzt dokumentiert; nicht erneut als offenen Ausbau beginnen. Allgemeine Dateibereinigung wird in Phase 1.2 mit erledigt, soweit sie zur FD-Backup-Entfernung gehört. Darüber hinausgehende Bereinigung bleibt im Backlog und überholt die bestätigten Phasen nicht. Die Einzelheiten der anderen Aufträge bleiben in den jeweiligen Abschnitten unten erhalten.
+
+
 Bestätigt am 11. November 2026: Eine Reihe entspricht einem bisherigen Designer-Projekt mit 1–20 normalen, bündig nebeneinanderliegenden Slides. Mehrere solcher Reihen stehen untereinander in EINER MKW-Datei. Die Oberfläche und normalen Bearbeitungsaktionen sollen diesen Zusammenhang vermitteln. Das vorhandene Gruppenmodell wird wiederverwendet; kein zweiter Projektbaum und keine eingebetteten eigenständigen MKW-Dokumente.
 
 Der Nutzer bat zuerst um Umsetzung der sechs Punkte am Donnerstag, 12. November, dann um sofortige Umsetzung dessen, was innerhalb des aktuellen Guthabens sauber möglich ist, und Planung des Rests. Ein gesamter Lauf inklusive Prüfung, Korrekturen, Veröffentlichung und Bericht bleibt auf das Guthaben EINES Fünf-Stunden-Fensters begrenzt. Keine Zusatzcredits, API-Abrechnung, automatischen Reset-Gutscheine, Zusatzagenten oder Nutzung eines weiteren Fensters. Geteilte Fünf-Stunden- und Wochenlimits jeweils tatsächlich prüfen; unbekannte Werte nicht als Kapazität behandeln. Mindestens ein Drittel des anfänglichen verfügbaren Rests für Abschluss/Prüfung behalten; spätestens bei etwa 20 % verbleibendem Kontingent keine Funktion mehr anfangen.
@@ -41,13 +72,9 @@ Nutzerwunsch vom 12. November umgesetzt: Klick auf **„Ebenen – N“** in der
 
 Erster vollständiger CI-Lauf `43182083492`: Chrome erfolgreich, Firefox mit einem Fehler am alten Drehgriff-Test. Dessen echte Pointer-Geste erhielt in `55cb80b` explizite Startbedingungen (Projekt/Fonts bereit, Griff stabil/erreichbar, Hit-Test auf tatsächlichen Griff); die Assertion auf geänderten Winkel bleibt unverändert. Lokal kompletter Firefox-Fall mit 50-Bilder-Rundlauf sowie gezielter Chrome-Fall bestanden. Vollständiger Folgelauf 43184759168 für 55cb80b erfolgreich, beide Browser bestanden. Nach anschliessenden Material-3-Feinkorrekturen den neuesten Endlauf ebenfalls direkt prüfen.
 
-### Nächste begrenzte Aufgaben
+### Historische Aufgabenliste vom 12. November
 
-1. Neue Reihenabläufe anhand tatsächlicher Rückmeldungen nachprüfen, bei Bedarf gezielt korrigieren; nicht die abgeschlossene Grundarbeit wiederholen.
-2. Nächster normaler IDML-Schritt: genau ein einfacher bearbeitbarer Textrahmen mit echtem InDesign-Test. Bestehende leere Datei nicht erneut beginnen, PSD behalten.
-3. Zeichen-/Farbwerkzeuge getrennt umsetzen: echte Formvorschau, Winkel-Farbfüllung, Pipette, anschliessend fünfteilige Farbhilfe. Keine Umsetzung allein aus der Planung ableiten.
-4. Studio-Bereinigung mit Abhängigkeits-/Grösseninventar und Regression planen, siehe unten. Alles für Bearbeitung und bestehende Dateien Nötige erhalten.
-5. Vorlagenentwürfe nach Gestaltungsgrundsätzen visuell vorlegen; nur ausdrücklich freigegebene Entwürfe mitliefern.
+Die frühere Reihenfolge an dieser Stelle ist durch die verbindliche Vier-Phasen-Priorisierung vom 13. November am Dokumentanfang ersetzt. Anforderungen und bereits erreichte Prüfungen bleiben in den Fachabschnitten erhalten.
 
 ## Historischer Ausgangsstand am 11. November
 

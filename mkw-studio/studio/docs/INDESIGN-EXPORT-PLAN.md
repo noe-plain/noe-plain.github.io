@@ -1,5 +1,10 @@
 # Geplant: schrittweiser InDesign-Export
 
+## Aktuelle Priorität · 13. November 2026
+
+Der Nutzer ordnet die bearbeitbare IDML-Weiterentwicklung ausdrücklich **Phase 3.1** zu. Zuerst Phase 1 (Bildkommentare fertigstellen, FD-Backup entfernen) und Phase 2 (Formvorschau, Winkel-Farbfüllung, Pipette, fünfteilige Farbhilfe) gemäss [verbindlichem Studio-Plan](DESIGNER-ROWS-PLAN.md) bearbeiten. Dies ersetzt ältere Aussagen, IDML sei unmittelbar der nächste Wochen-Schritt. Die technische Reihenfolge innerhalb dieses Exportplans bleibt erhalten: vorhandene echte Einseiten-Abnahme nutzen, mit genau einem bearbeitbaren Textrahmen und echtem InDesign-Test fortfahren. PSD und MKW bleiben gemäss den bestehenden Abnahmeregeln verfügbar.
+
+
 Auftrag vom 6. November 2026: Die PSD-Speichermöglichkeit soll künftig durch einen InDesign-Export ersetzt werden. Der Nutzer hat ausdrücklich klargestellt, dass dies derzeit geplant ist und schrittweise mit den bestehenden Wochen-Updates umgesetzt werden soll. Seit 11. November besteht eine experimentelle, tatsächlich in InDesign geprüfte Einseiten-Basis; ein vollständiger Projekt-Export ist noch nicht verfügbar.
 
 ## Ziel
