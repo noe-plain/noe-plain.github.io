@@ -70,11 +70,15 @@ async function selectTextScope(page, selector, values) {
 }
 async function ensureCanvasTextEditing(page) {
   const active = await page.evaluate(() =>
-    p.carousel ? !!carouselUI.editing : !!editingText,
+    p.carousel
+      ? carouselUI.editing?.id === carouselSelected()[0]?.id
+      : editingText?.boardId === selected && editingText?.key === layer,
   );
   if (!active) await page.locator("[data-text-edit-action]").click();
   await page.waitForFunction(() =>
-    p.carousel ? !!carouselUI.editing : !!editingText,
+    p.carousel
+      ? carouselUI.editing?.id === carouselSelected()[0]?.id
+      : editingText?.boardId === selected && editingText?.key === layer,
   );
   await page.evaluate(() =>
     MKWInlineText.focus(p.carousel ? carouselUI.editing.el : editingText.el),
