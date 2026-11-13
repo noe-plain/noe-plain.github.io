@@ -106,7 +106,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
     assert.equal(
       await page
         .locator("#carouselProperties h4")
-        .filter({ hasText: "Seiten & Artboards" })
+        .filter({ hasText: "Reihen & Slides" })
         .count(),
       1,
     );

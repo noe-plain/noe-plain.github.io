@@ -87,12 +87,7 @@ function studioSettingsUI() {
   studioDensitySettings(density);
   density.querySelector("legend").classList.add("sr-only");
   panels.general.append(appearance, colours);
-  const advanced = dialog.querySelector(".settings-advanced");
-  advanced.querySelector("h3").textContent = "Werkzeuge im Designer";
-  advanced.querySelector("strong").textContent = "Advanced-Modus";
-  advanced.querySelector("small").textContent =
-    "Pfade, Kurven, Formen und Formkonstrukteur im Designer sowie genaue Textformatierung in beiden Editoren. Die Designer-Werkzeugleiste steht dann links.";
-  panels.workflow.append(advanced, density);
+  panels.workflow.append(density);
   const preferences = dialog.querySelector(".settings-preferences"),
     exportLabel = preferences.querySelector(".settings-export-format"),
     exportHeading = exportLabel.previousElementSibling,
@@ -367,14 +362,6 @@ function studioSettingsUI() {
     "Hauptfarbe & Farbkonzept",
     "Normal, Komplementär, Harmonisch oder Lebendig.",
     "farben palette bunt farbwahl",
-  );
-  register(
-    "advanced",
-    "workflow",
-    ".settings-advanced",
-    "Advanced-Modus",
-    "Pfade, Kurven und Formen im Designer freischalten.",
-    "werkzeuge toolbar links formkonstrukteur",
   );
   register(
     "density",

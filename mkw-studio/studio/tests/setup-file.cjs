@@ -52,7 +52,7 @@ const { launch, artifact } = require("./browser.cjs");
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
     await page.locator("#settings-tab-workflow").click();
-    await page.locator("#advancedMode").check();
+
     await page.locator("#settings-tab-export").click();
     await page.locator("#autoSaveFile").uncheck();
     await page.locator("#settings-tab-guides").click();

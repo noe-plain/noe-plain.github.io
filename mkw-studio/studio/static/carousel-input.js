@@ -15,8 +15,9 @@ function carouselPoint(ev) {
 
 function carouselHit(pt) {
   return [...p.carousel.objects].reverse().find((o) => {
-    if (o.pageFragment) {
-      const a = p.carousel.artboards.find((a) => a.id === o.pageId);
+    const contentFrame = MKWCarouselPolicy.contentFrame(p.carousel, o);
+    if (contentFrame) {
+      const a = contentFrame;
       if (
         !a ||
         pt.x < a.x ||
@@ -99,7 +100,9 @@ function carouselPointer(ev) {
   if (
     busy ||
     ev.button !== 0 ||
-    ev.target.closest("textarea,button,input,.carousel-inline-text")
+    ev.target.closest(
+      "textarea,button,input,select,.carousel-inline-text,.campaign-card",
+    )
   )
     return;
   carouselEndText();
@@ -170,6 +173,15 @@ function carouselPointer(ev) {
     return;
   }
   const hit = carouselHit(pt);
+  if (p.carousel.pageStructure) {
+    const page = MKWCarouselPolicy.frames(p.carousel).find(
+      (a) => pt.x >= a.x && pt.x < a.x + a.w && pt.y >= a.y && pt.y < a.y + a.h,
+    );
+    if (page) {
+      carouselUI.slide = null;
+      carouselRow({ pageId: page.id });
+    }
+  }
   if (tool === "text" && hit?.type === "text") {
     carouselSelect([hit.id]);
     carouselEditText(hit);
@@ -244,13 +256,19 @@ function carouselCreateDrag(ev, type, start) {
         height: rect.h * carouselZoom + "px",
       });
     },
-    () => {
+    async () => {
       if (rect.w * carouselZoom < 5 || rect.h * carouselZoom < 5) {
         sketch.remove();
         status("Rahmen mit gedrückter Maustaste aufziehen.");
         return;
       }
+      const inherited =
+        p.campaign && type === "text"
+          ? await MKWCampaignUI.textChoice(rect)
+          : {};
+      if (inherited === null) return;
       const o = carouselObject(type, {
+        ...inherited,
         x: rect.x,
         y: rect.y,
         w: rect.w,
@@ -556,6 +574,7 @@ function carouselMove(ev) {
     },
     () => {
       if (begun) {
+        for (const o of objects) carouselAssignArtboard(o);
         changed(false);
       }
       carouselPanel();

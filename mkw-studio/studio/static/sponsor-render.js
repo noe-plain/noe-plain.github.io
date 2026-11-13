@@ -92,7 +92,7 @@ async function paintSponsors(ctx, b, opts = {}) {
     // Align the first visible glyph, rather than its typographic side bearing.
     ctx.fillText(group.name, group.x + bearing, group.y, group.w);
     for (const logo of group.logos) {
-      const asset = p.logos.find((a) => a.id === logo.id);
+      const asset = (opts.project || p).logos.find((a) => a.id === logo.id);
       if (!asset) continue;
       const mode = MKWSponsors.mode(logo, r.colour),
         bitmap = await sponsorBitmap(asset, mode, r.colour);

@@ -1,4 +1,5 @@
 "use strict";
+MKWCampaignUI.install();
 icons();
 busy = true;
 const startDialog = $("#startDialog");
@@ -25,6 +26,7 @@ startDialog.addEventListener("cancel", (event) => event.preventDefault());
     $("#startTemplates").disabled =
     $("#startDesigner").disabled =
       false;
+  $("#startCampaignPreview").disabled = false;
   $("#startOpen").onclick = () =>
     MKWProjects.library().catch((error) => MKWProjects.notice(error.message));
   $("#startNew").onclick = openProjectSetup;

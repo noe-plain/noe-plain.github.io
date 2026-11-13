@@ -39,7 +39,7 @@ header {
   position: fixed;
   top: auto;
   right: auto;
-  bottom: 58px;
+  bottom: 72px;
   left: calc((100% - var(--studio-shell-side)) / 2);
   transform: translateX(-50%);
   border: 0;
@@ -972,4 +972,18 @@ footer #carouselCoordinates {
     height: 48px;
     min-width: 48px;
   }
+}
+
+/* Keep every tool and paint action reachable when the floating pill is short. */
+.carousel-contextbar .studio-tool-surface {
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+.carousel-contextbar .studio-tool-surface::-webkit-scrollbar {
+  display: none;
+}
+.carousel-contextbar .carousel-toolrail {
+  flex: none;
+  overflow: visible;
 }

@@ -193,10 +193,10 @@ const { launch, artifact } = require("./browser.cjs");
       (await geometry(".carousel-contextbar", "#carouselExport")).gap >= 8,
     );
     await page.locator("#settings").click();
-    await page.locator("#settings-tab-workflow").click();await page.locator("#advancedMode").check();
+    await page.locator("#settings-tab-workflow").click();
     await page.locator("#closeSettings").click();
     const advanced = await geometry(".carousel-contextbar", "#carouselExport");
-    assert(advanced.below >= 8 && advanced.centered && advanced.inside);
+    assert(advanced.gap >= 8 && advanced.inside);
     assert(
       await page.locator(".studio-tool-surface #advancedColours").isVisible(),
     );

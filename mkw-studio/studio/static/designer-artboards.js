@@ -505,7 +505,8 @@ const MKWArtboardUI = (() => {
           summary = document.createElement("summary"),
           slot = document.createElement("div");
         format.className = "carousel-property-section spread-current-format";
-        format.innerHTML = "<h4>Format dieser Seite</h4>";
+        format.innerHTML =
+          "<h4>Format für dieses Artboard</h4><p class=artboard-help>Breite, Höhe und Schutzzonen gelten für alle Slides dieser Gruppe.</p>";
         fields.className = "carousel-fields";
         for (const key of ["w", "h"])
           fields.append(
@@ -521,12 +522,18 @@ const MKWArtboardUI = (() => {
         host.querySelector("#designerMoveContent").disabled = true;
         host.querySelector(".artboard-move-content").hidden = true;
         host.querySelector(".artboard-help").textContent =
-          "Positionen gelten für den ganzen Bogen. Inhalte bleiben bei ihrer Seite. Grösse und Schutzzonen verändern keine Elementgrössen.";
+          "Position, Grösse und Schutzzonen gelten für das ganze Artboard. Elementgrössen bleiben erhalten.";
         details.className = "spread-page-details";
         summary.textContent = "Position, Schutzzone & Hintergrund";
         details.append(summary, sections[1], sections[2]);
         host.prepend(format, slot);
         host.append(details);
+        if (MKWSpreadUI.selectedBoard()) {
+          format.hidden = true;
+          carouselArtboardFormatPanel(host, index);
+          host.prepend(host.lastElementChild);
+        }
+        if (!MKWSpreadUI.selectedBoard()) MKWSpreadUI.slidePanel(host, a.id);
         MKWSpreadUI.panel(slot);
       } else MKWSpreadUI.panel(host);
     } else {

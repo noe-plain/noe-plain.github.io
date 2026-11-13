@@ -416,9 +416,31 @@ $("#savePSD").onclick = async () => {
   MKWFields.notice($("#psdStatus"), "PSD wird vorbereitet …");
   try {
     // Open the native picker while the click still has user activation, before generating the PSD.
-    const name = saveFileName("psd"),
+    const rowOnly =
+        p.carousel?.pageStructure &&
+        document.querySelector("#psdRowScope")?.value === "row",
+      row = rowOnly ? carouselRow() : null,
+      source = row
+        ? {
+            ...p,
+            carousel: MKWRowScope.extract(
+              p.carousel,
+              row.page.id,
+              carouselPaintBounds,
+            ),
+          }
+        : p;
+    const name = row
+        ? saveFileName("psd").replace(
+            /\.psd$/i,
+            `_R${String(p.carousel.pageStructure.artboardInfo.findIndex((a) => a.id === row.info.id) + 1).padStart(2, "0")}.psd`,
+          )
+        : saveFileName("psd"),
       handle = await chooseSaveTarget(name, "psd");
-    const file = await buildPSD((text) => ($("#psdStatus").textContent = text));
+    const progress = (text) => ($("#psdStatus").textContent = text);
+    const file = row
+      ? await buildCarouselPSD(progress, source)
+      : await buildPSD(progress);
     await writeSaveFile(handle, file, name);
     $("#psdStatus").textContent =
       (handle ? "PSD gespeichert." : "PSD-Download gestartet.") +

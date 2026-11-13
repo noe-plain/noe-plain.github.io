@@ -89,7 +89,7 @@ const { launch, artifact } = require("./browser.cjs");
     const search = page.locator("#settingsSearch");
     for (const [query, category, target] of [
       ["Farbe", "general", ".settings-colours"],
-      ["Advanced", "workflow", ".settings-advanced"],
+      ["Bedienelemente", "workflow", ".settings-controls"],
       ["Stege", "guides", ".settings-designer-grid"],
       ["Schriftgrössen", "fonts", ".settings-text-sizes"],
       ["Sponsorgruppen", "sponsors", "#settings-panel-sponsors"],

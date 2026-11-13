@@ -10,6 +10,7 @@
     "script",
     "underline",
     "strike",
+    "family",
   ];
   const finite = (v, a, b) => Number.isFinite(v) && v >= a && v <= b;
   function attributes(value) {
@@ -223,7 +224,7 @@
           !finite(s.baselineShift, -5000, 5000)) ||
         (s.script !== undefined &&
           !["normal", "superscript", "subscript"].includes(s.script)) ||
-        ["uppercase", "underline", "strike"].some(
+        ["uppercase", "underline", "strike", "family"].some(
           (key) => s[key] !== undefined && typeof s[key] !== "boolean",
         )
       )

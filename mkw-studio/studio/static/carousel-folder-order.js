@@ -79,10 +79,19 @@ function carouselReorderFolder(c, folderId, targetKey, after = false) {
   };
 }
 function carouselMoveFolder(folderId, targetKey, after = false, record = true) {
-  const next = carouselReorderFolder(p.carousel, folderId, targetKey, after);
+  if (!carouselCanEditRowFolders()) return false;
+  const next = carouselReorderFolder(
+    carouselRowScope().view,
+    folderId,
+    targetKey,
+    after,
+  );
   if (!next) return false;
   if (record) checkpoint();
-  Object.assign(p.carousel, next);
+  p.carousel = MKWRowScope.mergeOrder(p.carousel, {
+    ...carouselRowScope().view,
+    ...next,
+  });
   if (record) changed();
   return true;
 }

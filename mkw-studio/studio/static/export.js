@@ -13,7 +13,8 @@ let exportOptions = {
 const exportCache = new Map();
 let exportCacheBytes = 0,
   reviewIndex = 0,
-  reviewURL;
+  reviewURL,
+  reviewGeneration = 0;
 function clearExportCache() {
   for (const entry of exportCache.values()) URL.revokeObjectURL(entry.url);
   exportCache.clear();
@@ -198,19 +199,16 @@ async function openExport() {
   $("#png8").checked = exportOptions.png8;
   $("#pngColours").value = exportOptions.colours;
   $("#exportTransparent").checked = exportOptions.transparent;
-  $("#exportNames").innerHTML = orderedBoards()
-    .map(
-      (b) =>
-        `<label class="export-card" data-id="${esc(b.id)}"><div class="export-preview"><span>Vorschau wird berechnet …</span></div><input type="checkbox" data-export-id="${esc(b.id)}" ${b.checked ? "checked" : ""}> <small>${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px</small><span class="export-name"></span><small class="export-size">Dateigrösse wird berechnet …</small></label>`,
-    )
-    .join("");
+  $("#exportNames").innerHTML = MKWExportPanel.selection(orderedBoards());
   $("#exportNames").onchange = (ev) => {
     if (ev.target.dataset.exportId) {
-      p.boards.find((b) => b.id === ev.target.dataset.exportId).checked =
-        ev.target.checked;
-      changed(false);
-      updateExportNames();
-      updateExportTotal();
+      exportSetSelection(
+        p.boards
+          .filter((b) =>
+            b.id === ev.target.dataset.exportId ? ev.target.checked : b.checked,
+          )
+          .map((b) => b.id),
+      );
     }
   };
   setExportProgress(0, 1, "Bereit zum Exportieren");
@@ -271,14 +269,7 @@ document.querySelectorAll("[data-export-format]").forEach(
     }),
 );
 function selectExports(checked) {
-  if (busy) return;
-  p.boards.forEach((b) => (b.checked = checked));
-  document
-    .querySelectorAll("[data-export-id]")
-    .forEach((input) => (input.checked = checked));
-  changed(false);
-  updateExportNames();
-  updateExportTotal();
+  exportSetSelection(checked ? p.boards.map((b) => b.id) : []);
 }
 $("#selectAllExports").onclick = () => selectExports(true);
 $("#deselectAllExports").onclick = () => selectExports(false);
@@ -369,6 +360,21 @@ function updateExportNames() {
       names = MKW.names(p.meta, bs).map((name) =>
         name.replace(/\.jpg$/, "." + exportOptions.format),
       );
+    if (
+      p.carousel?.pageStructure &&
+      !p.campaign &&
+      exportOptions.format !== "pdf"
+    )
+      names = names.map((name, i) => {
+        const info = MKWCarouselPolicy.slideInfo(
+          p.carousel,
+          bs[i].carouselSlide,
+        );
+        return name.replace(
+          /(\.[^.]+)$/,
+          `_R${String(info.row + 1).padStart(2, "0")}_S${String(info.local + 1).padStart(2, "0")}$1`,
+        );
+      });
     if (!bs.length) throw Error("Wähle mindestens ein Sujet.");
   } catch (e) {
     error = e.message;
@@ -412,6 +418,7 @@ async function runExport(mode) {
   clearTimeout(previewTimer);
   const plan = clone(exportPlan),
     settings = exportSettings(),
+    projectSnapshot = mode === "zip" ? snapshot() : null,
     disabled = new Map();
   $("#exportDialog")
     .querySelectorAll("input,select,button")
@@ -423,6 +430,15 @@ async function runExport(mode) {
     items = [];
   let folder;
   try {
+    if (projectSnapshot)
+      setExportProgress(
+        0,
+        plan.length + 1,
+        "Projektdatei für ZIP wird vorbereitet …",
+      );
+    const projectFile = projectSnapshot
+      ? await MKWProjectFile.encode(projectSnapshot)
+      : null;
     if (mode === "folder")
       folder = await window.showDirectoryPicker({ mode: "readwrite" });
     setExportProgress(
@@ -470,6 +486,10 @@ async function runExport(mode) {
       );
     }
     if (mode === "zip" && items.length) {
+      items.push({
+        name: "Projekt/" + MKW.projectName(projectSnapshot.meta) + ".mkw",
+        bytes: new Uint8Array(await projectFile.arrayBuffer()),
+      });
       setExportProgress(
         plan.length,
         plan.length + 1,
@@ -484,7 +504,7 @@ async function runExport(mode) {
     const successes = plan.length - failures.length;
     MKWFields.notice(
       $("#exportStatus"),
-      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${failures.length ? " " + failures.join(" · ") : ""}`,
+      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${mode === "zip" && successes ? " Vollständiges MKW-Projekt enthalten." : ""}${failures.length ? " " + failures.join(" · ") : ""}`,
       failures.length > 0,
     );
     setExportProgress(
@@ -525,18 +545,54 @@ $("#exportDialog").addEventListener("close", () => {
   clearTimeout(previewTimer);
 });
 $("#folder").hidden = !window.showDirectoryPicker;
+function exportSetSelection(ids) {
+  if (busy) return;
+  const selected = new Set(ids),
+    dirty = p.boards.some((b) => b.checked !== selected.has(b.id));
+  for (const b of p.boards) b.checked = selected.has(b.id);
+  for (const input of document.querySelectorAll(
+    "[data-export-id],[data-review-export-id]",
+  ))
+    input.checked = selected.has(
+      input.dataset.exportId || input.dataset.reviewExportId,
+    );
+  const scope = document.querySelector("#exportRowScope");
+  if (scope) scope.value = "custom";
+  if (dirty) changed(false);
+  updateExportNames();
+  updateExportTotal();
+  if ($("#reviewDialog").open) showReview();
+}
 function reviewBoards() {
-  return orderedBoards().filter((b) => b.checked);
+  return orderedBoards();
 }
 async function showReview() {
-  const boards = reviewBoards();
-  if (!boards.length) return;
+  const generation = ++reviewGeneration,
+    boards = reviewBoards();
+  const current = $("#reviewCurrentExport");
+  current.disabled = !boards.length;
+  $("#reviewSelectedCount").textContent =
+    `${p.boards.filter((b) => b.checked).length} von ${p.boards.length} ausgewählt`;
+  $("#reviewPrevious").disabled = $("#reviewNext").disabled = boards.length < 2;
+  if (!boards.length) {
+    $("#reviewImage").hidden = true;
+    $("#reviewPosition").textContent = "Keine Auswahl";
+    $("#reviewMessage").textContent =
+      "Im Projekt sind noch keine Bilder vorhanden.";
+    return;
+  }
   reviewIndex = (reviewIndex + boards.length) % boards.length;
   const b = boards[reviewIndex],
     index = reviewIndex;
+  current.dataset.boardId = b.id;
+  current.checked = b.checked;
   document.querySelector(".review-stage").classList.remove("checkerboard");
+  const label =
+    p.carousel && !p.campaign
+      ? MKWCarouselPolicy.slideInfo(p.carousel, b.carouselSlide).label
+      : asset(b).name;
   $("#reviewPosition").textContent =
-    `${index + 1} / ${boards.length} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
+    `${index + 1} / ${boards.length} · ${label}${b.checked ? "" : " · Nicht ausgewählt"} · ${MKW.ratio(b.w, b.h)} · ${b.w} × ${b.h} px`;
   $("#reviewImage").hidden = true;
   $("#reviewMessage").textContent = "Vorschau wird erstellt …";
   const finishLoading = MKWUIControls.loading("#reviewMessage");
@@ -544,10 +600,15 @@ async function showReview() {
     const entry = await encodedBoard(clone(b), exportSettings()),
       blob = entry.previewBlob || entry.blob,
       hasTransparency = entry.hasTransparency;
+    if (
+      generation !== reviewGeneration ||
+      index !== reviewIndex ||
+      !$("#reviewDialog").open
+    )
+      return;
     document
       .querySelector(".review-stage")
       .classList.toggle("checkerboard", hasTransparency);
-    if (index !== reviewIndex || !$("#reviewDialog").open) return;
     URL.revokeObjectURL(reviewURL);
     reviewURL = URL.createObjectURL(blob);
     $("#reviewImage").src = reviewURL;
@@ -555,13 +616,32 @@ async function showReview() {
     $("#reviewImage").hidden = false;
     $("#reviewMessage").textContent = "";
   } catch (e) {
-    $("#reviewMessage").textContent = e.message;
+    if (generation === reviewGeneration)
+      $("#reviewMessage").textContent = e.message;
   } finally {
     finishLoading();
   }
 }
 $("#reviewExport").onclick = () => {
-  reviewIndex = 0;
+  reviewIndex = Math.max(
+    0,
+    orderedBoards().findIndex((b) => b.checked),
+  );
+  if (!$("#reviewCurrentExport")) {
+    const actions = document.createElement("div");
+    actions.className = "review-current-actions";
+    actions.innerHTML =
+      '<label><input id="reviewCurrentExport" type="checkbox"><span>Dieses Bild exportieren</span></label><span id="reviewSelectedCount" role="status"></span>';
+    document.querySelector(".review-stage").before(actions);
+    $("#reviewCurrentExport").onchange = (e) =>
+      exportSetSelection(
+        p.boards
+          .filter((b) =>
+            b.id === e.target.dataset.boardId ? e.target.checked : b.checked,
+          )
+          .map((b) => b.id),
+      );
+  }
   $("#reviewDialog").showModal();
   showReview();
 };
@@ -582,6 +662,7 @@ $("#reviewDialog").addEventListener("keydown", (ev) => {
   }
 });
 $("#reviewDialog").addEventListener("close", () => {
+  reviewGeneration++;
   URL.revokeObjectURL(reviewURL);
   reviewURL = null;
   $("#reviewImage").removeAttribute("src");

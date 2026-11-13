@@ -81,7 +81,7 @@ function carouselJoinPath(o, index) {
   carouselFinishPath();
 }
 function carouselPathEndpointsOverlay(root) {
-  if (carouselUI.tool !== "path" || !studioPreferences.advanced) return;
+  if (carouselUI.tool !== "path") return;
   const draft = carouselPathDraft,
     selected = carouselSelected()[0];
   for (const o of p.carousel.objects) {
@@ -196,7 +196,6 @@ function carouselFinishPath(closed = false) {
 }
 function carouselPathPointer(ev, pt) {
   ev.preventDefault();
-  if (!studioPreferences.advanced) return;
   const endpoint = !ev.altKey && carouselPathEndpointHit(pt);
   if (endpoint) {
     if (carouselPathDraft) carouselJoinPath(endpoint.o, endpoint.index);

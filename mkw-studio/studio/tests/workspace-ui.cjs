@@ -229,13 +229,13 @@ const assert = require("node:assert/strict");
     assert.equal(carouselBar.height, postBar.height);
     assert.equal(
       await page.locator(".carousel-contextbar [data-tool]").count(),
-      6,
+      10,
     );
     assert.equal(
       await page
         .locator(".carousel-contextbar [data-tool] svg[data-google-icon]")
         .count(),
-      6,
+      10,
     );
     assert.equal(
       (await page.locator("#carouselViewport").boundingBox()).x,

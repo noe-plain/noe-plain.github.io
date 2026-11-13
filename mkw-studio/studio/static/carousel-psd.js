@@ -1,6 +1,6 @@
 "use strict";
-function carouselPSDBounds(o) {
-  const c = p.carousel,
+function carouselPSDBounds(o, project = p) {
+  const c = project.carousel,
     pad = carouselVisualPadding(o);
   const geometry = carouselObjectBounds(o);
   const effectPad = carouselEffectValue(o, "blur") * 3;
@@ -43,8 +43,9 @@ function carouselPSDBounds(o) {
       ) - top,
     ),
   };
-  if (o.pageFragment) {
-    const a = c.artboards.find((a) => a.id === o.pageId);
+  const contentFrame = MKWCarouselPolicy.contentFrame(c, o);
+  if (contentFrame) {
+    const a = contentFrame;
     const right = Math.min(result.left + result.w, a.x + a.w),
       bottom = Math.min(result.top + result.h, a.y + a.h);
     result.left = Math.max(result.left, a.x);
@@ -54,8 +55,20 @@ function carouselPSDBounds(o) {
   }
   return result;
 }
+function carouselPSDScopedCrop(o, c) {
+  if (o.pageFragment) return true;
+  const frame = MKWCarouselPolicy.contentFrame(c, o),
+    bounds = carouselPaintBounds(o);
+  return (
+    !!frame &&
+    (bounds.x < frame.x ||
+      bounds.y < frame.y ||
+      bounds.x + bounds.w > frame.x + frame.w ||
+      bounds.y + bounds.h > frame.y + frame.h)
+  );
+}
 async function carouselPSDLayer(o, project = p) {
-  const bounds = carouselPSDBounds(o);
+  const bounds = carouselPSDBounds(o, project);
   if (!bounds.w || !bounds.h) return null;
   const canvas = makeCanvas(bounds.w, bounds.h),
     ctx = exportContext(canvas);
@@ -91,10 +104,12 @@ async function carouselPSDLayer(o, project = p) {
         o.blend
       ] || "normal",
   };
-  return o.pageFragment ? result : carouselPSDVectorData(o, result);
+  return carouselPSDScopedCrop(o, project.carousel)
+    ? result
+    : carouselPSDVectorData(o, result);
 }
-async function buildCarouselPSD(progress = () => {}) {
-  const project = { ...p, carousel: clone(p.carousel) },
+async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
+  const project = { ...sourceProject, carousel: clone(sourceProject.carousel) },
     c = project.carousel,
     sources = MKWPSD.sources(),
     width = MKWCarouselPolicy.extent(c).w,
@@ -190,9 +205,15 @@ async function buildCarouselPSD(progress = () => {}) {
   for (const [index, o] of c.objects.entries()) {
     progress(`Ebene ${index + 1} / ${c.objects.length} vorbereiten …`);
     await new Promise((resolve) => setTimeout(resolve, 0));
-    if (o.pageFragment) {
+    if (carouselPSDScopedCrop(o, c)) {
       const layer = await carouselPSDLayer(o, project);
-      if (layer) append(o, { ...layer, name: o.name + " · Seitenausschnitt" });
+      if (layer)
+        append(o, {
+          ...layer,
+          name:
+            o.name +
+            (o.pageFragment ? " · Seitenausschnitt" : " · Artboard-Ausschnitt"),
+        });
       continue;
     }
     if (o.type === "text") {
@@ -213,7 +234,7 @@ async function buildCarouselPSD(progress = () => {}) {
       project.images.some((im) => im.id === o.imageId)
     ) {
       const source = project.images.find((im) => im.id === o.imageId),
-        bounds = carouselPSDBounds(o);
+        bounds = carouselPSDBounds(o, project);
       if (!bounds.w || !bounds.h) continue;
       const canvas = makeCanvas(bounds.w, bounds.h),
         ctx = exportContext(canvas);
@@ -368,7 +389,7 @@ async function buildCarouselPSD(progress = () => {}) {
     groupId: 1,
     origin: "userGenerated",
     associatedLayerId: 0,
-    name: MKW.projectName(p.meta) + "_" + String(i + 1).padStart(2, "0"),
+    name: MKW.projectName(project.meta) + "_" + String(i + 1).padStart(2, "0"),
     type: "image",
     bounds: (() => {
       const a = MKWCarouselPolicy.frame(c, i);
@@ -410,7 +431,9 @@ async function buildCarouselPSD(progress = () => {}) {
           : children,
         linkedFiles: sources.files,
         imageResources: {
-          slices: [{ bounds, groupName: p.meta.title || "Designer", slices }],
+          slices: [
+            { bounds, groupName: project.meta.title || "Designer", slices },
+          ],
           versionInfo: {
             hasRealMergedData: true,
             writerName: "MKW Studio",

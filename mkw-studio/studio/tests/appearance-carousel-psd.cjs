@@ -365,7 +365,6 @@ const assert = require("node:assert/strict");
       snapDistance: 12,
       exportFormat: "png",
       autoSaveFile: true,
-      advanced: false,
       curvature: false,
       pdfPreset: "linkedin",
       lineHeight: 95,

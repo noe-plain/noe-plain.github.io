@@ -18,15 +18,19 @@ function carouselPresentInspector() {
           : o?.name ||
             MKWSpreadUI.selectedBoard()?.name ||
             (slide !== null
-              ? MKWCarouselPolicy.frame(p.carousel, slide)?.name ||
+              ? (p.carousel.pageStructure
+                  ? MKWCarouselPolicy.slideInfo(p.carousel, slide).title
+                  : MKWCarouselPolicy.frame(p.carousel, slide)?.name) ||
                 `Slide ${slide + 1}`
               : "Dein Design"),
     subtitle = o
       ? `${carouselToolNames[o.type] || "Element"} · ${carouselObjectLocked(o) ? "Gesperrt" : carouselUI.content ? "Bildinhalt bearbeiten" : "Element bearbeiten"}`
       : MKWCarouselPolicy.isFree(p.carousel)
         ? slide !== null
-          ? `${MKWCarouselPolicy.frame(p.carousel, slide).w} × ${MKWCarouselPolicy.frame(p.carousel, slide).h} px · einzeln anpassbar`
-          : `${p.carousel.n} freie Zeichenflächen`
+          ? `${MKWCarouselPolicy.frame(p.carousel, slide).w} × ${MKWCarouselPolicy.frame(p.carousel, slide).h} px · ${p.carousel.pageStructure ? "gemeinsames Slideformat" : "einzeln anpassbar"}`
+          : p.carousel.pageStructure
+            ? `${p.carousel.pageStructure.groups.length} Reihen · ${p.carousel.n} Slides`
+            : `${p.carousel.n} freie Zeichenflächen`
         : `${p.carousel.n} Slides · ${p.carousel.w} × ${p.carousel.h} px`;
   MKWInspectorUI.present({
     root: $("#carouselSidebar"),
@@ -59,6 +63,11 @@ function carouselPanel() {
     items = carouselSelected(),
     o = items.at(-1),
     panel = $("#carouselProperties");
+  if (p.campaign && MKWCampaignUI.panel(panel, items)) {
+    carouselLayerPanel();
+    carouselPresentInspector();
+    return;
+  }
   panel.classList.toggle(
     "is-text-inspector",
     items.length > 0 && items.every((item) => item.type === "text"),
@@ -250,6 +259,7 @@ function carouselPanel() {
           delete o.gradientStart;
           delete o.gradientEnd;
         }
+        if (["x", "y"].includes(input.dataset.prop)) carouselAssignArtboard(o);
         changed(false);
         carouselUpdateWarning(o);
         if (carouselUI.editing?.id === o.id && input.dataset.prop === "text")
@@ -401,7 +411,7 @@ function carouselPanel() {
         .querySelectorAll("button:not(#carouselDuplicate)")
         .forEach((btn) => (btn.disabled = true));
   } else {
-    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", ...(studioPreferences.advanced ? ["path", "shape"] : [])].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><section class="designer-template-shortcut"><button type="button" id="carouselTemplates">${studioIcon("layers")}<span>Aus Vorlage starten</span></button><small>Erstellt ein neues Designer-Projekt.</small></section><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
+    panel.innerHTML = `<h3>Dein Design gestalten</h3><p>Wähle ein Element auf der Fläche oder füge etwas Neues hinzu.</p><div class="carousel-quick-start">${["image", "text", "gradient", "angle", "path", "shape"].map((type) => `<button data-quick-tool="${type}">${studioIcon(type)}<span>${carouselToolNames[type]}</span></button>`).join("")}</div><section class="designer-template-shortcut"><button type="button" id="carouselTemplates">${studioIcon("layers")}<span>Aus Vorlage starten</span></button><small>Erstellt ein neues Designer-Projekt.</small></section><div class="carousel-document-summary">${c.n} Slides · ${c.w} × ${c.h} px pro Slide</div>${section("Hintergrund", `<label>Zeichenflächenfarbe<input id="carouselBackground" type="color" value="${c.bg}"></label>`)}`;
     panel
       .querySelectorAll("[data-quick-tool]")
       .forEach(
@@ -432,6 +442,7 @@ function carouselPanel() {
       MKWSpreadUI.panel(panel);
     }
   }
+  if (p.campaign) MKWCampaignUI.scopePanel(panel, items);
   carouselRefinementsPanel(panel, items);
   carouselLayerPanel();
   carouselPresentInspector();
@@ -441,7 +452,7 @@ function carouselLegacyLayerPanel() {
   const c = p.carousel;
   carouselKeepLogosOnTop(c);
   const ids = new Set(carouselSelected().map((o) => o.id));
-  $("#carouselLayers").innerHTML = [...c.objects]
+  $("#carouselLayers").innerHTML = [...carouselRowScope().view.objects]
     .reverse()
     .map(
       (o) =>
@@ -468,7 +479,8 @@ function carouselLegacyLayerPanel() {
         row.classList.remove("drop-target");
         const source = carouselUI.layerDrag,
           target = row.dataset.layer;
-        if (!source || source === target) return;
+        if (!source || source === target || !carouselCanEditRowFolders())
+          return;
         const index = c.objects.findIndex((o) => o.id === source);
         if (
           index < 0 ||

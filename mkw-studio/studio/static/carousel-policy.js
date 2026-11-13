@@ -185,6 +185,54 @@
         bounds.y + bounds.h <= a.y + a.h,
     );
   }
+  function contentFrame(c, object) {
+    if (!object.pageId || (!object.pageFragment && !object.artboardScoped))
+      return null;
+    const frame = c.artboards?.find((a) => a.id === object.pageId);
+    if (!frame) return null;
+    if (object.pageFragment) return frame;
+    const group = c.pageStructure?.groups.find((ids) =>
+      ids.includes(object.pageId),
+    );
+    if (!group) return null;
+    const members = c.artboards.filter((a) => group.includes(a.id));
+    const x = Math.min(...members.map((a) => a.x)),
+      y = Math.min(...members.map((a) => a.y));
+    return {
+      x,
+      y,
+      w: Math.max(...members.map((a) => a.x + a.w)) - x,
+      h: Math.max(...members.map((a) => a.y + a.h)) - y,
+    };
+  }
+  function sourcePage(c, object) {
+    const all = frames(c);
+    const index = all.findIndex(
+      (a) =>
+        object.x >= a.x &&
+        object.x < a.x + a.w &&
+        object.y >= a.y &&
+        object.y < a.y + a.h,
+    );
+    return all[index < 0 ? nearest(c, object) : index];
+  }
+  function slideInfo(c, index) {
+    const page = frame(c, index),
+      group = c.pageStructure?.groups.find((g) => g.includes(page.id));
+    const row = group ? c.pageStructure.groups.indexOf(group) : 0,
+      local = group ? group.indexOf(page.id) : index;
+    return {
+      row,
+      local,
+      title: /^(Seite |Zeichenfläche )\d+$|^Neue Slide$/.test(page.name || "")
+        ? `Slide ${local + 1}`
+        : page.name || `Slide ${local + 1}`,
+      name: group ? c.pageStructure.artboardInfo[row].name : "Designer",
+      label: group
+        ? `${c.pageStructure.artboardInfo[row].name} · Slide ${local + 1}`
+        : `Slide ${local + 1}`,
+    };
+  }
   function safeRect(c, slide = 0) {
     const a = frame(c, slide);
     return {
@@ -267,6 +315,9 @@
     validFormat,
     formatPlan,
     safeRect,
+    contentFrame,
+    sourcePage,
+    slideInfo,
     grid,
   });
   if (typeof module !== "undefined") module.exports = api;

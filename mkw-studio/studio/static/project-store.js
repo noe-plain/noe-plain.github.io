@@ -196,7 +196,11 @@ const MKWProjectStore = (() => {
           version,
           updatedAt: Date.now(),
           title: document.meta.title || "Unbenanntes Projekt",
-          mode: document.carousel ? "carousel" : "post",
+          mode: document.campaign
+            ? "campaign"
+            : document.carousel
+              ? "carousel"
+              : "post",
           document,
           ...(!conflict && previous?.fileHandle
             ? { fileHandle: previous.fileHandle, fileStamp: previous.fileStamp }

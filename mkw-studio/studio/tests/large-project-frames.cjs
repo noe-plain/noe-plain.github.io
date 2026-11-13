@@ -144,6 +144,8 @@ const { launch, artifact } = require("./browser.cjs");
     await carousel.locator("#setupName").fill("Rahmenprüfung");
     await carousel.locator("#createProject").click();
     await carousel.locator("#carouselCanvas").waitFor();
+    await require("./browser.cjs").waitForProjectReady(carousel);
+    await carousel.evaluate(() => document.fonts.ready);
     const point = (x, y) =>
       carousel.evaluate(
         ([x, y]) => {
@@ -165,13 +167,24 @@ const { launch, artifact } = require("./browser.cjs");
       carouselTool("select");
     });
     assert.equal(
-      await carousel.evaluate(() => studioPreferences.advanced),
-      false,
+      await carousel.locator("[data-tool=path]").count(),
+      1,
     );
     assert.equal(await carousel.locator(".carousel-rotate-handle").count(), 1);
-    const rotation = await carousel
-      .locator(".carousel-rotate-handle")
-      .boundingBox();
+    // Unlike raw mouse coordinates, hover waits for stable geometry and a
+    // handle that actually receives pointer events after setup/font layout.
+    const rotateHandle = carousel.locator(".carousel-rotate-handle");
+    await rotateHandle.hover();
+    assert(
+      await rotateHandle.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return el.contains(
+          document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2),
+        );
+      }),
+      "The real rotation handle must receive the gesture",
+    );
+    const rotation = await rotateHandle.boundingBox();
     await drag(
       {
         x: rotation.x + rotation.width / 2,
@@ -234,7 +247,7 @@ const { launch, artifact } = require("./browser.cjs");
     // Both pen and curve modes keep anchors/handles after real undo/redo shortcuts.
     await carousel.locator("#settings").click();
     await carousel.locator("#settings-tab-workflow").click();
-    await carousel.locator("#advancedMode").check();
+
     await carousel.locator("#closeSettings").click();
     await carousel.evaluate(() => {
       p.carousel.objects = [];

@@ -78,7 +78,10 @@ async function carouselPaint(
       ctx.fillRect(0, 0, c.w * c.n, c.h);
     }
   }
-  for (const o of objects || c.objects) {
+  for (const original of objects || c.objects) {
+    const o = project.campaign
+      ? MKWCampaignUI.decorate(original, project)
+      : original;
     if (!isCurrent()) break;
     if (!carouselObjectVisible(o, c) || o.id === editingId) continue;
     // Photos clipped to other slides must not repeatedly decode during each export.
@@ -89,9 +92,13 @@ async function carouselPaint(
     )
       continue;
     ctx.save();
-    if (o.pageFragment && clipArtwork) {
-      const frame = c.artboards?.find((a) => a.id === o.pageId);
-      if (!frame || (slide !== null && frames[slide].id !== frame.id)) {
+    const contentFrame = MKWCarouselPolicy.contentFrame(c, o);
+    if (contentFrame && clipArtwork) {
+      const frame = contentFrame;
+      if (
+        slide !== null &&
+        !MKWCarouselPolicy.intersects(frames[slide], frame)
+      ) {
         ctx.restore();
         continue;
       }
@@ -122,6 +129,7 @@ async function carouselPaint(
             line.x + run.x,
             line.y + run.dy + offset,
             studioPaintRGBA(run.color || o.color, o.textAlpha ?? 1),
+            !!o.campaignFamily,
           );
         }
       }
@@ -146,6 +154,8 @@ async function carouselPaint(
     }
     ctx.restore();
   }
+  if (project.campaign)
+    await MKWCampaignUI.paintDecorations(ctx, project, slide);
   ctx.restore();
 }
 
@@ -257,6 +267,9 @@ function carouselRender() {
   carouselUI.vectorPoints = false;
   carouselEndText();
   document.body.classList.toggle("carousel-mode", carouselActive());
+  document.body.classList.toggle("campaign-preview", !!p.campaign);
+  if ($("#campaignConvert"))
+    $("#campaignConvert").hidden = !!p.carousel || !!p.campaign;
   $("#carouselEditor")?.remove();
   window.MKWWorkspaceScroll?.sync();
   $(".carousel-statusbar")?.remove();
@@ -313,6 +326,7 @@ function carouselRender() {
  <div id="carouselViewport" tabindex="0" aria-label="Designer-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Designer-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
  <aside id="carouselSidebar" aria-label="Designer-Eigenschaften und Ebenen"><h2 class="visually-hidden">Designer</h2><h3 class="visually-hidden">Eigenschaften</h3><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls studio-zoom-controls" role="group" aria-label="Zoom"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><button id="carouselZoomOut" aria-label="Ansicht verkleinern" title="Ansicht verkleinern">${studioIcon("minus")}</button><label class="studio-zoom-value"><input id="carouselZoom" aria-label="Zoom in Prozent" type="number" min="5" max="200" step="1" value="${Math.round(MKWZoom.percent(carouselZoom, studioZoomReference(true)))}"><span aria-hidden="true">%</span></label><button id="carouselZoomIn" aria-label="Ansicht vergrössern" title="Ansicht vergrössern">${studioIcon("plus")}</button></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
+  if (p.campaign) MKWCampaignUI.mount();
   window.MKWWorkspaceScroll?.sync();
   MKWUIControls.designer($("#carouselSidebar"));
   $("#footerZoom").append(host.querySelector(".carousel-statusbar"));
@@ -369,7 +383,7 @@ function carouselRender() {
       carouselToolUI();
       carouselRefresh();
       carouselPanel();
-    } else if (carouselIsVector(o) && studioPreferences.advanced) {
+    } else if (carouselIsVector(o)) {
       carouselStartPointEditing(o);
     } else if (o.type === "text") carouselEditText(o);
     else if (carouselHasImage(o)) {
@@ -432,6 +446,7 @@ function carouselCenter() {
 }
 
 function carouselFit() {
+  if (p.campaign) return MKWCampaignUI.fit();
   const c = p.carousel,
     v = $("#carouselViewport");
   carouselSetZoom(
@@ -766,7 +781,6 @@ function carouselDrawSelection() {
     carouselUI.content,
     carouselUI.tool,
     ordinary,
-    studioPreferences.advanced,
   ]);
   const previous = root.querySelector(".carousel-frame");
   if (ordinary && root.dataset.selectionKey === key && previous) {
@@ -825,13 +839,7 @@ function carouselDrawSelection() {
         frame.append(btn);
       }
   }
-  if (
-    (studioPreferences.advanced ||
-      (items.length === 1 && items[0].type === "angle")) &&
-    !content &&
-    !points &&
-    !items.every((o) => carouselObjectLocked(o))
-  ) {
+  if (!content && !points && !items.every((o) => carouselObjectLocked(o))) {
     const rotate = document.createElement("button");
     rotate.className = "carousel-rotate-handle";
     rotate.title = "Drehen · Shift: 15°";

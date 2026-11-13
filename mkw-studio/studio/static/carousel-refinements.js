@@ -94,6 +94,8 @@ function carouselValidateFolders(c) {
   for (const f of c.folders) {
     if (
       !f ||
+      (f.pageId !== undefined &&
+        (!c.pageStructure || !c.artboards.some((a) => a.id === f.pageId))) ||
       typeof f.id !== "string" ||
       ids.has(f.id) ||
       typeof f.name !== "string" ||
@@ -129,11 +131,17 @@ function carouselArrangeFolders(c = p.carousel) {
   c.objects = out;
 }
 function carouselCreateFolder() {
+  if (!carouselCanEditRowFolders()) return;
+  if ((p.carousel.folders?.length || 0) >= 500) {
+    status("Ein Projekt kann höchstens 500 Ordner enthalten.");
+    return;
+  }
   checkpoint();
   p.carousel.folders ??= [];
   const folder = {
     id: uid(),
     name: `Ordner ${p.carousel.folders.length + 1}`,
+    ...(carouselRow() ? { pageId: carouselRow().page.id } : {}),
     colour: carouselNextFolderColour(),
     visible: true,
     locked: false,
@@ -148,7 +156,20 @@ function carouselCreateFolder() {
   changed();
 }
 function carouselAssignFolder(o, id) {
-  if (o.type === "logo" || carouselObjectLocked(o)) return;
+  if (
+    o.type === "logo" ||
+    carouselObjectLocked(o) ||
+    !carouselCanEditRowFolders()
+  )
+    return;
+  const view = carouselRowScope().view;
+  if (
+    !view.objects.some((v) => v.id === o.id) ||
+    (id && !view.folders.some((f) => f.id === id))
+  ) {
+    status("Der Ordner gehört nicht zur aktiven Reihe.");
+    return;
+  }
   const folder = p.carousel.folders?.find((f) => f.id === id),
     wasEmpty = folder && !p.carousel.objects.some((v) => v.folderId === id);
   checkpoint();
@@ -158,12 +179,49 @@ function carouselAssignFolder(o, id) {
   if (wasEmpty) carouselMoveFolder(id, folder.before || null, false, false);
   changed();
 }
+function carouselOpenRowMenu(button) {
+  carouselCloseLayerMenu();
+  const project = p,
+    c = p.carousel,
+    row = carouselRow();
+  if (!row) return;
+  const menu = document.createElement("div");
+  menu.id = "carouselRowMenu";
+  menu.className = "carousel-effect-menu carousel-layer-menu";
+  menu.setAttribute("popover", "auto");
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", "Aktive Reihe wählen");
+  menu.innerHTML = c.pageStructure.artboardInfo
+    .map(
+      (a, i) =>
+        `<button type="button" role="menuitem" title="${esc(a.name)}" data-row-target="${esc(a.id)}" ${row.info.id === a.id ? 'aria-current="true"' : ""}><span>Reihe ${i + 1} · ${esc(a.name)}</span>${row.info.id === a.id ? studioIcon("check") : ""}</button>`,
+    )
+    .join("");
+  menu.querySelectorAll("[data-row-target]").forEach((item) => {
+    item.onclick = () => {
+      carouselCloseLayerMenu();
+      if (p !== project) return;
+      MKWSpreadUI.activateBoard(item.dataset.rowTarget);
+      document
+        .querySelector("#carouselRowPicker")
+        ?.focus({ preventScroll: true });
+    };
+  });
+  menu.addEventListener("toggle", (event) => {
+    button.setAttribute("aria-expanded", String(event.newState === "open"));
+    if (event.newState === "closed") menu.remove();
+  });
+  document.body.append(menu);
+  MKWUIMenu.open(menu, button);
+}
 function carouselLayerPanel() {
   carouselArrangeFolders();
   carouselLegacyLayerPanel();
   for (const folder of p.carousel.folders || [])
     if (folder.colour === undefined) folder.colour = carouselNextFolderColour();
   const c = p.carousel,
+    scope = carouselRowScope(),
+    view = scope.view,
     root = $("#carouselLayers"),
     heading = $(".carousel-layers-panel .carousel-section-heading");
   if (!$("#carouselNewFolder")) {
@@ -174,6 +232,41 @@ function carouselLayerPanel() {
     b.onclick = carouselCreateFolder;
     heading.append(b);
   }
+  const row = scope.ids ? carouselRow() : null,
+    title = heading.querySelector("h3");
+  if (row) {
+    let picker = title.querySelector("button");
+    if (!picker) {
+      picker = document.createElement("button");
+      picker.id = "carouselRowPicker";
+      picker.type = "button";
+      picker.setAttribute("aria-haspopup", "menu");
+      picker.setAttribute("aria-expanded", "false");
+      title.replaceChildren(picker);
+      MKWUIMenu.trigger(picker);
+    }
+    const number = c.pageStructure.groups.indexOf(row.ids) + 1;
+    picker.innerHTML = `<span>Ebenen – ${number}</span>${studioIcon("down")}`;
+    picker.setAttribute(
+      "aria-label",
+      `Ebenen – ${number}: ${row.info.name}. Aktive Reihe wechseln`,
+    );
+    picker.title = `Aktive Reihe wechseln · ${row.info.name}`;
+    picker.onclick = () => carouselOpenRowMenu(picker);
+  } else title.textContent = "Ebenen";
+  let context = document.querySelector("#carouselRowContext");
+  if (scope.shared.length) {
+    if (!context) {
+      context = document.createElement("section");
+      context.id = "carouselRowContext";
+      context.className = "carousel-property-section";
+      root.before(context);
+    }
+    context.innerHTML =
+      "<p>Diese Reihe verwendet noch geteilte Ordner.</p><button data-isolate-row>Ordner für diese Reihe unabhängig machen</button>";
+    context.querySelector("[data-isolate-row]").onclick =
+      carouselIsolateRowFolders;
+  } else context?.remove();
   const rows = new Map(
       [...root.children].map((row) => [row.dataset.layer, row]),
     ),
@@ -198,7 +291,7 @@ function carouselLayerPanel() {
     };
     row.ondragend = carouselFolderDragEnd;
     row.style.setProperty("--folder-colour", carouselFolderColour(f));
-    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button class="carousel-folder-name" data-folder-action="select"  title="${esc(f.name)}">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${c.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button>`;
+    row.innerHTML = `<button data-folder-action="collapse" aria-label="${f.collapsed ? "Ordner öffnen" : "Ordner zuklappen"}" aria-expanded="${!f.collapsed}">${studioIcon(f.collapsed ? "angle" : "down")}</button><button class="carousel-folder-name" data-folder-action="select"  title="${esc(f.name)}">${studioIcon("folder")}<span>${esc(f.name)}</span><small>${view.objects.filter((o) => o.folderId === f.id).length}</small></button><button data-folder-action="visible" aria-label="Ordner ein-/ausblenden" aria-pressed="${f.visible !== false}">${studioIcon(f.visible === false ? "hidden" : "visible")}</button><button data-folder-action="locked" aria-label="Ordner sperren/entsperren" aria-pressed="${!!f.locked}">${studioIcon(f.locked ? "locked" : "unlocked")}</button>`;
     row.querySelectorAll("button").forEach(
       (b) =>
         (b.onclick = () => {
@@ -206,12 +299,13 @@ function carouselLayerPanel() {
           if (action === "select") {
             if (carouselUI.folder === f.id) return;
             carouselSelect(
-              c.objects.filter((o) => o.folderId === f.id).map((o) => o.id),
+              view.objects.filter((o) => o.folderId === f.id).map((o) => o.id),
             );
             carouselUI.folder = f.id;
             carouselPanel();
             return;
           }
+          if (!carouselCanEditRowFolders()) return;
           if (action !== "collapse") checkpoint();
           f[action === "collapse" ? "collapsed" : action] =
             action === "visible"
@@ -248,7 +342,7 @@ function carouselLayerPanel() {
     };
     return row;
   };
-  for (const block of carouselLayerBlocks(c)) {
+  for (const block of carouselLayerBlocks(view)) {
     if (block.folder) {
       fragment.append(folderRow(block.folder));
       for (const child of [...block.objects].reverse()) {
@@ -276,6 +370,9 @@ function carouselRefinementsPanel(panel, items) {
     section.className = "carousel-property-section folder-properties";
     section.innerHTML = `<h4>Ordner</h4><label>Name<input id="carouselFolderName" maxlength="160" value="${esc(folder.name)}"></label><button id="carouselRemoveFolder" ${folder.locked ? "disabled" : ""}>Ordner entfernen …</button>`;
     panel.prepend(section);
+    $("#carouselFolderName").disabled = carouselRowScope().shared.length > 0;
+    $("#carouselRemoveFolder").disabled ||=
+      carouselRowScope().shared.length > 0;
     $("#carouselFolderName").onchange = (e) => {
       carouselSetItemName(folder, e.target.value);
       e.target.value = folder.name;
@@ -288,13 +385,18 @@ function carouselRefinementsPanel(panel, items) {
   if (items.length === 1 && o.type !== "logo") {
     const section = document.createElement("section");
     section.className = "carousel-property-section";
-    section.innerHTML = `<h4>Ablage</h4><label>Ebenenordner<select id="carouselFolderChoice"><option value="">Ohne Ordner</option>${(p.carousel.folders || []).map((f) => `<option value="${f.id}" ${o.folderId === f.id ? "selected" : ""}>${esc(f.name)}</option>`).join("")}</select></label>`;
+    section.innerHTML = `<h4>Ablage</h4><label>Ebenenordner<select id="carouselFolderChoice"><option value="">Ohne Ordner</option>${carouselRowScope()
+      .view.folders.map(
+        (f) =>
+          `<option value="${f.id}" ${o.folderId === f.id ? "selected" : ""}>${esc(f.name)}</option>`,
+      )
+      .join("")}</select></label>`;
     panel.append(section);
     $("#carouselFolderChoice").disabled = carouselObjectLocked(o);
     $("#carouselFolderChoice").onchange = (e) =>
       carouselAssignFolder(o, e.target.value);
   }
-  if (studioPreferences.advanced && items.length === 1) {
+  if (items.length === 1) {
     const section = panel.querySelector('[data-prop="w"]')?.closest("section");
     if (section) {
       const label = document.createElement("label");

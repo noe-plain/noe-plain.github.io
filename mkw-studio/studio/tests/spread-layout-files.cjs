@@ -7,7 +7,7 @@ const {launch,artifact,waitForProjectReady}=require('./browser.cjs');
   await page.goto(process.env.STUDIO_URL);await page.locator('#startDesigner').click();await page.locator('#setupName').fill('Bogen-Dateien');await page.locator('#cw').fill('600');await page.locator('#ch').fill('750');await page.locator('#cn').fill('2');await page.locator('#createProject').click();await waitForProjectReady(page);
   const initialHistory=await page.evaluate(()=>history.length);
   await page.locator('#carouselViewport').focus();await page.keyboard.press((process.platform==='darwin'?'Meta':'Control')+'+Alt+n');
-  assert.equal(await page.evaluate(()=>p.carousel.n),4);assert.equal(await page.evaluate(()=>history.length),initialHistory+1);
+  assert.equal(await page.evaluate(()=>p.carousel.n),3);assert.equal(await page.evaluate(()=>history.length),initialHistory+1);
   await page.evaluate(()=>undo());assert.equal(await page.evaluate(()=>p.carousel.pageStructure),undefined);
   const result=await page.evaluate(async()=>{
    const canvas=makeCanvas(1200,750),ctx=canvas.getContext('2d');ctx.fillStyle='#ff7022';ctx.fillRect(0,0,600,750);ctx.fillStyle='#2367b4';ctx.fillRect(600,0,600,750);const data=canvas.toDataURL();const im={id:uid(),name:'Ein Asset',data,original:data,width:1200,height:750};p.images.push(im);

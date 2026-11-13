@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-11-11T10:14:05.665Z",
+  "scope": "Generated single empty pages only; no text/image/whole-project export claim.",
+  "records": [
+    {
+      "file": "mkw-empty-800x1000.idml",
+      "sha256": "e38b3e42cc49a1904629d7fe09dc16f5f03877772482c4cf65e8edba485b5cd5",
+      "w": 800,
+      "h": 1000,
+      "version": "21.6.0.57",
+      "pages": 1,
+      "boundsPoints": [
+        0,
+        0,
+        750,
+        600
+      ],
+      "pageItems": 0,
+      "nativeRoundtrip": "native-roundtrip-800x1000.idml",
+      "result": "opened-and-reexported",
+      "reportedErrorsOrRepairs": "none reported; synchronous native open and re-export succeeded"
+    },
+    {
+      "file": "mkw-empty-1080x1350.idml",
+      "sha256": "c5dcf7e3a895c8916c278dda5f8df01476675f0b10ea86a96f5e2aec98d740b6",
+      "w": 1080,
+      "h": 1350,
+      "version": "21.6.0.57",
+      "pages": 1,
+      "boundsPoints": [
+        0,
+        0,
+        1012.5,
+        810
+      ],
+      "pageItems": 0,
+      "nativeRoundtrip": "native-roundtrip-1080x1350.idml",
+      "result": "opened-and-reexported",
+      "reportedErrorsOrRepairs": "none reported; synchronous native open and re-export succeeded"
+    }
+  ]
+}

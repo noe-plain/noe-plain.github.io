@@ -158,9 +158,13 @@ function carouselPDFText(board, opts) {
     measure = makeCanvas(1, 1).getContext("2d"),
     result = [];
   for (const object of c.objects) {
+    const contentFrame = MKWCarouselPolicy.contentFrame(c, object);
     if (
-      (object.pageFragment &&
-        object.pageId !== MKWCarouselPolicy.frame(c, board.carouselSlide).id) ||
+      (contentFrame &&
+        !MKWCarouselPolicy.intersects(
+          contentFrame,
+          MKWCarouselPolicy.frame(c, board.carouselSlide),
+        )) ||
       object.type !== "text" ||
       !carouselObjectVisible(object) ||
       !object.text.trim() ||
@@ -349,7 +353,7 @@ function carouselPDFUI() {
   ))
     el.hidden = !p.carousel;
   $("#folder").hidden = pdf || !window.showDirectoryPicker;
-  $("#zip").textContent = pdf ? "PDF herunterladen" : "ZIP herunterladen";
+  $("#zip").textContent = pdf ? "PDF herunterladen" : "ZIP mit Projektdatei";
   $("#qualityField").hidden = pdf || exportOptions.format === "png";
   $("#transparencyField").hidden = pdf || exportOptions.format === "jpg";
   if (!pdf) return;

@@ -9,11 +9,14 @@ const MKWSpreadUI = (() => {
     project = null,
     pendingMove = null,
     disposeList = () => {},
-    repaintFrame = 0;
+    repaintFrame = 0,
+    advancedOpen = false;
   const active = () => model.active(p.carousel);
   function reset() {
     if (project !== p.projectId) {
       selected.clear();
+      selectedArtboard = null;
+      focusedPage = null;
       anchor = null;
       pendingMove = null;
       project = p.projectId;
@@ -40,7 +43,7 @@ const MKWSpreadUI = (() => {
     message = "Seitenstruktur aktualisiert.",
     focus = true,
   ) {
-    if (busy) return false;
+    if (busy || p.campaign) return false;
     try {
       carouselEndText();
       const previous = p.carousel,
@@ -93,6 +96,19 @@ const MKWSpreadUI = (() => {
         selected = new Set(
           [...selected].filter((id) => next.artboards.some((a) => a.id === id)),
         );
+      if (!selected.size && action.type === "row-slide") {
+        const oldGroup = previous.pageStructure.groups.find((g) =>
+            g.includes(action.ids[0]),
+          ),
+          groupIndex = previous.pageStructure.groups.indexOf(oldGroup),
+          nextGroup = next.pageStructure.groups[groupIndex];
+        if (nextGroup?.length)
+          selected.add(
+            nextGroup[
+              Math.min(oldGroup.indexOf(action.ids[0]), nextGroup.length - 1)
+            ],
+          );
+      }
       if (!selected.size && next.n)
         selected.add(
           next.artboards[Math.min(carouselUI.slide ?? 0, next.n - 1)].id,
@@ -138,6 +154,8 @@ const MKWSpreadUI = (() => {
       selected.add(id);
       anchor = id;
     }
+    selectedArtboard = null;
+    focusedPage = id;
     carouselUI.ids.clear();
     carouselSelection = null;
     carouselUI.slide = ids.indexOf(id);
@@ -152,7 +170,55 @@ const MKWSpreadUI = (() => {
       initialMode = s?.mode || (policy.isFree(c) ? "single" : "spreads"),
       section = document.createElement("section");
     section.className = "carousel-property-section spread-panel";
-    section.innerHTML = `<h4 id="spreadTitle">Seiten &amp; Artboards</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${initialMode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Ermöglicht bis zu 20 verbundene Seiten. Die vorhandene Gestaltung bleibt unverändert; Seiten mit Zusammenfügen verbinden."><input type="radio" name="spreadMode" value="spreads" ${initialMode === "spreads" ? "checked" : ""}>Druckbögen (2–20 Seiten)</label></div>${!s ? '<p class="spread-note">Seiten verwalten, ohne die vorhandene Gestaltung zu verändern.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">${s.shuffle ? "Neue Seiten rücken nach." : "Seiten auswählen und mit „Zusammenfügen“ verbinden."}</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}<span>Neues Artboard</span></button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Artboard bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Auswahl gemeinsam formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
+    section.innerHTML = `<h4 id="spreadTitle">Reihen &amp; Slides</h4><div class="spread-modes" role="radiogroup" aria-label="Seitenanordnung"><label><input type="radio" name="spreadMode" value="single" ${initialMode === "single" ? "checked" : ""}>Einzelseiten</label><label title="Ermöglicht bis zu 20 verbundene Seiten. Die vorhandene Gestaltung bleibt unverändert; Seiten mit Zusammenfügen verbinden."><input type="radio" name="spreadMode" value="spreads" ${initialMode === "spreads" ? "checked" : ""}>Artboards (1–20 Slides)</label></div>${!s ? '<p class="spread-note">Seiten verwalten, ohne die vorhandene Gestaltung zu verändern.</p><button id="spreadEnable">Seitenverwaltung aktivieren</button>' : `<label class="spread-shuffle"><input id="spreadShuffle" type="checkbox" ${s.shuffle ? "checked" : ""}>Automatisches Nachrücken</label><p class="spread-note">Jede Reihe enthält 1–20 zusammenhängende Slides. Wähle eine Reihe oder eine einzelne Slide.</p><div id="spreadPages" class="spread-pages" role="listbox" aria-labelledby="spreadTitle" aria-multiselectable="true" tabindex="0" aria-describedby="spreadKeys"></div><p id="spreadEmpty" ${c.n ? "hidden" : ""}>Noch keine Seiten. Füge deine erste Seite hinzu.</p><p id="spreadKeys" class="spread-note">Mehrfachauswahl: Umschalt oder ⌘/Strg. Verschieben: Leertaste, Pfeile, Eingabe; Escape bricht ab.</p><p id="spreadCount"></p><button id="spreadAdd" class="primary">${studioIcon("plus")}<span>Neue Reihe</span></button><div class="spread-actions"><button data-spread-action="join">Zusammenfügen</button><button data-spread-action="split">Trennen</button><button data-spread-action="edit-spread">Reihe bearbeiten …</button><button data-spread-action="more">Weitere Aktionen</button></div><div class="spread-fields"><label>Artboards der Auswahl formatieren<select id="spreadFormat"><option value="">Format wählen …</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1080x1080">1:1 · 1080 × 1080</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="custom">Eigene Grösse …</option></select></label></div><details class="spread-advanced"><summary>Weitere Optionen</summary><label>Bindung<select id="spreadBinding"><option value="left" ${s.binding === "left" ? "selected" : ""}>Links (Leserichtung →)</option><option value="right" ${s.binding === "right" ? "selected" : ""}>Rechts (Leserichtung ←)</option></select></label><label>Erste Seitennummer<input id="spreadNumber" type="number" min="1" max="999999" step="1" value="${s.startNumber}"></label><label>Abstand zwischen Bögen (px)<input id="spreadGap" type="number" min="32" max="1000" step="1" value="${s.gap}"></label><label>Anschnitt-Hilfe (px)<input id="spreadBleed" type="number" min="0" max="100" step="1" value="${s.bleed}"></label><p class="spread-note">Anschnitt ist eine Anzeigehilfe. Der Export bleibt im Seiten-Endformat; keine Schnittmarken oder CMYK-Ausgabe.</p></details>`}<p id="spreadError" role="status"></p>`;
+    if (s && model.mixedGroups(c).length) {
+      const warning = document.createElement("p");
+      warning.className = "spread-note";
+      warning.setAttribute("role", "status");
+      warning.textContent =
+        "Dieses ältere Projekt enthält unterschiedliche Slideformate innerhalb eines Artboards. Wähle dessen Überschrift und übernimm ein gemeinsames Format. Die vorhandenen Inhalte wurden nicht verändert.";
+      section.querySelector("#spreadError").before(warning);
+    }
+    const advanced = document.createElement("details"),
+      summary = document.createElement("summary");
+    advanced.className = "spread-compat";
+    summary.textContent = "Erweiterte Seitenverwaltung";
+    advanced.append(summary);
+    advanced.open = advancedOpen;
+    advanced.ontoggle = () => {
+      if (advanced.isConnected) advancedOpen = advanced.open;
+    };
+    const edit = section.querySelector('[data-spread-action="edit-spread"]');
+    if (edit) section.querySelector("#spreadAdd").after(edit);
+    for (const node of [
+      ...section.querySelectorAll(
+        ":scope > .spread-modes,:scope > .spread-shuffle,:scope > .spread-actions,:scope > .spread-fields,:scope > .spread-advanced",
+      ),
+    ])
+      advanced.append(node);
+    section.append(advanced);
+    if (!s) {
+      const add = document.createElement("button");
+      add.id = "spreadNewRow";
+      add.className = "primary";
+      add.textContent = "Neue Reihe";
+      add.onclick = () => MKWSpreadUI.addSpread();
+      section.querySelector("#spreadEnable").before(add);
+      section.querySelector("#spreadEnable").textContent =
+        "Vorhandene Reihe verwalten";
+    } else if (c.n) {
+      const add = document.createElement("button"),
+        row = carouselRow();
+      add.id = "spreadAppend";
+      add.textContent = "Slide zu dieser Reihe hinzufügen";
+      add.disabled = !row || row.ids.length >= 20 || c.n >= 200;
+      add.onclick = () =>
+        commit(
+          { type: "append-page", ids: [carouselRow().page.id] },
+          "Slide zu dieser Reihe hinzugefügt.",
+        );
+      section.querySelector("#spreadAdd").after(add);
+    }
     host.append(section);
     for (const radio of section.querySelectorAll("[name=spreadMode]")) {
       const applyMode = () => {
@@ -226,6 +292,7 @@ const MKWSpreadUI = (() => {
       announce,
       actionsState: () => actionsState(host),
       openPage: (id) => {
+        const wasArtboard = !!selectedArtboard;
         const index = c.artboards.findIndex((a) => a.id === id);
         if (index < 0) return;
         selectedArtboard = null;
@@ -233,7 +300,8 @@ const MKWSpreadUI = (() => {
         carouselUI.slide = index;
         carouselUI.ids.clear();
         carouselSelection = null;
-        if (!MKWArtboardUI.selectPage(carouselUI.slide)) carouselPanel();
+        if (wasArtboard || !MKWArtboardUI.selectPage(carouselUI.slide))
+          carouselPanel();
         const scroll = $("#carouselProperties").scrollTop;
         carouselPresentInspector();
         $("#carouselProperties").scrollTop = scroll;
@@ -257,7 +325,7 @@ const MKWSpreadUI = (() => {
         carouselUI.slide = c.artboards.findIndex((a) => a.id === ids[0]);
         carouselSelection = null;
         carouselUI.ids.clear();
-        if (!MKWArtboardUI.selectPage(carouselUI.slide)) carouselPanel();
+        carouselPanel();
         const scroll = $("#carouselProperties").scrollTop;
         carouselPresentInspector();
         $("#carouselProperties").scrollTop = scroll;
@@ -294,6 +362,8 @@ const MKWSpreadUI = (() => {
       relevant = c.objects.filter(
         (o) =>
           carouselObjectVisible(o, c) &&
+          (!MKWCarouselPolicy.contentFrame(c, o) ||
+            policy.intersects(MKWCarouselPolicy.contentFrame(c, o), a)) &&
           (!o.pageFragment || o.pageId === id) &&
           MKWCarouselPolicy.intersects(carouselPaintBounds(o), a),
       );
@@ -576,6 +646,7 @@ const MKWSpreadUI = (() => {
         null,
         [...selected][0],
         document.querySelector("[data-spread-action=more]"),
+        true,
       );
     if (key === "move-to") return moveToArtboard();
     if (key === "edit-spread") return editSpread();
@@ -607,47 +678,101 @@ const MKWSpreadUI = (() => {
           : "Seiten dupliziert.",
     );
   }
-  function menu(event, id, anchor = document.querySelector("#spreadPages")) {
+  function menu(
+    event,
+    id,
+    anchor = document.querySelector("#spreadPages"),
+    advanced = false,
+  ) {
     document.querySelector("#spreadContextMenu")?.remove();
-    const menu = document.createElement("div");
-    menu.id = "spreadContextMenu";
-    menu.className = "carousel-effect-menu pages-action-menu";
-    menu.setAttribute("role", "menu");
-    menu.setAttribute("popover", "auto");
-    menu.setAttribute("aria-label", "Seitenaktionen");
-    for (const [key, label] of [
-      ["add-pair", "Neuer Druckbogen"],
-      ["move-to", "In Artboard verschieben …"],
-      ["previous", "Nach vorne"],
-      ["next", "Nach hinten"],
-      ["join", "Zu Druckbogen zusammenfügen"],
-      ["split", "Bogen trennen"],
-      ["duplicate", "Duplizieren"],
-      ["rename", "Umbenennen"],
-      ["delete", "Löschen …"],
-    ]) {
-      const b = document.createElement("button");
-      b.setAttribute("role", "menuitem");
-      b.textContent = label;
-      if (key === "join" && selected.size < 2) b.disabled = true;
-      if (key === "rename" && selected.size !== 1) b.disabled = true;
-      if (
-        key === "split" &&
-        !p.carousel.pageStructure.groups.some(
-          (g) => g.length > 1 && g.some((id) => selected.has(id)),
+    const popup = document.createElement("div");
+    popup.id = "spreadContextMenu";
+    popup.className = "carousel-effect-menu pages-action-menu";
+    popup.setAttribute("role", "menu");
+    popup.setAttribute("popover", "auto");
+    popup.setAttribute("aria-label", "Seitenaktionen");
+    if (!advanced) {
+      const c = p.carousel,
+        group = c.pageStructure.groups.find((g) => g.includes(id)),
+        index = group?.indexOf(id),
+        single = selected.size === 1;
+      for (const [key, label, disabled] of [
+        [
+          "before",
+          "Davor hinzufügen",
+          !single || group.length >= 20 || c.n >= 200,
+        ],
+        [
+          "after",
+          "Danach hinzufügen",
+          !single || group.length >= 20 || c.n >= 200,
+        ],
+        [
+          "duplicate",
+          "Slide duplizieren",
+          !single || group.length >= 20 || c.n >= 200,
+        ],
+        ["left", "Nach links", !single || index === 0],
+        ["right", "Nach rechts", !single || index === group.length - 1],
+        ["rename", "Umbenennen", !single],
+        ["remove", "Slide entfernen …", !single || group.length <= 1],
+        ["advanced", "Erweiterte Seitenaktionen …", false],
+      ]) {
+        const button = document.createElement("button");
+        button.setAttribute("role", "menuitem");
+        button.textContent = label;
+        button.disabled = disabled;
+        button.onclick = () => {
+          popup.hidePopover();
+          if (key === "advanced") menu(event, id, anchor, true);
+          else if (key === "rename") rename();
+          else
+            MKWSpreadUI.slideAction(
+              ["before", "after"].includes(key)
+                ? "insert"
+                : ["left", "right"].includes(key)
+                  ? "move"
+                  : key,
+              id,
+              key === "before" ? 0 : key === "left" ? -1 : 1,
+            );
+        };
+        popup.append(button);
+      }
+    } else
+      for (const [key, label] of [
+        ["add-pair", "Neuer Druckbogen"],
+        ["move-to", "In Artboard verschieben …"],
+        ["previous", "Nach vorne"],
+        ["next", "Nach hinten"],
+        ["join", "Zu Druckbogen zusammenfügen"],
+        ["split", "Bogen trennen"],
+        ["duplicate", "Als eigene Reihe duplizieren"],
+        ["rename", "Umbenennen"],
+        ["delete", "Löschen …"],
+      ]) {
+        const b = document.createElement("button");
+        b.setAttribute("role", "menuitem");
+        b.textContent = label;
+        if (key === "join" && selected.size < 2) b.disabled = true;
+        if (key === "rename" && selected.size !== 1) b.disabled = true;
+        if (
+          key === "split" &&
+          !p.carousel.pageStructure.groups.some(
+            (g) => g.length > 1 && g.some((id) => selected.has(id)),
+          )
         )
-      )
-        b.disabled = true;
-      if (key === "delete") b.classList.add("pages-delete-action");
-      b.onclick = () => {
-        menu.hidePopover();
-        action(key);
-      };
-      menu.append(b);
-    }
-    document.body.append(menu);
+          b.disabled = true;
+        if (key === "delete") b.classList.add("pages-delete-action");
+        b.onclick = () => {
+          popup.hidePopover();
+          action(key);
+        };
+        popup.append(b);
+      }
+    document.body.append(popup);
     MKWUIMenu.open(
-      menu,
+      popup,
       document.querySelector(`[data-page="${CSS.escape(id || "")}"]`) || anchor,
     );
   }
@@ -708,7 +833,7 @@ const MKWSpreadUI = (() => {
     dialog.setAttribute("aria-labelledby", "spreadEditTitle");
     const field = (key, label, value, min, max) =>
       `<label>${label}<input data-bogen="${key}" type="number" step="1" min="${min}" max="${max}" value="${value}" required></label>`;
-    dialog.innerHTML = `<h2 id="spreadEditTitle">${esc(c.pageStructure.artboardInfo[c.pageStructure.groups.indexOf(group)].name)} bearbeiten</h2><p>Die Änderungen gelten nur für diesen Bogen. Überzählige Seiten werden abgetrennt und bleiben erhalten.</p>${field("count", "Seiten aneinander (1–20)", group.length, 1, 20)}<div class="carousel-fields">${field("x", "Position X (px)", x, 0, 100000)}${field("y", "Position Y (px)", y, 0, 100000)}</div><label class="spread-format-toggle"><input id="spreadUniform" type="checkbox">Für alle Seiten dieses Bogens dasselbe Format verwenden</label><div id="spreadUniformFields" class="carousel-fields" hidden>${policy.formatKeys.map((k) => field(k, { w: "Breite (px)", h: "Höhe (px)", top: "Schutzzone oben", bottom: "Schutzzone unten", left: "Schutzzone links", right: "Schutzzone rechts" }[k], base[k], k === "w" || k === "h" ? 240 : 0, 4000)).join("")}</div><p id="spreadEditError" role="status"></p><div class="studio-feedback-actions"><button data-bogen-cancel autofocus>Abbrechen</button><button data-bogen-apply class="primary">Bogen übernehmen</button></div>`;
+    dialog.innerHTML = `<h2 id="spreadEditTitle">${esc(c.pageStructure.artboardInfo[c.pageStructure.groups.indexOf(group)].name)} bearbeiten</h2><p>Die Änderungen gelten nur für diese Reihe. Weniger Slides entfernen die überzähligen Slides nach deiner Bestätigung.</p>${field("count", "Slides nebeneinander (1–20)", group.length, 1, 20)}<div class="carousel-fields">${field("x", "Position X (px)", x, 0, 100000)}${field("y", "Position Y (px)", y, 0, 100000)}</div><label class="spread-format-toggle"><input id="spreadUniform" type="checkbox">Für alle Seiten dieses Bogens dasselbe Format verwenden</label><div id="spreadUniformFields" class="carousel-fields" hidden>${policy.formatKeys.map((k) => field(k, { w: "Breite (px)", h: "Höhe (px)", top: "Schutzzone oben", bottom: "Schutzzone unten", left: "Schutzzone links", right: "Schutzzone rechts" }[k], base[k], k === "w" || k === "h" ? 240 : 0, 4000)).join("")}</div><p id="spreadEditError" role="status"></p><div class="studio-feedback-actions"><button data-bogen-cancel autofocus>Abbrechen</button><button data-bogen-apply class="primary">Artboard übernehmen</button></div>`;
     const uniform = dialog.querySelector("#spreadUniform"),
       button = dialog.querySelector("[data-bogen-apply]"),
       error = dialog.querySelector("#spreadEditError");
@@ -722,7 +847,7 @@ const MKWSpreadUI = (() => {
     const operations = () => {
       const v = read();
       return {
-        type: "edit-spread",
+        type: "edit-row",
         ids: [base.id],
         count: v.count,
         x: v.x,
@@ -748,13 +873,36 @@ const MKWSpreadUI = (() => {
       }
     };
     dialog.querySelector("[data-bogen-cancel]").onclick = () => dialog.close();
-    button.onclick = () => {
+    button.onclick = async () => {
       if (p !== identity || p.carousel !== c) return;
       try {
         const value = operations();
-        model.plan(c, value, carouselObjectBounds, uid);
+        const preview = model.plan(c, value, carouselObjectBounds, uid),
+          deleted = c.objects.filter(
+            (o) => !preview.objects.some((v) => v.id === o.id),
+          );
+        if (
+          value.count < group.length &&
+          !(await MKWFeedback.ask({
+            title: "Reihe verkleinern?",
+            message: `${group.length - value.count} Slides und ${deleted.length} vollständig enthaltene Ebenen werden entfernt${
+              deleted.length
+                ? ": " +
+                  deleted
+                    .slice(0, 3)
+                    .map((o) => o.name || o.type)
+                    .join(", ") +
+                  (deleted.length > 3 ? " …" : "")
+                : ""
+            }. Übergreifende Inhalte bleiben erhalten. Rückgängig stellt die Änderung wieder her.`,
+            confirm: "Slides entfernen",
+            destructive: true,
+          }))
+        )
+          return;
+        if (p !== identity || p.carousel !== c) return;
         dialog.close();
-        commit(value, "Druckbogen aktualisiert. Inhalte bleiben erhalten.");
+        commit(value, "Reihe aktualisiert.");
       } catch (e) {
         error.textContent = e.message;
       }
@@ -900,7 +1048,7 @@ const MKWSpreadUI = (() => {
         const button = document.createElement("button");
         button.className = "carousel-slide-tab";
         button.dataset.slide = a.index;
-        button.textContent = `${c.pageStructure.startNumber + a.index} · ${a.name}`;
+        button.textContent = policy.slideInfo(c, a.index).title;
         button.setAttribute(
           "aria-label",
           `${a.name} auswählen oder Bogen verschieben`,
@@ -1102,11 +1250,97 @@ const MKWSpreadUI = (() => {
     });
   }
   return {
+    slideAction: async (operation, pageId, delta = 0) => {
+      const identity = p,
+        c = p.carousel,
+        page = c.artboards.find((a) => a.id === pageId);
+      if (!page) return false;
+      const group = c.pageStructure.groups.find((g) => g.includes(pageId));
+      const action = {
+        type: "row-slide",
+        ids: [pageId],
+        operation,
+        ...(operation === "insert"
+          ? { index: group.indexOf(pageId) + delta }
+          : {}),
+        ...(operation === "move" ? { delta } : {}),
+      };
+      let deleted = [];
+      try {
+        const preview = model.plan(c, action, carouselObjectBounds, uid);
+        deleted = c.objects.filter(
+          (o) => !preview.objects.some((v) => v.id === o.id),
+        );
+      } catch (e) {
+        status(e.message);
+        return false;
+      }
+      if (
+        operation === "remove" &&
+        !(await MKWFeedback.ask({
+          title: "Slide entfernen?",
+          message: `${deleted.length} vollständig enthaltene Ebenen werden entfernt${
+            deleted.length
+              ? ": " +
+                deleted
+                  .slice(0, 3)
+                  .map((o) => o.name || o.type)
+                  .join(", ") +
+                (deleted.length > 3 ? " …" : "")
+              : ""
+          }. Übergreifende Inhalte bleiben erhalten. Rückgängig stellt die Änderung wieder her.`,
+          confirm: "Slide entfernen",
+          destructive: true,
+        }))
+      )
+        return false;
+      if (p !== identity || p.carousel !== c) return false;
+      return commit(action, "Slideaktion für diese Reihe übernommen.");
+    },
+    slidePanel: (host, pageId) => {
+      const c = p.carousel,
+        group = c.pageStructure.groups.find((g) => g.includes(pageId)),
+        index = group.indexOf(pageId),
+        section = document.createElement("section");
+      section.className = "carousel-property-section";
+      section.innerHTML = `<h4>Slide ${index + 1} von ${group.length}</h4><div class="carousel-fields"><button data-row-slide="before" ${group.length >= 20 || c.n >= 200 ? "disabled" : ""}>Davor hinzufügen</button><button data-row-slide="after" ${group.length >= 20 || c.n >= 200 ? "disabled" : ""}>Danach hinzufügen</button><button data-row-slide="duplicate" ${group.length >= 20 || c.n >= 200 ? "disabled" : ""}>Slide duplizieren</button><button data-row-slide="remove" ${group.length <= 1 ? "disabled" : ""}>Slide entfernen …</button><button data-row-slide="left" ${index === 0 ? "disabled" : ""}>Nach links</button><button data-row-slide="right" ${index === group.length - 1 ? "disabled" : ""}>Nach rechts</button></div><p class="artboard-help">Übergreifende Ebenen bleiben zusammenhängend. Dupliziert werden vollständig auf dieser Slide liegende Inhalte.</p>`;
+      for (const button of section.querySelectorAll("button"))
+        button.onclick = () => {
+          const key = button.dataset.rowSlide;
+          MKWSpreadUI.slideAction(
+            ["before", "after"].includes(key)
+              ? "insert"
+              : ["left", "right"].includes(key)
+                ? "move"
+                : key,
+            pageId,
+            ["before", "left"].includes(key) ? (key === "before" ? 0 : -1) : 1,
+          );
+        };
+      host.prepend(section);
+    },
+    activateBoard: (id) => {
+      const c = p.carousel,
+        i = c.pageStructure.artboardInfo.findIndex((a) => a.id === id);
+      if (i < 0) return;
+      selectedArtboard = id;
+      focusedPage = null;
+      selected = new Set(c.pageStructure.groups[i]);
+      carouselUI.folder = null;
+      carouselSlideSelect(
+        c.artboards.findIndex((a) => a.id === c.pageStructure.groups[i][0]),
+      );
+      carouselSlideCenter(carouselUI.slide);
+    },
     selectedBoard: () =>
       p.carousel?.pageStructure?.artboardInfo?.find(
         (a) => a.id === selectedArtboard,
       ),
     panel,
+    editArtboard: (id) => {
+      selected = new Set([id]);
+      editSpread();
+    },
     commit,
     active,
     canvas,
@@ -1122,11 +1356,11 @@ const MKWSpreadUI = (() => {
         {
           type: "batch",
           actions: [
-            ...(active() ? [] : [{ type: "mode", mode: "spreads" }]),
-            { type: "add", count: 2, spread: true },
+            ...(active() ? [] : [{ type: "enable" }]),
+            { type: "add", count: 1, spread: true },
           ],
         },
-        "Neuer Druckbogen hinzugefügt.",
+        "Neue Reihe hinzugefügt.",
       ),
   };
 })();

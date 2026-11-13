@@ -5,6 +5,7 @@ function carouselSlideControls() {
     c = p.carousel,
     s = carouselZoom;
   if (!root) return;
+  if (p.campaign) return MKWCampaignUI.cards(root);
   if (MKWSpreadUI.active()) return MKWSpreadUI.canvas(root);
   if (MKWCarouselPolicy.isFree(c)) return MKWArtboardUI.controls(root);
   if (carouselUI.slide >= c.n) carouselUI.slide = c.n - 1;

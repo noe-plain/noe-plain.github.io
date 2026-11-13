@@ -20,7 +20,12 @@ const MKWProjectDialogs = (() => {
       ? records
           .map((record) => {
             const current = record.id === currentId,
-              mode = record.mode === "carousel" ? "Designer" : "FD-Kampagnen",
+              mode =
+                record.mode === "campaign"
+                  ? "FD-Kampagnen (Vorschau)"
+                  : record.mode === "carousel"
+                    ? "Designer"
+                    : "FD-Kampagnen",
               time = new Date(record.updatedAt).toLocaleString("de-CH", {
                 dateStyle: "medium",
                 timeStyle: "short",
@@ -90,7 +95,12 @@ const MKWProjectDialogs = (() => {
       '<h3 id="saveAlternativesTitle">Weitere Möglichkeiten</h3>';
     psdHint.textContent =
       "Photoshop benötigt dieselben Schriften. Spezialfälle enthalten eine genaue Rasterdarstellung und zusätzliche Ebenen zum Bearbeiten. MKW zum Weiterarbeiten im Studio behalten.";
-    alternative.append(psd, psdHint);
+    const psdScope = document.createElement("label");
+    psdScope.id = "psdRowScopeLabel";
+    psdScope.hidden = true;
+    psdScope.innerHTML =
+      'PSD-Auswahl<select id="psdRowScope"><option value="all">Gesamtes Projekt</option><option value="row">Aktive Reihe</option></select>';
+    alternative.append(psdScope, psd, psdHint);
     const exportCard = document.createElement("section");
     exportCard.className = "save-export-entry";
     exportCard.innerHTML = `<h3>Fertige Bilder teilen</h3><p>JPG, PNG, WebP und beim Designer auch PDF findest du im Export.</p><button type="button" id="saveOpenExport">${studioIcon("export")}<span>Zum Export</span></button>`;
@@ -117,6 +127,12 @@ const MKWProjectDialogs = (() => {
       previewLabel.firstChild.textContent = MKWProjects.fileLink()
         ? "Neue Datei beim Speichern unter …"
         : "So heisst deine Datei";
+      psdScope.hidden = !p.carousel?.pageStructure;
+      psdScope.querySelector("select").value = "all";
+      const row = p.carousel?.pageStructure ? carouselRow() : null;
+      psdScope.querySelector('[value="row"]').textContent = row
+        ? `Diese Reihe: ${row.info.name}`
+        : "Aktive Reihe";
       update();
       body.scrollTop = 0;
     });

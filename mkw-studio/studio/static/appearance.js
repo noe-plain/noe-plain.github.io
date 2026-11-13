@@ -43,7 +43,6 @@ function studioApplyPreferences() {
   for (const id of ["guideColour", "snapColour", "snapDistance"])
     $("#" + id).value = studioPreferences[id];
   $("#defaultExportFormat").value = studioPreferences.exportFormat;
-  $("#advancedMode").checked = studioPreferences.advanced;
   for (const key of Object.keys(studioPreferences.textSizes)) {
     const input = document.querySelector(`[data-default-text-size="${key}"]`);
     if (input) input.value = studioPreferences.textSizes[key];
@@ -56,7 +55,7 @@ function studioApplyPreferences() {
   if ($("#autoSaveFile"))
     $("#autoSaveFile").checked = studioPreferences.autoSaveFile;
   MKWFields.refresh($("#settingsDialog"));
-  carouselSyncAdvancedTools();
+  carouselSyncTools();
   studioPersistPreferences();
 }
 const studioPreferenceStorageErrors = new Set();
@@ -74,6 +73,7 @@ function studioWritePreference(key, value) {
   );
 }
 function studioPersistPreferences() {
+  studioPreferences = MKWSetupModel.preferences(studioPreferences);
   studioWritePreference(
     "mkw-studio-preferences",
     JSON.stringify(studioPreferences),
@@ -104,12 +104,6 @@ $("#snapDistance").onchange = (event) => {
 $("#defaultExportFormat").onchange = (event) => {
   studioPreferences.exportFormat = event.target.value;
   studioApplyPreferences();
-};
-$("#advancedMode").onchange = (event) => {
-  studioPreferences.advanced = event.target.checked;
-  studioApplyPreferences();
-  if (carouselActive()) carouselPanel();
-  else renderPanel();
 };
 studioApplyPreferences();
 function studioSetTheme(theme) {

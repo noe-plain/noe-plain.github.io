@@ -141,10 +141,11 @@ function carouselWarning(o) {
       : "Text überschreitet eine Slide-Grenze.";
   const safe = MKWCarouselPolicy.safeRect(c, index);
   if (
-    bounds.x < safe.x ||
-    bounds.x + bounds.w > safe.x + safe.w ||
-    bounds.y < safe.y ||
-    bounds.y + bounds.h > safe.y + safe.h
+    o.campaignRole !== "copyright" &&
+    (bounds.x < safe.x ||
+      bounds.x + bounds.w > safe.x + safe.w ||
+      bounds.y < safe.y ||
+      bounds.y + bounds.h > safe.y + safe.h)
   )
     return "Text liegt ausserhalb der empfohlenen Safezone.";
   if (carouselTextHeight(o) > o.h + 1)
@@ -171,6 +172,8 @@ function carouselGradientPoints(o) {
 }
 
 function validateCarousel(q) {
+  if (!MKWCampaignModel.valid(q))
+    throw Error("Ungültige Kampagnen-Verknüpfung.");
   const c = q.carousel;
   if (!c) return;
   if (
@@ -215,7 +218,10 @@ function validateCarousel(q) {
       (o.pageId !== undefined &&
         (!MKWSpreadLayoutModel.active(c) ||
           !c.artboards.some((a) => a.id === o.pageId))) ||
-      (o.pageFragment !== undefined && (o.pageFragment !== true || !o.pageId))
+      (o.pageFragment !== undefined &&
+        (o.pageFragment !== true || !o.pageId)) ||
+      (o.artboardScoped !== undefined &&
+        (o.artboardScoped !== true || !o.pageId || !c.pageStructure))
     )
       throw Error("Ungültige Seitenzuordnung einer Ebene.");
     if (
@@ -388,6 +394,120 @@ function carouselIcon(name) {
   return studioIcon(name);
 }
 
+// UI-only row context. No document/history state is written by choosing a row.
+function carouselRow(object = null) {
+  const c = p.carousel;
+  if (!c?.pageStructure || !c.n) return null;
+  if (carouselUI.rowProject !== p.projectId) {
+    carouselUI.rowPage = null;
+    carouselUI.rowProject = p.projectId;
+  }
+  const owner =
+    object &&
+    (c.artboards.find((a) => a.id === object.pageId) ||
+      MKWCarouselPolicy.sourcePage(c, carouselObjectBounds(object)));
+  const page =
+    owner ||
+    (carouselUI.slide !== null && c.artboards[carouselUI.slide]) ||
+    c.artboards.find((a) => a.id === carouselUI.rowPage) ||
+    c.artboards[0];
+  carouselUI.rowPage = page.id;
+  const index = c.pageStructure.groups.findIndex((ids) =>
+    ids.includes(page.id),
+  );
+  if (index < 0) return null;
+  const ids = c.pageStructure.groups[index],
+    frames = c.artboards.filter((a) => ids.includes(a.id));
+  return {
+    page,
+    ids,
+    frames,
+    info: c.pageStructure.artboardInfo[index],
+    bounds: MKWCarouselPolicy.contentFrame(c, {
+      pageId: page.id,
+      artboardScoped: true,
+    }),
+  };
+}
+function carouselRowObjects() {
+  const row = carouselRow();
+  if (!row) return p.carousel.objects;
+  return p.carousel.objects.filter((o) =>
+    row.ids.includes(
+      (
+        p.carousel.artboards.find((a) => a.id === o.pageId) ||
+        MKWCarouselPolicy.sourcePage(p.carousel, carouselObjectBounds(o))
+      )?.id,
+    ),
+  );
+}
+function carouselRowScope() {
+  return MKWRowScope.scope(
+    p.carousel,
+    carouselRow()?.page.id,
+    carouselObjectBounds,
+  );
+}
+function carouselCanEditRowFolders() {
+  const scope = carouselRowScope(),
+    ids = new Set(scope.view.objects.map((o) => o.id));
+  if (scope.ids && carouselSelected().some((o) => !ids.has(o.id))) {
+    status(
+      "Wähle für Ordner- und Ebenenaktionen nur Elemente der aktiven Reihe.",
+    );
+    return false;
+  }
+  if (!scope.shared.length) return true;
+  status("Mache die geteilten Ordner zuerst für diese Reihe unabhängig.");
+  return false;
+}
+function carouselIsolateRowFolders() {
+  try {
+    const next = MKWRowScope.isolate(
+      p.carousel,
+      carouselRow()?.page.id,
+      carouselObjectBounds,
+      uid,
+    );
+    if (next === p.carousel) return false;
+    validateCarousel({ ...p, carousel: next });
+    checkpoint();
+    p.carousel = next;
+    carouselUI.folder = null;
+    changed();
+    return true;
+  } catch (e) {
+    status(e.message);
+    return false;
+  }
+}
+function carouselCopyOrigin(objects) {
+  const object = objects.at(-1);
+  if (!object || !p.carousel.pageStructure) return null;
+  const row = carouselRow(object);
+  return (
+    row && {
+      ...row.bounds,
+      pageId: row.page.id,
+      projectId: p.projectId,
+      multipleRows: objects.some(
+        (o) =>
+          !row.ids.includes(
+            (
+              p.carousel.artboards.find((a) => a.id === o.pageId) ||
+              MKWCarouselPolicy.sourcePage(p.carousel, carouselObjectBounds(o))
+            )?.id,
+          ),
+      ),
+      folders: Object.fromEntries(
+        (p.carousel.folders || [])
+          .filter((f) => objects.some((o) => o.folderId === f.id))
+          .map((f) => [f.id, { visible: f.visible, locked: f.locked }]),
+      ),
+    }
+  );
+}
+
 function carouselSelected() {
   const c = p.carousel;
   if (!c) return [];
@@ -408,6 +528,8 @@ function carouselSelect(ids) {
     if (ids.includes(o.id)) MKWTypography.clear(o);
   carouselUI.ids = new Set(ids);
   carouselSelection = ids.at(-1) || null;
+  const last = p.carousel.objects.find((o) => o.id === carouselSelection);
+  if (last) carouselRow(last);
   carouselUI.content = false;
   carouselUI.framePoints = false;
   if (!same) carouselUI.textParagraph = carouselUI.textLine = 0;
@@ -485,9 +607,13 @@ function carouselDefault(type, rect = {}) {
             h: 1,
           }
         : { x: 0, y: 0, w: 1, h: 1 },
+    row = carouselRow(),
     target = MKWCarouselPolicy.frame(
       c,
-      carouselUI.slide ?? MKWCarouselPolicy.nearest(c, center),
+      carouselUI.slide ??
+        (row
+          ? c.artboards.findIndex((a) => a.id === row.page.id)
+          : MKWCarouselPolicy.nearest(c, center)),
     );
   const x = MKWCarouselPolicy.isFree(c)
     ? target.x + target.left
@@ -558,14 +684,36 @@ function carouselDefault(type, rect = {}) {
   };
 }
 
+function carouselAssignArtboard(o) {
+  if (!p.carousel.pageStructure || o.pageFragment) return;
+  const page = MKWCarouselPolicy.sourcePage(
+    p.carousel,
+    carouselObjectBounds(o),
+  );
+  if (page) {
+    o.pageId = page.id;
+    o.artboardScoped = true;
+    carouselRow(o);
+  }
+}
+
 function carouselObject(type, rect = {}) {
   if (!p.carousel.n) {
     status("Füge zuerst eine Seite hinzu.");
     return null;
   }
   if (!carouselCanAddObjects(1)) return null;
+  if (
+    p.campaign &&
+    !MKWCampaignUI.room(
+      type,
+      MKWCarouselPolicy.sourcePage(p.carousel, rect) || carouselRow()?.page,
+    )
+  )
+    return null;
   checkpoint();
   const o = carouselDefault(type, rect);
+  carouselAssignArtboard(o);
   carouselUI.slide = null;
   carouselUI.framePoints = false;
   if (type === "angle" && !rect.w) {
@@ -574,7 +722,22 @@ function carouselObject(type, rect = {}) {
   }
   if (type === "angle" && rect.x === undefined && rect.y === undefined)
     carouselInitialAngle(o);
-  p.carousel.objects.push(o);
+  if (
+    p.campaign &&
+    type === "gradient" &&
+    !p.carousel.objects.some(
+      (item) => item.type === "gradient" && item.pageId === o.pageId,
+    )
+  ) {
+    const firstText = p.carousel.objects.findIndex(
+      (item) => item.pageId === o.pageId && item.type === "text",
+    );
+    p.carousel.objects.splice(
+      firstText < 0 ? p.carousel.objects.length : firstText,
+      0,
+      o,
+    );
+  } else p.carousel.objects.push(o);
   carouselUI.ids = new Set([o.id]);
   carouselSelection = o.id;
   changed();
@@ -648,6 +811,7 @@ async function carouselImport(files, target) {
                 y: 0,
               },
         );
+        carouselAssignArtboard(o);
         p.carousel.objects.unshift(o);
       }
       delete o.imageSourceId;
@@ -683,14 +847,47 @@ function carouselCanAddObjects(count) {
   return false;
 }
 
-function carouselInsertCopies(objects, images = [], fonts = []) {
+function carouselInsertCopies(objects, images = [], fonts = [], origin = null) {
   if (!objects.length || !carouselCanAddObjects(objects.length)) return false;
+  const target = carouselRow(),
+    source = origin || carouselCopyOrigin(objects);
+  if (target) carouselUI.rowPage = target.page.id;
+  const transfer =
+    target &&
+    source &&
+    (source.projectId !== p.projectId || !target.ids.includes(source.pageId));
+  if (transfer && source.multipleRows) {
+    status(
+      "Bitte kopiere zum Einfügen in eine andere Reihe die Ebenen einer einzelnen Reihe.",
+    );
+    return false;
+  }
+  const dx = transfer ? target.bounds.x - source.x : 30,
+    dy = transfer ? target.bounds.y - source.y : 30;
   const copies = objects.map((o) => ({
     ...clone(o),
     id: uid(),
-    x: o.x + 30,
-    y: o.y + 30,
+    x: o.x + dx,
+    y: o.y + dy,
   }));
+  if (target && !source?.multipleRows)
+    for (const o of copies) {
+      const page = MKWCarouselPolicy.sourcePage(
+        { ...p.carousel, n: target.frames.length, artboards: target.frames },
+        carouselObjectBounds(o),
+      );
+      o.pageId = page.id;
+      o.artboardScoped = true;
+      // A folder shared with the source would couple visibility/locks across rows.
+      if (transfer && o.folderId) {
+        const folder = source.folders?.[o.folderId];
+        if (folder) {
+          o.visible = o.visible !== false && folder.visible !== false;
+          o.locked = !!(o.locked || folder.locked);
+        }
+        delete o.folderId;
+      }
+    }
   MKWTemplateModel.remapLinks(objects, copies);
   const candidate = {
     ...p,
@@ -752,8 +949,10 @@ function carouselLayerOrder(direction) {
       .map((o) => o.id),
   );
   if (!selectedIds.size) return;
-  let a = p.carousel.objects.filter((o) => o.type !== "logo");
-  const logos = p.carousel.objects.filter((o) => o.type === "logo");
+  if (!carouselCanEditRowFolders()) return;
+  const view = carouselRowScope().view;
+  let a = view.objects.filter((o) => o.type !== "logo");
+  const logos = view.objects.filter((o) => o.type === "logo");
   if (direction === "front" || direction === "back") {
     const chosen = a.filter((o) => selectedIds.has(o.id)),
       rest = a.filter((o) => !selectedIds.has(o.id));
@@ -768,9 +967,9 @@ function carouselLayerOrder(direction) {
         [a[i], a[i - 1]] = [a[i - 1], a[i]];
   }
   const next = [...a, ...logos];
-  if (next.every((o, i) => o === p.carousel.objects[i])) return;
+  if (next.every((o, i) => o === view.objects[i])) return;
   checkpoint();
-  p.carousel.objects = next;
+  p.carousel = MKWRowScope.mergeOrder(p.carousel, { ...view, objects: next });
   changed();
 }
 

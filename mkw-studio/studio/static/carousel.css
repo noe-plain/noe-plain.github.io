@@ -1090,3 +1090,72 @@
 #carouselSlideControls {
   z-index: 6;
 }
+
+#carouselSidebar #carouselRowPicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: var(--studio-shape-full);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+}
+#carouselRowPicker .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+#carouselSidebar #carouselRowPicker:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    transparent
+  );
+}
+#carouselSidebar #carouselRowPicker:is(:active, [aria-expanded="true"]) {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 12%,
+    transparent
+  );
+}
+#carouselRowMenu button > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#carouselRowMenu [aria-current="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#carouselRowMenu [aria-current="true"]:is(:hover, :focus-visible) {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 8%,
+    var(--md-sys-color-secondary-container)
+  );
+}
+@media (pointer: coarse) {
+  #carouselSidebar #carouselRowPicker {
+    min-height: 48px;
+  }
+}
+
+#carouselRowMenu button:active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 12%,
+    transparent
+  );
+}
+#carouselRowMenu [aria-current="true"]:active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-secondary-container) 12%,
+    var(--md-sys-color-secondary-container)
+  );
+}

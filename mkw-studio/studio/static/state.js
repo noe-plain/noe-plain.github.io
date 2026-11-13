@@ -60,6 +60,7 @@ function snapshot() {
   return {
     ...p,
     carousel: p.carousel ? clone(p.carousel) : undefined,
+    campaign: p.campaign ? clone(p.campaign) : undefined,
     meta: clone(p.meta),
     textOverrides: clone(p.textOverrides || {}),
     textTypeOverrides: clone(p.textTypeOverrides || {}),
@@ -78,6 +79,7 @@ function checkpoint() {
   future = [];
 }
 function changed(full = true) {
+  if (typeof MKWCampaignUI !== "undefined") MKWCampaignUI.sync();
   $("#undo").disabled = !history.length;
   $("#redo").disabled = !future.length;
   MKWTemplateModel.syncLinks(p.carousel);
@@ -258,6 +260,7 @@ function showImportStage(index, total, file, stage) {
 }
 $("#importDialog").addEventListener("cancel", (ev) => ev.preventDefault());
 async function importFiles(files) {
+  if (p.campaign) return MKWCampaignUI.importPhotos(files);
   if (p.carousel) return carouselImport(files);
   if (busy || !files.length) return;
   busy = true;

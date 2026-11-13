@@ -16,10 +16,7 @@ const carouselEndKinds = [
 ];
 const carouselIsVector = (o) => !!o && ["path", "shape"].includes(o.type);
 function carouselToolAvailable(tool) {
-  return (
-    !["path", "curve", "shape", "builder"].includes(tool) ||
-    studioPreferences.advanced
-  );
+  return Object.hasOwn(carouselToolNames, tool);
 }
 function carouselVectorDefaults(type) {
   return ["path", "shape"].includes(type)
@@ -48,16 +45,12 @@ function carouselVectorDefaults(type) {
       }
     : {};
 }
-function carouselSyncAdvancedTools() {
-  document.body.classList.toggle("advanced-mode", studioPreferences.advanced);
+function carouselSyncTools() {
+  document.body.classList.remove("advanced-mode");
   const rail = $(".carousel-toolrail");
   if (!rail) return;
   for (const tool of ["path", "curve", "shape", "builder"]) {
     let button = rail.querySelector(`[data-tool=${tool}]`);
-    if (!studioPreferences.advanced) {
-      button?.remove();
-      continue;
-    }
     if (!button) {
       button = document.createElement("button");
       button.dataset.tool = tool;
@@ -75,12 +68,6 @@ function carouselSyncAdvancedTools() {
       button.onclick = () => carouselTool(tool);
       rail.insertBefore(button, rail.querySelector("[data-tool=hand]"));
     }
-  }
-  if (!studioPreferences.advanced) {
-    carouselPathDraft = null;
-    carouselUI.vectorPoints = false;
-    if (["path", "curve", "shape", "builder"].includes(carouselUI.tool))
-      carouselUI.tool = "select";
   }
   for (const tool of ["path", "curve", "shape", "builder"]) {
     const button = rail.querySelector(`[data-tool=${tool}]`);
@@ -814,7 +801,7 @@ function carouselVectorPanel(o) {
     o.type === "shape"
       ? section(
           "Form",
-          `<button id="vectorShapePoints" ${!studioPreferences.advanced ? "disabled" : ""}>Punkte & Kurven bearbeiten</button><div class="vector-shapes" role="group" aria-label="Form auswählen">${[
+          `<button id="vectorShapePoints" >Punkte & Kurven bearbeiten</button><div class="vector-shapes" role="group" aria-label="Form auswählen">${[
             ["rect", "Rechteck"],
             ["ellipse", "Ellipse"],
             ["triangle", "Dreieck"],
@@ -831,7 +818,7 @@ function carouselVectorPanel(o) {
         )
       : section(
           "Pfad",
-          `<button id="vectorEditPoints" aria-pressed="${!!carouselUI.vectorPoints}" ${!studioPreferences.advanced ? "disabled" : ""}>${carouselUI.vectorPoints ? "Punktbearbeitung beenden" : "Punkte & Kurven bearbeiten"}</button><label class="vector-check"><input data-vector-key="closed" type="checkbox" ${o.closed ? "checked" : ""} ${o.points.length < 3 ? "disabled" : ""}> Geschlossener Pfad</label>${o.contours ? `<label>Teilpfad<select id="vectorContour">${o.contours.map((_, i) => `<option value="${i}" ${i === (carouselUI.vectorContour || 0) ? "selected" : ""}>Teilpfad ${i + 1}</option>`).join("")}</select></label>` : ""}${carouselUI.vectorPoints ? `<output class="vector-point-count">${carouselUI.vectorNodes?.size || 1} Punkte ausgewählt</output><output class="vector-point-count">Punkt ${(carouselUI.vectorNode ?? 0) + 1} von ${o.points.length}</output><div class="carousel-fields"><button id="vectorCorner">Eckpunkt</button><button id="vectorSmooth">Kurvenpunkt</button><button id="vectorAddPoint">Punkt hinzufügen</button><button id="vectorRemovePoint">Punkt entfernen</button></div>` : ""}`,
+          `<button id="vectorEditPoints" aria-pressed="${!!carouselUI.vectorPoints}" >${carouselUI.vectorPoints ? "Punktbearbeitung beenden" : "Punkte & Kurven bearbeiten"}</button><label class="vector-check"><input data-vector-key="closed" type="checkbox" ${o.closed ? "checked" : ""} ${o.points.length < 3 ? "disabled" : ""}> Geschlossener Pfad</label>${o.contours ? `<label>Teilpfad<select id="vectorContour">${o.contours.map((_, i) => `<option value="${i}" ${i === (carouselUI.vectorContour || 0) ? "selected" : ""}>Teilpfad ${i + 1}</option>`).join("")}</select></label>` : ""}${carouselUI.vectorPoints ? `<output class="vector-point-count">${carouselUI.vectorNodes?.size || 1} Punkte ausgewählt</output><output class="vector-point-count">Punkt ${(carouselUI.vectorNode ?? 0) + 1} von ${o.points.length}</output><div class="carousel-fields"><button id="vectorCorner">Eckpunkt</button><button id="vectorSmooth">Kurvenpunkt</button><button id="vectorAddPoint">Punkt hinzufügen</button><button id="vectorRemovePoint">Punkt entfernen</button></div>` : ""}`,
         );
   body += section(
     "Fläche & Kontur",
@@ -922,7 +909,7 @@ function carouselBindVectorPanel(o, panel) {
   );
   if ($("#vectorEditPoints"))
     $("#vectorEditPoints").onclick = () => {
-      if (carouselObjectLocked(o) || !studioPreferences.advanced) return;
+      if (carouselObjectLocked(o)) return;
       carouselUI.vectorPoints = !carouselUI.vectorPoints;
       carouselUI.vectorNode = 0;
       carouselRefresh();

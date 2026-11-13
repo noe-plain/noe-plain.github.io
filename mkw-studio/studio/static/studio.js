@@ -231,6 +231,8 @@ function bindFamilyTools(root) {
 function render() {
   if (carouselRender()) return;
   const postAnchor = postCaptureAnchor();
+  if ($("#campaignConvert"))
+    $("#campaignConvert").hidden = !!p.campaign || !!p.carousel;
   $("#savePSD").hidden = false;
   const s = surfaceScale();
   $("#empty").hidden = !!p.images.length;
@@ -344,7 +346,7 @@ const postInspector = MKWPostInspector.create({
     board: board(),
     step,
     layer,
-    advanced: studioPreferences.advanced,
+    advanced: true,
     elementNames,
   }),
   actions: {
