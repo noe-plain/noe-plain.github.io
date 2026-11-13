@@ -165,17 +165,20 @@ const MKWCampaignDocument = (() => {
   async function append(q, im, boards) {
     if ((q.carousel?.n || 0) + boards.length > 200)
       throw Error("Maximal 200 Ausgaben pro Kampagne.");
-    const formats = boards.map((b) => ({
-      ...MKWFormats.safe({ w: b.w, h: b.h, ...b.safe }),
-      left: 100,
-      right: 100,
-      ...b.safe,
-      w: b.w,
-      h: b.h,
-    }));
+    const formats = boards.map((b) => {
+      const safe = MKWLayout.safeRect({ ...b, sponsors: undefined });
+      return {
+        w: b.w,
+        h: b.h,
+        top: Math.round(safe.top),
+        bottom: Math.round(safe.bottom),
+        left: Math.round(safe.left),
+        right: Math.round(safe.right),
+      };
+    });
     if (formats.some((f) => !MKWCarouselPolicy.validFormat(f)))
       throw Error(
-        "Die Vorschau unterstützt Formate von 240–4000 px. Passe grössere Formate im bisherigen Modus an.",
+        "FD-Kampagnen unterstützt Formate von 240–4000 px. Passe grössere Formate im bisherigen Modus an.",
       );
     q.carousel ??= {
       ...formats[0],

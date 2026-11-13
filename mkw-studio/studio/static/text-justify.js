@@ -143,6 +143,25 @@
     return parts;
   }
   function wrap(text, width, measure, hyphenate) {
+    if (text.includes("\u2028")) {
+      let offset = 0;
+      return text.split("\u2028").flatMap((part) => {
+        const base = offset;
+        const lines = wrap(
+          part,
+          width,
+          (value, start = 0, hyphen = false) =>
+            measure(value, base + start, hyphen),
+          hyphenate,
+        ).map((line) => ({
+          ...line,
+          start: base + line.start,
+          end: base + line.end,
+        }));
+        offset += part.length + 1;
+        return lines;
+      });
+    }
     if (hyphenate) return wrapHyphenated(text, width, measure, hyphenate);
     if (!text.length) return [{ raw: "", start: 0, end: 0 }];
     const ends = [...text.matchAll(/[^ \t]+[ \t]*|[ \t]+/gu)].map(

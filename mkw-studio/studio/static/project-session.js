@@ -452,6 +452,42 @@ const MKWProjects = (() => {
         }
       };
     });
+    list.querySelectorAll("[data-convert-project]").forEach((button) => {
+      button.onclick = async () => {
+        if (opening) return;
+        const id = button.dataset.convertProject;
+        const accepted = await MKWFeedback.ask({
+          title: "FD-Kampagne umwandeln?",
+          message:
+            "Das ursprüngliche Projekt bleibt erhalten. Eine neue Kopie übernimmt die Titel in ein gemeinsames bearbeitbares Textfeld und erhält den bisherigen Verlauf.",
+          confirm: "Kopie umwandeln",
+          trigger: button,
+        });
+        if (
+          !accepted ||
+          opening ||
+          !dialog.open ||
+          generation !== libraryGeneration ||
+          !button.isConnected
+        )
+          return;
+        opening = true;
+        const finish = MKWUIControls.loading("#projectOpenStatus");
+        MKWFields.notice($("#projectOpenStatus"), "Projekt wird umgewandelt …");
+        try {
+          await open(MKWProjectStore.open(id));
+          await MKWCampaignUI.convert({ confirmed: true });
+        } catch (error) {
+          openError(
+            "Umwandlung nicht abgeschlossen. Die ursprüngliche Kampagne bleibt erhalten: " +
+              error.message,
+          );
+        } finally {
+          finish();
+          opening = false;
+        }
+      };
+    });
     list.querySelectorAll("[data-delete-project]").forEach((button) => {
       button.onclick = async () => {
         if (opening) return;

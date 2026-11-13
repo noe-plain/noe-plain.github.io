@@ -91,6 +91,30 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         return { text: o.text, history: history.length };
       });
       await page.locator("[data-typo-colour]").click();
+      assert.equal(
+        await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+        "false",
+      );
+      await page.locator("#paintFamilyText").click();
+      assert.equal(
+        await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+        "true",
+      );
+      await page.locator("#paintFamilyText").click();
+      assert.equal(
+        await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+        "false",
+      );
+      assert.equal(
+        await page.evaluate(
+          () =>
+            MKWText.at(
+              p.carousel ? carouselSelected()[0] : board().elements.title,
+              0,
+            ).family,
+        ),
+        false,
+      );
       await page.locator("#paintFamilyText").click();
       const applied = await page.evaluate(() => {
         const o = p.carousel ? carouselSelected()[0] : board().elements.title;
@@ -112,7 +136,18 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       assert.equal(applied.first, true);
       assert.equal(applied.last, undefined);
       assert(new Set(applied.colors.slice(0, 5)).size >= 4);
-      assert.equal(applied.history, source.history + 1);
+      assert.equal(applied.history, source.history + 3);
+      await page.locator("#paintClose").click();
+      await page.evaluate(() => {
+        const o = p.carousel ? carouselSelected()[0] : board().elements.title;
+        MKWTypography.track(o, 0, o.text.length);
+      });
+      await page.locator("[data-typo-colour]").click();
+      assert.equal(
+        await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+        "mixed",
+      );
+      await page.locator("#paintClose").click();
       if (mode !== "post") {
         const paintLayout = await page.evaluate(() => {
           const wells = document
@@ -134,7 +169,9 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
                 r.top >= pill.top &&
                 r.bottom <= pill.bottom &&
                 r.right <= pill.right,
-            ) && swap.right <= none.left
+            ) &&
+            Math.abs(swap.left - none.left) < 1 &&
+            swap.bottom <= none.top
           );
         });
         assert(
@@ -159,6 +196,46 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
           return !o || MKWText.at(o, 0).family !== true;
         }),
       );
+      if (mode !== "carousel") {
+        await page.evaluate(() => {
+          const o = p.carousel ? carouselSelected()[0] : board().elements.title;
+          delete o.family;
+          o.characterStyles = [];
+          o.color = "#126789";
+          if (p.carousel) p.campaign.rows[0].family = true;
+          else board().family = { enabled: true, background: "#ffffff" };
+          changed();
+          MKWTypography.track(o, 0, o.text.length);
+        });
+        await page.locator("[data-typo-colour]").click();
+        assert.equal(
+          await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+          "true",
+        );
+        await page.locator("#paintFamilyText").click();
+        assert.equal(
+          await page.locator("#paintFamilyText").getAttribute("aria-pressed"),
+          "false",
+        );
+        assert(
+          await page.evaluate(() => {
+            const o = p.carousel
+                ? MKWCampaignUI.decorate(carouselSelected()[0])
+                : board().elements.title,
+              runs = p.carousel
+                ? carouselTextLayout(o).lines.flatMap((l) => l.runs)
+                : textBlock(board(), "title")
+                    .records.find((r) => r.key === "title")
+                    .styled.lines.flatMap((l) => l.runs);
+            return runs.every((r) => !r.family && r.color === "#126789");
+          }),
+          "Turning off family text preserves the original solid colour, including family-design defaults",
+        );
+        await page.screenshot({
+          path: artifact("family-toggle-" + mode + ".png"),
+        });
+        await page.locator("#paintClose").click();
+      }
       console.log(
         "PASS selected family text colour, untouched neighbors, source, history and file:",
         mode,

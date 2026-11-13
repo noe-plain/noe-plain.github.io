@@ -303,6 +303,48 @@ const { launch, artifact } = require("./browser.cjs");
       await page.evaluate(() => carouselWarning(carouselSelected()[0])),
       "",
     );
+    const clippedCoverage = await page.evaluate(() => {
+      const frame = MKWCarouselPolicy.frames(p.carousel)[0],
+        object = {
+          ...carouselSelected()[0],
+          effects: undefined,
+          framePoints: undefined,
+          pageId: undefined,
+          artboardScoped: false,
+          x: frame.x - frame.w,
+          y: frame.y,
+          w: frame.w * 2,
+          h: frame.h,
+          scale: 0.5,
+          panX: frame.w / 2,
+          panY: 0,
+          angle: 0,
+        };
+      // Square source footprint covers the exported page while leaving the left, off-page half of the frame empty.
+      object.h = frame.w;
+      object.y = frame.y;
+      const result = {
+        rectangle: carouselPhotoCoversFrame(object),
+        missing: carouselPhotoCoversFrame({ ...object, panX: 0 }),
+        outside: carouselPhotoCoversFrame({
+          ...object,
+          x: frame.x - 10 * frame.w,
+        }),
+      };
+      result.angles = ["up", "left", "down"].map((direction) =>
+        carouselPhotoCoversFrame({
+          ...object,
+          type: "angle",
+          direction,
+          thickness: 150,
+        }),
+      );
+      return result;
+    });
+    assert(clippedCoverage.rectangle);
+    assert.equal(clippedCoverage.missing, false);
+    assert(clippedCoverage.outside);
+    assert(clippedCoverage.angles.every(Boolean));
     // Both the PNG preview and PSD raster retain the same photo clipping semantics.
     const exported = await page.evaluate(async () => {
       const o = carouselSelected()[0];

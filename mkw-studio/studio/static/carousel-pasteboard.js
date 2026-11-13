@@ -9,7 +9,12 @@ function carouselOutsideObjects(c = p.carousel) {
     );
   });
 }
+let carouselOutsideCandidates = null;
 function carouselPasteboardSpace(viewport, width, height) {
+  carouselOutsideCandidates = {
+    document: p.carousel,
+    objects: carouselOutsideObjects(),
+  };
   const pasteboard = $("#carouselPasteboard"),
     artwork = $("#carouselArtwork"),
     old = pasteboard.space,
@@ -18,7 +23,7 @@ function carouselPasteboardSpace(viewport, width, height) {
   let space = { left: x, right: x, top: y, bottom: y };
   if (carouselUI.drag && old) space = old;
   else
-    for (const object of carouselOutsideObjects()) {
+    for (const object of carouselOutsideCandidates.objects) {
       const b = carouselObjectBounds(object),
         z = carouselZoom,
         pad = 80;
@@ -46,6 +51,23 @@ function carouselScheduleOutside() {
   const viewport = $("#carouselViewport"),
     canvas = $("#carouselOutsideCanvas");
   if (!viewport || !canvas) return;
+  const candidates =
+    carouselOutsideCandidates?.document === p.carousel
+      ? carouselOutsideCandidates.objects
+      : carouselOutsideObjects();
+  if (!candidates.length) {
+    if (!canvas.paintEmpty) {
+      canvas.width = canvas.height = 1;
+      if (carouselOutsideBuffer)
+        carouselOutsideBuffer.width = carouselOutsideBuffer.height = 1;
+    }
+    canvas.paintEmpty = true;
+    canvas.hidden = true;
+    carouselOutsidePending = null;
+    carouselOutsideGeneration++;
+    return;
+  }
+  canvas.hidden = false;
   canvas.style.left = viewport.scrollLeft + "px";
   canvas.style.top = viewport.scrollTop + "px";
   canvas.style.width = viewport.clientWidth + "px";
@@ -61,7 +83,7 @@ function carouselScheduleOutside() {
     rect = canvas.getBoundingClientRect(),
     dx = origin.left - rect.left,
     dy = origin.top - rect.top,
-    objects = carouselOutsideObjects().filter((object) => {
+    objects = candidates.filter((object) => {
       const b = carouselObjectBounds(object),
         pad =
           carouselVisualPadding(object) +
@@ -84,6 +106,13 @@ function carouselScheduleOutside() {
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
       fontStatus,
     ]);
+  if (
+    !objects.length &&
+    canvas.paintEmpty &&
+    canvas.width === width &&
+    canvas.height === height
+  )
+    return;
   if (
     canvas.paintKey === key &&
     canvas.paintProject === p &&
@@ -126,11 +155,13 @@ async function carouselPaintOutside() {
   try {
     if (!current()) return;
     if (!job.objects.length) {
+      job.canvas.paintEmpty = true;
       job.canvas.width = job.width;
       job.canvas.height = job.height;
       if (carouselOutsideBuffer)
         carouselOutsideBuffer.width = carouselOutsideBuffer.height = 1;
     } else {
+      job.canvas.paintEmpty = false;
       buffer = carouselOutsideBuffer ??= makeCanvas(1, 1);
       if (buffer.width !== job.width) buffer.width = job.width;
       if (buffer.height !== job.height) buffer.height = job.height;

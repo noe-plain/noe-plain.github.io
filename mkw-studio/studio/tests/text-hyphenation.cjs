@@ -106,18 +106,9 @@ const assert = require("node:assert/strict"),
     });
 
     await page
-      .locator('[data-typo-page="paragraph"] .justification-settings')
+      .locator('.typography-inspector .justification-settings')
       .evaluate((el) => (el.open = true));
-    const choose = async (a, b) => {
-      await page.locator("[data-prop=text]").focus();
-      await page.locator("[data-prop=text]").evaluate(
-        (el, [a, b]) => {
-          el.setSelectionRange(a, b);
-          el.dispatchEvent(new Event("select"));
-        },
-        [a, b],
-      );
-    };
+    const choose = async (a, b) => require("./browser.cjs").canvasTextRange(page, a, b);
     await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
     await page.locator("[data-typo-hyphenate]").uncheck();
     assert.deepEqual(

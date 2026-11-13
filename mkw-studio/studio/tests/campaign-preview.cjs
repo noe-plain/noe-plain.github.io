@@ -28,15 +28,13 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       ctx.fillRect(0, 0, 400, 300);
       return c.toDataURL().split(",")[1];
     });
-    await page
-      .locator("#files")
-      .setInputFiles(
-        [1, 2, 3].map((i) => ({
-          name: `Foto-${i}.png`,
-          mimeType: "image/png",
-          buffer: Buffer.from(data, "base64"),
-        })),
-      );
+    await page.locator("#files").setInputFiles(
+      [1, 2, 3].map((i) => ({
+        name: `Foto-${i}.png`,
+        mimeType: "image/png",
+        buffer: Buffer.from(data, "base64"),
+      })),
+    );
     await page.waitForFunction(() => !busy && p.campaign.rows.length === 3);
     console.log(
       "imported",
@@ -124,6 +122,13 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
         h: 200,
       }).then((result) => (window.reusedText = result));
     });
+    assert.equal(
+      await page
+        .locator(".campaign-text-choice")
+        .evaluate((el) => el.parentElement.id),
+      "carouselEditingOverlay",
+    );
+    assert.equal(await page.locator("dialog.campaign-text-choice").count(), 0);
     await page.locator("[data-adopt]").first().click();
     await page.waitForFunction(() => window.reusedText?.text);
     await page.evaluate(() => {

@@ -93,6 +93,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
         const field = page.locator(panel + " .text-content-editor textarea");
         const action = () => page.locator(panel + " [data-text-edit-action]");
         assert.equal(await field.count(), 1);
+        assert(await field.isHidden());
         assert.equal(await action().getAttribute("aria-pressed"), "false");
         assert(await action().isEnabled());
         await settle(page);
@@ -167,7 +168,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
             p.carousel ? !carouselUI.editing : !editingText,
           ),
         );
-        await field.fill("Musik verbindet\nNeue Begegnungen");
+        await require("./browser.cjs").fillCanvasText(page,"Musik verbindet\nNeue Begegnungen");
         assert.equal(
           await page.evaluate(() =>
             p.carousel
@@ -177,16 +178,11 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           "Musik verbindet\nNeue Begegnungen",
         );
         if (advanced) {
-          await field.focus();
-          await field.evaluate((el) => {
-            el.setSelectionRange(0, 5);
-            el.dispatchEvent(new Event("select"));
-          });
+          await require("./browser.cjs").canvasTextRange(page,0,5);
           assert.match(
             await page.locator(panel + " [data-typo-scope]").textContent(),
             /5 Zeichen/,
           );
-          await action().click();
           assert.deepEqual(
             await page.evaluate(() =>
               carouselEditableSelection(
@@ -201,7 +197,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           if (mode === "carousel") await page.keyboard.press("Meta+z");
           else await page.evaluate(() => undo());
           await page.evaluate(() => { const el = p.carousel ? carouselUI.editing?.el : editingText?.el; if (el) { MKWTypography.restoreSelection(el, { start:0, end:5 }); MKWTypography.track(p.carousel ? carouselSelected()[0] : p.boards.find(b => b.id === selected).elements.title,0,5); } });
-          if(mode === "post") { await field.focus();await field.evaluate(el=>{el.setSelectionRange(0,5);el.dispatchEvent(new Event("select"))}); }
+          if(mode === "post") await require("./browser.cjs").canvasTextRange(page,0,5);
           await page.locator(panel + " [data-typo=size]").fill("76");
           const styled = await page.evaluate(() =>
             p.carousel
@@ -268,7 +264,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           selected = p.boards.find((b) => b.imageId === p.images[1].id).id;
           chooseStep("text");
         });
-        await page.locator("#mainTextInput").fill("Eigener Konzerttitel");
+        await require("./browser.cjs").fillCanvasText(page, "Eigener Konzerttitel");
         assert(await page.locator("#resetText").isVisible());
         await page.locator("#resetText").click();
         assert.equal(
@@ -293,7 +289,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
         });
       }
       const emptyField = page.locator(panel + " .text-content-editor textarea");
-      await emptyField.fill("");
+      await require("./browser.cjs").fillCanvasText(page,"");
       await actionFor(page, panel).click();
       await page.waitForFunction(() =>
         p.carousel ? !!carouselUI.editing : !!editingText,

@@ -103,7 +103,21 @@
         state.lineSelection = new Set(
           [...state.lineSelection].filter((key) => valid.has(key)),
         );
-      const chosen = state.lineSelection || valid;
+      const r = state.range,
+        caretLine = r && lineRows.findLast((line) => line.start <= r.start);
+      const chosen = r
+        ? new Set(
+            lineRows
+              .filter((line) =>
+                r.start === r.end
+                  ? line === caretLine
+                  : line.start < r.end &&
+                    (line.end > r.start ||
+                      (line.start === line.end && line.start === r.start)),
+              )
+              .map((line) => line.key),
+          )
+        : state.lineSelection || valid;
       const lineCount = host.querySelector("[data-lines-count]"),
         lineCountText = `${chosen.size} von ${lineRows.length} ${lineRows.length === 1 ? "Zeile" : "Zeilen"} ausgewählt`;
       const shortLineCount = `${chosen.size} von ${lineRows.length}`;

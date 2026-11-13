@@ -726,6 +726,14 @@
   font-size: 12px;
   font-weight: 400;
 }
+#paintFamilyText[aria-pressed="true"] {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+#paintFamilyText[aria-pressed="mixed"] {
+  outline: 2px dashed var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
 #paintFamilyText[hidden] {
   display: none;
 }
@@ -744,11 +752,35 @@
 }
 .carousel-contextbar #advancedColours .paint-actions {
   display: flex;
-  width: auto;
-  gap: 4px;
+  flex-direction: column;
+  width: 26px;
+  height: 50px;
+  gap: 2px;
 }
 .carousel-contextbar #advancedColours .paint-actions button {
-  width: 40px;
-  min-width: 40px;
-  height: 44px;
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  min-height: 24px;
+  border-radius: 6px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.carousel-contextbar #advancedColours .paint-actions button svg {
+  width: 18px;
+  height: 18px;
+}
+.carousel-contextbar
+  #advancedColours
+  .paint-actions
+  button:hover:not(:disabled) {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.carousel-contextbar #advancedColours .paint-actions button:disabled {
+  opacity: 0.55;
+}
+.carousel-contextbar #advancedColours .paint-actions button:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 1px;
 }

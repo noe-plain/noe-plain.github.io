@@ -274,6 +274,7 @@ function studioOpenColourPicker({
   onChange,
   onBegin,
   onFamily = null,
+  familyState = null,
   isCurrent = () => true,
   position = null,
 }) {
@@ -296,7 +297,7 @@ function studioOpenColourPicker({
     ),
     rect: anchor.getBoundingClientRect(),
     editing: false,
-    adapter: { onChange, onBegin, onFamily, isCurrent, label },
+    adapter: { onChange, onBegin, onFamily, familyState, isCurrent, label },
     position,
   };
   studioPicker.hsv = studioRGBToHSV(colour);
@@ -437,20 +438,19 @@ function studioCreatePicker() {
     if (!state) return;
     if (state.adapter) {
       if (!state.adapter.onFamily || !state.adapter.isCurrent()) return;
-      studioPickerBegin();
-      state.adapter.onFamily();
+      state.adapter.onFamily(studioFamilyState(state) !== true);
     } else if (
       state.object.type === "text" &&
       state.object.campaignRole !== "copyright"
     ) {
-      if (!MKWTypography.familyText(state.object)) {
+      const enabled = studioFamilyState(state) !== true;
+      if (!MKWTypography.familyText(state.object, enabled)) {
         checkpoint();
-        MKWText.changeCharacters(state.object, null, { family: true });
+        MKWText.changeCharacters(state.object, null, { family: enabled });
         changed(false);
-        carouselPanel();
       }
     }
-    studioClosePicker();
+    studioRenderPicker();
   };
   document.body.append(el);
   el.addEventListener("mkw-field-feedback", studioPositionPicker);
@@ -750,6 +750,19 @@ function studioDeleteStop() {
     studioPicker.hsv = studioRGBToHSV(studioPickerColour().colour);
   });
 }
+function studioFamilyState(state) {
+  if (state.adapter) return state.adapter.familyState?.() ?? false;
+  if (state.object.type !== "text") return false;
+  const scoped = MKWTypography.familyState(state.object);
+  if (scoped !== null) return scoped;
+  const o = p.campaign ? MKWCampaignUI.decorate(state.object) : state.object,
+    values = MKWText.segments(o).map((run) => !!(run.family ?? o.family));
+  return values.length && values.every(Boolean)
+    ? true
+    : values.some(Boolean)
+      ? "mixed"
+      : !!o.family;
+}
 function studioRenderPicker(refreshHandles = true) {
   const state = studioPicker;
   if (!state) return;
@@ -773,6 +786,15 @@ function studioRenderPicker(refreshHandles = true) {
   $("#paintFamilyText").hidden = state.adapter
     ? !state.adapter.onFamily
     : state.object.type !== "text" || state.object.campaignRole === "copyright";
+  const family = studioFamilyState(state),
+    familyButton = $("#paintFamilyText");
+  familyButton.setAttribute("aria-pressed", String(family));
+  familyButton.querySelector("small").textContent =
+    family === "mixed"
+      ? "Teilweise aktiv · alle aktivieren"
+      : family
+        ? "Aktiv · erneut klicken zum Ausschalten"
+        : "Inaktiv · bunte Buchstaben mit Kontur";
   $("#paintMode").disabled = !!state.adapter;
   $("#paintMode").value = gradient ? "gradient" : value.kind;
   $("#paintMode").querySelector("[value=gradient]").disabled = $(

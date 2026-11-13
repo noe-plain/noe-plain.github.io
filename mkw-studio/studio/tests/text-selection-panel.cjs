@@ -106,11 +106,7 @@ const {
       ),
       null,
     );
-    await page.locator("[data-prop=text]").evaluate((el) => {
-      el.focus();
-      el.setSelectionRange(2, 5);
-      el.dispatchEvent(new Event("select"));
-    });
+    await require("./browser.cjs").canvasTextRange(page, 2, 5);
     const before = await page.evaluate(() => {
       const o = carouselSelected()[0];
       return Array.from({ length: o.text.length }, (_, i) => MKWText.at(o, i));
@@ -177,9 +173,7 @@ const {
       selected = p.boards[0].id;
       chooseStep("text");
     });
-    await page
-      .locator("#mainTextInput")
-      .fill("Erster Absatz\nZweiter Absatz\nDritter Absatz");
+    await require("./browser.cjs").fillCanvasText(page, "Erster Absatz\nZweiter Absatz\nDritter Absatz");
     await selectTextScope(page, "[data-paragraph-selection]", ["0", "2"]);
     await page.locator("[data-typo=size]").fill("90");
     assert.deepEqual(
@@ -188,11 +182,7 @@ const {
       ),
       [90, null, 90],
     );
-    await page.locator("[data-post-text]").evaluate((el) => {
-      el.focus();
-      el.setSelectionRange(1, 4);
-      el.dispatchEvent(new Event("select"));
-    });
+    await require("./browser.cjs").canvasTextRange(page, 1, 4);
     await page.locator("[data-typo=size]").fill("110");
     assert(await page.locator("[data-typo-align=right]").isDisabled());
     assert(

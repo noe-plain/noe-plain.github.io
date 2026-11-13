@@ -84,7 +84,7 @@ header {
 .carousel-contextbar.studio-commandbar {
   bottom: calc(
     var(--studio-footer-height) + var(--studio-shell-inset) +
-      var(--studio-shell-gap) + 14px
+      var(--studio-shell-gap) + 28px
   );
 }
 footer {

@@ -5,6 +5,10 @@
     typeof module !== "undefined"
       ? require("./angle-policy.js")
       : root.MKWAnglePolicy;
+  const clip =
+    typeof module !== "undefined"
+      ? require("./polygon-clip.js")
+      : root.MKWPolygonClip;
   const directions = policy.directions;
   const defaults = (b, source = {}) => ({
     enabled: source.enabled ?? true,
@@ -75,33 +79,17 @@
     return { o, points, tip: { x, y }, inner: points[4] };
   }
   function visiblePoints(b, content = b) {
-    let points = geometry(b, content).points;
-    for (const [axis, edge, greater] of [
-      ["x", 0, true],
-      ["x", content.w, false],
-      ["y", 0, true],
-      ["y", content.h, false],
-    ]) {
-      const next = [];
-      for (let i = 0; i < points.length; i++) {
-        const a = points[i],
-          z = points[(i + 1) % points.length],
-          inside = (p) => (greater ? p[axis] >= edge : p[axis] <= edge);
-        if (inside(a)) next.push(a);
-        if (inside(a) !== inside(z)) {
-          const ratio = (edge - a[axis]) / (z[axis] - a[axis]);
-          next.push({
-            x: a.x + (z.x - a.x) * ratio,
-            y: a.y + (z.y - a.y) * ratio,
-          });
-        }
-      }
-      points = next;
-    }
-    return points.map((p) => ({
-      x: Math.max(0, Math.min(content.w, p.x)),
-      y: Math.max(0, Math.min(content.h, p.y)),
-    }));
+    return clip
+      .rectangle(geometry(b, content).points, {
+        x: 0,
+        y: 0,
+        w: content.w,
+        h: content.h,
+      })
+      .map((p) => ({
+        x: Math.max(0, Math.min(content.w, p.x)),
+        y: Math.max(0, Math.min(content.h, p.y)),
+      }));
   }
   function contains(b, p, content = b) {
     if (

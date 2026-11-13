@@ -212,6 +212,8 @@ function carouselPositionText(el, o) {
     line.style.position = "absolute";
     line.style.top = (layout.lines[index]?.y ?? 0) * carouselZoom + "px";
     line.style.left = (layout.lines[index]?.x ?? 0) * carouselZoom + "px";
+    line.style.width =
+      Math.max(1, o.w - (layout.lines[index]?.x ?? 0)) * carouselZoom + "px";
     line.style.fontSize = line.dataset.textSize * carouselZoom + "px";
     line.style.lineHeight = line.dataset.textSize * 1.12 * carouselZoom + "px";
     line.style.height = line.dataset.textHeight * carouselZoom + "px";
@@ -285,7 +287,7 @@ function carouselEditText(o) {
       b = end,
       insert = "";
     if (["insertParagraph", "insertLineBreak"].includes(ev.inputType))
-      insert = "\n";
+      insert = ev.inputType === "insertLineBreak" ? "\u2028" : "\n";
     else if (ev.inputType === "deleteContentBackward") {
       if (a === b && a > 0) a -= Array.from(o.text.slice(0, a)).at(-1).length;
     } else if (ev.inputType === "deleteContentForward") {
@@ -321,6 +323,7 @@ function carouselEditText(o) {
         carouselReplaceTextStyles(o, start, end, ""),
       );
   };
+  MKWInlineText.bindSelection(el);
   el.onmouseup = el.onkeyup = () => carouselTrackTextCaret(o, el);
   el.onkeydown = (ev) => {
     const key = ev.key.toLowerCase();
@@ -551,6 +554,21 @@ function carouselBindTextStyles(o, panel) {
 }
 
 function carouselWrapText(text, width, measure) {
+  if (text.includes("\u2028")) {
+    let offset = 0;
+    return text.split("\u2028").flatMap((part) => {
+      const base = offset;
+      const lines = carouselWrapText(part, width, (value, start = 0) =>
+        measure(value, base + start),
+      ).map((line) => ({
+        ...line,
+        start: base + line.start,
+        end: base + line.end,
+      }));
+      offset += part.length + 1;
+      return lines;
+    });
+  }
   if (!text.length) return [{ raw: "", start: 0, end: 0 }];
   const parts = [];
   let start = 0;
@@ -589,7 +607,7 @@ function carouselFormatEditable(el, o) {
           .filter((line) => line.paragraph === paragraph)
           .map(
             (line) =>
-              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-x="${line.x}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? carouselEditableRuns(o, line) : MKWInlineText.empty(o, line, carouselZoom)}</span>`,
+              `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" data-text-x="${line.x}" data-text-size="${line.size}" data-text-height="${line === layout.lines.at(-1) ? line.size * 1.12 : line.leading}">${line.raw ? carouselEditableRuns(o, line) : MKWInlineText.empty(o, line, carouselZoom)}</span>${o.text[line.end] === "\u2028" ? '<br data-soft-break="true" contenteditable="false">' : ""}`,
           )
           .join("")}</div>`,
     )
@@ -600,7 +618,11 @@ function carouselFormatEditable(el, o) {
 function carouselEditableValue(root) {
   if (root.nodeType === Node.TEXT_NODE) return root.textContent;
   if (root.nodeName === "BR")
-    return root.hasAttribute("data-placeholder") ? "" : "\n";
+    return root.hasAttribute("data-placeholder")
+      ? ""
+      : root.hasAttribute("data-soft-break")
+        ? "\u2028"
+        : "\n";
   return [...root.childNodes]
     .map(
       (child, i) =>

@@ -2,6 +2,11 @@
 const MKWCampaignUI = (() => {
   const decorated = new WeakMap();
   const openOptions = new Set();
+  const previewObservers = new Set();
+  function releaseCards() {
+    for (const observer of previewObservers) observer.disconnect();
+    previewObservers.clear();
+  }
   let optionsProject = null;
   const active = () => !!p.campaign;
 
@@ -77,17 +82,8 @@ const MKWCampaignUI = (() => {
       decorated.set(o, { signature, value: next });
       return next;
     }
-    let at = 0;
-    for (const run of MKWFamily.runs(o.text)) {
-      next.characterStyles.push({
-        ...MKWText.at(o, at),
-        start: at,
-        end: at + run.text.length,
-        color: run.color,
-      });
-      at += run.text.length;
-    }
-    next.campaignFamily = true;
+    next.characterStyles = o.characterStyles || [];
+    next.family = o.family ?? true;
     decorated.set(o, { signature, value: next });
     return next;
   }
@@ -160,6 +156,7 @@ const MKWCampaignUI = (() => {
       ]);
     if (host.dataset.signature === signature) return;
     host.dataset.signature = signature;
+    releaseCards();
     host.innerHTML = p.campaign.rows
       .map((row, i) => {
         const im = p.images.find((im) => im.id === row.imageId),
@@ -172,7 +169,7 @@ const MKWCampaignUI = (() => {
         const sponsors = p.boards.find(
           (b) => b.campaignPage === a.id,
         )?.sponsors;
-        return `<aside class="campaign-card image-info-card ${carouselZoom < 0.22 ? "is-overview" : ""}" data-campaign-row="${esc(im.id)}" aria-label="Bild ${i + 1}: ${esc(im.name)}" style="left:${(a.x - 1000) * carouselZoom}px;top:${a.y * carouselZoom}px;width:${Math.max(80, Math.min(260, 900 * carouselZoom))}px"><div class="campaign-card-heading"><canvas class="campaign-thumb" width="72" height="54" aria-hidden="true"></canvas><div><small>Bild ${i + 1} von ${p.campaign.rows.length}</small><strong title="${esc(im.name)}">${esc(im.name)}</strong></div></div>${master ? '<span class="campaign-master-label">Vorlage für gleiche Formate</span>' : ""}<button class="campaign-overview-action" data-campaign-action="open">Bearbeiten</button><div class="campaign-primary-actions"><button data-campaign-action="replace">${studioIcon("image")}<span>Bild ersetzen</span></button><button data-campaign-action="format">${studioIcon("plus")}<span>Format hinzufügen</span></button></div><div class="campaign-card-actions" role="group" aria-label="Bildreihe verwalten"><button data-campaign-action="up" aria-label="Bildreihe nach oben" ${i === 0 ? "disabled" : ""}>${studioIcon("up")}</button><button data-campaign-action="down" aria-label="Bildreihe nach unten" ${i === p.campaign.rows.length - 1 ? "disabled" : ""}>${studioIcon("down")}</button><button data-campaign-action="remove" aria-label="Bildreihe entfernen">${studioIcon("trash")}</button></div><label>Bildnachweis / Copyright<input data-campaign-copyright placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.campaignPage === a.id)?.elements.copyright.text || "")}"></label><details ${openOptions.has(im.id) ? "open" : ""}><summary>Gestaltungsoptionen</summary><label class="post-option-row"><input type="checkbox" data-campaign-angle ${row.angle ? "checked" : ""}><span>Bildwinkel</span><select aria-label="Winkelrichtung" data-campaign-direction>${MKWAnglePolicy.directions.map((d) => `<option value="${d}" ${row.direction === d ? "selected" : ""}>${{ up: "Oben", left: "Links", down: "Unten" }[d]}</option>`).join("")}</select></label><label class="post-option-row"><input type="checkbox" data-campaign-family ${row.family ? "checked" : ""}><span>Familienkonzert</span></label>${row.family ? `<label>Hintergrundfarbe<input type="color" data-colour-draft data-campaign-background value="${esc(row.background || "#f4efdf")}"></label>` : ""}<label class="post-option-row"><input type="checkbox" data-campaign-sponsors ${sponsors?.enabled ? "checked" : ""}><span>Sponsorenleiste</span></label><button data-campaign-action="sponsors">Sponsoren auswählen</button></details></aside>`;
+        return `<aside class="campaign-card image-info-card " data-campaign-row="${esc(im.id)}" aria-label="Bild ${i + 1}: ${esc(im.name)}" style="left:${a.x * carouselZoom - 258}px;top:${a.y * carouselZoom}px;width:230px;max-height:${Math.max(64, Math.max(...row.pages.map((id) => c.artboards.find((a) => a.id === id).h)) * carouselZoom)}px"><div class="campaign-card-heading"><canvas class="campaign-thumb" width="72" height="54" aria-hidden="true"></canvas><div><small>Bild ${i + 1} von ${p.campaign.rows.length}</small><strong title="${esc(im.name)}">${esc(im.name)}</strong></div></div>${master ? '<span class="campaign-master-label">Vorlage für gleiche Formate</span>' : ""}<button class="campaign-overview-action" data-campaign-action="open">Bearbeiten</button><div class="campaign-primary-actions"><button data-campaign-action="replace">${studioIcon("image")}<span>Bild ersetzen</span></button><button data-campaign-action="format">${studioIcon("plus")}<span>Format hinzufügen</span></button></div><div class="campaign-card-actions" role="group" aria-label="Bildreihe verwalten"><button data-campaign-action="up" aria-label="Bildreihe nach oben" ${i === 0 ? "disabled" : ""}>${studioIcon("up")}</button><button data-campaign-action="down" aria-label="Bildreihe nach unten" ${i === p.campaign.rows.length - 1 ? "disabled" : ""}>${studioIcon("down")}</button><button data-campaign-action="remove" aria-label="Bildreihe entfernen">${studioIcon("trash")}</button></div><label>Bildnachweis / Copyright<input data-campaign-copyright placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.campaignPage === a.id)?.elements.copyright.text || "")}"></label><details ${openOptions.has(im.id) ? "open" : ""}><summary>Gestaltungsoptionen</summary><label class="post-option-row"><input type="checkbox" data-campaign-angle ${row.angle ? "checked" : ""}><span>Bildwinkel</span><select aria-label="Winkelrichtung" data-campaign-direction>${MKWAnglePolicy.directions.map((d) => `<option value="${d}" ${row.direction === d ? "selected" : ""}>${{ up: "Oben", left: "Links", down: "Unten" }[d]}</option>`).join("")}</select></label><label class="post-option-row"><input type="checkbox" data-campaign-family ${row.family ? "checked" : ""}><span>Familienkonzert</span></label>${row.family ? `<label>Hintergrundfarbe<input type="color" data-colour-draft data-campaign-background value="${esc(row.background || "#f4efdf")}"></label>` : ""}<label class="post-option-row"><input type="checkbox" data-campaign-sponsors ${sponsors?.enabled ? "checked" : ""}><span>Sponsorenleiste</span></label><button data-campaign-action="sponsors">Sponsoren auswählen</button></details></aside>`;
       })
       .join("");
     host.querySelectorAll("[data-campaign-row]").forEach((card) => {
@@ -194,20 +191,31 @@ const MKWCampaignUI = (() => {
         });
       const thumb = card.querySelector(".campaign-thumb"),
         im = p.images.find((i) => i.id === row.imageId);
-      previewImage(im.data)
-        .then((bitmap) => {
-          if (!thumb?.isConnected) return;
-          const ctx = thumb.getContext("2d"),
-            scale = Math.min(72 / bitmap.width, 54 / bitmap.height);
-          ctx.drawImage(
-            bitmap,
-            0,
-            0,
-            bitmap.width * scale,
-            bitmap.height * scale,
-          );
-        })
-        .catch(() => {});
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          previewObservers.delete(observer);
+          previewImage(im.data)
+            .then((bitmap) => {
+              if (!thumb.isConnected) return;
+              const context = thumb.getContext("2d"),
+                scale = Math.min(72 / bitmap.width, 54 / bitmap.height);
+              context.drawImage(
+                bitmap,
+                0,
+                0,
+                bitmap.width * scale,
+                bitmap.height * scale,
+              );
+            })
+            .catch(() => {});
+        },
+        { root: $("#carouselViewport"), rootMargin: "200px" },
+      );
+      previewObservers.add(observer);
+      observer.observe(thumb);
+      card._previewObserver = observer;
       for (const [selector, key] of [
         ["[data-campaign-angle]", "angle"],
         ["[data-campaign-family]", "family"],
@@ -311,7 +319,7 @@ const MKWCampaignUI = (() => {
     if (!active()) return;
     document.body.classList.add("campaign-preview");
     const label = $("#carouselEditor .studio-mode-label");
-    if (label) label.textContent = "FD-Kampagnen (Vorschau)";
+    if (label) label.textContent = "FD-Kampagnen";
     const rail = $(".carousel-toolrail");
     if (rail && !$("#campaignAdd")) {
       const button = document.createElement("button");
@@ -326,7 +334,7 @@ const MKWCampaignUI = (() => {
     const c = p.carousel;
     if (!items.length) {
       const a = c.artboards[carouselUI.slide ?? 0] || c.artboards[0];
-      host.innerHTML = `<h3>FD-Kampagnen (Vorschau)</h3><p>Gestalte die erste Ausgabe eines Formats. Gleiche Formate übernehmen das Design. Bei weiteren Bildern bleibt jede Eigenschaft einzeln anpassbar.</p><button id="campaignImport">Bilder hinzufügen</button>${a ? `<p>${esc(a.name)} · ${a.w} × ${a.h} px</p>` : ""}`;
+      host.innerHTML = `<h3>FD-Kampagnen</h3><p>Gestalte die erste Ausgabe eines Formats. Gleiche Formate übernehmen das Design. Bei weiteren Bildern bleibt jede Eigenschaft einzeln anpassbar.</p><button id="campaignImport">Bilder hinzufügen</button>${a ? `<p>${esc(a.name)} · ${a.w} × ${a.h} px</p>` : ""}`;
       host.querySelector("#campaignImport").onclick = () => $("#files").click();
       return true;
     }
@@ -380,47 +388,9 @@ const MKWCampaignUI = (() => {
       .reverse()
       .filter((o, i, list) => list.findIndex((v) => v.text === o.text) === i);
     if (!recent.length) return {};
-    return new Promise((resolve) => {
-      const dialog = document.createElement("dialog");
-      dialog.className = "campaign-text-choice";
-      dialog.setAttribute("aria-label", "Text für neues Format");
-      dialog.innerHTML = `<h2>Textfeld aufziehen</h2><div class="campaign-text-choice-grid"><button data-new>Neuen Text schreiben</button><section><h3>Vorhandenen Text übernehmen</h3>${recent.map((o) => `<button data-adopt="${esc(o.id)}">${esc(o.text.slice(0, 120))}</button>`).join("")}</section></div><button data-cancel>Abbrechen</button>`;
-      let result = null;
-      dialog.querySelector("[data-new]").onclick = () => {
-        result = {};
-        dialog.close();
-      };
-      dialog.querySelector("[data-cancel]").onclick = () => dialog.close();
-      for (const button of dialog.querySelectorAll("[data-adopt]"))
-        button.onclick = () => {
-          const o = c.objects.find((o) => o.id === button.dataset.adopt);
-          result = clone(o);
-          for (const k of [
-            "id",
-            "pageId",
-            "folderId",
-            "x",
-            "y",
-            "w",
-            "h",
-            "campaignRole",
-            "campaignLocal",
-          ])
-            delete result[k];
-          dialog.close();
-        };
-      dialog.addEventListener(
-        "close",
-        () => {
-          dialog.remove();
-          resolve(result);
-        },
-        { once: true },
-      );
-      document.body.append(dialog);
-      dialog.showModal();
-    });
+    return MKWCampaignTextChoice.open(rect, recent, c);
   }
+
   async function replacePhoto(row) {
     const project = p;
     const input = document.createElement("input");
@@ -617,56 +587,40 @@ const MKWCampaignUI = (() => {
       ctx.restore();
     }
   }
-  async function convert() {
-    if (p.carousel || p.campaign) return;
-    const accepted = await MKWFeedback.ask({
-      title: "Als Vorschau-Kopie weiterarbeiten?",
-      message:
-        "Deine bestehende Kampagne bleibt erhalten. Die Kopie erhält bearbeitbare Designer-Ebenen. Bitte Typografie und komplexe Ausschnitte vor dem Export vergleichen.",
-      confirm: "Vorschau-Kopie erstellen",
-    });
+  async function convert({ confirmed = false } = {}) {
+    if (busy || p.carousel || p.campaign) return;
+    const accepted =
+      confirmed ||
+      (await MKWFeedback.ask({
+        title: "FD-Kampagne umwandeln?",
+        message:
+          "Das ursprüngliche Projekt bleibt erhalten. Die Kopie erhält gemeinsame Textfelder mit bisherigen Schriftgrössen und den bisherigen Verlauf. Bitte das Ergebnis vor dem Export vergleichen.",
+        confirm: "Kopie umwandeln",
+      }));
     if (!accepted) return;
     const source = p,
+      original = snapshot(),
       q = {
-        ...snapshot(),
+        ...original,
         projectId: uid(),
         campaign: newState(),
         boards: [],
         carousel: undefined,
       };
-    q.meta.title = (q.meta.title || "Kampagne") + " · Vorschau";
+    q.meta.title = (q.meta.title || "Kampagne") + " · Kopie";
+    busy = true;
+    status("Kampagne wird umgewandelt …");
+    const finishLoading = MKWUIControls.loading("#status");
     try {
-      for (const im of source.images) {
-        const boards = source.boards
+      for (const im of original.images) {
+        const boards = original.boards
           .filter((b) => b.imageId === im.id)
           .map((b) => clone(b));
         await append(q, im, boards);
         for (const b of boards) {
-          const a = q.carousel.artboards.find((a) => a.id === b.campaignPage),
-            layout = textBlock(b);
-          for (const key of ["date", "title", "subtitle", "copyright"]) {
-            const e = layout.records.find((record) => record.key === key);
-            if (!e?.text || !e.visible) continue;
-            q.carousel.objects.push(
-              base("text", a, {
-                ...clone(b.elements[key]),
-                campaignRole: key,
-                name: elementNames[key],
-                text:
-                  key === "copyright"
-                    ? MKWLayout.copyrightText(b.elements[key].text)
-                    : b.elements[key].text,
-                x: a.x + e.x,
-                y: a.y + e.y,
-                w: Math.max(1, e.w || a.w - a.left - a.right),
-                h: Math.max(1, e.h || e.size * 2),
-                size: e.size,
-                font: e.role,
-                textAlign: e.align,
-                angle: e.angle || 0,
-              }),
-            );
-          }
+          if (p !== source) return;
+          const a = q.carousel.artboards.find((a) => a.id === b.campaignPage);
+          MKWCampaignMigration.add(q, b, a);
           if (b.angle?.enabled) {
             const row = rowFor(a.id, q);
             row.angle = true;
@@ -677,12 +631,24 @@ const MKWCampaignUI = (() => {
       MKWCampaignModel.reconcile(q, uid);
       validate(q);
       validateCarousel(q);
+      if (p !== source) return;
+      await MKWProjects.autosave({ writeFile: false });
+      if (p !== source) return;
+      carouselUI.slide = 0;
       await MKWProjects.startDocument(q);
+      if ($("#saveDialog").open) $("#saveDialog").close();
+      fit();
       status(
-        "Vorschau-Kopie erstellt. Das ursprüngliche MKW-Projekt bleibt im bisherigen Modus. Bitte Ausschnitte und Typografie vor dem Export vergleichen.",
+        "FD-Kampagne umgewandelt. Das ursprüngliche Projekt bleibt erhalten. Bitte das Ergebnis vor dem Export vergleichen.",
       );
     } catch (e) {
-      status("Umstieg nicht abgeschlossen: " + e.message);
+      status(
+        "Umwandlung nicht abgeschlossen. Das ursprüngliche Projekt bleibt erhalten: " +
+          e.message,
+      );
+    } finally {
+      busy = false;
+      finishLoading();
     }
   }
   function install() {
@@ -692,22 +658,27 @@ const MKWCampaignUI = (() => {
     start.disabled = true;
     start.innerHTML =
       studioIcon("image") +
-      "<strong>FD-Kampagnen (Vorschau)</strong><span>Designer-Werkzeuge für viele Fotos und Formate.</span><small>Individuell anpassbar, je Format verbunden.</small>";
+      '<strong>FD-Kampagnen</strong><span>Viele Fotos. Ein einheitliches Layout.</span><small>Gleiche Formate übernehmen dein Design.</small><span class="start-mode-action">Neues Projekt ' +
+      studioIcon("plus") +
+      "</span>";
     $(".start-mode-grid").prepend(start);
     const old = $("#startNew");
-    old.className = "start-backup";
-    old.innerHTML =
-      studioIcon("image") +
-      "<span><strong>FD-Kampagnen (Backup)</strong><small>Bisherigen Bearbeitungsablauf verwenden.</small></span>";
-    $(".start-returning").append(old);
+    old.className = "start-backup-link";
+    old.textContent = "FD-Kampagnen (Backup)";
+    const links = document.createElement("div");
+    links.className = "start-home-links";
+    const help = $("#startHelp");
+    help.before(links);
+    links.append(old, help);
     start.onclick = () => MKWProjectSetup.open({ mode: "preview" });
     const convertButton = document.createElement("button");
     convertButton.id = "campaignConvert";
-    convertButton.textContent = "Als FD-Kampagnen-Vorschau weiterarbeiten";
+    convertButton.textContent = "In den neuen FD-Ablauf umwandeln";
     convertButton.onclick = convert;
     $("#saveDialog .save-alternatives").append(convertButton);
   }
   return {
+    releaseCards,
     active,
     newState,
     sync,

@@ -515,13 +515,18 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     );
     await page.locator(`[data-layer="${textId}"] [data-action=select]`).click();
     const content = (await chosen()).text;
-    await page.locator("[data-prop=text]").fill(content + "\nZUSATZ");
+    await require("./browser.cjs").canvasTextRange(page, content.length, content.length);
+    await page.keyboard.press("Enter");
+    await page.keyboard.insertText("ZUSATZ");
+    await page.locator("[data-text-edit-action]").click();
     assert.equal(
       await page.locator("[data-paragraph-selection] input").count(),
       5,
-      "Sidebar text changes must update paragraph choices",
+      "Direct text changes must update paragraph choices",
     );
-    await page.locator("[data-prop=text]").fill(content);
+    await require("./browser.cjs").canvasTextRange(page, content.length, content.length + 7);
+    await page.keyboard.press("Backspace");
+    await page.locator("[data-text-edit-action]").click();
     assert.deepEqual((await chosen()).textStyles, expectedStyles);
     await page.screenshot({
       path: require("./browser.cjs").artifact("mkw-text-styles.png"),

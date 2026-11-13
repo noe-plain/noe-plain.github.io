@@ -22,15 +22,15 @@ const MKWProjectDialogs = (() => {
             const current = record.id === currentId,
               mode =
                 record.mode === "campaign"
-                  ? "FD-Kampagnen (Vorschau)"
+                  ? "FD-Kampagnen"
                   : record.mode === "carousel"
                     ? "Designer"
-                    : "FD-Kampagnen",
+                    : "FD-Kampagnen (Backup)",
               time = new Date(record.updatedAt).toLocaleString("de-CH", {
                 dateStyle: "medium",
                 timeStyle: "short",
               });
-            return `<div class="project-library-entry" role="listitem"><button type="button" class="project-library-row" data-project-id="${esc(record.id)}"${current ? ' aria-describedby="currentProjectLabel"' : ""}>${studioIcon(record.mode === "carousel" ? "builder" : "image")}<span><strong>${esc(record.title || "Unbenanntes Projekt")}</strong><small>${mode} · ${esc(time)}</small>${record.fileName ? `<small class="project-linked-file">${esc(record.fileName)}</small>` : ""}${current ? '<span id="currentProjectLabel" class="project-current-label">Aktuell geöffnet</span>' : ""}</span></button><button type="button" class="icon-button" data-delete-project="${esc(record.id)}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${current ? 'disabled aria-describedby="currentProjectLabel"' : ""}>${studioIcon("trash")}</button></div>`;
+            return `<div class="project-library-entry" role="listitem"><button type="button" class="project-library-row" data-project-id="${esc(record.id)}"${current ? ' aria-describedby="currentProjectLabel"' : ""}>${studioIcon(record.mode === "carousel" ? "builder" : "image")}<span><strong>${esc(record.title || "Unbenanntes Projekt")}</strong><small>${mode} · ${esc(time)}</small>${record.fileName ? `<small class="project-linked-file">${esc(record.fileName)}</small>` : ""}${current ? '<span id="currentProjectLabel" class="project-current-label">Aktuell geöffnet</span>' : ""}</span></button><div class="project-library-actions"><button type="button" class="icon-button" data-delete-project="${esc(record.id)}" aria-label="Browsersicherung löschen: ${esc(record.title)}" ${current ? 'disabled aria-describedby="currentProjectLabel"' : ""}>${studioIcon("trash")}</button>${record.mode !== "carousel" && record.mode !== "campaign" ? `<button type="button" class="icon-button" data-convert-project="${esc(record.id)}" title="In FD-Kampagnen umwandeln" aria-label="In FD-Kampagnen umwandeln: ${esc(record.title || "Unbenanntes Projekt")}">${studioIcon("replace")}</button>` : ""}</div></div>`;
           })
           .join("")
       : '<div class="project-library-empty" role="listitem"><strong>Noch keine Projekte in diesem Browser</strong><p>Wähle „MKW-Datei öffnen“. Sobald du im Studio arbeitest, erscheint deine Browsersicherung hier.</p></div>';

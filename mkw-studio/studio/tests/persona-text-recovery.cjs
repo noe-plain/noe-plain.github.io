@@ -88,7 +88,7 @@ const { launch, artifact, waitForProjectReady, selectTextScope } = require('./br
       selected = p.boards[0].id;
       chooseStep('text');
     });
-    await page.locator('#mainTextInput').fill('Oben\nMitte\nUnten');
+    await require("./browser.cjs").fillCanvasText(page, 'Oben\nMitte\nUnten');
     await page.locator('[data-scope-picker=paragraph] summary').click();
 
     await page.locator('[data-paragraph-all]').click();

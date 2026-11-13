@@ -13,6 +13,7 @@
     "static/project-file.js",
     "static/project-store.js",
     "static/angle-policy.js",
+    "static/polygon-clip.js",
     "static/post-angle-model.js",
     "static/text-model.js",
     "static/text-scope-model.js",
@@ -118,6 +119,8 @@
     "static/template-save.js",
     "static/template-ui.js",
     "static/campaign-document.js",
+    "static/campaign-migration.js",
+    "static/campaign-text-choice.js",
     "static/campaign-ui.js",
     "static/start.js",
     "static/workspace-scroll.js"

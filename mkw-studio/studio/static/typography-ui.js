@@ -7,6 +7,25 @@ const MKWTypography = (() => {
     if (!sessions.has(o)) sessions.set(o, {});
     return sessions.get(o);
   };
+  let selectionFrame = 0;
+  document.addEventListener("selectionchange", () => {
+    if (selectionFrame) return;
+    selectionFrame = requestAnimationFrame(() => {
+      selectionFrame = 0;
+      const el = document.activeElement;
+      if (!current?.host.isConnected || !el?.matches(".mkw-inline-input"))
+        return;
+      const selected = window.getSelection();
+      if (
+        !selected?.anchorNode ||
+        !el.contains(selected.anchorNode) ||
+        !el.contains(selected.focusNode)
+      )
+        return;
+      const next = carouselEditableSelection(el);
+      track(current.o, next.start, next.end);
+    });
+  });
   const record = (o) => ({
     ...o,
     font: o.font || o.role,
@@ -233,16 +252,15 @@ const MKWTypography = (() => {
     });
     const colour = common(values("color")),
       colourButton = host.querySelector("[data-typo-colour]");
-    colourButton.disabled = locked || !hasSelection || (family && !copyright);
+    colourButton.disabled = locked || !hasSelection;
     colourButton.querySelector("i").style.background =
       colour || "linear-gradient(135deg,#111 50%,#fff 50%)";
-    host.querySelector("[data-typo-colour-label]").textContent = family
-      ? copyright
+    host.querySelector("[data-typo-colour-label]").textContent =
+      family && copyright
         ? "Schwarz / Weiss"
-        : "Familienpalette"
-      : common(values("family")) === true
-        ? "Familienkonzert"
-        : colour || "Gemischt";
+        : familyState() === true
+          ? "Familienkonzert"
+          : colour || "Gemischt";
     colourButton.setAttribute(
       "aria-label",
       "Textfarbe wählen · " +
@@ -432,6 +450,16 @@ const MKWTypography = (() => {
   }
   function bind(host, options) {
     current = { ...options, host, targets: options.targets || [options.o] };
+    const advanced = [...host.querySelectorAll("details.typo-details")];
+    if (advanced.length) {
+      const extra =
+        host.querySelector(":scope > .typo-more-options") ||
+        document.createElement("section");
+      extra.className = "typo-more-options";
+      extra.setAttribute("aria-label", "Weitere Textoptionen");
+      extra.append(...advanced);
+      host.append(extra);
+    }
     host.querySelector(".paragraph-scope").hidden = current.targets.length > 1;
     const lineScope = host.querySelector("[data-line-scope]");
     lineScope.hidden = current.targets.length > 1;
@@ -565,7 +593,8 @@ const MKWTypography = (() => {
         onBegin: remember,
         onFamily: owner.copyright
           ? null
-          : () => character({ family: true }, true, scopes),
+          : (enabled) => character({ family: enabled }, false, scopes),
+        familyState: () => familyState(null, scopes),
         isCurrent: () => current === owner && host.isConnected,
         onChange: (value) =>
           character(
@@ -810,7 +839,15 @@ const MKWTypography = (() => {
     if (!layout) return;
     const styled =
         layout.styled ||
-        postLayout({ ...e, key }, layout.w, layout.size / e.size),
+        postLayout(
+          {
+            ...e,
+            key,
+            family: key !== "copyright" && (e.family ?? !!b.family?.enabled),
+          },
+          layout.w,
+          layout.size / e.size,
+        ),
       o = styled.source;
     el.classList.add("mkw-inline-input");
     el.dataset.canvasText = String(!!layout.visible);
@@ -822,7 +859,7 @@ const MKWTypography = (() => {
             .filter((line) => line.paragraph === paragraph)
             .map(
               (line) =>
-                `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" style="position:absolute;left:${line.x * surfaceScale()}px;top:${line.y * surfaceScale()}px;font-size:${line.size * surfaceScale()}px;line-height:1.12">${line.raw ? carouselEditableRuns(o, line, surfaceScale()) : MKWInlineText.empty(o, line, surfaceScale())}</span>`,
+                `<span class="carousel-text-line" data-text-start="${line.start}" data-text-end="${line.end}" style="position:absolute;width:${Math.max(1, styled.source.w - line.x) * surfaceScale()}px;left:${line.x * surfaceScale()}px;top:${line.y * surfaceScale()}px;font-size:${line.size * surfaceScale()}px;line-height:1.12">${line.raw ? carouselEditableRuns(o, line, surfaceScale()) : MKWInlineText.empty(o, line, surfaceScale())}</span>${o.text[line.end] === "\u2028" ? '<br data-soft-break="true" contenteditable="false">' : ""}`,
             )
             .join("")}</div>`,
       )
@@ -831,6 +868,7 @@ const MKWTypography = (() => {
     if (r) restoreSelection(el, r);
   }
   function bindPostInline(b, key, el) {
+    MKWInlineText.bindSelection(el);
     const o = b.elements[key],
       undo = [],
       redo = [];
@@ -887,7 +925,13 @@ const MKWTypography = (() => {
       const r = carouselEditableSelection(el);
       if (["insertParagraph", "insertLineBreak"].includes(ev.inputType)) {
         ev.preventDefault();
-        replace(key === "copyright" ? " " : "\n");
+        replace(
+          key === "copyright"
+            ? " "
+            : ev.inputType === "insertLineBreak"
+              ? "\u2028"
+              : "\n",
+        );
       } else if (ev.inputType === "insertText" && ev.data != null) {
         ev.preventDefault();
         replace(ev.data);
@@ -930,7 +974,29 @@ const MKWTypography = (() => {
       postInline(b, key, el, true);
     });
   }
-  function familyText(target) {
+  function familyState(target = null, scopes = null) {
+    if (
+      !current?.host?.isConnected ||
+      (target && !current.targets.includes(target))
+    )
+      return null;
+    const states = current.targets.flatMap((o, index) => {
+      const styled = record(o),
+        decorated = !current.post && p.campaign ? MKWCampaignUI.decorate(o) : o;
+      styled.family = o.family ?? (current.family || decorated.family || false);
+      return MKWTextScope.values(
+        styled,
+        scopes?.[index] || formattingScope(o),
+        "family",
+      ).map(Boolean);
+    });
+    return states.length && states.every(Boolean)
+      ? true
+      : states.some(Boolean)
+        ? "mixed"
+        : false;
+  }
+  function familyText(target, enabled) {
     if (
       !current ||
       current.post ||
@@ -938,11 +1004,12 @@ const MKWTypography = (() => {
       !current.targets.includes(target)
     )
       return false;
-    if (!current.copyright) character({ family: true });
+    if (!current.copyright) character({ family: enabled });
     return true;
   }
   return {
     familyText,
+    familyState,
     panel,
     bind,
     carousel,

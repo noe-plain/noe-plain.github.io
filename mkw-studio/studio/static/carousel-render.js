@@ -260,6 +260,17 @@ function carouselToolUI() {
 }
 
 function carouselRender() {
+  const previous = $("#carouselEditor"),
+    oldViewport = $("#carouselViewport"),
+    retainedView =
+      previous?.dataset.project === p.projectId && oldViewport
+        ? {
+            x: oldViewport.scrollLeft,
+            y: oldViewport.scrollTop,
+            zoom: carouselZoom,
+          }
+        : null;
+  MKWCampaignUI.releaseCards();
   MKWSpreadUI.dispose();
   MKWInspectorSplit.detach();
   MKWUIControls.designer(null);
@@ -286,8 +297,12 @@ function carouselRender() {
   if (!c.n) carouselUI.slide = null;
   if (carouselUI.slide !== null)
     carouselUI.slide = Math.max(0, Math.min(c.n - 1, carouselUI.slide));
-  const firstView = !Number.isFinite(c.zoom);
-  carouselZoom = c.zoom || carouselZoom;
+  const firstView = !retainedView && !Number.isFinite(c.zoom);
+  carouselZoom = retainedView?.zoom || c.zoom || carouselZoom;
+  if (retainedView) {
+    c.scrollX = retainedView.x;
+    c.scrollY = retainedView.y;
+  }
   carouselUI.ids = new Set(
     [...carouselUI.ids].filter((id) => c.objects.some((o) => o.id === id)),
   );
@@ -298,6 +313,7 @@ function carouselRender() {
   $("#savePSD").hidden = false;
   const host = document.createElement("section");
   host.id = "carouselEditor";
+  host.dataset.project = p.projectId;
   host.setAttribute("role", "region");
   host.setAttribute("aria-label", "Designer-Arbeitsbereich");
   host.innerHTML = `
@@ -360,6 +376,7 @@ function carouselRender() {
       (viewport.clientHeight - 128) / MKWCarouselPolicy.extent(c).h,
     );
   viewport.onscroll = () => {
+    if (!viewport.isConnected || p.carousel !== c) return;
     MKWSpreadUI.scroll();
     c.scrollX = viewport.scrollLeft;
     c.scrollY = viewport.scrollTop;

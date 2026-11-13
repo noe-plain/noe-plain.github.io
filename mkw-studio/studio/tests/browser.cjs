@@ -68,7 +68,55 @@ async function selectTextScope(page, selector, values) {
     await input.setChecked(desired.has(value));
   }
 }
+async function ensureCanvasTextEditing(page) {
+  const active = await page.evaluate(() =>
+    p.carousel ? !!carouselUI.editing : !!editingText,
+  );
+  if (!active) await page.locator("[data-text-edit-action]").click();
+  await page.waitForFunction(() =>
+    p.carousel ? !!carouselUI.editing : !!editingText,
+  );
+  await page.evaluate(() =>
+    MKWInlineText.focus(p.carousel ? carouselUI.editing.el : editingText.el),
+  );
+}
+async function canvasTextRange(page, start, end) {
+  await ensureCanvasTextEditing(page);
+  await page.evaluate(
+    ({ start, end }) => {
+      const el = p.carousel ? carouselUI.editing.el : editingText.el,
+        o = p.carousel ? carouselSelected()[0] : board().elements[layer];
+      MKWTypography.restoreSelection(el, { start, end });
+      MKWTypography.track(o, start, end);
+    },
+    { start, end },
+  );
+}
+async function fillCanvasText(page, value) {
+  const length = await page.evaluate(() => {
+    const o = p.carousel ? carouselSelected()[0] : board().elements[layer];
+    return o.text.length;
+  });
+  await canvasTextRange(page, 0, length);
+  await page.keyboard.press("Backspace");
+  const parts = value.split(/([\n\u2028])/);
+  for (const part of parts) {
+    if (part === "\n") await page.keyboard.press("Enter");
+    else if (part === "\u2028") await page.keyboard.press("Shift+Enter");
+    else if (part) await page.keyboard.insertText(part);
+  }
+  await page.waitForFunction(
+    (value) =>
+      (p.carousel ? carouselSelected()[0] : board().elements[layer]).text ===
+      value,
+    value,
+  );
+  await page.locator("[data-text-edit-action]").click();
+}
 module.exports = {
+  ensureCanvasTextEditing,
+  fillCanvasText,
+  canvasTextRange,
   launch,
   artifact,
   waitForProjectReady,

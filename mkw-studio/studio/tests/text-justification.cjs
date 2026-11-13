@@ -73,17 +73,7 @@ const { launch, artifact } = require("./browser.cjs");
       studioApplyPreferences();
       carouselPanel();
     });
-    const choose = async (a, b) => {
-      const f = page.locator("[data-prop=text]");
-      await f.focus();
-      await f.evaluate(
-        (el, [a, b]) => {
-          el.setSelectionRange(a, b);
-          el.dispatchEvent(new Event("select"));
-        },
-        [a, b],
-      );
-    };
+    const choose = async (a, b) => require("./browser.cjs").canvasTextRange(page, a, b);
     await require("./browser.cjs").selectTextScope(page,"[data-paragraph-selection]",["0"]);
 
     await page.locator("[data-typo=size]").fill("47");
@@ -278,11 +268,7 @@ const { launch, artifact } = require("./browser.cjs");
       studioApplyPreferences();
       renderPanel();
     });
-    await post.locator("[data-post-text]").focus();
-    await post.locator("[data-post-text]").evaluate((el, end) => {
-      el.setSelectionRange(0, end);
-      el.dispatchEvent(new Event("select"));
-    }, source.indexOf("\n"));
+    await require("./browser.cjs").canvasTextRange(post,0,source.indexOf("\n"));
 
     await require("./browser.cjs").selectTextScope(post,"[data-paragraph-selection]",["0"]);
     await post.locator("[data-typo=size]").fill("51");
@@ -335,7 +321,7 @@ const { launch, artifact } = require("./browser.cjs");
     assert(postExact.psd);
     assert.equal(postExact.align, "justify");
     assert.equal(postExact.size, 51);
-    await post.locator("[data-post-text-edit]").click();
+    await require("./browser.cjs").ensureCanvasTextEditing(post);
     assert.equal(
       await post.evaluate(() => carouselEditableValue(editingText.el)),
       source,

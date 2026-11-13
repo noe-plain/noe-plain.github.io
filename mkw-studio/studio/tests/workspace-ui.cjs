@@ -52,7 +52,7 @@ const assert = require("node:assert/strict");
       buffer: Buffer.from(fixture.split(",")[1], "base64"),
     });
     await page.waitForFunction(() => !busy && p.boards.length === 2);
-    await page.locator("#mainTextInput").fill("KONZERTE\nFÜR ALLE");
+    await require("./browser.cjs").fillCanvasText(page, "KONZERTE\nFÜR ALLE");
     await page.evaluate(() => document.activeElement.blur());
     await page.keyboard.press("Shift+W");
     assert.equal(
@@ -64,17 +64,17 @@ const assert = require("node:assert/strict");
       await page.locator("#footerGuides").getAttribute("aria-pressed"),
       "true",
     );
-    await page.locator("#mainTextInput").focus();
+    await require("./browser.cjs").canvasTextRange(page,17,17);
     await page.keyboard.press("Shift+W");
-    assert((await page.locator("#mainTextInput").inputValue()).endsWith("W"));
+    assert(await page.evaluate(()=>board().elements.title.text.endsWith("W")));
     assert.equal(
       await page.locator("#footerGuides").getAttribute("aria-pressed"),
       "true",
     );
-    await page.locator("#mainTextInput").fill("KONZERTE\nFÜR ALLE");
+    await require("./browser.cjs").fillCanvasText(page, "KONZERTE\nFÜR ALLE");
     const postBar = await page.locator(".dock").boundingBox();
     assert.equal(postBar.height, 58);
-    assert.equal(postBar.y, 1000 - 52 - 12 - 12 - 14 - 58);
+    assert.equal(postBar.y, 1000 - 52 - 12 - 12 - 28 - 58);
     assert.equal(await page.locator(".dock [data-step]").count(), 6);
     assert.equal(
       await page.locator(".dock [data-step] svg[data-google-icon]").count(),

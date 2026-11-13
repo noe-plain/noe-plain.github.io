@@ -2,7 +2,7 @@
 (function (root) {
   const copyrightText = (text) => {
     const value = String(text || "")
-      .replace(/[\r\n]+/g, " ")
+      .replace(/[\r\n\u2028]+/g, " ")
       .trim();
     return value ? (value.includes("©") ? value : "© " + value) : "";
   };
@@ -44,7 +44,7 @@
   }
   function wrap(text, width, measure) {
     const lines = [];
-    for (const paragraph of String(text).split("\n")) {
+    for (const paragraph of String(text).split(/[\n\u2028]/)) {
       let line = "";
       for (const word of paragraph.split(/\s+/).filter(Boolean)) {
         const next = line ? line + " " + word : word;

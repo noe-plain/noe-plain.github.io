@@ -71,17 +71,7 @@ const { launch } = require("./browser.cjs");
       renderPanel();
       syncOverlays(true);
     });
-    const choose = async (a, b) => {
-      const f = page.locator("[data-post-text]");
-      await f.focus();
-      await f.evaluate(
-        (el, [a, b]) => {
-          el.setSelectionRange(a, b);
-          el.dispatchEvent(new Event("select"));
-        },
-        [a, b],
-      );
-    };
+    const choose = async (a, b) => require("./browser.cjs").canvasTextRange(page, a, b);
     await choose(0, 5);
     await page.locator("[data-typo=size]").fill("115");
     assert.deepEqual(
@@ -137,7 +127,7 @@ const { launch } = require("./browser.cjs");
     await choose(5, 5);
 
     await page.locator("[data-typo=size]").fill("123");
-    await page.locator("[data-post-text-edit]").click();
+    await require("./browser.cjs").ensureCanvasTextEditing(page);
     await page.evaluate(() => {
       carouselEditableCaret(editingText.el, 5);
       MKWTypography.track(board().elements.title, 5, 5);

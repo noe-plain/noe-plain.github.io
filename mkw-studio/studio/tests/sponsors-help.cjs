@@ -478,7 +478,7 @@ const { launch, artifact } = require("./browser.cjs");
       renderPanel();
       syncOverlays(true);
     });
-    await page.locator("#mainTextInput").fill("Aus nächster Nähe");
+    await require("./browser.cjs").fillCanvasText(page, "Aus nächster Nähe");
     assert.equal(await page.locator("[data-typo-toggle=uppercase]").getAttribute("aria-pressed"),"true");
     assert.equal(
       await page.evaluate(() => board().elements.date.text),

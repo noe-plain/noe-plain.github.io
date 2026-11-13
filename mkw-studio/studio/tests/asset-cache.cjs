@@ -63,7 +63,7 @@ const assert = require("node:assert/strict"),
         buffer: Buffer.from(fixture.split(",")[1], "base64"),
       });
     await page.waitForFunction(() => !busy && p.boards.length === 2);
-    await page.locator("#mainTextInput").fill("Das ist ein Titel");
+    await require("./browser.cjs").fillCanvasText(page, "Das ist ein Titel");
     await page.evaluate(() => autosave());
     const before = await page.evaluate(() =>
       JSON.stringify(MKWProjectAssets.compact(p)),

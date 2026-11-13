@@ -1245,8 +1245,35 @@ const MKWSpreadUI = (() => {
     if (!active() || repaintFrame) return;
     repaintFrame = requestAnimationFrame(() => {
       repaintFrame = 0;
-      if (active() && document.querySelector("#carouselCanvas"))
-        carouselRefresh();
+      if (!active()) return;
+      const canvas = document.querySelector("#carouselCanvas"),
+        region = canvas?._region,
+        viewport = document.querySelector("#carouselViewport");
+      if (!canvas || !viewport) return;
+      if (region) {
+        const origin = carouselOrigin(),
+          box = viewport.getBoundingClientRect(),
+          extent = MKWCarouselPolicy.extent(p.carousel),
+          margin = 48 / carouselZoom,
+          left = Math.max(0, (box.left - origin.left) / carouselZoom - margin),
+          top = Math.max(0, (box.top - origin.top) / carouselZoom - margin),
+          right = Math.min(
+            extent.w,
+            (box.right - origin.left) / carouselZoom + margin,
+          ),
+          bottom = Math.min(
+            extent.h,
+            (box.bottom - origin.top) / carouselZoom + margin,
+          );
+        if (
+          region.x <= left &&
+          region.y <= top &&
+          region.x + region.w >= right &&
+          region.y + region.h >= bottom
+        )
+          return;
+      }
+      carouselRefresh();
     });
   }
   return {

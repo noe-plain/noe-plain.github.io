@@ -90,6 +90,8 @@ test("extra images and later gradients stay local; deleted followers stay delete
   q.carousel.objects[0].text = "Andere";
   m.reconcile(q, id);
   assert.equal(target.id, null);
+  assert.deepEqual(target.last, {});
+  assert.deepEqual(target.overrides, []);
   assert.equal(q.carousel.objects.filter((o) => o.type === "text").length, 1);
   assert(m.valid(q));
 });

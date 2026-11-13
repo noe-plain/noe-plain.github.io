@@ -84,6 +84,84 @@ const MKWInlineText = (() => {
     holdView(el);
     el.focus({ preventScroll: true });
   }
+  const selectionBindings = new WeakSet();
+  function bindSelection(el) {
+    if (selectionBindings.has(el)) return;
+    selectionBindings.add(el);
+    const point = (x, y) => {
+      const rows = [...el.querySelectorAll("[data-text-start]")];
+      const row = rows.reduce((best, line) => {
+        const r = line.getBoundingClientRect(),
+          distance = Math.max(r.top - y, 0, y - r.bottom);
+        return !best || distance < best.distance ? { line, distance } : best;
+      }, null)?.line;
+      if (!row) return null;
+      const glyphs = [...row.querySelectorAll("[data-script]")].map((run) =>
+        run.getBoundingClientRect(),
+      );
+      const left = Math.min(...glyphs.map((r) => r.left)),
+        right = Math.max(...glyphs.map((r) => r.right));
+      if (x > left && x < right) {
+        const p = document.caretPositionFromPoint?.(x, y),
+          range = p
+            ? document.createRange()
+            : document.caretRangeFromPoint?.(x, y);
+        if (p) {
+          range.setStart(p.offsetNode, p.offset);
+          range.collapse(true);
+        }
+        if (range && el.contains(range.startContainer)) return range;
+      }
+      carouselEditableCaret(
+        el,
+        +(x <= left ? row.dataset.textStart : row.dataset.textEnd),
+      );
+      return window.getSelection().rangeCount
+        ? window.getSelection().getRangeAt(0).cloneRange()
+        : null;
+    };
+    el.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || event.target.closest("[data-script]")) return;
+      const previous = window.getSelection(),
+        keep =
+          event.shiftKey && el.contains(previous?.anchorNode)
+            ? { node: previous.anchorNode, offset: previous.anchorOffset }
+            : null;
+      const start = point(event.clientX, event.clientY);
+      if (!start) return;
+      event.preventDefault();
+      event.stopPropagation();
+      focus(el);
+      const anchor = keep || {
+        node: start.startContainer,
+        offset: start.startOffset,
+      };
+      const move = (next) => {
+        if (!el.isConnected || !anchor.node.isConnected) return stop();
+        const end = point(next.clientX, next.clientY);
+        if (end)
+          window
+            .getSelection()
+            .setBaseAndExtent(
+              anchor.node,
+              anchor.offset,
+              end.startContainer,
+              end.startOffset,
+            );
+      };
+      const stop = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", stop);
+        window.removeEventListener("pointercancel", stop);
+        window.removeEventListener("blur", stop);
+      };
+      move(event);
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", stop, { once: true });
+      window.addEventListener("pointercancel", stop, { once: true });
+      window.addEventListener("blur", stop, { once: true });
+    });
+  }
   function bindPanel({
     host,
     field,
@@ -103,20 +181,18 @@ const MKWInlineText = (() => {
     button.classList.add("text-edit-action");
     const group = document.createElement("div"),
       command = document.createElement("div"),
-      label = document.createElement("label"),
       help = document.createElement("p"),
       wrapper = field.closest("label"),
       owner = host.closest("#stepPanel,#carouselProperties");
     group.className = "text-content-group";
     command.className = "text-content-command";
-    label.htmlFor = field.id;
-    label.textContent = "Textinhalt";
     const accessibleName = field.getAttribute("aria-label");
     if (accessibleName && !accessibleName.startsWith("Textinhalt"))
       field.setAttribute("aria-label", "Textinhalt · " + accessibleName);
     help.className = "text-edit-help";
     help.id = field.id + "Help";
     help.setAttribute("role", "status");
+    button.setAttribute("aria-describedby", help.id);
     const descriptions = new Set(
       (field.getAttribute("aria-describedby") || "")
         .split(/\s+/)
@@ -126,7 +202,11 @@ const MKWInlineText = (() => {
     field.setAttribute("aria-describedby", [...descriptions].join(" "));
     if (wrapper && host.contains(wrapper)) wrapper.replaceWith(group);
     else field.before(group);
-    command.append(label, button);
+    field.hidden = true;
+    field.tabIndex = -1;
+    help.hidden = true;
+    group.classList.add("canvas-text-edit-command");
+    command.append(button);
     group.append(command, field, help);
     host.querySelector(":scope > .type-section-heading")?.remove();
     host.querySelector(":scope > h3")?.remove();
@@ -173,7 +253,7 @@ const MKWInlineText = (() => {
             ? "Text zuerst auf dem Bild anzeigen, um ihn dort zu bearbeiten."
             : editing
               ? "Auf der Fläche aktiv. Escape beendet die Bearbeitung."
-              : "Hier schreiben oder direkt auf der Fläche bearbeiten.";
+              : "Doppelklick auf den Text oder „Auf der Fläche“ wählen.";
       if (state.button.textContent !== text || state.button.childElementCount)
         state.button.textContent = text;
       state.button.setAttribute(
@@ -184,9 +264,19 @@ const MKWInlineText = (() => {
       );
       state.button.setAttribute("aria-pressed", String(editing));
       state.button.disabled = !usable;
+      state.button.title = hint;
       if (state.help.textContent !== hint) state.help.textContent = hint;
       host.dataset.textEditing = String(editing);
     }
   }
-  return { domBaseline, runs, empty, holdView, focus, bindPanel, refreshPanel };
+  return {
+    domBaseline,
+    runs,
+    empty,
+    holdView,
+    focus,
+    bindSelection,
+    bindPanel,
+    refreshPanel,
+  };
 })();

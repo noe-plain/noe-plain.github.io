@@ -243,6 +243,11 @@ const MKWProjectStore = (() => {
       .filter((r) => r?.document)
       .map(({ document, fileHandle, fileStamp, ...meta }) => ({
         ...meta,
+        mode: document.campaign
+          ? "campaign"
+          : document.carousel
+            ? "carousel"
+            : "post",
         fileName: fileHandle?.name || "",
       }))
       .sort((a, b) => b.updatedAt - a.updatedAt);

@@ -148,14 +148,21 @@
   font-size: 16px;
   line-height: 24px;
 }
-.project-library-entry > .icon-button {
+.project-library-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-block: 8px;
+}
+.project-library-actions > .icon-button {
   width: 48px;
   height: 48px;
   min-height: 48px;
   padding: 12px;
   color: var(--md-sys-color-on-surface-variant);
 }
-.project-library-entry > .icon-button:hover:not(:disabled) {
+.project-library-actions > [data-delete-project]:hover:not(:disabled) {
   color: var(--md-sys-color-error);
   background: var(--md-sys-color-error-container);
 }

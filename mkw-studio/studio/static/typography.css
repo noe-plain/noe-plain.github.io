@@ -684,3 +684,27 @@
   :is(.typo-control-group > label, .typo-grid > label) {
   margin: 0;
 }
+
+.typo-more-options {
+  margin-top: var(--studio-space-4);
+  display: grid;
+  gap: 8px;
+}
+.mkw-inline-input .carousel-text-line {
+  min-width: 1px;
+}
+
+/* Text is entered on the artwork; the inspector retains only the direct-edit command. */
+:is(#stepPanel, #carouselProperties) .canvas-text-edit-command {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.canvas-text-edit-command .text-content-command {
+  justify-content: flex-end;
+}
+.canvas-text-edit-command textarea[hidden],
+.canvas-text-edit-command .text-edit-help[hidden] {
+  display: none !important;
+}

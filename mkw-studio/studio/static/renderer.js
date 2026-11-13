@@ -54,7 +54,17 @@ function textBlock(b, key) {
         measureTextWidth(text, size, role, b.family?.enabled),
       key,
       (e, width, factor) =>
-        MKWText.rich(e) ? MKWTypography.postLayout(e, width, factor) : null,
+        MKWText.rich(e)
+          ? MKWTypography.postLayout(
+              {
+                ...e,
+                family:
+                  e.key !== "copyright" && (e.family ?? !!b.family?.enabled),
+              },
+              width,
+              factor,
+            )
+          : null,
     ),
     e = layout.copyright;
   if (e && e.text && !e.styled) {
@@ -139,7 +149,7 @@ function softLogoShadow(ctx, b, logo, opacity = 0.28) {
   ctx.restore();
 }
 let gradientCache = null;
-function textGradient(ctx, b, layout, opacity = 0.42) {
+function textGradientGeometry(b, layout) {
   const main = layout.mainRecords.filter((e) => e.visible && e.text);
   const first = main[0],
     title = main.find((e) => e.key === "title") || first;
@@ -164,6 +174,10 @@ function textGradient(ctx, b, layout, opacity = 0.42) {
       ascent -
       measureContext.measureText("Mg").actualBoundingBoxAscent;
   }
+  return { start, baseline, hasText: !!first };
+}
+function textGradient(ctx, b, layout, opacity = 0.42) {
+  const { start, baseline, hasText: first } = textGradientGeometry(b, layout);
   const signature = JSON.stringify([b.w, b.h, start, baseline, !!first]);
   if (gradientCache?.signature !== signature) {
     const canvas = makeCanvas(b.w, b.h),
@@ -236,7 +250,7 @@ function drawText(ctx, layout, opts = {}) {
       let paletteOffset = familyTextOffset(layout, e.key, opts.family?.offset);
       for (const line of e.styled.lines)
         for (const run of line.runs) {
-          if (opts.family?.enabled && e.key !== "copyright") {
+          if (opts.family?.enabled && e.key !== "copyright" && run.family) {
             let glyphX = x + line.x + run.x;
             for (const glyph of MKWFamily.runs(run.text, paletteOffset)) {
               const part = { ...run, text: glyph.text, width: 0 };

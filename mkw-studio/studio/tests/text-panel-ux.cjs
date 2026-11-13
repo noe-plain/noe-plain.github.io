@@ -62,11 +62,7 @@ const {
       before,
       "Opening, selecting and closing a scope changes no document/history",
     );
-    await page.locator("[data-prop=text]").evaluate((el) => {
-      el.focus();
-      el.setSelectionRange(0, 5);
-      el.dispatchEvent(new Event("select"));
-    });
+    await require("./browser.cjs").canvasTextRange(page, 0, 5);
     assert.match(
       await page.locator("[data-typo-scope]").textContent(),
       /5 Zeichen/,

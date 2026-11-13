@@ -141,7 +141,7 @@ const {
       selected = p.boards[0].id;
       chooseStep("text");
     });
-    await page.locator("#mainTextInput").fill("Unser Konzert");
+    await require("./browser.cjs").fillCanvasText(page, "Unser Konzert");
     assert.match(
       await page.locator("#toolsSidebar .inspector-scope").textContent(),
       /Textvorlage/,
@@ -189,7 +189,7 @@ const {
       await page.locator("#toolsSidebar .inspector-scope").textContent(),
       /verknüpft/,
     );
-    await page.locator("#mainTextInput").fill("Nur dieses Bild");
+    await require("./browser.cjs").fillCanvasText(page, "Nur dieses Bild");
     assert.match(
       await page.locator("#toolsSidebar .inspector-scope").textContent(),
       /Eigene/,

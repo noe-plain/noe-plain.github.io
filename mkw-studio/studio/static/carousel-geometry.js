@@ -88,21 +88,65 @@ function carouselImageBounds(o, project = p) {
 }
 
 function carouselPhotoCoversFrame(o) {
-  const b = carouselImageBounds(o),
-    left = b.x - o.x,
-    top = b.y - o.y,
-    right = left + b.w,
-    bottom = top + b.h;
-  // Every polygon edge is straight, so its vertices completely determine
-  // containment within the rectangular photo footprint. Rotation/flips of the
-  // whole object do not affect this local-space test.
-  return carouselFramePoints(o).every(
-    ({ x, y }) =>
-      x * o.w >= left - 0.01 &&
-      x * o.w <= right + 0.01 &&
-      y * o.h >= top - 0.01 &&
-      y * o.h <= bottom + 0.01,
-  );
+  const photo = carouselImageBounds(o),
+    left = photo.x - o.x,
+    top = photo.y - o.y,
+    right = left + photo.w,
+    bottom = top + photo.h;
+  let local = carouselFramePoints(o).map((point) => ({
+    x: point.x * o.w,
+    y: point.y * o.h,
+  }));
+  if (o.type === "angle") {
+    const horizontal = MKWAnglePolicy.horizontal(o.direction),
+      w = horizontal ? o.w : o.h,
+      h = horizontal ? o.h : o.w,
+      t = Math.min(o.thickness * Math.SQRT2, w * 0.9, h * 0.44),
+      angle =
+        o.direction === "left"
+          ? 180
+          : o.direction === "up"
+            ? -90
+            : o.direction === "down"
+              ? 90
+              : 0;
+    local = [
+      [0, 0],
+      [w, h / 2],
+      [0, h],
+      [0, h - t],
+      [w - t, h / 2],
+      [0, t],
+    ].map(([x, y]) => {
+      const rotated = carouselRotatePoint(
+        { x: x - w / 2, y: y - h / 2 },
+        angle,
+      );
+      return { x: rotated.x + o.w / 2, y: rotated.y + o.h / 2 };
+    });
+  }
+  let world = local.map((point) => carouselToWorld(o, point));
+  const content = MKWCarouselPolicy.contentFrame(p.carousel, o);
+  if (content) world = MKWPolygonClip.rectangle(world, content);
+  const bounds = carouselObjectBounds(o);
+  for (const frame of MKWCarouselPolicy.frames(p.carousel)) {
+    if (!MKWCarouselPolicy.intersects(bounds, frame)) continue;
+    const visible = MKWPolygonClip.rectangle(world, frame);
+    if (MKWPolygonClip.area(visible) < 0.0001) continue;
+    if (
+      !visible.every((point) => {
+        const p = carouselToLocal(o, point);
+        return (
+          p.x >= left - 0.01 &&
+          p.x <= right + 0.01 &&
+          p.y >= top - 0.01 &&
+          p.y <= bottom + 0.01
+        );
+      })
+    )
+      return false;
+  }
+  return true;
 }
 
 function carouselImageResize(ev, o, corner) {

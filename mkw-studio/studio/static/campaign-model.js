@@ -208,6 +208,8 @@
           const o = objects.get(t.id);
           if (!o) {
             t.id = null;
+            t.last = {};
+            t.overrides = [];
             continue;
           }
           const local = values(o, a),

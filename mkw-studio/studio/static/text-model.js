@@ -198,6 +198,7 @@
   function rich(o) {
     return !!(
       o.typographyVersion ||
+      o.text?.includes("\u2028") ||
       o.align === "justify" ||
       o.textAlign === "justify" ||
       o.characterStyles?.length ||

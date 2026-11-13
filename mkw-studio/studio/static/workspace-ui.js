@@ -138,6 +138,8 @@ function studioQueueCommandbarFit() {
     studioCommandbarFrame = requestAnimationFrame(studioFitCommandbars);
 }
 function studioSetSidebar(open) {
+  const layoutChanged =
+    document.body.classList.contains("sidebar-hidden") === open;
   const postAnchor =
     typeof postCaptureAnchor === "function" && !p.carousel
       ? postCaptureAnchor()
@@ -145,7 +147,8 @@ function studioSetSidebar(open) {
   const viewport = $("#carouselViewport"),
     canvas = $("#carouselCanvas");
   const rect = viewport?.getBoundingClientRect(),
-    art = canvas?.getBoundingClientRect();
+    art =
+      p.carousel && canvas ? carouselOrigin() : canvas?.getBoundingClientRect();
   const center =
     rect && art
       ? {
@@ -169,9 +172,9 @@ function studioSetSidebar(open) {
       studioIcon(open ? "sidebar" : "sidebarOpen") +
       "<span>Einstellungen</span>";
   }
-  if (center && p.carousel) {
+  if (center && p.carousel && layoutChanged) {
     carouselRefresh();
-    const next = canvas.getBoundingClientRect(),
+    const next = carouselOrigin(),
       view = viewport.getBoundingClientRect();
     viewport.scrollLeft +=
       next.left +

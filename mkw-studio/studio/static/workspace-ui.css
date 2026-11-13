@@ -39,7 +39,7 @@ header {
   position: fixed;
   top: auto;
   right: auto;
-  bottom: 72px;
+  bottom: 58px;
   left: calc((100% - var(--studio-shell-side)) / 2);
   transform: translateX(-50%);
   border: 0;
@@ -986,4 +986,21 @@ footer #carouselCoordinates {
 .carousel-contextbar .carousel-toolrail {
   flex: none;
   overflow: visible;
+}
+
+/* Tools use icons and accessible hints at every workspace width. */
+.studio-commandbar .studio-tool-group > button > span {
+  display: none;
+}
+.studio-commandbar .studio-tool-group > button {
+  width: 40px;
+  min-width: 40px;
+  padding: 9px;
+  gap: 0;
+}
+@media (pointer: coarse) {
+  .studio-commandbar .studio-tool-group > button {
+    width: 48px;
+    min-width: 48px;
+  }
 }

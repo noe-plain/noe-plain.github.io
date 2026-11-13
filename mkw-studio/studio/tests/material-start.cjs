@@ -269,7 +269,7 @@ const { launch, artifact } = require("./browser.cjs");
         assert.equal(b[2].y, b[3].y);
         assert(Math.abs(b[0].w - b[1].w) < 1);
         assert(Math.abs(b[2].w - b[3].w) < 1);
-        assert(b[4].y >= b[3].y + b[3].h, "Legacy backup stays secondary");
+        assert(b[4].y >= b[3].y + b[3].h, "Legacy backup stays in the footer");
       } else {
         for (let i = 1; i < b.length; i++)
           assert(b[i].y >= b[i - 1].y + b[i - 1].h);

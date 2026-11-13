@@ -418,6 +418,11 @@ function postTextContent(b, key, panel, field) {
     active: () => editingText?.boardId === b.id && editingText.key === key,
     available: () => !!b.elements[key].visible,
     start: (selection) => {
+      document
+        .querySelectorAll(".board-card")
+        .forEach((card) =>
+          card.classList.toggle("selected", card.dataset.id === b.id),
+        );
       const el = document.querySelector(
           `.interaction[data-board="${b.id}"] .text-editor[data-key="${key}"]`,
         ),
