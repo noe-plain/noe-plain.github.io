@@ -112,13 +112,9 @@ const {
       const copied = await page.evaluate(() => {
         const el = p.carousel ? carouselUI.editing.el : editingText.el;
         window.testClip = new DataTransfer();
-        el.dispatchEvent(
-          new ClipboardEvent("copy", {
-            clipboardData: testClip,
-            bubbles: true,
-            cancelable: true,
-          }),
-        );
+        const event = new Event("copy", { bubbles: true, cancelable: true });
+        Object.defineProperty(event, "clipboardData", { value: testClip });
+        el.dispatchEvent(event);
         return {
           plain: testClip.getData("text/plain"),
           html: testClip.getData("text/html"),
@@ -219,13 +215,9 @@ const {
             bubbles: true,
           }),
         );
-        el.dispatchEvent(
-          new ClipboardEvent("paste", {
-            clipboardData: testClip,
-            bubbles: true,
-            cancelable: true,
-          }),
-        );
+        const event = new Event("paste", { bubbles: true, cancelable: true });
+        Object.defineProperty(event, "clipboardData", { value: testClip });
+        el.dispatchEvent(event);
       });
       result = await page.evaluate(() =>
         clone(p.carousel ? carouselSelected()[0] : board().elements.title),
