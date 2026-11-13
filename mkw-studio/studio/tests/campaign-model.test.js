@@ -130,3 +130,36 @@ test("local text remains independent while position keeps following the master",
   assert.equal(target.x, 1135);
   assert.deepEqual(link.targets[0].overrides, ["text"]);
 });
+
+test("linked text shortening rebases individual character formatting without detaching position/content", () => {
+  const q = fixture();
+  m.reconcile(q, id);
+  const source = q.carousel.objects.find((o) => o.id === "t"),
+    link = q.campaign.links[0],
+    target = q.carousel.objects.find((o) => o.id === link.targets[0].id);
+  target.characterStyles = [{ start: 0, end: 5, size: 35, color: "#123456" }];
+  target.x += 20;
+  m.reconcile(q, id);
+  source.text = "Hi";
+  m.reconcile(q, id);
+  assert.equal(target.text, "Hi");
+  assert.equal(target.x, 1120);
+  assert(target.characterStyles.every((s) => s.end <= 2));
+  assert.equal(target.characterStyles[0].size, 35);
+  assert(link.targets[0].overrides.includes("characterStyles"));
+  assert(!link.targets[0].overrides.includes("text"));
+});
+test("local short content safely receives source character formatting without invalid ranges", () => {
+  const q = fixture();
+  m.reconcile(q, id);
+  const source = q.carousel.objects.find((o) => o.id === "t"),
+    link = q.campaign.links[0],
+    target = q.carousel.objects.find((o) => o.id === link.targets[0].id);
+  target.text = "A";
+  m.reconcile(q, id);
+  source.characterStyles = [{ start: 0, end: 5, size: 95 }];
+  m.reconcile(q, id);
+  assert.equal(target.text, "A");
+  assert.deepEqual(target.characterStyles, [{ start: 0, end: 1, size: 95 }]);
+  assert.deepEqual(link.targets[0].overrides, ["text"]);
+});

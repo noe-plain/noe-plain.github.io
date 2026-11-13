@@ -125,11 +125,12 @@ const {
     await page.locator("#carouselSidebar [data-inspector-jump=style]").click();
     const pane = await page.locator("#carouselProperties").boundingBox();
     const colour = await page.locator("[data-typo-colour]").boundingBox();
+    await page.screenshot({ path: artifact("text-panel-ux-ipad.png") });
     assert(
       colour.y + colour.height <= pane.y + pane.height + 1,
-      "Font/size/colour stay in reach on iPad-size view",
+      "Font/size/colour stay in reach on iPad-size view: " +
+        JSON.stringify({ pane, colour }),
     );
-    await page.screenshot({ path: artifact("text-panel-ux-ipad.png") });
     await paragraph.locator("summary").click();
     await line.locator("summary").click();
     await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });

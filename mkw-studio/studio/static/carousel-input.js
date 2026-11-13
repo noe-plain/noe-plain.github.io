@@ -588,7 +588,8 @@ function carouselResize(ev, corner) {
   const rotation = objects.length === 1 ? objects[0].angle || 0 : 0,
     projectPoint = (e) => carouselRotatePoint(carouselPoint(e), -rotation),
     start = projectPoint(ev),
-    base = objects.map((o) => {
+    originals = objects.map(clone),
+    base = originals.map((o) => {
       const copy = clone(o);
       if (rotation) {
         const q = carouselRotatePoint(copy, -rotation);
@@ -618,8 +619,10 @@ function carouselResize(ev, corner) {
           10,
           b.h + (corner.includes("s") ? dy : corner.includes("n") ? -dy : 0),
         );
+      const scaleText =
+        e.shiftKey || (corner.length === 2 && MKWTextResize.active(objects));
       const preserve =
-        e.shiftKey ||
+        scaleText ||
         objects.some(
           (o) =>
             o.type === "angle" || o.type === "logo" || (!rotation && o.angle),
@@ -648,6 +651,17 @@ function carouselResize(ev, corner) {
       );
       ({ x, y, w, h } = snap);
       carouselUI.snapLines = snap.guides;
+      let typography;
+      try {
+        typography = objects.map((o, i) =>
+          scaleText && o.type === "text"
+            ? MKWTextEdit.scale(base[i], w / b.w)
+            : null,
+        );
+      } catch (error) {
+        status(error.message);
+        return;
+      }
       objects.forEach((o, i) => {
         const old = base[i];
         o.x = x + ((old.x - b.x) * w) / b.w;
@@ -659,26 +673,7 @@ function carouselResize(ev, corner) {
           o.x = q.x;
           o.y = q.y;
         }
-        if (e.shiftKey && o.type === "text") {
-          const factor = w / b.w;
-          o.size = Math.max(1, Math.min(1000, old.size * factor));
-          if (old.textStyles)
-            o.textStyles = old.textStyles.map((style) =>
-              style
-                ? {
-                    ...style,
-                    size: style.size
-                      ? Math.max(1, Math.min(1000, style.size * factor))
-                      : undefined,
-                    leading: style.leading?.map((value) =>
-                      value == null
-                        ? null
-                        : Math.max(1, Math.min(3000, value * factor)),
-                    ),
-                  }
-                : null,
-            );
-        }
+        if (typography[i]) Object.assign(o, typography[i]);
       });
       carouselRefresh();
       carouselCoordinates(objects);
@@ -687,6 +682,15 @@ function carouselResize(ev, corner) {
       if (begun) {
         changed(false);
       }
+      carouselPanel();
+    },
+    () => {
+      objects.forEach((o, i) => {
+        for (const key of Object.keys(o))
+          if (!(key in originals[i])) delete o[key];
+        Object.assign(o, clone(originals[i]));
+      });
+      carouselRefresh();
       carouselPanel();
     },
   );

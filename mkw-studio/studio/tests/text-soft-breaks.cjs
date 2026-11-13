@@ -152,7 +152,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         JSON.stringify(range),
       );
       await page.keyboard.press("Escape");
-      const field = page.locator(".text-content-editor textarea").first();
+      const field = page.locator(".typography-inspector textarea").first();
       assert(
         await field.isHidden(),
         "Text is edited on the artwork, not in a second sidebar input",

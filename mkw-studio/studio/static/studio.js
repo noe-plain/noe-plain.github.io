@@ -415,6 +415,8 @@ function postTextContent(b, key, panel, field) {
     host: field.closest(".tool-section"),
     field,
     button: panel.querySelector("[data-post-text-edit]"),
+    object: b.elements[key],
+    editor: () => editingText?.el,
     active: () => editingText?.boardId === b.id && editingText.key === key,
     available: () => !!b.elements[key].visible,
     start: (selection) => {

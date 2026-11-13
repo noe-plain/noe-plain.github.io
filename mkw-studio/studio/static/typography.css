@@ -315,11 +315,6 @@
 }
 
 /* Text content has the same native field and direct-edit command in both editors. */
-:is(#stepPanel, #carouselProperties) .text-content-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 .text-content-group {
   display: grid;
   gap: 8px;
@@ -390,9 +385,6 @@
   width: 100%;
   box-sizing: border-box;
 }
-#stepPanel .text-content-editor > .typo-visible {
-  min-height: 40px;
-}
 :is(#stepPanel, #carouselProperties) .typography-inspector {
   padding: 16px;
   border: 0;
@@ -421,9 +413,6 @@
   background: var(--md-sys-color-surface-container);
   font-size: 12px;
   line-height: 18px;
-}
-:is(#stepPanel, #carouselProperties) .text-content-editor [hidden] {
-  display: none !important;
 }
 @media (pointer: coarse) {
   :is(#stepPanel, #carouselProperties) .text-edit-action {
@@ -707,5 +696,67 @@
 }
 .canvas-text-edit-command textarea[hidden],
 .canvas-text-edit-command .text-edit-help[hidden] {
+  display: none !important;
+}
+
+.text-resize-controls {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px 24px;
+}
+.text-resize-controls h5 {
+  margin: 0;
+  font: inherit;
+  font-weight: 600;
+}
+.text-resize-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.text-resize-modes button {
+  white-space: normal;
+  min-width: 0;
+  min-height: 44px;
+}
+.text-resize-modes button[aria-pressed="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.text-scale-input {
+  display: grid;
+  grid-template-columns: minmax(48px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+.text-scale-input input {
+  min-width: 0;
+  width: 100%;
+}
+.text-scale-input button {
+  padding-inline: 12px;
+}
+.text-clipboard-menu {
+  max-width: calc(100vw - 16px);
+}
+.text-clipboard-menu button {
+  white-space: normal;
+  min-height: 44px;
+}
+
+.typo-context-actions {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.typo-context-actions .text-content-command {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+}
+.typo-context-actions textarea[hidden],
+.typo-context-actions .text-edit-help[hidden] {
   display: none !important;
 }

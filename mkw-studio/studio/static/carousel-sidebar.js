@@ -306,6 +306,8 @@ function carouselPanel() {
       MKWInlineText.bindPanel({
         host: panel.querySelector(".type-content"),
         field: panel.querySelector("[data-prop=text]"),
+        object: o,
+        editor: () => carouselUI.editing?.el,
         button: $("#carouselTextEdit"),
         active: () => carouselUI.editing?.id === o.id,
         locked: carouselObjectLocked(o),
@@ -322,6 +324,7 @@ function carouselPanel() {
     if (o.type === "text") {
       MKWTypography.carousel(o, panel);
       carouselBindTextAlignment(o, panel);
+      MKWTextResize.bind(panel, o);
       const content = panel.querySelector("[data-prop=text]");
       content.onselect =
         content.onkeyup =

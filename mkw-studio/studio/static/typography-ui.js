@@ -904,10 +904,72 @@ const MKWTypography = (() => {
         rememberText();
       nativeRemembered = false;
     });
-    el.onpaste = (ev) => {
-      ev.preventDefault();
-      replace(ev.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n"));
-    };
+    const editingProject = p;
+    MKWTextClipboard.bind(el, {
+      object: o,
+      effective: () => ({
+        ...record(o),
+        key,
+        family: key !== "copyright" && (o.family ?? !!b.family?.enabled),
+      }),
+      isCurrent: () =>
+        p === editingProject && el.isConnected && editingText?.el === el,
+      replace: (fragment, selection, rich) => {
+        if (key === "copyright") {
+          fragment = {
+            ...fragment,
+            text: fragment.text.replace(/[\r\n\u2028]+/g, " "),
+            characterStyles: [],
+            textStyles: [],
+          };
+          rich = false;
+        }
+        const beforeText = o.text,
+          candidates = p.boards
+            .filter((target) => target.elements[key].text === beforeText)
+            .map((target) => ({
+              target,
+              next: MKWTextEdit.replace(
+                target.elements[key],
+                selection.start,
+                selection.end,
+                fragment,
+                rich,
+              ),
+            }));
+        rememberText();
+        undo.at(-1).linkedStyles = candidates.map(({ target }) => ({
+          id: target.id,
+          characters: clone(target.elements[key].characterStyles || []),
+          paragraphs: clone(target.elements[key].textStyles || []),
+        }));
+        setSharedText(
+          b,
+          key,
+          beforeText.slice(0, selection.start) +
+            fragment.text +
+            beforeText.slice(selection.end),
+        );
+        for (const { target, next } of candidates) {
+          const element = target.elements[key];
+          if (element.text !== next.text) continue;
+          if (rich && (target.w !== b.w || target.h !== b.h))
+            MKWText.keepSizes(next, element);
+          element.characterStyles = next.characterStyles;
+          element.textStyles = next.textStyles;
+          element.typographyVersion = 1;
+        }
+        track(
+          o,
+          selection.start + fragment.text.length,
+          selection.start + fragment.text.length,
+        );
+        changed(false);
+        postInline(b, key, el, true);
+        const field = document.querySelector("[data-post-text]");
+        if (field) field.value = o.text;
+      },
+    });
     el.addEventListener("compositionstart", () => {
       rememberText();
       if (editingText?.el === el) editingText.composing = true;
@@ -965,8 +1027,27 @@ const MKWTypography = (() => {
         characters: clone(o.characterStyles || []),
         paragraphs: clone(o.textStyles || []),
         range: range(o),
+        linkedStyles: previous.linkedStyles?.map((saved) => {
+          const element = p.boards.find((target) => target.id === saved.id)
+            ?.elements[key];
+          return element
+            ? {
+                id: saved.id,
+                characters: clone(element.characterStyles || []),
+                paragraphs: clone(element.textStyles || []),
+              }
+            : saved;
+        }),
       });
       setSharedText(b, key, previous.text);
+      for (const saved of previous.linkedStyles || []) {
+        const element = p.boards.find((target) => target.id === saved.id)
+          ?.elements[key];
+        if (element) {
+          element.characterStyles = saved.characters;
+          element.textStyles = saved.paragraphs;
+        }
+      }
       o.characterStyles = previous.characters;
       o.textStyles = previous.paragraphs;
       track(o, previous.range?.start || 0, previous.range?.end || 0);

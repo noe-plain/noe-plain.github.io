@@ -1,6 +1,12 @@
 /* Campaign links use the Designer object model; positions are local to each output. */
 (function (root) {
   "use strict";
+  const textModel =
+      typeof module !== "undefined" ? require("./text-model.js") : root.MKWText,
+    textEdit =
+      typeof module !== "undefined"
+        ? require("./text-edit-model.js")
+        : root.MKWTextEdit;
   const copy = (value) =>
     value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -219,11 +225,44 @@
             ...Object.keys(t.last),
           ]))
             if (!same(local[k], t.last[k])) overrides.add(k);
+          let remapped;
+          if (
+            source.type === "text" &&
+            changed.has("text") &&
+            (overrides.has("characterStyles") || overrides.has("textStyles")) &&
+            !overrides.has("text") &&
+            local.text !== current.text
+          ) {
+            const diff = textModel.diff(local.text, current.text);
+            remapped = textEdit.replace(
+              local,
+              diff.start,
+              diff.end,
+              { text: diff.insert },
+              false,
+            );
+          }
           for (const k of changed)
             if (!overrides.has(k)) {
               if (k in current) local[k] = copy(current[k]);
               else delete local[k];
             }
+          if (source.type === "text") {
+            for (const key of ["characterStyles", "textStyles"])
+              if (remapped && overrides.has(key)) local[key] = remapped[key];
+            if (local.characterStyles)
+              local.characterStyles = textModel.merge(
+                local.characterStyles.map((run) => ({
+                  ...run,
+                  end: Math.min(run.end, local.text.length),
+                })),
+              );
+            if (local.textStyles)
+              local.textStyles = local.textStyles.slice(
+                0,
+                local.text.split("\n").length,
+              );
+          }
           apply(o, local, a);
           t.last = values(o, a);
           t.overrides = [...overrides];

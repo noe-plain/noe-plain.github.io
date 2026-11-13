@@ -4,6 +4,7 @@ const MKWCampaignUI = (() => {
   const openOptions = new Set();
   const previewObservers = new Set();
   function releaseCards() {
+    MKWCampaignCardUI.release();
     for (const observer of previewObservers) observer.disconnect();
     previewObservers.clear();
   }
@@ -169,18 +170,33 @@ const MKWCampaignUI = (() => {
         const sponsors = p.boards.find(
           (b) => b.campaignPage === a.id,
         )?.sponsors;
-        return `<aside class="campaign-card image-info-card " data-campaign-row="${esc(im.id)}" aria-label="Bild ${i + 1}: ${esc(im.name)}" style="left:${a.x * carouselZoom - 258}px;top:${a.y * carouselZoom}px;width:230px;max-height:${Math.max(64, Math.max(...row.pages.map((id) => c.artboards.find((a) => a.id === id).h)) * carouselZoom)}px"><div class="campaign-card-heading"><canvas class="campaign-thumb" width="72" height="54" aria-hidden="true"></canvas><div><small>Bild ${i + 1} von ${p.campaign.rows.length}</small><strong title="${esc(im.name)}">${esc(im.name)}</strong></div></div>${master ? '<span class="campaign-master-label">Vorlage für gleiche Formate</span>' : ""}<button class="campaign-overview-action" data-campaign-action="open">Bearbeiten</button><div class="campaign-primary-actions"><button data-campaign-action="replace">${studioIcon("image")}<span>Bild ersetzen</span></button><button data-campaign-action="format">${studioIcon("plus")}<span>Format hinzufügen</span></button></div><div class="campaign-card-actions" role="group" aria-label="Bildreihe verwalten"><button data-campaign-action="up" aria-label="Bildreihe nach oben" ${i === 0 ? "disabled" : ""}>${studioIcon("up")}</button><button data-campaign-action="down" aria-label="Bildreihe nach unten" ${i === p.campaign.rows.length - 1 ? "disabled" : ""}>${studioIcon("down")}</button><button data-campaign-action="remove" aria-label="Bildreihe entfernen">${studioIcon("trash")}</button></div><label>Bildnachweis / Copyright<input data-campaign-copyright placeholder="Bildbeschreibung © Name" value="${esc(p.boards.find((b) => b.campaignPage === a.id)?.elements.copyright.text || "")}"></label><details ${openOptions.has(im.id) ? "open" : ""}><summary>Gestaltungsoptionen</summary><label class="post-option-row"><input type="checkbox" data-campaign-angle ${row.angle ? "checked" : ""}><span>Bildwinkel</span><select aria-label="Winkelrichtung" data-campaign-direction>${MKWAnglePolicy.directions.map((d) => `<option value="${d}" ${row.direction === d ? "selected" : ""}>${{ up: "Oben", left: "Links", down: "Unten" }[d]}</option>`).join("")}</select></label><label class="post-option-row"><input type="checkbox" data-campaign-family ${row.family ? "checked" : ""}><span>Familienkonzert</span></label>${row.family ? `<label>Hintergrundfarbe<input type="color" data-colour-draft data-campaign-background value="${esc(row.background || "#f4efdf")}"></label>` : ""}<label class="post-option-row"><input type="checkbox" data-campaign-sponsors ${sponsors?.enabled ? "checked" : ""}><span>Sponsorenleiste</span></label><button data-campaign-action="sponsors">Sponsoren auswählen</button></details></aside>`;
+        return MKWCampaignCardUI.markup({
+          row,
+          index: i,
+          im,
+          frame: a,
+          height: Math.max(
+            ...row.pages.map(
+              (id) => c.artboards.find((frame) => frame.id === id).h,
+            ),
+          ),
+          master,
+          sponsors,
+          open: openOptions.has(im.id),
+          count: p.campaign.rows.length,
+          copyright:
+            p.boards.find((b) => b.campaignPage === a.id)?.elements.copyright
+              .text || "",
+        });
       })
       .join("");
     host.querySelectorAll("[data-campaign-row]").forEach((card) => {
       const row = p.campaign.rows.find(
         (r) => r.imageId === card.dataset.campaignRow,
       );
-      card.querySelector("details").ontoggle = (e) => {
-        e.target.open
-          ? openOptions.add(row.imageId)
-          : openOptions.delete(row.imageId);
-      };
+      MKWCampaignCardUI.bind(card, (open) =>
+        open ? openOptions.add(row.imageId) : openOptions.delete(row.imageId),
+      );
       card.querySelector("[data-campaign-sponsors]").onchange = (e) =>
         change(() => {
           for (const page of row.pages) {
@@ -199,12 +215,14 @@ const MKWCampaignUI = (() => {
           previewImage(im.data)
             .then((bitmap) => {
               if (!thumb.isConnected) return;
+              thumb.width = 460;
+              thumb.height = 220;
               const context = thumb.getContext("2d"),
-                scale = Math.min(72 / bitmap.width, 54 / bitmap.height);
+                scale = Math.max(460 / bitmap.width, 220 / bitmap.height);
               context.drawImage(
                 bitmap,
-                0,
-                0,
+                (460 - bitmap.width * scale) / 2,
+                (220 - bitmap.height * scale) / 2,
                 bitmap.width * scale,
                 bitmap.height * scale,
               );

@@ -16,6 +16,7 @@
     "static/polygon-clip.js",
     "static/post-angle-model.js",
     "static/text-model.js",
+    "static/text-edit-model.js",
     "static/text-scope-model.js",
     "static/text-justify.js",
     "static/text-hyphen.js",
@@ -94,6 +95,8 @@
     "static/ui-theme.js",
     "static/ui-controls.js",
     "static/ui-menus.js",
+    "static/text-clipboard.js",
+    "static/text-resize.js",
     "static/appearance.js",
     "static/carousel-pdf.js",
     "static/settings-ui.js",
@@ -121,6 +124,7 @@
     "static/campaign-document.js",
     "static/campaign-migration.js",
     "static/campaign-text-choice.js",
+    "static/campaign-card-ui.js",
     "static/campaign-ui.js",
     "static/start.js",
     "static/workspace-scroll.js"
@@ -157,6 +161,7 @@
     "static/ui-fields.css",
     "static/inspector-ui.css",
     "static/spread-layout.css",
-    "static/campaign.css"
+    "static/campaign.css",
+    "static/campaign-card.css"
   ]
 }

@@ -90,7 +90,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           if (p.carousel) carouselPanel();
           else renderPanel();
         }, advanced);
-        const field = page.locator(panel + " .text-content-editor textarea");
+        const field = page.locator(panel + " .typography-inspector textarea");
         const action = () => page.locator(panel + " [data-text-edit-action]");
         assert.equal(await field.count(), 1);
         assert(await field.isHidden());
@@ -288,7 +288,7 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
           carouselPanel();
         });
       }
-      const emptyField = page.locator(panel + " .text-content-editor textarea");
+      const emptyField = page.locator(panel + " .typography-inspector textarea");
       await require("./browser.cjs").fillCanvasText(page,"");
       await actionFor(page, panel).click();
       await page.waitForFunction(() =>

@@ -1,6 +1,7 @@
 "use strict";
 /* Imports and transactions for campaign projects; Designer rendering remains authoritative. */
 const MKWCampaignDocument = (() => {
+  const rowGap = 320;
   const active = () => !!p.campaign;
   const base = (type, a, values = {}) => ({
     id: uid(),
@@ -144,7 +145,7 @@ const MKWCampaignDocument = (() => {
         a.y = y;
         x += a.w + 200;
       }
-      y += height + 320;
+      y += height + rowGap;
       columnWidth = Math.max(columnWidth, width);
     }
     c.artboards = q.campaign.rows.flatMap((r) =>
@@ -206,7 +207,9 @@ const MKWCampaignDocument = (() => {
       const a = {
         ...formats[i],
         id: uid(),
-        name: `${im.name} · ${MKW.ratio(b.w, b.h)}`,
+        name: `${im.name} · ${MKW.ratio(b.w, b.h)}`
+          .slice(0, 80)
+          .replace(/[\uD800-\uDBFF]$/, ""),
         x: 0,
         y: 0,
         bg: b.family?.enabled ? b.family.background : b.bg,
@@ -355,6 +358,7 @@ const MKWCampaignDocument = (() => {
   }
 
   return {
+    rowGap,
     base,
     newState,
     rowFor,

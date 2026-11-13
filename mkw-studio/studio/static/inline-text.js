@@ -170,10 +170,12 @@ const MKWInlineText = (() => {
     start,
     stop,
     available = () => true,
+    editor = () => null,
+    object = null,
     locked = false,
   }) {
     if (!host || !field) return;
-    host.classList.add("text-content-editor");
+
     if (!field.id) field.id = "studioTextContent" + ++fieldSequence;
     button ||= document.createElement("button");
     button.type = "button";
@@ -184,7 +186,7 @@ const MKWInlineText = (() => {
       help = document.createElement("p"),
       wrapper = field.closest("label"),
       owner = host.closest("#stepPanel,#carouselProperties");
-    group.className = "text-content-group";
+    group.className = "typo-context-actions";
     command.className = "text-content-command";
     const accessibleName = field.getAttribute("aria-label");
     if (accessibleName && !accessibleName.startsWith("Textinhalt"))
@@ -207,7 +209,17 @@ const MKWInlineText = (() => {
     help.hidden = true;
     group.classList.add("canvas-text-edit-command");
     command.append(button);
+    if (object)
+      MKWTextClipboard.controls(command, {
+        start,
+        editor,
+        object,
+        locked,
+        available,
+      });
     group.append(command, field, help);
+    const actionHost = owner?.querySelector(".typography-inspector") || host;
+    actionHost.prepend(group);
     host.querySelector(":scope > .type-section-heading")?.remove();
     host.querySelector(":scope > h3")?.remove();
     let fieldUsed = false;
@@ -215,7 +227,8 @@ const MKWInlineText = (() => {
       fieldUsed = true;
     });
     const state = { field, button, help, active, available, locked };
-    panels.set(host, state);
+    panels.set(actionHost, state);
+    if (host !== actionHost && !host.children.length) host.remove();
     button.onpointerdown = (event) => {
       if (event.button === 0 && active()) event.preventDefault();
     };
@@ -234,13 +247,13 @@ const MKWInlineText = (() => {
         );
       refreshPanel(owner);
     };
-    refreshPanel(host);
+    refreshPanel(actionHost);
   }
   function refreshPanel(root) {
     if (!root) return;
-    const hosts = root.matches(".text-content-editor")
+    const hosts = root.matches(".typography-inspector")
       ? [root]
-      : root.querySelectorAll(".text-content-editor");
+      : root.querySelectorAll(".typography-inspector");
     for (const host of hosts) {
       const state = panels.get(host);
       if (!state) continue;

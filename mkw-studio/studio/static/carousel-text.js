@@ -29,7 +29,7 @@ function carouselJustificationHint(
   return `<details class="typo-details justification-settings" ${hidden ? "hidden" : ""}><summary>Blocksatz · Satzwerte</summary><label class="justification-hyphen"><input type="checkbox" ${attribute} ${enabled ? "checked" : ""}>Automatische Silbentrennung</label><p>Deutsch (Schweiz) · reformierte Rechtschreibung 2006</p><table><thead><tr><th></th><th>Min.</th><th>Optimal</th><th>Max.</th></tr></thead><tbody><tr><th>Wortabstand</th><td>80 %</td><td>100 %</td><td>120 %</td></tr><tr><th>Zeichenabstand</th><td>−2 %</td><td>0 %</td><td>+2 %</td></tr><tr><th>Glyphenbreite</th><td>98 %</td><td>100 %</td><td>102 %</td></tr></tbody></table><p>Letzte Absatzzeile linksbündig. Bei zu schmalen Zeilen werden die Grenzen eingehalten; ein Hinweis zeigt unvollständig ausgeglichene Zeilen.</p></details>`;
 }
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4><div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button><button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4>${MKWTextResize.markup()}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button><button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
 }
 function carouselBindTextAlignment(o, panel) {
   const hyphen = panel.querySelector("[data-text-hyphenate]");
@@ -65,6 +65,8 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
   const key = JSON.stringify([
       o.text,
       o.font,
+      o.color,
+      o.family,
       fontStatus,
       o.size,
       o.w,
@@ -301,28 +303,29 @@ function carouselEditText(o) {
       carouselReplaceTextStyles(o, a, b, insert),
     );
   };
-  el.onpaste = (ev) => {
-    ev.preventDefault();
-    const text = ev.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n"),
-      { start, end } = carouselEditableSelection(el);
-    apply(
-      o.text.slice(0, start) + text + o.text.slice(end),
-      start + text.length,
-      carouselReplaceTextStyles(o, start, end, text),
-    );
-  };
-  el.oncopy = el.oncut = (ev) => {
-    const { start, end } = carouselEditableSelection(el);
-    if (start === end) return;
-    ev.preventDefault();
-    ev.clipboardData.setData("text/plain", o.text.slice(start, end));
-    if (ev.type === "cut")
-      apply(
-        o.text.slice(0, start) + o.text.slice(end),
-        start,
-        carouselReplaceTextStyles(o, start, end, ""),
+  const editingProject = p;
+  MKWTextClipboard.bind(el, {
+    object: o,
+    effective: () => (p.campaign ? MKWCampaignUI.decorate(o) : o),
+    isCurrent: () =>
+      p === editingProject && el.isConnected && carouselUI.editing?.id === o.id,
+    replace: (fragment, selection, rich) => {
+      const next = MKWTextEdit.replace(
+        o,
+        selection.start,
+        selection.end,
+        fragment,
+        rich,
       );
-  };
+      apply(
+        next.text,
+        selection.start + fragment.text.length,
+        next.textStyles,
+        true,
+        next.characterStyles,
+      );
+    },
+  });
   MKWInlineText.bindSelection(el);
   el.onmouseup = el.onkeyup = () => carouselTrackTextCaret(o, el);
   el.onkeydown = (ev) => {
