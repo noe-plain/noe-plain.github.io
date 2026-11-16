@@ -32,7 +32,7 @@ Alle Termine, Texte und Personenbezeichnungen sind Beispiele. Fotos: Noë Plain,
 - Renderpixel vor/nach MKW-Rundlauf exakt gleich. Beide Slider-Übergänge zusätzlich mit jeweils 32 Pixel breiten Randstreifen bei voller Exportauflösung gegen die durchgehende Bildstrecke geprüft: maximal 8/255 Kanalabweichung und mittlere Kanalabweichung maximal 0,05/255 als Toleranz für vereinzelte Canvas-Rasterrundungen an skalierten Bildkanten. Tatsächliche Messwerte stehen in verification.json. Dies ist keine Behauptung identischer Rasterung sämtlicher SVG-Logo-Pixel zwischen verschieden breiten Zeichenflächen.
 - Native PNG-Vorschauen aus dem bestehenden Renderer; keine zusätzlichen PDF-/PSD- oder InDesign-Abnahmen für diese Entwürfe behauptet.
 - Bestehende Bibliothek, aktives Ausgangsprojekt und dessen Verlauf bleiben bei der Erzeugung unverändert. 206 Modell-/Pakettests bestanden, einschliesslich neuer Katalog-/Ladefehler- und Typografieprüfungen. Die bestehenden Vorlagensuiten sowie PNG/ZIP/MKW-, PDF- und PSD-Regressionen bestanden lokal; der neue Galerieablauf prüft alle drei Vorlagen, die Winkelebenenreihenfolge und den Hintergrund auf der dritten Folie.
-- Firefox-Prüfung nicht bestanden/abgenommen: der lokale Firefox konnte wegen macOS-Prozess-/Grafikbeschränkungen nicht starten. Keine Sicherheitsfunktionen umgangen.
+- Lokaler Firefox konnte wegen macOS-Prozess-/Grafikbeschränkungen nicht starten; keine Sicherheitsfunktionen umgangen. Die vollständigen Firefox-Prüfungen inklusive der neuen Galerie-/PSD-Abnahme sind anschliessend auf GitHub erfolgreich durchgelaufen (43832711784).
 - Die drei vom Nutzer benannten Originalprojekte im Downloads-Ordner waren wegen macOS-Lesezugriffssperre nicht lesbar. Sie wurden nicht verändert und noch nicht als visuelle Referenz ausgewertet. Der direkte Abgleich bleibt offen, bis lesbare Kopien vorliegen.
 
 ## Sechs Persona-Perspektiven
@@ -43,7 +43,7 @@ Alle Termine, Texte und Personenbezeichnungen sind Beispiele. Fotos: Noë Plain,
 | Erfahrener Designer | Gemeinsame Textblöcke, Absatz-/Zeichenformate, echte übergreifende Bildebenen.                                           | Im Editor geprüft.                                                               |
 | Senior UX-Experte   | Konzert ankündigen, Menschen vorstellen und Bildstrecke erzählen sind getrennte klare Anwendungsfälle.                   | Aufbau umgesetzt.                                                                |
 | UI-Expertin         | Gemeinsames Raster, eng gesetzte Versalien, Harriet-Fliesstext, Logo und 39-%-Verläufe konsistent. Keine neue Editor-UI. | Visueller Entwurfscheck; Abgleich der drei Originalprojekte offen.               |
-| QA-Entwicklerin     | Modellvalidierung, Dateirundlauf, identische Rundlaufpixel und reale Textbearbeitung.                                    | Chrome geprüft; Firefox-Zugang offen.                                            |
+| QA-Entwicklerin     | Modellvalidierung, Dateirundlauf, identische Rundlaufpixel und reale Textbearbeitung.                                    | Chrome, Firefox-CI und tatsächliche Live-Seite geprüft.                          |
 | Fehlersucher        | Längere Titel, Erzeugung ohne Bibliotheks-/Projektmutation, Rückgängig/Wiederholen.                                      | Gezielte Prüfungen bestanden; extreme Inhaltslängen nicht automatisch abgedeckt. |
 
 ## Reproduzieren

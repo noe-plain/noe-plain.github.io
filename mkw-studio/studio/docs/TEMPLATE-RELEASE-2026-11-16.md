@@ -32,7 +32,7 @@ Notwendiges abschliessendes Refactoring: Das bestehende reine Vorlagenmodell erh
 | Erfahrener Designer | Gemeinsame Textfelder, verlässliche Formatierung, frei bearbeitbare Bildrahmen und Winkel unter den Fotos. | Gelöst, realer Bearbeitungs-/Dateiweg geprüft. |
 | Senior UX-Experte | Logo–Bild–Titel, Bildfolie und Textfolie bilden einen nachvollziehbaren Ablauf; Slider führt über die Kanten weiter. | Gelöst. |
 | UI-Expertin | Einheitliches Raster, Typografie und 39-%-Verläufe; bestehende Material-3-Galerie ohne neue parallele UI. | Visuell geprüft und vom Nutzer freigegeben. |
-| QA-Entwicklerin | Neue Layouts unabhängig laden, Fehler erneut versuchen, eigene Bibliothek und Dateikompatibilität erhalten. | Lokal gelöst; tatsächlichen GitHub-/Live-Endnachweis ergänzen. |
+| QA-Entwicklerin | Neue Layouts unabhängig laden, Fehler erneut versuchen, eigene Bibliothek und Dateikompatibilität erhalten. | Gelöst; vollständige Chrome-/Firefox- und Live-Prüfung bestanden. |
 | Fehlersucher | Längere/geänderte Absätze, Ladefehler, Abbruch, Undo/Redo und Schlussfolie mit Hintergrund. | Gezielte Prüfungen bestanden; beliebig lange Texte bleiben begrenzt. |
 
 ## Grenzen und Nachweise
@@ -40,3 +40,10 @@ Notwendiges abschliessendes Refactoring: Das bestehende reine Vorlagenmodell erh
 Die drei vom Nutzer genannten MKW-Dateien im Downloads-Ordner waren wegen macOS-Lesesperre nicht zugänglich und wurden nicht verändert. Die Freigabe bezieht sich auf die tatsächlich gezeigten Entwürfe und die zuletzt beauftragten Korrekturen. Kein direkter Originaldatei-Abgleich behauptet. Vorschau-Fotos stammen ausschliesslich aus den beiden vorhandenen Studio-Testbildern und sind nicht Bestandteil der bildfreien Vorlagen.
 
 PSD und MKW bleiben verfügbar. Kein neuer IDML- oder SVG-Meilenstein, kein sonstiges Editor-Feature und keine FD-Backup-Entfernung in diesem Auftrag. Quellen und reproduzierbare Vorschauen: `drafts/content-templates-2026-11-16/`.
+
+
+## Tatsächlicher Veröffentlichungsabschluss
+
+Code-Endstand **52f46dbd87f4db899710111120e74cdeed2757d0** auf origin/main und GitHub Pages. [Vollständiger GitHub-Endlauf 43832711784](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711784) erfolgreich: Chrome, Firefox und zusammenfassender Studio-Check bestanden, einschliesslich 206 Modell-/Pakettests und neuer Vorlagen-/PSD-Prüfung. [Pages-Bereitstellung 43832711399](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711399) erfolgreich. Der ältere Zwischenlauf 43831626775 ist nicht der Endnachweis.
+
+Echter Live-Galerieablauf für alle drei Vorlagen bestanden: Inhalte einsetzen, Designer öffnen, MKW-Rundlauf und tatsächlicher Slider-PSD-Download mit Kompositprüfung. Zusätzlich die drei endgültigen Download-MKWs auf der Live-Seite geöffnet, Text sichtbar geändert und Undo/Redo geprüft. HTML, Editor-JS/CSS und alle vier Vorlagen-JSONs stimmen bytegenau mit dem geprüften Code überein. Maschineller Nachweis mit SHA-Werten und tatsächlichen Job-Ergebnissen: [TEMPLATE-VERIFICATION-2026-11-16.json](TEMPLATE-VERIFICATION-2026-11-16.json). Anschliessend nur diesen Prüfnachweis dokumentiert, keine weitere Laufzeitänderung.
