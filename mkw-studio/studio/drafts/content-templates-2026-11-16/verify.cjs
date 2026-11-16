@@ -128,11 +128,11 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
         if (id === "bilderslider") {
           const photos = c.objects.filter((o) => o.type === "image");
           if (
-            photos.length !== 4 ||
+            photos.length !== 6 ||
             c.objects.filter((o) => o.type === "text").length !== 1
           )
             throw Error(
-              "Slider benötigt vier Bildplätze und nur einen Titelblock",
+              "Slider benötigt sechs Bildplätze und nur einen Titelblock",
             );
           for (const seam of [1080, 2160])
             if (!photos.some((o) => o.x < seam && o.x + o.w > seam))
@@ -144,12 +144,21 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
             angle.pageId !== c.artboards[1].id
           )
             throw Error("Linker Winkel auf Slide 2 fehlt");
-          if (c.objects.some((o) => o.pageId === c.artboards[2].id))
-            throw Error("Slide 3 soll ohne eigene Ebenen offen bleiben");
+          if (
+            c.objects
+              .filter((o) => o.pageId === c.artboards[2].id)
+              .some((o) => !o.name.startsWith("Hintergrundfoto"))
+          )
+            throw Error(
+              "Slide 3 soll nur ein eigenes Hintergrundbild besitzen",
+            );
           const second = c.artboards[1];
           if (
             photos.filter(
-              (o) => o.x < second.x + second.w && o.x + o.w > second.x,
+              (o) =>
+                !o.name.startsWith("Hintergrundfoto") &&
+                o.x < second.x + second.w &&
+                o.x + o.w > second.x,
             ).length !== 3
           )
             throw Error("Slide 2 benötigt drei darüberliegende Bilder");

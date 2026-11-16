@@ -36,7 +36,7 @@ const MKWTemplates = (() => {
     },
     {
       id: "mkw-bilder-slider",
-      url: "static/templates/mkw-bilder-slider.json?v=699b6fc38e3b",
+      url: "static/templates/mkw-bilder-slider.json?v=ce84cb91e2a8",
       name: "MKW – Bilder-Slider",
       description:
         "Titelbild, linker Winkel hinter drei Bildern und eine offene Schlussfolie mit Bildanschnitt.",

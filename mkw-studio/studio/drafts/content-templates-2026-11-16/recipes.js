@@ -121,6 +121,7 @@
           w,
           h: height,
           direction: "left",
+          pageFragment: true,
           thickness: 250,
           glow: 0,
           glowAlpha: 0,
@@ -299,18 +300,20 @@
         "bilderslider",
         "Bilder-Slider",
         3,
-        "Titelbild, linker Bildwinkel mit drei Fotos und eine offene Schlussfolie mit angeschnittenem Bild.",
-        ["Übertitel und Titel auf Slide 1", "vier Bildplätze"],
+        "Drei Hintergrundbilder: Titelbild, grosser linker Winkel hinter drei Fotos und eine Schlussfolie mit Bildanschnitt.",
+        ["Übertitel und Titel auf Slide 1", "sechs Bildplätze"],
       );
       const cover = d.photo(0, "Hintergrundfoto 1 – Impression 1");
-      d.angle(1, cover, 0, -200, 780, 1750);
+      d.photo(1, "Hintergrundfoto 2 – Impression 2");
+      d.photo(2, "Hintergrundfoto 3 – Impression 1");
+      d.angle(1, cover, 30, -2250, 3000, 6000);
       const inset = (page, label, x, y, w, h) => {
         d.shape(page, `Rahmen ${label}`, x - 10, y - 10, w + 20, h + 20, paper);
         d.photo(page, label, x, y, w, h);
       };
-      inset(0, "Bildbrücke 1 – Impression 2", 900, 300, 840, 420);
-      inset(1, "Detail 1", 110, 900, 760, 340);
-      inset(1, "Bildbrücke 2", 850, 260, 480, 600);
+      inset(0, "Bildbrücke 1 – Impression 2", 990, 300, 750, 420);
+      inset(1, "Detail 1", 110, 780, 550, 460);
+      inset(1, "Bildbrücke 2", 720, 300, 485, 940);
       d.gradient(0, "Verlauf hinter Logo", 0, 500, 1, 0);
       d.gradient(0, "Verlauf hinter Titel", 260, 1090, 0, 1);
       d.logo(0);

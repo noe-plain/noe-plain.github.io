@@ -8,11 +8,11 @@ Alle Slides: 1080 × 1350. Höchstens ein linksbündiges Textfeld pro Slide; rei
 
 Alle Verläufe: Multiplizieren, 39 % Deckkraft. Konzertauftakt und Bilder-Slider verwenden vollflächige Fotos; neue Fotos erfordern einen geeigneten Ausschnitt für lesbaren Text. Die vorhandenen Studio-Logos werden unverzerrt eingesetzt.
 
-| Datei              | Aufbau                                                                                                                                                                                            | Schnell austauschen                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `auftakt.mkw`      | Eine Konzertankündigung mit vollflächigem Foto; kompakter Übertitel/Titel/Termin-Block.                                                                                                           | Foto und gemeinsamer Textblock.               |
-| `menschen.mkw`     | Nahe am Orchester: 1. Logo → Bild → Titel; 2. schmaleres rechtsbündiges Bild, freier Streifen links; 3. Übertitel und Harriet-Fliesstext, ohne Hintergrundfoto.                                   | Zwei Bilder, Titel, Übertitel und Fliesstext. |
-| `bilderslider.mkw` | Drei Slides mit vier unabhängigen Bildplätzen. Slide 2 hat einen linken Bildwinkel hinter drei Fotos; Slide 3 bleibt ohne eigene Ebenen offen und zeigt nur den Anschnitt der zweiten Bildbrücke. | Übertitel/Titel und vier Bildplätze.          |
+| Datei              | Aufbau                                                                                                                                                                                                                                 | Schnell austauschen                           |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `auftakt.mkw`      | Eine Konzertankündigung mit vollflächigem Foto; kompakter Übertitel/Titel/Termin-Block.                                                                                                                                                | Foto und gemeinsamer Textblock.               |
+| `menschen.mkw`     | Nahe am Orchester: 1. Logo → Bild → Titel; 2. schmaleres rechtsbündiges Bild, freier Streifen links; 3. Übertitel und Harriet-Fliesstext, ohne Hintergrundfoto.                                                                        | Zwei Bilder, Titel, Übertitel und Fliesstext. |
+| `bilderslider.mkw` | Drei Slides mit sechs unabhängigen Bildplätzen. Slide 2 hat einen linken Bildwinkel hinter drei Fotos; Slide 3 hat ein Hintergrundbild, keine weiteren eigenen Vordergrundelemente und einen kleinen Anschnitt der zweiten Bildbrücke. | Übertitel/Titel und sechs Bildplätze.         |
 
 Bildstrecken-Inspiration: [Seamly – durchgehende Bildstrecken über Slide-Grenzen](https://seamly.art/). Eigenständiger Entwurf, keine fremden Vorlagen oder Bilder kopiert.
 
@@ -20,9 +20,9 @@ Bildstrecken-Inspiration: [Seamly – durchgehende Bildstrecken über Slide-Gren
 
 Die MKW-Dateien über „Projekt öffnen“ im Studio öffnen. Texte über das gemeinsame Textfeld und dessen vorhandene Absatz-/Zeilenauswahl bearbeiten. Bilder im vorhandenen Bildrahmen ersetzen; die übergreifenden Bilder des Sliders sind jeweils eine einzige Ebene, damit der Ausschnitt an der Slide-Kante zusammenpasst. Rahmen und Verläufe sind gegen versehentliches Verschieben gesperrt und können bei Bedarf entsperrt werden.
 
-Die zusätzlichen JSON-Dateien enthalten die bildfreien Vorlagendaten für eine spätere freigegebene Aufnahme. Zum direkten Bearbeiten die MKW-Dateien verwenden. Im Studio sind die drei Layouts zusätzlich über „Vorlagen“ verfügbar, sobald der veröffentlichte Stand geladen ist.
+Die zusätzlichen JSON-Dateien enthalten die bildfreien Vorlagendaten der freigegebenen Aufnahme. Zum direkten Bearbeiten die MKW-Dateien verwenden. Im Studio sind die drei Layouts zusätzlich über „Vorlagen“ verfügbar, sobald der veröffentlichte Stand geladen ist.
 
-Alle Termine, Texte und Personenbezeichnungen sind Beispiele. Fotos: Noë Plain, zwei vorhandene Probeaufnahmen aus dem Studio-Testbestand. Dieselben beiden Fotos veranschaulichen mehrere Slots; vier Bildplätze bedeuten nicht sieben verschiedene Beispielaufnahmen. Bei Veröffentlichung Inhalte, Ausschnitte und Bildnachweise redaktionell einsetzen.
+Alle Termine, Texte und Personenbezeichnungen sind Beispiele. Fotos: Noë Plain, zwei vorhandene Probeaufnahmen aus dem Studio-Testbestand. Dieselben beiden Fotos veranschaulichen mehrere Slots; sechs Bildplätze bedeuten nicht sechs verschiedene Beispielaufnahmen. Bei Veröffentlichung Inhalte, Ausschnitte und Bildnachweise redaktionell einsetzen.
 
 ## Prüfung und Grenzen
 
@@ -31,7 +31,7 @@ Alle Termine, Texte und Personenbezeichnungen sind Beispiele. Fotos: Noë Plain,
 - Textbearbeitung über sichtbaren Editor, unveränderte übrige Ebenen und Undo/Redo in allen drei Dateien geprüft.
 - Renderpixel vor/nach MKW-Rundlauf exakt gleich. Beide Slider-Übergänge zusätzlich mit jeweils 32 Pixel breiten Randstreifen bei voller Exportauflösung gegen die durchgehende Bildstrecke geprüft: maximal 8/255 Kanalabweichung und mittlere Kanalabweichung maximal 0,05/255 als Toleranz für vereinzelte Canvas-Rasterrundungen an skalierten Bildkanten. Tatsächliche Messwerte stehen in verification.json. Dies ist keine Behauptung identischer Rasterung sämtlicher SVG-Logo-Pixel zwischen verschieden breiten Zeichenflächen.
 - Native PNG-Vorschauen aus dem bestehenden Renderer; keine zusätzlichen PDF-/PSD- oder InDesign-Abnahmen für diese Entwürfe behauptet.
-- Bestehende Bibliothek, aktives Ausgangsprojekt und dessen Verlauf bleiben bei der Erzeugung unverändert. 206 Modell-/Pakettests bestanden, einschliesslich neuer Katalog-/Ladefehler- und Typografieprüfungen. Die bestehenden Vorlagensuiten sowie PNG/ZIP/MKW-, PDF- und PSD-Regressionen bestanden lokal; der neue Galerieablauf prüft alle drei Vorlagen, die Winkelebenenreihenfolge und die offene dritte Folie.
+- Bestehende Bibliothek, aktives Ausgangsprojekt und dessen Verlauf bleiben bei der Erzeugung unverändert. 206 Modell-/Pakettests bestanden, einschliesslich neuer Katalog-/Ladefehler- und Typografieprüfungen. Die bestehenden Vorlagensuiten sowie PNG/ZIP/MKW-, PDF- und PSD-Regressionen bestanden lokal; der neue Galerieablauf prüft alle drei Vorlagen, die Winkelebenenreihenfolge und den Hintergrund auf der dritten Folie.
 - Firefox-Prüfung nicht bestanden/abgenommen: der lokale Firefox konnte wegen macOS-Prozess-/Grafikbeschränkungen nicht starten. Keine Sicherheitsfunktionen umgangen.
 - Die drei vom Nutzer benannten Originalprojekte im Downloads-Ordner waren wegen macOS-Lesezugriffssperre nicht lesbar. Sie wurden nicht verändert und noch nicht als visuelle Referenz ausgewertet. Der direkte Abgleich bleibt offen, bis lesbare Kopien vorliegen.
 
