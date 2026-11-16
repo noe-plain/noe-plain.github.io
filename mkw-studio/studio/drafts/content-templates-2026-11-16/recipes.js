@@ -1,4 +1,4 @@
-/* Editable proposals only; never registered with the shipped template library. */
+/* Source recipes for the three templates approved on 16 November 2026. */
 (function (root) {
   "use strict";
   const rows =
@@ -31,7 +31,7 @@
       );
       c.pageStructure.artboardInfo[0].name = name;
       const template = {
-        id: `mkw-draft-${id}`,
+        id: `mkw-${{ menschen: "nahe-am-orchester", auftakt: "konzertauftakt", bilderslider: "bilder-slider" }[id]}`,
         name: `MKW – ${name}`,
         description: purpose,
         version: 1,
@@ -44,7 +44,7 @@
         name,
         purpose,
         replace,
-        approval: "pending",
+        approval: "approved",
         template,
       });
       function add(page, type, label, spec) {
@@ -114,6 +114,23 @@
           panX: 0,
           panY: 0,
         });
+      const angle = (page, source, x, y, w, height) => {
+        const item = add(page, "angle", "Winkel links", {
+          x,
+          y,
+          w,
+          h: height,
+          direction: "left",
+          thickness: 250,
+          glow: 0,
+          glowAlpha: 0,
+          scale: 1,
+          panX: 0,
+          panY: 0,
+        });
+        template.slots.at(-1).sourceId = source.id;
+        return item;
+      };
       const logo = (page, white = true) =>
         add(page, "logo", "MKW-Logo", {
           x: 384,
@@ -199,6 +216,7 @@
         text,
         shape,
         photo,
+        angle,
         logo,
         background,
         gradient,
@@ -233,15 +251,17 @@
       for (let page = 0; page < 3; page++)
         d.shape(page, "Papierfläche", 0, 0, 1080, 1350, cream);
       d.logo(0, false);
-      d.photo(0, "Porträt oder Instrument", 96, 300, 888, 440);
+      d.c.bottom = 100;
+      for (const frame of d.c.artboards) frame.bottom = 100;
+      d.photo(0, "Porträt oder Instrument", 96, 300, 888, 620);
       d.heading(
         0,
         "NAHE AM ORCHESTER",
         "AM PULS\nDES KLANGS.",
         "",
-        820,
+        960,
         100,
-        330,
+        290,
         ink,
       );
       d.photo(1, "Impression 2", 200, 100, 880, 1150);
@@ -279,19 +299,18 @@
         "bilderslider",
         "Bilder-Slider",
         3,
-        "Sieben Bildplätze auf drei verbundenen Slides: Titel am Anfang, Bildanschnitte führen zum nächsten Motiv.",
-        ["Übertitel und Titel auf Slide 1", "sieben Bildplätze"],
+        "Titelbild, linker Bildwinkel mit drei Fotos und eine offene Schlussfolie mit angeschnittenem Bild.",
+        ["Übertitel und Titel auf Slide 1", "vier Bildplätze"],
       );
-      for (let i = 0; i < 3; i++)
-        d.photo(i, `Hintergrundfoto ${i + 1} – Impression ${(i % 2) + 1}`);
+      const cover = d.photo(0, "Hintergrundfoto 1 – Impression 1");
+      d.angle(1, cover, 0, -200, 780, 1750);
       const inset = (page, label, x, y, w, h) => {
         d.shape(page, `Rahmen ${label}`, x - 10, y - 10, w + 20, h + 20, paper);
         d.photo(page, label, x, y, w, h);
       };
       inset(0, "Bildbrücke 1 – Impression 2", 900, 300, 840, 420);
       inset(1, "Detail 1", 110, 900, 760, 340);
-      inset(1, "Bildbrücke 2", 850, 260, 760, 600);
-      inset(2, "Detail 2 – Impression 2", 460, 960, 610, 300);
+      inset(1, "Bildbrücke 2", 850, 260, 480, 600);
       d.gradient(0, "Verlauf hinter Logo", 0, 500, 1, 0);
       d.gradient(0, "Verlauf hinter Titel", 260, 1090, 0, 1);
       d.logo(0);

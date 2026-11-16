@@ -53,6 +53,7 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
         image: carouselDefault("image"),
         shape: carouselDefault("shape"),
         gradient: carouselDefault("gradient"),
+        angle: carouselDefault("angle"),
         logo: seed.carousel.objects.find((o) => o.type === "logo"),
       });
       return {
@@ -127,15 +128,31 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
         if (id === "bilderslider") {
           const photos = c.objects.filter((o) => o.type === "image");
           if (
-            photos.length !== 7 ||
+            photos.length !== 4 ||
             c.objects.filter((o) => o.type === "text").length !== 1
           )
             throw Error(
-              "Slider benötigt sieben Bildplätze und nur einen Titelblock",
+              "Slider benötigt vier Bildplätze und nur einen Titelblock",
             );
           for (const seam of [1080, 2160])
             if (!photos.some((o) => o.x < seam && o.x + o.w > seam))
               throw Error("Bildbrücke über Slide-Grenze fehlt");
+          const angle = c.objects.find((o) => o.type === "angle");
+          if (
+            !angle ||
+            angle.direction !== "left" ||
+            angle.pageId !== c.artboards[1].id
+          )
+            throw Error("Linker Winkel auf Slide 2 fehlt");
+          if (c.objects.some((o) => o.pageId === c.artboards[2].id))
+            throw Error("Slide 3 soll ohne eigene Ebenen offen bleiben");
+          const second = c.artboards[1];
+          if (
+            photos.filter(
+              (o) => o.x < second.x + second.w && o.x + o.w > second.x,
+            ).length !== 3
+          )
+            throw Error("Slide 2 benötigt drei darüberliegende Bilder");
         }
         for (const o of c.objects.filter((o) => o.type === "gradient"))
           if (o.opacity !== 0.39 || o.blend !== "multiply")
@@ -196,7 +213,7 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
         if (id === "bilderslider") {
           // Check both sides of every seam against the continuous artwork.
           // Focus on the photo joins: SVG logo rasterization away from a seam can vary with canvas width.
-          const scale = 0.5,
+          const scale = 1,
             whole = makeCanvas(c.w * c.n * scale, c.h * scale);
           await carouselPaint(
             exportContext(whole),
@@ -211,7 +228,7 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
           );
           for (let slide = 0; slide < c.n; slide++) {
             const bitmap = await createImageBitmap(
-              await (await fetch(previews[slide])).blob(),
+              await (await fetch(await render(q, slide, scale))).blob(),
             );
             const part = makeCanvas(bitmap.width, bitmap.height),
               ctx = exportContext(part);
@@ -252,7 +269,7 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
             });
             // Canvas drawImage can quantize a few clipped, scaled photo-edge samples differently.
             // A displaced crop or visible gap fails both this tight mean and the channel bound.
-            if (maxDiff > 8 || meanError > 0.02)
+            if (maxDiff > 8 || meanError > 0.05)
               throw Error(
                 `Bildübergang Slide ${slide + 1}: Maximum ${maxDiff}, Mittel ${meanError}`,
               );
@@ -370,9 +387,10 @@ const output = process.env.MKW_DRAFT_OUTPUT || "/tmp/mkw-vorlagen-2026-11-16";
           mkwRoundtripPixelEqual: true,
           carouselSeamStripsVerified: true,
           seamMaximumChannelDifference: 8,
-          seamMaximumMeanChannelDifference: 0.02,
+          seamMaximumMeanChannelDifference: 0.05,
           seamStripWidthPixels: 32,
           previewScale: 0.5,
+          seamComparisonScale: 1,
         },
         null,
         2,

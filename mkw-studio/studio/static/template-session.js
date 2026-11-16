@@ -1,10 +1,9 @@
 "use strict";
 const MKWTemplates = (() => {
-  const builtInURL =
-    "static/templates/mkw-winkel-slidepost.json?v=1e279be10487";
   const builtIns = [
     {
       id: "mkw-winkel-slidepost",
+      url: "static/templates/mkw-winkel-slidepost.json?v=1e279be10487",
       name: "MKW · Winkel-Slidepost",
       description:
         "Vier Slides mit gemeinsamem Hintergrund, Bildrahmen und drei Winkeln.",
@@ -13,8 +12,41 @@ const MKWTemplates = (() => {
       n: 4,
       builtIn: true,
     },
+    {
+      id: "mkw-nahe-am-orchester",
+      url: "static/templates/mkw-nahe-am-orchester.json?v=6e9b103bab5c",
+      name: "MKW – Nahe am Orchester",
+      description:
+        "Logo, grösseres Porträt und Titel; rechtsbündiges Bild; Übertitel mit Fliesstext.",
+      w: 1080,
+      h: 1350,
+      n: 3,
+      builtIn: true,
+    },
+    {
+      id: "mkw-konzertauftakt",
+      url: "static/templates/mkw-konzertauftakt.json?v=09515d997712",
+      name: "MKW – Konzertauftakt",
+      description:
+        "Vollflächiges Konzertfoto mit kompaktem Übertitel, Titel und Termin.",
+      w: 1080,
+      h: 1350,
+      n: 1,
+      builtIn: true,
+    },
+    {
+      id: "mkw-bilder-slider",
+      url: "static/templates/mkw-bilder-slider.json?v=699b6fc38e3b",
+      name: "MKW – Bilder-Slider",
+      description:
+        "Titelbild, linker Winkel hinter drei Bildern und eine offene Schlussfolie mit Bildanschnitt.",
+      w: 1080,
+      h: 1350,
+      n: 3,
+      builtIn: true,
+    },
   ];
-  let defaultRequest;
+  const requests = new Map();
   function validateDesign(item, fonts = p.fonts) {
     const t = MKWTemplateModel.validate(item),
       c = t.carousel;
@@ -35,20 +67,28 @@ const MKWTemplates = (() => {
     return [...builtIns, ...(await MKWTemplateStore.list())];
   }
   async function get(id) {
-    if (builtIns.some((t) => t.id === id)) {
-      defaultRequest ??= fetch(builtInURL)
-        .then(async (response) => {
-          if (!response.ok)
-            throw Error(
-              "Die Vorlage konnte nicht geladen werden. Bitte erneut versuchen.",
-            );
-          return validateDesign(await response.json());
-        })
-        .catch((error) => {
-          defaultRequest = null;
-          throw error;
-        });
-      return clone(await defaultRequest);
+    const builtIn = builtIns.find((t) => t.id === id);
+    if (builtIn) {
+      if (!requests.has(id))
+        requests.set(
+          id,
+          fetch(builtIn.url)
+            .then(async (response) => {
+              if (!response.ok)
+                throw Error(
+                  "Die Vorlage konnte nicht geladen werden. Bitte erneut versuchen.",
+                );
+              const item = validateDesign(await response.json());
+              if (item.id !== id)
+                throw Error("Die geladene Vorlage passt nicht zur Auswahl.");
+              return item;
+            })
+            .catch((error) => {
+              requests.delete(id);
+              throw error;
+            }),
+        );
+      return clone(await requests.get(id));
     }
     const item = await MKWTemplateStore.get(id);
     if (!item) throw Error("Diese Vorlage wurde inzwischen entfernt.");
