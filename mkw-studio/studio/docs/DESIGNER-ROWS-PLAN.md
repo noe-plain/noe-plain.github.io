@@ -265,3 +265,12 @@ Nutzerauftrag: Den **FD-Backup-Modus aus dem Tool entfernen** und die verbleiben
 5. **Abnahme:** Verbleibende Modi vom Einstieg über Bearbeitung bis Speichern/Öffnen und tatsächlichen Export prüfen; relevante alte Dateien/Vorlagen, Undo/Redo, Assetrundlauf und vorhandene Browser-/Modelltests wiederverwenden. Keine toten Verweise auf den entfernten Modus. Geänderte Bedienflächen nach Material Design 3 und aus allen sechs Persona-Perspektiven prüfen; erst den getesteten Stand veröffentlichen.
 
 Planstatus: beauftragt, noch nicht umgesetzt. Den gezielten Ausbau der Bildnotizen und die übrigen bestätigten Folgeaufträge weiterführen; Umsetzung dieses Bereinigungsblocks im passenden begrenzten Guthabenfenster planen.
+
+
+## Abgleich · 16. November 2026
+
+Aktueller geprüfter origin/main-Stand: `62e88693ed02024d966c3b086d8835e112cff95b`. [Vollständige GitHub-Prüfungen 43445187071](https://github.com/noe-plain/noe-plain.github.io/actions/runs/43445187071) und Pages-Bereitstellung sind erfolgreich; keine offenen GitHub-Issues beim Abgleich. HTML und gebündeltes JS/CSS der tatsächlichen Live-Seite stimmen bytegenau mit diesem Stand überein. Keine neuen Browserinteraktionen oder lokalen Regressionstests behauptet: Der bestehende erfolgreiche CI-Stand und die Auslieferung wurden geprüft.
+
+Phase 1.1 bleibt offen: Der Speichervertrag für Kommentare ist vorhanden, sichtbare Eingabe/Bearbeitung in der Vorschau und diskrete Anzeige auf der Arbeitsfläche fehlen weiterhin. Die vereinheitlichte Werkzeugleiste ist bereits umgesetzt. FD-Backup-Entfernung folgt erst nach fertiggestellten und abgenommenen Bildkommentaren.
+
+Die aktuelle Wochenkontingent-Abfrage liegt unter der verbindlichen Abschlussreserve-Grenze. Deshalb in diesem Lauf keine neue Funktion begonnen und keine Laufzeitdatei geändert. Die nächste Umsetzung bleibt Phase 1.1 gemäss obiger Reihenfolge; zuerst ein neuer tatsächlicher Guthabenabgleich. Keine Zusatzcredits, Agenten oder Fortsetzung in einem zweiten Nutzungsfenster eingeplant. Die bisherigen Abnahmeanforderungen aller sechs Personas bleiben für die Kommentar-UI offen.
