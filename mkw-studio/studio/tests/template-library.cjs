@@ -233,7 +233,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("[data-remove-template]").click();
     await page.locator("[data-feedback-confirm]").click();
     await page.waitForFunction(
-      () => document.querySelectorAll(".template-library-row").length === 1,
+      () => document.querySelectorAll(".template-library-row").length === 4,
     );
     assert.equal(
       await page.evaluate(async () => (await MKWTemplateStore.all()).length),

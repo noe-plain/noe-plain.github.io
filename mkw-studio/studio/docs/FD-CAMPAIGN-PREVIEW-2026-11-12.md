@@ -46,3 +46,8 @@ Offizielle Komponentenreferenzen: https://m3.material.io/components/toolbars/ove
 - Die neue Firefox-CI-Auswahl enthält die drei neuen Funktionssuiten; der allgemeine Chrome-Lauf enthält sie ebenfalls. GitHub-Endstatus separat nach Veröffentlichung bestätigen.
 
 Kein erneuter Photoshop-/InDesign-Anwendungstest in diesem Lauf; PSD/PDF-Pixel- und Strukturregressionen sowie echte Browserdownloads sind automatisiert geprüft. Kein manueller Screenreader-Test und kein realer Nutzertest mit sechs Personen.
+
+
+## Folgeprioritäten · Nutzerfestlegung vom 13. November 2026
+
+Die [verbindliche Vier-Phasen-Reihenfolge](DESIGNER-ROWS-PLAN.md) ersetzt die frühere Prioritätsangabe in diesem Bericht: zuerst Bildkommentare fertigstellen und anschliessend den FD-Backup-Modus mit Abhängigkeitsanalyse/Bereinigung/Regression entfernen; danach die vier Editorwerkzeuge in Phase 2, erst dann bearbeitbare IDML und SVG in Phase 3, anschliessend Vorlagenfreigabe und Startseiten-/Bildvorschau in Phase 4. Die dokumentierten bisherigen Umsetzungen/Nachweise bleiben bestehen; insbesondere die vereinheitlichte Werkzeugleiste nicht erneut als offene Aufgabe beginnen.

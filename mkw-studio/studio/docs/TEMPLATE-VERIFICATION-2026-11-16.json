@@ -1,0 +1,96 @@
+{
+  "commit": "52f46dbd87f4db899710111120e74cdeed2757d0",
+  "url": "https://noe-plain.github.io/mkw-studio/studio/",
+  "files": [
+    {
+      "file": "index.html",
+      "equal": true,
+      "bytes": 15350,
+      "sha256": "5bd490b36b02c4978349de8e78653ba2058ad3b59494d094e0e3aba9404b4b0f"
+    },
+    {
+      "file": "static/editor.bundle.js",
+      "equal": true,
+      "bytes": 1014594,
+      "sha256": "72c2b68767e6a409fb036297ab5984e458d25faf4b2c408fb054f3c42f19b144"
+    },
+    {
+      "file": "static/editor.bundle.css",
+      "equal": true,
+      "bytes": 307913,
+      "sha256": "a5f7f070c89c8ad709d503771eaa381845bbc53d743c17a008566bd515a5b1b3"
+    },
+    {
+      "file": "static/templates/mkw-nahe-am-orchester.json",
+      "equal": true,
+      "bytes": 7425,
+      "sha256": "6e9b103bab5c4fb083acd3e82d229f406ef34a3734ee5a02f4659e2a42c8424b"
+    },
+    {
+      "file": "static/templates/mkw-konzertauftakt.json",
+      "equal": true,
+      "bytes": 3651,
+      "sha256": "09515d99771283d21c527c354c7904c5ad4dad242ab57197ec9b0c542acdf565"
+    },
+    {
+      "file": "static/templates/mkw-bilder-slider.json",
+      "equal": true,
+      "bytes": 10420,
+      "sha256": "ce84cb91e2a857afd3c7f947a779a76d843aad3644d0a9ab8982baceb95c6940"
+    },
+    {
+      "file": "static/templates/mkw-winkel-slidepost.json",
+      "equal": true,
+      "bytes": 7935,
+      "sha256": "1e279be10487a2fc3d29d6b38b3b75403b641345d89478e0412cc635e438e474"
+    }
+  ],
+  "allByteEqual": true,
+  "localUnitTests": 206,
+  "localUnitTestsPassed": true,
+  "localGallery": "passed",
+  "liveGallery": "passed",
+  "actualSliderPsd": {
+    "width": 3240,
+    "height": 1350,
+    "compositeSampleComparison": "passed"
+  },
+  "templateIds": [
+    "mkw-nahe-am-orchester",
+    "mkw-konzertauftakt",
+    "mkw-bilder-slider"
+  ],
+  "regularCI": {
+    "id": 43832711784,
+    "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711784",
+    "status": "completed",
+    "conclusion": "success",
+    "commit": "52f46dbd87f4db899710111120e74cdeed2757d0"
+  },
+  "pages": {
+    "id": 43832711399,
+    "conclusion": "success"
+  },
+  "checkedAt": "2026-11-16T08:54:13.097868+00:00",
+  "liveMKWEditing": "passed",
+  "jobs": [
+    {
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711784/job/133181639034"
+    },
+    {
+      "name": "browser (firefox)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711784/job/133181639407"
+    },
+    {
+      "name": "studio",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/43832711784/job/133188716955"
+    }
+  ]
+}

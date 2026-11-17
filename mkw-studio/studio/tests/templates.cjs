@@ -300,7 +300,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#settings").click();
     await page.locator("#settings-tab-templates").click();
     await page.waitForFunction(
-      () => document.querySelectorAll(".template-library-row").length === 2,
+      () => document.querySelectorAll(".template-library-row").length === 5,
     );
     await page.screenshot({
       path: artifact("templates-settings.png"),

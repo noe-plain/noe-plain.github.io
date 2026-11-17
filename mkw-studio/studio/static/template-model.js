@@ -4,6 +4,12 @@
     typeof module !== "undefined"
       ? require("./carousel-policy.js")
       : root.MKWCarouselPolicy;
+  const textModel =
+    typeof module !== "undefined" ? require("./text-model.js") : root.MKWText;
+  const textEdit =
+    typeof module !== "undefined"
+      ? require("./text-edit-model.js")
+      : root.MKWTextEdit;
   const copy = (value) => JSON.parse(JSON.stringify(value));
   const kinds = new Set([
     "text",
@@ -291,6 +297,53 @@
       );
     });
   }
+  // Filling plain-text fields preserves typography by paragraph, independent of text length.
+  function filledText(object, value) {
+    const paragraphs = textEdit.paragraphs(object.text),
+      next = value.split("\n");
+    const characters = [],
+      styles = [];
+    let offset = 0;
+    next.forEach((line, index) => {
+      const source = paragraphs[Math.min(index, paragraphs.length - 1)];
+      const original = object.text.slice(source.start, source.end);
+      const fragment = {
+        ...object,
+        text: original,
+        characterStyles: textModel
+          .segments(object, source.start, source.end)
+          .map((run) => ({
+            ...run,
+            start: run.start - source.start,
+            end: run.end - source.start,
+          })),
+      };
+      const inherited = textModel.at(object, source.start);
+      for (const run of textModel.forInput(
+        fragment,
+        line,
+        original ? undefined : inherited,
+      ))
+        characters.push({
+          ...run,
+          start: run.start + offset,
+          end: run.end + offset,
+        });
+      if (index < next.length - 1)
+        characters.push({
+          start: offset + line.length,
+          end: offset + line.length + 1,
+          ...textModel.at(object, Math.max(source.start, source.end - 1)),
+        });
+      styles.push(copy(object.textStyles?.[source.index] || null));
+      offset += line.length + 1;
+    });
+    return {
+      text: value,
+      characterStyles: textModel.merge(characters),
+      textStyles: styles,
+    };
+  }
   function instantiate(
     template,
     { name, code = "", values = {}, uid = () => crypto.randomUUID() } = {},
@@ -311,13 +364,7 @@
       if (o.type === "text") {
         const old = o.text || "",
           next = value.text ?? old;
-        o.text = next;
-        if (next !== old) {
-          o.characterStyles = (o.characterStyles || [])
-            .filter((s) => s.start < next.length)
-            .map((s) => ({ ...s, end: Math.min(s.end, next.length) }));
-          o.textStyles = (o.textStyles || []).slice(0, next.split("\n").length);
-        }
+        if (next !== old) Object.assign(o, filledText(o, next));
       }
       if (imageLayer(o) && value.image) {
         o.imageId = value.image.id;
