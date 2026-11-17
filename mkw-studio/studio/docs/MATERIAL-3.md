@@ -1,5 +1,8 @@
 # Material 3 migration – compatibility inventory
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 The completed stages establish UI-only colour roles, adjustable tool colour, shared control/motion tokens, native switches/sliders, non-blocking plain tooltips, press feedback and an optional compact input density. The milestone sections below record the component rollout and the final cross-component review. Keep the established renderer and document model unchanged during maintenance.
 
 ## Ownership

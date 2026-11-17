@@ -1,5 +1,8 @@
 # Projekt öffnen und speichern: Material-3-Überarbeitung
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 Stand: 27.10.2026 · Ausgangsstand `797059c01a7b4dcaf2d14c717da8cb7d89b6d68d`.
 
 ## Entscheidung aus fünf Perspektiven

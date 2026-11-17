@@ -1,5 +1,8 @@
 # Gemeinsames Textbedienfeld · 6. November 2026
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 ## Ergebnis
 
 „Schrift & Farbe“ und „Absatz & Abstände“ stehen ohne Reiterwechsel in einem Bedienfeld. Die Auswahl „Einzelne Absätze & Zeilen“ bleibt erhalten und bestimmt den normalen Bearbeitungsumfang. Es gibt ein gemeinsames Feld für die Schriftgrösse.

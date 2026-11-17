@@ -1,5 +1,8 @@
 # Rechte Seitenleiste: Kontext und Ebenen trennen
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 ## Entscheidung aus fünf Perspektiven
 
 - **Neue Nutzerin:** Kontext oben, Ebenen unten. Zwei sichtbare Bereiche mit je eigener Scrollfläche; nichts muss erst in einen Tab verschoben werden.

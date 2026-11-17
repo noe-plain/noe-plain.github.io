@@ -1,5 +1,8 @@
 # Freie Zeichenflächen im Designer – Konzept und Abnahme
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 ## Fünf Perspektiven
 
 | Persona | Risiko | Umsetzung und Prüfkriterium |

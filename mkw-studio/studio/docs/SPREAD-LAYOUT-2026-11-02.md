@@ -1,5 +1,8 @@
 # Seiten und Druckbögen – Umsetzung und Prüfung
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 Ausgangspunkt: a4104ba; vor der Veröffentlichung mit b061e18 vom 3. November zusammengeführt. Bestehende FD-Kampagnen, zusammenhängende Designer-Slides und freie Zeichenflächen bleiben unverändert, bis die Seitenverwaltung ausdrücklich verwendet wird.
 
 ## Entscheidungen aus den fünf Perspektiven

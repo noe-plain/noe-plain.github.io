@@ -1,5 +1,8 @@
 # Vorlagen – Überarbeitung und Abnahme
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 ## Bewertung vor der Umsetzung
 
 | Perspektive | Bisheriges Problem / Auswirkung | Entscheidung und Prüfkriterium |

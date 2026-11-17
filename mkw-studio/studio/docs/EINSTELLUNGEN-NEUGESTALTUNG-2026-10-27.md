@@ -1,5 +1,8 @@
 # Einstellungen: neue Struktur und Bedienung
 
+> Historischer Fach-/Prüfbericht, kein aktiver Arbeitsplan. Alle heutigen Prioritäten und Status stehen ausschliesslich im [Masterplan](MASTERPLAN.md). Ältere offene Kästchen und Reihenfolgen unten sind historische Zwischenstände.
+
+
 Stand: 27.10.2026 · Ausgangsstand `b9454ebe44bc30abc4241978aed27b7a0d4aa6b6`.
 
 ## Entscheidung aus fünf Perspektiven
