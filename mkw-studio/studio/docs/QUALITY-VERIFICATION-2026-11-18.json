@@ -5,7 +5,79 @@
   "retirementComplete": false,
   "modelTests": 217,
   "release": {
-    "status": "pending actual CI/live verification",
+    "status": "success",
+    "codeCommit": "caa828e22800508aa5754335bcebaa757d6bcdb3",
+    "ciUrl": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/44332104938",
+    "ciConclusion": "success",
+    "pagesUrl": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/44332103611",
+    "pagesConclusion": "success",
+    "runs": [
+      {
+        "id": 44332104938,
+        "name": "MKW Studio checks",
+        "jobs": [
+          {
+            "id": 134898945888,
+            "name": "browser (firefox)",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134898945888"
+          },
+          {
+            "id": 134898946615,
+            "name": "browser (chromium)",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134898946615"
+          },
+          {
+            "id": 134910942939,
+            "name": "studio",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134910942939"
+          }
+        ]
+      },
+      {
+        "id": 44332103611,
+        "name": "pages build and deployment",
+        "jobs": [
+          {
+            "id": 134898953449,
+            "name": "build",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134898953449"
+          },
+          {
+            "id": 134900055796,
+            "name": "report-build-status",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134900055796"
+          },
+          {
+            "id": 134900056030,
+            "name": "deploy",
+            "status": "completed",
+            "conclusion": "success",
+            "check_run_url": "https://api.github.com/repos/noe-plain/noe-plain.github.io/check-runs/134900056030"
+          }
+        ]
+      }
+    ],
+    "browserCounts": {
+      "firefox": {
+        "passed": 105,
+        "total": 105
+      },
+      "chrome": {
+        "passed": 120,
+        "total": 120
+      }
+    },
+    "modelTests": 217,
     "liveFirstAttempt": {
       "suiteCount": 6,
       "suites": [
@@ -39,7 +111,38 @@
           "sha256": "90793d9d5ef30b50134878bfadd2e7958cb617b5533d578c7c2f0264ced60589"
         }
       ]
-    }
+    },
+    "liveFinal": {
+      "conclusion": "success",
+      "suites": [
+        "footer-messages",
+        "zoom-ui",
+        "optical-alignment"
+      ],
+      "files": [
+        {
+          "path": "index.html",
+          "equal": true,
+          "sha256": "2c21a8c715d6bfe2bca545156a0fddf6805e0618d0a6fb75ad80b8b43f92ff3f"
+        },
+        {
+          "path": "static/editor.bundle.js",
+          "equal": true,
+          "sha256": "af30adab6bfd486cc6e78d0e60bb2c3c1938f05709044d962624c91fcff16bf5"
+        },
+        {
+          "path": "static/editor.bundle.css",
+          "equal": true,
+          "sha256": "0e94dfa205e1aa6e4bff3cf34382497a96d1473f12079cce66bbeba435b91b60"
+        },
+        {
+          "path": "hilfe/index.html",
+          "equal": true,
+          "sha256": "90793d9d5ef30b50134878bfadd2e7958cb617b5533d578c7c2f0264ced60589"
+        }
+      ]
+    },
+    "scope": "Final follow-up changes CSS compact width only, runtime JS unchanged byte-for-byte from first live-verified functional commit. Final documentation update does not change runtime files."
   },
   "performance": [
     {
@@ -1003,5 +1106,15 @@
     "conclusion": "failure",
     "failure": "zoom-ui: 390px footer zoom right edge differed by 8px between modes",
     "correction": "Notice button uses the existing 36px compact footer size below 761px, remains 44px otherwise; exact size and unchanged original zoom assertions checked."
+  },
+  "quotaAtClosure": {
+    "fiveHourUsedPercent": 78,
+    "weekUsedPercent": 25,
+    "fiveHourRemainingPercent": 22,
+    "weekRemainingPercent": 75,
+    "extraCreditsUsed": false,
+    "resetCreditsUsed": false,
+    "agentsUsed": false,
+    "continuationInSecondWindow": false
   }
 }

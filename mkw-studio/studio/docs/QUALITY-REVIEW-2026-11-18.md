@@ -39,7 +39,11 @@ Persona-Prüfung durch Expertensicht, keine Nutzerstudie. Kein manueller Screenr
 
 Der erste vollständige CI-Lauf 44327649296 fand einen 8-Pixel-Unterschied der Zoomposition bei 390-Pixel-Fenstern in beiden Browsern. Die neue Meldungsschaltfläche verwendet nun die vorhandene kompakte Footerbreite von 36 px unter 761 px, sonst 44 px. Die ursprüngliche Gleichheitsprüfung der Zoomgeometrie bleibt unverändert; die neue Footerprüfung prüft beide Breiten exakt. Keine Funktionsassertions entfernt. Sechs gezielte erste Live-Fälle bestanden bereits; dies allein ersetzt den korrigierten vollständigen Endlauf nicht.
 
-Lokale Prüfung abgeschlossen. Commit, vollständiger CI-Endlauf und tatsächliche Live-Abnahme werden nach Veröffentlichung hier und im maschinellen Nachweis ergänzt. Ein gestarteter Job zählt nicht als bestanden.
+**Abgeschlossen und veröffentlicht:** Funktionsstand `7629d8e`, kompakte Footer-Korrektur **`caa828e22800508aa5754335bcebaa757d6bcdb3`**. [Vollständiger Endlauf 44332104938](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44332104938) erfolgreich: **217 Modell-/Pakettests, 120/120 Chrome- und 105/105 Firefox-Suiten**, beide Browser und Studio-Gate grün. [GitHub Pages 44332103611](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44332103611) vollständig erfolgreich. Der fehlerhafte erste Lauf ist damit durch diesen nachweislich erfolgreichen Endlauf ersetzt.
+
+Sechs echte Chrome-Live-Fälle am Funktionsstand bestanden (`footer-messages`, `optical-alignment`, `export-colour`, `legacy-photo-transform`, `row-performance`, `row-export`); nach der alleinigen CSS-Korrektur nochmals **3/3** an der endgültigen Live-Fassung (`footer-messages`, `zoom-ui`, `optical-alignment`). HTML, JS, CSS und Hilfe sind bytegleich zum geprüften Endstand; Laufzeit-JS blieb durch die CSS-Korrektur unverändert. Danach ausschliesslich Nachweise/Masterplan ergänzt, keine Laufzeitdatei verändert.
+
+Abschlusskontrolle des Guthabens: kurzes Fenster **78 % verbraucht / 22 % frei**, Woche **25 % verbraucht / 75 % frei**. Kein weiterer Funktionsstart, keine Zusatzcredits/Resets/Agenten oder Fortsetzung im zweiten Fenster. Die verbleibenden B02-/UI02-/UI03-Aufgaben sind geplant statt als erledigt ausgegeben.
 
 ## Farbtechnische Grundlagen
 

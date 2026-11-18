@@ -124,6 +124,16 @@
       "legacy large-format path",
       "representative conversion acceptance",
       "remove exclusive backup UI/logic and proven unused files"
-    ]
+    ],
+    "release": {
+      "codeCommit": "caa828e22800508aa5754335bcebaa757d6bcdb3",
+      "ciRun": 44332104938,
+      "conclusion": "success",
+      "modelTests": 217,
+      "chromeSuites": 120,
+      "firefoxSuites": 105,
+      "liveTransformTest": "success",
+      "retirementComplete": false
+    }
   }
 }
