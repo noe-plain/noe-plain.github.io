@@ -1,0 +1,80 @@
+{
+  "verifiedAt": "2026-11-18T12:06:58.754300+00:00",
+  "runtimeCommit": "f30ee47",
+  "checkedCommit": "d16b070a47dcb5a6f1eb00fe9930903b06de19a7",
+  "ci": {
+    "url": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/44298061744",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "browser (firefox)",
+        "conclusion": "success"
+      },
+      {
+        "name": "browser (chromium)",
+        "conclusion": "success"
+      },
+      {
+        "name": "studio",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "tests": {
+    "model": 214,
+    "chromeSuites": 114,
+    "firefoxSuites": 99,
+    "liveChrome": [
+      "review-comments",
+      "review-comments-fd",
+      "angle-fill",
+      "continuous-row"
+    ]
+  },
+  "liveFiles": [
+    {
+      "path": "index.html",
+      "equal": true,
+      "sha256": "01939fcc08b8ec7b9cb63d8c8d946cd647cac40b4a2f34f495145d7a60d14c9b"
+    },
+    {
+      "path": "static/editor.bundle.js",
+      "equal": true,
+      "sha256": "b627393818e17beffc05a1a45f168bfc16426fe2f50c663a1a7993654180280d"
+    },
+    {
+      "path": "static/editor.bundle.css",
+      "equal": true,
+      "sha256": "cb9f48181cb310c358a6bb6204fff109cd3bcc1e6aefc17f13e1097563b72458"
+    },
+    {
+      "path": "hilfe/index.html",
+      "equal": true,
+      "sha256": "fbb6551cc0e654734958df0851dd5bcd0f01b2827ebb6f4d2f91ac623629b9f1"
+    }
+  ],
+  "archive": {
+    "name": "comments-project.zip",
+    "sha256": "5578c39e5ceb3bb339584c866b0adf150dba2ed1de7a3d9eb2abb5e4ea259b43",
+    "entries": [
+      "Bildkommentare_4x5_1_R01_S01.png",
+      "Bildkommentare_4x5_2_R01_S02.png",
+      "Bildkommentare_4x5_3_R01_S03.png",
+      "Projekt/Bildkommentare.mkw"
+    ],
+    "mkwValidatedBy": "review-comments.cjs: existing project reader + validate"
+  },
+  "limits": [
+    "Historical explicit page clips/fragments preserved, no automatic unclip/migration.",
+    "Continuous-row raster comparison max 20/255, mean 0.00294/255; row movement native slide PNGs byte-identical.",
+    "PSD appearance and fill/mask serialization checked; no manual Photoshop full-effect editing claimed.",
+    "Local preinstalled Firefox lacked libmozglue; actual Firefox acceptance completed in clean GitHub runner.",
+    "No FD-Backup removal, IDML content or other independent follow-up feature in this run."
+  ],
+  "usageAtClose": {
+    "fiveHourUsedPercent": 68,
+    "weeklyUsedPercent": 10,
+    "resetCreditsUsed": false,
+    "additionalAgents": false
+  }
+}

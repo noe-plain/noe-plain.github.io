@@ -311,7 +311,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     });
     assert.deepEqual(errors, []);
     console.log(
-      "PASS create/move/resize snapping for image, text and gradients; feedback guides; stop transparency and export alpha; opacity beside blend; topmost logo; 150 px default; free angle placement and optional tip guides; prominent image action; bottom-right zoom and Alt scroll; legacy restore",
+      "PASS create/move/resize snapping for image, text and gradients; feedback guides; stop transparency and export alpha; opacity beside blend; topmost logo; 200 px default; free angle placement and optional tip guides; prominent image action; bottom-right zoom and Alt scroll; legacy restore",
     );
   } finally {
     await browser.close();
