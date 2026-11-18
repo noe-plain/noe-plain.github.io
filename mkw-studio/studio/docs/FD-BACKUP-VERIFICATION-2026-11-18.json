@@ -69,5 +69,48 @@
       "next": "Define explicit safe unsupported-file route; no automatic resizing or loss of source."
     }
   ],
-  "scope": "Dependency audit plus one bounded conversion fix. Existing backup entry, editor and reader remain. No size-reduction claim."
+  "scope": "Dependency audit plus one bounded conversion fix. Existing backup entry, editor and reader remain. No size-reduction claim.",
+  "release": {
+    "commit": "8cbe9413ce4968d59f8e08f77c9418aee9f7283b",
+    "ciUrl": "https://github.com/noe-plain/noe-plain.github.io/actions/runs/44302332505",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "browser (chromium)",
+        "conclusion": "success"
+      },
+      {
+        "name": "browser (firefox)",
+        "conclusion": "success"
+      },
+      {
+        "name": "studio",
+        "conclusion": "success"
+      }
+    ],
+    "modelTests": 214,
+    "chromeSuites": 115,
+    "firefoxSuites": 100,
+    "liveChromeSuites": [
+      "backup-migration",
+      "campaign-preview"
+    ],
+    "liveFiles": [
+      {
+        "path": "index.html",
+        "equal": true,
+        "sha256": "0af348fb3c952ea50af62a615274c9335f27514b1d58fdf6ef02834df3fc9cc7"
+      },
+      {
+        "path": "static/editor.bundle.js",
+        "equal": true,
+        "sha256": "a85380f6cb8c37dc4ad85d5926c84db20d04edd8e2bad5fff641452fe059800c"
+      },
+      {
+        "path": "static/editor.bundle.css",
+        "equal": true,
+        "sha256": "cb9f48181cb310c358a6bb6204fff109cd3bcc1e6aefc17f13e1097563b72458"
+      }
+    ]
+  }
 }
