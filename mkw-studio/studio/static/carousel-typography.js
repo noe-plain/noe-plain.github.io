@@ -32,7 +32,8 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
     )
       return [{ ...style, family: false }];
     let at = style.start;
-    const offset = MKWFamily.count((o.text || raw).slice(0, at));
+    const offset =
+      (o.familyOffset || 0) + MKWFamily.count((o.text || raw).slice(0, at));
     return MKWFamily.runs(
       (o.text || raw).slice(style.start, style.end),
       offset,
@@ -56,6 +57,7 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
       base = style.size ?? size;
     run.font = style.font || o.font;
     run.color = style.color || o.color;
+    run.familyStrokeOnTop = !!o.familyStrokeOnTop;
     run.script = style.script || o.script || "normal";
     run.uppercase = style.uppercase ?? o.uppercase;
     run.text = run.uppercase ? run.raw.toLocaleUpperCase("de-CH") : run.raw;
@@ -130,13 +132,15 @@ function carouselPaintTextRun(ctx, run, x, y, color, family = false) {
   ctx.font = `${run.size}px ${fontFamily(run.font)}`;
   if ("letterSpacing" in ctx) ctx.letterSpacing = run.letterSpacing + "px";
   if (color || run.color) ctx.fillStyle = color || run.color;
-  if (family || run.family) {
+  const outlined = family || run.family;
+  if (outlined) {
     ctx.lineWidth = 2;
     ctx.strokeStyle = MKWFamily.outline;
     ctx.lineJoin = "round";
-    ctx.strokeText(run.text, x, y);
+    if (!run.familyStrokeOnTop) ctx.strokeText(run.text, x, y);
   }
   ctx.fillText(run.text, x, y);
+  if (outlined && run.familyStrokeOnTop) ctx.strokeText(run.text, x, y);
   if (run.underline)
     ctx.fillRect(
       x,

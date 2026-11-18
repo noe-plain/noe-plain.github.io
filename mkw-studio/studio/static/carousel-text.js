@@ -62,12 +62,16 @@ const carouselMeasureContext = makeCanvas(1, 1).getContext("2d"),
   carouselTextLayouts = new WeakMap();
 function carouselTextLayout(o, ctx = carouselMeasureContext) {
   if (MKWTextHyphen.requires(o)) MKWTextHyphen.ensure().catch(() => {});
+  const kerning = ctx.fontKerning;
+  if (o.familyStrokeOnTop) ctx.fontKerning = "none";
   const key = JSON.stringify([
       o.text,
       o.font,
       o.color,
       o.family,
       o.campaignFamily,
+      o.familyOffset,
+      o.familyStrokeOnTop,
       fontStatus,
       o.size,
       o.w,
@@ -91,7 +95,10 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       ctx.wordSpacing,
     ]),
     cached = carouselTextLayouts.get(o);
-  if (cached?.key === key && cached.fonts === fontStatus) return cached.layout;
+  if (cached?.key === key && cached.fonts === fontStatus) {
+    ctx.fontKerning = kerning;
+    return cached.layout;
+  }
   const lines = [];
   let y = 0,
     offset = 0;
@@ -192,6 +199,7 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       (o.textStyles?.[o.text.split("\n").length - 1]?.spaceAfter || 0),
   };
   carouselTextLayouts.set(o, { key, fonts: fontStatus, layout });
+  ctx.fontKerning = kerning;
   return layout;
 }
 
@@ -616,6 +624,8 @@ function carouselWrapText(text, width, measure) {
 
 function carouselFormatEditable(el, o) {
   if (p.campaign) o = MKWCampaignUI.decorate(o);
+  el.style.fontKerning = o.familyStrokeOnTop ? "none" : "";
+  el.style.paintOrder = o.familyStrokeOnTop ? "fill stroke" : "";
   el.style.webkitTextStroke = o.campaignFamily
     ? `${2 * carouselZoom}px ${MKWFamily.outline}`
     : "";

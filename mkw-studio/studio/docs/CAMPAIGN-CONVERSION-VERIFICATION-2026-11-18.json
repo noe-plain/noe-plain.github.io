@@ -7,7 +7,10 @@
   "localBrowserSuites": [
     "campaign-conversion-guard",
     "campaign-migration",
-    "backup-migration"
+    "backup-migration",
+    "campaign-family-migration",
+    "family-text-colour",
+    "psd-editability"
   ],
   "guard": {
     "result": {
@@ -49,5 +52,75 @@
   },
   "release": {
     "status": "pending actual CI/live verification"
+  },
+  "familyMigration": {
+    "before": [
+      {
+        "offset": 0,
+        "max": 199,
+        "mean": 0.4594211111111111
+      },
+      {
+        "offset": 3,
+        "max": 199,
+        "mean": 1.1096088888888889
+      }
+    ],
+    "after": {
+      "results": [
+        {
+          "offset": 0,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 1,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 2,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 3,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 4,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 5,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 6,
+          "max": 0,
+          "mean": 0
+        },
+        {
+          "offset": 7,
+          "max": 0,
+          "mean": 0
+        }
+      ],
+      "files": {
+        "pngExact": true,
+        "psdMax": 0,
+        "pdfMax": 0,
+        "offset": 7,
+        "cacheUpdated": true,
+        "titleReference": true,
+        "editableText": 1,
+        "references": 1
+      }
+    },
+    "newPersistedFields": false,
+    "nativePhotoshopAcceptance": false
   }
 }

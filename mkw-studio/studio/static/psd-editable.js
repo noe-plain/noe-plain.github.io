@@ -225,6 +225,7 @@ const MKWPSD = (() => {
   }
   function needsTextReference(o, layout) {
     return (
+      o.familyStrokeOnTop ||
       carouselHasEffects(o) ||
       layout.lines.some((line) => line.justification || line.opticalAlign) ||
       o.textStyles?.some(

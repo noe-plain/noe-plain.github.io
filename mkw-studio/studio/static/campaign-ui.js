@@ -70,12 +70,17 @@ const MKWCampaignUI = (() => {
     if (!project.campaign || o.type !== "text") return o;
     const row = rowFor(o.pageId, project);
     if (!row?.family) return o;
-    const signature = JSON.stringify(o),
+    const legacyFamily =
+        o.campaignRole === "titles"
+          ? project.boards.find((b) => b.campaignPage === o.pageId)?.family
+          : null,
+      signature = JSON.stringify([o, legacyFamily?.offset]),
       cached = decorated.get(o);
     if (cached?.signature === signature) return cached.value;
     const next = { ...o, characterStyles: [] };
     if (o.campaignRole === "copyright") {
       next.color = MKWFamily.copyrightColor(o.color);
+      next.familyStrokeOnTop = true;
       next.characterStyles = (o.characterStyles || []).map((s) => ({
         ...s,
         color: next.color,
@@ -85,6 +90,10 @@ const MKWCampaignUI = (() => {
     }
     next.characterStyles = o.characterStyles || [];
     next.family = o.family ?? true;
+    if (legacyFamily) {
+      next.familyOffset = legacyFamily.offset || 0;
+      next.familyStrokeOnTop = true;
+    }
     decorated.set(o, { signature, value: next });
     return next;
   }

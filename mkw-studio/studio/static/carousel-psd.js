@@ -217,16 +217,19 @@ async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
       continue;
     }
     if (o.type === "text") {
-      const layout = carouselTextLayout(o),
-        layer = await carouselPSDLayer(o, project);
+      const effective = project.campaign
+          ? MKWCampaignUI.decorate(o, project)
+          : o,
+        layout = carouselTextLayout(effective),
+        layer = await carouselPSDLayer(effective, project);
       if (!layer) continue;
       const editable = {
         ...layer,
         ...MKWPSD.blend(o),
         opacity: (o.opacity ?? 1) * (o.textAlpha ?? 1),
-        text: MKWPSD.text(o, layout),
+        text: MKWPSD.text(effective, layout),
       };
-      if (MKWPSD.needsTextReference(o, layout))
+      if (MKWPSD.needsTextReference(effective, layout))
         append(o, MKWPSD.reference(o.name, layer, editable));
       else append(o, editable);
     } else if (o.type === "angle" && MKWAnglePolicy.solid(o)) {

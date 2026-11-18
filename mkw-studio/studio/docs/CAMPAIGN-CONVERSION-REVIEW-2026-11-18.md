@@ -14,16 +14,26 @@ Echten Bestätigungsdialog nach tatsächlichem `startDocument`-Projektwechsel un
 
 **Lokal bestanden:** Formatierung, Build, Formatprüfung, **217 Modell-/Pakettests**, `campaign-conversion-guard`, `campaign-migration`, `backup-migration`. Neuer Fall in Chrome-Standardlauf und Firefox-CI registriert. [Maschinenwerte](CAMPAIGN-CONVERSION-VERIFICATION-2026-11-18.json).
 
+## Anschliessender Familienlayout-Fall
+
+Ein weiterer eigener Pixelvergleich belegte einen echten Altdatei-Unterschied: Familien-Titel zeichneten die Kontur bisher über der Füllung, die neue Darstellung darunter; ein alter Palettenversatz wurde nicht berücksichtigt. Bei einem eigenen 600×750-Projekt betrug die maximale Abweichung zunächst 199/255 (Versatz 0 und 3). Nach Korrektur der Kontur/Farbfolge blieb eine Copyright-Abweichung durch abweichendes Kerning; auch diese ist korrigiert.
+
+Der vorhandene Kampagnen-Decorator liest bei migrierten Titeln den schon gespeicherten Palettenversatz aus dem ursprünglichen Board. Er liefert ausschliesslich temporäre Renderwerte; keine neuen Dokumentfelder, kein zweites Textmodell. Der vorhandene Glyphen-Paintpfad unterstützt dabei die bisherige Konturreihenfolge und das bisherige Kerning. Cache-Schlüssel berücksichtigen diese Werte. Direktbearbeitung verwendet entsprechende CSS-Werte. Designer-/neue Kampagnentexte behalten ihren bisherigen Standard.
+
+`campaign-family-migration` prüft **alle acht** bisherigen Palettenversätze mit tatsächlichen Referenzpixeln, Copyright, Cache-Aktualisierung, unverändertem Rohmodell sowie MKW-Speichern/Lesen/Wiederöffnen. Im lokalen Chrome-Lauf sind alle acht Vergleiche **exakt**; echte PNG-/PDF-/PSD-Ausgaben ebenfalls exakt. PSD erhält für den Titel eine genaue Rasterdarstellung mit separat editierbarer Textreferenz, da die historische Konturreihenfolge nicht als nativ abgenommen ist. Angeschnittenes Copyright kann wie bisher gerastert bleiben. Keine vollständige native Photoshop-/App-Abnahme behauptet.
+
+Zusätzlich lokal bestanden: `family-text-colour` in Designer/Backup/neuer Kampagne, bestehende `campaign-migration`, `psd-editability`, 217 Modelltests und Formatprüfung. Die anfängliche Testannahme zweier nativer PSD-Texte wurde durch die konkrete erforderliche Titelreferenz ersetzt; die Pixelvergleiche bleiben unverändert streng. Neuer Fall in beiden vollständigen Browserläufen registriert.
+
 ## Sechs-Persona-Prüfung
 
 | Persona | Feedback / Problem | Status |
 | --- | --- | --- |
 | Neue Nutzerin | Nicht mögliche Umwandlung verständlich erklären | Betroffene Ausgabe, Masse, Grenze und sicherer Weiterweg gelöst |
-| Erfahrener Designer | Altformate/Ausschnitte nicht heimlich verkleinern | Original/MKW erhalten; neue Übernahme grosser Altformate offen |
+| Erfahrener Designer | Altformate/Ausschnitte und Familien-Typografie erhalten | Original/MKW erhalten; acht Familienfarbfolgen/Konturen korrigiert; grosse Altformate offen |
 | Senior UX-Experte | Bestätigung gehört zum unveränderten Zielprojekt | Projekt-/Revisionswechsel verwirft die Aktion |
 | UI-Expertin | Kohärente M3-Rückfrage und Footer-Zustände | Bestehende Komponenten verwendet; Warnung/Fehler unterschieden |
 | QA-Entwicklerin | Gemeinsame Validierung und Datei-/Verlaufsabnahme | Geprüfter Umfang gelöst; Gesamtausstieg offen |
-| Destruktiver Fehlersucher | Leere Gruppen, ungenutzte Quellen, 201 Ausgaben, Kontextwechsel | Eigene Fälle bestanden; nicht unterstützte Altformate bewusst blockiert |
+| Destruktiver Fehlersucher | Leere Gruppen, ungenutzte Quellen, 201 Ausgaben, Kontextwechsel und Palettenversatz | Eigene Fälle bestanden, inkl. acht Versätzen; nicht unterstützte Altformate bewusst blockiert |
 
 Expertenprüfung, keine Nutzerstudie. **FD-Backup noch vorhanden.** Für Altformate ausserhalb 240–4000 px nun klarer verlustfreier Abweisungs-/Weiterbearbeitungsweg im bisherigen Editor, noch keine neue verlustfreie Übernahme. Vor vollständiger Entfernung weiterhin Ersatzweg und repräsentative Konvertierungsabnahme nötig. PSD/MKW, gemeinsame Dienste und alte Dateien bleiben; keine Grössenreduktion behauptet. Keine neue unabhängige Funktion in diesem Lauf beginnen.
 

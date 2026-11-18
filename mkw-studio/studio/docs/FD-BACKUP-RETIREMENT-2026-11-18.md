@@ -57,3 +57,5 @@ Nachtrag abgeschlossen: Code `caa828e`, vollständiger GitHub-Endlauf 4433210493
 ## Weitere Fortsetzung · Konvertierungsgrenze
 
 [Konvertierungsprüfung](CAMPAIGN-CONVERSION-REVIEW-2026-11-18.md): Format-/Safezone-Prüfung vor Kopie-Aufbau, konkreter sicherer Weiterweg, Projekt-/Revisionsbindung der Bestätigung und No-op für leere Bildgruppen. Original/MKW auch für 6000×4000 bzw. 240×239 erhalten. B02 weiterhin offen: Der alte Editor bleibt für nicht unterstützte Altformate erforderlich; ein klarer Hinweis allein ist kein Ersatz und keine Modusentfernung.
+
+Weitere repräsentative Prüfung: Familien-Palettenversatz und bisherige Konturreihenfolge/Kerning waren nicht layouttreu (eigene Referenz max. 199/255). Über den bestehenden temporären Decorator korrigiert, alle acht Versätze lokal pixelgleich, echter MKW-/PNG-/PDF-/PSD-Rundlauf geprüft. Kein neues Dateimodell, kein nativer PSD-Kontur-Nachweis. Aktueller Nachweis im Konvertierungsbericht; B02 bleibt unvollständig.

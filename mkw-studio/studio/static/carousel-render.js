@@ -116,6 +116,7 @@ async function carouselPaint(
     ctx.translate(o.x, o.y);
     if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
     if (o.type === "text") {
+      if (o.familyStrokeOnTop) ctx.fontKerning = "none";
       ctx.fillStyle = studioPaintRGBA(o.color, o.textAlpha ?? 1);
       ctx.textBaseline = "top";
       ctx.textAlign = "left";
