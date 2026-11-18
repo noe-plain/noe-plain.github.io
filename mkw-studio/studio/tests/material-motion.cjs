@@ -70,7 +70,7 @@ const { launch, artifact } = require("./browser.cjs");
                 !document.querySelector(a).hidden &&
                 document.querySelector(".footer-view-controls")
                   .firstElementChild === document.querySelector(a) &&
-                x.width >= 40 &&
+                x.width === (matchMedia("(max-width: 760px)").matches ? 36 : 44) &&
                 x.height >= 32 &&
                 y.width > 0 &&
                 y.height > 0

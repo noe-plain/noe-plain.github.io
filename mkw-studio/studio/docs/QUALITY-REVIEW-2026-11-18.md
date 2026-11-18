@@ -37,6 +37,8 @@ Persona-Prüfung durch Expertensicht, keine Nutzerstudie. Kein manueller Screenr
 
 ## Veröffentlichung
 
+Der erste vollständige CI-Lauf 44327649296 fand einen 8-Pixel-Unterschied der Zoomposition bei 390-Pixel-Fenstern in beiden Browsern. Die neue Meldungsschaltfläche verwendet nun die vorhandene kompakte Footerbreite von 36 px unter 761 px, sonst 44 px. Die ursprüngliche Gleichheitsprüfung der Zoomgeometrie bleibt unverändert; die neue Footerprüfung prüft beide Breiten exakt. Keine Funktionsassertions entfernt. Sechs gezielte erste Live-Fälle bestanden bereits; dies allein ersetzt den korrigierten vollständigen Endlauf nicht.
+
 Lokale Prüfung abgeschlossen. Commit, vollständiger CI-Endlauf und tatsächliche Live-Abnahme werden nach Veröffentlichung hier und im maschinellen Nachweis ergänzt. Ein gestarteter Job zählt nicht als bestanden.
 
 ## Farbtechnische Grundlagen

@@ -996,6 +996,12 @@ footer #carouselCoordinates {
   color: var(--md-sys-color-on-surface-variant);
   background: var(--md-sys-color-surface-container-low);
 }
+@media (max-width: 760px) {
+  .footer-view-controls .studio-notice-button {
+    width: 36px;
+    min-width: 36px;
+  }
+}
 .footer-view-controls .studio-notice-button[data-level="info"] {
   color: var(--md-sys-color-on-primary-container);
   background: var(--md-sys-color-primary-container);

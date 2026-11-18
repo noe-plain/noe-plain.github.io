@@ -5,7 +5,41 @@
   "retirementComplete": false,
   "modelTests": 217,
   "release": {
-    "status": "pending actual CI/live verification"
+    "status": "pending actual CI/live verification",
+    "liveFirstAttempt": {
+      "suiteCount": 6,
+      "suites": [
+        "footer-messages",
+        "optical-alignment",
+        "export-colour",
+        "legacy-photo-transform",
+        "row-performance",
+        "row-export"
+      ],
+      "conclusion": "success",
+      "files": [
+        {
+          "path": "index.html",
+          "equal": true,
+          "sha256": "f0ab81d2b5868288d5ae2f4704ec806d8dcfd1978203274444c7e1b04a558bbf"
+        },
+        {
+          "path": "static/editor.bundle.js",
+          "equal": true,
+          "sha256": "af30adab6bfd486cc6e78d0e60bb2c3c1938f05709044d962624c91fcff16bf5"
+        },
+        {
+          "path": "static/editor.bundle.css",
+          "equal": true,
+          "sha256": "9b8bf75479800bb7a364280745ae55702b61e76f43b2925aa3e9e09ddea79af2"
+        },
+        {
+          "path": "hilfe/index.html",
+          "equal": true,
+          "sha256": "90793d9d5ef30b50134878bfadd2e7958cb617b5533d578c7c2f0264ced60589"
+        }
+      ]
+    }
   },
   "performance": [
     {
@@ -962,5 +996,12 @@
         }
       ]
     }
-  ]
+  ],
+  "firstCIAttempt": {
+    "commit": "7629d8efac9411c3d1c64d6296923787f0695e5d",
+    "runId": 44327649296,
+    "conclusion": "failure",
+    "failure": "zoom-ui: 390px footer zoom right edge differed by 8px between modes",
+    "correction": "Notice button uses the existing 36px compact footer size below 761px, remains 44px otherwise; exact size and unchanged original zoom assertions checked."
+  }
 }
