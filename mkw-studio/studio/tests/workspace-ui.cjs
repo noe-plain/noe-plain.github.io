@@ -64,9 +64,11 @@ const assert = require("node:assert/strict");
       await page.locator("#footerGuides").getAttribute("aria-pressed"),
       "true",
     );
-    await require("./browser.cjs").canvasTextRange(page,17,17);
+    await require("./browser.cjs").canvasTextRange(page, 17, 17);
     await page.keyboard.press("Shift+W");
-    assert(await page.evaluate(()=>board().elements.title.text.endsWith("W")));
+    assert(
+      await page.evaluate(() => board().elements.title.text.endsWith("W")),
+    );
     assert.equal(
       await page.locator("#footerGuides").getAttribute("aria-pressed"),
       "true",
@@ -133,9 +135,15 @@ const assert = require("node:assert/strict");
       assert.equal(boxes.header.right, boxes.workspace.right);
       assert.equal(boxes.footer.right, boxes.width - 12);
       if (sidebar === "#carouselSidebar") {
-        const panes = await page.locator("#designerContextPane,.carousel-layers-panel").evaluateAll(nodes => nodes.map(n=>parseFloat(getComputedStyle(n).borderTopLeftRadius)));
-        assert.deepEqual(panes,[28,28]);
-        assert.equal(boxes.sidebar.radius,0);
+        const panes = await page
+          .locator("#designerContextPane,.carousel-layers-panel")
+          .evaluateAll((nodes) =>
+            nodes.map((n) =>
+              parseFloat(getComputedStyle(n).borderTopLeftRadius),
+            ),
+          );
+        assert.deepEqual(panes, [28, 28]);
+        assert.equal(boxes.sidebar.radius, 0);
         delete boxes.sidebar;
       }
       for (const box of Object.values(boxes).filter(
@@ -194,14 +202,18 @@ const assert = require("node:assert/strict");
     });
     const placement = await page.evaluate(() => {
       const n = $("#postNotice").getBoundingClientRect(),
-        e = $("#export").getBoundingClientRect();
+        e = $("#footerGuides").getBoundingClientRect();
       return {
         left: n.right <= e.left,
+        first:
+          $(".footer-view-controls").firstElementChild === $("#postNotice"),
         sameY: Math.abs(n.y - e.y) < 2,
         visible: !$("#postNotice").hidden,
       };
     });
-    assert(placement.left && placement.sameY && placement.visible);
+    assert(
+      placement.left && placement.first && placement.sameY && placement.visible,
+    );
     await page.locator("#postNotice").click();
     assert(await page.locator("#studioWarnings").isVisible());
     await page.locator("[data-warning-index]").first().click();

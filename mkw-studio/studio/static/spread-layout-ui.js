@@ -132,7 +132,7 @@ const MKWSpreadUI = (() => {
     } catch (error) {
       const node = document.querySelector("#spreadError");
       if (node) node.textContent = error.message;
-      status(error.message);
+      status(error, "error");
       announce(error.message);
       return false;
     }
@@ -1299,7 +1299,7 @@ const MKWSpreadUI = (() => {
           (o) => !preview.objects.some((v) => v.id === o.id),
         );
       } catch (e) {
-        status(e.message);
+        status(e, "error");
         return false;
       }
       if (

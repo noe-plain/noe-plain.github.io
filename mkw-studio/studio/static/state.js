@@ -55,7 +55,12 @@ let p = fresh(),
 const board = () => p.boards.find((b) => b.id === selected),
   asset = (b) => p.images.find((i) => i.id === b.imageId);
 const clone = (x) => JSON.parse(JSON.stringify(x));
-const status = (s) => ($("#status").textContent = s);
+const status = (value, level = "info") => {
+  const message =
+    typeof value?.message === "string" ? value.message : String(value ?? "");
+  $("#status").textContent = message;
+  window.MKWFooterFeedback?.report(message, level, "operation");
+};
 function snapshot() {
   return {
     ...p,

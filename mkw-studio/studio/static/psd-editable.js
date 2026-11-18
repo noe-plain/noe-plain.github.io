@@ -111,20 +111,12 @@ const MKWPSD = (() => {
     );
   }
   function designerTransform(o, source) {
-    const fit = Math.max(o.w / source.width, o.h / source.height) * o.scale;
-    return [
-      [-1, -1],
-      [1, -1],
-      [1, 1],
-      [-1, 1],
-    ].flatMap(([x, y]) => {
-      const q = carouselToWorld(o, {
-        x: o.w / 2 + o.panX + (x * source.width * fit * o.flipX) / 2,
-        y: o.h / 2 + o.panY + (y * source.height * fit * o.flipY) / 2,
-      });
+    return MKWPhotoTransform.corners(o, source).flatMap((point) => {
+      const q = carouselToWorld(o, point);
       return [q.x, q.y];
     });
   }
+
   function font(role) {
     const f = p.fonts.find((f) => f.role === role);
     return {
@@ -234,7 +226,7 @@ const MKWPSD = (() => {
   function needsTextReference(o, layout) {
     return (
       carouselHasEffects(o) ||
-      layout.lines.some((line) => line.justification) ||
+      layout.lines.some((line) => line.justification || line.opticalAlign) ||
       o.textStyles?.some(
         (s) => s?.leading && Object.keys(s.leading).some((k) => Number(k) > 0),
       )

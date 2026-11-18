@@ -10,9 +10,9 @@
     />
     <link
       rel="stylesheet"
-      href="../static/ui-theme-tokens.css?v=f9a82e794bf4"
+      href="../static/ui-theme-tokens.css?v=b86a421a3a48"
     />
-    <link rel="stylesheet" href="../static/ui-theme.css?v=f9a82e794bf4" />
+    <link rel="stylesheet" href="../static/ui-theme.css?v=b86a421a3a48" />
     <link rel="stylesheet" href="hilfe.css?v=1207b3f797a4" />
     <script src="hilfe.js?v=097f3e57514e" defer></script>
   </head>
@@ -209,6 +209,7 @@
           <h3>Alte Kampagne weiterverwenden</h3><p>Der bisherige Ablauf ist auf der Startseite über den Link <strong>FD-Kampagnen (Backup)</strong> links neben <strong>Hilfe &amp; How-to</strong> erreichbar. Alte MKW-Dateien öffnen sich dort wie bisher. Im Fenster <strong>Projekt öffnen</strong> findest du bei alten Kampagnen unter dem Papierkorb den Button <strong>In FD-Kampagnen umwandeln</strong>. Alternativ gibt es dieselbe Aktion im Speicherdialog. Nach deiner Bestätigung erstellt das Studio eine neue Projektkopie. Über-, Konzert- und Untertitel werden in einem gemeinsamen Textfeld mit bisherigen Grössen und Formatierungen zusammengeführt; der bisherige Textverlauf wird übernommen. Das Copyright bleibt eine eigene bewegliche Ebene. Die Originaldatei bleibt erhalten. Vergleiche das Ergebnis vor dem Export.</p>
           <h3>Familienkonzert-Farben für einzelne Texte</h3><p>Markiere die gewünschten Zeichen oder wähle Absätze/Zeilen. Öffne unter <strong>Textfarbe</strong> den Farbwähler und wähle <strong>Familienkonzert</strong>. Nur diese Auswahl erhält bunte Buchstaben mit 2-px-Kontur. Ein zweiter Klick auf <strong>Familienkonzert</strong> schaltet die Farbfolge wieder aus und zeigt die bisherige Textfarbe. Der Button zeigt aktiv, inaktiv oder teilweise aktiv an. Du kannst auch eine normale Textfarbe wählen. Der Quelltext bleibt erhalten. Die Funktion steht in Designer, FD-Kampagnen und bisherigem FD-Modus bereit; Copyright ist ausgenommen.</p>
           <p>Die Werkzeuge zeigen nur Icons; ihre Namen erscheinen als Hinweis beim Darüberfahren oder Fokussieren. Die überlappenden Farbfelder in der Werkzeugleiste bearbeiten Fläche und Kontur des gewählten Elements. Die vordere Fläche ist aktiv. Am fokussierten Farbfeld wählt Pfeil links die Fläche, Pfeil rechts die Kontur; Eingabe öffnet den Farbwähler. Je nach Element kann eine Kontur nicht verfügbar sein.</p>
+          <p><strong>Meldungen im Footer:</strong> Ganz links in der rechten Footer-Gruppe bleibt der Meldungsbutton immer sichtbar. Neutral bedeutet keine aktuellen Warnungen oder Fehler, Blau eine Projektinformation, Gelb einen Hinweis und Rot einen Fehler. Ein Klick öffnet Details und die bisherigen Sprünge zum betroffenen Element. Auch Speicherfehler erscheinen dort; Hinweise können geschlossen und später wieder angesehen werden. Escape schliesst die Details. Das Öffnen der Meldungen ändert dein Layout nicht.</p>
           <h3>Exportvorschau</h3><p>Mit den festen Pfeilbuttons wechselst du zwischen den Bildern. Die Checkbox <strong>Dieses Bild exportieren</strong> nimmt das gezeigte Bild in die Auswahl auf oder entfernt es. Die Übersicht aller Exportbilder erreichst du über <strong>Zurück zum Export</strong>.</p>
           <p>In der Vorschau kannst du einen <strong>Bildkommentar</strong> hinzufügen, bearbeiten oder entfernen. Bis zu 1000 Zeichen bleiben als interne Notiz im Projekt; <strong>Speichern</strong> übernimmt sie, <strong>Abbrechen</strong> verwirft die Eingabe. Escape bricht zunächst die Bearbeitung ab. In FD-Kampagnen gilt die Notiz für alle Formate desselben Bildes, im Designer für die jeweilige Slide. Auf der Fläche öffnet der kleine Button <strong>Kommentar</strong> unter dem Bild die Notiz. Sie bleibt in MKW und der Projektdatei im Bild-ZIP erhalten, erscheint aber nie im PNG-, PDF- oder PSD-Motiv.</p>
           <p class="note">Die folgenden detaillierten Anleitungen zu festen Textarten und der bisherigen Formatvorlage betreffen <strong>FD-Kampagnen (Backup)</strong>.</p>
@@ -777,7 +778,9 @@
             Grossbuchstaben und Hochstellen lassen sich wieder ausschalten, ohne
             den ursprünglichen Text neu einzugeben.
           </p>
+          <p><strong>Optisch bündige Textkanten:</strong> Aktiviere im Textpanel unter <strong>Absatz &amp; Abstände → Optischer Randausgleich</strong> die Ausrichtung sichtbarer Buchstabenkanten. Sie gilt für die gewählten Absätze und deren Links-, Rechts- oder Mittelachse. Gewollte Einzüge bleiben erhalten. Bestehende Texte und Vorlagen verschieben sich erst nach deiner Auswahl. Blocksatz verwendet seine eigene Abstandsregelung. Im PSD bleibt bei optisch ausgeglichenem Text eine genaue Rasterdarstellung mit zusätzlichem bearbeitbarem Text erhalten.</p>
           <h3>Bildwinkel positionieren und drehen</h3>
+          <p>Unter <strong>Inhalt → Bilddrehung</strong> drehst du das Bild innerhalb seines Rahmens oder Winkels. Die Rahmenrichtung bleibt dabei erhalten. <strong>Rahmen füllen</strong> zentriert und skaliert das Bild passend, ohne diese Bilddrehung zurückzusetzen.</p>
           <p>Unter <strong>Füllung</strong> kannst du zwischen einem Bild und einer Farbfläche wechseln und Farbe sowie Deckkraft einstellen. Der bisherige Bildausschnitt bleibt beim Wechsel zur Farbe erhalten. Neue Winkel starten mit 200 px Schenkelbreite, 50 px Schein und 0,8 Intensität; bestehende Winkel und Vorlagen behalten ihre gespeicherten Werte.</p>
           <ol>
             <li>
@@ -1268,6 +1271,7 @@
             </li>
             <li>Prüfe die Vorschau und lade das PDF herunter.</li>
           </ol>
+          <h3>Farbtreue</h3><p>Das Studio arbeitet für Bildschirm- und Social-Media-Ausgaben in <strong>sRGB</strong>. PDF und PSD enthalten das zugehörige Farbprofil. PNG ohne Farbreduktion und verlustfreie PDF erhalten die gerenderten RGB-Werte; JPG und WebP verwenden verlustbehaftete Komprimierung, PNG-8 reduziert die Farbpalette. Nutze PNG beziehungsweise die verlustfreie PDF, wenn exakte Farbwerte besonders wichtig sind. Farbraumgrenzen, Bildschirmeinstellungen und andere Programme können die Darstellung beeinflussen; dies ist kein CMYK-Druckproof.</p>
           <h3>Das Exportfenster im Überblick</h3>
           <p>Links wählst du Bilder oder Slides aus und prüfst ihre Vorschauen.
             Rechts stehen <strong>Dateiformat &amp; Qualität</strong> und

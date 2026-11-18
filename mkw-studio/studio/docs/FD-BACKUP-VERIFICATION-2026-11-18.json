@@ -112,5 +112,18 @@
         "sha256": "cb9f48181cb310c358a6bb6204fff109cd3bcc1e6aefc17f13e1097563b72458"
       }
     ]
+  },
+  "followUp": {
+    "baselineCommit": "b0200e5eb8cb9b48bbe8748e73510b1136c9c0c3",
+    "report": "QUALITY-REVIEW-2026-11-18.md",
+    "verification": "QUALITY-VERIFICATION-2026-11-18.json",
+    "angleBlocker": "resolved for tested source transformations; four directions, independent rotations, flips, background and PNG/PDF/PSD/MKW",
+    "original17DegreeFixturePixelMax": 0,
+    "retirementComplete": false,
+    "remaining": [
+      "legacy large-format path",
+      "representative conversion acceptance",
+      "remove exclusive backup UI/logic and proven unused files"
+    ]
   }
 }

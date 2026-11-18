@@ -77,6 +77,7 @@ let studioSidebarOpen = !matchMedia("(max-width:760px)").matches,
 let studioCommandbarFrame = 0,
   studioPostGuides = true;
 function studioSyncFooter() {
+  studioMountNoticeButtons();
   const carousel = !!p.carousel;
   if (!carousel) $("#footerCurvature")?.setAttribute("hidden", "");
   $("#footerGuides").setAttribute(
@@ -198,41 +199,123 @@ function studioToggleSidebar() {
 }
 
 let studioWarningButton = null,
-  studioWarningSignature = null;
+  studioWarningSignature = null,
+  studioWarningListSignature = null,
+  studioFeedbackProject = null;
+const studioFeedbackMessages = new Map();
+function studioMountNoticeButtons() {
+  const host = document.querySelector(".footer-view-controls");
+  if (!host) return;
+  for (const id of ["postNotice", "carouselNotice"]) {
+    let button = $("#" + id);
+    if (!button && id === "carouselNotice") {
+      button = document.createElement("button");
+      button.id = id;
+      button.type = "button";
+      button.className = "studio-action studio-notice-button";
+      button.setAttribute("aria-controls", "studioWarnings");
+      button.setAttribute("aria-expanded", "false");
+      button.onclick = studioToggleWarnings;
+      host.prepend(button);
+    }
+    if (!button) continue;
+    button.hidden = (id === "carouselNotice") !== !!p.carousel;
+    if (button.parentElement !== host) host.prepend(button);
+  }
+  const active = $(p.carousel ? "#carouselNotice" : "#postNotice");
+  if (active && host.firstElementChild !== active) host.prepend(active);
+}
+function studioSystemMessages() {
+  if (studioFeedbackProject !== p.projectId) {
+    studioFeedbackProject = p.projectId;
+    studioFeedbackMessages.clear();
+    studioWarningItems = [];
+  }
+  return [...studioFeedbackMessages.values()];
+}
 function studioSetWarnings(items) {
+  const messages = studioSystemMessages();
   studioWarningItems = items;
+  studioMountNoticeButtons();
   const button = $(p.carousel ? "#carouselNotice" : "#postNotice"),
-    signature = JSON.stringify(items);
+    signature = JSON.stringify([p.projectId, items, messages]);
   if (button === studioWarningButton && signature === studioWarningSignature)
     return;
   studioWarningButton = button;
   studioWarningSignature = signature;
+  const error = [...items, ...messages].some(
+      (item) => item.level === "error" || item.severity === "error",
+    ),
+    warning =
+      items.length > 0 || messages.some((item) => item.level === "warning"),
+    information = messages.some(
+      (item) => item.source === "storage" && item.message,
+    ),
+    level = error ? "error" : warning ? "warning" : information ? "info" : "ok",
+    count =
+      items.length +
+      messages.filter((item) => ["error", "warning"].includes(item.level))
+        .length,
+    label = error
+      ? `${count} Meldung${count === 1 ? "" : "en"} – Fehler prüfen`
+      : warning
+        ? `${count} Hinweis${count === 1 ? "" : "e"} zum Artwork`
+        : information
+          ? "Informationen zum Projekt"
+          : "Keine aktuellen Warnungen oder Fehler";
   if (button) {
-    const label = `${items.length} Hinweis${items.length === 1 ? "" : "e"} zum Artwork`;
-    button.hidden = !items.length;
+    button.dataset.level = level;
     button.innerHTML =
-      studioIcon("warning") +
-      `<span class="studio-warning-count" aria-hidden="true">${items.length}</span>`;
+      studioIcon(error || warning ? "warning" : "info") +
+      `<span class="studio-warning-count" aria-hidden="true">${count > 99 ? "99+" : count}</span>`;
     button.setAttribute("aria-label", label);
     button.title = label;
     button.setAttribute("aria-expanded", String(!$("#studioWarnings").hidden));
   }
-  const list = $("#studioWarningList");
-  list.innerHTML = items
-    .map(
-      (item, index) =>
-        `<button class="studio-warning-item" data-warning-index="${index}">${studioIcon("warning")}<span><strong>${esc(item.title)}</strong><span>${esc(item.message)}</span></span>${studioIcon("angle")}</button>`,
+  const system = $("#studioSystemMessages");
+  system.replaceChildren();
+  for (const item of messages) {
+    if (
+      item.source === "storage" &&
+      $("#studioStorageMessages #projectStorageNotice")
     )
-    .join("");
-  list
-    .querySelectorAll("[data-warning-index]")
-    .forEach(
-      (button) =>
-        (button.onclick = () =>
-          studioFocusWarning(items[+button.dataset.warningIndex])),
-    );
-  if (!items.length) studioCloseWarnings(true);
-  studioQueueCommandbarFit();
+      continue;
+    const node = document.createElement("div"),
+      heading = document.createElement("strong"),
+      text = document.createElement("p");
+    node.className = "studio-feedback-item";
+    node.dataset.level = item.level;
+    heading.textContent =
+      item.level === "error"
+        ? "Fehler"
+        : item.level === "warning"
+          ? "Hinweis"
+          : "Projektstatus";
+    text.textContent = item.message;
+    node.append(heading, text);
+    system.append(node);
+  }
+  $("#studioNoMessages").hidden = !!(items.length || messages.length);
+  const list = $("#studioWarningList"),
+    listSignature = JSON.stringify([p.projectId, items]);
+  if (listSignature !== studioWarningListSignature) {
+    const hadFocus = list.contains(document.activeElement);
+    if (!count && hadFocus) studioCloseWarnings(true);
+    studioWarningListSignature = listSignature;
+    list.innerHTML = items
+      .map(
+        (item, index) =>
+          `<button class="studio-warning-item" data-warning-index="${index}">${studioIcon("warning")}<span><strong>${esc(item.title)}</strong><span>${esc(item.message)}</span></span>${studioIcon("angle")}</button>`,
+      )
+      .join("");
+    list
+      .querySelectorAll("[data-warning-index]")
+      .forEach(
+        (button) =>
+          (button.onclick = () =>
+            studioFocusWarning(items[+button.dataset.warningIndex])),
+      );
+  }
 }
 function studioCloseWarnings(restore = false) {
   const panel = $("#studioWarnings"),
@@ -254,7 +337,10 @@ function studioToggleWarnings() {
     "aria-expanded",
     String(open),
   );
-  if (open) panel.querySelector("[data-warning-index]")?.focus();
+  if (open)
+    (
+      panel.querySelector("[data-warning-index]") || $("#closeStudioWarnings")
+    ).focus();
 }
 function studioFocusWarning(item) {
   studioCloseWarnings();
@@ -305,10 +391,24 @@ studioWarnings.id = "studioWarnings";
 studioWarnings.className = "studio-notices";
 studioWarnings.hidden = true;
 studioWarnings.setAttribute("aria-labelledby", "studioWarningsTitle");
-studioWarnings.innerHTML = `<div class="studio-notices-heading"><h2 id="studioWarningsTitle">Hinweise zum Artwork</h2><button id="closeStudioWarnings" class="icon-button" aria-label="Hinweise schliessen">${studioIcon("close")}</button></div><div id="studioWarningList"></div>`;
+studioWarnings.innerHTML = `<div class="studio-notices-heading"><h2 id="studioWarningsTitle">Hinweise &amp; Meldungen</h2><button id="closeStudioWarnings" class="icon-button" aria-label="Hinweise schliessen">${studioIcon("close")}</button></div><div id="studioStorageMessages"></div><div id="studioSystemMessages"></div><p id="studioNoMessages">Keine aktuellen Hinweise zum Artwork.</p><div id="studioWarningList"></div>`;
 document.body.append(studioWarnings);
+window.MKWFooterFeedback = Object.freeze({
+  attachStorageNotice(node) {
+    $("#studioStorageMessages").append(node);
+  },
+  report(message, level = "info", source = "operation") {
+    studioSystemMessages();
+    const text = String(message || "");
+    if (text)
+      studioFeedbackMessages.set(source, { message: text, level, source });
+    else studioFeedbackMessages.delete(source);
+    studioSetWarnings(studioWarningItems);
+  },
+});
 $("#closeStudioWarnings").onclick = () => studioCloseWarnings(true);
 $("#postNotice").onclick = studioToggleWarnings;
+studioSetWarnings(studioWarningItems);
 $("#toolsToggle").onclick = studioToggleSidebar;
 $("#footerGuides").onclick = () => {
   if (p.carousel) {

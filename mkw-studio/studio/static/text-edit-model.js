@@ -7,6 +7,7 @@
   const maxLength = 100000;
   const paragraphKeys = [
     "align",
+    "opticalAlign",
     "size",
     "lineHeight",
     "spaceBefore",
@@ -60,6 +61,7 @@
         });
       const style = {
         align: o.textAlign || o.align || "left",
+        opticalAlign: o.opticalAlign ?? false,
         lineHeight: o.lineHeight ?? 0.95,
         ...pick(ps, paragraphKeys),
       };

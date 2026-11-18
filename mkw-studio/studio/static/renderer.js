@@ -497,7 +497,7 @@ async function draw() {
     syncOverlays();
     updateWarning();
   } catch (e) {
-    status(e.message);
+    status(e, "error");
   } finally {
     drawing = false;
     if (drawAgain) {

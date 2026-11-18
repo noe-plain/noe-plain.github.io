@@ -141,13 +141,6 @@ header {
   border-color: transparent;
   color: var(--md-sys-color-on-secondary-container);
 }
-.studio-commandbar .studio-notice-button {
-  color: var(--md-sys-color-warning);
-  background: var(--md-sys-color-warning-container);
-  border-color: transparent;
-  height: var(--studio-bar-height);
-  border-radius: var(--studio-shape-large);
-}
 .studio-commandbar .studio-action > span {
   display: none;
 }
@@ -627,7 +620,7 @@ footer #carouselCoordinates {
 .studio-notices {
   position: fixed;
   top: auto;
-  bottom: 126px;
+  bottom: calc(var(--studio-footer-height) + var(--studio-shell-inset) + 12px);
   right: 18px;
   z-index: 70;
   width: min(420px, calc(100vw - 36px));
@@ -857,9 +850,6 @@ footer #carouselCoordinates {
     right: 10px;
     width: calc(100vw - 20px);
   }
-  .studio-notice-button > span {
-    display: none;
-  }
 }
 
 #workspace {
@@ -912,8 +902,7 @@ footer #carouselCoordinates {
   );
   box-shadow: 0 2px 8px #11182714;
 }
-.studio-commandbar
-  .studio-action:is(#export, #carouselExport, .studio-notice-button) {
+.studio-commandbar .studio-action:is(#export, #carouselExport) {
   display: inline-flex;
   box-sizing: border-box;
   width: var(--studio-export-action-width, 112px);
@@ -956,14 +945,6 @@ footer #carouselCoordinates {
   > span {
   display: none;
 }
-.studio-commandbar .studio-action.studio-notice-button .studio-warning-count,
-.studio-commandbar.studio-icons-only
-  .studio-action.studio-notice-button
-  .studio-warning-count {
-  display: inline;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
 @media (pointer: coarse) {
   :root {
     --studio-bar-height: 66px;
@@ -1003,4 +984,68 @@ footer #carouselCoordinates {
     width: 48px;
     min-width: 48px;
   }
+}
+
+/* A stable first item in the right footer group; state never relies on colour alone. */
+.footer-view-controls .studio-notice-button {
+  position: relative;
+  width: 44px;
+  min-width: 44px;
+  height: 40px;
+  border-radius: var(--studio-shape-full);
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container-low);
+}
+.footer-view-controls .studio-notice-button[data-level="info"] {
+  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-primary-container);
+}
+.footer-view-controls .studio-notice-button[data-level="warning"] {
+  color: var(--md-sys-color-warning);
+  background: var(--md-sys-color-warning-container);
+}
+.footer-view-controls .studio-notice-button[data-level="error"] {
+  color: var(--md-sys-color-on-error-container);
+  background: var(--md-sys-color-error-container);
+}
+.footer-view-controls .studio-notice-button > .studio-warning-count {
+  display: inline-grid;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  min-width: 12px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+  font-weight: 600;
+}
+.studio-feedback-item {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  overflow-wrap: anywhere;
+}
+.studio-feedback-item[data-level="error"] {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+.studio-feedback-item p {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+}
+
+.footer-view-controls .studio-notice-button:hover {
+  box-shadow: inset 0 0 0 999px color-mix(in srgb, currentColor 8%, transparent);
+}
+
+#studioStorageMessages > .project-storage-notice {
+  position: static;
+  width: auto;
+  max-width: none;
+  margin: 0 0 8px;
+  inset: auto;
+  box-shadow: none;
 }

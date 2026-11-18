@@ -67,11 +67,13 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
       o.font,
       o.color,
       o.family,
+      o.campaignFamily,
       fontStatus,
       o.size,
       o.w,
       o.lineHeight,
       o.textAlign,
+      o.opticalAlign,
       o.hyphenate,
       MKWTextHyphen.version,
       o.textStyles,
@@ -144,12 +146,28 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
         leading =
           style?.leading?.[index] ??
           Math.max(size, ...styled.runs.map((run) => run.size)) * automatic;
+      const opticalAlign =
+          (style?.opticalAlign ?? o.opticalAlign) === true && !justified,
+        ink = opticalAlign
+          ? carouselTextInk(styled.runs, ctx, !!o.campaignFamily)
+          : null,
+        x = ink
+          ? alignment.value === "right"
+            ? o.w - ink.right
+            : alignment.value === "center"
+              ? (o.w - ink.left - ink.right) / 2
+              : ink.indent - ink.left
+          : alignment.factor
+            ? (o.w - width) * alignment.factor
+            : 0;
       lines.push({
         text: styled.runs.map((run) => run.text).join(""),
         runs: styled.runs,
         ...(justification ? { justification } : {}),
         width,
-        x: alignment.factor ? (o.w - width) * alignment.factor : 0,
+        x,
+        opticalAlign,
+        ...(ink ? { ink } : {}),
         align: alignment.value,
         raw: part.raw,
         hyphen: !!part.hyphen,

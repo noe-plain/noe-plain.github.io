@@ -78,6 +78,24 @@ function exportContext(canvas) {
     willReadFrequently: true,
   });
 }
+let exportSRGBProfilePromise;
+function exportSRGBProfile() {
+  return (exportSRGBProfilePromise ??= fetch("static/srgb.icc")
+    .then(async (response) => {
+      if (!response.ok)
+        throw Error("sRGB-Farbprofil konnte nicht geladen werden.");
+      const bytes = new Uint8Array(await response.arrayBuffer()),
+        tag = (offset) =>
+          String.fromCharCode(...bytes.subarray(offset, offset + 4));
+      if (bytes.length < 128 || tag(36) !== "acsp" || tag(16) !== "RGB ")
+        throw Error("Ungültiges sRGB-Farbprofil.");
+      return bytes;
+    })
+    .catch((error) => {
+      exportSRGBProfilePromise = null;
+      throw error;
+    }));
+}
 async function encodedBoard(b, settings) {
   if (settings.format === "pdf") return carouselEncodePDFPage(b, settings);
   const key = exportKey(b, settings);
@@ -416,6 +434,7 @@ async function runExport(mode) {
   const finishLoading = MKWUIControls.loading("#progressText");
   exportGeneration++;
   clearTimeout(previewTimer);
+  window.MKWFooterFeedback?.report("", "info", "export");
   const plan = clone(exportPlan),
     settings = exportSettings(),
     projectSnapshot = mode === "zip" ? snapshot() : null,
@@ -515,7 +534,14 @@ async function runExport(mode) {
         : "Fertig · " + successes + " Dateien",
     );
     status(`${successes} Bilder exportiert`);
+    if (failures.length)
+      window.MKWFooterFeedback?.report(failures.join("\n"), "error", "export");
   } catch (e) {
+    window.MKWFooterFeedback?.report(
+      e.name === "AbortError" ? "Export abgebrochen." : e.message,
+      e.name === "AbortError" ? "info" : "error",
+      "export",
+    );
     MKWFields.notice(
       $("#exportStatus"),
       e.name === "AbortError" ? "Export abgebrochen." : e.message,

@@ -435,7 +435,7 @@ const MKWCampaignUI = (() => {
         p.images = p.images.map((a) => (a.id === im.id ? im : a));
         changed();
       } catch (e) {
-        status(e.message);
+        status(e, "error");
       } finally {
         busy = false;
       }

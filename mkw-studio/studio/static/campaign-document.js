@@ -229,7 +229,7 @@ const MKWCampaignDocument = (() => {
           panY: t.y - a.h / 2,
           flipX: t.flipX,
           flipY: t.flipY,
-          angle: t.angle,
+          imageAngle: t.angle,
         }),
       );
       const e = b.elements.logo,
@@ -249,7 +249,10 @@ const MKWCampaignDocument = (() => {
       );
       if (row.family || b.family?.enabled) row.family = true;
       if (b.angle?.enabled) {
-        const geometry = MKWPostAngle.geometry(b),
+        const geometry = MKWPostAngle.geometry(
+            b,
+            MKWSponsors.layout(b)?.content || b,
+          ),
           g = geometry.o,
           bg = q.carousel.objects.find(
             (o) => o.pageId === a.id && o.campaignRole === "background",
@@ -263,9 +266,7 @@ const MKWCampaignDocument = (() => {
             campaignLocal: true,
             imageId: im.id,
             imageSourceId: bg.id,
-            scale: 1.12,
-            panX: 24,
-            panY: -24,
+            ...MKWPhotoTransform.fromLegacy(g, im, b.angle.image),
           }),
         );
         row.angle = true;

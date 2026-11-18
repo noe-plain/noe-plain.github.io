@@ -227,7 +227,7 @@ function sponsorPanel(b, panel) {
       sponsorApply(b.imageId, config);
       renderPanel();
     } catch (error) {
-      status(error.message);
+      status(error, "error");
     }
   };
   const logo = s.groups
@@ -563,6 +563,6 @@ document.addEventListener("change", async (event) => {
       }
     }
   } catch (e) {
-    status(e.message);
+    status(e, "error");
   }
 });

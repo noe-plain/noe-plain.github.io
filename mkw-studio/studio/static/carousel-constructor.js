@@ -355,7 +355,7 @@ function carouselBuilderPointer(ev, pt) {
           carouselBuilderCache = null;
           changed();
         } catch (e) {
-          status(e.message);
+          status(e, "error");
         }
       },
       () => {
@@ -364,7 +364,7 @@ function carouselBuilderPointer(ev, pt) {
       },
     );
   } catch (e) {
-    status(e.message);
+    status(e, "error");
   }
 }
 function carouselConstructorOverlay() {

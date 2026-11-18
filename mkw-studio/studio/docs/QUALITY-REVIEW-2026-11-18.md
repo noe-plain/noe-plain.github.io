@@ -1,0 +1,44 @@
+# Qualitäts-Folgeprüfung · 18. November 2026
+
+Ausgang **b0200e5eb8cb9b48bbe8748e73510b1136c9c0c3**, eigene getrennte Arbeitskopie. Auftrag: Leistung, optische Textbündigkeit und Exportfarben prüfen; anschliessend den priorisierten Plan fortsetzen. Währenddessen ergänzt: Meldungen dauerhaft unten rechts, als erstes Element der rechten Footergruppe. Floating Labels und das einfachere Reihen-Seitenmenü sind im Masterplan **UI02/UI03 geplant**, nicht in diesem Lauf implementiert. Keine Nutzerdateien verändert. Keine weiteren Agenten, Zusatzcredits oder Reset-Gutscheine verwendet.
+
+## Tatsächliche Änderungen
+
+- **Leistung:** Designer-Vorschauen berücksichtigen nur die sichtbaren Objekte im Cache-Schlüssel und verwenden die bereits berechnete Objektliste beim Zeichnen. Ordnersichtbarkeit, Layout, Gruppen und Kampagnen-Sponsoren lösen weiterhin die nötige Neuberechnung aus; Kampagnen behalten ihre vollständigen verknüpften Abhängigkeiten. Exporte bleiben vollständig. Quellen: `static/carousel-render.js`.
+- **Optisch bündiger Text:** „Optischer Randausgleich“ unter Absatz & Abstände ist ausdrücklich aktivierbar. Die sichtbaren Glyphenkanten statt nur der nominellen Zeichenbreite bestimmen links/rechts/zentriert den Zeilenanfang; absichtliche Einrückungen bleiben. Alte Texte behalten ihre bisherigen Ursprünge. Ein gemeinsamer Layoutpfad für Canvas, Inline und PDF; Absatzumfang und direkte Zeichenmarkierung bleiben erhalten. Blocksatz bleibt beim bisherigen Algorithmus. Quellen: `carousel-typography.js`, `carousel-text.js`, `typography-ui.js`, zugehörige Text-/Dateimodelle. PSD erhält eine genaue Rasterreferenz mit separat editierbarem Text; keine native optische Photoshop-Satzfunktion behauptet.
+- **Exportfarben:** PDF-Bilder tragen jetzt dasselbe validierte sRGB-ICC-Profil wie PSD. Keine zweite Farbtransformation bereits in sRGB gerenderter Pixel. Quellen: `export.js`, `carousel-pdf.js`, `psd.js`. Dies ist kein PDF/A-/PDF/X-, CMYK- oder Monitor-Kalibrierungsnachweis.
+- **B02 fortgesetzt:** `photo-transform-model.js` besitzt die unabhängige Bilddrehung, Skalierung, Ausschnitte, Spiegelung und Eckpunkte. Canvas, Effekte, Abdeckungsprüfung und unterstützte PSD-Platzierungen verwenden denselben Eigentümer. Der Konverter übernimmt den bisherigen Hintergrund-/Winkel-Bildtransform statt fester Ausschnittswerte; im Inspector ist die Bilddrehung separat bearbeitbar. Quellen: `campaign-document.js`, `carousel-geometry.js`, `carousel-effects.js`, `carousel-sidebar.js`, `psd-editable.js`. **FD-Backup bleibt noch vorhanden**; Altformatgrenzen und eigentlicher Abbau bleiben offen.
+- **Meldungen im Footer:** Immer sichtbares Statussymbol als erstes rechtes Element, neutrales/info-/warn-/fehlerabhängiges M3-Farbschema. Klick öffnet die Details, Escape schliesst und gibt den Fokus zurück. Der vorhandene Speicherhinweis liegt ausschliesslich dort; kein oberes Doppelbanner, kein automatischer Fokuswechsel. Speicher-, Export- und Vorgangsmeldungen bleiben getrennt, damit eine Erfolgsmeldung keinen Speicherfehler verdeckt. Alte Meldungen verschwinden beim Projektwechsel. Quellen: `workspace-ui.js/.css`, `project-session.js`, `state.js`, Exportmeldungen und semantische Farbtokens.
+
+## Gemessene Prüfungen und Grenzen
+
+Eigene synthetische Projekte, keine fremden Bilder/Dateien. Rohwerte: [QUALITY-VERIFICATION-2026-11-18.json](QUALITY-VERIFICATION-2026-11-18.json).
+
+- Reihenlastfälle **1×3, 3×3 und 10×20 Slides**, bis 200 Slides/401 Objekte und 50 eigene 640×480-Prüfbilder. Bei fünf Änderungen ausserhalb des Sichtbereichs **0 unnötige Neuzeichnungen**, 100 Bewegungsaktualisierungen zu **einem** Paint zusammengefasst. Grössester Vorschau-Canvas 2.083.248 Pixel. Sichtbare Ordneränderung verändert wirklich die Vorschau. Lokale Zeitwerte sind keine FPS-Garantie oder 50-Grossfoto-Benchmark; vorhandene Grossfoto-/Speichertests zusätzlich wiederverwendet.
+- Optische Bündigkeit mit gemischten Fonts/Grössen links/rechts/zentriert im tatsächlichen Raster geprüft (2-Pixel-Toleranz), ursprüngliche Standardposition unverändert. Checkbox, Absatzumfang, Tastatur, Undo/Redo, Inline, MKW, PDF-Textauswahl und PSD-Referenz getestet. Hell/Dunkel und 768-Pixel-Fenster geprüft.
+- Neun eigene Farbfelder durch echte PNG/PNG-8/JPG/WebP/PDF/PSD-Ausgaben: verlustfreie Testflächen exakt, verlustbehaftete Formate innerhalb 5/255. PDF-ICC ausgelesen und lokaler echter Poppler-Render exakt zu den RGB-Testwerten. Getaggte Display-P3-Quelle über den Bildimport korrekt nach sRGB normalisiert, soweit der Browser P3 unterstützt. PNG-8 kann bei allgemeinen Fotos Farben quantisieren; JPEG/WebP sind verlustbehaftet. Weitfarbraum-Ausgabe, CMYK-Druck und identische Darstellung in jeder Anwendung werden nicht behauptet.
+- Alt-Winkel in vier Richtungen mit unabhängigen Bildwinkeln/Spiegelungen und gedrehten Hintergründen: reale Referenzpixel maximal 1/255 verschieden. Ursprüngliche 17°-Diagnose nun exakt; Originalprojekt isoliert. MKW/Undo/Redo geprüft, PNG exakt zum Quellbild, PDF maximal 0, PSD maximal 1/255 und mittlere Abweichung 0,00000778/255. Unterstützte platzierte PSD-Quelltransformationen geprüft. Winkel mit reihenbezogenem Clip bleiben konservativ gerastert; keine native Vollbearbeitbarkeit aller Effekte behauptet.
+- Footer in Designer, Kampagne und altem FD: null Meldungen, Fehler/Warnung, Klartext statt HTML, Themen, Tastatur/Fokus, 768-Pixel-Anordnung, wiederholter Speicherfehler, Schliessen und Projektwechsel. Bestehende Speicher-/native Speichertests wiederverwendet. Keine Meldungen in Dokument/Undo/Exportpixeln.
+
+**Lokal bestanden:** Formatierung, Build, Formatprüfung, **217 Modell-/Pakettests**. Gezielte reale Chrome-Suiten: neue fünf Fälle sowie `backup-migration`, `workspace-ui`, `material-motion`, `material-workflow`, `material-paint-wiki`, `post-workspace`, `post-angle`, `carousel-photo-effects`, `psd-editability`, `appearance-carousel-psd`, `interactive-performance`, `render-export`, `large-project-frames`, `carousel-text-alignment`, `inline-fidelity`, `row-export`, `row-psd`, `campaign-migration`, `carousel-export-images`, `project-storage`, `native-incremental-save`. Neueste gemeinsame Schlussprüfung 10/10 bestanden; keine zusätzliche unmotivierte Vollwiederholung. Lokales Firefox-Runtimeproblem (fehlende `libmozglue`-Bibliothek) ist kein bestandener Firefox-Test; dafür tatsächlichen vollständigen Linux-CI-Endlauf abwarten.
+
+## Sechs-Persona-Matrix
+
+| Persona | Feedback / Problem | Status |
+| --- | --- | --- |
+| Neue Nutzerin | Meldungen müssen auffindbar bleiben und den Entwurf nicht verdecken; Reihenmenü braucht einfacheren Einstieg | Footer gelöst; Reihenmenü UI03 geplant |
+| Erfahrener Designer | Sichtbare Textkanten sollen bündig sein, bestehende Entwürfe und Bildausschnitte erhalten bleiben | Optischer Randausgleich aktivierbar; geprüfte Alttransformationen erhalten |
+| Senior UX-Experte | Klare Wirkungsbereiche, keine Fokusübernahme, Fehler verschwinden nicht durch unabhängigen Erfolg | Footer-/Absatzablauf gelöst; vollständiger B02-Übergang offen |
+| UI-Expertin | Kompakte M3-Zustände, passende semantische Farben in Hell/Dunkel | Footer und Textsteuerung geprüft; Floating Labels UI02 geplant |
+| QA-Entwicklerin | Gemeinsame reine Geometrie, Cache-Invalidierung und echte Datei-/Pixelabnahme | Gezielte Regression gelöst; weitere repräsentative Altdateien offen |
+| Destruktiver Fehlersucher | Viele Reihen, Ordnersperren/-sichtbarkeit, unabhängige Fehler, ungewöhnliche Drehungen und ungültige Werte | Geprüfte Fälle gelöst; grosse alte FD-Formate vor Modusentfernung offen |
+
+Persona-Prüfung durch Expertensicht, keine Nutzerstudie. Kein manueller Screenreader-/physischer Touch-/Photoshop-App-Nachweis in diesem Lauf. PSD und MKW bleiben verfügbar. Kein weiterer IDML-Ausbau. Nächster priorisierter Schritt: sicheren Weg für bisher unterstützte grosse FD-Altformate und repräsentative Konvertierungsabnahme festlegen, dann exklusive Backup-Einstiege/Bedienzweige entfernen und nachgewiesen tote Dateien bereinigen. UI02/UI03 bleiben gesondert geplante Oberflächenarbeit.
+
+## Veröffentlichung
+
+Lokale Prüfung abgeschlossen. Commit, vollständiger CI-Endlauf und tatsächliche Live-Abnahme werden nach Veröffentlichung hier und im maschinellen Nachweis ergänzt. Ein gestarteter Job zählt nicht als bestanden.
+
+## Farbtechnische Grundlagen
+
+Der [HTML-Canvas-Standard](https://html.spec.whatwg.org/multipage/canvas.html) und [WebKits Farbraumbeschreibung](https://webkit.org/blog/12058/wide-gamut-2d-graphics-using-html-canvas/) erläutern explizite Canvas-Farbräume. Die [PDF Association](https://pdfa.org/wp-content/uploads/2011/08/tn0002_color_in_pdfa-1_2008-03-141.pdf) beschreibt ICC-basierte Farbangaben; daraus folgt allein keine PDF/A-Konformität unseres Exports.

@@ -27,6 +27,11 @@ const MKWProjects = (() => {
         el.classList.add("notice-attention");
       }
     }
+    window.MKWFooterFeedback?.report(
+      el?.hidden ? "" : message,
+      error ? "error" : "info",
+      "storage",
+    );
   }
   function fileLink(id = p.projectId) {
     return links.get(id);
@@ -542,11 +547,13 @@ const MKWProjects = (() => {
         ? null
         : { id: p.projectId, message: message.textContent };
       banner.hidden = true;
+      window.MKWFooterFeedback?.report("", "info", "storage");
       if (returnFocus?.isConnected && !banner.contains(returnFocus))
         returnFocus.focus?.({ preventScroll: true });
     };
     banner.append(message, close);
     document.body.append(banner);
+    window.MKWFooterFeedback?.attachStorageNotice(banner);
     const saveAs = document.createElement("button");
     saveAs.id = "saveProjectAs";
     saveAs.textContent = "Speichern unter …";
@@ -617,6 +624,7 @@ const MKWProjects = (() => {
     try {
       if (savedRevision < revision) await autosave();
       await restore(document);
+      notice("");
       revision = 1;
       savedRevision = 0;
       await autosave({ writeFile: false });

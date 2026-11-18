@@ -237,6 +237,11 @@ function validateCarousel(q) {
     if (o.type === "angle" && !MKWAnglePolicy.accepts(o.direction))
       throw Error("Ungültige Winkelrichtung.");
     studioValidatePaint(o);
+    if (
+      o.opticalAlign !== undefined &&
+      (o.type !== "text" || typeof o.opticalAlign !== "boolean")
+    )
+      throw Error("Ungültiger optischer Randausgleich.");
     if (o.strokeImageId && !q.images.some((im) => im.id === o.strokeImageId))
       throw Error("Konturbild fehlt.");
     if (carouselIsVector(o)) carouselValidateVector(o);
@@ -291,8 +296,10 @@ function validateCarousel(q) {
         o.textStyles.some(
           (style) =>
             style &&
-            ((style.align !== undefined &&
-              !carouselValidTextAlign(style.align)) ||
+            ((style.opticalAlign !== undefined &&
+              typeof style.opticalAlign !== "boolean") ||
+              (style.align !== undefined &&
+                !carouselValidTextAlign(style.align)) ||
               (style.size !== undefined &&
                 (!Number.isFinite(style.size) ||
                   style.size < 1 ||
@@ -478,7 +485,7 @@ function carouselIsolateRowFolders() {
     changed();
     return true;
   } catch (e) {
-    status(e.message);
+    status(e, "error");
     return false;
   }
 }
@@ -831,7 +838,7 @@ async function carouselImport(files, target) {
     status(`${imported} Bilder im Designer platziert.`);
   } catch (e) {
     if (imported) changed();
-    status(e.message);
+    status(e, "error");
   } finally {
     busy = false;
     finishLoading();

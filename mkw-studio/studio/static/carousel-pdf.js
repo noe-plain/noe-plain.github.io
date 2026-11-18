@@ -257,7 +257,14 @@ async function carouselBuildPDF(pages, title) {
       TextRenderingMode,
     } = MKWPDF,
     document = await PDFDocument.create(),
-    fonts = new Map();
+    fonts = new Map(),
+    profile = document.context.register(
+      document.context.flateStream(await exportSRGBProfile(), {
+        N: 3,
+        Alternate: "DeviceRGB",
+      }),
+    ),
+    colourSpace = document.context.obj(["ICCBased", profile]);
   document.registerFontkit({
     ...MKWPDF.fontkit,
     create(...args) {
@@ -279,6 +286,15 @@ async function carouselBuildPDF(pages, title) {
         record.source.type === "image/jpeg"
           ? await document.embedJpg(bytes)
           : await document.embedPng(bytes);
+    // The encoded artwork is sRGB already. Tag those RGB numbers explicitly;
+    // do not perform a second conversion or claim PDF/A or print-CMYK output.
+    await image.embed();
+    const embedded = document.context.lookup(image.ref);
+    if (
+      embedded.dict.get(MKWPDF.PDFName.of("ColorSpace"))?.toString() ===
+      "/DeviceRGB"
+    )
+      embedded.dict.set(MKWPDF.PDFName.of("ColorSpace"), colourSpace);
     page.drawImage(image, {
       x: 0,
       y: 0,

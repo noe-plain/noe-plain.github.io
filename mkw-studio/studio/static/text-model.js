@@ -198,6 +198,7 @@
   function rich(o) {
     return !!(
       o.typographyVersion ||
+      o.opticalAlign === true ||
       o.text?.includes("\u2028") ||
       o.align === "justify" ||
       o.textAlign === "justify" ||
@@ -232,6 +233,8 @@
         throw Error("Ungültige Zeichenformatierung.");
     };
     check(o);
+    if (o.opticalAlign !== undefined && typeof o.opticalAlign !== "boolean")
+      throw Error("Ungültiger optischer Randausgleich.");
     if (o.hyphenate !== undefined && typeof o.hyphenate !== "boolean")
       throw Error("Ungültige Silbentrennung.");
     if (o.characterStyles !== undefined) {
@@ -259,6 +262,8 @@
       for (const s of o.textStyles)
         if (s) {
           if (
+            (s.opticalAlign !== undefined &&
+              typeof s.opticalAlign !== "boolean") ||
             (s.align !== undefined &&
               !["left", "center", "right", "justify"].includes(s.align)) ||
             (s.hyphenate !== undefined && typeof s.hyphenate !== "boolean") ||

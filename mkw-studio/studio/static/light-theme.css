@@ -139,23 +139,6 @@ html[data-theme="light"] .empty-symbol {
 html[data-theme="light"] dialog::backdrop {
   background: #27354e55;
 }
-html[data-theme="light"]
-  :is(.studio-notice-button, #postNotice, #carouselNotice) {
-  color: #8f4b00;
-  background: #fff3cc;
-  border-color: #e7a23c;
-}
-html[data-theme="light"]
-  :is(.studio-notice-button, #postNotice, #carouselNotice):hover {
-  color: #783c00;
-  background: #ffe5a2;
-  border-color: #d88b12;
-}
-html[data-theme="light"]
-  :is(.studio-notice-button, #postNotice, #carouselNotice)
-  svg {
-  color: #cb7900;
-}
 html[data-theme="light"] .studio-inline-warning,
 html[data-theme="light"] #carouselProperties .carousel-warning:not(:empty) {
   color: #834900;

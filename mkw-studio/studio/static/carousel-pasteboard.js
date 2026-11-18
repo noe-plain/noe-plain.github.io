@@ -191,7 +191,7 @@ async function carouselPaintOutside() {
     job.canvas.paintProject = job.project;
     job.canvas.paintSources = job.sources;
   } catch (error) {
-    if (current()) status(error.message);
+    if (current()) status(error, "error");
   } finally {
     carouselOutsideRunning = false;
     if (carouselOutsidePending && !carouselOutsideFrame)

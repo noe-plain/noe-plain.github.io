@@ -127,9 +127,7 @@ function textLayerData(e, left, top, family, layout) {
 }
 async function withPSDProfile(buffer) {
   // Add Photoshop image resource 1039 (ICC), using the same sRGB profile as JPG.
-  const profile = new Uint8Array(
-      await (await fetch("static/srgb.icc")).arrayBuffer(),
-    ),
+  const profile = await exportSRGBProfile(),
     data = new Uint8Array(buffer),
     view = new DataView(buffer),
     offset = 30 + view.getUint32(26),

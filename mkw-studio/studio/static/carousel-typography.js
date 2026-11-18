@@ -86,6 +86,39 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   if (previousSpacing !== undefined) ctx.letterSpacing = previousSpacing;
   return { runs, width: x };
 }
+// Visible glyph bounds, measured once with the cached text layout. Advances
+// remain unchanged, preserving wrapping, selection and intentional indentation.
+function carouselTextInk(runs, ctx, family = false) {
+  let left = Infinity,
+    right = -Infinity,
+    indent = 0,
+    found = false;
+  ctx.save();
+  ctx.textAlign = "left";
+  for (const run of runs) {
+    if (!run.text.trim()) continue;
+    ctx.font = `${run.size}px ${fontFamily(run.font)}`;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = run.letterSpacing + "px";
+    const m = ctx.measureText(run.text),
+      scale = run.glyphScale ?? 1;
+    if (!found) {
+      indent =
+        run.x + ctx.measureText(run.text.match(/^\s*/u)[0]).width * scale;
+      found = true;
+    }
+    const outline = run.family || family ? 1 : 0;
+    left = Math.min(
+      left,
+      run.x - (m.actualBoundingBoxLeft ?? 0) * scale - outline,
+    );
+    right = Math.max(
+      right,
+      run.x + (m.actualBoundingBoxRight ?? run.width) * scale + outline,
+    );
+  }
+  ctx.restore();
+  return found ? { left, right, indent } : null;
+}
 function carouselPaintTextRun(ctx, run, x, y, color, family = false) {
   const horizontal = run.glyphScale ?? 1;
   if (horizontal !== 1) {

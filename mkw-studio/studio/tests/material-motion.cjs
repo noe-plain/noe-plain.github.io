@@ -68,9 +68,12 @@ const { launch, artifact } = require("./browser.cjs");
                 y = document.querySelector(b).getBoundingClientRect();
               return (
                 !document.querySelector(a).hidden &&
-                Math.abs(x.width - y.width) < 0.5 &&
-                Math.abs(x.height - y.height) < 0.5 &&
-                x.width > 0
+                document.querySelector(".footer-view-controls")
+                  .firstElementChild === document.querySelector(a) &&
+                x.width >= 40 &&
+                x.height >= 32 &&
+                y.width > 0 &&
+                y.height > 0
               );
             },
             [warning, exporter],
@@ -335,7 +338,7 @@ const { launch, artifact } = require("./browser.cjs");
       await page.close();
     }
     console.log(
-      "PASS morphing/rotating loading geometry, real wavy import/export progress, completion/hidden/reduced-motion/system-colour cleanup, equal warning/export sizes at three widths and Advanced, matching native FD dropdown anatomy and unchanged documents",
+      "PASS morphing/rotating loading geometry, real wavy import/export progress, completion/hidden/reduced-motion/system-colour cleanup, permanent footer indicator at three widths and legacy preferences, matching native FD dropdown anatomy and unchanged documents",
     );
   } finally {
     await browser.close();

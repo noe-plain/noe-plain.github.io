@@ -36,6 +36,7 @@ function carouselObjectLocked(o) {
   return !!(o.locked || carouselFolder(o)?.locked);
 }
 function carouselValidateRefinements(o, c, q) {
+  MKWPhotoTransform.validate(o);
   if (
     o.angle !== undefined &&
     (!Number.isFinite(o.angle) || Math.abs(o.angle) > 360)
@@ -471,7 +472,7 @@ function carouselReplaceLogo(o) {
       changed();
       status("Logo ersetzt.");
     } catch (e) {
-      status(e.message);
+      status(e, "error");
     } finally {
       finishLoading();
     }

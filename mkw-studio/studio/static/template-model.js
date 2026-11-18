@@ -14,6 +14,10 @@
     typeof module !== "undefined"
       ? require("./angle-policy.js")
       : root.MKWAnglePolicy;
+  const photoTransform =
+    typeof module !== "undefined"
+      ? require("./photo-transform-model.js")
+      : root.MKWPhotoTransform;
   const copy = (value) => JSON.parse(JSON.stringify(value));
   const kinds = new Set([
     "text",
@@ -221,6 +225,7 @@
     const ids = new Set(),
       names = new Set();
     for (const o of c.objects) {
+      photoTransform.validate(o);
       if (o.type === "angle") angles.validateFill(o);
       if (
         typeof o.id !== "string" ||

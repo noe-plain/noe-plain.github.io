@@ -85,7 +85,7 @@ function carouselPanel() {
     return;
   }
   const number = (key, label, min = 0, max = 100000) =>
-    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round((carouselIsVector(o) && ["x", "y", "w", "h"].includes(key) ? (["w", "h"].includes(key) ? carouselLocalBounds(o)[key] : carouselObjectBounds(o)[key]) : o[key]) * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
+    `<label>${label}<input data-prop="${key}" type="number" value="${Math.round((carouselIsVector(o) && ["x", "y", "w", "h"].includes(key) ? (["w", "h"].includes(key) ? carouselLocalBounds(o)[key] : carouselObjectBounds(o)[key]) : (o[key] ?? 0)) * 100) / 100}" min="${min}" max="${max}" step="any"></label>`;
   const color = (key, label) =>
     `<label>${label}<input data-prop="${key}" type="color" value="${esc(o[key])}"></label>`;
   const select = (key, label, values) =>
@@ -148,7 +148,7 @@ function carouselPanel() {
      : ""
  }
  ${["image", "gradient"].includes(o.type) ? section("Rahmenform", carouselFramePicker(o) + `<button id="carouselFrameEdit" aria-pressed="${carouselUI.framePoints}">${carouselUI.framePoints ? "Punktbearbeitung beenden" : "Rahmenpunkte bearbeiten"}</button><button id="carouselFrameReset">Rechteck zurücksetzen</button>`) : ""}
- ${carouselHasImage(o) ? section("Inhalt", '<div class="carousel-fields">' + number("panX", "Ausschnitt X", -100000) + number("panY", "Ausschnitt Y", -100000) + `</div><div class="carousel-flip-controls" role="group" aria-label="Bild spiegeln">${["flipX", "flipY"].map((key, i) => `<button data-flip="${key}" aria-pressed="${o[key] === -1}" title="${i ? "Vertikal" : "Horizontal"} spiegeln">${studioIcon("flip", i ? "flip-vertical" : "")}<span>${i ? "Vertikal" : "Horizontal"}</span></button>`).join("")}</div><button id="carouselContentEdit">${carouselUI.content ? "Zurück zum Rahmen" : "Bildausschnitt bearbeiten"}</button>` + '<button id="carouselImageFit">Rahmen füllen</button>') : ""}
+ ${carouselHasImage(o) ? section("Inhalt", '<div class="carousel-fields">' + number("panX", "Ausschnitt X", -100000) + number("panY", "Ausschnitt Y", -100000) + number("imageAngle", "Bilddrehung · °", -360, 360) + `</div><div class="carousel-flip-controls" role="group" aria-label="Bild spiegeln">${["flipX", "flipY"].map((key, i) => `<button data-flip="${key}" aria-pressed="${o[key] === -1}" title="${i ? "Vertikal" : "Horizontal"} spiegeln">${studioIcon("flip", i ? "flip-vertical" : "")}<span>${i ? "Vertikal" : "Horizontal"}</span></button>`).join("")}</div><button id="carouselContentEdit">${carouselUI.content ? "Zurück zum Rahmen" : "Bildausschnitt bearbeiten"}</button>` + '<button id="carouselImageFit">Rahmen füllen</button>') : ""}
  ${
    o.type === "logo"
      ? section(
@@ -377,7 +377,8 @@ function carouselPanel() {
     if ($("#carouselImageFit"))
       $("#carouselImageFit").onclick = () => {
         checkpoint();
-        o.scale = 1;
+        const source = p.images.find((im) => im.id === o.imageId);
+        o.scale = source ? MKWPhotoTransform.coverScale(o, source) : 1;
         o.panX = o.panY = 0;
         changed(false);
         carouselPanel();

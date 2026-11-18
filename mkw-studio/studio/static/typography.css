@@ -544,7 +544,7 @@
 }
 :is(#carouselProperties, #stepPanel)
   .typography-inspector
-  .scope-option
+  :is(.scope-option, .typo-optical-align)
   input[type="checkbox"] {
   appearance: none;
   display: grid;
@@ -559,7 +559,7 @@
 }
 :is(#carouselProperties, #stepPanel)
   .typography-inspector
-  .scope-option
+  :is(.scope-option, .typo-optical-align)
   input[type="checkbox"]:checked {
   border-color: var(--md-sys-color-primary);
   background: var(--md-sys-color-primary);
@@ -759,4 +759,27 @@
 .typo-context-actions textarea[hidden],
 .typo-context-actions .text-edit-help[hidden] {
   display: none !important;
+}
+
+:is(#carouselProperties, #stepPanel)
+  .typography-inspector
+  label.typo-optical-align {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 40px;
+  gap: 12px;
+  text-align: left;
+}
+:is(#carouselProperties, #stepPanel)
+  .typography-inspector
+  .typo-optical-align
+  input[type="checkbox"] {
+  margin: 0;
+  flex: none;
+  padding: 0;
+}
+.typography-inspector .typo-optical-align:has(input:disabled) {
+  color: var(--md-sys-color-on-surface-variant);
 }

@@ -132,6 +132,7 @@
       "workspace-dot": dark ? "#353c47" : "#c2c9d4",
       error: dark ? "#ffb4ab" : "#b3261e",
       "error-container": dark ? "#4c2425" : "#fce8e6",
+      "on-error-container": dark ? "#ffdad6" : "#410e0b",
       warning: dark ? "#ffd580" : "#835200",
       "warning-container": dark ? "#433518" : "#fff0cb",
       success: dark ? "#9ed5b4" : "#24633e",

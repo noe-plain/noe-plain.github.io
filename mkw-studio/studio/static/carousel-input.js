@@ -659,7 +659,7 @@ function carouselResize(ev, corner) {
             : null,
         );
       } catch (error) {
-        status(error.message);
+        status(error, "error");
         return;
       }
       objects.forEach((o, i) => {

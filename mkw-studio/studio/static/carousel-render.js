@@ -201,7 +201,8 @@ async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0, project = p) {
     return;
   }
   const bitmap = await loadImage(im.data, project),
-    fit = Math.max(o.w / im.width, o.h / im.height) * o.scale,
+    transform = MKWPhotoTransform.geometry(o, im),
+    fit = transform.scale,
     w = im.width * fit,
     h = im.height * fit,
     x = -w / 2,
@@ -209,8 +210,9 @@ async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0, project = p) {
     bw = bitmap.width,
     bh = bitmap.height;
   ctx.save();
-  ctx.translate(o.w / 2 + o.panX, o.h / 2 + o.panY);
-  ctx.scale(o.flipX, o.flipY);
+  ctx.translate(transform.x, transform.y);
+  if (transform.angle) ctx.rotate((transform.angle * Math.PI) / 180);
+  ctx.scale(transform.flipX, transform.flipY);
   ctx.drawImage(bitmap, x, y, w, h);
   if (edgePad) {
     // Clamp the source edge for the blur kernel. Final compositing still clips
@@ -354,7 +356,7 @@ function carouselRender() {
    )
    .join(
      "",
-   )}</div></div><div class="studio-bar-actions"><button id="carouselNotice" class="studio-action studio-notice-button" aria-controls="studioWarnings" aria-expanded="false" hidden></button><button id="carouselExport" class="studio-action" aria-label="Export">${studioIcon("export")}<span>Export</span></button></div></nav>
+   )}</div></div><div class="studio-bar-actions"><button id="carouselExport" class="studio-action" aria-label="Export">${studioIcon("export")}<span>Export</span></button></div></nav>
  <div id="carouselViewport" tabindex="0" aria-label="Designer-Montagefläche"><div id="carouselPasteboard"><div id="carouselArtwork"><canvas id="carouselCanvas" aria-label="Designer-Gestaltung"></canvas><div id="carouselGuides"></div><div id="carouselSnapOverlay"></div><div id="carouselSelectionOverlay"></div><div id="carouselEditingOverlay"></div><div id="carouselSlideControls"></div></div></div><canvas id="carouselOutsideCanvas" aria-hidden="true"></canvas></div>
  <aside id="carouselSidebar" aria-label="Designer-Eigenschaften und Ebenen"><h2 class="visually-hidden">Designer</h2><h3 class="visually-hidden">Eigenschaften</h3><section id="carouselProperties" aria-label="Eigenschaften"></section><section class="carousel-layers-panel"><div class="carousel-section-heading"><h3>Ebenen</h3></div><div id="carouselLayers"></div></section></aside><div class="carousel-statusbar"><span id="carouselHint" hidden></span><span id="carouselCoordinates" hidden></span><div class="carousel-zoom-controls studio-zoom-controls" role="group" aria-label="Zoom"><button id="carouselFit" aria-label="Artwork einpassen" title="Artwork einpassen">${studioIcon("fit")}</button><button id="carouselZoomOut" aria-label="Ansicht verkleinern" title="Ansicht verkleinern">${studioIcon("minus")}</button><label class="studio-zoom-value"><input id="carouselZoom" aria-label="Zoom in Prozent" type="number" min="5" max="200" step="1" value="${Math.round(MKWZoom.percent(carouselZoom, studioZoomReference(true)))}"><span aria-hidden="true">%</span></label><button id="carouselZoomIn" aria-label="Ansicht vergrössern" title="Ansicht vergrössern">${studioIcon("plus")}</button></div></div><input id="carouselFile" type="file" accept="image/*" multiple hidden>`;
   document.body.append(host);
@@ -365,7 +367,6 @@ function carouselRender() {
   host
     .querySelectorAll("button[data-tool]")
     .forEach((btn) => (btn.onclick = () => carouselTool(btn.dataset.tool)));
-  $("#carouselNotice").onclick = studioToggleWarnings;
   $("#carouselExport").onclick = () => {
     carouselEndText();
     openExport();
@@ -498,13 +499,23 @@ let carouselPaintBuffer = null,
 
 const carouselPaintStates = new WeakMap();
 function carouselSchedulePaint(canvas, scale, generation) {
+  const c = p.carousel,
+    objects = canvas._region
+      ? c.objects.filter((o) =>
+          MKWCarouselPolicy.intersects(carouselPaintBounds(o), canvas._region),
+        )
+      : null;
   const key = JSON.stringify([
       p.carousel.w,
       p.carousel.h,
       p.carousel.n,
       p.carousel.bg,
       p.carousel.artboards,
-      p.carousel.objects,
+      p.campaign ? c.objects : objects || c.objects,
+      c.folders,
+      c.layout,
+      c.pageStructure?.groups,
+      p.campaign ? p.boards.map((b) => b.sponsors) : null,
       canvas._region,
       scale,
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
@@ -523,6 +534,7 @@ function carouselSchedulePaint(canvas, scale, generation) {
     return;
   carouselPaintPending = {
     canvas,
+    objects,
     scale,
     region: canvas._region,
     generation,
@@ -576,18 +588,13 @@ async function carouselRunPaint() {
     if (job.region)
       ctx.translate(-job.region.x * job.scale, -job.region.y * job.scale);
     job.canvas.setAttribute("aria-busy", "true");
-    const objects = job.region
-      ? job.project.carousel.objects.filter((o) =>
-          MKWCarouselPolicy.intersects(carouselPaintBounds(o), job.region),
-        )
-      : null;
     await carouselPaint(
       ctx,
       null,
       job.scale,
       false,
       job.editingId,
-      objects,
+      job.objects,
       current,
       previewImage,
     );
@@ -603,7 +610,7 @@ async function carouselRunPaint() {
       });
     }
   } catch (error) {
-    status(error.message);
+    status(error, "error");
   } finally {
     clearTimeout(loadingTimer);
     finishLoading();

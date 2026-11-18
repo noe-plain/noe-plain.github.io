@@ -7,6 +7,10 @@ const { launch, artifact } = require("./browser.cjs");
         viewport: { width: 1500, height: 1000 },
       }),
       errors = [];
+    const openNotice = async () => {
+      if (!(await page.locator("#studioWarnings").isVisible()))
+        await page.locator("#carouselNotice").click();
+    };
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto(process.env.STUDIO_URL);
     await page.locator("#startNew").click();
@@ -15,7 +19,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#cn").fill("1");
     await page.locator("#createProject").click();
     await page.locator("#carouselCanvas").waitFor();
-  await require("./browser.cjs").waitForProjectReady(page);
+    await require("./browser.cjs").waitForProjectReady(page);
     const ids = await page.evaluate(() => {
       carouselObject("shape", {
         id: "menu-shape",
@@ -221,9 +225,11 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#projectStorageNotice").getAttribute("role"),
       "alert",
     );
+    await openNotice();
     assert(await page.locator("#projectStorageNotice").isVisible());
     for (const theme of ["light", "dark"]) {
       await page.evaluate((t) => studioSetTheme(t), theme);
+      await openNotice();
       const contrast = await page
         .locator("#projectStorageNotice")
         .evaluate((el) => {
@@ -241,6 +247,7 @@ const { launch, artifact } = require("./browser.cjs");
         contrast >= 4.5,
         "persistent save errors remain legible in both themes",
       );
+      await page.locator("#closeStudioWarnings").click();
       await action.click();
       await page.screenshot({
         animations: "disabled",
@@ -288,6 +295,7 @@ const { launch, artifact } = require("./browser.cjs");
       revision,
       undo: history.length,
     }));
+    await openNotice();
     await page.locator("#save").focus();
     await page.locator("#projectNoticeClose").focus();
     await page.keyboard.press("Enter");
@@ -306,6 +314,7 @@ const { launch, artifact } = require("./browser.cjs");
         "Bitte Projekt speichern, um die Datei zu aktualisieren.",
       ),
     );
+    await openNotice();
     assert(await page.locator("#projectStorageNotice").isVisible());
     assert.equal(
       await page.locator("#projectStorageNotice").getAttribute("role"),
@@ -325,11 +334,13 @@ const { launch, artifact } = require("./browser.cjs");
     await page.evaluate(() =>
       MKWProjects.notice("Eine andere Datei wurde geöffnet."),
     );
+    await openNotice();
     assert(await page.locator("#projectStorageNotice").isVisible());
     await page.locator("#projectNoticeClose").click();
     await page.evaluate(() =>
       MKWProjects.notice("Neue Sicherung nicht möglich.", true),
     );
+    await openNotice();
     assert(await page.locator("#projectStorageNotice").isVisible());
     assert.equal(
       await page.locator("#projectStorageNotice").getAttribute("role"),
@@ -340,6 +351,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.evaluate(() =>
       MKWProjects.notice("Neue Sicherung nicht möglich.", true),
     );
+    await openNotice();
     assert(
       await page.locator("#projectStorageNotice").isVisible(),
       "A new failed save must remain visible even with the same error text",

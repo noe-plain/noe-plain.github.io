@@ -164,10 +164,16 @@ async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
   if (o.angle) ctx.rotate((o.angle * Math.PI) / 180);
   if (framed) {
     carouselClipPhoto(ctx, o, scale);
-    const bounds = carouselImageBounds(o, project);
-    ctx.beginPath();
-    ctx.rect(bounds.x - o.x, bounds.y - o.y, bounds.w, bounds.h);
-    ctx.clip();
+    const source = project.images.find((im) => im.id === o.imageId);
+    if (source) {
+      const points = MKWPhotoTransform.corners(o, source);
+      ctx.beginPath();
+      points.forEach((point, index) =>
+        index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y),
+      );
+      ctx.closePath();
+      ctx.clip();
+    }
   }
   ctx.drawImage(
     entry.canvas,

@@ -145,11 +145,6 @@
   padding: 6px;
   font: inherit;
 }
-#carouselNotice {
-  font-size: 10px;
-  color: #ffca7e;
-  white-space: nowrap;
-}
 .carousel-toolrail {
   display: flex;
   flex-direction: column;
@@ -585,9 +580,6 @@
   }
   .carousel-contextbar #carouselToolName {
     min-width: 40px;
-  }
-  .carousel-contextbar #carouselNotice {
-    display: none;
   }
   #carouselProperties {
     padding: 12px;

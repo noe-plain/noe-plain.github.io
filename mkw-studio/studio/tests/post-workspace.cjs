@@ -343,8 +343,8 @@ const assert = require("node:assert/strict");
         border: s.borderColor,
       };
     });
-    assert.equal(warning.background, "rgb(255, 243, 204)");
-    assert.equal(warning.color, "rgb(143, 75, 0)");
+    assert.equal(warning.background, "rgb(255, 240, 203)");
+    assert.equal(warning.color, "rgb(131, 82, 0)");
     assert.equal(
       await canvas
         .locator("..")

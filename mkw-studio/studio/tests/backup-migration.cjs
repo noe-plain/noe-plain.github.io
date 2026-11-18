@@ -113,6 +113,7 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
         },
         sourceAngle: before.angle.image.angle,
         convertedAngle: angle.angle,
+        convertedImageAngle: angle.imageAngle,
       };
     }, before);
     assert(
@@ -130,8 +131,13 @@ const { launch, waitForProjectReady } = require("./browser.cjs");
       true,
       "New campaigns still start with the normal visible logo",
     );
+    assert.equal(result.convertedImageAngle, result.sourceAngle);
+    assert(
+      result.anglePixelDifference.max <= 1,
+      "Converted angle retains actual source pixels",
+    );
     console.log(
-      "PASS hidden legacy logo, original isolation and shared image comment; rotated-angle diagnostic remains an explicit retirement blocker",
+      "PASS hidden legacy logo, original isolation, shared comment and actual independent angle crop/rotation pixels",
     );
     fs.writeFileSync(
       require("./browser.cjs").artifact("backup-migration-audit.json"),

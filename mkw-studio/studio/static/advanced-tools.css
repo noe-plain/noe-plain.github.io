@@ -197,10 +197,6 @@ html[data-theme="light"] .vector-node.is-selected {
   min-width: 58px;
   padding: 12px;
 }
-.advanced-mode.carousel-mode
-  .carousel-contextbar:has(.studio-notice-button:not([hidden])) {
-  --studio-floating-actions-height: calc(var(--studio-bar-height) * 2 + 18px);
-}
 @media (max-height: 760px) {
   .advanced-mode .carousel-contextbar .studio-tool-group > button {
     height: 34px;

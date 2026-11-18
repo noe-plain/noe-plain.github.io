@@ -24,6 +24,7 @@
   --md-sys-color-workspace-dot: #c2c9d4;
   --md-sys-color-error: #b3261e;
   --md-sys-color-error-container: #fce8e6;
+  --md-sys-color-on-error-container: #410e0b;
   --md-sys-color-warning: #835200;
   --md-sys-color-warning-container: #fff0cb;
   --md-sys-color-success: #24633e;
@@ -54,6 +55,7 @@ html[data-theme="dark"] {
   --md-sys-color-workspace-dot: #353c47;
   --md-sys-color-error: #ffb4ab;
   --md-sys-color-error-container: #4c2425;
+  --md-sys-color-on-error-container: #ffdad6;
   --md-sys-color-warning: #ffd580;
   --md-sys-color-warning-container: #433518;
   --md-sys-color-success: #9ed5b4;

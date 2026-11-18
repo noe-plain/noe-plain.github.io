@@ -76,23 +76,20 @@ function carouselAngleMask(o) {
 function carouselImageBounds(o, project = p) {
   const im = project.images.find((im) => im.id === o.imageId);
   if (!im) return { x: o.x, y: o.y, w: o.w, h: o.h };
-  const scale = Math.max(o.w / im.width, o.h / im.height) * o.scale,
-    w = im.width * scale,
-    h = im.height * scale;
+  const points = MKWPhotoTransform.corners(o, im),
+    left = Math.min(...points.map((p) => p.x)),
+    top = Math.min(...points.map((p) => p.y));
   return {
-    x: o.x + o.w / 2 + o.panX - w / 2,
-    y: o.y + o.h / 2 + o.panY - h / 2,
-    w,
-    h,
+    x: o.x + left,
+    y: o.y + top,
+    w: Math.max(...points.map((p) => p.x)) - left,
+    h: Math.max(...points.map((p) => p.y)) - top,
   };
 }
 
 function carouselPhotoCoversFrame(o) {
-  const photo = carouselImageBounds(o),
-    left = photo.x - o.x,
-    top = photo.y - o.y,
-    right = left + photo.w,
-    bottom = top + photo.h;
+  const source = p.images.find((im) => im.id === o.imageId);
+  if (!source) return true;
   let local = carouselFramePoints(o).map((point) => ({
     x: point.x * o.w,
     y: point.y * o.h,
@@ -136,12 +133,7 @@ function carouselPhotoCoversFrame(o) {
     if (
       !visible.every((point) => {
         const p = carouselToLocal(o, point);
-        return (
-          p.x >= left - 0.01 &&
-          p.x <= right + 0.01 &&
-          p.y >= top - 0.01 &&
-          p.y <= bottom + 0.01
-        );
+        return MKWPhotoTransform.contains(o, source, p);
       })
     )
       return false;
