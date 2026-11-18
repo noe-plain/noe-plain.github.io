@@ -15,6 +15,19 @@ function studioPaintStops(stops, start, end, alpha = 1, endAlpha = 1) {
       ];
 }
 function studioPaintRead(o, channel = "fill") {
+  if (o.type === "angle")
+    return {
+      ...MKWAnglePolicy.fill(o),
+      enabled: true,
+      stops: [],
+      angle: 90,
+      imageId: o.imageId,
+      scale: o.scale || 1,
+      panX: o.panX || 0,
+      panY: o.panY || 0,
+      flipX: o.flipX || 1,
+      flipY: o.flipY || 1,
+    };
   if (carouselIsVector(o) || o === carouselVectorColours) {
     const mode = o[channel + "Mode"] || "solid";
     return {
@@ -72,6 +85,18 @@ function studioPaintRead(o, channel = "fill") {
   };
 }
 function studioPaintWrite(o, channel, value) {
+  if (o.type === "angle") {
+    if (!["solid", "image"].includes(value.kind))
+      throw Error("Winkel unterstützen Bild oder Farbfüllung.");
+    o.angleFillMode = value.kind;
+    o.angleColour = value.colour;
+    o.opacity = value.alpha;
+    if (value.imageId && value.imageId !== o.imageId) {
+      o.imageId = value.imageId;
+      delete o.imageSourceId;
+    }
+    return;
+  }
   if (carouselIsVector(o) || o === carouselVectorColours) {
     o[channel] = value.colour;
     o[channel + "Alpha"] = value.alpha;

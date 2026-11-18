@@ -294,6 +294,7 @@
           "Eine Reihe kann höchstens 20 Slides enthalten; ein Projekt höchstens 200.",
         );
       const page = { ...copy(base), id: id(), name: "Neue Slide" };
+      if (op !== "duplicate") delete page.reviewComment;
       created.push(page);
       order.splice(insertion, 0, page.id);
     } else if (op === "move") {
@@ -319,6 +320,7 @@
           fail("Ein Projekt kann höchstens 200 Slides enthalten.");
         while (order.length < count) {
           const page = { ...copy(base), id: id(), name: "Neue Slide" };
+          delete page.reviewComment;
           created.push(page);
           order.push(page.id);
         }
@@ -770,6 +772,7 @@
           id: id(),
           name: `Seite ${c.n + i + 1}`,
         }));
+        for (const page of added) delete page.reviewComment;
         c.artboards.push(...added);
         if (action.spread) {
           if (count > maxSpreadPages)

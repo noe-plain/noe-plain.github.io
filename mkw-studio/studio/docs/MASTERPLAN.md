@@ -50,16 +50,9 @@ Keine dieser Zeilen behauptet, dass im heutigen Produkt bereits ein neuer P0-Feh
 
 ## 5. Priorisierte offene Umsetzung – Reihenfolge 1 bis 7
 
-### 1 · Bildkommentare fertigstellen — P1 / B01
+### 1 · Bildkommentare — B01 abgeschlossen am 18. November
 
-**Stand:** Speichervertrag geprüft, sichtbarer Ablauf fehlt. Bestehende ausdrücklich priorisierte GitHub-Aufgabe.
-
-- In Exportvorschau Notiz hinzufügen, bearbeiten und entfernen; auf der Arbeitsfläche zurückhaltend beim richtigen Bild anzeigen.
-- Stabile Bild-/Slide-ID statt Vorschauindex; Zuordnung bei Ersetzen, Verschieben, Duplizieren und Löschen nachvollziehbar behandeln.
-- Begrenzte reine Texteingabe, verständliche Leer-/Fehlerzustände, Abbrechen, Undo/Redo und Tastaturalternative.
-- MKW, Browser-/Dateisicherung und vollständige Projektbeigabe im ZIP erhalten die Notiz. PNG/PDF/PSD-Motivpixel bleiben unverändert.
-
-**Warum zuerst:** Ein brauchbarer Feedbackablauf spart Rückfragen und sichert den bereits begonnenen Speichervertrag zu einer vollständigen Funktion ab. **Fertig, wenn:** Notiz nach Speichern/Öffnen und Strukturaktionen richtig zugeordnet bleibt, Abbruch nichts ändert und Exporte keine Notizpixel enthalten.
+Nachweis und Grenzen stehen unter **D29** und in [REVIEW-2026-11-18.md](REVIEW-2026-11-18.md). Nächste reguläre Priorität ist B02; B01 nicht neu beginnen.
 
 ### 2 · FD-Backup entfernen und gemeinsam benötigten Code bewahren — P1 / B02
 
@@ -72,16 +65,9 @@ Keine dieser Zeilen behauptet, dass im heutigen Produkt bereits ein neuer P0-Feh
 
 **Nutzen:** Weniger Verwirrung für Einsteigerinnen, weniger doppelte Wartung für QA. **Fertig, wenn:** Beide verbleibenden Modi ihre vollständigen Arbeitswege beherrschen, alte Dateien nutzbar bleiben und keine toten Backup-Verweise übrig sind.
 
-### 3 · Durchgehendes Artboard verbindlich machen — P1 / A01
+### 3 · Durchgehendes Artboard — A01 normaler Reihenablauf geprüft am 18. November
 
-**Stand:** Mehrere Reihen, 1–20 bündige Slides, gemeinsame Formate und reihenbezogene Bearbeitung sind bereits vorhanden; die neu bestätigte Semantik gezielt prüfen und verbleibende Abweichungen beheben, nicht bei null beginnen.
-
-- Jede Reihe ist eine einzige zusammenhängende Gestaltungsfläche. Bilder, Texte, Winkel, Verläufe, Formen und Effekte können mehrere Slides überbrücken, ohne in unabhängige Teile zerlegt zu werden.
-- Innere Slide-Grenzen sind Gestaltungshilfen und Export-Schnittpositionen, keine Bearbeitungs-, Masken- oder Effektgrenzen.
-- Reihe verschieben nimmt ihren Inhalt zusammenhängend mit. Neue Slides verändern bestehende Ausschnitte/Positionen nicht ungefragt. Mehrere Reihen bleiben unabhängig mit ausreichendem Abstand.
-- Erst beim Export in einzelne Slides schneiden. Gemeinsame Koordinaten und Renderinggrundlage verwenden; keine grosse unbeschränkte Rasterfläche voraussetzen.
-
-**Nutzen:** Grundlegende Verlässlichkeit für nahtlose Instagram-/LinkedIn-Carousels und für darauf aufbauende Vorlagen. **Fertig, wenn:** Panorama mit Text/Verlauf/Winkel/FX nach Bewegung, Zoom, MKW-Rundlauf und Export nahtlos bleibt; PNG-Slides ergeben die gemeinsame Referenz ohne Lücke/Doppelung. Kompressions- und Rastertoleranzen separat benennen. Keine Kontrolle über die Oberfläche externer Social-Media-Apps behaupten.
+Gemeinsame Fläche und Export-Schnitte nutzen bereits das vorhandene Gruppenmodell. Gezielte Abnahme unter **D30**; kein zweites Dokumentmodell eingeführt. Explizite alte Seitenmasken/Fragmentobjekte bleiben unverändert lesbar und werden nicht ungefragt entclippt. Für abweichende Altdateien ist weiterhin ein bewusster Migrationsentscheid nötig.
 
 ### 4 · Vorlagentexte mit vorbereiteten Absatzformaten — P1 / T01
 
@@ -116,19 +102,16 @@ Keine dieser Zeilen behauptet, dass im heutigen Produkt bereits ein neuer P0-Feh
 
 **Nutzen:** Kürzere wahrnehmbare Wartezeit ohne schwereren Start. **Fertig, wenn:** Kaltstart, erster Einstieg und Wechsel in beiden Modi gemessen sind; keine doppelte gemeinsame Initialisierung und keine Dokumentänderung durch die Vorbereitung.
 
-### 7 · Neue Winkel-Defaults zentral setzen — P1 / W01, kleiner abgeschlossener Schritt
+### 7 · Winkel-Defaults — W01 abgeschlossen am 18. November
 
-- Schenkelbreite **200 px**, Schein **50 px**, Intensität **0,8** für neu erzeugte Winkel.
-- Alle Erzeugungswege auf denselben Default beziehen. Bestehende Winkel und ausdrücklich in Vorlagen gespeicherte Werte nicht still überschreiben.
-
-**Nutzen:** Weniger wiederholtes Einstellen, konsistenter Ausgangspunkt. **Fertig, wenn:** Neue Winkel in den relevanten Modi dieselben Werte haben; alte Dateien und Vorlagen behalten ihre Werte. Derzeit nur vorgemerkt.
+Zentrale neue Defaults **200 px / 50 px / 0,8**, bestehende Werte bleiben erhalten. Nachweis unter **D31**.
 
 ## 6. Danach – Editorhilfen und Dateiformate
 
 | Reihenfolge / ID | Priorität | Offene Aufgabe | Abhängigkeit / überprüfbares Ziel |
 | --- | --- | --- | --- |
 | 8 / E01 | P2 | Tatsächliche Formvorschau während des Zeichnens | Gewählte Form, Proportionen, Füllung/Kontur vor Loslassen sichtbar. Escape/Pointer-Abbruch ohne Mutation/Undo-Eintrag; Zoom/Touch prüfen. |
-| 9 / E02 | P2 | Winkel mit Farbfüllung | Bestehende Bildfüllung, Maske und FX bewahren; Farbe/Deckkraft klar wählen. Dateien, Vorlagen und PNG/PDF/PSD behalten ihre Bedeutung. Nicht bereits durch die drei neuen Vorlagen umgesetzt. |
+| 9 / E02 | Erledigt – nochmals prüfen für Abschluss | Winkel mit Farbfüllung am 18. November implementiert | Nachweise D31; echte Photoshop-Handbearbeitung komplexer Effekte bleibt unter F04 offen. |
 | 10 / C01 | P2 | Pipette im Farbpicker | Sichtbare Farben bei korrekten Zoom-/Ausschnittkoordinaten übernehmen, Abbruch sicher; lokale Browseralternative bei fehlender Bildschirm-Pipetten-API. |
 | 11 / C02 | P2 | Farbhilfe mit fünf Farben | Aktive Reihenbilder lokal analysieren, fünf bearbeitbare Felder und passende Vorschläge; gezielte Übernahme ohne automatische Umfärbung. Transparenz, ähnliche Farben und grosse/fehlende Bilder behandeln. |
 | 12 / F01 | P2 | IDML: erster bearbeitbarer Textrahmen | Bestehende tatsächlich in InDesign geöffnete leere Einseiten-Basis erhalten. Einen einfachen Text mit Basisschrift exportieren und wirklich in InDesign öffnen/bearbeiten; Schema-/Referenzlücke dokumentieren. Kein nativer INDD-Browserexport. |
@@ -159,7 +142,7 @@ F01 bleibt ein begrenzter Exportmeilenstein und überholt die bestätigte Folge 
 ## 9. Freigabe und Fortschreibung
 
 1. Beim nächsten Umsetzungsauftrag von Q01 und dem ersten offenen priorisierten Schritt ausgehen, nicht von alten „nächster Schritt“-Abschnitten.
-2. Planfreigabe und bereits beauftragte Aufgaben nicht verwechseln: Dieser Lauf implementiert nichts. Bestehende Aufträge bleiben dokumentiert; die Ergänzungen vom 17. November sind ausdrücklich nur vorgemerkt.
+2. Planfreigabe und bereits beauftragte Aufgaben nicht verwechseln: Der Planungslauf vom 17. November implementierte nichts. Am 18. November wurden B01/W01/E02 auf ausdrücklichen Auftrag umgesetzt und A01 gezielt abgenommen.
 3. Neue notwendige Fehler hier mit Reproduktion, Auswirkung und Prüfkriterium ergänzen; bei P0 die begründete Umpriorisierung nennen.
 4. Nach Umsetzung tatsächlichen Commit, Tests/Browser, Datei-/Exportnachweise und Grenzen eintragen. Den Eintrag anschliessend nach unten verschieben und **„Erledigt – nochmals prüfen für Abschluss“** markieren.
 5. In der Abschlussprüfung nur relevante Regressionen wiederholen; keine bereits erfolgreiche Vollprüfung ohne neue Änderung oder Sorge grundlos neu starten. Neue spätere Änderungen verlangen ihre passende Prüfung.
@@ -176,14 +159,14 @@ F01 bleibt ein begrenzter Exportmeilenstein und überholt die bestätigte Folge 
 
 ## 11. Erledigt – nochmals prüfen für Abschluss
 
-Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskästchen bedeutet **erneute Endkontrolle**, nicht „Funktion fehlt“. Bestehende Nachweise bleiben gültig für ihren jeweils geprüften Stand; es wurde in diesem Planungslauf keine neue Browser-/Produktabnahme durchgeführt.
+Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskästchen bedeutet **erneute Endkontrolle**, nicht „Funktion fehlt“. Bestehende Nachweise bleiben gültig für ihren jeweils geprüften Stand; der Planungslauf vom 17. November enthielt keine neue Produktabnahme. Die Ergänzungen D29–D31 beziehen sich auf die tatsächlichen Prüfungen vom 18. November.
 
 | ID | Bereits umgesetzt / vorhandener Stand | Nochmals prüfen für Abschluss | Endkontrolle |
 | --- | --- | --- | --- |
 | D01 | Material-3-Grundgestaltung: Start/Bento, Flächen, Header/Toolbars, Sidebar/Ebenen, FD-Karten/Optionen, Einrichten/Vorlagen, Einstellungen, Bibliothek/Speichern/Export, Picker und Wiki | Gleiche Aktionen/States/Abstände, schmale Fenster und UI-/Artwork-Trennung am letzten Gesamtstand; nur belegte Restbefunde korrigieren. | [ ] |
 | D02 | Kontrast, zugängliche Namen, Fokus-/Popupgrenzen, Fehlermeldungen, Löschdialoge und übrige abgeschlossene Material-Auditpunkte A01–A10/F01/F02/R01 | Keine Rückkehr früherer Fehler; Grenzen manueller AT-Prüfung bleiben bei A11Y01 offen. | [ ] |
 | D03 | Einheitliche Werkzeuge ohne Advanced-Funktionssperre; kompakte Affinity-artige Fläche/Kontur mit Tausch/Ein-Aus | Vollständiger Zugriff in beiden verbleibenden Modi, sichtbare aktive Kanäle, Tastatur/Touch und keine Überlagerung. | [ ] |
-| D04 | Mehrere freie Artboards/Reihen, 1–20 Slides je Reihe, Format/Schutzzonen, lokale Nummerierung und Ebenen-/Ordnerscope | Vorhandene Grundlagen erhalten; neue durchgehende Semantik wird gesondert unter A01 fertiggestellt. | [ ] |
+| D04 | Mehrere freie Artboards/Reihen, 1–20 Slides je Reihe, Format/Schutzzonen, lokale Nummerierung und Ebenen-/Ordnerscope | Vorhandene Grundlagen erhalten; durchgehende Semantik im normalen Ablauf unter D30 gezielt abgenommen. | [ ] |
 | D05 | Seiten-/Reihenaktionen, Drag-and-drop mit Alternativen, unabhängige Formate und Inhalte | Hinzufügen/Verschieben/Duplizieren/Entfernen/Abbrechen ohne fremde Reihen zu verändern. | [ ] |
 | D06 | Getrennte Eigenschaften und Ebenen mit verschiebbarer Höhe; Sidebarbreite 300–450 px | Grenzen, Keyboard, Persistenz und gemeinsame Breiten von Header/Arbeitsfläche. | [ ] |
 | D07 | Neuer FD-Designer-Ablauf, geschützte Altdatei-Konvertierung, gleiche Formatvorlage mit individuellen Eigenschaftsabweichungen | Textinhalt und Position unabhängig verknüpft, zusätzliche Bilder individuell, alte Originale erhalten. B02 ist die spätere Modusbereinigung. | [ ] |
@@ -192,7 +175,7 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D10 | Rich-/Plain-Copy/Paste, proportionale Textskalierung und numerische Alternative | Native Tasten und Menü, Formatgrenzen, Sperren, Undo/Redo, gemischte Schriftgrössen und MKW. | [ ] |
 | D11 | Absatzgrösse nach vollständiger Markierung/Dreifachklick | Absatz erhält passende Höhe, vorige Absätze unverändert, folgende rücken mit; bei Altdaten vorhandene Regeln nicht heimlich ändern. | [ ] |
 | D12 | Ausrichtung/Blocksatz, Schweizer Silbentrennung, Absatz-/Zeilenwerte, Gross-/Hochstellung und Familienfarben | Gemeinsame Layout-/Inline-/Exporttreue, Auswahlumfang, Copyright ohne Familienkontur; benannte Vorlagen-Absatzformate unter T01 bleiben neue Arbeit. | [ ] |
-| D13 | Winkel/Bildrahmen, Masken, Inhalt-/Rahmentrennung, Drehen, Snapping und sichtbarkeitsbezogene Abdeckungswarnungen | Exportrahmen und echte sichtbare Lücken; neue Defaults W01/Farbfüllung E02 nicht als schon erledigt ansehen. | [ ] |
+| D13 | Winkel/Bildrahmen, Masken, Inhalt-/Rahmentrennung, Drehen, Snapping und sichtbarkeitsbezogene Abdeckungswarnungen | Exportrahmen und echte sichtbare Lücken; neue Defaults W01/Farbfüllung E02 unter D31 separat abgenommen. | [ ] |
 | D14 | Pfad-/Kurven-/Formwerkzeuge, Fortsetzen/Verbinden, Mehrfachpunkte, Raster/Schutzzonen und Ebenen/Ordner/FX | Kurven-/Auswahl-/Undo-Zustände, Masken und reihenbezogene Zugehörigkeit; Formvorschau E01 bleibt separat offen. | [ ] |
 | D15 | Sponsorenleisten und Gruppen, Gewichtung, Reihenfolge, automatische Darstellung, anpassbare Farbe | Heller/dunkler Hintergrund, JPG-Hintergründe, Gruppenbeschriftung und optisch stabile Logogrösse. | [ ] |
 | D16 | Projektbibliothek, Speichern/Öffnen, max. fünf Browserprojekte, Konflikt-/Wiederherstellungsschutz und Asset-Bereinigung | 50 Bilder, gelöschte Inhalte, mehrere Tabs, Quota/Abbruch und kein Download durch Autosave. | [ ] |
@@ -208,3 +191,6 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D26 | Lazy Wiki/How-to und dokumentierte bestehende Bedienwege | Nach jeder neuen Funktion aktualisieren, erst beim Öffnen laden, Suche/Tastatur und verständliche Nutzersprache. | [ ] |
 | D27 | MKW-Studio-Übersicht führt WebP als verfügbar/Redesign geplant und PDF als geplant | Kennzeichnung mit tatsächlichem Angebot abgleichen; spätere UX-Verbesserungen unter S02. | [ ] |
 | D28 | Historische CI-/Pages-/Live-Abnahmen und automatische Browser-/Dateitests vorhanden | Neueste relevante Release-Nachweise übernehmen, keine veralteten Zwischenfehler als heutigen Zustand ausgeben und keine Tests ohne tatsächlichen Lauf behaupten. | [ ] |
+| D29 | Bildkommentare B01: Vorschau-Eingabe/Bearbeiten/Entfernen, maximal 1000 Zeichen, explizites Speichern/Abbrechen, Cmd/Ctrl+Enter und Escape; diskrete M3-Notiz ausserhalb der Motive | Echte Browserabnahme mit Undo/Redo, FD-Formaten/Ersetzen/Löschen, Designer-Duplikat, Autosave/MKW und tatsächlich entpacktem ZIP. PNG/PDF/PSD-Pixel unverändert. Keine Cloud-/Mehrpersonenkommentare. | [x] lokal, CI/Live siehe Bericht |
+| D30 | A01: normale Reihe bleibt eine durchgehende Fläche mit Panorama, Text, Verlauf, Form und Winkel/FX; vorhandenes Gruppenmodell beibehalten | Bewegung pixelgleich, neue Slide erhält Ausschnitte, andere Reihe unverändert, Zoom/MKW. PNG-Schnitte vs. Gesamtreferenz: maximale Kanaldifferenz 20/255, mittlere 0,00294/255; Rastertoleranz ausdrücklich, kein verlustfreies Vektorversprechen. Explizite Altmasken bleiben erhalten. | [x] lokal, CI/Live siehe Bericht |
+| D31 | W01/E02: zentrale neue Winkel-Defaults 200/50/0,8; Bild/Farbfüllung mit bestehender Deckkraft, Crop beim Zurückwechseln erhalten | Gemeinsame Picker-/Geometrie-/Effektpfade, MKW, Vorlagen ohne erzwungenes Bild, echte PNG/PDF/PSD-Pixel inkl. Transparenz und FD-Adapter. PSD mit Rasterreferenz plus editierbarer Füllung/Maske; keine native Gesamt-FX-Abnahme behauptet. | [x] lokal, CI/Live siehe Bericht |

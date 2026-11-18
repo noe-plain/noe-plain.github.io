@@ -26,6 +26,7 @@
     "static/spread-layout-model.js",
     "static/template-model.js",
     "static/campaign-model.js",
+    "static/review-comments-model.js",
     "static/state.js",
     "static/user-fonts.js",
     "static/sponsor-model.js",
@@ -126,6 +127,7 @@
     "static/campaign-text-choice.js",
     "static/campaign-card-ui.js",
     "static/campaign-ui.js",
+    "static/review-comments.js",
     "static/start.js",
     "static/workspace-scroll.js"
   ],
@@ -147,6 +149,7 @@
     "static/paint-picker.css",
     "static/projects.css",
     "static/export-ui.css",
+    "static/review-comments.css",
     "static/carousel-refinements.css",
     "static/editor-polish.css",
     "static/typography.css",

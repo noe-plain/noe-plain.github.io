@@ -256,6 +256,7 @@ function render() {
           .join("")}</div></section>`,
     )
     .join("");
+  delete $("#boardSpace").dataset.commentSignature;
   bindFamilyTools(document);
   document
     .querySelectorAll("[data-text-type]")

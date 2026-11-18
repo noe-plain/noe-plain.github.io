@@ -1,0 +1,156 @@
+.review-comment {
+  padding: 16px 20px;
+  margin-top: 12px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+}
+.review-comment-heading,
+.review-comment-meta,
+.review-comment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.review-comment-heading h3 {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+}
+.review-comment-heading span,
+.review-comment-meta,
+.review-comment-hint {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#reviewCommentText,
+[data-note-content] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 20px;
+  max-height: 200px;
+  overflow: auto;
+}
+#reviewCommentForm label {
+  display: block;
+  font-size: 13px;
+  margin: 12px 0 6px;
+}
+#reviewCommentInput {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  min-height: 88px;
+  max-height: 220px;
+  font: inherit;
+}
+.review-comment-actions {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+#reviewCommentError {
+  color: var(--md-sys-color-error);
+  font-size: 13px;
+}
+#reviewCommentError:empty,
+#reviewCommentStatus:empty {
+  display: none;
+}
+#reviewWorkspaceNotes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.review-note-chip {
+  pointer-events: auto;
+  box-sizing: border-box;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  font:
+    12px/20px "MKW UI",
+    sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#reviewWorkspaceNotes .review-note-chip {
+  position: absolute;
+}
+.board-card > .review-note-chip {
+  margin: 8px 0;
+}
+.review-note-popup {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  box-sizing: border-box;
+  max-height: min(340px, calc(100dvh - 32px));
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 20px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: 0 8px 24px #0003;
+  z-index: 100;
+}
+.review-note-popup [data-note-close] {
+  min-height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border-radius: 50%;
+}
+.review-note-chip:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+/* Keep image navigation fixed while a long comment or edit form changes. */
+#reviewDialog[open]:has(#reviewComment) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "heading heading" "selection selection" "image note" "navigation navigation";
+  gap: 12px;
+}
+#reviewDialog:has(#reviewComment) > .dialog-heading {
+  grid-area: heading;
+}
+#reviewDialog:has(#reviewComment) > .review-current-actions {
+  grid-area: selection;
+}
+#reviewDialog:has(#reviewComment) > .review-stage {
+  grid-area: image;
+  height: auto;
+  min-height: 0;
+}
+#reviewDialog:has(#reviewComment) > .review-controls {
+  grid-area: navigation;
+}
+#reviewDialog:has(#reviewComment) > .review-comment {
+  grid-area: note;
+  margin: 0;
+  min-height: 0;
+  overflow: auto;
+}
+@media (max-width: 900px) {
+  #reviewDialog[open]:has(#reviewComment) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(120px, 1fr) auto 224px;
+    grid-template-areas: "heading" "selection" "image" "navigation" "note";
+  }
+  .review-comment-actions {
+    position: sticky;
+    bottom: 0;
+    padding-block: 6px;
+    background: var(--md-sys-color-surface-container-low);
+  }
+}

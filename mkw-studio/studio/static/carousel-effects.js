@@ -30,7 +30,7 @@ function pruneCarouselEffects() {
 }
 async function carouselPaintEffect(ctx, o, scale, loadImage, project = p) {
   const local = carouselLocalBounds(o),
-    framed = ["image", "angle"].includes(o.type),
+    framed = ["image", "angle"].includes(o.type) && !MKWAnglePolicy.solid(o),
     pad =
       Math.ceil(carouselEffectValue(o, "blur") * 3) +
       (framed ? 4 : carouselVisualPadding(o)),

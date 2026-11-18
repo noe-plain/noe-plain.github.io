@@ -402,7 +402,7 @@ function carouselKeepVectorImage(o, base) {
 }
 function carouselHasImage(o) {
   return (
-    ["image", "angle"].includes(o.type) ||
+    (["image", "angle"].includes(o.type) && !MKWAnglePolicy.solid(o)) ||
     (carouselIsVector(o) && o.fillMode === "image") ||
     (o.type === "gradient" && o.gradientFillMode === "image")
   );

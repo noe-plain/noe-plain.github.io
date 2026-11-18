@@ -121,13 +121,14 @@ function carouselPanel() {
      ],
    )}<label class="carousel-slider"><span>Deckkraft <output>${Math.round(o.opacity * 100)} %</output></span><input data-prop="opacity" type="range" min="0" max="100" step="1" value="${Math.round(o.opacity * 100)}"></label></div>`,
  )}
- ${o.imageSourceId ? `<p class="carousel-linked-source">Bild aus ${esc(c.objects.find((s) => s.id === o.imageSourceId)?.name || "Hintergrund")} · Ersetzen macht das Winkelbild unabhängig.</p>` : ""}
+ ${o.imageSourceId && !MKWAnglePolicy.solid(o) ? `<p class="carousel-linked-source">Bild aus ${esc(c.objects.find((s) => s.id === o.imageSourceId)?.name || "Hintergrund")} · Ersetzen macht das Winkelbild unabhängig.</p>` : ""}
  ${o.type === "text" ? carouselTextContentPanel(o) + MKWTypography.panel() + carouselTextFramePanel(o) : ""}
  ${carouselIsVector(o) ? carouselVectorPanel(o) : ""}
  ${o.type === "gradient" ? section("Verlauf", studioPaintCards(o) + '<button id="carouselGradientEdit">Verlauf auf der Fläche bearbeiten</button>') : ""}
  ${
    o.type === "angle"
-     ? section(
+     ? section("Füllung", studioPaintCards(o)) +
+       section(
          "Winkel",
          select(
            "direction",

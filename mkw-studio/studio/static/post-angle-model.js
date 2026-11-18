@@ -11,15 +11,16 @@
       : root.MKWPolygonClip;
   const directions = policy.directions;
   const defaults = (b, source = {}) => ({
+    ...policy.paintFields(source),
     enabled: source.enabled ?? true,
     direction: source.direction || "left",
     tip: source.tip
       ? { ...source.tip }
       : { x: source.direction === "right" ? 0.72 : 0.28, y: 0.5 },
-    thickness: source.thickness ?? 150,
-    glow: source.glow ?? 50,
+    thickness: source.thickness ?? policy.defaults.thickness,
+    glow: source.glow ?? policy.defaults.glow,
     glowColor: source.glowColor || "#ffffff",
-    glowAlpha: source.glowAlpha ?? 0.6,
+    glowAlpha: source.glowAlpha ?? policy.defaults.glowAlpha,
     image: {
       ...b.image,
       scale: Math.min(100, b.image.scale * 1.12),
@@ -45,6 +46,7 @@
       ),
       length = Math.max(w, h) * 2 + t + 4,
       o = {
+        ...policy.paintFields(a),
         type: "angle",
         direction: a.direction,
         thickness: t / Math.SQRT2,
@@ -124,6 +126,7 @@
     }));
   }
   function covers(b, im, content = b) {
+    if (policy.solid(b.angle)) return true;
     return localPoints(b, content).every(
       (p) =>
         Math.abs(p.x) <= (im.width * b.angle.image.scale) / 2 + 0.01 &&
@@ -145,6 +148,7 @@
   function validate(b) {
     const a = b.angle;
     if (a === undefined) return;
+    policy.validateFill(a);
     if (
       !a ||
       typeof a.enabled !== "boolean" ||

@@ -125,7 +125,7 @@ function carouselWarning(o) {
     if (!MKWCarouselPolicy.intersects(a, carouselObjectBounds(o)))
       return "Seitenausschnitt liegt ausserhalb seiner Seite. Position prüfen oder Rückgängig verwenden.";
   }
-  if (["image", "angle"].includes(o.type)) {
+  if (["image", "angle"].includes(o.type) && !MKWAnglePolicy.solid(o)) {
     if (!o.imageId || !p.images.some((im) => im.id === o.imageId))
       return "Bild im Rahmen fehlt. Bitte ein Bild auswählen.";
     if (!carouselPhotoCoversFrame(o))
@@ -197,6 +197,7 @@ function validateCarousel(q) {
   carouselValidateFolders(c);
   const ids = new Set();
   for (const o of c.objects) {
+    if (o.type === "angle") MKWAnglePolicy.validateFill(o);
     if (
       typeof o.id !== "string" ||
       ids.has(o.id) ||
@@ -668,10 +669,10 @@ function carouselDefault(type, rect = {}) {
     kind: "linear",
     rotation: 0,
     direction: "left",
-    thickness: 150,
-    glow: 50,
+    thickness: MKWAnglePolicy.defaults.thickness,
+    glow: MKWAnglePolicy.defaults.glow,
     glowColor: "#ffffff",
-    glowAlpha: 0.6,
+    glowAlpha: MKWAnglePolicy.defaults.glowAlpha,
     scale: 1,
     panX: 0,
     panY: 0,

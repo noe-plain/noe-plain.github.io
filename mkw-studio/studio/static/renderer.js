@@ -521,7 +521,10 @@ function updateWarning() {
       angleUncovered =
         b.angle?.enabled &&
         !MKWPostAngle.covers(b, im, MKWPostAngleEditor.area(b)),
-      angleLow = b.angle?.enabled && b.angle.image.scale > 1.001,
+      angleLow =
+        b.angle?.enabled &&
+        !MKWAnglePolicy.solid(b.angle) &&
+        b.angle.image.scale > 1.001,
       low = b.image.scale > 1.001,
       card = document.querySelector(`.board-card[data-id="${b.id}"]`);
     if (card) {
@@ -662,6 +665,7 @@ function selectBoard(id) {
 }
 const postOverlayStates = new WeakMap();
 function syncOverlays(force = false) {
+  window.MKWReviewCommentsUI?.workspace();
   const s = surfaceScale();
   for (const b of p.boards) {
     const root = document.querySelector(`.interaction[data-board="${b.id}"]`);

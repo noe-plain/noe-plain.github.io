@@ -148,6 +148,8 @@ async function carouselPaint(
     } else if (o.type === "logo") {
       const im = await carouselLogoImage(o, project);
       ctx.drawImage(im, 0, 0, o.w, o.h);
+    } else if (o.type === "angle" && MKWAnglePolicy.solid(o)) {
+      carouselPaintSolidAngle(ctx, o, scale);
     } else {
       carouselClipPhoto(ctx, o, scale);
       await carouselPaintPhoto(ctx, o, loadImage, 0, project);
@@ -171,10 +173,24 @@ function carouselClipPhoto(ctx, o, scale) {
         .padStart(2, "0");
     ctx.shadowBlur = o.glow * scale;
     ctx.fillStyle = "#ffffff";
+    if (MKWAnglePolicy.solid(o)) {
+      const outside = new Path2D(),
+        pad = Math.ceil(o.glow * 3) + 4;
+      outside.rect(-pad, -pad, o.w + 2 * pad, o.h + 2 * pad);
+      outside.addPath(path);
+      ctx.clip(outside, "evenodd");
+    }
     ctx.fill(path);
     ctx.restore();
     ctx.clip(path);
   } else ctx.clip(carouselImageMask(o));
+}
+
+function carouselPaintSolidAngle(ctx, o, scale) {
+  carouselClipPhoto(ctx, o, scale);
+  const value = MKWAnglePolicy.fill(o);
+  ctx.fillStyle = value.colour;
+  ctx.fill(carouselAngleMask(o));
 }
 
 async function carouselPaintPhoto(ctx, o, loadImage, edgePad = 0, project = p) {
@@ -749,6 +765,7 @@ function carouselRefresh() {
   carouselSyncColourWells();
   carouselDrawSnap();
   carouselSlideControls();
+  window.MKWReviewCommentsUI?.workspace();
   if (carouselUI.editing) {
     const o = c.objects.find((o) => o.id === carouselUI.editing.id);
     if (o) carouselPositionText(carouselUI.editing.el, o);

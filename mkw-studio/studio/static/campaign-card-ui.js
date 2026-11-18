@@ -38,6 +38,11 @@ const MKWCampaignCardUI = (() => {
       summary.focus({ preventScroll: true });
     };
     details.ontoggle = () => {
+      if (!details.isConnected) {
+        clean?.();
+        clean = null;
+        return;
+      }
       onToggle(details.open);
       clean?.();
       clean = null;

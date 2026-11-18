@@ -574,6 +574,9 @@ async function showReview() {
   $("#reviewSelectedCount").textContent =
     `${p.boards.filter((b) => b.checked).length} von ${p.boards.length} ausgewählt`;
   $("#reviewPrevious").disabled = $("#reviewNext").disabled = boards.length < 2;
+  window.MKWReviewCommentsUI?.show(
+    boards[(reviewIndex + boards.length) % boards.length],
+  );
   if (!boards.length) {
     $("#reviewImage").hidden = true;
     $("#reviewPosition").textContent = "Keine Auswahl";
@@ -622,10 +625,10 @@ async function showReview() {
     finishLoading();
   }
 }
-$("#reviewExport").onclick = () => {
+function openReview(boardId) {
   reviewIndex = Math.max(
     0,
-    orderedBoards().findIndex((b) => b.checked),
+    orderedBoards().findIndex((b) => (boardId ? b.id === boardId : b.checked)),
   );
   if (!$("#reviewCurrentExport")) {
     const actions = document.createElement("div");
@@ -644,7 +647,8 @@ $("#reviewExport").onclick = () => {
   }
   $("#reviewDialog").showModal();
   showReview();
-};
+}
+$("#reviewExport").onclick = () => openReview();
 $("#reviewPrevious").onclick = () => {
   reviewIndex--;
   showReview();
@@ -655,6 +659,11 @@ $("#reviewNext").onclick = () => {
 };
 $("#closeReview").onclick = () => $("#reviewDialog").close();
 $("#reviewDialog").addEventListener("keydown", (ev) => {
+  if (
+    ev.target.closest("input,textarea,select,[contenteditable=true]") ||
+    window.MKWReviewCommentsUI?.editing()
+  )
+    return;
   if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
     ev.preventDefault();
     reviewIndex += ev.key === "ArrowRight" ? 1 : -1;

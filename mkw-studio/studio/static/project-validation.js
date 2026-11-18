@@ -22,6 +22,11 @@
         !["manual", "heading"].includes(q.meta.dateSource)
       )
         throw Error("Ungültige Herkunft des Konzertdatums.");
+      const comments =
+        typeof module !== "undefined"
+          ? require("./review-comments-model.js")
+          : root.MKWReviewCommentsModel;
+      comments.validate(q);
       const ids = new Set();
       for (const i of q.images) {
         if (

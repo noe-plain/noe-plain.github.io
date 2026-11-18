@@ -1,6 +1,26 @@
 "use strict";
 const MKWPSDPost = (() => {
   async function angle(b, left, top, registry) {
+    if (MKWAnglePolicy.solid(b.angle)) {
+      const area = MKWSponsors.layout(b)?.content || b;
+      const mask = MKWPSD.polygon(
+        MKWPostAngle.visiblePoints(b, area).map((pt) => ({
+          x: pt.x + left,
+          y: pt.y + top,
+        })),
+      );
+      const canvas = makeCanvas(b.w, b.h);
+      await MKWPostAngleEditor.paint(exportContext(canvas), b, 1, {
+        only: "postAngle",
+      });
+      const appearance = { name: "Winkel", left, top, canvas, opacity: 1 };
+      const editable = MKWPSD.fill(
+        { ...appearance, opacity: b.angle.opacity ?? 1 },
+        MKWAnglePolicy.fill(b.angle).colour,
+        mask,
+      );
+      return MKWPSD.reference("Farbwinkel", appearance, editable);
+    }
     const source = asset(b),
       area = MKWSponsors.layout(b)?.content || b,
       geometry = MKWPostAngle.geometry(b, area),
@@ -37,6 +57,7 @@ const MKWPSDPost = (() => {
     g.restore();
     return {
       name: "Winkel",
+      opacity: b.angle.opacity ?? 1,
       opened: false,
       children: [
         { name: "Schein · Darstellung (gerastert)", left, top, canvas: glow },

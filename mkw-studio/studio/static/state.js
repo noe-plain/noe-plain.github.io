@@ -79,6 +79,7 @@ function checkpoint() {
   future = [];
 }
 function changed(full = true) {
+  Object.assign(p, MKWReviewCommentsModel.adopt(p));
   if (typeof MKWCampaignUI !== "undefined") MKWCampaignUI.sync();
   $("#undo").disabled = !history.length;
   $("#redo").disabled = !future.length;
@@ -312,6 +313,9 @@ async function importFiles(files) {
         showImportStage(index, files.length, f.name, 2);
         await new Promise((resolve) => setTimeout(resolve, 30));
         if (replaceId) {
+          const previous = p.images.find((i) => i.id === replaceId);
+          if (previous?.reviewComment !== undefined)
+            im.reviewComment = previous.reviewComment;
           p.images = p.images.map((i) => (i.id === replaceId ? im : i));
           p.boards
             .filter((b) => b.imageId === replaceId)

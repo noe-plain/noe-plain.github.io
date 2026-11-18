@@ -428,6 +428,9 @@ const MKWCampaignUI = (() => {
           };
         await image(im.data);
         if (p !== project) return;
+        const previous = p.images.find((a) => a.id === im.id);
+        if (previous?.reviewComment !== undefined)
+          im.reviewComment = previous.reviewComment;
         checkpoint();
         p.images = p.images.map((a) => (a.id === im.id ? im : a));
         changed();

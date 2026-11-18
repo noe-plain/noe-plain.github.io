@@ -229,6 +229,16 @@ async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
       if (MKWPSD.needsTextReference(o, layout))
         append(o, MKWPSD.reference(o.name, layer, editable));
       else append(o, editable);
+    } else if (o.type === "angle" && MKWAnglePolicy.solid(o)) {
+      const appearance = await carouselPSDLayer(o, project);
+      if (appearance) {
+        const editable = MKWPSD.fill(
+          { ...appearance, name: "Farbfüllung", opacity: o.opacity ?? 1 },
+          MKWAnglePolicy.fill(o).colour,
+          MKWPSD.imageMask(o),
+        );
+        append(o, MKWPSD.reference(o.name, appearance, editable));
+      }
     } else if (
       ["image", "angle"].includes(o.type) &&
       project.images.some((im) => im.id === o.imageId)

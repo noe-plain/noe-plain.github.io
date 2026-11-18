@@ -10,6 +10,10 @@
     typeof module !== "undefined"
       ? require("./text-edit-model.js")
       : root.MKWTextEdit;
+  const angles =
+    typeof module !== "undefined"
+      ? require("./angle-policy.js")
+      : root.MKWAnglePolicy;
   const copy = (value) => JSON.parse(JSON.stringify(value));
   const kinds = new Set([
     "text",
@@ -217,6 +221,7 @@
     const ids = new Set(),
       names = new Set();
     for (const o of c.objects) {
+      if (o.type === "angle") angles.validateFill(o);
       if (
         typeof o.id !== "string" ||
         ids.has(o.id) ||
@@ -247,6 +252,7 @@
       slots.add(slot.objectId);
       if (
         o.type === "angle" &&
+        !angles.solid(o) &&
         (!slot.sourceId ||
           !c.objects.some((s) => s.id === slot.sourceId && imageLayer(s)))
       )
@@ -289,6 +295,9 @@
           template.slots.some(
             (s) =>
               s.sourceId === o.id &&
+              !angles.solid(
+                template.carousel.objects.find((o) => o.id === s.objectId),
+              ) &&
               visible(
                 template.carousel.objects.find((o) => o.id === s.objectId),
                 template.carousel,

@@ -8,7 +8,9 @@ const MKWPostAngleEditor = (() => {
     layer === "postAngle" &&
     b.angle?.enabled;
   const postAngleEditing = (b) =>
-    postAngleActive(b) && postAngleContent.board === b.id;
+    postAngleActive(b) &&
+    !MKWAnglePolicy.solid(b.angle) &&
+    postAngleContent.board === b.id;
   function postAngleCreate(b, source = {}) {
     b.angle = MKWPostAngle.defaults(b, source);
     MKWPostAngle.cover(b, asset(b), postAngleArea(b));
@@ -63,18 +65,29 @@ const MKWPostAngleEditor = (() => {
     if (editingText) editingText.el.blur();
     step = "crop";
     layer = "postAngle";
-    postAngleContent.board = content ? b.id : null;
+    postAngleContent.board =
+      content && !MKWAnglePolicy.solid(b.angle) ? b.id : null;
     selectBoard(b.id);
     updateDock();
     draw();
   }
   async function postAnglePaint(ctx, b, scale, opts) {
     if (!b.angle?.enabled || (opts.only && opts.only !== "postAngle")) return;
+    if (MKWAnglePolicy.solid(b.angle)) {
+      const { o } = MKWPostAngle.geometry(b, postAngleArea(b));
+      ctx.save();
+      ctx.translate(o.x, o.y);
+      ctx.globalAlpha *= b.angle.opacity ?? 1;
+      carouselPaintSolidAngle(ctx, o, scale);
+      ctx.restore();
+      return;
+    }
     const { o } = MKWPostAngle.geometry(b, postAngleArea(b)),
       photo = asset(b),
       im = await (opts.preview ? previewImage : image)(photo.data),
       t = b.angle.image;
     ctx.save();
+    ctx.globalAlpha *= b.angle.opacity ?? 1;
     ctx.translate(o.x, o.y);
     carouselClipPhoto(ctx, o, scale);
     ctx.translate(-o.x, -o.y);
@@ -96,7 +109,7 @@ const MKWPostAngleEditor = (() => {
     $("#toolTitle").textContent = editing
       ? "Winkel · Bildinhalt"
       : "Winkel gestalten";
-    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bearbeiten</h3><div class="tool-button-grid post-angle-mode"><button data-angle-mode="frame" aria-pressed="${!editing}">${studioIcon("move")}Winkel</button><button data-angle-mode="content" aria-pressed="${editing}">${studioIcon("image")}Bildinhalt</button></div><p class="post-angle-hint">${editing ? "Bild ziehen oder an den Eckgriffen skalieren. Escape beendet die Bildbearbeitung." : "Winkel entlang der Mittelachse ziehen. Doppelklick öffnet den Bildinhalt."}</p></section><section class="tool-section"><h3>Winkel</h3><label>Ausrichtung<select id="postAngleDirection">${options(
+    panel.innerHTML = `<div class="panel-row"><section class="tool-section"><h3>Bearbeiten</h3><div class="tool-button-grid post-angle-mode"><button data-angle-mode="frame" aria-pressed="${!editing}">${studioIcon("move")}Winkel</button><button data-angle-mode="content" ${MKWAnglePolicy.solid(a) ? "disabled" : ""} aria-pressed="${editing}">${studioIcon("image")}Bildinhalt</button></div><p class="post-angle-hint">${editing ? "Bild ziehen oder an den Eckgriffen skalieren. Escape beendet die Bildbearbeitung." : "Winkel entlang der Mittelachse ziehen. Doppelklick öffnet den Bildinhalt."}</p></section><section class="tool-section"><h3>Winkel</h3><label>Ausrichtung<select id="postAngleDirection">${options(
       MKWAnglePolicy.choices(a.direction).map((key) => [
         key,
         { up: "Oben", left: "Links", down: "Unten", right: "Rechts (bisher)" }[
@@ -104,7 +117,46 @@ const MKWPostAngleEditor = (() => {
         ],
       ]),
       a.direction,
-    )}</select></label><label>Schenkelbreite (px)<input id="postAngleThickness" type="number" min="1" max="1000" value="${a.thickness}"></label></section><section class="tool-section"><h3>Bildinhalt</h3><div class="tool-button-grid"><button data-angle-flip="flipX">${studioIcon("flip")}Horizontal</button><button data-angle-flip="flipY">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button id="postAngleFill">Winkel vollständig füllen</button><button id="postAngleReset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Schein</h3><label>Weichheit (px)<input id="postAngleGlow" type="number" min="0" max="300" value="${a.glow}"></label><label>Deckkraft (%)<input id="postAngleGlowAlpha" type="number" min="0" max="100" value="${Math.round(a.glowAlpha * 100)}"></label><label>Farbe<input id="postAngleGlowColor" type="color" value="${a.glowColor}"></label></section></div>`;
+    )}</select></label><label>Schenkelbreite (px)<input id="postAngleThickness" type="number" min="1" max="1000" value="${a.thickness}"></label></section><section class="tool-section" id="postAngleImageControls"><h3>Bildinhalt</h3><div class="tool-button-grid"><button data-angle-flip="flipX">${studioIcon("flip")}Horizontal</button><button data-angle-flip="flipY">${studioIcon("flip", "flip-vertical")}Vertikal</button></div><button id="postAngleFill">Winkel vollständig füllen</button><button id="postAngleReset" class="tool-secondary">Bildausschnitt zurücksetzen</button></section><section class="tool-section"><h3>Schein</h3><label>Weichheit (px)<input id="postAngleGlow" type="number" min="0" max="300" value="${a.glow}"></label><label>Deckkraft (%)<input id="postAngleGlowAlpha" type="number" min="0" max="100" value="${Math.round(a.glowAlpha * 100)}"></label><label>Farbe<input id="postAngleGlowColor" type="color" value="${a.glowColor}"></label></section></div>`;
+    const solid = MKWAnglePolicy.solid(a),
+      value = MKWAnglePolicy.fill(a);
+    const fill = document.createElement("section");
+    fill.className = "tool-section";
+    fill.innerHTML = `<h3>Füllung</h3><label>Inhalt<select id="postAngleFillMode"><option value="image">Bild</option><option value="solid">Farbe</option></select></label><label id="postAngleColourLabel">Farbe<input id="postAngleColour" type="color" value="${value.colour}"></label><label>Deckkraft (%)<input id="postAngleOpacity" type="number" min="0" max="100" step="1" value="${Math.round(value.alpha * 100)}"></label>`;
+    panel.querySelector(".panel-row").prepend(fill);
+    $("#postAngleFillMode").value = value.kind;
+    $("#postAngleColourLabel").hidden = !solid;
+    $("#postAngleImageControls").hidden = solid;
+    on("postAngleFillMode", "change", (event) => {
+      const mode = event.target.value;
+      if (!["image", "solid"].includes(mode)) return;
+      mutate(() => {
+        a.angleFillMode = mode;
+        postAngleContent.board = null;
+      }, false);
+      postAnglePanel(b, panel);
+    });
+    on("postAngleColour", "change", (event) => {
+      if (/^#[a-f0-9]{6}$/i.test(event.target.value))
+        mutate(() => {
+          a.angleColour = event.target.value;
+        }, false);
+    });
+    on("postAngleOpacity", "change", (event) => {
+      const value = Number(event.target.value);
+      if (
+        !event.target.value ||
+        !Number.isFinite(value) ||
+        value < 0 ||
+        value > 100
+      ) {
+        event.target.value = Math.round((a.opacity ?? 1) * 100);
+        return;
+      }
+      mutate(() => {
+        a.opacity = value / 100;
+      }, false);
+    });
     panel
       .querySelectorAll("[data-angle-mode]")
       .forEach(

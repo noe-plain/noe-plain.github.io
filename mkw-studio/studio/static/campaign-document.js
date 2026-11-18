@@ -42,10 +42,10 @@ const MKWCampaignDocument = (() => {
     endAlpha: 1,
     kind: "linear",
     direction: "left",
-    thickness: 150,
-    glow: 50,
+    thickness: MKWAnglePolicy.defaults.thickness,
+    glow: MKWAnglePolicy.defaults.glow,
     glowColor: "#ffffff",
-    glowAlpha: 0.6,
+    glowAlpha: MKWAnglePolicy.defaults.glowAlpha,
     ...values,
   });
   function newState() {

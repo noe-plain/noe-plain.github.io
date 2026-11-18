@@ -127,7 +127,8 @@ function studioSyncPaintControls() {
       button.disabled =
         carouselObjectLocked(o) ||
         (!vector &&
-          (channel === "stroke" || !["text", "gradient"].includes(o.type)));
+          (channel === "stroke" ||
+            !["text", "gradient", "angle"].includes(o.type)));
       button.classList.toggle("is-disabled", button.disabled);
     }
     const pickerButton = $("#toolPaintPicker");
@@ -168,6 +169,18 @@ function studioSyncPaintControls() {
     );
   }
   const o = studioPaintTarget();
+  if (o.type === "angle") {
+    const opacity = document.querySelector(
+      '#carouselProperties [data-prop="opacity"]',
+    );
+    if (opacity && document.activeElement !== opacity) {
+      opacity.value = Math.round((o.opacity ?? 1) * 100);
+      opacity
+        .closest("label")
+        ?.querySelector("output")
+        ?.replaceChildren(document.createTextNode(opacity.value + " %"));
+    }
+  }
   document
     .querySelectorAll("#carouselProperties [data-paint-channel]")
     .forEach((button) => {
@@ -797,10 +810,10 @@ function studioRenderPicker(refreshHandles = true) {
         : "Inaktiv · bunte Buchstaben mit Kontur";
   $("#paintMode").disabled = !!state.adapter;
   $("#paintMode").value = gradient ? "gradient" : value.kind;
-  $("#paintMode").querySelector("[value=gradient]").disabled = $(
-    "#paintMode",
-  ).querySelector("[value=image]").disabled =
+  $("#paintMode").querySelector("[value=gradient]").disabled =
     !vector && state.object.type !== "gradient";
+  $("#paintMode").querySelector("[value=image]").disabled =
+    !vector && !["gradient", "angle"].includes(state.object.type);
   $("#paintEnabled").hidden = !vector;
   $("#paintEnabled").setAttribute("aria-pressed", String(value.enabled));
   $("#paintEnabled").innerHTML = studioIcon(
