@@ -163,9 +163,8 @@ const MKWCampaignDocument = (() => {
       name: a.name,
     }));
   }
-  async function append(q, im, boards) {
-    if ((q.carousel?.n || 0) + boards.length > 200)
-      throw Error("Maximal 200 Ausgaben pro Kampagne.");
+  function checkBoards(boards) {
+    if (boards.length > 200) throw Error("Maximal 200 Ausgaben pro Kampagne.");
     const formats = boards.map((b) => {
       const safe = MKWLayout.safeRect({ ...b, sponsors: undefined });
       return {
@@ -177,10 +176,25 @@ const MKWCampaignDocument = (() => {
         right: Math.round(safe.right),
       };
     });
-    if (formats.some((f) => !MKWCarouselPolicy.validFormat(f)))
+    const invalid = formats.flatMap((f, i) =>
+      MKWCarouselPolicy.validFormat(f)
+        ? []
+        : [`Ausgabe ${i + 1} (${f.w} × ${f.h} px)`],
+    );
+    if (invalid.length)
       throw Error(
-        "FD-Kampagnen unterstützt Formate von 240–4000 px. Passe grössere Formate im bisherigen Modus an.",
+        invalid.slice(0, 3).join(", ") +
+          (invalid.length > 3 ? ` und ${invalid.length - 3} weitere` : "") +
+          ": FD-Kampagnen benötigt 240–4000 px je Seite und gültige Safezones. " +
+          "Es wurde nichts umgewandelt oder verkleinert. Du kannst das Original im bisherigen Editor weiterbearbeiten und als MKW speichern.",
       );
+    return formats;
+  }
+  async function append(q, im, boards) {
+    if (!boards.length) return;
+    if ((q.carousel?.n || 0) + boards.length > 200)
+      throw Error("Maximal 200 Ausgaben pro Kampagne.");
+    const formats = checkBoards(boards);
     q.carousel ??= {
       ...formats[0],
       bg: "#ffffff",
@@ -368,6 +382,7 @@ const MKWCampaignDocument = (() => {
     room,
     place,
     append,
+    checkBoards,
     importPhotos,
   };
 })();

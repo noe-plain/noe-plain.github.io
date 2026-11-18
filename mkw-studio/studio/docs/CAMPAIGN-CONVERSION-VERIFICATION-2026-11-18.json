@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-18",
+  "baselineCommit": "4387ee35395a8def97b1443eb7268093585c50ef",
+  "usesUserFiles": false,
+  "retirementComplete": false,
+  "modelTests": 217,
+  "localBrowserSuites": [
+    "campaign-conversion-guard",
+    "campaign-migration",
+    "backup-migration"
+  ],
+  "guard": {
+    "result": {
+      "message": "Umwandlung nicht möglich: Ausgabe 2 (6000 × 4000 px), Ausgabe 3 (240 × 239 px): FD-Kampagnen benötigt 240–4000 px je Seite und gültige Safezones. Es wurde nichts umgewandelt oder verkleinert. Du kannst das Original im bisherigen Editor weiterbearbeiten und als MKW speichern.",
+      "dimensions": [
+        [
+          600,
+          750
+        ],
+        [
+          6000,
+          4000
+        ],
+        [
+          240,
+          239
+        ]
+      ],
+      "supported": [
+        {
+          "w": 600,
+          "h": 750,
+          "top": 56,
+          "bottom": 111,
+          "left": 56,
+          "right": 56
+        }
+      ],
+      "maximum": "Maximal 200 Ausgaben pro Kampagne."
+    },
+    "staleProjectGuard": true,
+    "staleRevisionGuard": true,
+    "unusedImageConversion": {
+      "campaign": true,
+      "rows": 1,
+      "slides": 1,
+      "status": "FD-Kampagne umgewandelt. Das ursprüngliche Projekt bleibt erhalten. Bitte das Ergebnis vor dem Export vergleichen."
+    }
+  },
+  "release": {
+    "status": "pending actual CI/live verification"
+  }
+}

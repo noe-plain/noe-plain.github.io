@@ -610,6 +610,16 @@ const MKWCampaignUI = (() => {
   }
   async function convert({ confirmed = false } = {}) {
     if (busy || p.carousel || p.campaign) return;
+    const source = p,
+      sourceRevision = revision;
+    try {
+      if (!source.boards.length)
+        throw Error("Füge zuerst ein Bild mit mindestens einer Ausgabe hinzu.");
+      MKWCampaignDocument.checkBoards(source.boards);
+    } catch (error) {
+      status("Umwandlung nicht möglich: " + error.message, "warning");
+      return;
+    }
     const accepted =
       confirmed ||
       (await MKWFeedback.ask({
@@ -619,8 +629,13 @@ const MKWCampaignUI = (() => {
         confirm: "Kopie umwandeln",
       }));
     if (!accepted) return;
-    const source = p,
-      original = snapshot(),
+    if (p !== source || revision !== sourceRevision || busy) {
+      status(
+        "Die Umwandlung wurde verworfen, weil das Projekt inzwischen gewechselt oder geändert wurde. Bitte erneut starten.",
+      );
+      return;
+    }
+    const original = snapshot(),
       q = {
         ...original,
         projectId: uid(),
@@ -666,6 +681,7 @@ const MKWCampaignUI = (() => {
       status(
         "Umwandlung nicht abgeschlossen. Das ursprüngliche Projekt bleibt erhalten: " +
           e.message,
+        "error",
       );
     } finally {
       busy = false;

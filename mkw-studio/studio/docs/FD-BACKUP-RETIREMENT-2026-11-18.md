@@ -53,3 +53,7 @@ Der oben dokumentierte historische Winkelverlust ist inzwischen im geprüften Um
 **B02 nicht abgeschlossen:** grosse Altformate und repräsentative weitere Konvertierungen bleiben vor Entfernung abzusichern. Backup-Einstieg und exklusiver Inspector sind weiterhin vorhanden, keine Dateireduktion behauptet. Nächsten Schritt 1 oben nicht erneut implementieren; von Schritt 2 und dem Formatfall weiterarbeiten.
 
 Nachtrag abgeschlossen: Code `caa828e`, vollständiger GitHub-Endlauf 44332104938 und Pages erfolgreich (217 Modelltests, 120 Chrome-/105 Firefox-Suiten). Die neue Transformationsprüfung ist auch tatsächlich live bestanden. Ausführlicher Nachweis im Qualitätsbericht; anschliessend nur Dokumentation geändert.
+
+## Weitere Fortsetzung · Konvertierungsgrenze
+
+[Konvertierungsprüfung](CAMPAIGN-CONVERSION-REVIEW-2026-11-18.md): Format-/Safezone-Prüfung vor Kopie-Aufbau, konkreter sicherer Weiterweg, Projekt-/Revisionsbindung der Bestätigung und No-op für leere Bildgruppen. Original/MKW auch für 6000×4000 bzw. 240×239 erhalten. B02 weiterhin offen: Der alte Editor bleibt für nicht unterstützte Altformate erforderlich; ein klarer Hinweis allein ist kein Ersatz und keine Modusentfernung.
