@@ -1,12 +1,14 @@
 # MKW Studio – verbindlicher Masterplan
 
-Stand: **17. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
+Stand: **18. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
 
-**Auftrag dieses Laufs: planen, konsolidieren und priorisieren. Keine Funktionsimplementierung, keine Änderung bestehender Designs und keine neue Veröffentlichung des Tools.** Prioritäten sind eine begründete Reihenfolge für die nächste Umsetzung, keine Behauptung bereits erledigter Arbeit.
+**Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
 ## 1. Grundlage, Quellen und Status
 
-- GitHub abgeglichen mit `main` **4a86da1ef7d60535b985ff50bf307ca7871c2c89**, einschliesslich der Vorlagen-Veröffentlichung vom 16. November. Der neuere Hauptzweig wurde zur Konsolidierung übernommen; gegenüber diesem Stand werden ausschliesslich Planungsunterlagen geändert. Vor einer späteren Implementierung erneut den dann aktuellen Hauptzweig abgleichen.
+- Umsetzung am 18. November auf sauberem `origin/main` **ec79fe59b8b0291137dfea81f596bd7447dc365a** begonnen; öffentliche offene Issues beim erneuten Abruf leer. Eigene getrennte Arbeitskopie verwendet. Aktuelle Code-/CI-/Live-Nachweise: [REVIEW-2026-11-18.md](REVIEW-2026-11-18.md).
+
+- Historische Konsolidierungsbasis vom 17. November: `main` **4a86da1ef7d60535b985ff50bf307ca7871c2c89**, einschliesslich der Vorlagen-Veröffentlichung vom 16. November. Der neuere Hauptzweig wurde zur Konsolidierung übernommen; gegenüber diesem Stand werden ausschliesslich Planungsunterlagen geändert. Vor einer späteren Implementierung erneut den dann aktuellen Hauptzweig abgleichen.
 - 42 Markdown-Unterlagen aus dem GitHub-Dokumentationsordner erfasst und auf offene Checklisten abgeglichen; die einschlägigen Fachpläne, Aufgaben-JSON und die bestätigten Ergänzungen vom 17. November ausgewertet. Öffentliche Repository-Issues und Meilensteine lieferten beim Abruf keine Einträge. Die öffentliche Projektseite lieferte keine auswertbare Aufgabenliste; private Boards sind damit nicht geprüft.
 - Der GitHub-Reihenplan vom 13./16. November priorisiert Bildkommentare vor Backup-Entfernung und danach Zeichen-/Farbwerkzeuge, Dateiformate und weitere Gestaltung. Diese Reihenfolge bleibt erhalten. Die neuen Artboard-/Vorlagengrundlagen werden nach der Backup-Bereinigung und vor neuen Zeichenwerkzeugen eingeordnet: Sie sichern das Verhalten, auf dem die weiteren Vorlagen aufbauen.
 - Die drei Vorlagen „Nahe am Orchester“, „Konzertauftakt“ und „Bilder-Slider“ sind laut neuerem Releasebericht bereits freigegeben, veröffentlicht und geprüft. Nicht nochmals als offene Entwurfsaufgabe beginnen. Die neue Platzhalter-/Absatzformat-Bedienung und die noch angekündigten konkreten Nutzervorlagen bleiben separate Aufgaben.

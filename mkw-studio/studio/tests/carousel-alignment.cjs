@@ -224,7 +224,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright"),
     await page.evaluate(() =>
       carouselObject("angle", { x: 230, y: 350, w: 300, h: 600 }),
     );
-    assert.equal((await object()).thickness, 150);
+    // New objects use W01; explicit legacy values are covered in angle-fill.test.js.
+    assert.equal((await object()).thickness, 200);
     assert.equal(
       await page.locator("#carouselReplace").getAttribute("class"),
       "primary carousel-place-image",
