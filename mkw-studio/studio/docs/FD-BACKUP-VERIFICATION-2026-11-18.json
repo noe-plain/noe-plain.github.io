@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-18",
+  "baselineCommit": "0e80750a4d0367f88f140e0ec1e06d021a40f079",
+  "retirementComplete": false,
+  "removedFiles": [],
+  "baselineStudio": {
+    "trackedFiles": 492,
+    "trackedBytes": 50366658,
+    "testFilesUsingLegacyEntry": 85
+  },
+  "ownSyntheticFixture": {
+    "width": 600,
+    "height": 750,
+    "imageWidth": 128,
+    "imageHeight": 128,
+    "angleRotation": 17,
+    "hiddenLogo": true,
+    "usesUserFiles": false
+  },
+  "before": {
+    "independentCopy": true,
+    "originalAnglePreserved": true,
+    "commentPreserved": true,
+    "originalLogoVisible": false,
+    "convertedLogoVisible": true,
+    "anglePixelDifference": {
+      "max": 255,
+      "mean": 12.1596,
+      "channelsAboveOne": 99524,
+      "totalChannels": 1800000
+    },
+    "sourceAngle": 17,
+    "convertedAngle": 0
+  },
+  "after": {
+    "independentCopy": true,
+    "originalAnglePreserved": true,
+    "commentPreserved": true,
+    "originalLogoVisible": false,
+    "convertedLogoVisible": false,
+    "newCampaignLogoVisible": true,
+    "anglePixelDifference": {
+      "max": 255,
+      "mean": 12.1596,
+      "channelsAboveOne": 99524,
+      "totalChannels": 1800000
+    },
+    "sourceAngle": 17,
+    "convertedAngle": 0
+  },
+  "passed": [
+    "214 model/package tests",
+    "backup-migration (source isolation, comments, hidden logo and new-campaign logo default)",
+    "campaign-migration (editable title pixels, gradient <=1 rounding level, cancellation, 50 images/100 outputs and MKW)",
+    "campaign-preview",
+    "review-comments-fd"
+  ],
+  "blockers": [
+    {
+      "id": "B02-ANGLE",
+      "status": "open",
+      "evidence": "Custom source angle rotation 17 degrees becomes 0; append also installs fixed crop 1.12/24/-24. Synthetic angle-only pixel delta remains max255, mean12.1596.",
+      "next": "Preserve source image transform independently of angle geometry, then compare real PNG/PDF/PSD/MKW paths before retiring legacy editor."
+    },
+    {
+      "id": "B02-FORMAT",
+      "status": "open",
+      "evidence": "Legacy setup permits up to 10000 px, campaign append validates 240–4000 px.",
+      "next": "Define explicit safe unsupported-file route; no automatic resizing or loss of source."
+    }
+  ],
+  "scope": "Dependency audit plus one bounded conversion fix. Existing backup entry, editor and reader remain. No size-reduction claim."
+}

@@ -97,6 +97,12 @@ const MKWCampaignMigration = (() => {
     return object;
   }
   function add(q, b, frame) {
+    // append() supplies a visible logo for new campaigns. Imported legacy
+    // documents keep their deliberate visibility instead of revealing it.
+    const logo = q.carousel.objects.find(
+      (o) => o.pageId === frame.id && o.campaignRole === "logo",
+    );
+    if (logo) logo.visible = b.elements.logo.visible;
     const layout = textBlock(b),
       gradient = textGradientGeometry(b, layout),
       main = titles(b, frame, layout);

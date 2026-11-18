@@ -60,6 +60,8 @@ Nachweis und Grenzen stehen unter **D29** und in [REVIEW-2026-11-18.md](REVIEW-2
 
 **Abhängigkeit:** B01 fertig und geprüft; der bestehende GitHub-Auftrag setzt diese Reihenfolge ausdrücklich fest.
 
+**Fortschritt 18. November, Folgeauftrag:** Abhängigkeitsmatrix und echte Konvertierungsdiagnose erstellt. Sichtbarkeit eines ausgeblendeten Logos beim Umwandeln korrigiert; neue Kampagnen unverändert. **B02 bleibt offen:** eigener Test belegt Verlust der unabhängigen Winkel-Bilddrehung/des Ausschnitts, zudem unterschiedliche Alt-/Neu-Formatgrenzen. Vor ersatzlosem Entfernen lösen. [Konkrete Schritte, Messung und sechs Personas](FD-BACKUP-RETIREMENT-2026-11-18.md). Keine Backup-Dateien oder gemeinsamen Dienste entfernt.
+
 - Funktions-/Abhängigkeitsmatrix für Designer und FD-Kampagnen erstellen: gemeinsam, modusbezogen, nur Backup oder unbenutzt; dynamische Referenzen und Vorlagen berücksichtigen.
 - Den alten Backup-Einstieg samt tatsächlich exklusiver UI/Logik entfernen. Gemeinsame Text-, Bild-, Speicher-, Export- und Wiederherstellungsfunktionen erhalten.
 - Alte MKW-Dateien weiterhin öffnen und bei Bedarf ausdrücklich in eine geschützte, bearbeitbare neue Fassung konvertieren. Kein stiller Verlust von Inhalt, Typografie, Assets oder Originaldatei.
