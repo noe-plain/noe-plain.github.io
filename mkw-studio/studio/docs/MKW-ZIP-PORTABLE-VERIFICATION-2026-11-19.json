@@ -9,6 +9,11 @@
   "studioTestsPassed": 221,
   "pythonContainerTestsPassed": 20,
   "webkitCodecOnlyPassed": true,
+  "releasedCode": "9d8be5a719de605ebc4d3fbc25d2d3782371fb18",
+  "windowsSyntheticBrowserChecksPassed": true,
+  "browserWorkflowRun": 44550941570,
+  "pagesWorkflowRun": 44550939839,
+  "liveSyntheticBrowserCheckPassed": true,
   "cases": [
     {
       "case": 1,
