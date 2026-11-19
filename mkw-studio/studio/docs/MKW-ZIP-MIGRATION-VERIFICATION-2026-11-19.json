@@ -1,0 +1,70 @@
+{
+  "milestone": "N01.2",
+  "format": "mkw-studio-zip",
+  "formatVersion": 2,
+  "schemaVersion": 2,
+  "date": "2026-11-19",
+  "tools": {
+    "unzip": "6.00",
+    "sqliteCli": "3.54.0",
+    "chrome": "157.0.8103.79"
+  },
+  "checks": {
+    "containerTestsPassed": 20,
+    "studioTestsPassed": 217,
+    "chromeSuitesPassed": [
+      "mkw-zip-migration-render",
+      "project-file-drop",
+      "native-incremental-save",
+      "project-open"
+    ],
+    "rebuiltEditorByteEqual": true,
+    "legacyFamiliesTested": ["json", "gzip", "blocks"],
+    "privateOriginalsRetained": true,
+    "browserInput": "Original and gzip MKW reconstructed by the ZIP v2 reader"
+  },
+  "cases": [
+    {
+      "case": 1,
+      "sourceFamily": "gzip",
+      "editorMode": "designer",
+      "sourceBytes": 129815491,
+      "zipBytes": 111460314,
+      "modelEqual": true,
+      "uniqueAssets": 8,
+      "mediaReferences": 9,
+      "independentZipAndSqlitePass": true,
+      "pngPixelMatches": 3,
+      "pdfFirstPageSizeAndImageMatch": true,
+      "psdCompositeAndLayerStructureMatch": true
+    },
+    {
+      "case": 2,
+      "sourceFamily": "gzip",
+      "editorMode": "fd",
+      "sourceBytes": 39527658,
+      "zipBytes": 39607932,
+      "modelEqual": true,
+      "uniqueAssets": 20,
+      "mediaReferences": 20,
+      "independentZipAndSqlitePass": true,
+      "pngPixelMatches": 18,
+      "pdfFirstPageSizeAndImageMatch": null,
+      "psdCompositeAndLayerStructureMatch": true
+    },
+    {
+      "case": 3,
+      "sourceFamily": "gzip",
+      "editorMode": "designer",
+      "sourceBytes": 7760820,
+      "zipBytes": 7983898,
+      "modelEqual": true,
+      "uniqueAssets": 4,
+      "mediaReferences": 4,
+      "independentZipAndSqlitePass": true,
+      "pngPixelMatches": 1,
+      "pdfFirstPageSizeAndImageMatch": true,
+      "psdCompositeAndLayerStructureMatch": true
+    }
+  ]
+}

@@ -20,8 +20,28 @@ Der letzte Befehl verwendet `unzip` und das eigenständige SQLite-Kommandozeilen
 | `assets/<sha256>.png` | Eine binäre PNG pro Inhalts-Hash. Beliebig viele Bildobjekte derselben Datei teilen die entsprechende Referenz im Rahmen der Profilgrenzen. |
 | `previews/<artboard-id>.png` | Eine getrennte PNG-Vorschau pro Zeichenfläche |
 
-Die gemeinsame Dateiendung ist `.mkw`. Die Familie wird anhand der Dateisignatur unterschieden. Bei ZIP entscheiden zusätzlich Formatkennung und Version im Manifest sowie die SQLite-Kennung und das Schema. Der Editor verwendet weiterhin seine vorhandenen Formate JSON, gzip-JSON und MKWBLK1. Das Öffnen oder Speichern des ZIP-Profils im Editor sowie die Migration bleiben separate Schritte.
+Die gemeinsame Dateiendung ist `.mkw`. Die Familie wird anhand der Dateisignatur unterschieden. Bei ZIP entscheiden zusätzlich Formatkennung und Version im Manifest sowie die SQLite-Kennung und das Schema. Der Editor verwendet weiterhin seine vorhandenen Formate JSON, gzip-JSON und MKWBLK1. Der lokale Konverter erzeugt ZIP v2 und kann daraus wieder eine gzip-MKW für den bestehenden Editor schreiben.
 
 Das Basisprofil verwendet ZIP STORE und begrenzt Archive auf 64 MiB, SQLite auf 4 MiB und Vorschaubilder auf längstens 1.024 Pixel. Der Leser akzeptiert die spezifizierten Einträge und genau das v1-Schema. Er prüft CRC, SHA-256, Fremdschlüssel und Manifest-/DB-Identität. PNG-Typ und Abmessungen werden anhand des Headers geprüft. Das eigentliche Dekodieren erfolgt über einen Bildleser. Die Grenzen gelten für diesen Entwicklungs-Codec. Weitere Objekttypen, Schriften, ZIP64 und Streaming werden in den Folgestufen spezifiziert.
 
 [ZIP-Spezifikation](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT) · [SQLite-Anwendungskennung](https://www.sqlite.org/pragma.html#pragma_application_id) · [SQLite-Kommandozeilenwerkzeug](https://www.sqlite.org/cli.html)
+
+## Vorhandene Projekte in MKW ZIP v2 umwandeln
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 tools/mkw-container/migration.py convert "/pfad/Original.mkw" "/pfad/Kopie – ZIP.mkw"
+PYTHONDONTWRITEBYTECODE=1 python3 tools/mkw-container/migration.py restore "/pfad/Kopie – ZIP.mkw" "/pfad/Kopie – Studio.mkw"
+```
+
+Beide Befehle brauchen einen neuen Zielnamen im gewünschten Verzeichnis. Der Konverter prüft die Quelldatei vor und nach dem Lesen. Er rekonstruiert und vergleicht das gesamte Projektmodell vor der Freigabe der neuen Datei. Die Veröffentlichung erfolgt per Hardlink zu der vollständig geschriebenen Datei im selben Dateisystem. Bei fehlender Hardlink-Unterstützung meldet der Befehl einen Fehler. Der Reader prüft ZIP-CRC, Manifest, SHA-256, SQLite-Schema, Datenbankintegrität, Fremdschlüssel und die Zuordnung jedes Medienverweises.
+
+ZIP v2 hält die geordneten Sammlungen des alten Modells in SQLite-Datensätzen fest. Unbekannte Eigenschaften und die ursprünglichen Projekt- und Objekt-IDs bleiben erhalten. Medien aus standardkonformen Base64-Daten-URLs liegen binär unter `assets/<sha256>.bin`. Identische Dateien teilen sich denselben Archiveintrag. Ungewöhnlich kodierte Daten-URLs bleiben bei Bedarf exakt in ihrer ursprünglichen Textform erhalten. Das Profil bewahrt vorhandene Vorschaudaten und erzeugt noch keine neuen Vorschaubilder.
+
+Für diesen lokalen Konverter gelten 768 MiB für die Quelle und das entpackte Legacy-JSON, 576 MiB für ZIP, 32 MiB für SQLite und 5.000 ZIP-Einträge. Der Konverter hält das Modell und die Medien während der vollständigen Prüfung im Speicher. Anwendungen für Lazy Loading und inkrementelle Aktualisierung folgen im Masterplan. Studio-Speichern und -Öffnen bleiben beim bisherigen Profil.
+
+Der manuelle Rendering-Vergleich nimmt eine private JSON-Liste mit `case`, `source` und `restored` pro Datei. Er öffnet beide Projekte im bestehenden Editor und protokolliert ausschliesslich Vergleichsergebnisse. Eingaben, Zwischenkopien und Ausgaben aus privaten Projekten gehören ausserhalb des Repositorys.
+
+```sh
+MKW_MIGRATION_INPUT=/pfad/paare.json MKW_TEST_OUTPUT=/pfad/lokale-pruefung \
+  npm run test:browser -- mkw-zip-migration-render
+```
