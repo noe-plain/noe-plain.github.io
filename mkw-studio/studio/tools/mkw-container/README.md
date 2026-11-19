@@ -45,3 +45,15 @@ Der manuelle Rendering-Vergleich nimmt eine private JSON-Liste mit `case`, `sour
 MKW_MIGRATION_INPUT=/pfad/paare.json MKW_TEST_OUTPUT=/pfad/lokale-pruefung \
   npm run test:browser -- mkw-zip-migration-render
 ```
+
+## Browser-Arbeitsmodus (N01.3)
+
+Die Module in `working-session/` verwenden das vorhandene v2-Schema. `serveSession` erhält die lokal ausgelieferte SQLite-WASM-Initialisierung. Ein Worker besitzt genau eine Arbeitskopie. `open` erhält ein schreibgeschütztes `File` und eine UUID. `asset` erhält einen Modellpfad wie `["images", 0, "data"]`. `saveText` erhält die erwartete Revision und eine Liste von Designer-Texten oder FD-Textfeldern. Eine Transaktion schreibt jeweils nur die geänderten Datensätze und die Revisionsnummer. `open` mit `resume: true` benötigt einen neuen Worker, dieselbe UUID und die zur Sitzung gehörende Quelldatei. `close` gibt den Arbeitsstand frei. `close` mit `discard: true` entfernt die Arbeitskopie.
+
+Der Test nutzt eine private Liste mit `case`, `target` und optional `targetHash`. Die lokale Testseite erhält die MKW-Dateien über den Datei-Input. Die optionalen Felder `source` und `sourceHash` erlauben zusätzlich eine Vorher-/Nachher-Prüfung der alten Arbeitskopie. Der Ergebnisbericht enthält nur Messwerte. Bezug und Version der SQLite-WASM-Ressourcen stehen im [Machbarkeitsnachweis](../design-format-probe/README.md).
+
+```sh
+node tools/mkw-container/working-session/check.mjs /pfad/sqlite-wasm/dist /pfad/paare.json /pfad/ergebnis.json
+```
+
+Der reguläre Editor verwendet weiterhin seine bisherigen MKW-Speicherwege. Das Übernehmen einer Arbeitsrevision in die portable Datei und die Anbindung an Projektdialoge und Autosave folgen im Masterplan.
