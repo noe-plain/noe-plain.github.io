@@ -470,3 +470,8 @@ Legacy family titles are identified by the existing `titles` campaign role. The 
 ## Project file drop ownership
 
 `project-dialogs` owns the Material file target and delegated drag feedback for the existing start/open actions. Once its module is initialized, `project-session.setupFileDrop` supplies availability, the existing `openFile` decoder/session boundary and contextual error reporting. The idle welcome screen deliberately keeps general editing busy; ready project-open controls are allowed without enabling background image import. Opening remains single-flight, saves prior work through the existing path, and does not obtain write permission from a dropped File. No document state or alternate persistence path belongs to drag feedback.
+
+
+## MKW ZIP v1 basis codec
+
+`tools/mkw-container/` owns the standalone N01.1 codec, SQL schema, synthetic fixture generator and independent verification recipe. The transport suffix remains `.mkw` for every project family. ZIP files carry the `mkw-studio-zip` manifest identifier and a separate schema version and SQLite application ID. Binary media have content-hash paths and previews have artboard IDs. The codec verifies paths, CRC, SHA-256, schema and foreign keys before returning the records. Work on conversion can reuse this schema and format contract. The development codec is outside the editor manifest and the current browser only opens the previous MKW families.

@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-19",
+  "sourceBaseline": "224b38c3c334e93032ad7b867ba5da5a05d9814c",
+  "file": "examples/mkw-zip-v1.mkw",
+  "bytes": 62649,
+  "sha256": "04fb2935fddf7ee96e20a16a2f0a7b0fbc9fe4374f7210ec247a303e6aa5afbd",
+  "sameToolVersionsRegenerationByteIdentical": true,
+  "unzip": {
+    "version": "6.00 (Info-ZIP/Apple)",
+    "testedEntries": 4,
+    "allCrcsPassed": true
+  },
+  "manifest": {
+    "appVersion": "2.0.0",
+    "entries": {
+      "assets/69076af2444e1b2fcfd3457cd477db0f2d49c2f0a601bfc2a7c98636d10008b9.png": {
+        "bytes": 3926,
+        "sha256": "69076af2444e1b2fcfd3457cd477db0f2d49c2f0a601bfc2a7c98636d10008b9"
+      },
+      "previews/board-1.png": {
+        "bytes": 4286,
+        "sha256": "57eec9aaa53021d1fccf12b4e88eff41e1821718c68ad1b631c0fbb1c1afb9c4"
+      },
+      "project.sqlite": {
+        "bytes": 53248,
+        "sha256": "09602dc4e49f355bd3e2bb74aca68c98aa75cce305ed70e8bc69378b0508a198"
+      }
+    },
+    "format": "mkw-studio-zip",
+    "formatVersion": 1,
+    "minimumReaderVersion": 1,
+    "project": {
+      "id": "mkw-zip-example",
+      "revision": 0,
+      "title": "MKW · Beispiel"
+    },
+    "schemaVersion": 1
+  },
+  "allEntryHashesAndSizesVerified": true,
+  "sqlite": {
+    "cliVersion": "3.54.0",
+    "integrityCheck": "ok",
+    "foreignKeyCheckEmpty": true,
+    "applicationId": 1296783194,
+    "schemaVersion": 1,
+    "artboards": [
+      {
+        "id": "board-1",
+        "width": 128,
+        "height": 80
+      }
+    ],
+    "layers": [
+      {
+        "id": "layer-1",
+        "artboard_id": "board-1",
+        "name": "Motiv"
+      }
+    ],
+    "objects": [
+      {
+        "id": "01-title",
+        "layer_id": "layer-1",
+        "text": "MKW",
+        "asset_sha256": null
+      },
+      {
+        "id": "02-image",
+        "layer_id": "layer-1",
+        "text": null,
+        "asset_sha256": "69076af2444e1b2fcfd3457cd477db0f2d49c2f0a601bfc2a7c98636d10008b9"
+      },
+      {
+        "id": "03-image",
+        "layer_id": "layer-1",
+        "text": null,
+        "asset_sha256": "69076af2444e1b2fcfd3457cd477db0f2d49c2f0a601bfc2a7c98636d10008b9"
+      }
+    ],
+    "assets": [
+      {
+        "sha256": "69076af2444e1b2fcfd3457cd477db0f2d49c2f0a601bfc2a7c98636d10008b9",
+        "mime": "image/png",
+        "width": 48,
+        "height": 32
+      }
+    ]
+  },
+  "imageDecode": {
+    "tool": "macOS sips",
+    "previewPx": [
+      128,
+      80
+    ],
+    "assetPx": [
+      48,
+      32
+    ]
+  },
+  "checks": {
+    "codecTests": 12,
+    "modelTests": 217,
+    "chrome": [
+      "project-file-drop",
+      "project-open",
+      "native-incremental-save"
+    ],
+    "editorBuildUnchanged": true
+  },
+  "editorUsesExistingMkwFormats": true,
+  "zipEditorIntegration": false,
+  "userFilesUsed": false
+}
