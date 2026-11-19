@@ -36,3 +36,7 @@ Expertenprüfung, keine Nutzerstudie. Im ersten Bereinigungs-CI-Lauf 44488529697
 ## Veröffentlichung
 
 Lokale Prüfung abgeschlossen. Tatsächlichen Codecommit, vollständigen CI-/Pages-Endstatus und Live-Abnahme ergänzen. Die zuvor elf gelöschten Quellarchive bleiben gelöscht; der anschliessende Nutzerauftrag verändert die Laufzeit gezielt um das Drop-Feld. Die Bytegleichheit des ursprünglichen reinen Archivschritts bezieht sich auf `05c9761`, nicht auf diesen neuen UI-Stand.
+
+### Beschriftungskorrektur im vollständigen Endlauf
+
+Der erste vollständige Drop-Lauf 44494795963 fand in beiden Browsern `label-content-name-mismatch`: Ein verkürztes `aria-label` überlagerte die neue sichtbare Hilfszeile. Das Feld verwendet jetzt seinen vollständigen nativen sichtbaren Buttonnamen; keine doppelte Beschreibung, keine abweichende zugängliche Beschriftung. Die unveränderte `seven-perspectives`-Prüfung besteht lokal in allen 42 Kontexten, ebenso der Drop-Fall und 217 Modelltests. Vollständigen korrigierten CI-/Live-Endnachweis anschliessend ergänzen.

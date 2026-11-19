@@ -47,5 +47,17 @@
   ],
   "release": {
     "status": "pending actual CI/live verification"
+  },
+  "firstCIAttempt": {
+    "codeCommit": "84546f221e90a92709a1edbe49e87dd45e728c6f",
+    "run": 44494795963,
+    "conclusion": "failure",
+    "case": "seven-perspectives: library label-content-name-mismatch",
+    "correction": "Use the native complete visible button label without a conflicting aria-label; no accessibility assertion removed.",
+    "localRetest": [
+      "seven-perspectives (42 contexts, no automatic violations)",
+      "project-file-drop"
+    ],
+    "conclusionAfterLocalCorrection": "success"
   }
 }
