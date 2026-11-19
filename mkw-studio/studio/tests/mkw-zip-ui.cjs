@@ -1,6 +1,13 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const { createHash } = require("node:crypto");
 const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
+
+async function fileHash(file) {
+  const hash = createHash("sha256");
+  for await (const bytes of fs.createReadStream(file)) hash.update(bytes);
+  return hash.digest("hex");
+}
 
 async function openMkw(page, file) {
   await page.locator("#projectFile").setInputFiles(file);
@@ -163,7 +170,9 @@ async function openMkw(page, file) {
       const fixtures = JSON.parse(
         fs.readFileSync(process.env.MKW_ZIP_PRIVATE_INPUT, "utf8"),
       );
+      const recovery = [];
       for (const { case: index, file: input, boards, designer } of fixtures) {
+        const sourceHash = await fileHash(input);
         const priorId = await page.evaluate(() => p.projectId);
         await openMkw(page, input);
         const state = await page.evaluate(() => ({
@@ -184,7 +193,68 @@ async function openMkw(page, file) {
         assert.equal(state.boards, boards);
         assert.equal(state.designer, designer);
         assert.equal(state.linked, false);
+
+        // Check recovery from a committed browser backup of an imported ZIP.
+        const restoredText = "ZIP · Wiederherstellungsprüfung " + index;
+        const target = await page.evaluate(async (text) => {
+          checkpoint();
+          const element = p.carousel
+            ? p.carousel.objects.find(
+                (o) => o.type === "text" && o.text.endsWith(" ·"),
+              )
+            : p.boards[0].elements.title;
+          if (p.carousel) {
+            element.textStyles = carouselTextStylesForInput(element, text);
+            element.characterStyles = [];
+          }
+          element.text = text;
+          changed(false);
+          await MKWProjects.autosave({ writeFile: false });
+          return element.id ?? null;
+        }, restoredText);
+        const expected = { id: state.id, target, restoredText };
+        await page.reload();
+        await page.locator("#startOpen").click();
+        await page.locator("#projectLibraryList[aria-busy=false]").waitFor();
+        await page
+          .locator(`#projectLibraryList [data-project-id="${state.id}"]`)
+          .click();
+        await waitForProjectReady(page);
+        const recovered = await page.evaluate(
+          ({ id, target, restoredText }) => {
+            const element = p.carousel
+              ? p.carousel.objects.find((o) => o.id === target)
+              : p.boards[0].elements.title;
+            return {
+              savedText:
+                p.projectId === id && element?.text.endsWith(restoredText),
+              boards: p.boards.length,
+              fileLinked: !!MKWProjects.fileLink(),
+            };
+          },
+          expected,
+        );
+        assert.deepEqual(recovered, {
+          savedText: true,
+          boards,
+          fileLinked: false,
+        });
+        assert.equal(await fileHash(input), sourceHash);
+        recovery.push({
+          case: index,
+          boards,
+          explicitBrowserSave: true,
+          reopenedFromLibrary: true,
+          sourceUnchanged: true,
+        });
+        console.log(
+          `Case ${index}: restored the committed browser backup after reload.`,
+        );
       }
+      fs.writeFileSync(
+        artifact("mkw-zip-recovery-results.json"),
+        JSON.stringify(recovery, null, 2) + "\n",
+      );
     }
     const designer = await browser.newPage();
     await designer.goto(process.env.STUDIO_URL);
