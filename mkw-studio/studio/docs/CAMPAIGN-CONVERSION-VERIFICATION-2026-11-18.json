@@ -51,7 +51,53 @@
     }
   },
   "release": {
-    "status": "pending actual CI/live verification"
+    "status": "success",
+    "codeCommit": "ff867e01a562c6096bf9ec84d6895b08804510b6",
+    "ciRun": 44340070962,
+    "ciConclusion": "success",
+    "pagesRun": 44340069812,
+    "pagesConclusion": "success",
+    "modelTests": 217,
+    "browserCounts": {
+      "firefox": [
+        107,
+        107
+      ],
+      "chrome": [
+        122,
+        122
+      ]
+    },
+    "verifiedOn": "2026-11-19",
+    "liveSuites": [
+      "campaign-conversion-guard",
+      "campaign-family-migration",
+      "campaign-preview"
+    ],
+    "liveConclusion": "success",
+    "liveFiles": [
+      {
+        "path": "index.html",
+        "equal": true,
+        "sha256": "6046f6615fa94b538e3228be8c8416a906c56f3ce8492879897bf3c0cbc1278a"
+      },
+      {
+        "path": "static/editor.bundle.js",
+        "equal": true,
+        "sha256": "3445a8ebb7cb78150e741b2de85fb44d65b8c14fec2dc496785aa9a1d4fa02f9"
+      },
+      {
+        "path": "static/editor.bundle.css",
+        "equal": true,
+        "sha256": "0e94dfa205e1aa6e4bff3cf34382497a96d1473f12079cce66bbeba435b91b60"
+      },
+      {
+        "path": "hilfe/index.html",
+        "equal": true,
+        "sha256": "67bd2be7cd5760796f04ae9eecb46f7169e6a90b0dd98c0b8a272a1b58beb952"
+      }
+    ],
+    "retirementComplete": false
   },
   "familyMigration": {
     "before": [

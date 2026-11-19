@@ -39,4 +39,4 @@ Expertenprüfung, keine Nutzerstudie. **FD-Backup noch vorhanden.** Für Altform
 
 ## Veröffentlichung
 
-Lokale Prüfung abgeschlossen; tatsächlichen Commit, CI-/Pages-Endstatus und Live-Abnahme nach Veröffentlichung ergänzen. Ein gestarteter Lauf ist kein Erfolgsnachweis.
+**Endnachweis am 19. November ergänzt:** Code `ff867e01a562c6096bf9ec84d6895b08804510b6`. [Vollständiger CI-Endlauf 44340070962](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44340070962) erfolgreich: 217 Modelltests, **122/122 Chrome- und 107/107 Firefox-Suiten**, beide Browser und Studio-Gate grün. [GitHub Pages 44340069812](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44340069812) erfolgreich. Drei echte Chrome-Live-Fälle (`campaign-conversion-guard`, `campaign-family-migration`, `campaign-preview`) erneut bestanden; HTML/JS/CSS/Hilfe bytegleich zum Hauptstand. Dies schliesst den Konvertierungs-/Familien-Teilschritt ab, nicht die vollständige FD-Backup-Entfernung.

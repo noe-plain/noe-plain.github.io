@@ -1,5 +1,7 @@
 # MKW Sujet Studio
 
+> Historische Anleitung zur Version 1. Aktuelle Aufgaben und Bedienstand stehen im Masterplan bzw. in der Studio-Hilfe. Alte Quellkopien wurden am 19. November 2026 aus der aktiven Auslieferung entfernt; sie bleiben in der Git-Historie erhalten.
+
 Ein tatsächlich lokal arbeitendes Webtool für Social-Media-Sujets des Musikkollegiums Winterthur. Bilder, Originaldateien, Projekte, Schriften und Exporte bleiben auf dem Mac. Kein Konto, keine Cloud, keine Analyse- oder externen Schriftanfragen.
 
 ## Start auf diesem Mac
@@ -96,7 +98,7 @@ DATUM_PROJEKTKÜRZEL_PROJEKTTITEL_FORMAT_NUMMER.jpg
 - `index.html` / `static/style.css`: deutsche responsive Oberfläche, komplett ohne externe Ressourcen.
 - `Start.command`, `vendor/`: Start und Offline-Installationsbaustein.
 - `tests/`: wiederholbare Prüfungen. Details und ehrliche Grenzen in `TESTBERICHT.md`.
-- `static/urspruengliche-demo.html`: Sicherung der vorherigen Demo, wird vom Server nicht ausgeliefert.
+- [Ursprüngliche Demo – historische Git-Fassung](https://github.com/noe-plain/noe-plain.github.io/blob/ff867e01a562c6096bf9ec84d6895b08804510b6/mkw-studio/studio/backups/urspruengliche-demo.html): keine aktive Studio-Abhängigkeit.
 
 ## Prüfungen selbst ausführen
 

@@ -1,6 +1,6 @@
 # MKW Studio – verbindlicher Masterplan
 
-Stand: **18. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
+Stand: **19. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
 
 **Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
@@ -19,15 +19,18 @@ Stand: **18. November 2026**. Dies ist die einzige aktive Aufgaben- und Priorit�
 
 **Statuswerte:** `offen`, `teilweise vorhanden`, `wartet auf Vorlage/Freigabe`, `pausiert`, `Erledigt – nochmals prüfen für Abschluss`. Nur neue tatsächliche Befunde dürfen aus der Abschlussprüfung wieder eine offene Fehleraufgabe machen.
 
-## 2. Priorisierung anhand der fünf Personas
+## 2. Priorisierung anhand der sechs Personas
 
 | Persona | Was erhält Vorrang? | Was verhindert die Priorisierung? |
 | --- | --- | --- |
-| Neue Nutzerin ohne Gestaltungswissen | Eindeutige Begriffe, sichtbarer Änderungsumfang, direkt befüllbare Vorlagen, nachvollziehbarer Speicherstatus und Fehlerhilfe. | Neue Einstellungsflut und versteckte Doppelklick-/Drag-Zwänge. |
-| Erfahrener Nutzer mit Zeitdruck | Stabile Reihen, unveränderte Bilder über Slide-Grenzen, wiederholbare Formatierung, kurze Wege, schneller Wechsel und effiziente Speicherung. | Wiederholte Handarbeit, verlorene Ausschnitte und unnötiges Neuladen. |
-| Senior UX/UI-Designerin | Zuerst ein verständliches Interaktionsmodell, danach konsistente Material-3-Komponenten und gezielte optische Korrekturen. Viel Platz für das Artwork. | Rein dekorative Komplettumbauten ohne nachgewiesenen Nutzen. |
-| Barrierefreiheitsexperte | Tastaturalternativen, Fokusführung, zugängliche Namen, verständliche Fehler und Kontrast bei jeder Etappe. | Barrierefreiheit als erst am Ende angehängte Zusatzaufgabe. |
-| Entwicklerin und QA-Testerin | Klare Modellgrenzen, sichere Dateien und Migrationen, reproduzierbare Tests, begrenzter Speicher und nachvollziehbare Abnahme. | Doppelte Komponenten, konkurrierende Dokumentmodelle und ungeprüfte Exportversprechen. |
+| Neue Nutzerin ohne Gestaltungswissen | Eindeutige Begriffe, klare Führung, verständlicher Änderungs-/Speicherstatus und direkt befüllbare Vorlagen. | Einstellungsflut und versteckte Bedienwege. |
+| Erfahrener InDesign-/Affinity-Designer | Stabile Reihen, erhaltene Layouts/Ausschnitte, bekannte Workflows, kurze Wege und effiziente Speicherung. | Wiederholte Handarbeit, Datenverlust und ungeprüfte Bearbeitbarkeitsversprechen. |
+| Senior UX-Experte | Durchgehende Nutzerwege, klare Wirkungsbereiche, geringe kognitive Last und sichere Abbruchwege. | Widersprüchliche Zustände und unbemerkte Änderungen anderer Reihen. |
+| UI-Expertin | Kohärente Material-3-Komponenten, Hierarchie, Zustände und platzsparende Desktop-Oberfläche. | Dekorative Sonderlösungen ohne funktionalen Nutzen. |
+| QA-Entwicklerin | Klare Modellgrenzen, sichere Dateien/Migrationen, messbare Leistung und reproduzierbare Abnahme. | Doppelte Modelle und ungetestete Bereinigung. |
+| Destruktiver Fehlersucher | Grenzwerte, ungewöhnliche Eingaben, schnelle Zustandswechsel, Abbruch und Wiederherstellung. | Stille Beschädigung, halbe Mutationen und verlorene Undo-/Dateiinhalte. |
+
+Tastatur, Fokus, verständliche Fehler und geeignete Kontraste gelten weiterhin für jede Etappe (Q03/A11Y01). Eine Persona-Prüfung ist keine behauptete Nutzerstudie.
 
 **Entscheidungsregel:** Nachgewiesene Datenverlust-, Sicherheits-, blockierende Bedien- oder wesentliche Zugänglichkeitsfehler sind P0 und unterbrechen die Reihenfolge. Danach zählen konkreter Alltagsnutzen und Abhängigkeiten; kleiner Aufwand allein macht eine kosmetische Aufgabe nicht dringend. Es werden keine neu geprüften Fehler oder realen Persona-Interviews behauptet.
 
@@ -69,6 +72,10 @@ Nachweis und Grenzen stehen unter **D29** und in [REVIEW-2026-11-18.md](REVIEW-2
 **Weitere Fortsetzung 18. November, Ausgang `4387ee3`:** Gemeinsame Format-/Safezone-Vorprüfung mit konkret betroffenen Ausgaben, kein stilles Verkleinern/Überspringen. Bestätigung an Projekt/Revision gebunden; ungenutzte Bildquellen erzeugen keine leeren Reihen. Alte grosse/kleine Formate bleiben im Original und MKW erhalten und werden bewusst im bisherigen Editor weiterbearbeitet. **Kein vollständiger Ersatz dieses Altdatei-Wegs, B02 daher weiter offen.** [Teilschritt, sechs Personas und Abnahme](CAMPAIGN-CONVERSION-REVIEW-2026-11-18.md). Nächster Schritt bleibt Ersatzweg für nicht unterstützte Altformate und repräsentative Migration vor Modus-/Dateiabbau.
 
 **Weiterer repräsentativer B02-Fall:** Alte Familienlayouts behalten nun alle acht Palettenversätze, die bisherige Konturreihenfolge und Copyright-Kerning. Temporärer vorhandener Kampagnen-Decorator und gemeinsamer Text-Paintpfad, keine neuen Dateifelder. Echter lokaler MKW-/PNG-/PDF-/PSD-Vergleich pixelgleich; PSD mit ehrlicher Rasterreferenz plus bearbeitbarem Titel, keine native Gesamt-Abnahme. [Nachweise im Konvertierungsbericht](CAMPAIGN-CONVERSION-REVIEW-2026-11-18.md). Grosse Altformate und eigentliche Modus-/Dateibereinigung bleiben offen.
+
+**19. November – tatsächlicher Endabgleich:** `ff867e0` ist vollständig veröffentlicht und geprüft: 217 Modelltests, 122 Chrome-/107 Firefox-Suiten, Pages erfolgreich, drei echte Live-Fälle und Bytegleichheit bestätigt. [Konvertierungsnachweis](CAMPAIGN-CONVERSION-REVIEW-2026-11-18.md).
+
+**B02-Bereinigung begonnen:** Elf ungenutzte Quellarchiv-Dateien aus `backups/` (133.152 Bytes) aus dem aktiven Baum entfernt; Git-Historie bleibt erhalten. Keine aktive Modus-/Bearbeitungsfunktion entfernt, Laufzeit-Build bleibt bytegleich. [Abhängigkeiten, Messung, sechs Personas und Freigabestand](CLEANUP-REVIEW-2026-11-19.md). Der FD-Backup-Modus selbst bleibt offen, bis der notwendige Altdatei-Weg ersetzt und repräsentativ abgenommen ist.
 
 - Funktions-/Abhängigkeitsmatrix für Designer und FD-Kampagnen erstellen: gemeinsam, modusbezogen, nur Backup oder unbenutzt; dynamische Referenzen und Vorlagen berücksichtigen.
 - Den alten Backup-Einstieg samt tatsächlich exklusiver UI/Logik entfernen. Gemeinsame Text-, Bild-, Speicher-, Export- und Wiederherstellungsfunktionen erhalten.
@@ -138,7 +145,7 @@ F01 bleibt ein begrenzter Exportmeilenstein und überholt die bestätigte Folge 
 | ID | Priorität / Status | Aufgabe | Abnahme / Grenze |
 | --- | --- | --- | --- |
 | T03 | P3, wartet auf Nutzervorlagen | Noch angekündigte konkrete Vorlagen übernehmen | T01/T02 nutzen; Originale tatsächlich zugänglich machen, Bild-/Textplätze und Formatierung prüfen. Neue Entwürfe zeigen und nur ausdrücklich freigegebene Layouts mitliefern. Drei bereits veröffentlichte Vorlagen nicht erneut entwerfen. |
-| S01 | P3 | Startseiten-Bildauswahl/-vorschau gezielt verbessern | Gewähltes Bild/Ausschnitt deutlicher, Einstellungszugang und direkter Einstieg erhalten; reale fünf-Persona-/schmale Fenster-Prüfung statt Komplettumbau aus Geschmack. |
+| S01 | P3 | Startseiten-Bildauswahl/-vorschau gezielt verbessern | Gewähltes Bild/Ausschnitt deutlicher, Einstellungszugang und direkter Einstieg erhalten; reale sechs-Persona-/schmale Fenster-Prüfung statt Komplettumbau aus Geschmack. |
 | UI02 | P2, geplant – Nutzerauftrag 18. November | Floating Labels für alle Eingabefelder | Gemeinsame Feld-Komponenten verwenden. Bei Fokus ODER vorhandenem Wert wandert das Label nach oben und wird kleiner; leer und ohne Fokus kehrt es zurück. Nutzerbeispiel: `input:focus + label, input:not(:placeholder-shown) + label` mit `top: 0` und `transform: translateY(-50%) scale(0.8)`. Vorhandenen Stand zuerst abgleichen; die Labels nicht nur bei neu erstellten Feldern anwenden. Text-/Zahl-/Such-/Datumsfelder und Textareas sowie passende Auswahlfelder übergreifend prüfen; spezifische Beschriftung nicht textbasierter Eingaben erhalten. Auch Initialwerte, Import/Projektwechsel, Autofill, 0, ungültige Zahlen, Deaktivierung/Readonly, Hell/Dunkel und reduzierte Bewegung beachten. Dauerhaft zugeordnetes echtes Label, keine Platzhalter als Ersatz; Animation ohne springendes Layout oder teure Dauerberechnung. Noch nicht umgesetzt. |
 | UI03 | P2, geplant – Nutzerauftrag 18. November | Seitenmenü für Artboards/Reihen vereinfachen | Reihe hinzufügen und anschliessend direkt anpassen können. Grösse/Format und Safezone leicht auffindbar und ohne Umwege bedienen. Klar benannte aktive Reihe und sichtbarer Reihenbezug jeder Aktion; keine unbemerkten Änderungen an anderen Reihen. Häufige Aktionen direkt sichtbar, seltene Aktionen verständlich gruppiert und leicht erreichbar. Keine zusätzlichen Overflow-Menüs oder verschachtelten Scrollbereiche; die bereits scrollende Seitenleiste bleibt der einzige Scrollkontext. Gemeinsames Gruppenmodell, einheitliche Formate je Reihe, M3-Komponenten, Desktop-Vorrang und Tablet-/Tastaturbedienung erhalten. Konkreter Ablauf und Abnahme unten; noch nicht umgesetzt. |
 | S02 | P3, Bestandsabgleich zuerst | MKW-Studio-Übersicht und WebP-Redesign | Übersicht passend zu den Tools prüfen. WebP existiert und ist als Redesign vorgemerkt, PDF als geplant gekennzeichnet. WebP-Umbau erst als begrenztes eigenes Vorhaben nach dem Designtool planen; kein zweiter aktiver Projektplan. |
@@ -172,7 +179,7 @@ UI03 verbessert die vorhandene Oberfläche; D04/D05 und das vorhandene Reihenmod
 3. Neue notwendige Fehler hier mit Reproduktion, Auswirkung und Prüfkriterium ergänzen; bei P0 die begründete Umpriorisierung nennen.
 4. Nach Umsetzung tatsächlichen Commit, Tests/Browser, Datei-/Exportnachweise und Grenzen eintragen. Den Eintrag anschliessend nach unten verschieben und **„Erledigt – nochmals prüfen für Abschluss“** markieren.
 5. In der Abschlussprüfung nur relevante Regressionen wiederholen; keine bereits erfolgreiche Vollprüfung ohne neue Änderung oder Sorge grundlos neu starten. Neue spätere Änderungen verlangen ihre passende Prüfung.
-6. Keine automatischen Termine ändern und keine zusätzlichen Automationen anlegen. Fünf-Persona-Review ist eine Expertenprüfung, keine behauptete Nutzerstudie.
+6. Keine automatischen Termine ändern und keine zusätzlichen Automationen anlegen. Sechs-Persona-Review ist eine Expertenprüfung, keine behauptete Nutzerstudie.
 
 ## 10. Quellen und historische Nachweise
 
