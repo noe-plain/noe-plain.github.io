@@ -1,6 +1,12 @@
 // Runs inside the original Studio build. Private projects enter through its
 // browser file API and are never served by the local test server.
-export async function checkSession(file) {
+import {
+  copyIntoWorkspace,
+  checkPortable,
+  checkGrowth,
+} from "./check-portable.mjs";
+
+export async function checkSession(file, portableName = "") {
   const ensure = (pass, message) => {
     if (!pass) throw Error(message);
   };
@@ -35,8 +41,12 @@ export async function checkSession(file) {
   }
 
   const sessionId = crypto.randomUUID();
+  const outputHandle = portableName ? await copyIntoWorkspace(file) : null;
   let connection = connect();
-  const args = { file, sessionId };
+  const args = {
+    file: outputHandle ? await outputHandle.getFile() : file,
+    sessionId,
+  };
   async function call(action, options) {
     const reply = await connection.send(action, options);
     if (reply.error) throw Error(reply.error);
@@ -55,6 +65,15 @@ export async function checkSession(file) {
   const localProject = p;
   try {
     const { value: first } = await call("open", args);
+    if (outputHandle) {
+      const { value: noChange } = await call("portablePlan", {
+        expectedRevision: 0,
+      });
+      ensure(
+        noChange.unchanged && noChange.bytesWritten === 0,
+        "Ungeändertes ZIP erzeugte Schreibarbeit.",
+      );
+    }
     const { value: empty } = await call("stats");
     ensure(
       empty.assetReads === 0 && empty.assetReadBytes === 0,
@@ -254,7 +273,44 @@ export async function checkSession(file) {
       noOp.opfsWriteBytes === noOpStart.opfsWriteBytes,
       "No-op hat OPFS beschrieben.",
     );
+    let portable = null;
+    if (outputHandle) {
+      portable = await checkPortable(outputHandle, portableName, call, ensure);
+    }
     await call("close", { discard: true });
+    if (portable) {
+      connection.stop();
+      connection = connect();
+      const newSession = await call("open", {
+        file: portable.file,
+        sessionId: crypto.randomUUID(),
+      });
+      ensure(
+        target(newSession.value.project).text === edit.text,
+        "Textrevision fehlt im portablen ZIP.",
+      );
+      const { value: noChange } = await call("portablePlan", {
+        expectedRevision: 0,
+      });
+      ensure(noChange.unchanged, "Erneutes Speichern erzeugte Schreibarbeit.");
+      await call("close", { discard: true });
+      if (q.boards.length === 1) {
+        const growth = await copyIntoWorkspace(portable.file);
+        connection.stop();
+        connection = connect();
+        await call("open", {
+          file: await growth.getFile(),
+          sessionId: crypto.randomUUID(),
+        });
+        await call("saveText", {
+          expectedRevision: 0,
+          edits: [{ ...edit, text: "Formatprüfung ".repeat(5500) }],
+        });
+        portable.proof.growth = await checkGrowth(growth, call, ensure);
+        await call("close", { discard: true });
+      }
+      portable.download();
+    }
 
     return {
       mode,
@@ -276,6 +332,7 @@ export async function checkSession(file) {
       workerRestartRecoveredText: true,
       recoveryMediaReadBytes: recoveryStats.assetReadBytes,
       sqliteVersion: first.dbVersion,
+      ...(portable ? { portable: portable.proof } : {}),
     };
   } finally {
     connection.stop();

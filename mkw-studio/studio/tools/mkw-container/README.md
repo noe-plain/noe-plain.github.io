@@ -20,7 +20,7 @@ Der letzte Befehl verwendet `unzip` und das eigenständige SQLite-Kommandozeilen
 | `assets/<sha256>.png` | Eine binäre PNG pro Inhalts-Hash. Beliebig viele Bildobjekte derselben Datei teilen die entsprechende Referenz im Rahmen der Profilgrenzen. |
 | `previews/<artboard-id>.png` | Eine getrennte PNG-Vorschau pro Zeichenfläche |
 
-Die gemeinsame Dateiendung ist `.mkw`. Die Familie wird anhand der Dateisignatur unterschieden. Bei ZIP entscheiden zusätzlich Formatkennung und Version im Manifest sowie die SQLite-Kennung und das Schema. Der Editor verwendet weiterhin seine vorhandenen Formate JSON, gzip-JSON und MKWBLK1. Der lokale Konverter erzeugt ZIP v2 und kann daraus wieder eine gzip-MKW für den bestehenden Editor schreiben.
+Die gemeinsame Dateiendung ist `.mkw`. Die Familie wird anhand der Dateisignatur unterschieden. Bei ZIP entscheiden zusätzlich Formatkennung und Version im Manifest sowie die SQLite-Kennung und das Schema. Der Editor liest JSON, gzip-JSON, MKWBLK1 sowie ZIP v2 und v3. Sein Standardspeicherweg bleibt erhalten. Der lokale Konverter erzeugt ZIP v2 und kann v2 oder v3 als gzip-MKW wiederherstellen.
 
 Das Basisprofil verwendet ZIP STORE und begrenzt Archive auf 64 MiB, SQLite auf 4 MiB und Vorschaubilder auf längstens 1.024 Pixel. Der Leser akzeptiert die spezifizierten Einträge und genau das v1-Schema. Er prüft CRC, SHA-256, Fremdschlüssel und Manifest-/DB-Identität. PNG-Typ und Abmessungen werden anhand des Headers geprüft. Das eigentliche Dekodieren erfolgt über einen Bildleser. Die Grenzen gelten für diesen Entwicklungs-Codec. Weitere Objekttypen, Schriften, ZIP64 und Streaming werden in den Folgestufen spezifiziert.
 
@@ -37,7 +37,7 @@ Beide Befehle brauchen einen neuen Zielnamen im gewünschten Verzeichnis. Der Ko
 
 ZIP v2 hält die geordneten Sammlungen des alten Modells in SQLite-Datensätzen fest. Unbekannte Eigenschaften und die ursprünglichen Projekt- und Objekt-IDs bleiben erhalten. Medien aus standardkonformen Base64-Daten-URLs liegen binär unter `assets/<sha256>.bin`. Identische Dateien teilen sich denselben Archiveintrag. Ungewöhnlich kodierte Daten-URLs bleiben bei Bedarf exakt in ihrer ursprünglichen Textform erhalten. Das Profil bewahrt vorhandene Vorschaudaten und erzeugt noch keine neuen Vorschaubilder.
 
-Für diesen lokalen Konverter gelten 768 MiB für die Quelle und das entpackte Legacy-JSON, 576 MiB für ZIP, 32 MiB für SQLite und 5.000 ZIP-Einträge. Der Konverter hält das Modell und die Medien während der vollständigen Prüfung im Speicher. Anwendungen für Lazy Loading und inkrementelle Aktualisierung folgen im Masterplan. Studio-Speichern und -Öffnen bleiben beim bisherigen Profil.
+Für diesen lokalen Konverter gelten 768 MiB für die Quelle und das entpackte Legacy-JSON, 576 MiB für ZIP, 32 MiB für SQLite und 5.000 ZIP-Einträge. Der Konverter hält das Modell und die Medien während der vollständigen Prüfung im Speicher. Der separate Browser-Arbeitsmodus lädt Medien bei Bedarf.
 
 Der manuelle Rendering-Vergleich nimmt eine private JSON-Liste mit `case`, `source` und `restored` pro Datei. Er öffnet beide Projekte im bestehenden Editor und protokolliert ausschliesslich Vergleichsergebnisse. Eingaben, Zwischenkopien und Ausgaben aus privaten Projekten gehören ausserhalb des Repositorys.
 
@@ -56,4 +56,11 @@ Der Test nutzt eine private Liste mit `case`, `target` und optional `targetHash`
 node tools/mkw-container/working-session/check.mjs /pfad/sqlite-wasm/dist /pfad/paare.json /pfad/ergebnis.json
 ```
 
-Der reguläre Editor verwendet weiterhin seine bisherigen MKW-Speicherwege. Das Übernehmen einer Arbeitsrevision in die portable Datei und die Anbindung an Projektdialoge und Autosave folgen im Masterplan.
+Mit `portablePlan` plant die Arbeitssitzung die Übernahme einer Textrevision in die portable Datei. Der Plan lässt bei gleich grosser Datenbank die Medienbereiche unverändert. Ein Wachstum erstellt einen kompakten Ersatz aus den vorhandenen Medien. Der folgende lokale Test erwartet ein neues Ausgabeverzeichnis und schreibt nur getrennte Kopien. UnZip und SQLite prüfen sie unabhängig.
+
+```sh
+node tools/mkw-container/working-session/check.mjs /pfad/sqlite-wasm/dist /pfad/paare.json /pfad/ergebnis.json /pfad/neue-revisionen
+PYTHONDONTWRITEBYTECODE=1 python3 tools/mkw-container/verify_revision.py /pfad/paare.json /pfad/neue-revisionen
+```
+
+Im regulären Editor ist die ZIP-Kopie eine zusätzliche Option. Die verknüpfte inkrementelle Speicherung im normalen Studio und ihre Plattformabnahme stehen im [Masterplan](../../docs/MASTERPLAN.md).

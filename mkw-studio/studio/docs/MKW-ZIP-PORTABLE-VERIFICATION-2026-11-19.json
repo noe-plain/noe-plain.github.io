@@ -1,0 +1,63 @@
+{
+  "formatVersion": 3,
+  "schemaVersion": 2,
+  "chrome": "157.0.8103.79",
+  "platform": "darwin",
+  "unzip": "6.00",
+  "sqliteCli": "3.54.0",
+  "localChromeSuitesPassed": 5,
+  "studioTestsPassed": 221,
+  "pythonContainerTestsPassed": 20,
+  "webkitCodecOnlyPassed": true,
+  "cases": [
+    {
+      "case": 1,
+      "mediaEntriesByteEqual": 8,
+      "mediaPayloadBytesRetained": 111390955,
+      "zipAndSqlitePassed": true,
+      "onlyExpectedTextChanged": true,
+      "initialCopyBytes": 111460314,
+      "updatedZipBytes": 111460314,
+      "actuallyWrittenBytes": 9995,
+      "mediaReadBytesForPlanning": 0,
+      "mediaWriteBytes": 0,
+      "archiveWriteAbortPreservedFile": true,
+      "staleFileStampRejected": true,
+      "untouchedSourceZip": true
+    },
+    {
+      "case": 2,
+      "mediaEntriesByteEqual": 20,
+      "mediaPayloadBytesRetained": 39517414,
+      "zipAndSqlitePassed": true,
+      "onlyExpectedTextChanged": true,
+      "initialCopyBytes": 39607932,
+      "updatedZipBytes": 39607932,
+      "actuallyWrittenBytes": 12058,
+      "mediaReadBytesForPlanning": 0,
+      "mediaWriteBytes": 0,
+      "archiveWriteAbortPreservedFile": true,
+      "staleFileStampRejected": true,
+      "untouchedSourceZip": true
+    },
+    {
+      "case": 3,
+      "mediaEntriesByteEqual": 4,
+      "mediaPayloadBytesRetained": 7920231,
+      "zipAndSqlitePassed": true,
+      "onlyExpectedTextChanged": true,
+      "initialCopyBytes": 7983898,
+      "updatedZipBytes": 7983898,
+      "actuallyWrittenBytes": 9303,
+      "mediaReadBytesForPlanning": 0,
+      "mediaWriteBytes": 0,
+      "archiveWriteAbortPreservedFile": true,
+      "staleFileStampRejected": true,
+      "growth": {
+        "fullRewriteBytes": 8065819,
+        "assetCount": 4
+      },
+      "untouchedSourceZip": true
+    }
+  ]
+}

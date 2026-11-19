@@ -1,108 +1,18 @@
+import {
+  checkSchema,
+  readScope,
+  verifiedReferences,
+} from "../../../static/mkw-zip/model-db.mjs";
 // The portable database is the seed for a private, revisioned OPFS work copy.
-const APPLICATION_ID = 0x4d4b575a;
 const DB_PATH = "/working.sqlite";
+const SNAPSHOT_DB = "/portable.sqlite";
 const STATE_SCHEMA = `CREATE TABLE working_state (
   singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
   source_manifest TEXT NOT NULL,
   revision INTEGER NOT NULL CHECK (revision >= 0)
 ) STRICT`;
-const schemaObjects = `SELECT type,name,tbl_name,sql FROM sqlite_schema
-  WHERE sql IS NOT NULL ORDER BY type,name`;
-const fields =
-  "SELECT name,kind,json_value FROM fields WHERE scope=? ORDER BY position";
-const records =
-  "SELECT json_value FROM records WHERE scope=? AND collection=? ORDER BY position";
 const locateText = `SELECT position,json_value FROM records
   WHERE scope=? AND collection=? AND legacy_id=? LIMIT 2`;
-
-function checkSchema(db, sqlite, schema, resumed) {
-  usingSchema(sqlite, schema, resumed, (reference) => {
-    if (
-      db.selectValue("PRAGMA application_id") !== APPLICATION_ID ||
-      db.selectValue("PRAGMA user_version") !== 2 ||
-      JSON.stringify(db.selectArrays(schemaObjects)) !==
-        JSON.stringify(reference.selectArrays(schemaObjects)) ||
-      db.selectValue("PRAGMA integrity_check") !== "ok" ||
-      db.selectArrays("PRAGMA foreign_key_check").length !== 0
-    )
-      throw Error("Ungültige MKW-Arbeitsdatenbank.");
-  });
-}
-
-function usingSchema(sqlite, schema, working, inspect) {
-  const reference = new sqlite.oo1.DB(":memory:");
-  try {
-    reference.exec(schema);
-    if (working) reference.exec(STATE_SCHEMA);
-    inspect(reference);
-  } finally {
-    reference.close();
-  }
-}
-
-function readScope(db, scope) {
-  const result = Object.create(null);
-  for (const [key, kind, value] of db.selectArrays(fields, [scope])) {
-    const name = JSON.parse(key);
-    if (kind === "scope") {
-      if (scope !== "project" || !["carousel", "campaign"].includes(name))
-        throw Error("Ungültiger MKW-Abschnitt.");
-      result[name] = readScope(db, name);
-    } else if (kind === "records") {
-      result[name] = db.selectValues(records, [scope, key]).map(JSON.parse);
-    } else {
-      result[name] = JSON.parse(value);
-    }
-  }
-  return result;
-}
-
-function verifiedReferences(db, project, zip) {
-  const assets = new Map(
-    db.selectArrays("SELECT sha256,byte_count FROM assets"),
-  );
-  if (
-    assets.size !== zip.assets.size ||
-    [...assets].some(([hash, size]) => zip.assets.get(hash) !== size)
-  )
-    throw Error("Ungültiger MKW-Medienindex.");
-  const refs = new Map();
-  const referenced = new Set();
-  for (const [storedPath, hash, prefix, encoding] of db.selectArrays(
-    "SELECT path_json,sha256,url_prefix,encoding FROM asset_refs",
-  )) {
-    const path = JSON.parse(storedPath);
-    if (!Array.isArray(path) || path.length === 0)
-      throw Error("Ungültige MKW-Medienreferenz.");
-    let value = project;
-    for (const key of path) {
-      if (
-        value === null ||
-        typeof value !== "object" ||
-        (Array.isArray(value)
-          ? !Number.isSafeInteger(key)
-          : typeof key !== "string") ||
-        !Object.hasOwn(value, key)
-      )
-        throw Error("Ungültige MKW-Medienreferenz.");
-      value = value[key];
-    }
-    const key = JSON.stringify(path);
-    const lower = prefix.toLowerCase();
-    if (
-      value !== null ||
-      refs.has(key) ||
-      (encoding === "base64"
-        ? !lower.startsWith("data:") || !lower.endsWith(";base64,")
-        : prefix !== "")
-    )
-      throw Error("Ungültige MKW-Medienreferenz.");
-    refs.set(key, { hash, encoding, type: prefix.slice(5).split(";")[0] });
-    referenced.add(hash);
-  }
-  if (referenced.size !== assets.size) throw Error("Verwaistes MKW-Medium.");
-  return refs;
-}
 
 function stageText(db, pending, edit) {
   const { kind, id, element, text } = edit || {};
@@ -168,7 +78,7 @@ export async function openWorkingDb(sqlite, schema, zip, sessionId, resume) {
     db.exec(
       "PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON; PRAGMA query_only=ON",
     );
-    checkSchema(db, sqlite, schema, resume);
+    checkSchema(db, sqlite, schema, resume ? STATE_SCHEMA : "");
     const source = zip.source;
     const origin = db.selectArray(
       "SELECT source_family,source_sha256,model_sha256 FROM project",
@@ -203,8 +113,43 @@ export async function openWorkingDb(sqlite, schema, zip, sessionId, resume) {
       throw Error("MKW-Quelle stimmt nicht mit dem Arbeitsstand überein.");
 
     const revision = () => db.selectValue("SELECT revision FROM working_state");
+    async function exportDatabase(expectedRevision) {
+      if (revision() !== expectedRevision)
+        throw Error("Arbeitsstand wurde inzwischen geändert.");
+      pool.importDb(SNAPSHOT_DB, await zip.readDatabase());
+      try {
+        const snapshot = new pool.OpfsSAHPoolDb(SNAPSHOT_DB);
+        try {
+          snapshot.exec("PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON");
+          const sql =
+            "SELECT scope,collection,position,json_value FROM records ORDER BY scope,collection,position";
+          const current = db.selectArrays(sql);
+          const prior = snapshot.selectArrays(sql);
+          if (current.length !== prior.length)
+            throw Error("MKW-Datensatzstruktur wurde geändert.");
+          snapshot.transaction(() => {
+            for (const [i, row] of current.entries()) {
+              if (row.slice(0, 3).some((key, k) => key !== prior[i][k]))
+                throw Error("MKW-Datensatzstruktur wurde geändert.");
+              if (row[3] !== prior[i][3])
+                snapshot.exec(
+                  "UPDATE records SET json_value=? WHERE scope=? AND collection=? AND position=?",
+                  { bind: [row[3], ...row.slice(0, 3)] },
+                );
+            }
+          });
+          checkSchema(snapshot, sqlite, schema);
+        } finally {
+          snapshot.close();
+        }
+        return pool.exportFile(SNAPSHOT_DB);
+      } finally {
+        pool.unlink(SNAPSHOT_DB);
+      }
+    }
     return {
       refs,
+      exportDatabase,
       snapshot: { project, revision: revision() },
       getProject: () => ({
         project: readScope(db, "project"),

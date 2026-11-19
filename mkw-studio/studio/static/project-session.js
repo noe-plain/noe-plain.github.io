@@ -248,6 +248,8 @@ const MKWProjects = (() => {
     MKWFields.notice(loadingTarget, "Projektdatei wird geöffnet …");
     const finishLoading = MKWUIControls.loading(loadingTarget);
     try {
+      const isZip = await MKWProjectFile.isZip(file);
+      if (isZip) handle = null;
       const document = MKWProjectAssets.hydrate(
         await MKWProjectFile.decode(file),
       );
@@ -277,9 +279,11 @@ const MKWProjects = (() => {
       success = true;
       await autosave({ writeFile: false });
       notice(
-        handle
-          ? ""
-          : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
+        isZip
+          ? "MKW ZIP geöffnet. Die Quelldatei bleibt erhalten. Aktuelle Änderungen kannst du als neue MKW-ZIP-Kopie herunterladen."
+          : handle
+            ? ""
+            : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
       );
     } finally {
       finishLoading();
@@ -322,6 +326,10 @@ const MKWProjects = (() => {
       )
         throw Error("Dateizugriff wurde nicht freigegeben.");
       MKWFields.notice($("#psdStatus"), "Projektdatei wird vorbereitet …");
+      if (handle && (await MKWProjectFile.isZip(await handle.getFile())))
+        throw Error(
+          "Diese MKW-ZIP-Datei bleibt erhalten. Bitte einen neuen Dateinamen wählen.",
+        );
       if (
         asNew &&
         fileLink() &&
@@ -389,6 +397,27 @@ const MKWProjects = (() => {
         $("#psdStatus").classList.add("save-error");
         $("#psdStatus").setAttribute("role", "alert");
       }
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+  async function downloadZipCopy() {
+    if (busy) return;
+    const name = saveFileName("mkw").replace(/\.mkw$/i, " – ZIP.mkw");
+    setSaveBusy(true);
+    $("#psdStatus").classList.remove("save-error");
+    MKWFields.notice($("#psdStatus"), "MKW-ZIP-Kopie wird vorbereitet …");
+    try {
+      const copy = await MKWProjectFile.encodeZip(MKWProjectAssets.capture(p));
+      download(copy, name);
+      status("MKW-ZIP-Kopie heruntergeladen.");
+      $("#saveDialog").close();
+    } catch (error) {
+      MKWFields.notice(
+        $("#psdStatus"),
+        "MKW ZIP konnte nicht gespeichert werden: " + error.message,
+        true,
+      );
     } finally {
       setSaveBusy(false);
     }
@@ -592,6 +621,7 @@ const MKWProjects = (() => {
       event.target.value = "";
     };
     $("#saveProject").onclick = () => saveFile();
+    $("#saveZipCopy").onclick = downloadZipCopy;
     const dateHint = document.createElement("small");
     dateHint.id = "saveDateHint";
     $("#saveDate").after(dateHint);

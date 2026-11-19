@@ -213,6 +213,7 @@ async function openExport() {
       updateExportNames();
     });
   $("#exportFormat").value = exportOptions.format;
+  $("#exportZipProfile").checked = false;
   $("#exportQuality").value = exportOptions.quality;
   $("#png8").checked = exportOptions.png8;
   $("#pngColours").value = exportOptions.colours;
@@ -438,6 +439,7 @@ async function runExport(mode) {
   const plan = clone(exportPlan),
     settings = exportSettings(),
     projectSnapshot = mode === "zip" ? snapshot() : null,
+    zipProfile = $("#exportZipProfile").checked,
     disabled = new Map();
   $("#exportDialog")
     .querySelectorAll("input,select,button")
@@ -456,7 +458,9 @@ async function runExport(mode) {
         "Projektdatei für ZIP wird vorbereitet …",
       );
     const projectFile = projectSnapshot
-      ? await MKWProjectFile.encode(projectSnapshot)
+      ? await (zipProfile ? MKWProjectFile.encodeZip : MKWProjectFile.encode)(
+          projectSnapshot,
+        )
       : null;
     if (mode === "folder")
       folder = await window.showDirectoryPicker({ mode: "readwrite" });

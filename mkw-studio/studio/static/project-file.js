@@ -9,6 +9,22 @@
   async function encode(project, options) {
     return encodeDocument(MKWProjectAssets.compact(project), options);
   }
+  async function isZip(file) {
+    const header = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+    return (
+      header[0] === 0x50 &&
+      header[1] === 0x4b &&
+      header[2] === 3 &&
+      header[3] === 4
+    );
+  }
+  async function zipOperation(action, input) {
+    const { runZipOperation } = await import("./mkw-zip/client.mjs");
+    return runZipOperation(action, input);
+  }
+  function encodeZip(project) {
+    return zipOperation("encode", project);
+  }
   async function encodeDocument(
     document,
     { compress = true, assetCollections = collections } = {},
@@ -66,6 +82,7 @@
     if (file.size > maxBytes) throw Error("Die Datei ist zu gross.");
     if (file.slice && (await blocks.isBlockFile(file)))
       return blocks.decode(file, { maxBytes });
+    if (file.slice && (await isZip(file))) return zipOperation("decode", file);
     const header = file.slice
       ? new Uint8Array(await file.slice(0, 2).arrayBuffer())
       : [];
@@ -196,7 +213,7 @@
       reader.releaseLock();
     }
   }
-  const api = { encode, encodeDocument, decode };
+  const api = { encode, encodeDocument, decode, isZip, encodeZip };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectFile = api;
 })(globalThis);

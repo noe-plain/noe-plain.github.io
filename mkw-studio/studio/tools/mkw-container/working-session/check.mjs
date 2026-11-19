@@ -1,16 +1,16 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
-const [vendorDir, inputs, output] = process.argv.slice(2);
+const [vendorDir, inputs, output, portableDirectory] = process.argv.slice(2);
 if (!vendorDir || !inputs || !output)
   throw Error(
-    "Usage: node check.mjs <SQLite WASM dist> <private pairs.json> <result.json>",
+    "Usage: node check.mjs <SQLite WASM dist> <private pairs.json> <result.json> [new portable output directory]",
   );
 const studio = fileURLToPath(new URL("../../../", import.meta.url));
 const vendor = resolve(vendorDir);
@@ -56,6 +56,7 @@ async function hash(file) {
 }
 let browser;
 try {
+  if (portableDirectory) await mkdir(portableDirectory);
   browser = await chromium.launch({
     executablePath:
       process.env.CHROME_PATH ||
@@ -93,14 +94,24 @@ try {
         document.body.append(input);
       });
       await page.locator("#working-session-fixture").setInputFiles(target);
-      const result = await page.evaluate(async () => {
-        const { checkSession } = await import(
-          "./tools/mkw-container/working-session/check-page.mjs"
-        );
-        return checkSession(
-          document.getElementById("working-session-fixture").files[0],
-        );
-      });
+      const portableName = portableDirectory ? `case-${caseId}.mkw` : "";
+      const transfer = portableName ? page.waitForEvent("download") : null;
+      const result = await page
+        .evaluate(async (portableName) => {
+          const { checkSession } = await import(
+            "./tools/mkw-container/working-session/check-page.mjs"
+          );
+          return checkSession(
+            document.getElementById("working-session-fixture").files[0],
+            portableName,
+          );
+        }, portableName)
+        .catch(async (error) => {
+          transfer?.catch(() => {});
+          throw error;
+        });
+      if (transfer)
+        await (await transfer).saveAs(resolve(portableDirectory, portableName));
       assert.equal(await hash(target), before);
       if (sourceHash) assert.equal(await hash(source), sourceHash);
       proof.cases.push({

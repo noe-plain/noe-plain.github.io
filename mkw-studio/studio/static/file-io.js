@@ -56,11 +56,30 @@ function setSaveBusy(value) {
 
 async function writeFilePlan(handle, plan) {
   if (plan.unchanged) return;
+  async function checkTarget() {
+    const { size, lastModified, probe } = plan.expected;
+    const current = await handle.getFile();
+    const data = await current
+      .slice(probe.offset, probe.offset + probe.length)
+      .arrayBuffer();
+    const bytes = new Uint8Array(await crypto.subtle.digest("SHA-256", data));
+    const hash = Array.from(bytes, (n) => n.toString(16).padStart(2, "0")).join(
+      "",
+    );
+    if (
+      current.size !== size ||
+      current.lastModified !== lastModified ||
+      hash !== probe.sha256
+    )
+      throw Error("Die Zieldatei wurde ausserhalb des Studios geändert.");
+  }
+  if (plan.expected) await checkTarget();
   const stream = await handle.createWritable({
     keepExistingData: plan.keepExistingData,
     mode: "exclusive",
   });
   try {
+    if (plan.expected) await checkTarget();
     for (const write of plan.writes)
       await stream.write({
         type: "write",

@@ -1,5 +1,6 @@
-import { openZipV2 } from "./zip-v2.mjs";
+import { openMkwZip } from "../../../static/mkw-zip/zip-reader.mjs";
 import { openWorkingDb } from "./session-db.mjs";
+import { planSnapshot } from "../../../static/mkw-zip/zip-writer.mjs";
 
 const MAX_CACHE_BYTES = 64 * 1024 ** 2;
 const MAX_CACHE_ITEMS = 32;
@@ -18,15 +19,15 @@ export function serveSession(initSqlite, channel = self) {
       if (started)
         throw Error("Der Worker gehört bereits zu einer MKW-Arbeitssitzung.");
       started = true;
-      const container = await openZipV2(file);
+      const container = await openMkwZip(file);
       const [sqlite, schema] = await Promise.all([
         initSqlite(),
-        fetch(new URL("../migration-schema.sql", import.meta.url)).then(
-          (response) => {
-            if (!response.ok) throw Error("MKW-Schema fehlt.");
-            return response.text();
-          },
-        ),
+        fetch(
+          new URL("../../../static/mkw-zip/schema.sql", import.meta.url),
+        ).then((response) => {
+          if (!response.ok) throw Error("MKW-Schema fehlt.");
+          return response.text();
+        }),
       ]);
       const { snapshot, ...session } = await openWorkingDb(
         sqlite,
@@ -72,6 +73,9 @@ export function serveSession(initSqlite, channel = self) {
     },
     saveText({ expectedRevision, edits }) {
       return working.saveText(expectedRevision, edits);
+    },
+    async portablePlan({ expectedRevision }) {
+      return planSnapshot(zip, await working.exportDatabase(expectedRevision));
     },
     async close({ discard = false }) {
       await working.close(discard === true);

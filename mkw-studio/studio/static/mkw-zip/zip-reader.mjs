@@ -1,13 +1,13 @@
-// Read the STORED MKW ZIP v2 profile without materializing or extracting the archive.
-const MAX_ARCHIVE = 576 * 1024 ** 2;
-const MAX_DATABASE = 32 * 1024 ** 2;
-const MAX_MANIFEST = 1024 ** 2;
+// Read STORED MKW ZIP profiles with schema 2 without extracting the archive.
+export const MAX_ARCHIVE = 576 * 1024 ** 2;
+export const MAX_DATABASE = 32 * 1024 ** 2;
+export const MAX_MANIFEST = 1024 ** 2;
 const decoder = new TextDecoder("utf-8", { fatal: true });
 const hashPattern = /^[a-f0-9]{64}$/;
 const assetPath = (hash) => `assets/${hash}.bin`;
 const validName =
   /^(manifest\.json|project\.sqlite|assets\/[a-f0-9]{64}\.bin)$/;
-const invalid = () => Error("Ungültiger MKW-ZIP-v2-Container.");
+const invalid = () => Error("Ungültiger oder unbekannter MKW-ZIP-Container.");
 const view = (bytes) =>
   new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 
@@ -22,12 +22,12 @@ export function crc32(bytes) {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-async function sha256(bytes) {
+export async function sha256(bytes) {
   const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
   return Array.from(hash, (n) => n.toString(16).padStart(2, "0")).join("");
 }
 
-export async function openZipV2(file) {
+export async function openMkwZip(file) {
   if (!(file instanceof Blob) || file.size < 22 || file.size > MAX_ARCHIVE)
     throw invalid();
   async function read(offset, length) {
@@ -83,7 +83,14 @@ export async function openZipV2(file) {
       throw invalid();
     const name = decoder.decode(directory.subarray(cursor + 46, nameEnd));
     if (!validName.test(name) || entries.has(name)) throw invalid();
-    entries.set(name, { flags, crc, size, offset, name });
+    entries.set(name, {
+      flags,
+      crc,
+      size,
+      offset,
+      name,
+      central: start + cursor,
+    });
     cursor = next;
   }
 
@@ -104,7 +111,7 @@ export async function openZipV2(file) {
       throw invalid();
   }
 
-  async function entryBytes(entry) {
+  async function payloadOffset(entry) {
     const { offset, size, name, flags, crc } = entry;
     const header = view(await read(offset, 30 + name.length));
     const extra = header.getUint16(28, true);
@@ -121,8 +128,11 @@ export async function openZipV2(file) {
       payload + size > entry.end
     )
       throw invalid();
-    const bytes = await read(payload, size);
-    if (crc32(bytes) !== crc) throw Error("Ungültige ZIP-Prüfsumme.");
+    return payload;
+  }
+  async function entryBytes(entry) {
+    const bytes = await read(await payloadOffset(entry), entry.size);
+    if (crc32(bytes) !== entry.crc) throw Error("Ungültige ZIP-Prüfsumme.");
     return bytes;
   }
 
@@ -131,11 +141,13 @@ export async function openZipV2(file) {
   const assets = new Map();
   if (
     manifest?.format !== "mkw-studio-zip" ||
-    manifest.formatVersion !== 2 ||
+    ![2, 3].includes(manifest.formatVersion) ||
     manifest.schemaVersion !== 2 ||
-    manifest.minimumReaderVersion !== 2 ||
+    manifest.minimumReaderVersion !== manifest.formatVersion ||
     typeof manifest.appVersion !== "string" ||
     !["json", "gzip", "blocks"].includes(manifest.source?.family) ||
+    typeof manifest.source.sha256 !== "string" ||
+    typeof manifest.source.modelSha256 !== "string" ||
     !hashPattern.test(manifest.source.sha256) ||
     !hashPattern.test(manifest.source.modelSha256) ||
     Object.keys(manifest.entries || {}).length !== entries.size - 1 ||
@@ -146,7 +158,11 @@ export async function openZipV2(file) {
   for (const [name, entry] of entries) {
     if (name === "manifest.json") continue;
     const record = manifest.entries[name];
-    if (record?.bytes !== entry.size || !hashPattern.test(record?.sha256))
+    if (
+      record?.bytes !== entry.size ||
+      typeof record.sha256 !== "string" ||
+      !hashPattern.test(record.sha256)
+    )
       throw invalid();
     if (name === "project.sqlite") continue;
     if (name !== assetPath(record.sha256)) throw invalid();
@@ -162,6 +178,10 @@ export async function openZipV2(file) {
   }
   return {
     source: manifest.source,
+    manifest,
+    file,
+    entries,
+    payloadOffset,
     identity: await sha256(manifestBytes),
     assets,
     counts,

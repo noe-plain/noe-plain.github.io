@@ -21,7 +21,7 @@ from codec import APPLICATION_ID, FORMAT, FormatError, family, manifest_json, sc
 
 SCHEMA_VERSION = 2
 FORMAT_VERSION = 2
-SCHEMA = Path(__file__).with_name("migration-schema.sql").read_text(encoding="utf-8")
+SCHEMA = (Path(__file__).resolve().parents[2] / "static/mkw-zip/schema.sql").read_text(encoding="utf-8")
 ASSET = re.compile(r"assets/([a-f0-9]{64})\.bin")
 HASH = re.compile(r"[a-f0-9]{64}")
 BLOCK_PREFIX = re.compile(r"data:[^,\r\n]{0,256};base64,")
@@ -262,7 +262,7 @@ def expand_scope(db, scope, scopes_seen):
     for expected, (pos, key, kind, value) in enumerate(db.execute(
         "SELECT position,name,kind,json_value FROM fields WHERE scope=? ORDER BY position", (scope,)
     )):
-        name = load_json(key.encode("ascii"))
+        name = load_json(key.encode("utf-8"))
         if not isinstance(name, str) or name in result or expected != pos:
             raise FormatError("Invalid project field ordering")
         if kind == "scope":
@@ -279,13 +279,13 @@ def expand_scope(db, scope, scopes_seen):
             )):
                 if item_pos != index:
                     raise FormatError("Invalid ordered project collection")
-                row = load_json(item.encode("ascii"))
+                row = load_json(item.encode("utf-8"))
                 if legacy_id != record_identity(row):
                     raise FormatError("Project record identity mismatch")
                 items.append(row)
             result[name] = items
         else:
-            result[name] = load_json(value.encode("ascii"))
+            result[name] = load_json(value.encode("utf-8"))
     return result
 
 
@@ -359,7 +359,7 @@ def read_db(path, assets):
                     cache[key] = asset.decode("utf-8", "surrogatepass")
                 else:
                     raise FormatError("Invalid media URL encoding")
-            resolve_media_path(document, load_json(path_json.encode("ascii")), cache[key])
+            resolve_media_path(document, load_json(path_json.encode("utf-8")), cache[key])
         if referenced != assets.keys():
             raise FormatError("Unreferenced ZIP asset")
         return project, document
@@ -390,11 +390,12 @@ def read_zip(path):
                     or archive.getinfo("project.sqlite").file_size > MAX_DATABASE):
                 raise FormatError("Invalid MKW ZIP size or missing entries")
             manifest = manifest_json(archive.read("manifest.json"))
+            manifest_version = manifest.get("formatVersion") if isinstance(manifest, dict) else None
             if (not isinstance(manifest, dict) or manifest.get("format") != FORMAT
-                    or any(type(manifest.get(key)) is not int or manifest[key] != version
-                           for key, version in (("formatVersion", FORMAT_VERSION),
-                                                ("schemaVersion", SCHEMA_VERSION),
-                                                ("minimumReaderVersion", FORMAT_VERSION)))
+                    or type(manifest_version) is not int or manifest_version not in (2, 3)
+                    or type(manifest.get("schemaVersion")) is not int or manifest["schemaVersion"] != SCHEMA_VERSION
+                    or type(manifest.get("minimumReaderVersion")) is not int
+                    or manifest["minimumReaderVersion"] != manifest_version
                     or not isinstance(manifest.get("appVersion"), str)
                     or not isinstance(manifest.get("entries"), dict)
                     or manifest["entries"].keys() != names - {"manifest.json"}):
@@ -417,7 +418,11 @@ def read_zip(path):
                 project, document = read_db(db_path, assets)
         validate_legacy(document)
         origin = dict(zip(("family", "sha256", "modelSha256"), project))
-        if manifest.get("source") != origin or project[2] != model_sha256(document):
+        # In v3 these source hashes document provenance. The current DB and
+        # its referenced entries are instead bound by their own entry hashes.
+        if manifest.get("source") != origin or (
+            manifest_version == 2 and project[2] != model_sha256(document)
+        ):
             raise FormatError("MKW ZIP reconstructed model checksum mismatch")
         return manifest, document
     except (zipfile.BadZipFile, sqlite3.Error, UnicodeError, json.JSONDecodeError, RecursionError) as error:
