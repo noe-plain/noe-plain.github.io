@@ -46,7 +46,48 @@
     "footer-messages"
   ],
   "release": {
-    "status": "pending actual CI/live verification"
+    "status": "success",
+    "commit": "742102e8b3f9d349fdf123b02e6f28a72c2d3341",
+    "ciRun": 44498195214,
+    "pagesRun": 44498194562,
+    "modelTests": 217,
+    "browserCounts": {
+      "firefox": [
+        108,
+        108
+      ],
+      "chrome": [
+        123,
+        123
+      ]
+    },
+    "liveSuites": [
+      "seven-perspectives",
+      "project-file-drop"
+    ],
+    "liveConclusion": "success",
+    "liveFiles": [
+      {
+        "path": "index.html",
+        "equal": true,
+        "sha256": "723bf072ff67cd77a8970866f4ad5a5334b4b969d2ce81bc01d95c468d08f33e"
+      },
+      {
+        "path": "static/editor.bundle.js",
+        "equal": true,
+        "sha256": "3f718539ed1e1e8df7be1d347a41cb11bed02220abc84e23473f4f0dbe7b392b"
+      },
+      {
+        "path": "static/editor.bundle.css",
+        "equal": true,
+        "sha256": "cd9dd7d67369c455867812ce76c479c3db4fc4be6e05dd6dc8df2bdd4889dfe6"
+      },
+      {
+        "path": "hilfe/index.html",
+        "equal": true,
+        "sha256": "8e4658e7398d98b7d5d93dc41bd5005528286123b94e5e8d3a0387c9c92c8501"
+      }
+    ]
   },
   "firstCIAttempt": {
     "codeCommit": "84546f221e90a92709a1edbe49e87dd45e728c6f",

@@ -1,0 +1,104 @@
+{
+  "platform": "darwin",
+  "architecture": "arm64",
+  "fixture": {
+    "count": 50,
+    "image": [
+      384,
+      480
+    ],
+    "board": [
+      600,
+      750
+    ],
+    "description": "distinct synthetic lossless PNGs"
+  },
+  "browsers": {
+    "chromium": {
+      "version": "157.0.8103.79",
+      "sqlite": {
+        "create": {
+          "dbVersion": "3.54.1",
+          "wasmMs": 40.19999999925494,
+          "ms": 80.39999999850988,
+          "isolated": false
+        },
+        "edit": {
+          "dbVersion": "3.54.1",
+          "wasmMs": 34.399999998509884,
+          "ms": 43.5,
+          "committed": "Konzert · Neuer Text 1",
+          "isolated": false
+        },
+        "pageSize": 8192,
+        "initialBytes": 57344,
+        "editedBytes": 57344,
+        "differingBytes": 12,
+        "changedSQLitePages": 2,
+        "foreignKeyRollback": true,
+        "reopenedInNewWorker": true
+      },
+      "zip": {
+        "containerBytes": 7139700,
+        "assetBytes": 7081647,
+        "patchWrites": 7,
+        "patchBytes": 16655,
+        "assetPayloadWriteBytes": 0,
+        "changedDatabasePages": 2,
+        "verifiedCRCAndHashes": true,
+        "sqliteReaderVersion": "3.54.0",
+        "verifiedDatabaseTextAndIntegrity": true,
+        "atomicBrowserCommitTested": false
+      },
+      "zipBrowserCommit": {
+        "storage": "browser OPFS FileSystemFileHandle",
+        "abortPreservedOriginal": true,
+        "commitMatchedVerifiedZip": true,
+        "writeMs": 17.699999999254942,
+        "writeBytes": 16655
+      },
+      "sampledJSHeapBefore": 9070364,
+      "mkw": {
+        "download": {
+          "bytes": 26096179,
+          "encodeMs": 1018.1999999992549
+        },
+        "native": {
+          "bytes": 26075887,
+          "packMs": 71.10000000149012,
+          "planMs": 2278.39999999851,
+          "writeMs": 59.69999999925494,
+          "firstWriteBytes": 26075887,
+          "layoutEditMs": 67.40000000223517,
+          "layoutEditWriteBytes": 8225,
+          "noOpWriteBytes": 0
+        },
+        "reads": {
+          "download": {
+            "decodeAndValidateMs": 219.80000000074506,
+            "throughFirstArtworkPaintMs": 265
+          },
+          "native": {
+            "decodeAndValidateMs": 916.5,
+            "throughFirstArtworkPaintMs": 959.6000000014901
+          }
+        }
+      },
+      "sampledJSHeapAfter": 95261376,
+      "sampledJSHeapPeak": 133283524,
+      "heapSamples": 108
+    },
+    "firefox": {
+      "launchError": "Lokales Playwright-Firefox 1509: libmozglue.dylib fehlt."
+    },
+    "webkit": {
+      "launchError": "Playwright-WebKit 2248 beim Lauf nicht lauffähig installiert."
+    }
+  },
+  "sourceCommit": "742102e8b3f9d349fdf123b02e6f28a72c2d3341",
+  "date": "2026-11-19",
+  "sqlitePackage": "@sqlite.org/sqlite-wasm@3.54.1-build1",
+  "userFilesUsed": false,
+  "windowsTested": false,
+  "productionFormatImplemented": false
+}

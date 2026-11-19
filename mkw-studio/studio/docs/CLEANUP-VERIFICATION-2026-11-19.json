@@ -65,9 +65,90 @@
   "removedBytes": 133152,
   "runtimeChanged": false,
   "retirementComplete": false,
-  "stage": "local verification passed; remote CI/live pending",
+  "stage": "published, archive URLs and final follow-up CI verified",
   "release": {
-    "status": "pending"
+    "status": "success",
+    "archiveCommit": "05c97619e749ea3135ef6e97f8144d10790b6434",
+    "archivePagesRun": 44488528684,
+    "archivePagesConclusion": "success",
+    "archiveLive": {
+      "retiredArchives": [
+        {
+          "path": "backups/app-v1-final.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/app-v1.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/browser-v1.cjs",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/index-v1.html",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/psd-v2.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/renderer-v2.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/smoke-v1.cjs",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/state-v2.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/studio-v2.js",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/style-v1.css",
+          "httpStatus": 404
+        },
+        {
+          "path": "backups/urspruengliche-demo.html",
+          "httpStatus": 404
+        }
+      ],
+      "runtimeFiles": [
+        {
+          "path": "index.html",
+          "equal": true,
+          "sha256": "6046f6615fa94b538e3228be8c8416a906c56f3ce8492879897bf3c0cbc1278a"
+        },
+        {
+          "path": "static/editor.bundle.js",
+          "equal": true,
+          "sha256": "3445a8ebb7cb78150e741b2de85fb44d65b8c14fec2dc496785aa9a1d4fa02f9"
+        },
+        {
+          "path": "static/editor.bundle.css",
+          "equal": true,
+          "sha256": "0e94dfa205e1aa6e4bff3cf34382497a96d1473f12079cce66bbeba435b91b60"
+        },
+        {
+          "path": "hilfe/index.html",
+          "equal": true,
+          "sha256": "67bd2be7cd5760796f04ae9eecb46f7169e6a90b0dd98c0b8a272a1b58beb952"
+        }
+      ]
+    },
+    "archiveLiveSuites": [
+      "campaign-family-migration",
+      "row-export"
+    ],
+    "archiveLiveConclusion": "success",
+    "finalFollowUpCommit": "742102e8b3f9d349fdf123b02e6f28a72c2d3341",
+    "finalFollowUpCiRun": 44498195214,
+    "finalFollowUpConclusion": "success"
   },
   "localChecks": {
     "modelTests": 217,
