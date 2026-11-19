@@ -108,5 +108,18 @@
   "after": {
     "studioFiles": 500,
     "studioBytes": 50427233
+  },
+  "runtimeScopeCommit": "05c97619e749ea3135ef6e97f8144d10790b6434",
+  "firstCIAttempt": {
+    "run": 44488529697,
+    "conclusion": "failure",
+    "failedCase": "Firefox material-workflow, open notice popup intercepted layer menu target",
+    "followUp": "Explicit keyboard close with hidden-state assertion before menu target; native close-click separately verified."
+  },
+  "followUp": {
+    "dropField": "PROJECT-DROP-VERIFICATION-2026-11-19.json",
+    "runtimeChangedByExplicitNewUserRequest": true,
+    "designPlan": "MASTERPLAN.md#1--neues-natives-design-projektformat--hohe-priorität--p1--n01",
+    "designImplemented": false
   }
 }

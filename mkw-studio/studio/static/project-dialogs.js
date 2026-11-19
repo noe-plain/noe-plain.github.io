@@ -5,12 +5,100 @@ const MKWProjectDialogs = (() => {
     dialog.id = "projectLibrary";
     dialog.className = "project-task-dialog";
     dialog.setAttribute("aria-labelledby", "projectOpenTitle");
-    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Im Browser weiterarbeiten oder eine MKW-Datei auswählen.</p></div><button id="closeProjectLibrary" type="button" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><div class="project-dialog-body"><div class="project-dialog-grid"><section class="project-browser-section" aria-labelledby="projectBrowserTitle"><div class="project-library-heading"><div><h3 id="projectBrowserTitle">Zuletzt in diesem Browser</h3><p>Deine automatisch gesicherten Projekte.</p></div><span id="projectLibraryCount" class="project-count">Maximal ${MKWProjectStore.projectLimit}</span></div><p id="projectOpenStatus" role="status"></p><button type="button" id="retryProjectLibrary" hidden>Erneut laden</button><div id="projectLibraryList" role="list" aria-label="Gespeicherte Projekte"></div></section><aside class="project-file-section" aria-labelledby="projectFileTitle"><div class="project-dialog-symbol" aria-hidden="true">${studioIcon("folder")}</div><h3 id="projectFileTitle">Auf deinem Computer</h3><p>Öffne eine MKW-Datei, die du selbst gespeichert oder von jemandem erhalten hast.</p><button type="button" id="openProjectFile" class="project-open-file primary">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small>Datei auswählen</small></span></button><p class="project-file-note">Die Datei enthält dein bearbeitbares Projekt mit den verwendeten Bildern und Schriften.</p></aside></div></div><div class="project-dialog-footer"><p class="project-library-retention">Nur in diesem Browser: Die ${MKWProjectStore.projectLimit} zuletzt bearbeiteten Projekte bleiben gespeichert. Ältere Browsersicherungen werden automatisch entfernt. MKW-Dateien auf deinem Computer bleiben erhalten.</p><button type="button" id="dismissProjectLibrary">Schliessen</button></div>`;
+    dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="projectOpenTitle">Projekt öffnen</h2><p>Im Browser weiterarbeiten oder eine MKW-Datei auswählen.</p></div><button id="closeProjectLibrary" type="button" class="icon-button" aria-label="Projektübersicht schliessen">${studioIcon("close")}</button></div><div class="project-dialog-body"><div class="project-dialog-grid"><section class="project-browser-section" aria-labelledby="projectBrowserTitle"><div class="project-library-heading"><div><h3 id="projectBrowserTitle">Zuletzt in diesem Browser</h3><p>Deine automatisch gesicherten Projekte.</p></div><span id="projectLibraryCount" class="project-count">Maximal ${MKWProjectStore.projectLimit}</span></div><p id="projectOpenStatus" role="status"></p><button type="button" id="retryProjectLibrary" hidden>Erneut laden</button><div id="projectLibraryList" role="list" aria-label="Gespeicherte Projekte"></div></section><aside class="project-file-section" aria-labelledby="projectFileTitle"><div class="project-dialog-symbol" aria-hidden="true">${studioIcon("folder")}</div><h3 id="projectFileTitle">Auf deinem Computer</h3><p>Öffne eine MKW-Datei, die du selbst gespeichert oder von jemandem erhalten hast.</p><button type="button" id="openProjectFile" class="project-open-file project-file-drop" aria-label="MKW-Datei öffnen" aria-describedby="projectDropHint">${studioIcon("folder")}<span><strong>MKW-Datei öffnen</strong><small id="projectDropHint">Hier ablegen oder Datei auswählen</small></span></button><p class="project-file-note">Die Datei enthält dein bearbeitbares Projekt mit den verwendeten Bildern und Schriften.</p></aside></div></div><div class="project-dialog-footer"><p class="project-library-retention">Nur in diesem Browser: Die ${MKWProjectStore.projectLimit} zuletzt bearbeiteten Projekte bleiben gespeichert. Ältere Browsersicherungen werden automatisch entfernt. MKW-Dateien auf deinem Computer bleiben erhalten.</p><button type="button" id="dismissProjectLibrary">Schliessen</button></div>`;
     document.body.append(dialog);
     dialog.querySelector("#closeProjectLibrary").onclick = () => dialog.close();
     dialog.querySelector("#dismissProjectLibrary").onclick = () =>
       dialog.close();
     return dialog;
+  }
+  let dropInstalled = false;
+  function installFileDrop({ canOpen, openFile, reportError }) {
+    if (dropInstalled) return;
+    dropInstalled = true;
+    const selector = "#startOpen, #openProjectFile";
+    let depth = new WeakMap();
+    const reset = () => {
+      document
+        .querySelectorAll(selector)
+        .forEach((zone) => zone.classList.remove("is-project-drop-target"));
+      depth = new WeakMap();
+    };
+    const zoneFor = (event) => event.target.closest?.(selector);
+    const filesDrag = (event) =>
+      Array.from(event.dataTransfer?.types || []).includes("Files");
+    document.addEventListener(
+      "dragenter",
+      (event) => {
+        const zone = zoneFor(event);
+        if (!zone || !filesDrag(event) || zone.disabled || !canOpen()) return;
+        event.preventDefault();
+        depth.set(zone, (depth.get(zone) || 0) + 1);
+        zone.classList.add("is-project-drop-target");
+      },
+      true,
+    );
+    document.addEventListener(
+      "dragleave",
+      (event) => {
+        const zone = zoneFor(event);
+        if (!zone) return;
+        const count = Math.max(0, (depth.get(zone) || 0) - 1);
+        depth.set(zone, count);
+        if (!count) zone.classList.remove("is-project-drop-target");
+      },
+      true,
+    );
+    document.addEventListener(
+      "dragover",
+      (event) => {
+        const zone = zoneFor(event);
+        if (!zone || !filesDrag(event)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect =
+          zone.disabled || !canOpen() ? "none" : "copy";
+      },
+      true,
+    );
+    document.addEventListener(
+      "drop",
+      async (event) => {
+        const zone = zoneFor(event),
+          isFiles = filesDrag(event);
+        reset();
+        if (!zone || !isFiles) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (zone.disabled || !canOpen()) return;
+        const files = Array.from(event.dataTransfer.files);
+        zone.focus({ preventScroll: true });
+        if (files.length !== 1 || !/\.mkw$/i.test(files[0].name)) {
+          reportError(
+            "Bitte genau eine .mkw-Datei hier ablegen. Bilder kannst du wie bisher auf die Arbeitsfläche ziehen.",
+          );
+          return;
+        }
+        zone.disabled = true;
+        zone.setAttribute("aria-busy", "true");
+        try {
+          await openFile(files[0]);
+        } catch (error) {
+          reportError("Projekt konnte nicht geöffnet werden: " + error.message);
+        } finally {
+          zone.disabled = false;
+          zone.removeAttribute("aria-busy");
+          if (zone.isConnected && zone.getClientRects().length)
+            zone.focus({ preventScroll: true });
+        }
+      },
+      true,
+    );
+    document.addEventListener("dragend", reset, true);
+    window.addEventListener("blur", reset);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") reset();
+    });
   }
   function libraryRows(records, currentId) {
     const list = $("#projectLibraryList");
@@ -138,5 +226,6 @@ const MKWProjectDialogs = (() => {
     });
   }
   setupSave();
-  return { libraryShell, libraryRows };
+  MKWProjects.setupFileDrop(installFileDrop);
+  return { libraryShell, libraryRows, installFileDrop };
 })();

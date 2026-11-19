@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-19",
+  "baselineCommit": "05c97619e749ea3135ef6e97f8144d10790b6434",
+  "modelTests": 217,
+  "usesUserFiles": false,
+  "drop": {
+    "formats": [
+      "gzip-JSON",
+      "MKWBLK1",
+      "legacy JSON"
+    ],
+    "surfaces": [
+      "start card",
+      "open dialog"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1500,
+      780
+    ],
+    "keyboard": true,
+    "invalidAndMultiplePreserveDocument": true,
+    "unsavedSourceSaved": true,
+    "duplicateDropIgnored": true,
+    "downloadCount": 0,
+    "manualOSDragTest": false
+  },
+  "designFormat": {
+    "task": "N01",
+    "priority": "P1",
+    "analysisAndPlanComplete": true,
+    "implementationStarted": false,
+    "plan": "MASTERPLAN.md"
+  },
+  "localBrowserSuites": [
+    "project-file-drop",
+    "project-open",
+    "project-dialogs",
+    "material-start",
+    "material-workflow",
+    "dialog-layout",
+    "material-paint-wiki",
+    "footer-messages"
+  ],
+  "release": {
+    "status": "pending actual CI/live verification"
+  }
+}

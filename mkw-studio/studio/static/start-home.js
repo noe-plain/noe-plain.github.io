@@ -51,7 +51,7 @@
   returning.className = "start-returning";
   returning.setAttribute("aria-label", "Vorlagen und bestehende Projekte");
   templates.innerHTML = `${studioIcon("layers")}<span><strong>Mit Vorlage starten</strong><small>Design wählen und mit deinen Inhalten füllen.</small></span>`;
-  open.innerHTML = `${studioIcon("folder")}<span><strong>Projekt öffnen</strong><small>MKW-Datei oder eines deiner letzten fünf Browserprojekte.</small></span>`;
+  open.innerHTML = `${studioIcon("folder")}<span><strong>Projekt öffnen</strong><small>MKW hier ablegen oder gespeichertes Projekt wählen.</small></span>`;
   returning.append(templates, open);
   footer.className = "start-home-footer";
   const local = document.createElement("span");

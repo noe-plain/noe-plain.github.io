@@ -235,7 +235,7 @@
   box-shadow: none;
 }
 #projectLibrary #openProjectFile :is(strong, small, span) {
-  color: var(--md-sys-color-on-primary);
+  color: inherit;
 }
 #projectLibrary .project-open-file strong {
   font-size: var(--studio-body-size);
@@ -510,4 +510,33 @@
   .save-dialog-footer {
     padding: 12px 16px;
   }
+}
+
+/* One native action doubles as an explicit project-file drop field. */
+#projectLibrary .project-open-file.project-file-drop {
+  min-height: 148px;
+  padding: 24px 16px;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border: 2px dashed var(--md-sys-color-outline);
+  border-radius: 20px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+}
+#projectLibrary #openProjectFile.project-file-drop small {
+  display: block;
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 1;
+}
+#projectLibrary .project-file-drop:hover {
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-primary);
+}
+#projectLibrary .project-file-drop.is-project-drop-target,
+#startOpen.is-project-drop-target {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }

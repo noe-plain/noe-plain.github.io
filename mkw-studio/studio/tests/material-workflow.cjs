@@ -247,7 +247,8 @@ const { launch, artifact } = require("./browser.cjs");
         contrast >= 4.5,
         "persistent save errors remain legible in both themes",
       );
-      await page.locator("#closeStudioWarnings").click();
+      await page.keyboard.press("Escape");
+      assert(await page.locator("#studioWarnings").isHidden());
       await action.click();
       await page.screenshot({
         animations: "disabled",

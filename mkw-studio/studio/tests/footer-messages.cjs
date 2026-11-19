@@ -134,6 +134,9 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         await page.screenshot({
           path: artifact(`footer-message-${mode}-${theme}.png`),
         });
+        await page.locator("#closeStudioWarnings").click();
+        await page.locator("#studioWarnings").waitFor({ state: "hidden" });
+        await openDetails();
         await page.keyboard.press("Escape");
         await page.evaluate(() => {
           MKWProjects.notice("");

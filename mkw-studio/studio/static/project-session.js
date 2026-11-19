@@ -245,7 +245,7 @@ const MKWProjects = (() => {
     const loadingTarget = $(
       $("#projectLibrary")?.open ? "#projectOpenStatus" : "#startStatus",
     );
-    loadingTarget.textContent = "Projektdatei wird geöffnet …";
+    MKWFields.notice(loadingTarget, "Projektdatei wird geöffnet …");
     const finishLoading = MKWUIControls.loading(loadingTarget);
     try {
       const document = MKWProjectAssets.hydrate(
@@ -394,10 +394,25 @@ const MKWProjects = (() => {
     }
   }
   function openError(message) {
-    const field = $("#projectOpenStatus");
-    if (field && $("#projectLibrary").open)
-      MKWFields.notice(field, message, true);
+    const field = $("#projectLibrary")?.open
+      ? $("#projectOpenStatus")
+      : $("#startDialog").open
+        ? $("#startStatus")
+        : null;
+    if (field) MKWFields.notice(field, message, true);
     else notice(message, true);
+  }
+  function setupFileDrop(install) {
+    install({
+      canOpen: () =>
+        !openingProject &&
+        (!busy ||
+          ($("#startDialog").open &&
+            !$("#startOpen").disabled &&
+            !$("#projectSetup").open)),
+      openFile,
+      reportError: openError,
+    });
   }
   async function library() {
     let dialog = $("#projectLibrary");
@@ -642,6 +657,7 @@ const MKWProjects = (() => {
     saveFile,
     library,
     setup,
+    setupFileDrop,
     fileLink,
     notice,
     versions,
