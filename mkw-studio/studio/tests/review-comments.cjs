@@ -191,7 +191,9 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     const listing = execFileSync("unzip", ["-Z1", dest], { encoding: "utf8" });
     const name = listing.split("\n").find((n) => n.endsWith(".mkw"));
     assert(name);
-    const bytes = execFileSync("unzip", ["-p", dest, name]);
+    const bytes = execFileSync("unzip", ["-p", dest, name], {
+      maxBuffer: 8 * 1024 ** 2,
+    });
     const packed = await page.evaluate(async (data) => {
       const q = MKWProjectAssets.hydrate(
         await MKWProjectFile.decode(
