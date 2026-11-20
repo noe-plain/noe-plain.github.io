@@ -5,6 +5,10 @@
   "liveSyntheticChecksPassed": true,
   "nativeMacFilePickerAutosaveAndReopenPassed": true,
   "webKitDownloadAndBrowserLibraryRecoveryPassed": true,
+  "liveCode": "89839089a63222d9adb370fa37fe154d30cdf4e1",
+  "liveWorkflowRun": 44706747664,
+  "liveChromiumLinkedZipPassed": true,
+  "liveWebKitDownloadAndBrowserLibraryRecoveryPassed": true,
   "checks": [
     {
       "case": 1,
@@ -52,7 +56,8 @@
   "syntheticChecks": {
     "interruptedCommitReconciled": true,
     "assetRemovalCompacted": true,
-    "externalChangePreserved": true
+    "externalChangePreserved": true,
+    "migratedLinkedLegacyFileUnchanged": true
   },
   "localBrowserSuitesPassed": 8,
   "platform": "macOS",

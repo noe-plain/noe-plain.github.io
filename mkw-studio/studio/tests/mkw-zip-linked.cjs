@@ -261,6 +261,27 @@ async function checkCase(browser, { case: number, file, boards }) {
     await page.evaluate(() => {
       studioPreferences.autoSaveFile = true;
     });
+    let legacyHash;
+    if (!file) {
+      await page.evaluate(async () => {
+        const root = await navigator.storage.getDirectory();
+        const handle = await root.getFileHandle("legacy-test.mkw", {
+          create: true,
+        });
+        window.showSaveFilePicker = async () => handle;
+      });
+      await retrySave(page);
+      legacyHash = await page.evaluate(async () => {
+        const root = await navigator.storage.getDirectory();
+        const legacy = await MKWProjects.fileLink().handle.getFile();
+        if (!(await MKWProjectBlocks.isBlockFile(legacy)))
+          throw Error("No legacy file linked.");
+        const candidate = await root.getFileHandle("linked-test.mkw");
+        window.showSaveFilePicker = async () => candidate;
+        const { sha256 } = await import("./static/mkw-zip/zip-reader.mjs");
+        return sha256(await legacy.arrayBuffer());
+      });
+    }
     await page.locator("#save").click();
     await page.locator("#linkZipCopy").click();
     await page.waitForFunction(
@@ -400,6 +421,15 @@ async function checkCase(browser, { case: number, file, boards }) {
     if (!file) {
       await failAfterCommitAndRetry(page, id);
       await checkCompactionAndExternalChange(page);
+      const currentLegacyHash = await page.evaluate(async () => {
+        const root = await navigator.storage.getDirectory();
+        const legacy = await (
+          await root.getFileHandle("legacy-test.mkw")
+        ).getFile();
+        const { sha256 } = await import("./static/mkw-zip/zip-reader.mjs");
+        return sha256(await legacy.arrayBuffer());
+      });
+      assert.equal(currentLegacyHash, legacyHash);
     }
     if (file) assert.equal(await fileHash(file), before);
     assert.deepEqual(faults, []);
@@ -421,6 +451,7 @@ async function checkCase(browser, { case: number, file, boards }) {
             interruptedCommitReconciled: true,
             assetRemovalCompacted: true,
             externalChangePreserved: true,
+            migratedLinkedLegacyFileUnchanged: true,
           }
         : {}),
     };
