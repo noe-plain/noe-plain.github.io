@@ -23,6 +23,40 @@ function studioPaintKindName(v) {
         : "")
   );
 }
+const paintBackgroundSources = new WeakMap();
+function studioPaintBackground(el, value, fit = "cover") {
+  const source =
+    value.enabled && value.kind === "image"
+      ? p.images.find((im) => im.id === value.imageId)?.data
+      : null;
+  const previous = paintBackgroundSources.get(el);
+  if (source && previous?.source === source && previous.fit === fit) return;
+  if (!source) {
+    paintBackgroundSources.delete(el);
+    el.style.background = fit === "contain" ? "" : studioPaintSwatch(value);
+    return;
+  }
+  const set = (url) =>
+    (el.style.background = `url("${url}") center / ${fit} no-repeat`);
+  const current = { source, fit };
+  paintBackgroundSources.set(el, current);
+  if (typeof source === "string") set(source);
+  else {
+    el.style.background = studioPaintSwatch(value);
+    image(source).then(
+      (bitmap) => {
+        if (el.isConnected && paintBackgroundSources.get(el) === current)
+          set(bitmap.src);
+      },
+      (error) => {
+        if (el.isConnected && paintBackgroundSources.get(el) === current) {
+          paintBackgroundSources.delete(el);
+          status(error, "error");
+        }
+      },
+    );
+  }
+}
 function studioPaintCards(o) {
   const channels = carouselIsVector(o) ? ["fill", "stroke"] : ["fill"];
   return `<div class="paint-inspector">${channels
@@ -34,6 +68,9 @@ function studioPaintCards(o) {
     .join("")}</div>`;
 }
 function studioBindPaintCards(panel, o) {
+  for (const chip of panel.querySelectorAll("[data-paint-chip]"))
+    studioPaintBackground(chip, studioPaintRead(o, chip.dataset.paintChip));
+
   panel
     .querySelectorAll("[data-paint-channel]")
     .forEach(
@@ -121,7 +158,7 @@ function studioSyncPaintControls() {
     ]) {
       const button = $("#" + id),
         value = studioPaintRead(o, channel);
-      button.style.background = studioPaintSwatch(value);
+      studioPaintBackground(button, value);
       button.classList.toggle("is-front", studioPaintFront === channel);
       button.classList.toggle("no-paint", !value.enabled);
       button.disabled =
@@ -185,8 +222,7 @@ function studioSyncPaintControls() {
     .querySelectorAll("#carouselProperties [data-paint-channel]")
     .forEach((button) => {
       const value = studioPaintRead(o, button.dataset.paintChannel);
-      button.querySelector(".paint-chip").style.background =
-        studioPaintSwatch(value);
+      studioPaintBackground(button.querySelector(".paint-chip"), value);
       button.querySelector(".paint-kind").textContent =
         studioPaintKindName(value);
       button.disabled = carouselObjectLocked(o);
@@ -891,9 +927,11 @@ function studioRenderPicker(refreshHandles = true) {
   }
   if (value.kind === "image") {
     const im = p.images.find((im) => im.id === value.imageId);
-    $("#paintImagePreview").style.background = im
-      ? `url("${im.data}") center / contain no-repeat`
-      : "";
+    studioPaintBackground(
+      $("#paintImagePreview"),
+      { ...value, enabled: true },
+      "contain",
+    );
     $("#paintImagePreview").textContent = im ? "" : "Noch kein Bild gewählt";
     $("#paintPlaceImage").disabled = !!state.object.locked;
   }

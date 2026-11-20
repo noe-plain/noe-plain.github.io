@@ -270,20 +270,29 @@ async function checkCase(browser, { case: number, file, boards }) {
         });
         window.showSaveFilePicker = async () => handle;
       });
-      await retrySave(page);
       legacyHash = await page.evaluate(async () => {
         const root = await navigator.storage.getDirectory();
-        const legacy = await MKWProjects.fileLink().handle.getFile();
-        if (!(await MKWProjectBlocks.isBlockFile(legacy)))
-          throw Error("No legacy file linked.");
-        const candidate = await root.getFileHandle("linked-test.mkw");
-        window.showSaveFilePicker = async () => candidate;
+        const legacy = await root.getFileHandle("legacy-test.mkw");
+        const packed = await MKWProjectStore.pack(p);
+        const plan = await MKWProjectBlocks.prepare(
+          packed,
+          await legacy.getFile(),
+        );
+        await writeFilePlan(legacy, plan);
+        const file = await legacy.getFile();
+        const stamp = { size: file.size, modified: file.lastModified };
+        await MKWProjectStore.link(p.projectId, legacy, stamp);
+        await MKWProjects.attach({
+          ...(await MKWProjectStore.open(p.projectId)),
+        });
+        const handle = await root.getFileHandle("linked-test.mkw");
+        window.showSaveFilePicker = async () => handle;
         const { sha256 } = await import("./static/mkw-zip/zip-reader.mjs");
-        return sha256(await legacy.arrayBuffer());
+        return sha256(await file.arrayBuffer());
       });
     }
     await page.locator("#save").click();
-    await page.locator("#linkZipCopy").click();
+    await page.locator("#saveProject").click();
     await page.waitForFunction(
       () => MKWProjects.fileLink()?.stamp?.zip && !busy,
     );

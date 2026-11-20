@@ -72,6 +72,12 @@ test("MKW ZIP verifies an unopened asset only on demand, even with a valid ZIP C
   await zip.readDatabase();
   assert.equal(zip.counts.assetReadBytes, 0);
   await assert.rejects(zip.readAsset(hash), /Prüfsumme/);
+  const slice = await zip.assetSlice(hash);
+  const { verifiedMedia } = await import("../static/mkw-zip/media-source.mjs");
+  await assert.rejects(
+    verifiedMedia({ ...slice, hash, length: slice.blob.size }),
+    /Prüfsumme/,
+  );
 });
 
 test("MKW ZIP no-op writes nothing, and fixed-size updates skip asset payloads", async () => {

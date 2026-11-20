@@ -22,7 +22,7 @@ function chooseSaveTarget(name, extension) {
         description: extension === "mkw" ? "Studio-Projekt" : "Photoshop-Datei",
         accept: {
           [extension === "mkw"
-            ? "application/json"
+            ? "application/zip"
             : "image/vnd.adobe.photoshop"]: ["." + extension],
         },
       },

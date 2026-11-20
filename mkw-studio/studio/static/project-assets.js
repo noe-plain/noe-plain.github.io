@@ -110,7 +110,34 @@
       if (!im.original) im.original = im.data;
     return project;
   }
-  const api = { references, prune, capture, compact, hydrate };
+  // Portable archives never contain this object in their SQLite JSON.
+  // Only the archive reader or IndexedDB supplies a binary-backed image.
+  function deferred(source) {
+    return (
+      typeof Blob !== "undefined" &&
+      source?.blob instanceof Blob &&
+      source.blob.size === source.length &&
+      /^[a-f0-9]{64}$/.test(source.hash) &&
+      source.encoding === "base64" &&
+      /^data:image\/[a-z0-9.+-]+;base64,$/i.test(source.prefix)
+    );
+  }
+  function sourcePrefix(source) {
+    return typeof source === "string"
+      ? source
+      : deferred(source)
+        ? source.prefix
+        : "";
+  }
+  const api = {
+    references,
+    prune,
+    capture,
+    compact,
+    hydrate,
+    deferred,
+    sourcePrefix,
+  };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectAssets = api;
 })(globalThis);

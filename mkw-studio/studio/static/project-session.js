@@ -54,7 +54,7 @@ const MKWProjects = (() => {
     isCurrent = () => true,
   ) {
     const link = fileLink(project.projectId);
-    if (!link) return false;
+    if (!link?.stamp?.zip) return false;
     let permission = await link.handle.queryPermission({ mode: "readwrite" });
     if (permission !== "granted" && interactive)
       permission = await link.handle.requestPermission({ mode: "readwrite" });
@@ -89,70 +89,54 @@ const MKWProjects = (() => {
         }
         return current;
       };
+      MKWProjectAssets.prune(project);
       const current = await check();
       if (!current) return false;
-      if (initialStamp?.zip) {
-        const identities = [
-          ...(sameStamp(current) ? [initialStamp.zipIdentity] : []),
-          ...(initialStamp.zipPending ? [initialStamp.zipPending] : []),
-        ];
-        const { plan, known } = await MKWProjectFile.prepareZip(
-          project,
-          current,
-          identities,
-          zipCache?.link === link ? zipCache.known : undefined,
-        );
-        const latest = await check();
-        if (
-          !latest ||
-          latest.size !== current.size ||
-          latest.lastModified !== current.lastModified
-        )
-          return false;
-        if (!plan.unchanged) {
-          const baseIdentity = plan.expected.probe.sha256;
-          const pending = {
-            ...stamp(current),
-            zip: true,
-            zipIdentity: baseIdentity,
-            zipVersion:
-              baseIdentity === initialStamp.zipPending
-                ? initialStamp.zipPendingVersion
-                : initialStamp.zipVersion,
-            zipPending: plan.identity,
-            zipPendingVersion: expectedVersion,
-          };
-          await MKWProjectStore.link(id, link.handle, pending, expectedVersion);
-          link.stamp = pending;
-          if (!isCurrent() || fileLink(id) !== link) return false;
-        }
-        await writeFilePlan(link.handle, plan);
-        const written = await link.handle.getFile();
-        const committed = {
-          ...stamp(written),
+      const identities = [
+        ...(sameStamp(current) ? [initialStamp.zipIdentity] : []),
+        ...(initialStamp.zipPending ? [initialStamp.zipPending] : []),
+      ];
+      const { plan, known } = await MKWProjectFile.prepareZip(
+        project,
+        current,
+        identities,
+        zipCache?.link === link ? zipCache.known : undefined,
+      );
+      const latest = await check();
+      if (
+        !latest ||
+        latest.size !== current.size ||
+        latest.lastModified !== current.lastModified
+      )
+        return false;
+      if (!plan.unchanged) {
+        const baseIdentity = plan.expected.probe.sha256;
+        const pending = {
+          ...stamp(current),
           zip: true,
-          zipIdentity: plan.identity,
-          zipVersion: expectedVersion,
+          zipIdentity: baseIdentity,
+          zipVersion:
+            baseIdentity === initialStamp.zipPending
+              ? initialStamp.zipPendingVersion
+              : initialStamp.zipVersion,
+          zipPending: plan.identity,
+          zipPendingVersion: expectedVersion,
         };
-        await MKWProjectStore.link(id, link.handle, committed, expectedVersion);
-        link.stamp = committed;
-        if (p.projectId === id) zipCache = { link, known };
-        return true;
+        await MKWProjectStore.link(id, link.handle, pending, expectedVersion);
+        link.stamp = pending;
+        if (!isCurrent() || fileLink(id) !== link) return false;
       }
-      if (await MKWProjectFile.isZip(current))
-        throw Error(
-          "Bitte eine neue Datei für den bisherigen MKW-Speicherweg wählen.",
-        );
-      const packed = await MKWProjectStore.pack(project),
-        plan = await MKWProjectBlocks.prepare(packed, current, {
-          readAsset: MKWProjectStore.asset,
-        });
-      // Serialization can take time for new photos. Recheck before touching the file.
-      if (!(await check())) return false;
-      if (plan.unchanged) return true;
-      await writeFilePlan(link.handle, plan);
-      link.stamp = stamp(await link.handle.getFile());
-      await MKWProjectStore.link(project.projectId, link.handle, link.stamp);
+      if (!plan.unchanged) await writeFilePlan(link.handle, plan);
+      const written = await link.handle.getFile();
+      const committed = {
+        ...stamp(written),
+        zip: true,
+        zipIdentity: plan.identity,
+        zipVersion: expectedVersion,
+      };
+      await MKWProjectStore.link(id, link.handle, committed, expectedVersion);
+      link.stamp = committed;
+      if (p.projectId === id) zipCache = { link, known };
       return true;
     };
     return navigator.locks
@@ -163,7 +147,7 @@ const MKWProjects = (() => {
     clearTimeout(saveTimer);
     saveTimer = null;
     // Keep immutable asset identities so unchanged photos reuse their SHA-256.
-    // The store compacts this snapshot before persisting; raw originals stay out.
+    // The store preserves the complete model of imported and linked ZIP projects.
     const document = MKWProjectAssets.capture(p),
       id = document.projectId,
       saveRevision = revision;
@@ -253,7 +237,7 @@ const MKWProjects = (() => {
     dialog.id = "projectOpeningDialog";
     dialog.setAttribute("aria-labelledby", "projectOpeningTitle");
     dialog.innerHTML =
-      '<h2 id="projectOpeningTitle" tabindex="-1" autofocus>Projekt wird geöffnet</h2><p role="status">Bilder und Schriften werden geladen …</p>';
+      '<h2 id="projectOpeningTitle" tabindex="-1" autofocus>Projekt wird geöffnet</h2><p role="status">Projekt und Schriften werden vorbereitet …</p>';
     dialog.addEventListener("cancel", (event) => event.preventDefault());
     document.body.append(dialog);
     const finishLoading = MKWUIControls.loading(dialog.querySelector("p"));
@@ -313,7 +297,7 @@ const MKWProjects = (() => {
       const isZip = await MKWProjectFile.isZip(file);
       if (isZip) handle = null;
       const document = MKWProjectAssets.hydrate(
-        await MKWProjectFile.decode(file),
+        await MKWProjectFile.decode(file, { lazyImages: true }),
       );
       validate(document);
       validateCarousel(document);
@@ -322,7 +306,7 @@ const MKWProjects = (() => {
       // A separate copy must never silently replace another project's browser backup or file link.
       let existing;
       try {
-        existing = await MKWProjectStore.open(document.projectId);
+        existing = await MKWProjectStore.metadata(document.projectId);
       } catch {}
       const same = !!(
         handle &&
@@ -343,10 +327,8 @@ const MKWProjects = (() => {
       await autosave({ writeFile: false });
       notice(
         isZip
-          ? "MKW ZIP geöffnet. Die Quelldatei bleibt erhalten. Aktuelle Änderungen kannst du als neue MKW-ZIP-Kopie herunterladen."
-          : handle
-            ? ""
-            : "Die Datei ist geöffnet. Für direkte Dateiaktualisierungen bitte einmal „Projekt speichern“ verwenden und die vorhandene MKW-Datei auswählen.",
+          ? "MKW-Projekt geöffnet. Über «Projekt speichern» kannst du eine Arbeitskopie anlegen."
+          : "Ältere MKW-Datei geöffnet. Über «Projekt speichern» kannst du sie als neues MKW-Projekt sichern.",
       );
     } finally {
       finishLoading();
@@ -374,170 +356,97 @@ const MKWProjects = (() => {
   }
   async function saveFile(asNew = false) {
     if (busy) return;
-    let handle = asNew ? null : fileLink()?.handle;
+    const previous = fileLink(),
+      linked = !asNew && previous?.stamp?.zip ? previous : null,
+      name = saveFileName("mkw"),
+      field = $("#psdStatus");
     setSaveBusy(true);
-    $("#psdStatus").classList.remove("save-error");
-    MKWFields.notice($("#psdStatus"), "Speicherort wird vorbereitet …");
-    // Ask for a handle/permission during the user gesture, before asynchronous project processing.
+    field.classList.remove("save-error");
+    MKWFields.notice(field, "Speicherort wird vorbereitet …");
     try {
-      if (!handle && window.showSaveFilePicker)
-        handle = await chooseSaveTarget(saveFileName("mkw"), "mkw");
+      // Request the location or permission during the user gesture.
+      const handle = linked?.handle || (await chooseSaveTarget(name, "mkw"));
       if (
         handle &&
         (await handle.queryPermission({ mode: "readwrite" })) !== "granted" &&
         (await handle.requestPermission({ mode: "readwrite" })) !== "granted"
       )
         throw Error("Dateizugriff wurde nicht freigegeben.");
-      MKWFields.notice($("#psdStatus"), "Projektdatei wird vorbereitet …");
-      if (
-        handle &&
-        (asNew || !fileLink()?.stamp?.zip) &&
-        (await MKWProjectFile.isZip(await handle.getFile()))
-      )
+      const initial = handle && !linked ? await handle.getFile() : null;
+      if (initial?.size)
         throw Error(
-          "Diese MKW-ZIP-Datei bleibt erhalten. Bitte einen neuen Dateinamen wählen.",
+          "Die vorhandene Datei bleibt erhalten. Bitte einen neuen Dateinamen wählen.",
         );
-      if (
-        asNew &&
-        fileLink() &&
-        handle &&
-        !(await handle.isSameEntry(fileLink().handle))
-      ) {
+      MKWFields.notice(field, "Projektdatei wird vorbereitet …");
+      if (asNew && previous && handle) {
         p.projectId = uid();
         versions.set(p.projectId, 0);
-        links.delete(p.projectId);
         revision++;
       }
-      if (handle && !fileLink()) {
-        links.set(p.projectId, {
-          handle,
-          stamp: stamp(await handle.getFile()),
-        });
-      }
-      // Persist browser state first; concurrent edits fork before a file is touched.
-      let backupError = null;
-      const result = await autosave({ writeFile: false }).catch((error) => {
-        backupError = error;
-        return null;
-      });
-      if (result?.conflict)
-        throw Error(
-          "Konfliktkopie gesichert. Bitte für diese Kopie „Speichern unter …“ verwenden.",
-        );
-      if (handle) {
-        if (asNew) {
-          links.set(p.projectId, {
-            handle,
-            stamp: stamp(await handle.getFile()),
-          });
-        }
-        const ok = await writeLinked(MKWProjectAssets.capture(p), true);
-        if (!ok)
+      let backupError;
+      const backup = await autosave({ writeFile: false, lossless: true }).catch(
+        (error) => {
+          backupError = error;
+          return null;
+        },
+      );
+      if (backup?.conflict)
+        throw Error("Konfliktkopie gesichert. Bitte diese separat speichern.");
+      const project = MKWProjectAssets.prune(MKWProjectAssets.capture(p));
+      if (linked) {
+        if (!(await writeLinked(project, true)))
           throw Error(
-            "Datei nicht überschrieben. Bitte den Hinweis oberhalb der Arbeitsfläche beachten.",
+            "Die Datei konnte nicht aktualisiert werden. Bitte den Speicherhinweis beachten.",
           );
         status("Browser und MKW-Datei aktualisiert.");
-        notice("");
+      } else if (handle) {
+        const { plan, known } = await MKWProjectFile.prepareZip(project);
+        await writeFilePlan(handle, {
+          size: plan.blob.size,
+          bytesWritten: plan.blob.size,
+          keepExistingData: false,
+          expected: { size: 0, lastModified: initial.lastModified },
+          writes: [{ position: 0, data: plan.blob }],
+        });
+        if (backup) {
+          const saved = {
+            ...stamp(await handle.getFile()),
+            zip: true,
+            zipIdentity: plan.identity,
+            zipVersion: backup.version,
+          };
+          const link = { handle, stamp: saved };
+          await MKWProjectStore.link(
+            project.projectId,
+            handle,
+            saved,
+            backup.version,
+          );
+          links.set(project.projectId, link);
+          zipCache = { link, known };
+        }
+        status("MKW-Datei gespeichert.");
       } else {
-        download(await MKWProjectFile.encode(p), saveFileName("mkw"));
+        download(await MKWProjectFile.encodeZip(project), name);
         status("MKW-Datei heruntergeladen · Browsersicherung bleibt aktiv.");
-        notice(
-          "Dieser Browser erlaubt keine direkte Aktualisierung lokaler Dateien. Automatisch wird im Browser gesichert. Für direktes Überschreiben bitte einen Browser mit Dateizugriff verwenden.",
-        );
       }
-      if (backupError) {
-        notice(
-          "MKW-Datei gespeichert. Die Browsersicherung ist fehlgeschlagen; bitte Speicherplatz freigeben oder ältere Browserprojekte entfernen. " +
-            backupError.message,
-          true,
-        );
-        status("MKW-Datei gespeichert · Browsersicherung fehlgeschlagen.");
-      }
+      notice(
+        backupError
+          ? "MKW-Datei gespeichert. Die Browsersicherung ist fehlgeschlagen: " +
+              backupError.message
+          : "",
+        !!backupError,
+      );
       $("#saveDialog").close();
     } catch (error) {
       if (error.name === "AbortError")
-        MKWFields.notice($("#psdStatus"), "Speichern abgebrochen.");
+        MKWFields.notice(field, "Speichern abgebrochen.");
       else {
         const message = "Speichern nicht abgeschlossen: " + error.message;
-        $("#psdStatus").textContent = message;
+        MKWFields.notice(field, message, true);
+        field.classList.add("save-error");
         notice(message, true);
-        $("#psdStatus").classList.add("save-error");
-        $("#psdStatus").setAttribute("role", "alert");
       }
-    } finally {
-      setSaveBusy(false);
-    }
-  }
-  async function downloadZipCopy() {
-    if (busy) return;
-    const name = saveFileName("mkw").replace(/\.mkw$/i, " – ZIP.mkw");
-    setSaveBusy(true);
-    $("#psdStatus").classList.remove("save-error");
-    MKWFields.notice($("#psdStatus"), "MKW-ZIP-Kopie wird vorbereitet …");
-    try {
-      const copy = await MKWProjectFile.encodeZip(MKWProjectAssets.capture(p));
-      download(copy, name);
-      status("MKW-ZIP-Kopie heruntergeladen.");
-      $("#saveDialog").close();
-    } catch (error) {
-      MKWFields.notice(
-        $("#psdStatus"),
-        "MKW ZIP konnte nicht gespeichert werden: " + error.message,
-        true,
-      );
-    } finally {
-      setSaveBusy(false);
-    }
-  }
-  async function linkZipCopy() {
-    if (busy || !window.showSaveFilePicker) return;
-    const id = p.projectId;
-    const name = saveFileName("mkw").replace(/\.mkw$/i, " – ZIP.mkw");
-    const statusField = $("#psdStatus");
-    setSaveBusy(true);
-    statusField.classList.remove("save-error");
-    MKWFields.notice(
-      statusField,
-      "Speicherort für die MKW-ZIP-Arbeitsdatei wählen …",
-    );
-    try {
-      const handle = await chooseSaveTarget(name, "mkw");
-      const initial = await handle.getFile();
-      if (initial.size)
-        throw Error("Bitte einen neuen Namen für die Arbeitsdatei wählen.");
-      const backup = await autosave({ writeFile: false, lossless: true });
-      if (backup.conflict || p.projectId !== id)
-        throw Error(
-          "Der Stand wurde als Konfliktkopie erhalten. Bitte diese separat speichern.",
-        );
-      const { plan, known } = await MKWProjectFile.prepareZip(
-        MKWProjectAssets.capture(p),
-      );
-      await writeFilePlan(handle, {
-        size: plan.blob.size,
-        keepExistingData: false,
-        expected: { size: 0, lastModified: initial.lastModified },
-        writes: [{ position: 0, data: plan.blob }],
-      });
-      const saved = {
-        ...stamp(await handle.getFile()),
-        zip: true,
-        zipIdentity: plan.identity,
-        zipVersion: backup.version,
-      };
-      const link = { handle, stamp: saved };
-      await MKWProjectStore.link(id, handle, saved, backup.version);
-      links.set(id, link);
-      zipCache = { link, known };
-      notice("");
-      status("MKW-ZIP-Arbeitsdatei verknüpft.");
-      $("#saveDialog").close();
-    } catch (error) {
-      MKWFields.notice(
-        statusField,
-        error.name === "AbortError" ? "Speichern abgebrochen." : error.message,
-        error.name !== "AbortError",
-      );
     } finally {
       setSaveBusy(false);
     }
@@ -741,8 +650,6 @@ const MKWProjects = (() => {
       event.target.value = "";
     };
     $("#saveProject").onclick = () => saveFile();
-    $("#saveZipCopy").onclick = downloadZipCopy;
-    $("#linkZipCopy").onclick = linkZipCopy;
     const dateHint = document.createElement("small");
     dateHint.id = "saveDateHint";
     $("#saveDate").after(dateHint);
@@ -757,7 +664,6 @@ const MKWProjects = (() => {
     $("#save").setAttribute("aria-label", "Projekt speichern");
     $("#save").onclick = () => {
       original();
-      $("#linkZipCopy").hidden = !window.showSaveFilePicker;
       updateDateHint();
       $("#saveAsHint").textContent = window.showSaveFilePicker
         ? "„Speichern unter …“ öffnet die Auswahl für Ordner und Dateiname."
@@ -765,22 +671,27 @@ const MKWProjects = (() => {
       $("#saveName").closest("label").firstChild.textContent = fileLink()
         ? "Dateiname für Speichern unter / PSD"
         : "Dateiname";
-      $("#saveProject strong").textContent = fileLink()
+      $("#saveProject strong").textContent = fileLink()?.stamp?.zip
         ? "MKW-Datei aktualisieren"
         : window.showSaveFilePicker
           ? "Speichern unter …"
           : "MKW-Datei herunterladen";
-      $("#saveLocationHint").textContent = fileLink()
-        ? "Verknüpft: " +
-          fileLink().handle.name +
-          (studioPreferences.autoSaveFile
-            ? " · wird automatisch aktualisiert."
-            : " · automatische Dateiaktualisierung ausgeschaltet.")
-        : window.showSaveFilePicker
-          ? studioPreferences.autoSaveFile
-            ? "Wähle einen Ordner und Dateinamen. Danach wird diese MKW-Datei automatisch aktualisiert."
-            : "Wähle einen Ordner und Dateinamen. Die automatische Dateiaktualisierung ist ausgeschaltet."
-          : "Automatische Sicherung im Browser. Lokale Dateien können hier nur heruntergeladen werden.";
+      $("#saveLocationHint").textContent =
+        fileLink() && !fileLink().stamp?.zip
+          ? "Bisherige Datei: " +
+            fileLink().handle.name +
+            " · «Projekt speichern» legt eine neue MKW-Datei an."
+          : fileLink()?.stamp?.zip
+            ? "Verknüpft: " +
+              fileLink().handle.name +
+              (studioPreferences.autoSaveFile
+                ? " · wird automatisch aktualisiert."
+                : " · automatische Dateiaktualisierung ausgeschaltet.")
+            : window.showSaveFilePicker
+              ? studioPreferences.autoSaveFile
+                ? "Wähle einen Ordner und Dateinamen. Danach wird diese MKW-Datei automatisch aktualisiert."
+                : "Wähle einen Ordner und Dateinamen. Die automatische Dateiaktualisierung ist ausgeschaltet."
+              : "Automatische Sicherung im Browser. Lokale Dateien können hier nur heruntergeladen werden.";
     };
   }
   async function startDocument(document) {

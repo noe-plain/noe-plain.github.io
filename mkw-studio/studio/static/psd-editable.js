@@ -33,24 +33,34 @@ const MKWPSD = (() => {
       ids = new Map();
     return {
       files,
-      add(key, name, data) {
+      async add(key, name, data) {
         if (!ids.has(key)) {
+          const media = MKWProjectAssets.deferred(data)
+            ? await MKWProjectFile.mediaBytes(data)
+            : bytesFromData(data);
           const id = uid();
           ids.set(key, id);
           files.push({
             id,
             name: (name || "Bild").replace(/\.[^.]+$/, "") + ".png",
             type: "PNG ",
-            data: bytesFromData(data),
+            data: media,
           });
         }
         return ids.get(key);
       },
     };
   }
-  function placed(layer, registry, source, transform, mask, key = source.id) {
+  async function placed(
+    layer,
+    registry,
+    source,
+    transform,
+    mask,
+    key = source.id,
+  ) {
     layer.placedLayer = {
-      id: registry.add(key, source.name, source.data),
+      id: await registry.add(key, source.name, source.data),
       placed: uid(),
       type: "raster",
       width: source.width,

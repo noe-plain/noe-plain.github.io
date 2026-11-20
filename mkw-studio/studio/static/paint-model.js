@@ -197,7 +197,7 @@ function studioPaintCSS(value) {
     return "linear-gradient(135deg,transparent 45%,#ec4652 46%,#ec4652 53%,transparent 54%)";
   if (value.kind === "image") {
     const im = p.images.find((im) => im.id === value.imageId);
-    return im
+    return typeof im?.data === "string"
       ? `url("${im.data}") center / cover`
       : "linear-gradient(135deg,#a9b6c9,#e4e9f1)";
   }

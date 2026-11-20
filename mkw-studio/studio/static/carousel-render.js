@@ -659,7 +659,10 @@ function carouselRefresh() {
   const viewport = $("#carouselViewport");
   carouselPasteboardSpace(viewport, width, height);
   let drawScale = rasterScale;
-  if (structured) {
+  const regional =
+    structured ||
+    p.images.some((asset) => MKWProjectAssets.deferred(asset.data));
+  if (regional) {
     const v = MKWSpreadUI.visible(),
       x = Math.max(0, Math.floor(v.x)),
       y = Math.max(0, Math.floor(v.y)),
@@ -675,6 +678,7 @@ function carouselRefresh() {
     if (canvas.width !== rw) canvas.width = rw;
     if (canvas.height !== rh) canvas.height = rh;
     Object.assign(canvas.style, {
+      position: "absolute",
       left: x * s + "px",
       top: y * s + "px",
       width: w * s + "px",
@@ -687,6 +691,7 @@ function carouselRefresh() {
     if (canvas.height !== Math.ceil(extent.h * rasterScale))
       canvas.height = Math.ceil(extent.h * rasterScale);
     Object.assign(canvas.style, {
+      position: "",
       left: "",
       top: "",
       width: width + "px",

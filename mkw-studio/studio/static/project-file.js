@@ -7,7 +7,20 @@
         ? require("./project-blocks.js")
         : root.MKWProjectBlocks;
   async function encode(project, options) {
-    return encodeDocument(MKWProjectAssets.compact(project), options);
+    const compact = MKWProjectAssets.compact(project);
+    for (const image of compact.images) image.data = await mediaUrl(image.data);
+    return encodeDocument(compact, options);
+  }
+  async function mediaUrl(source) {
+    if (!MKWProjectAssets.deferred(source)) return source;
+    const { toBase64, verifiedMedia } = await import(
+      "./mkw-zip/media-source.mjs?v=80a0a0d9436c"
+    );
+    return source.prefix + toBase64(await verifiedMedia(source));
+  }
+  async function mediaBytes(source) {
+    const { verifiedMedia } = await import("./mkw-zip/media-source.mjs?v=80a0a0d9436c");
+    return verifiedMedia(source);
   }
   async function isZip(file) {
     const header = new Uint8Array(await file.slice(0, 4).arrayBuffer());
@@ -19,11 +32,11 @@
     );
   }
   async function zipOperation(action, input) {
-    const { runZipOperation } = await import("./mkw-zip/client.mjs");
+    const { runZipOperation } = await import("./mkw-zip/client.mjs?v=80a0a0d9436c");
     return runZipOperation(action, input);
   }
   async function prepareZip(project, file, identities, known) {
-    const { prepareLinkedZip } = await import("./mkw-zip/client.mjs");
+    const { prepareLinkedZip } = await import("./mkw-zip/client.mjs?v=80a0a0d9436c");
     return prepareLinkedZip(project, file, identities, known);
   }
   async function encodeZip(project) {
@@ -82,11 +95,15 @@
       type: compressed ? "application/gzip" : "application/json",
     });
   }
-  async function decode(file, { maxBytes = Infinity } = {}) {
+  async function decode(
+    file,
+    { maxBytes = Infinity, lazyImages = false } = {},
+  ) {
     if (file.size > maxBytes) throw Error("Die Datei ist zu gross.");
     if (file.slice && (await blocks.isBlockFile(file)))
       return blocks.decode(file, { maxBytes });
-    if (file.slice && (await isZip(file))) return zipOperation("decode", file);
+    if (file.slice && (await isZip(file)))
+      return zipOperation(lazyImages ? "open" : "decode", file);
     const header = file.slice
       ? new Uint8Array(await file.slice(0, 2).arrayBuffer())
       : [];
@@ -217,7 +234,16 @@
       reader.releaseLock();
     }
   }
-  const api = { encode, encodeDocument, decode, isZip, encodeZip, prepareZip };
+  const api = {
+    encode,
+    encodeDocument,
+    decode,
+    isZip,
+    encodeZip,
+    prepareZip,
+    mediaUrl,
+    mediaBytes,
+  };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectFile = api;
 })(globalThis);

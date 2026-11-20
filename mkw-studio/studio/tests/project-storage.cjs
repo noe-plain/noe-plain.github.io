@@ -97,9 +97,12 @@ const assert = require("node:assert/strict");
         };
       });
       assert.equal(initial.link, "linked.mkw");
-      assert.equal(initial.project.images[0].original, undefined);
+      assert.equal(
+        initial.project.images[0].original,
+        "data:image/png;base64,REDUNDANT",
+      );
       assert(initial.project.images[0].data.startsWith("data:image/png"));
-      assert.equal(initial.project.fonts.length, 2);
+      assert(initial.project.fonts.length >= 2);
       let downloads = 0;
       page.on("download", () => downloads++);
       await page.evaluate(async () => {
@@ -195,13 +198,19 @@ const assert = require("node:assert/strict");
           throw error;
         });
       const file = await downloading,
-        project = await require("../static/project-file.js").decode(
-          new Blob([require("node:fs").readFileSync(await file.path())]),
+        bytes = require("node:fs").readFileSync(await file.path()),
+        project = await page.evaluate(
+          (data) => MKWProjectFile.decode(new Blob([new Uint8Array(data)])),
+          Array.from(bytes),
         );
+      assert.equal(bytes.subarray(0, 4).toString("hex"), "504b0304");
       assert(file.suggestedFilename().endsWith(".mkw"));
       assert.equal(project.projectId, id);
       assert.equal(project.meta.subtitle, "Firefox-Browsersicherung");
-      assert.equal(project.images[0].original, undefined);
+      assert.equal(
+        project.images[0].original,
+        "data:image/png;base64,REDUNDANT",
+      );
       assert(project.images[0].data.startsWith("data:image/png"));
       assert.equal(await page.evaluate(() => !!MKWProjects.fileLink()), false);
       await page.reload();

@@ -61,7 +61,7 @@ const MKWPSDPost = (() => {
       opened: false,
       children: [
         { name: "Schein · Darstellung (gerastert)", left, top, canvas: glow },
-        MKWPSD.placed(
+        await MKWPSD.placed(
           { name: "Bildinhalt", left, top, canvas: photo },
           registry,
           source,
@@ -211,7 +211,7 @@ const MKWPSDPost = (() => {
           c.rotate(-Math.PI / 2);
           c.drawImage(bitmap, 0, 0, logo.w, logo.h);
         } else c.drawImage(bitmap, 0, 0, w, h);
-        const layer = MKWPSD.placed(
+        const layer = await MKWPSD.placed(
           {
             name: asset.name || "Sponsorlogo",
             left: Math.min(...coords.map((p) => p.x)),
@@ -246,7 +246,7 @@ const MKWPSDPost = (() => {
             blendMode: "normal",
           };
           delete original.placedLayer;
-          MKWPSD.placed(
+          await MKWPSD.placed(
             original,
             registry,
             asset,

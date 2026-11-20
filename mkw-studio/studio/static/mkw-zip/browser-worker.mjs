@@ -1,5 +1,5 @@
 import sqliteInit from "./vendor/sqlite-3.54.1/index.mjs";
-import { decodeZip, prepareZip } from "./browser-codec.mjs";
+import { decodeZip, prepareZip } from "./browser-codec.mjs?v=80a0a0d9436c";
 
 self.onmessage = async ({ data: { action, input } }) => {
   try {
@@ -13,6 +13,8 @@ self.onmessage = async ({ data: { action, input } }) => {
     ]);
     let value;
     if (action === "decode") value = await decodeZip(input, sqlite, schema);
+    else if (action === "open")
+      value = await decodeZip(input, sqlite, schema, true);
     else if (action === "prepare") {
       let version;
       if (!input.file) {

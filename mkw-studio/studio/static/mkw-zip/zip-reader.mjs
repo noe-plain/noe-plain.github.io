@@ -186,6 +186,12 @@ export async function openMkwZip(file) {
     assets,
     counts,
     readDatabase: () => verified(database),
+    async assetSlice(hash) {
+      const entry = entries.get(assetPath(hash));
+      if (!entry) throw Error("MKW-Medium fehlt.");
+      const offset = await payloadOffset(entry);
+      return { blob: file.slice(offset, offset + entry.size), crc: entry.crc };
+    },
     async readAsset(hash) {
       const entry = entries.get(assetPath(hash));
       if (!entry) throw Error("MKW-Medium fehlt.");

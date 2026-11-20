@@ -151,7 +151,15 @@ async function image(src) {
       }
     };
     bitmap.onerror = fail;
-    bitmap.src = src;
+    if (MKWProjectAssets.deferred(src))
+      MKWProjectFile.mediaUrl(src).then(
+        (url) => (bitmap.src = url),
+        (error) => {
+          if (cache.get(src) === promise) cache.delete(src);
+          reject(error);
+        },
+      );
+    else bitmap.src = src;
   });
   cache.set(src, promise);
   return promise;
@@ -161,7 +169,10 @@ function pruneImageCache() {
   const used = new Set([...p.images, ...p.logos].map((item) => item.data));
   pruneImagePreviews(used);
   for (const key of cache.keys())
-    if (key.startsWith("data:") && !used.has(key)) {
+    if (
+      (typeof key !== "string" || key.startsWith("data:")) &&
+      !used.has(key)
+    ) {
       cache.delete(key);
       imageCacheBytes -= imageCacheSizes.get(key) || 0;
       imageCacheSizes.delete(key);
@@ -583,7 +594,7 @@ async function restore(q) {
   for (const im of q.images) {
     im.captureDate = im.captureDate || MKW.filenameDate(im.name);
     im.captureDay = im.captureDay || MKW.weekday(im.captureDate);
-    await image(im.data);
+    if (!MKWProjectAssets.deferred(im.data)) await image(im.data);
   }
   for (const l of q.logos) await image(l.data);
   p = q;

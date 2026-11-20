@@ -109,6 +109,15 @@ const MKWProjectStore = (() => {
           delete item.original;
         for (const [field, ref] of mediaFields) {
           const data = item[field];
+          if (MKWProjectAssets.deferred(data)) {
+            // Use the source key until verification. Unchecked bytes from a
+            // different archive must never replace an existing binary asset.
+            const id = "zip:" + data.key;
+            assets.set(id, data);
+            delete item[field];
+            item[ref] = id;
+            continue;
+          }
           if (!data) continue;
           if (field === "original" && !/^data:[^,]*;base64,/i.test(data))
             continue;
@@ -136,6 +145,16 @@ const MKWProjectStore = (() => {
             throw Error(
               "Ein Projektbestandteil fehlt in der Browsersicherung. Bitte die MKW-Datei öffnen.",
             );
+          const binary =
+            data.bytes instanceof ArrayBuffer
+              ? { ...data, blob: new Blob([data.bytes]) }
+              : data;
+          if (MKWProjectAssets.deferred(binary)) {
+            delete binary.bytes;
+            item[field] = binary;
+            delete item[ref];
+            continue;
+          }
           const url =
             typeof data === "string"
               ? data
@@ -193,14 +212,36 @@ const MKWProjectStore = (() => {
     };
   }
   async function save(project, expectedVersion = 0, options = {}) {
-    // Only the native block writer needs cached Blobs. Browsers using
-    // downloads can reuse their data URLs without persisting Blob files.
+    // Keep previously imported archive slices binary. Some browsers
+    // require the URL representation for media imported outside an archive.
     const nativeAssets = typeof globalThis.showSaveFilePicker === "function";
-    const lossless = options.lossless || options.fileStamp?.zip === true;
+    const hasDeferred = project.images.some(
+      ({ data, original }) =>
+        MKWProjectAssets.deferred(data) || MKWProjectAssets.deferred(original),
+    );
+    const lossless =
+      hasDeferred || options.lossless || options.fileStamp?.zip === true;
     const packed = await pack(project, {
         lossless,
       }),
       database = await db();
+    // WebKit cannot safely persist every file-backed Blob slice. Keep the
+    // encoded bytes for recovery there without decoding images or building URLs.
+    if (!nativeAssets && hasDeferred) {
+      const existing = new Set(
+        await result(
+          database.transaction("assets").objectStore("assets").getAllKeys(),
+        ),
+      );
+      for (const [key, data] of packed.assets)
+        if (MKWProjectAssets.deferred(data) && !existing.has(key)) {
+          const { blob, ...reference } = data;
+          packed.assets.set(key, {
+            ...reference,
+            bytes: await blob.arrayBuffer(),
+          });
+        }
+    }
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(
           ["projects", "assets", "meta"],
@@ -249,7 +290,7 @@ const MKWProjectStore = (() => {
           const get = assets.getKey(key);
           get.onsuccess = () => {
             if (get.result === undefined) {
-              if (!nativeAssets) {
+              if (!nativeAssets || MKWProjectAssets.deferred(data)) {
                 assets.put(data, key);
                 return;
               }
@@ -351,8 +392,11 @@ const MKWProjectStore = (() => {
         reject(transaction.error);
     });
   }
+  function metadata(id) {
+    return read("projects", id);
+  }
   async function version(id) {
-    return (await read("projects", id))?.version;
+    return (await metadata(id))?.version;
   }
   async function last({ metadataOnly = false } = {}) {
     const id = await read("meta", "lastProject");
@@ -410,6 +454,7 @@ const MKWProjectStore = (() => {
     open,
     last,
     version,
+    metadata,
     link,
     remove,
     pack,

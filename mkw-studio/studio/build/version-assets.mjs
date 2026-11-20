@@ -42,6 +42,36 @@ const patternPath = "static/hyphenation/hyph-de-1996.tex",
     `const patternURL = "${patternPath}?v=${patternHash}";`,
   );
 if (hyphenSource !== nextHyphen) await writeFile(hyphenFile, nextHyphen);
+// Keep the lazy archive reader, client and worker on the same protocol after
+// a Pages update, including for browsers with previously cached ES modules.
+const zipSources = [
+  "project-file.js",
+  ...[
+    "browser-codec",
+    "browser-worker",
+    "client",
+    "media-draft",
+    "media-source",
+    "model-db",
+    "zip-reader",
+    "zip-writer",
+  ].map((name) => "mkw-zip/" + name + ".mjs"),
+];
+const zipImports = /"(\.\/(?:mkw-zip\/)?[-a-z]+\.mjs)(?:\?v=[a-f0-9]+)?"/g;
+const zipGraph = new Map();
+const zipHash = createHash("sha256");
+for (const path of zipSources) {
+  const file = new URL("static/" + path, root);
+  const code = await readFile(file, "utf8");
+  zipGraph.set(file, code);
+  zipHash.update(code.replace(zipImports, '"$1"'));
+}
+const zipVersion = zipHash.digest("hex").slice(0, 12);
+for (const [file, code] of zipGraph) {
+  const versioned = code.replace(zipImports, `"$1?v=${zipVersion}"`);
+  if (versioned !== code) await writeFile(file, versioned);
+}
+
 // Recognition remains lazy; version the worker and its local models together.
 const workerFile = new URL("static/subject-worker.js", root),
   workerSource = await readFile(workerFile, "utf8");

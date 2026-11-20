@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const { isDeepStrictEqual } = require("node:util");
 const { launch, artifact } = require("./browser.cjs");
 
-async function inspect(browser, file) {
+async function inspect(browser, file, lazy = false) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
   });
@@ -16,6 +16,16 @@ async function inspect(browser, file) {
   try {
     await page.goto(process.env.STUDIO_URL);
     await page.locator("#startOpen:enabled").waitFor();
+    if (lazy)
+      await page.evaluate(() => {
+        window.imageReads = new Set();
+        const hydrate = MKWProjectFile.mediaUrl;
+        MKWProjectFile.mediaUrl = (source) => {
+          if (MKWProjectAssets.deferred(source))
+            window.imageReads.add(source.hash);
+          return hydrate(source);
+        };
+      });
     await page.locator("#projectFile").setInputFiles(file);
     await page.waitForFunction(
       () =>
@@ -24,6 +34,27 @@ async function inspect(browser, file) {
       null,
       { timeout: 100_000 },
     );
+    let demand;
+    if (lazy) {
+      await page.waitForFunction(
+        () =>
+          !carouselPaintRunning &&
+          !carouselPaintPending &&
+          !drawing &&
+          !postThumbnailRunning,
+      );
+      demand = await page.evaluate(() => ({
+        cached: new Set(p.images.map((im) => im.data.hash).filter(Boolean))
+          .size,
+        read: window.imageReads.size,
+      }));
+      assert(demand.cached > 0, "Project open has no deferred pictures.");
+      if (!(await page.evaluate(() => !!p.carousel)) && demand.cached > 8)
+        assert(
+          demand.read < demand.cached,
+          "Opening loaded offscreen pictures.",
+        );
+    }
     const data = await page.evaluate(async () => {
       const digest = async (bytes) => {
         const hash = await crypto.subtle.digest("SHA-256", bytes);
@@ -107,7 +138,7 @@ async function inspect(browser, file) {
       return { boardCount: boards.length, png, pdf: pdfResult, psd };
     });
     assert.deepEqual(errors, []);
-    return data;
+    return { data, demand };
   } finally {
     await context.close();
   }
@@ -121,11 +152,18 @@ async function inspect(browser, file) {
   try {
     const results = [];
     for (const entry of pairs) {
-      const before = await inspect(browser, entry.source);
+      const { data: before } = await inspect(browser, entry.source);
       console.log(
         `Case ${entry.case} baseline: ${before.boardCount} PNGs, ${before.pdf ? "PDF" : "no PDF mode"}, ${before.psd.limit ? "PSD limit" : "PSD"}`,
       );
-      const after = await inspect(browser, entry.restored);
+      const { data: after, demand } = await inspect(
+        browser,
+        entry.target,
+        true,
+      );
+      console.log(
+        `Case ${entry.case} viewport: ${demand.read} of ${demand.cached} deferred images read.`,
+      );
       for (const field of Object.keys(before))
         assert(
           isDeepStrictEqual(after[field], before[field]),
@@ -133,6 +171,7 @@ async function inspect(browser, file) {
         );
       results.push({
         case: entry.case,
+        demand,
         outputs: before.boardCount,
         pngPixelMatches: before.png.length,
         representativePdfMatches: before.pdf ? true : null,

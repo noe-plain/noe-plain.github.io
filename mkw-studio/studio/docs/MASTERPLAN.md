@@ -60,7 +60,7 @@ Keine dieser Zeilen behauptet, dass im heutigen Produkt bereits ein neuer P0-Feh
 
 ### 1 · Neues natives MKW-ZIP-Profil — hohe Priorität / P1 / N01
 
-**Nutzerauftrag 19. November:** Das neue Profil behält die Endung `.mkw`. **Status: Konvertierung, lokaler Worker und inkrementelle portable Textrevisionen sind nachgewiesen.** Der reguläre Editor kann ZIP-Projekte parallel öffnen und als neue Kopie herunterladen. Der bisherige Speicherweg darf erst nach erfolgreicher Abnahme der Konvertierung und des vollständigen neuen Speicherwegs entfernt werden.
+**Nutzerauftrag 20. November:** Das ZIP-Profil behält die Endung `.mkw`. Der normale Editor öffnet Bilddaten bedarfsweise und speichert Projektdateien und die Projektbeigabe im Bild-ZIP standardmässig im ZIP-Profil. Alte JSON-, gzip- und MKWBLK1-Dateien bleiben lesbar. Aus solchen Dateien wird eine neue Arbeitsdatei angelegt. Sie werden durch Autosave nicht verändert.
 
 #### N01 · Ist-Analyse der vorhandenen Speicherarchitektur
 
@@ -123,7 +123,7 @@ previews/<stabile-id>.png
 - Unterstützte ältere Format-/DB-Versionen beim Öffnen automatisch über explizit versionierte, deterministische und transaktionale Migrationsschritte übernehmen; zuerst auf einer Arbeitskopie, danach validieren. Die Originaldatei dabei nicht automatisch überschreiben. Zu neue Version verständlich abweisen bzw. nur bei nachgewiesener Kompatibilität lesen, nie die Quelldatei überschreiben. Unbekannte gültige Daten erhalten oder den Fall konkret melden statt still zu entfernen.
 - Asset-Schreiben, DB-Commit und ZIP-Abschluss als getrennte Fehlerpunkte absichern. Nach fehlendem Speicherplatz, Abbruch, Tab-/Worker-Absturz, beschädigtem Eintrag, veränderter Fremddatei und konkurrierendem Schreiben bleibt der letzte gültige Stand erreichbar. Lokale begrenzte Recovery-/Undo-Referenzen berücksichtigen; portable Datei nicht durch unbeschränkte Sitzungsverläufe aufblasen. Atomarität und harte Absturz-/Stromausfallgarantien nicht gleichsetzen.
 
-#### N01 · Konkrete Umsetzung und Abnahmetore (noch offen)
+#### N01 · Umsetzung und Abnahme
 
 | Stufe | Begrenzter Umsetzungsschritt | Erforderlicher Nachweis |
 | --- | --- | --- |
@@ -133,7 +133,7 @@ previews/<stabile-id>.png
 | N01.3 — lokaler Arbeitsmodus geprüft | Bedarfsweiser Assetzugang, private SQLite-Arbeitskopie mit gezielten Texttransaktionen und Wiederaufnahme nach Worker-Abbruch. | Drei reale Projekte, 0 Bildbytes beim Öffnen und Textspeichern, ein geänderter Datensatz pro Textänderung sowie Abweisung bei Konflikt, Schreibfehler und sichere Wiederaufnahme. Editor-Autosave, Undo/Redo, versteckte Objekte, Clipboard, 5-Projekt-Retention und Konfliktkopien bleiben bis zur ZIP-Anbindung bei N01.6 auf dem bestehenden Pfad und werden bei der Anbindung über beide Pfade abgenommen. |
 | N01.4 — portabler Schreibpfad geprüft | Eine Arbeitsrevision mit gleich grosser Datenbank inkrementell in die ZIP-Datei schreiben. Bei Wachstum kompakt neu aufbauen. | Drei echte ZIP-Updates, null Medien-Schreibbytes, No-op, Wachstum, Abbruch und Konfliktschutz geprüft. Automatisches Aktualisieren einer verknüpften Benutzerdatei bleibt Teil der Editoranbindung. |
 | N01.5 — Format und verknüpfter Ablauf geprüft | Versionswechsel v2 nach v3, beschädigte Einträge, grosse Projekte und Plattformrundlauf prüfen. | Versions-, Medien- und Belastungsprüfungen stehen oben. Der [GitHub-Lauf für Chromium, Firefox und Windows](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44704100294) war erfolgreich. Die drei Projektkopien, die echte macOS-Dateiauswahl und der WebKit-Rundlauf über Download und Projektbibliothek sind geprüft. |
-| N01.6 — verknüpfter ZIP-Pfad im Editor | MKW-ZIP öffnen, separat herunterladen oder eine neue ZIP-Arbeitsdatei verknüpfen. Die vollständige Projektbeigabe bleibt im Bild-ZIP wählbar. | Inkrementelles Speichern, Autosave, Wiederherstellung nach Schreibabbruch und erneutes Speichern sind mit allen drei Projektkopien geprüft. Die bewusste Migration einer bestehenden Verknüpfung auf eine neue Arbeitsdatei ist synthetisch geprüft. Für den Standardwechsel bleibt Lazy Loading beim regulären Öffnen offen. Die bisherigen Leser bleiben für alte Projektdateien erhalten. |
+| N01.6 — MKW-ZIP als Editorstandard | Beim Öffnen Bilddaten bedarfsweise lesen. Normales Speichern, Speichern unter und Projektbeigabe verwenden MKW-ZIP. Ein Browser mit Dateiauswahl verknüpft eine neue Arbeitsdatei. Die alten Formate bleiben im Import. | Alle drei Projektkopien bestanden Rendering, inkrementellen Autosave, Schreibabbruch und Wiederherstellung. [Abnahme des normalen Editors](MKW-ZIP-STANDARD-REVIEW-2026-11-20.md) |
 
 **Nachweis N01.6, 20. November:** Drei ausdrücklich verknüpfte ZIP-Arbeitsdateien wurden im normalen Editor automatisch aktualisiert. Der Schreibstrom verarbeitete 18.530 B, 20.593 B und 17.838 B mit jeweils 0 B aus Medienbereichen. Nach dem induzierten Abbruch blieben die Dateien bytegleich. Nach Neuladen stellte die Bibliothek den neueren Text und die Verknüpfung wieder her. Der erneute Klick auf «Projekt speichern» übertrug diesen Stand in dieselbe Arbeitsdatei. [Prüfbericht mit sechs Personas](MKW-ZIP-LINKED-REVIEW-2026-11-20.md) · [Messprotokoll](MKW-ZIP-LINKED-VERIFICATION-2026-11-20.json)
 

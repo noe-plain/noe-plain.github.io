@@ -27,13 +27,17 @@
           ? require("./review-comments-model.js")
           : root.MKWReviewCommentsModel;
       comments.validate(q);
+      const assets =
+        typeof module !== "undefined"
+          ? require("./project-assets.js")
+          : root.MKWProjectAssets;
       const ids = new Set();
       for (const i of q.images) {
         if (
           ids.has(i.id) ||
           typeof i.id !== "string" ||
-          !i.data?.startsWith("data:image/png;base64,") ||
-          !i.original?.startsWith("data:") ||
+          !assets.sourcePrefix(i.data).startsWith("data:image/png;base64,") ||
+          !assets.sourcePrefix(i.original).startsWith("data:") ||
           !Number.isFinite(i.width) ||
           !Number.isFinite(i.height) ||
           i.width < 1 ||

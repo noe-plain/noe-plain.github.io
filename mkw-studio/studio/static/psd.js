@@ -328,7 +328,7 @@ async function buildPSD(progress = () => {}) {
           e = b.elements.logo,
           w = e.size,
           h = (w * source.height) / source.width;
-        MKWPSD.placed(l, registry, source, [
+        await MKWPSD.placed(l, registry, source, [
           left + e.x,
           top + e.y,
           left + e.x + w,
@@ -360,7 +360,7 @@ async function buildPSD(progress = () => {}) {
               },
             ],
           };
-        MKWPSD.placed(
+        await MKWPSD.placed(
           l,
           registry,
           im,

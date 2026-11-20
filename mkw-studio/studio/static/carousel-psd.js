@@ -258,7 +258,7 @@ async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
         o.type === "angle" ? carouselAngleMask(o) : carouselImageMask(o),
       );
       await carouselPaintPhoto(ctx, o, image, 0, project);
-      const layer = MKWPSD.placed(
+      const layer = await MKWPSD.placed(
         {
           name: o.name,
           left: bounds.left,
@@ -336,7 +336,7 @@ async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
           const q = carouselToWorld(o, { x, y });
           return [q.x, q.y];
         });
-        MKWPSD.placed(layer, sources, source, transform);
+        await MKWPSD.placed(layer, sources, source, transform);
         Object.assign(layer, MKWPSD.blend(o));
         append(o, layer);
       }
@@ -364,7 +364,7 @@ async function buildCarouselPSD(progress = () => {}, sourceProject = p) {
             const native = { ...layer };
             delete native.vectorFill;
             delete native.vectorStroke;
-            MKWPSD.placed(
+            await MKWPSD.placed(
               native,
               sources,
               source,

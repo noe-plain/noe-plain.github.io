@@ -1,9 +1,9 @@
-import { mediaDraft } from "./media-draft.mjs";
+import { mediaDraft } from "./media-draft.mjs?v=80a0a0d9436c";
 
 export function runZipOperation(action, input) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
-      new URL("./browser-worker.mjs", import.meta.url),
+      new URL("./browser-worker.mjs?v=80a0a0d9436c", import.meta.url),
       { type: "module" },
     );
     const rejectOpen = (error) => {

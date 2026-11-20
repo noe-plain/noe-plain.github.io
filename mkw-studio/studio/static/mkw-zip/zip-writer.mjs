@@ -7,7 +7,7 @@ import {
   MAX_ARCHIVE,
   MAX_DATABASE,
   MAX_MANIFEST,
-} from "./zip-reader.mjs";
+} from "./zip-reader.mjs?v=80a0a0d9436c";
 
 const encoder = new TextEncoder();
 const manifestName = "manifest.json";

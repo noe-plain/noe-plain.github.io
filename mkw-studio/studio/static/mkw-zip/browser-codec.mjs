@@ -1,13 +1,15 @@
 // The compatibility entry point hydrates the normal Studio model. It does
 // not install an OPFS session or change how the editor stores existing projects.
-import { checkSchema, readScope, verifiedReferences } from "./model-db.mjs";
-import { buildSnapshot, planSnapshot } from "./zip-writer.mjs";
+import { checkSchema, readScope, verifiedReferences } from "./model-db.mjs?v=80a0a0d9436c";
+import { buildSnapshot, planSnapshot } from "./zip-writer.mjs?v=80a0a0d9436c";
 import {
   openMkwZip,
   sha256,
   MAX_ARCHIVE,
   MAX_DATABASE,
-} from "./zip-reader.mjs";
+} from "./zip-reader.mjs?v=80a0a0d9436c";
+
+import { toBase64, verifiedMedia } from "./media-source.mjs?v=80a0a0d9436c";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
@@ -18,13 +20,6 @@ const collections = {
   campaign: new Set(["rows", "links"]),
 };
 const stringify = JSON.stringify;
-
-function toBase64(bytes) {
-  const parts = [];
-  for (let i = 0; i < bytes.length; i += 24576)
-    parts.push(btoa(String.fromCharCode(...bytes.subarray(i, i + 24576))));
-  return parts.join("");
-}
 
 function encodeVerbatim(value) {
   // Match the migration reader's UTF-8 with surrogate preservation.
@@ -106,7 +101,7 @@ function openDatabase(sqlite, input, readOnly) {
   }
 }
 
-export async function decodeZip(file, sqlite, schema) {
+export async function decodeZip(file, sqlite, schema, lazyImages = false) {
   const zip = await openMkwZip(file);
   const db = openDatabase(sqlite, await zip.readDatabase(), true);
   let project;
@@ -138,9 +133,25 @@ export async function decodeZip(file, sqlite, schema) {
         : length;
     if (expanded > maxExpanded)
       throw Error("Die entpackte MKW-ZIP-Datei ist zu gross.");
-    const key = stringify([ref.hash, ref.encoding, ref.prefix]);
+    const fields = JSON.parse(path);
+    const deferred =
+      lazyImages &&
+      fields.length === 3 &&
+      fields[0] === "images" &&
+      ["data", "original"].includes(fields[2]) &&
+      ref.encoding === "base64" &&
+      /^data:image\/[a-z0-9.+-]+;base64,$/i.test(ref.prefix);
+    const key = stringify([ref.hash, ref.encoding, ref.prefix, deferred]);
     let url = urls.get(key);
-    if (url === undefined) {
+    if (url === undefined && deferred) {
+      url = {
+        ...ref,
+        length,
+        key: crypto.randomUUID(),
+        ...(await zip.assetSlice(ref.hash)),
+      };
+      urls.set(key, url);
+    } else if (url === undefined) {
       const encodingKey = stringify([ref.hash, ref.encoding]);
       if (!byHash.has(encodingKey)) {
         const asset = await zip.readAsset(ref.hash);
@@ -152,7 +163,6 @@ export async function decodeZip(file, sqlite, schema) {
       url = ref.prefix + byHash.get(encodingKey);
       urls.set(key, url);
     }
-    const fields = JSON.parse(path);
     const leaf = fields.pop();
     fields.reduce((record, field) => record[field], project)[leaf] = url;
   }
@@ -203,9 +213,13 @@ async function indexMedia(draft, previous) {
         encoding: encoded.encoding,
       };
     } else {
-      descriptor = value;
-      if (previous?.assets.get(value.hash) !== value.length)
-        throw Error("MKW-ZIP-Medium passt nicht zur verknüpften Datei.");
+      const { hash, length, prefix, encoding, blob } = value;
+      descriptor = { hash, length, prefix, encoding };
+      if (previous?.assets.get(hash) !== length && !assets.get(hash)?.data) {
+        if (!blob)
+          throw Error("MKW-ZIP-Medium passt nicht zur verknüpften Datei.");
+        data = await verifiedMedia(value);
+      }
     }
     const { hash, length } = descriptor;
     if (!assets.has(hash)) {

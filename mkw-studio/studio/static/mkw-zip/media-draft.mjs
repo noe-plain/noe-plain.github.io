@@ -5,7 +5,11 @@ export function mediaDraft(project, known = new Map()) {
   const urls = [];
   const media = [];
   function visit(value, path) {
-    if (typeof value === "string" && /^data:[^,]*,/i.test(value)) {
+    const deferred = value?.blob instanceof Blob && value.encoding === "base64";
+    if (
+      deferred ||
+      (typeof value === "string" && /^data:[^,]*,/i.test(value))
+    ) {
       if (!indexes.has(value)) {
         indexes.set(value, media.length);
         urls.push(value);

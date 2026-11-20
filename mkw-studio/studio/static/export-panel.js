@@ -21,20 +21,7 @@ const MKWExportPanel = (() => {
   settings.setAttribute("aria-labelledby", "exportSettingsTitle");
   formatHeading.id = "exportSettingsTitle";
   formatHeading.textContent = "Dateiformat & Qualität";
-  const zipProfile = document.createElement("label");
-  zipProfile.className = "check";
-  zipProfile.innerHTML =
-    '<input id="exportZipProfile" type="checkbox"> Projektbeigabe im Bild-ZIP als MKW ZIP';
-  settings.append(
-    formatHeading,
-    buttons,
-    format,
-    preset,
-    options,
-    pdf,
-    hint,
-    zipProfile,
-  );
+  settings.append(formatHeading, buttons, format, preset, options, pdf, hint);
   naming.setAttribute("aria-labelledby", "exportNamingTitle");
   namingHeading.id = "exportNamingTitle";
   naming.append(namingHeading, fields);
@@ -50,7 +37,6 @@ const MKWExportPanel = (() => {
   dialog.querySelector(".dialog-heading p").textContent =
     "Bilder auswählen, Einstellungen prüfen und herunterladen.";
   function sync() {
-    zipProfile.hidden = format.value === "pdf";
     const designer = !!p.carousel && !p.campaign;
     document.querySelector("#exportRowScopeLabel")?.remove();
     if (p.carousel?.pageStructure && !p.campaign) {

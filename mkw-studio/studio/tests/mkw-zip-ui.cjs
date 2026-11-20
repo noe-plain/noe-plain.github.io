@@ -16,7 +16,17 @@ async function fileHash(file) {
 
 async function openMkw(page, file) {
   await page.locator("#projectFile").setInputFiles(file);
-  await waitForProjectReady(page);
+  try {
+    await waitForProjectReady(page);
+  } catch (error) {
+    const state = await page.evaluate(() => ({
+      busy,
+      notice: document.querySelector("[data-notice-message]")?.textContent,
+      status: document.querySelector("#status").textContent,
+      dialogs: [...document.querySelectorAll("dialog[open]")].map((d) => d.id),
+    }));
+    throw Error("MKW did not open: " + JSON.stringify(state), { cause: error });
+  }
   await page.waitForFunction(
     () => !document.querySelector("#projectOpeningDialog"),
   );
@@ -87,10 +97,11 @@ async function openMkw(page, file) {
     await waitForProjectReady(page);
     await page.locator("#save").click();
     const downloadZip = page.waitForEvent("download");
-    await page.locator("#saveZipCopy").click();
+    await page.evaluate(() => (window.showSaveFilePicker = undefined));
+    await page.locator("#saveProject").click();
     const file = artifact("mkw-zip-ui-copy.mkw");
     const saved = await downloadZip;
-    assert(saved.suggestedFilename().endsWith(" – ZIP.mkw"));
+    assert(saved.suggestedFilename().endsWith(".mkw"));
     await saved.saveAs(file);
     assert.equal(
       fs.readFileSync(file).subarray(0, 4).toString("hex"),
@@ -130,7 +141,6 @@ async function openMkw(page, file) {
     await page.locator("#export").click();
     await page.locator("[data-export-format=png]").click();
     await page.locator("#exportNames input").last().uncheck();
-    await page.locator("#exportZipProfile").check();
     const imageZip = page.waitForEvent("download").catch(async (error) => {
       throw Error(
         (await page.locator("#exportStatus").textContent()) || error.message,
@@ -171,16 +181,16 @@ async function openMkw(page, file) {
       "Zweite Seite",
     );
 
-    const backedUp = await page.evaluate(() => ({
+    const backedUp = await page.evaluate(async () => ({
       id: p.projectId,
-      picture: p.images[0].data,
+      picture: await MKWProjectFile.mediaUrl(p.images[0].data),
     }));
     await page.reload();
     await openLatestProject(page);
     assert.deepEqual(
-      await page.evaluate(() => ({
+      await page.evaluate(async () => ({
         id: p.projectId,
-        picture: p.images[0].data,
+        picture: await MKWProjectFile.mediaUrl(p.images[0].data),
         text: p.boards[1].elements.title.text,
       })),
       { ...backedUp, text: "Zweite Seite" },

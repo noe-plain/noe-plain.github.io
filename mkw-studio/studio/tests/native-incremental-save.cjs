@@ -130,9 +130,14 @@ const { launch } = require("./browser.cjs");
       JSON.stringify(result.file.images.map((i) => [i.id, i.data.length])),
       first.project,
     );
-    const size = await page.evaluate(
-      async () => (await nativeTestHandle.getFile()).size,
-    );
+    // Adding subtitle text can grow SQLite by one page. Measure repeated
+    // equal-size text replacements after that row has its final size.
+    const size = await page.evaluate(async () => {
+      p.meta.subtitle = "Änderung a";
+      revision++;
+      await autosave();
+      return (await nativeTestHandle.getFile()).size;
+    });
     await page.evaluate(async () => {
       for (let i = 0; i < 8; i++) {
         p.meta.subtitle = "Änderung " + i;
@@ -148,12 +153,12 @@ const { launch } = require("./browser.cjs");
         return nativePlans.length === writes;
       }),
     );
+    const finalSize = await page.evaluate(
+      async () => (await nativeTestHandle.getFile()).size,
+    );
     assert(
-      Math.abs(
-        (await page.evaluate(
-          async () => (await nativeTestHandle.getFile()).size,
-        )) - size,
-      ) < 1000,
+      Math.abs(finalSize - size) < 1000,
+      `Repeated fixed-size edits grew the MKW archive from ${size} to ${finalSize} bytes.`,
     );
     await page.reload();
     await require("./browser.cjs").openLatestProject(page);
