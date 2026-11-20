@@ -105,8 +105,8 @@ const { launch, artifact } = require("./browser.cjs");
       );
       await page.evaluate(() => {
         MKWProjectStore.save = window.realStoreSave;
-        window.realEncode = MKWProjectFile.encode;
-        MKWProjectFile.encode = async () => {
+        window.realEncode = MKWProjectFile.encodeZip;
+        MKWProjectFile.encodeZip = async () => {
           throw Error("Test: Datei kann nicht geschrieben werden");
         };
       });
@@ -129,7 +129,7 @@ const { launch, artifact } = require("./browser.cjs");
       );
       await page.screenshot({ path: artifact("mkw-save-warning.png") });
       await page.evaluate(() => {
-        MKWProjectFile.encode = window.realEncode;
+        MKWProjectFile.encodeZip = window.realEncode;
       });
     }
     await page.close();

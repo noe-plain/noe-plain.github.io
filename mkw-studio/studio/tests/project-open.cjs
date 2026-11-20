@@ -126,8 +126,10 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#saveProject").click();
       const downloaded = await downloading,
         text = require("node:fs").readFileSync(await downloaded.path());
-      const decoded = await require("../static/project-file.js").decode(
-        new Blob([text]),
+      assert.equal(text.subarray(0, 4).toString("hex"), "504b0304");
+      const decoded = await page.evaluate(
+        (data) => MKWProjectFile.decode(new Blob([new Uint8Array(data)])),
+        Array.from(text),
       );
       assert.equal(downloaded.suggestedFilename(), "Gewählter_Name.mkw");
       first = { id: await page.evaluate(() => p.projectId), text };
