@@ -1,11 +1,13 @@
-/* MKW remains JSON, but no operation assembles the complete asset payload as a string. */
+/* Portable archive codec and streaming compatibility readers. */
 (function (root) {
   "use strict";
   const collections = ["images", "logos", "fonts"],
     blocks =
       typeof module !== "undefined"
         ? require("./project-blocks.js")
-        : root.MKWProjectBlocks;
+        : root.MKWProjectBlocks,
+    mediaModule = "./mkw-zip/media-source.mjs?v=c75b81a42ad8",
+    clientModule = "./mkw-zip/client.mjs?v=c75b81a42ad8";
   async function encode(project, options) {
     const compact = MKWProjectAssets.compact(project);
     for (const image of compact.images) image.data = await mediaUrl(image.data);
@@ -13,13 +15,11 @@
   }
   async function mediaUrl(source) {
     if (!MKWProjectAssets.deferred(source)) return source;
-    const { toBase64, verifiedMedia } = await import(
-      "./mkw-zip/media-source.mjs?v=80a0a0d9436c"
-    );
+    const { toBase64, verifiedMedia } = await import(mediaModule);
     return source.prefix + toBase64(await verifiedMedia(source));
   }
   async function mediaBytes(source) {
-    const { verifiedMedia } = await import("./mkw-zip/media-source.mjs?v=80a0a0d9436c");
+    const { verifiedMedia } = await import(mediaModule);
     return verifiedMedia(source);
   }
   async function isZip(file) {
@@ -32,11 +32,11 @@
     );
   }
   async function zipOperation(action, input) {
-    const { runZipOperation } = await import("./mkw-zip/client.mjs?v=80a0a0d9436c");
+    const { runZipOperation } = await import(clientModule);
     return runZipOperation(action, input);
   }
   async function prepareZip(project, file, identities, known) {
-    const { prepareLinkedZip } = await import("./mkw-zip/client.mjs?v=80a0a0d9436c");
+    const { prepareLinkedZip } = await import(clientModule);
     return prepareLinkedZip(project, file, identities, known);
   }
   async function encodeZip(project) {

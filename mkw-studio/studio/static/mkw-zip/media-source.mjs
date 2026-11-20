@@ -1,4 +1,4 @@
-import { crc32, sha256 } from "./zip-reader.mjs?v=80a0a0d9436c";
+import { crc32, sha256 } from "./zip-reader.mjs?v=c75b81a42ad8";
 
 export function toBase64(bytes) {
   const parts = [];

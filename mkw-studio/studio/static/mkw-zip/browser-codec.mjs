@@ -1,15 +1,15 @@
 // The compatibility entry point hydrates the normal Studio model. It does
 // not install an OPFS session or change how the editor stores existing projects.
-import { checkSchema, readScope, verifiedReferences } from "./model-db.mjs?v=80a0a0d9436c";
-import { buildSnapshot, planSnapshot } from "./zip-writer.mjs?v=80a0a0d9436c";
+import { checkSchema, readScope, verifiedReferences } from "./model-db.mjs?v=c75b81a42ad8";
+import { buildSnapshot, planSnapshot } from "./zip-writer.mjs?v=c75b81a42ad8";
 import {
   openMkwZip,
   sha256,
   MAX_ARCHIVE,
   MAX_DATABASE,
-} from "./zip-reader.mjs?v=80a0a0d9436c";
+} from "./zip-reader.mjs?v=c75b81a42ad8";
 
-import { toBase64, verifiedMedia } from "./media-source.mjs?v=80a0a0d9436c";
+import { toBase64, verifiedMedia } from "./media-source.mjs?v=c75b81a42ad8";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });

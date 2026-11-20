@@ -1,5 +1,5 @@
 import sqliteInit from "./vendor/sqlite-3.54.1/index.mjs";
-import { decodeZip, prepareZip } from "./browser-codec.mjs?v=80a0a0d9436c";
+import { decodeZip, prepareZip } from "./browser-codec.mjs?v=c75b81a42ad8";
 
 self.onmessage = async ({ data: { action, input } }) => {
   try {

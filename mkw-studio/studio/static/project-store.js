@@ -236,10 +236,9 @@ const MKWProjectStore = (() => {
       for (const [key, data] of packed.assets)
         if (MKWProjectAssets.deferred(data) && !existing.has(key)) {
           const { blob, ...reference } = data;
-          packed.assets.set(key, {
-            ...reference,
-            bytes: await blob.arrayBuffer(),
-          });
+          const bytes = await blob.arrayBuffer();
+          data.blob = new Blob([bytes]);
+          packed.assets.set(key, { ...reference, bytes });
         }
     }
     return new Promise((resolve, reject) => {
@@ -251,6 +250,7 @@ const MKWProjectStore = (() => {
         assets = transaction.objectStore("assets"),
         meta = transaction.objectStore("meta");
       let outcome;
+      const storedSlices = new Map();
       const current = projects.get(project.projectId);
       current.onsuccess = () => {
         const previous = current.result,
@@ -290,7 +290,18 @@ const MKWProjectStore = (() => {
           const get = assets.getKey(key);
           get.onsuccess = () => {
             if (get.result === undefined) {
-              if (!nativeAssets || MKWProjectAssets.deferred(data)) {
+              if (MKWProjectAssets.deferred(data) && nativeAssets) {
+                const put = assets.put(data, key);
+                put.onsuccess = () => {
+                  const durable = assets.get(key);
+                  durable.onsuccess = () => {
+                    if (MKWProjectAssets.deferred(durable.result))
+                      storedSlices.set(data, durable.result.blob);
+                  };
+                };
+                return;
+              }
+              if (!nativeAssets) {
                 assets.put(data, key);
                 return;
               }
@@ -321,7 +332,11 @@ const MKWProjectStore = (() => {
         maintainProjects(transaction, { keepId: id });
         outcome = { id, version, conflict, missing, record };
       };
-      transaction.oncomplete = () => resolve(outcome);
+      transaction.oncomplete = () => {
+        // The open session uses its own copy even if the input file is moved.
+        for (const [source, blob] of storedSlices) source.blob = blob;
+        resolve(outcome);
+      };
       transaction.onerror = transaction.onabort = () =>
         reject(
           transaction.error ||
