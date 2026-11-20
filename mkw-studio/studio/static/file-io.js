@@ -55,10 +55,14 @@ function setSaveBusy(value) {
 }
 
 async function writeFilePlan(handle, plan) {
-  if (plan.unchanged) return;
   async function checkTarget() {
     const { size, lastModified, probe } = plan.expected;
     const current = await handle.getFile();
+    const changed = () =>
+      Error("Die Zieldatei wurde ausserhalb des Studios geändert.");
+    if (current.size !== size || current.lastModified !== lastModified)
+      throw changed();
+    if (!probe) return;
     const data = await current
       .slice(probe.offset, probe.offset + probe.length)
       .arrayBuffer();
@@ -66,14 +70,10 @@ async function writeFilePlan(handle, plan) {
     const hash = Array.from(bytes, (n) => n.toString(16).padStart(2, "0")).join(
       "",
     );
-    if (
-      current.size !== size ||
-      current.lastModified !== lastModified ||
-      hash !== probe.sha256
-    )
-      throw Error("Die Zieldatei wurde ausserhalb des Studios geändert.");
+    if (hash !== probe.sha256) throw changed();
   }
   if (plan.expected) await checkTarget();
+  if (plan.unchanged) return;
   const stream = await handle.createWritable({
     keepExistingData: plan.keepExistingData,
     mode: "exclusive",

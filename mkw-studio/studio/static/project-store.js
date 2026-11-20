@@ -58,68 +58,100 @@ const MKWProjectStore = (() => {
     const database = await db();
     return result(database.transaction(store).objectStore(store).get(key));
   }
-  async function hash(data, item) {
-    if (item && itemHashes.get(item)?.data === data)
-      return itemHashes.get(item).key;
-    if (hashCache.has(data)) return hashCache.get(data);
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(data),
-    );
-    const key = [...new Uint8Array(digest)]
-      .map((n) => n.toString(16).padStart(2, "0"))
-      .join("");
-    if (item) itemHashes.set(item, { data, key });
-    hashCache.set(data, key);
-    while (
-      hashCache.size > 12 ||
-      [...hashCache.keys()].reduce((sum, key) => sum + key.length * 2, 0) >
-        32 * 1024 * 1024
-    )
-      hashCache.delete(hashCache.keys().next().value);
+  async function hash(data, item, field) {
+    const references = item && itemHashes.get(item);
+    if (references?.[field]?.data === data) return references[field].key;
+    let key = hashCache.get(data);
+    if (!key) {
+      const digest = await crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(data),
+      );
+      key = [...new Uint8Array(digest)]
+        .map((n) => n.toString(16).padStart(2, "0"))
+        .join("");
+      hashCache.set(data, key);
+      while (
+        hashCache.size > 12 ||
+        [...hashCache.keys()].reduce((sum, key) => sum + key.length * 2, 0) >
+          32 * 1024 * 1024
+      )
+        hashCache.delete(hashCache.keys().next().value);
+    }
+    if (item) itemHashes.set(item, { ...references, [field]: { data, key } });
     return key;
   }
-  async function pack(project) {
-    const document = MKWProjectAssets.compact(project),
-      assets = new Map();
-    for (const collection of ["images", "logos", "fonts"])
-      for (const item of document[collection])
-        if (item.data) {
-          const id = await hash(
-            item.data,
-            project[collection].find(
-              (original) =>
-                original.id === item.id && original.role === item.role,
-            ),
-          );
-          assets.set(id, item.data);
-          delete item.data;
-          item.assetRef = id;
+  const mediaFields = [
+    ["data", "assetRef"],
+    ["original", "originalAssetRef"],
+  ];
+  const storedMedia = (document) =>
+    ["images", "logos", "fonts"].flatMap((key) =>
+      (document[key] || []).flatMap((item) =>
+        mediaFields.map(([, ref]) => item[ref]).filter(Boolean),
+      ),
+    );
+  async function pack(project, { lossless = false } = {}) {
+    const document = lossless
+      ? MKWProjectAssets.capture(project)
+      : MKWProjectAssets.compact(project);
+    const assets = new Map();
+    for (const collection of ["images", "logos", "fonts"]) {
+      if (lossless)
+        document[collection] = document[collection].map((item) => ({
+          ...item,
+        }));
+      for (const item of document[collection]) {
+        const original = project[collection].find(
+          (source) => source.id === item.id && source.role === item.role,
+        );
+        if (collection === "images" && item.original === item.data)
+          delete item.original;
+        for (const [field, ref] of mediaFields) {
+          const data = item[field];
+          if (!data) continue;
+          if (field === "original" && !/^data:[^,]*;base64,/i.test(data))
+            continue;
+          const id = await hash(data, original, field);
+          assets.set(id, data);
+          delete item[field];
+          item[ref] = id;
+          if (lossless)
+            item[ref + "Prefix"] = data.slice(0, data.indexOf(",") + 1);
         }
+      }
+    }
     return { document, assets };
   }
   async function unpack(document, storedAssets = null) {
     const project = structuredClone(document);
     for (const collection of ["images", "logos", "fonts"])
       for (const item of project[collection] || [])
-        if (item.assetRef) {
+        for (const [field, ref] of mediaFields) {
+          if (!item[ref]) continue;
           const data = storedAssets
-            ? storedAssets.get(item.assetRef)
-            : await read("assets", item.assetRef);
+            ? storedAssets.get(item[ref])
+            : await read("assets", item[ref]);
           if (!data)
             throw Error(
               "Ein Projektbestandteil fehlt in der Browsersicherung. Bitte die MKW-Datei öffnen.",
             );
-          item.data =
+          const url =
             typeof data === "string"
               ? data
               : await new Promise((resolve, reject) => {
-                  const r = new FileReader();
-                  r.onload = () => resolve(r.result);
-                  r.onerror = () => reject(r.error);
-                  r.readAsDataURL(data);
+                  const reader = new FileReader();
+                  reader.onload = () => resolve(reader.result);
+                  reader.onerror = () => reject(reader.error);
+                  reader.readAsDataURL(data);
                 });
-          delete item.assetRef;
+          const prefix = item[ref + "Prefix"];
+          item[field] =
+            prefix === undefined
+              ? url
+              : prefix + url.slice(url.indexOf(",") + 1);
+          delete item[ref];
+          delete item[ref + "Prefix"];
         }
     return MKWProjectAssets.hydrate(project);
   }
@@ -148,11 +180,7 @@ const MKWProjectStore = (() => {
         .objectStore("meta")
         .put(retained[0]?.id || null, "lastProject");
       const refs = new Set(
-        retained.flatMap((record) =>
-          ["images", "logos", "fonts"].flatMap((key) =>
-            (record.document[key] || []).map((item) => item.assetRef),
-          ),
-        ),
+        retained.flatMap((record) => storedMedia(record.document)),
       );
       const assets = transaction.objectStore("assets"),
         cursor = assets.openKeyCursor();
@@ -165,7 +193,10 @@ const MKWProjectStore = (() => {
     };
   }
   async function save(project, expectedVersion = 0, options = {}) {
-    const packed = await pack(project),
+    const lossless = options.lossless || options.fileStamp?.zip === true;
+    const packed = await pack(project, {
+        lossless,
+      }),
       database = await db();
     return new Promise((resolve, reject) => {
       const transaction = database.transaction(
@@ -215,11 +246,27 @@ const MKWProjectStore = (() => {
           const get = assets.getKey(key);
           get.onsuccess = () => {
             if (get.result === undefined) {
-              const comma = data.indexOf(","),
-                mime = data.slice(5, data.indexOf(";")),
-                binary = atob(data.slice(comma + 1)),
-                bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-              assets.put(new Blob([bytes], { type: mime }), key);
+              const comma = data.indexOf(",");
+              const encoded = data.slice(comma + 1);
+              const mime = data.slice(5, comma).split(";")[0];
+              let binary;
+              try {
+                binary = atob(encoded);
+              } catch (error) {
+                if (!lossless) throw error;
+              }
+              if (
+                lossless &&
+                (binary === undefined || btoa(binary) !== encoded)
+              )
+                assets.put(data, key);
+              else
+                assets.put(
+                  new Blob([Uint8Array.from(binary, (c) => c.charCodeAt(0))], {
+                    type: mime,
+                  }),
+                  key,
+                );
             }
           };
         }
@@ -265,13 +312,10 @@ const MKWProjectStore = (() => {
           transaction.abort();
           return;
         }
-        for (const item of ["images", "logos", "fonts"].flatMap(
-          (key) => record.document[key] || [],
-        ))
-          if (item.assetRef) {
-            const get = transaction.objectStore("assets").get(item.assetRef);
-            get.onsuccess = () => storedAssets.set(item.assetRef, get.result);
-          }
+        for (const ref of new Set(storedMedia(record.document))) {
+          const get = transaction.objectStore("assets").get(ref);
+          get.onsuccess = () => storedAssets.set(ref, get.result);
+        }
       };
       transaction.oncomplete = () => resolve({ record, storedAssets });
       transaction.onabort = transaction.onerror = () =>
@@ -324,14 +368,18 @@ const MKWProjectStore = (() => {
     }
     return null;
   }
-  async function link(id, handle, stamp) {
+  async function link(id, handle, stamp, expectedVersion) {
     const database = await db();
     return new Promise((resolve, reject) => {
       const tx = database.transaction("projects", "readwrite"),
         store = tx.objectStore("projects"),
         request = store.get(id);
       request.onsuccess = () => {
-        if (!request.result) {
+        if (
+          !request.result ||
+          (expectedVersion !== undefined &&
+            request.result.version !== expectedVersion)
+        ) {
           tx.abort();
           return;
         }

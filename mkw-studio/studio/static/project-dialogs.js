@@ -188,7 +188,13 @@ const MKWProjectDialogs = (() => {
     psdScope.hidden = true;
     psdScope.innerHTML =
       'PSD-Auswahl<select id="psdRowScope"><option value="all">Gesamtes Projekt</option><option value="row">Aktive Reihe</option></select>';
-    alternative.append($("#saveZipCopy"), psdScope, psd, psdHint);
+    alternative.append(
+      $("#linkZipCopy"),
+      $("#saveZipCopy"),
+      psdScope,
+      psd,
+      psdHint,
+    );
     const exportCard = document.createElement("section");
     exportCard.className = "save-export-entry";
     exportCard.innerHTML = `<h3>Fertige Bilder teilen</h3><p>JPG, PNG, WebP und beim Designer auch PDF findest du im Export.</p><button type="button" id="saveOpenExport">${studioIcon("export")}<span>Zum Export</span></button>`;

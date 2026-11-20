@@ -1,0 +1,55 @@
+{
+  "browser": "157.0.8103.79",
+  "checks": [
+    {
+      "case": 1,
+      "boards": 3,
+      "fileBytes": 112949457,
+      "writtenBytes": 18530,
+      "mediaWriteBytes": 0,
+      "mediaTransferredToWorkerOnWarmSave": 0,
+      "noOpWriteBytes": 0,
+      "timedAutosave": true,
+      "abortPreservedFile": true,
+      "restoredAfterReload": true,
+      "retryCommitted": true,
+      "sourceUnchanged": true
+    },
+    {
+      "case": 2,
+      "boards": 18,
+      "fileBytes": 41097075,
+      "writtenBytes": 20593,
+      "mediaWriteBytes": 0,
+      "mediaTransferredToWorkerOnWarmSave": 0,
+      "noOpWriteBytes": 0,
+      "timedAutosave": true,
+      "abortPreservedFile": true,
+      "restoredAfterReload": true,
+      "retryCommitted": true,
+      "sourceUnchanged": true
+    },
+    {
+      "case": 3,
+      "boards": 1,
+      "fileBytes": 9477137,
+      "writtenBytes": 17838,
+      "mediaWriteBytes": 0,
+      "mediaTransferredToWorkerOnWarmSave": 0,
+      "noOpWriteBytes": 0,
+      "timedAutosave": true,
+      "abortPreservedFile": true,
+      "restoredAfterReload": true,
+      "retryCommitted": true,
+      "sourceUnchanged": true
+    }
+  ],
+  "syntheticChecks": {
+    "interruptedCommitReconciled": true,
+    "assetRemovalCompacted": true,
+    "externalChangePreserved": true
+  },
+  "localBrowserSuitesPassed": 8,
+  "platform": "macOS",
+  "fileHandle": "Chromium OPFS, selected through normal Studio save action with a substituted picker"
+}

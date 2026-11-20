@@ -1,5 +1,5 @@
 import sqliteInit from "./vendor/sqlite-3.54.1/index.mjs";
-import { decodeZip, encodeZip } from "./browser-codec.mjs";
+import { decodeZip, prepareZip } from "./browser-codec.mjs";
 
 self.onmessage = async ({ data: { action, input } }) => {
   try {
@@ -13,14 +13,24 @@ self.onmessage = async ({ data: { action, input } }) => {
     ]);
     let value;
     if (action === "decode") value = await decodeZip(input, sqlite, schema);
-    else if (action === "encode") {
-      const response = await fetch(
-        new URL("../../package.json", import.meta.url),
+    else if (action === "prepare") {
+      let version;
+      if (!input.file) {
+        const response = await fetch(
+          new URL("../../package.json", import.meta.url),
+        );
+        if (!response.ok)
+          throw Error("Studio-Version konnte nicht geladen werden.");
+        ({ version } = await response.json());
+      }
+      value = await prepareZip(
+        input.draft,
+        version,
+        sqlite,
+        schema,
+        input.file,
+        input.identities,
       );
-      if (!response.ok)
-        throw Error("Studio-Version konnte nicht geladen werden.");
-      const { version } = await response.json();
-      value = await encodeZip(input, version, sqlite, schema);
     } else throw Error("Unbekannter MKW-ZIP-Vorgang.");
     self.postMessage({ value });
   } catch (error) {

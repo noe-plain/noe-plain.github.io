@@ -100,30 +100,72 @@ function entryChecksums(entry, bytes) {
   ];
 }
 
-export async function planSnapshot(zip, database) {
-  if (database.byteLength > MAX_DATABASE)
-    throw Error("MKW-Projektdatenbank ist zu gross.");
-  const hash = await sha256(database);
-  if (hash === zip.manifest.entries[databaseName].sha256) {
-    return {
-      unchanged: true,
-      size: zip.file.size,
-      bytesWritten: 0,
-      writes: [],
-    };
-  }
-  const manifest = encoder.encode(
+function encodeManifest(metadata, database, hash, assets) {
+  const result = encoder.encode(
     JSON.stringify({
-      ...zip.manifest,
+      ...metadata,
+      format: "mkw-studio-zip",
       formatVersion: 3,
+      schemaVersion: 2,
       minimumReaderVersion: 3,
       entries: {
-        ...zip.manifest.entries,
-        [databaseName]: { bytes: database.byteLength, sha256: hash },
+        "project.sqlite": { bytes: database.byteLength, sha256: hash },
+        ...Object.fromEntries(
+          [...assets].map(([sha256, item]) => [
+            `assets/${sha256}.bin`,
+            { bytes: item.length, sha256 },
+          ]),
+        ),
       },
     }),
   );
-  if (manifest.length > MAX_MANIFEST) throw Error("MKW-Manifest ist zu gross.");
+  if (result.length > MAX_MANIFEST) throw Error("MKW-Manifest ist zu gross.");
+  return result;
+}
+
+function fallback(manifest, database, items) {
+  return archiveBlob([
+    { name: manifestName, data: manifest, crc: crc32(manifest) },
+    { name: databaseName, data: database, crc: crc32(database) },
+    ...items,
+  ]);
+}
+
+export async function buildSnapshot(database, assets, metadata) {
+  const manifest = encodeManifest(
+    metadata,
+    database,
+    await sha256(database),
+    assets,
+  );
+  return {
+    identity: await sha256(manifest),
+    blob: fallback(
+      manifest,
+      database,
+      [...assets].map(([hash, { data }]) => ({
+        name: `assets/${hash}.bin`,
+        data,
+        crc: crc32(data),
+      })),
+    ),
+  };
+}
+
+export async function planSnapshot(
+  zip,
+  database,
+  assets = new Map([...zip.assets].map(([hash, length]) => [hash, { length }])),
+  baseline,
+) {
+  if (database.byteLength > MAX_DATABASE)
+    throw Error("MKW-Projektdatenbank ist zu gross.");
+  const hash = await sha256(database);
+  const mediaUnchanged =
+    zip.assets.size === assets.size &&
+    [...assets].every(
+      ([digest, asset]) => zip.assets.get(digest) === asset.length,
+    );
   const oldManifest = zip.entries.get(manifestName);
   const oldDatabase = zip.entries.get(databaseName);
   const manifestOffset = await zip.payloadOffset(oldManifest);
@@ -139,11 +181,24 @@ export async function planSnapshot(zip, database) {
           },
         }
       : undefined;
+  if (mediaUnchanged && hash === zip.manifest.entries[databaseName].sha256) {
+    return {
+      identity: zip.identity,
+      unchanged: true,
+      expected,
+      size: zip.file.size,
+      bytesWritten: 0,
+      writes: [],
+    };
+  }
+  const manifest = encodeManifest(zip.manifest, database, hash, assets);
+  const identity = await sha256(manifest);
   if (
+    mediaUnchanged &&
     oldManifest.size === manifest.length &&
     oldDatabase.size === database.byteLength
   ) {
-    const oldDatabaseBytes = await zip.readDatabase();
+    const oldDatabaseBytes = baseline ?? (await zip.readDatabase());
     const writes = [
       ...changedDatabasePages(
         oldDatabaseBytes,
@@ -155,6 +210,7 @@ export async function planSnapshot(zip, database) {
       ...entryChecksums(oldDatabase, database),
     ].sort((a, b) => a.position - b.position);
     return {
+      identity,
       keepExistingData: true,
       expected,
       size: zip.file.size,
@@ -166,21 +222,25 @@ export async function planSnapshot(zip, database) {
     };
   }
 
-  const items = [
-    { name: manifestName, data: manifest, crc: crc32(manifest) },
-    { name: databaseName, data: database, crc: crc32(database) },
-  ];
-  for (const entry of zip.entries.values()) {
-    if (entry === oldManifest || entry === oldDatabase) continue;
-    const start = await zip.payloadOffset(entry);
-    items.push({
-      name: entry.name,
-      crc: entry.crc,
-      data: zip.file.slice(start, start + entry.size),
-    });
+  const items = [];
+  for (const [digest, asset] of assets) {
+    const name = `assets/${digest}.bin`;
+    const entry = zip.entries.get(name);
+    if (entry?.size === asset.length) {
+      const start = await zip.payloadOffset(entry);
+      items.push({
+        name,
+        crc: entry.crc,
+        data: zip.file.slice(start, start + entry.size),
+      });
+    } else {
+      if (!asset.data) throw Error("MKW-ZIP-Medium fehlt für die neue Datei.");
+      items.push({ name, crc: crc32(asset.data), data: asset.data });
+    }
   }
-  const data = archiveBlob(items);
+  const data = fallback(manifest, database, items);
   return {
+    identity,
     keepExistingData: false,
     expected,
     size: data.size,

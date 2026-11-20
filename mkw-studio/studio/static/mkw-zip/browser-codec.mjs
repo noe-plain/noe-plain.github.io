@@ -1,11 +1,10 @@
 // The compatibility entry point hydrates the normal Studio model. It does
 // not install an OPFS session or change how the editor stores existing projects.
 import { checkSchema, readScope, verifiedReferences } from "./model-db.mjs";
-import { archiveBlob } from "./zip-writer.mjs";
+import { buildSnapshot, planSnapshot } from "./zip-writer.mjs";
 import {
   openMkwZip,
   sha256,
-  crc32,
   MAX_ARCHIVE,
   MAX_DATABASE,
 } from "./zip-reader.mjs";
@@ -76,12 +75,8 @@ function decodeVerbatim(bytes) {
   return parts.join("");
 }
 
-export async function decodeZip(file, sqlite, schema) {
-  const zip = await openMkwZip(file);
-  const input = await zip.readDatabase();
+function openDatabase(sqlite, input, readOnly) {
   const db = new sqlite.oo1.DB(":memory:");
-  let project;
-  let refs;
   try {
     const { capi, wasm } = sqlite;
     const capacity = input.length + 32;
@@ -96,12 +91,27 @@ export async function decodeZip(file, sqlite, schema) {
         ptr,
         input.length,
         capacity,
-        capi.SQLITE_DESERIALIZE_FREEONCLOSE | capi.SQLITE_DESERIALIZE_READONLY,
+        capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+          (readOnly
+            ? capi.SQLITE_DESERIALIZE_READONLY
+            : capi.SQLITE_DESERIALIZE_RESIZEABLE),
       ),
     );
-    db.exec(
-      "PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON; PRAGMA query_only=ON",
-    );
+    db.exec("PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON");
+    db.exec(readOnly ? "PRAGMA query_only=ON" : "PRAGMA secure_delete=ON");
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+
+export async function decodeZip(file, sqlite, schema) {
+  const zip = await openMkwZip(file);
+  const db = openDatabase(sqlite, await zip.readDatabase(), true);
+  let project;
+  let refs;
+  try {
     checkSchema(db, sqlite, schema);
     const origin = db.selectArray(
       "SELECT source_family,source_sha256,model_sha256 FROM project",
@@ -176,44 +186,43 @@ function encodeDataUrl(value) {
   return { data: encodeVerbatim(value), prefix: "", encoding: "verbatim" };
 }
 
-async function separateMedia(document) {
-  const originals = new Map();
+async function indexMedia(draft, previous) {
+  const { layout, paths, media } = draft;
   const assets = new Map();
-  const refs = [];
+  const descriptors = [];
   let total = 0;
-  async function visit(value, path) {
-    if (typeof value === "string" && /^data:[^,]*,/i.test(value)) {
-      if (!originals.has(value)) {
-        const { data, prefix, encoding } = encodeDataUrl(value);
-        const hash = await sha256(data);
-        if (!assets.has(hash)) {
-          total += data.byteLength;
-          if (total > MAX_ARCHIVE || assets.size >= 4998)
-            throw Error("Die MKW-ZIP-Datei überschreitet das Grössenlimit.");
-          assets.set(hash, data);
-        }
-        originals.set(value, [hash, prefix, encoding]);
-      }
-      refs.push([stringify(path), ...originals.get(value)]);
-      return null;
+  for (const value of media) {
+    let descriptor, data;
+    if (typeof value === "string") {
+      const encoded = encodeDataUrl(value);
+      data = encoded.data;
+      descriptor = {
+        hash: await sha256(data),
+        length: data.length,
+        prefix: encoded.prefix,
+        encoding: encoded.encoding,
+      };
+    } else {
+      descriptor = value;
+      if (previous?.assets.get(value.hash) !== value.length)
+        throw Error("MKW-ZIP-Medium passt nicht zur verknüpften Datei.");
     }
-    if (Array.isArray(value)) {
-      const items = [];
-      for (const [i, child] of value.entries())
-        items.push(await visit(child ?? null, [...path, i]));
-      return items;
+    const { hash, length } = descriptor;
+    if (!assets.has(hash)) {
+      total += length;
+      if (total > MAX_ARCHIVE || assets.size >= 4998)
+        throw Error("Die MKW-ZIP-Datei überschreitet das Grössenlimit.");
+      assets.set(hash, { length, data });
+    } else if (data && !assets.get(hash).data) {
+      assets.get(hash).data = data;
     }
-    if (value && typeof value === "object") {
-      const record = Object.create(null);
-      for (const [name, child] of Object.entries(value))
-        if (child !== undefined)
-          record[name] = await visit(child, [...path, name]);
-      return record;
-    }
-    return value;
+    descriptors.push(descriptor);
   }
-  const layout = await visit(document, []);
-  return { layout, assets, refs };
+  const refs = paths.map(([path, i]) => {
+    const { hash, prefix, encoding } = descriptors[i];
+    return [path, hash, prefix, encoding];
+  });
+  return { layout, assets, refs, descriptors };
 }
 
 function insertScope(db, scope, values) {
@@ -255,12 +264,85 @@ function insertScope(db, scope, values) {
   }
 }
 
-export async function encodeZip(document, appVersion, sqlite, schema) {
-  const { layout, assets, refs } = await separateMedia(document);
-  // Source family 'json' identifies the in-memory Studio model. Its media
-  // fingerprints are captured in refs, without a second expanded JSON copy.
-  const identity = await sha256(encoder.encode(stringify([layout, refs])));
-  const source = { family: "json", sha256: identity, modelSha256: identity };
+// Match table identities before patching data in its existing SQLite pages.
+const layoutTables = [
+  {
+    read: "SELECT scope,name,position,kind,json_value FROM fields ORDER BY scope,position",
+    update: "UPDATE fields SET json_value=? WHERE scope=? AND name=?",
+    keys: 2,
+  },
+  {
+    read: "SELECT scope,collection,position,legacy_id,json_value FROM records ORDER BY scope,collection,position",
+    update:
+      "UPDATE records SET json_value=? WHERE scope=? AND collection=? AND position=?",
+    keys: 3,
+  },
+];
+
+function updateDatabase(sqlite, schema, input, draft) {
+  const previous = openDatabase(sqlite, input, false);
+  try {
+    checkSchema(previous, sqlite, schema);
+    for (const query of [
+      "SELECT * FROM project",
+      "SELECT * FROM assets ORDER BY sha256",
+      "SELECT * FROM asset_refs ORDER BY path_json",
+    ]) {
+      if (
+        stringify(previous.selectArrays(query)) !==
+        stringify(draft.selectArrays(query))
+      )
+        return null;
+    }
+    const patches = [];
+    for (const table of layoutTables) {
+      const before = previous.selectArrays(table.read);
+      const after = draft.selectArrays(table.read);
+      if (before.length !== after.length) return null;
+      for (const [i, row] of after.entries()) {
+        if (row.slice(0, -1).some((value, c) => value !== before[i][c]))
+          return null;
+        if (row.at(-1) !== before[i].at(-1))
+          patches.push([
+            table.update,
+            [row.at(-1), ...row.slice(0, table.keys)],
+          ]);
+      }
+    }
+    if (!patches.length) return input;
+    previous.transaction(() => {
+      for (const [statement, bind] of patches)
+        previous.exec(statement, { bind });
+    });
+    return sqlite.capi.sqlite3_js_db_export(previous.pointer);
+  } finally {
+    previous.close();
+  }
+}
+
+export async function prepareZip(
+  draft,
+  appVersion,
+  sqlite,
+  schema,
+  file,
+  identities,
+) {
+  const previous = file ? await openMkwZip(file) : null;
+  if (previous && !identities.includes(previous.identity))
+    throw Error(
+      "Das Manifest der verknüpften MKW-ZIP-Datei wurde ausserhalb des Studios geändert.",
+    );
+  const { layout, assets, refs, descriptors } = await indexMedia(
+    draft,
+    previous,
+  );
+  let source = previous?.source;
+  const baseline = previous ? await previous.readDatabase() : null;
+  if (!source) {
+    const identity = await sha256(encoder.encode(stringify([layout, refs])));
+    source = { family: "json", sha256: identity, modelSha256: identity };
+  }
   const db = new sqlite.oo1.DB(":memory:");
   let database;
   try {
@@ -268,53 +350,28 @@ export async function encodeZip(document, appVersion, sqlite, schema) {
     db.exec(schema);
     db.transaction(() => {
       db.exec("INSERT INTO project VALUES(1,?,?,?)", {
-        bind: [source.family, identity, identity],
+        bind: [source.family, source.sha256, source.modelSha256],
       });
       insertScope(db, "project", layout);
-      for (const [hash, bytes] of assets)
-        db.exec("INSERT INTO assets VALUES(?,?)", {
-          bind: [hash, bytes.length],
-        });
+      for (const [hash, { length }] of assets)
+        db.exec("INSERT INTO assets VALUES(?,?)", { bind: [hash, length] });
       for (const ref of refs)
         db.exec("INSERT INTO asset_refs VALUES(?,?,?,?)", { bind: ref });
     });
     checkSchema(db, sqlite, schema);
     verifiedReferences(db, layout, {
-      assets: new Map([...assets].map(([hash, bytes]) => [hash, bytes.length])),
+      assets: new Map([...assets].map(([hash, asset]) => [hash, asset.length])),
     });
-    database = sqlite.capi.sqlite3_js_db_export(db.pointer);
+    database =
+      (baseline && updateDatabase(sqlite, schema, baseline, db)) ??
+      sqlite.capi.sqlite3_js_db_export(db.pointer);
   } finally {
     db.close();
   }
   if (database.length > MAX_DATABASE)
     throw Error("MKW-Projektdatenbank ist zu gross.");
-  const entries = {
-    "project.sqlite": {
-      bytes: database.length,
-      sha256: await sha256(database),
-    },
-  };
-  const items = [
-    { name: "project.sqlite", data: database, crc: crc32(database) },
-  ];
-  for (const [hash, data] of assets) {
-    const name = `assets/${hash}.bin`;
-    entries[name] = { bytes: data.length, sha256: hash };
-    items.push({ name, data, crc: crc32(data) });
-  }
-  const manifest = encoder.encode(
-    stringify({
-      format: "mkw-studio-zip",
-      formatVersion: 3,
-      schemaVersion: 2,
-      minimumReaderVersion: 3,
-      appVersion,
-      source,
-      entries,
-    }),
-  );
-  return archiveBlob([
-    { name: "manifest.json", data: manifest, crc: crc32(manifest) },
-    ...items,
-  ]);
+  const plan = previous
+    ? await planSnapshot(previous, database, assets, baseline)
+    : await buildSnapshot(database, assets, { source, appVersion });
+  return { plan, descriptors };
 }

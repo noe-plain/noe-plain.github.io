@@ -7,7 +7,8 @@ const MKWProjects = (() => {
   let queue = Promise.resolve(),
     dismissedNotice = null,
     openingProject = false,
-    libraryGeneration = 0;
+    libraryGeneration = 0,
+    zipCache;
   const stamp = (file) => ({ size: file.size, modified: file.lastModified });
   function notice(message, error = false) {
     const el = $("#projectStorageNotice");
@@ -37,6 +38,7 @@ const MKWProjects = (() => {
     return links.get(id);
   }
   async function attach(record) {
+    zipCache = undefined;
     aliases.delete(record.id);
     versions.set(record.id, record.version);
     if (record.fileHandle)
@@ -63,21 +65,23 @@ const MKWProjects = (() => {
       return false;
     }
     const perform = async () => {
+      const id = project.projectId;
+      const expectedVersion = versions.get(id);
+      const initialStamp = link.stamp;
+      const sameStamp = (file) =>
+        file.size === initialStamp?.size &&
+        file.lastModified === initialStamp?.modified;
       const check = async () => {
-        if (!isCurrent()) return false;
-        const latest = await MKWProjectStore.version(project.projectId);
-        if ((latest || 0) !== (versions.get(project.projectId) || 0)) {
+        if (!isCurrent() || fileLink(id) !== link) return false;
+        const latest = await MKWProjectStore.version(id);
+        if ((latest || 0) !== (expectedVersion || 0)) {
           notice(
             "Ein anderer Tab hat eine neuere Sicherung erstellt. Die Datei wird erst nach der Konfliktprüfung aktualisiert.",
           );
           return false;
         }
         const current = await link.handle.getFile();
-        if (
-          link.stamp &&
-          (current.size !== link.stamp.size ||
-            current.lastModified !== link.stamp.modified)
-        ) {
+        if (initialStamp && !sameStamp(current) && !initialStamp.zipPending) {
           notice(
             "Die verknüpfte MKW-Datei wurde ausserhalb dieses Tabs geändert. Dein Stand bleibt im Browser erhalten. Bitte die andere Datei prüfen oder „Speichern unter …“ verwenden.",
           );
@@ -87,6 +91,58 @@ const MKWProjects = (() => {
       };
       const current = await check();
       if (!current) return false;
+      if (initialStamp?.zip) {
+        const identities = [
+          ...(sameStamp(current) ? [initialStamp.zipIdentity] : []),
+          ...(initialStamp.zipPending ? [initialStamp.zipPending] : []),
+        ];
+        const { plan, known } = await MKWProjectFile.prepareZip(
+          project,
+          current,
+          identities,
+          zipCache?.link === link ? zipCache.known : undefined,
+        );
+        const latest = await check();
+        if (
+          !latest ||
+          latest.size !== current.size ||
+          latest.lastModified !== current.lastModified
+        )
+          return false;
+        if (!plan.unchanged) {
+          const baseIdentity = plan.expected.probe.sha256;
+          const pending = {
+            ...stamp(current),
+            zip: true,
+            zipIdentity: baseIdentity,
+            zipVersion:
+              baseIdentity === initialStamp.zipPending
+                ? initialStamp.zipPendingVersion
+                : initialStamp.zipVersion,
+            zipPending: plan.identity,
+            zipPendingVersion: expectedVersion,
+          };
+          await MKWProjectStore.link(id, link.handle, pending, expectedVersion);
+          link.stamp = pending;
+          if (!isCurrent() || fileLink(id) !== link) return false;
+        }
+        await writeFilePlan(link.handle, plan);
+        const written = await link.handle.getFile();
+        const committed = {
+          ...stamp(written),
+          zip: true,
+          zipIdentity: plan.identity,
+          zipVersion: expectedVersion,
+        };
+        await MKWProjectStore.link(id, link.handle, committed, expectedVersion);
+        link.stamp = committed;
+        if (p.projectId === id) zipCache = { link, known };
+        return true;
+      }
+      if (await MKWProjectFile.isZip(current))
+        throw Error(
+          "Bitte eine neue Datei für den bisherigen MKW-Speicherweg wählen.",
+        );
       const packed = await MKWProjectStore.pack(project),
         plan = await MKWProjectBlocks.prepare(packed, current, {
           readAsset: MKWProjectStore.asset,
@@ -123,6 +179,7 @@ const MKWProjects = (() => {
         {
           fileHandle: links.get(target)?.handle,
           fileStamp: links.get(target)?.stamp,
+          lossless: options.lossless,
         },
       );
       versions.set(outcome.id, outcome.version);
@@ -134,6 +191,7 @@ const MKWProjects = (() => {
         if (p.projectId === target || p.projectId === id) {
           p.projectId = outcome.id;
           p.meta.title = outcome.record.title;
+          zipCache = undefined;
         }
         notice(
           outcome.missing
@@ -226,7 +284,11 @@ const MKWProjects = (() => {
       $("#startDialog").close();
       $("#projectLibrary")?.close();
       busy = false;
-      notice("");
+      notice(
+        record.fileStamp?.zip && record.version > record.fileStamp.zipVersion
+          ? "Neueren Stand aus der Browsersicherung geöffnet. Du kannst die verknüpfte MKW-ZIP-Datei über «Projekt speichern» aktualisieren."
+          : "",
+      );
       status(
         record.fileHandle
           ? "Projekt geöffnet · MKW-Datei verknüpft."
@@ -268,6 +330,7 @@ const MKWProjects = (() => {
         (await handle.isSameEntry(existing.fileHandle))
       );
       if (existing && !same) document.projectId = uid();
+      zipCache = undefined;
       await restore(document);
       versions.set(document.projectId, same ? existing.version : 0);
       if (handle) links.set(document.projectId, { handle, stamp: stamp(file) });
@@ -326,7 +389,11 @@ const MKWProjects = (() => {
       )
         throw Error("Dateizugriff wurde nicht freigegeben.");
       MKWFields.notice($("#psdStatus"), "Projektdatei wird vorbereitet …");
-      if (handle && (await MKWProjectFile.isZip(await handle.getFile())))
+      if (
+        handle &&
+        (asNew || !fileLink()?.stamp?.zip) &&
+        (await MKWProjectFile.isZip(await handle.getFile()))
+      )
         throw Error(
           "Diese MKW-ZIP-Datei bleibt erhalten. Bitte einen neuen Dateinamen wählen.",
         );
@@ -417,6 +484,59 @@ const MKWProjects = (() => {
         $("#psdStatus"),
         "MKW ZIP konnte nicht gespeichert werden: " + error.message,
         true,
+      );
+    } finally {
+      setSaveBusy(false);
+    }
+  }
+  async function linkZipCopy() {
+    if (busy || !window.showSaveFilePicker) return;
+    const id = p.projectId;
+    const name = saveFileName("mkw").replace(/\.mkw$/i, " – ZIP.mkw");
+    const statusField = $("#psdStatus");
+    setSaveBusy(true);
+    statusField.classList.remove("save-error");
+    MKWFields.notice(
+      statusField,
+      "Speicherort für die MKW-ZIP-Arbeitsdatei wählen …",
+    );
+    try {
+      const handle = await chooseSaveTarget(name, "mkw");
+      const initial = await handle.getFile();
+      if (initial.size)
+        throw Error("Bitte einen neuen Namen für die Arbeitsdatei wählen.");
+      const backup = await autosave({ writeFile: false, lossless: true });
+      if (backup.conflict || p.projectId !== id)
+        throw Error(
+          "Der Stand wurde als Konfliktkopie erhalten. Bitte diese separat speichern.",
+        );
+      const { plan, known } = await MKWProjectFile.prepareZip(
+        MKWProjectAssets.capture(p),
+      );
+      await writeFilePlan(handle, {
+        size: plan.blob.size,
+        keepExistingData: false,
+        expected: { size: 0, lastModified: initial.lastModified },
+        writes: [{ position: 0, data: plan.blob }],
+      });
+      const saved = {
+        ...stamp(await handle.getFile()),
+        zip: true,
+        zipIdentity: plan.identity,
+        zipVersion: backup.version,
+      };
+      const link = { handle, stamp: saved };
+      await MKWProjectStore.link(id, handle, saved, backup.version);
+      links.set(id, link);
+      zipCache = { link, known };
+      notice("");
+      status("MKW-ZIP-Arbeitsdatei verknüpft.");
+      $("#saveDialog").close();
+    } catch (error) {
+      MKWFields.notice(
+        statusField,
+        error.name === "AbortError" ? "Speichern abgebrochen." : error.message,
+        error.name !== "AbortError",
       );
     } finally {
       setSaveBusy(false);
@@ -622,6 +742,7 @@ const MKWProjects = (() => {
     };
     $("#saveProject").onclick = () => saveFile();
     $("#saveZipCopy").onclick = downloadZipCopy;
+    $("#linkZipCopy").onclick = linkZipCopy;
     const dateHint = document.createElement("small");
     dateHint.id = "saveDateHint";
     $("#saveDate").after(dateHint);
@@ -636,6 +757,7 @@ const MKWProjects = (() => {
     $("#save").setAttribute("aria-label", "Projekt speichern");
     $("#save").onclick = () => {
       original();
+      $("#linkZipCopy").hidden = !window.showSaveFilePicker;
       updateDateHint();
       $("#saveAsHint").textContent = window.showSaveFilePicker
         ? "„Speichern unter …“ öffnet die Auswahl für Ordner und Dateiname."
@@ -668,6 +790,7 @@ const MKWProjects = (() => {
     busy = true;
     try {
       if (savedRevision < revision) await autosave();
+      zipCache = undefined;
       await restore(document);
       notice("");
       revision = 1;

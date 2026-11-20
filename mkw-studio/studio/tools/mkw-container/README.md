@@ -63,4 +63,4 @@ node tools/mkw-container/working-session/check.mjs /pfad/sqlite-wasm/dist /pfad/
 PYTHONDONTWRITEBYTECODE=1 python3 tools/mkw-container/verify_revision.py /pfad/paare.json /pfad/neue-revisionen
 ```
 
-Im regulären Editor ist die ZIP-Kopie eine zusätzliche Option. Die verknüpfte inkrementelle Speicherung im normalen Studio und ihre Plattformabnahme stehen im [Masterplan](../../docs/MASTERPLAN.md).
+Im regulären Editor lässt sich zusätzlich eine neue MKW-ZIP-Arbeitsdatei verknüpfen. Der manuelle Browser-Test `mkw-zip-linked` prüft das Zeitintervall für Autosave, die Schreibbereiche und die Wiederherstellung nach dem Abbruch eines echten Browser-Schreibstroms. Er startet ohne private Eingabe mit einem eigenen synthetischen Projekt. `MKW_ZIP_PRIVATE_INPUT` verweist bei Bedarf auf die lokale Liste aus dem Test `mkw-zip-ui`. Der Fortschritt der Plattformabnahme steht im [Masterplan](../../docs/MASTERPLAN.md).

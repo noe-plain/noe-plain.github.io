@@ -22,8 +22,12 @@
     const { runZipOperation } = await import("./mkw-zip/client.mjs");
     return runZipOperation(action, input);
   }
-  function encodeZip(project) {
-    return zipOperation("encode", project);
+  async function prepareZip(project, file, identities, known) {
+    const { prepareLinkedZip } = await import("./mkw-zip/client.mjs");
+    return prepareLinkedZip(project, file, identities, known);
+  }
+  async function encodeZip(project) {
+    return (await prepareZip(project)).plan.blob;
   }
   async function encodeDocument(
     document,
@@ -213,7 +217,7 @@
       reader.releaseLock();
     }
   }
-  const api = { encode, encodeDocument, decode, isZip, encodeZip };
+  const api = { encode, encodeDocument, decode, isZip, encodeZip, prepareZip };
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWProjectFile = api;
 })(globalThis);

@@ -1,3 +1,5 @@
+import { mediaDraft } from "./media-draft.mjs";
+
 export function runZipOperation(action, input) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
@@ -23,4 +25,14 @@ export function runZipOperation(action, input) {
       rejectOpen(error);
     }
   });
+}
+
+export async function prepareLinkedZip(project, file, identities, known) {
+  const { urls, draft } = mediaDraft(project, known);
+  const { plan, descriptors } = await runZipOperation("prepare", {
+    draft,
+    file,
+    identities,
+  });
+  return { plan, known: new Map(urls.map((url, i) => [url, descriptors[i]])) };
 }
