@@ -14,7 +14,11 @@ Nach dem ersten tatsächlich ausgeführten Dateischreibaufruf wurde pro Projekt 
 
 Ein zusätzlicher synthetischer Fall deckt einen Unterbruch nach dem Dateicommit ab. Die nächste Sitzung erkennt das bereits geschriebene Manifest. Der Link speichert vor einem weiteren Update dieses Manifest als Ausgangspunkt. Die Regression prüft einen zweiten Abbruch mit anschliessender Wiederherstellung. Sie prüft auch den kompakten Neuaufbau nach der Entfernung eines Mediums und den Schutz einer ausserhalb des Studios geänderten Datei.
 
-Der bestehende MKW-Speicherweg und die ZIP-Downloads bleiben verfügbar. Das bedarfsweise Laden im eigenständigen Arbeitsmodus ist bereits belegt. Die normale Dateiauswahl verwendet weiterhin die kompatible, vollständige Hydrierung des Editor-Modells. Kaltstart, vollständige WebKit-Abnahme und native Betriebssystem-Dateiauswahl bleiben vor der Umstellung des Standards zu prüfen.
+Eine neue Testdatei wurde zusätzlich mit der echten macOS-Dateiauswahl in Chrome verknüpft. Autosave änderte den Projekttitel in der Datei. Die Bibliothek nahm Dateiverknüpfung und Stand nach Neuladen wieder auf. Die unabhängig gelesene ZIP-Datei enthielt den neuen Titel und alle vier Test-Slides. Die [GitHub-Suiten für Chromium, Firefox und den Windows-ZIP-Pfad](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44704100294) waren erfolgreich. Die synthetischen Tests liefen auch auf der veröffentlichten Seite.
+
+WebKit meldete beim Sichern von Blob-Dateien in IndexedDB einen Speicherfehler. Browser ohne direkten Dateizugriff speichern neu zu sichernde Medien deshalb als bereits unterstützte Daten-URLs in der lokalen Bibliothek. Der WebKit-Rundlauf mit Download, Import, Bibliotheks-Wiederherstellung und vollständiger Projektbeigabe zum Bild-ZIP bestand danach. Die binären Inhalte in der portablen MKW-ZIP-Datei behalten ihr Format.
+
+Der bestehende MKW-Speicherweg und die ZIP-Downloads bleiben verfügbar. Das bedarfsweise Laden im eigenständigen Arbeitsmodus ist belegt. Die normale Dateiöffnung verwendet weiterhin die vollständige Hydrierung des Editor-Modells. Der Kaltstart ohne vollständige Medienhydration und die kontrollierte Migration bereits verknüpfter alter MKW-Dateien bleiben Freigabetore vor der Umstellung des Standards.
 
 | Persona | Feedback / Problem | Status |
 | --- | --- | --- |

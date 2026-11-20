@@ -1,5 +1,10 @@
 {
   "browser": "157.0.8103.79",
+  "linkedWorkflowRun": 44704100294,
+  "chromiumFirefoxAndWindowsChecksPassed": true,
+  "liveSyntheticChecksPassed": true,
+  "nativeMacFilePickerAutosaveAndReopenPassed": true,
+  "webKitDownloadAndBrowserLibraryRecoveryPassed": true,
   "checks": [
     {
       "case": 1,

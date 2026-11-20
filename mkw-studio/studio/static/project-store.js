@@ -193,6 +193,9 @@ const MKWProjectStore = (() => {
     };
   }
   async function save(project, expectedVersion = 0, options = {}) {
+    // Only the native block writer needs cached Blobs. Browsers using
+    // downloads can reuse their data URLs without persisting Blob files.
+    const nativeAssets = typeof globalThis.showSaveFilePicker === "function";
     const lossless = options.lossless || options.fileStamp?.zip === true;
     const packed = await pack(project, {
         lossless,
@@ -246,6 +249,10 @@ const MKWProjectStore = (() => {
           const get = assets.getKey(key);
           get.onsuccess = () => {
             if (get.result === undefined) {
+              if (!nativeAssets) {
+                assets.put(data, key);
+                return;
+              }
               const comma = data.indexOf(",");
               const encoded = data.slice(comma + 1);
               const mime = data.slice(5, comma).split(";")[0];

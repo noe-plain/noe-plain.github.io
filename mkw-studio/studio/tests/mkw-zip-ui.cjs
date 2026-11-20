@@ -1,7 +1,12 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const { createHash } = require("node:crypto");
-const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
+const {
+  launch,
+  waitForProjectReady,
+  openLatestProject,
+  artifact,
+} = require("./browser.cjs");
 
 async function fileHash(file) {
   const hash = createHash("sha256");
@@ -164,6 +169,21 @@ async function openMkw(page, file) {
     assert.equal(
       await page.evaluate(() => p.boards[1].elements.title.text),
       "Zweite Seite",
+    );
+
+    const backedUp = await page.evaluate(() => ({
+      id: p.projectId,
+      picture: p.images[0].data,
+    }));
+    await page.reload();
+    await openLatestProject(page);
+    assert.deepEqual(
+      await page.evaluate(() => ({
+        id: p.projectId,
+        picture: p.images[0].data,
+        text: p.boards[1].elements.title.text,
+      })),
+      { ...backedUp, text: "Zweite Seite" },
     );
 
     if (process.env.MKW_ZIP_PRIVATE_INPUT) {

@@ -336,13 +336,28 @@ async function checkCase(browser, { case: number, file, boards }) {
       window.failZipWrite = true;
     });
     await editText(page, second);
-    await page.waitForFunction(
-      () =>
-        window.zipWrites.some((event) => event.abort) &&
-        document
-          .querySelector("[data-notice-message]")
-          ?.textContent.includes("ZIP-Testabbruch"),
-    );
+    try {
+      await page.waitForFunction(
+        () =>
+          window.zipWrites.some((event) => event.abort) &&
+          document
+            .querySelector("[data-notice-message]")
+            ?.textContent.includes("ZIP-Testabbruch"),
+      );
+    } catch (error) {
+      const state = await page.evaluate(() => ({
+        writes: window.zipWrites.map(({ calls, abort }) => ({
+          calls: calls.length,
+          abort,
+        })),
+        notice: document.querySelector("[data-notice-message]")?.textContent,
+        revision,
+        savedRevision,
+      }));
+      throw Error("ZIP abort was not observed: " + JSON.stringify(state), {
+        cause: error,
+      });
+    }
     assert.equal(
       (await inspectFile(page)).sha256,
       saved.sha256,
@@ -417,9 +432,14 @@ async function checkCase(browser, { case: number, file, boards }) {
 (async () => {
   const browser = await launch();
   try {
-    const inputs = process.env.MKW_ZIP_PRIVATE_INPUT
+    let inputs = process.env.MKW_ZIP_PRIVATE_INPUT
       ? JSON.parse(fs.readFileSync(process.env.MKW_ZIP_PRIVATE_INPUT, "utf8"))
       : [{ case: 0, boards: 1 }];
+    if (process.env.MKW_ZIP_PRIVATE_CASE)
+      inputs = inputs.filter(
+        ({ case: index }) => index === Number(process.env.MKW_ZIP_PRIVATE_CASE),
+      );
+    assert(inputs.length > 0, "No matching ZIP acceptance cases.");
     const checks = [];
     for (const input of inputs) {
       const result = await checkCase(browser, input);
