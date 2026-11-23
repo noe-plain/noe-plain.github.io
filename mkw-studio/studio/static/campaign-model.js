@@ -101,7 +101,38 @@
     }
     return true;
   }
-  function reconcile(q, makeId) {
+  function formats(
+    q,
+    frames = new Map(q.carousel.artboards.map((a) => [a.id, a])),
+  ) {
+    const result = new Map();
+    for (const row of q.campaign.rows)
+      for (const id of row.pages) {
+        const frame = frames.get(id);
+        if (!frame) continue;
+        const format = key(frame);
+        if (!result.has(format)) result.set(format, []);
+        result.get(format).push(frame);
+      }
+    return result;
+  }
+  function promoteLeader(link, leader, objects, frames) {
+    const source = objects.get(link.source);
+    if (!source || source.pageId === leader?.id) return;
+    const target = link.targets.find((t) => t.page === leader?.id);
+    const next = objects.get(target?.id);
+    if (!next) return;
+    const prior = values(source, frames.get(source.pageId));
+    link.source = next.id;
+    link.last = prior;
+    link.targets.splice(link.targets.indexOf(target), 1, {
+      page: source.pageId,
+      id: source.id,
+      last: prior,
+      overrides: [],
+    });
+  }
+  function reconcile(q, makeId, inheritPages = new Set()) {
     const c = q.carousel,
       s = q.campaign;
     if (!c || !s) return;
@@ -110,19 +141,16 @@
     s.rows = s.rows
       .map((r) => ({ ...r, pages: r.pages.filter((id) => frames.has(id)) }))
       .filter((r) => r.pages.length);
-    const first = new Map();
-    for (const row of s.rows)
-      for (const id of row.pages) {
-        const a = frames.get(id);
-        if (!first.has(key(a))) first.set(key(a), id);
-      }
+    const groups = formats(q, frames);
+    for (const link of s.links)
+      promoteLeader(link, groups.get(link.format)?.[0], objects, frames);
     const sources = new Set(s.links.map((l) => l.source)),
       followers = new Set(s.links.flatMap((l) => l.targets.map((t) => t.id)));
     for (const o of [...c.objects]) {
       const a = frames.get(o.pageId);
       if (
         !a ||
-        first.get(key(a)) !== a.id ||
+        groups.get(key(a))?.[0]?.id !== a.id ||
         sources.has(o.id) ||
         followers.has(o.id) ||
         o.campaignLocal ||
@@ -163,110 +191,112 @@
             ...new Set([...Object.keys(l.last), ...Object.keys(current)]),
           ].filter((k) => !same(current[k], l.last[k])),
         );
-      l.targets = l.targets.filter((t) => frames.has(t.page));
-      for (const row of s.rows)
-        for (const page of row.pages) {
-          const a = frames.get(page);
-          if (page === source.pageId || key(a) !== l.format) continue;
-          let t = l.targets.find((t) => t.page === page);
-          if (!t) {
-            let o =
-              source.campaignRole &&
-              c.objects.find(
-                (o) =>
-                  o.pageId === page &&
-                  o.campaignRole === source.campaignRole &&
-                  !followers.has(o.id),
-              );
-            if (!o) {
-              if (c.objects.length >= 500)
-                throw Error(
-                  "Die Kampagne erreicht 500 Ebenen. Entferne Ebenen oder verwende weniger Bilder/Formate.",
-                );
-              o = {
-                ...copy(source),
-                id: makeId(),
-                pageId: page,
-                artboardScoped: true,
-              };
-              delete o.folderId;
-              apply(o, current, a);
-              if (source.type === "gradient") {
-                const at = c.objects.findIndex(
-                  (item) => item.pageId === page && item.type === "text",
-                );
-                c.objects.splice(at < 0 ? c.objects.length : at, 0, o);
-              } else c.objects.push(o);
-              objects.set(o.id, o);
-            }
-            const initial = values(o, a);
-            t = {
-              page,
-              id: o.id,
-              last: initial,
-              overrides: Object.keys(initial).filter(
-                (k) => !same(initial[k], current[k]),
-              ),
-            };
-            l.targets.push(t);
-            followers.add(o.id);
-          }
-          const o = objects.get(t.id);
-          if (!o) {
-            t.id = null;
-            t.last = {};
-            t.overrides = [];
-            continue;
-          }
-          const local = values(o, a),
-            overrides = new Set(t.overrides);
-          for (const k of new Set([
-            ...Object.keys(local),
-            ...Object.keys(t.last),
-          ]))
-            if (!same(local[k], t.last[k])) overrides.add(k);
-          let remapped;
-          if (
-            source.type === "text" &&
-            changed.has("text") &&
-            (overrides.has("characterStyles") || overrides.has("textStyles")) &&
-            !overrides.has("text") &&
-            local.text !== current.text
-          ) {
-            const diff = textModel.diff(local.text, current.text);
-            remapped = textEdit.replace(
-              local,
-              diff.start,
-              diff.end,
-              { text: diff.insert },
-              false,
+      const group = groups.get(l.format) || [],
+        groupIds = new Set(group.map((a) => a.id));
+      l.targets = l.targets.filter((t) => groupIds.has(t.page));
+      for (const a of group) {
+        const page = a.id;
+        if (page === source.pageId) continue;
+        let t = l.targets.find((t) => t.page === page);
+        if (!t) {
+          let o =
+            source.campaignRole &&
+            c.objects.find(
+              (o) =>
+                o.pageId === page &&
+                o.campaignRole === source.campaignRole &&
+                !followers.has(o.id),
             );
-          }
-          for (const k of changed)
-            if (!overrides.has(k)) {
-              if (k in current) local[k] = copy(current[k]);
-              else delete local[k];
-            }
-          if (source.type === "text") {
-            for (const key of ["characterStyles", "textStyles"])
-              if (remapped && overrides.has(key)) local[key] = remapped[key];
-            if (local.characterStyles)
-              local.characterStyles = textModel.merge(
-                local.characterStyles.map((run) => ({
-                  ...run,
-                  end: Math.min(run.end, local.text.length),
-                })),
+          if (!o) {
+            if (c.objects.length >= 500)
+              throw Error(
+                "Die Kampagne erreicht 500 Ebenen. Entferne Ebenen oder verwende weniger Bilder/Formate.",
               );
-            if (local.textStyles)
-              local.textStyles = local.textStyles.slice(
-                0,
-                local.text.split("\n").length,
+            o = {
+              ...copy(source),
+              id: makeId(),
+              pageId: page,
+              artboardScoped: true,
+            };
+            delete o.folderId;
+            apply(o, current, a);
+            if (source.type === "gradient") {
+              const at = c.objects.findIndex(
+                (item) => item.pageId === page && item.type === "text",
               );
+              c.objects.splice(at < 0 ? c.objects.length : at, 0, o);
+            } else c.objects.push(o);
+            objects.set(o.id, o);
           }
-          apply(o, local, a);
-          t.last = values(o, a);
-          t.overrides = [...overrides];
+          if (inheritPages.has(page)) apply(o, current, a);
+          const initial = values(o, a);
+          t = {
+            page,
+            id: o.id,
+            last: initial,
+            overrides: Object.keys(initial).filter(
+              (k) => !same(initial[k], current[k]),
+            ),
+          };
+          l.targets.push(t);
+          followers.add(o.id);
         }
+        const o = objects.get(t.id);
+        if (!o) {
+          t.id = null;
+          t.last = {};
+          t.overrides = [];
+          continue;
+        }
+        const local = values(o, a),
+          overrides = new Set(t.overrides);
+        for (const k of new Set([
+          ...Object.keys(local),
+          ...Object.keys(t.last),
+        ]))
+          if (!same(local[k], t.last[k])) overrides.add(k);
+        let remapped;
+        if (
+          source.type === "text" &&
+          changed.has("text") &&
+          (overrides.has("characterStyles") || overrides.has("textStyles")) &&
+          !overrides.has("text") &&
+          local.text !== current.text
+        ) {
+          const diff = textModel.diff(local.text, current.text);
+          remapped = textEdit.replace(
+            local,
+            diff.start,
+            diff.end,
+            { text: diff.insert },
+            false,
+          );
+        }
+        for (const k of changed)
+          if (!overrides.has(k)) {
+            if (k in current) local[k] = copy(current[k]);
+            else delete local[k];
+          }
+        if (source.type === "text") {
+          for (const key of ["characterStyles", "textStyles"])
+            if (remapped && overrides.has(key)) local[key] = remapped[key];
+          if (local.characterStyles)
+            local.characterStyles = textModel.merge(
+              local.characterStyles.map((run) => ({
+                ...run,
+                end: Math.min(run.end, local.text.length),
+              })),
+            );
+          if (local.textStyles)
+            local.textStyles = local.textStyles.slice(
+              0,
+              local.text.split("\n").length,
+            );
+        }
+        apply(o, local, a);
+        t.last = values(o, a);
+        t.overrides = [...overrides];
+      }
       l.last = current;
     }
   }
@@ -286,7 +316,7 @@
     }
     return false;
   }
-  const api = Object.freeze({ valid, reconcile, reset, values, key });
+  const api = Object.freeze({ valid, reconcile, reset, values, key, formats });
   if (typeof module !== "undefined") module.exports = api;
   else root.MKWCampaignModel = api;
 })(globalThis);

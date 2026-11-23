@@ -368,10 +368,8 @@ function updateExportNames() {
   try {
     if (dateError) throw Error(dateError);
     if (exportOptions.format === "pdf") {
-      if (!carouselValidatePDF(exportOptions.pdf))
-        throw Error(
-          "Bitte PDF-Seitengrösse (240–4000 px) und Einstellungen prüfen.",
-        );
+      if (!bs.every((board) => carouselValidatePDF(exportOptions.pdf, board)))
+        throw Error("Bitte PDF-Seitengrösse und Einstellungen prüfen.");
       const name = MKW.projectName(p.meta);
       names = bs.map((_, i) => name + ".pdf · Seite " + (i + 1));
     } else

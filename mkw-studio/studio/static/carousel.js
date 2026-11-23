@@ -176,11 +176,12 @@ function validateCarousel(q) {
     throw Error("Ungültige Kampagnen-Verknüpfung.");
   const c = q.carousel;
   if (!c) return;
+  const campaign = !!q.campaign;
   if (
-    !MKWCarouselPolicy.validFormat(c) ||
+    !MKWCarouselPolicy.validFormat(c, campaign) ||
     !MKWCarouselPolicy.validDocumentCount(c) ||
     !MKWSpreadLayoutModel.valid(c) ||
-    !MKWCarouselPolicy.validBoards(c) ||
+    !MKWCarouselPolicy.validBoards(c, campaign) ||
     !/^#[0-9a-f]{6}$/i.test(c.bg) ||
     !Array.isArray(c.objects) ||
     c.objects.length > 500 ||

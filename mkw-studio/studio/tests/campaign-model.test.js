@@ -163,3 +163,90 @@ test("local short content safely receives source character formatting without in
   assert.deepEqual(target.characterStyles, [{ start: 0, end: 1, size: 95 }]);
   assert.deepEqual(link.targets[0].overrides, ["text"]);
 });
+
+test("formats use the top matching subject regardless of column and adopt new default layers", () => {
+  const q = fixture();
+  const [, b, , d] = q.carousel.artboards;
+  // The format is the second column in the first row and the first in the next.
+  q.campaign.rows[1].pages.reverse();
+  q.carousel.objects.push(
+    {
+      id: "first-logo",
+      type: "logo",
+      campaignRole: "logo",
+      pageId: b.id,
+      source: "black",
+      x: b.x + 25,
+      y: b.y + 40,
+      w: 320,
+      h: 90,
+      visible: false,
+    },
+    {
+      id: "new-logo",
+      type: "logo",
+      campaignRole: "logo",
+      pageId: d.id,
+      source: "white",
+      x: d.x + 100,
+      y: d.y + 200,
+      w: 600,
+      h: 120,
+      visible: true,
+    },
+  );
+  m.reconcile(q, id, new Set([d.id]));
+  const logo = q.carousel.objects.find((o) => o.id === "new-logo");
+  assert.equal(logo.source, "black");
+  assert.equal(logo.visible, false);
+  assert.equal(logo.x - d.x, 25);
+  assert.equal(logo.w, 320);
+  assert.deepEqual(
+    q.campaign.links.find((l) => l.source === "first-logo").targets[0]
+      .overrides,
+    [],
+  );
+  assert.equal(m.formats(q).get("1080x1080")[0].id, b.id);
+  assert(m.valid(q));
+});
+
+test("after reordering, the top subject leads its own format and other local overrides survive", () => {
+  const q = fixture();
+  const [, b, , d] = q.carousel.artboards;
+  q.images.push({ id: "im3" });
+  q.campaign.rows.push({ imageId: "im3", pages: ["e"] });
+  q.carousel.artboards.push({ ...d, id: "e", x: 0, y: 4500 });
+  q.carousel.objects.push({
+    ...q.carousel.objects[0],
+    id: "square",
+    pageId: b.id,
+    x: b.x + 100,
+    y: b.y + 300,
+    text: "Quadrat",
+  });
+  m.reconcile(q, id);
+  const square = q.campaign.links.find((l) => l.format === "1080x1080");
+  const dText = q.carousel.objects.find(
+    (o) => o.pageId === d.id && o.type === "text",
+  );
+  const eText = q.carousel.objects.find(
+    (o) => o.pageId === "e" && o.type === "text",
+  );
+  dText.text = "Neue Vorlage";
+  eText.x += 50;
+  m.reconcile(q, id);
+  q.campaign.rows.unshift(q.campaign.rows.splice(1, 1)[0]);
+  m.reconcile(q, id);
+  assert.equal(square.source, dText.id);
+  assert.equal(eText.x, 150);
+  assert.equal(eText.text, "Neue Vorlage");
+  dText.size = 91;
+  m.reconcile(q, id);
+  assert.equal(eText.size, 91);
+  assert.equal(
+    q.carousel.objects.find((o) => o.id === "square").text,
+    "Neue Vorlage",
+  );
+  assert.equal(q.carousel.objects.find((o) => o.id === "t").text, "Hallo");
+  assert(m.valid(JSON.parse(JSON.stringify(q))));
+});

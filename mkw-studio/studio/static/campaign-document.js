@@ -90,10 +90,8 @@ const MKWCampaignDocument = (() => {
   }
   function room(type, a) {
     if (!active() || !a || type === "image") return carouselCanAddObjects(1);
-    const peers = p.carousel.artboards.filter(
-        (f) => f.w === a.w && f.h === a.h,
-      ),
-      first = peers[0];
+    const peers = MKWCampaignModel.formats(p).get(MKWCampaignModel.key(a)),
+      first = peers?.[0];
     const count =
       first?.id === a.id && type !== "gradient"
         ? peers.length
@@ -163,7 +161,7 @@ const MKWCampaignDocument = (() => {
       name: a.name,
     }));
   }
-  function checkBoards(boards) {
+  function checkBoards(boards, legacy = false) {
     if (boards.length > 200) throw Error("Maximal 200 Ausgaben pro Kampagne.");
     const formats = boards.map((b) => {
       const safe = MKWLayout.safeRect({ ...b, sponsors: undefined });
@@ -177,7 +175,7 @@ const MKWCampaignDocument = (() => {
       };
     });
     const invalid = formats.flatMap((f, i) =>
-      MKWCarouselPolicy.validFormat(f)
+      MKWCarouselPolicy.validFormat(f, legacy)
         ? []
         : [`Ausgabe ${i + 1} (${f.w} × ${f.h} px)`],
     );
@@ -185,16 +183,18 @@ const MKWCampaignDocument = (() => {
       throw Error(
         invalid.slice(0, 3).join(", ") +
           (invalid.length > 3 ? ` und ${invalid.length - 3} weitere` : "") +
-          ": FD-Kampagnen benötigt 240–4000 px je Seite und gültige Safezones. " +
+          (legacy
+            ? ": Das Altformat benötigt 16–10’000 px je Seite, höchstens 40 Mio. Pixel und gültige Schutzzonen. "
+            : ": FD-Kampagnen benötigt 240–4000 px je Seite und gültige Schutzzonen. ") +
           "Es wurde nichts umgewandelt oder verkleinert. Du kannst das Original im bisherigen Editor weiterbearbeiten und als MKW speichern.",
       );
     return formats;
   }
-  async function append(q, im, boards) {
+  async function append(q, im, boards, { legacy = false } = {}) {
     if (!boards.length) return;
     if ((q.carousel?.n || 0) + boards.length > 200)
       throw Error("Maximal 200 Ausgaben pro Kampagne.");
-    const formats = checkBoards(boards);
+    const formats = checkBoards(boards, legacy);
     q.carousel ??= {
       ...formats[0],
       bg: "#ffffff",
@@ -333,8 +333,12 @@ const MKWCampaignDocument = (() => {
               return b;
             },
           );
-          await append(next, im, boards);
-          MKWCampaignModel.reconcile(next, uid);
+          await append(next, im, boards, { legacy: true });
+          MKWCampaignModel.reconcile(
+            next,
+            uid,
+            new Set(next.campaign.rows.at(-1)?.pages),
+          );
           validate(next);
           validateCarousel(next);
           Object.assign(q, next);

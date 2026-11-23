@@ -12,15 +12,17 @@
     "left",
     "right",
   ]);
-  function validFormat(c) {
+  const validSize = (w, h, min, max) =>
+    [w, h].every((n) => Number.isInteger(n) && n >= min && n <= max);
+  const validLegacySize = (w, h) =>
+    validSize(w, h, 16, 10000) && w * h <= 40000000;
+  function validFormat(c, legacy = false) {
     return (
       !!c &&
-      formatKeys.every((key) => Number.isInteger(c[key])) &&
-      c.w >= 240 &&
-      c.h >= 240 &&
-      c.w <= 4000 &&
-      c.h <= 4000 &&
-      Math.min(c.top, c.bottom, c.left, c.right) >= 0 &&
+      (legacy ? validLegacySize(c.w, c.h) : validSize(c.w, c.h, 240, 4000)) &&
+      [c.top, c.bottom, c.left, c.right].every(
+        (n) => Number.isInteger(n) && n >= 0,
+      ) &&
       c.top + c.bottom < c.h &&
       c.left + c.right < c.w
     );
@@ -104,7 +106,7 @@
       assigned.every((id, i) => id === c.artboards[i].id)
     );
   }
-  function validBoards(c) {
+  function validBoards(c, legacy = false) {
     if (!isFree(c)) return c.layout === undefined && c.artboards === undefined;
     if (
       !Array.isArray(c.artboards) ||
@@ -116,7 +118,7 @@
     for (const [i, a] of c.artboards.entries()) {
       if (
         !a ||
-        !validFormat(a) ||
+        !validFormat(a, legacy) ||
         !Number.isInteger(a.x) ||
         !Number.isInteger(a.y) ||
         a.x < 0 ||
@@ -313,6 +315,7 @@
     validCount,
     formatKeys,
     validFormat,
+    validLegacySize,
     formatPlan,
     safeRect,
     contentFrame,

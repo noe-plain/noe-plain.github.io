@@ -361,7 +361,7 @@ const MKWCampaignUI = (() => {
     const c = p.carousel;
     if (!items.length) {
       const a = c.artboards[carouselUI.slide ?? 0] || c.artboards[0];
-      host.innerHTML = `<h3>FD-Kampagnen</h3><p>Gestalte die erste Ausgabe eines Formats. Gleiche Formate übernehmen das Design. Bei weiteren Bildern bleibt jede Eigenschaft einzeln anpassbar.</p><button id="campaignImport">Bilder hinzufügen</button>${a ? `<p>${esc(a.name)} · ${a.w} × ${a.h} px</p>` : ""}`;
+      host.innerHTML = `<h3>FD-Kampagnen</h3><p>Gestalte das oberste Sujet je Auflösung. Sujets mit gleicher Breite und Höhe übernehmen sein Design. Bei den weiteren Bildern kannst du einzelne Eigenschaften anpassen.</p><button id="campaignImport">Bilder hinzufügen</button>${a ? `<p>${esc(a.name)} · ${a.w} × ${a.h} px</p>` : ""}`;
       host.querySelector("#campaignImport").onclick = () => $("#files").click();
       return true;
     }
@@ -522,9 +522,10 @@ const MKWCampaignUI = (() => {
         const prior = q.campaign.rows.find((r) => r.imageId === row.imageId);
         await append(q, im, [b]);
         if (p !== project || !dialog.open) return;
-        prior.pages.push(...q.campaign.rows.pop().pages);
+        const pages = q.campaign.rows.pop().pages;
+        prior.pages.push(...pages);
         place(q);
-        MKWCampaignModel.reconcile(q, uid);
+        MKWCampaignModel.reconcile(q, uid, new Set(pages));
         validate(q);
         validateCarousel(q);
         checkpoint();
@@ -624,7 +625,7 @@ const MKWCampaignUI = (() => {
     try {
       if (!source.boards.length)
         throw Error("Füge zuerst ein Bild mit mindestens einer Ausgabe hinzu.");
-      MKWCampaignDocument.checkBoards(source.boards);
+      MKWCampaignDocument.checkBoards(source.boards, true);
     } catch (error) {
       status("Umwandlung nicht möglich: " + error.message, "warning");
       return;
@@ -634,7 +635,7 @@ const MKWCampaignUI = (() => {
       (await MKWFeedback.ask({
         title: "FD-Kampagne umwandeln?",
         message:
-          "Das ursprüngliche Projekt bleibt erhalten. Die Kopie erhält gemeinsame Textfelder mit bisherigen Schriftgrössen und den bisherigen Verlauf. Bitte das Ergebnis vor dem Export vergleichen.",
+          "Das ursprüngliche Projekt bleibt erhalten. Die Kopie übernimmt die Ausgabeformate in Originalgrösse sowie die bisherigen Schriftgrössen und den Verlauf. Bitte das Ergebnis vor dem Export vergleichen.",
         confirm: "Kopie umwandeln",
       }));
     if (!accepted) return;
@@ -661,7 +662,7 @@ const MKWCampaignUI = (() => {
         const boards = original.boards
           .filter((b) => b.imageId === im.id)
           .map((b) => clone(b));
-        await append(q, im, boards);
+        await append(q, im, boards, { legacy: true });
         for (const b of boards) {
           if (p !== source) return;
           const a = q.carousel.artboards.find((a) => a.id === b.campaignPage);

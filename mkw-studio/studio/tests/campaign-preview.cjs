@@ -149,6 +149,59 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       ),
       90,
     );
+    // Add the same format in another row. Its position among formats is irrelevant.
+    const top = await page.evaluate(() => {
+      const [a] = MKWCampaignModel.formats(p).get("1080x1440");
+      const logo = p.carousel.objects.find(
+        (o) => o.pageId === a.id && o.campaignRole === "logo",
+      );
+      checkpoint();
+      logo.source = "black";
+      logo.x = a.x + 80;
+      logo.visible = false;
+      changed(false);
+      return a.id;
+    });
+    await page.locator("[data-campaign-action=format]").nth(1).click();
+    await page.locator("[data-w]").fill("1080");
+    await page.locator("[data-h]").fill("1440");
+    await page.locator("[data-add]").click();
+    await page
+      .locator(".campaign-format-dialog")
+      .waitFor({ state: "detached" });
+    const inherited = await page.evaluate((top) => {
+      const group = MKWCampaignModel.formats(p).get("1080x1440");
+      const follower = group[1];
+      const layer = (a, role) =>
+        p.carousel.objects.find(
+          (o) => o.pageId === a.id && o.campaignRole === role,
+        );
+      const logo = layer(follower, "logo");
+      const patch = p.campaign.links.find(
+        (l) => l.source === layer(group[0], "logo").id,
+      );
+      return {
+        leader: group[0].id,
+        logo: logo.source,
+        x: logo.x - follower.x,
+        visible: logo.visible,
+        overrides: patch.targets.find((t) => t.page === follower.id).overrides,
+        text: p.carousel.objects.some(
+          (o) => o.pageId === follower.id && o.type === "text" && o.size === 50,
+        ),
+        background:
+          layer(follower, "background").imageId === p.campaign.rows[1].imageId,
+      };
+    }, top);
+    assert.deepEqual(inherited, {
+      leader: top,
+      logo: "black",
+      x: 80,
+      visible: false,
+      overrides: [],
+      text: true,
+      background: true,
+    });
     // First gradient follows the format; later gradients/additional pictures remain local.
     await page.evaluate(() => {
       const a = p.carousel.artboards[0];
@@ -244,6 +297,10 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
       })),
     );
     assert.deepEqual(violations, []);
+    const closeOptions = page.locator(
+      ".campaign-card-popover:popover-open [data-card-close]",
+    );
+    if (await closeOptions.count()) await closeOptions.first().click();
     await page.locator("#carouselExport").click();
     await page.locator("#reviewExport").click();
     assert.equal(await page.locator("#reviewSelection").count(), 0);

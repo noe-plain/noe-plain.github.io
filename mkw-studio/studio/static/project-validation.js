@@ -49,6 +49,10 @@
       if (typeof MKWCampaignModel !== "undefined" && !MKWCampaignModel.valid(q))
         throw Error("Ungültige Kampagnen-Verknüpfung.");
       family(q);
+      const policy =
+        typeof module !== "undefined"
+          ? require("./carousel-policy.js")
+          : root.MKWCarouselPolicy;
       const bids = new Set();
       for (const b of q.boards) {
         textBox(b.textBox);
@@ -56,10 +60,7 @@
           bids.has(b.id) ||
           typeof b.id !== "string" ||
           !ids.has(b.imageId) ||
-          ![b.w, b.h].every(
-            (n) => Number.isInteger(n) && n >= 16 && n <= 10000,
-          ) ||
-          b.w * b.h > 40000000 ||
+          !policy.validLegacySize(b.w, b.h) ||
           !b.image ||
           !b.elements ||
           !/^#[0-9a-f]{6}$/i.test(b.bg)

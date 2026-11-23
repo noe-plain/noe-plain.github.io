@@ -41,15 +41,23 @@ function carouselPDFPreset(key) {
     h = preset.h || Math.round((w * c.h) / c.w);
   return { ...preset, w, h, preset: key };
 }
-function carouselValidatePDF(settings) {
+function carouselPDFPageSettings(settings, board) {
+  return board &&
+    settings?.preset === "original" &&
+    MKWCarouselPolicy.isFree(p.carousel)
+    ? { ...settings, w: board.w, h: board.h }
+    : settings;
+}
+function carouselValidatePDF(settings, board) {
+  const opts = carouselPDFPageSettings(settings, board);
+  if (!opts) return false;
+  const originalCampaign = board && p.campaign && opts.preset === "original";
   return (
-    settings &&
-    Number.isInteger(settings.w) &&
-    Number.isInteger(settings.h) &&
-    settings.w >= 240 &&
-    settings.h >= 240 &&
-    settings.w <= 4000 &&
-    settings.h <= 4000 &&
+    (originalCampaign
+      ? MKWCarouselPolicy.validLegacySize(opts.w, opts.h)
+      : [opts.w, opts.h].every(
+          (n) => Number.isInteger(n) && n >= 240 && n <= 4000,
+        )) &&
     ["jpeg", "lossless"].includes(settings.compression) &&
     Number.isFinite(settings.quality) &&
     settings.quality >= 50 &&
@@ -61,14 +69,9 @@ function carouselValidatePDF(settings) {
 async function carouselEncodePDFPage(b, settings) {
   const key = exportKey(b, settings);
   if (exportCache.has(key)) return exportCache.get(key);
-  const opts =
-    settings.pdf?.preset === "original" && MKWCarouselPolicy.isFree(p.carousel)
-      ? { ...settings.pdf, w: b.w, h: b.h }
-      : settings.pdf;
-  if (!carouselValidatePDF(opts))
-    throw Error(
-      "PDF-Seitengrösse: 240–4000 px. Bitte die Einstellungen prüfen.",
-    );
+  const opts = carouselPDFPageSettings(settings.pdf, b);
+  if (!carouselValidatePDF(settings.pdf, b))
+    throw Error("PDF-Seitengrösse oder Einstellungen sind ungültig.");
   await document.fonts.ready;
   const c = makeCanvas(opts.w, opts.h),
     ctx = exportContext(c);
