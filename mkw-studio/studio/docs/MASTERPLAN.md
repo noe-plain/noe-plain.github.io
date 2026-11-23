@@ -215,7 +215,7 @@ Zentrale neue Defaults **200 px / 50 px / 0,8**, bestehende Werte bleiben erhalt
 
 | Reihenfolge / ID | Priorität | Offene Aufgabe | Abhängigkeit / überprüfbares Ziel |
 | --- | --- | --- | --- |
-| 8 / E01 | Lokal geprüft | Tatsächliche Formvorschau während des Zeichnens | Gewählte Form mit Fläche und Kontur vor dem Loslassen. Geometrie, Abbruch, Undo/Redo, Zoom und Tablet-Eingabe geprüft. [Prüfbericht mit sechs Personas](SHAPE-PREVIEW-REVIEW-2026-11-23.md) |
+| 8 / E01 | Veröffentlicht und live geprüft | Tatsächliche Formvorschau während des Zeichnens | Gewählte Form mit Fläche und Kontur vor dem Loslassen. Pixelvergleich, Abbruch, Undo/Redo und Tablet-Eingabe geprüft. Release `d010897`. [Prüfbericht mit sechs Personas](SHAPE-PREVIEW-REVIEW-2026-11-23.md) |
 | 9 / E02 | Erledigt – nochmals prüfen für Abschluss | Winkel mit Farbfüllung am 18. November implementiert | Nachweise D31; echte Photoshop-Handbearbeitung komplexer Effekte bleibt unter F04 offen. |
 | 10 / C01 | P2 | Pipette im Farbpicker | Sichtbare Farben bei korrekten Zoom-/Ausschnittkoordinaten übernehmen, Abbruch sicher; lokale Browseralternative bei fehlender Bildschirm-Pipetten-API. |
 | 11 / C02 | P2 | Farbhilfe mit fünf Farben | Aktive Reihenbilder lokal analysieren, fünf bearbeitbare Felder und passende Vorschläge; gezielte Übernahme ohne automatische Umfärbung. Transparenz, ähnliche Farben und grosse/fehlende Bilder behandeln. |
