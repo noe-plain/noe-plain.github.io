@@ -609,9 +609,14 @@ const MKWCampaignUI = (() => {
   }
   async function paintDecorations(ctx, project, slide) {
     if (!project.campaign) return;
-    for (const [i, b] of project.boards.entries()) {
-      if (slide !== null && slide !== i) continue;
-      const a = project.carousel.artboards[i];
+    const artboards = project.carousel.artboards;
+    const boards = new Map(
+      project.boards.map((board) => [board.campaignPage, board]),
+    );
+    const frames = slide === null ? artboards : [artboards[slide]];
+    for (const a of frames) {
+      const b = boards.get(a?.id);
+      if (!b?.sponsors?.enabled) continue;
       ctx.save();
       ctx.translate(a.x, a.y);
       await paintSponsors(ctx, b, { project });

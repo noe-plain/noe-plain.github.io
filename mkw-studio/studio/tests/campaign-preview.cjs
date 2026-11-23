@@ -311,6 +311,47 @@ const { launch, artifact, waitForProjectReady } = require("./browser.cjs");
     console.log(
       "PASS campaign setup/import, same-format links, individual property override, no slides/text toggles and MKW roundtrip",
     );
+    const rowPSD = await page.evaluate(async () => {
+      // The project retains all output metadata when exporting an extracted
+      // row. Its non-first page must retain its own decorations and size.
+      const target = p.carousel.artboards[1];
+      const carousel = MKWRowScope.extract(
+        p.carousel,
+        target.id,
+        carouselPaintBounds,
+      );
+      const boards = p.boards.map((board) =>
+        board.campaignPage === target.id
+          ? { ...board, sponsors: { enabled: true, groups: [] } }
+          : board,
+      );
+      const decorate = paintSponsors;
+      const calls = [];
+      try {
+        paintSponsors = (ctx, board, options) => {
+          calls.push(board.campaignPage);
+          return decorate(ctx, board, options);
+        };
+        const blob = await buildCarouselPSD(() => {}, {
+          ...p,
+          boards,
+          carousel,
+        });
+        const psd = agPsd.readPsd(await blob.arrayBuffer(), {
+          skipLayerImageData: true,
+        });
+        return {
+          size: [psd.width, psd.height],
+          expected: [target.w, target.h],
+          calls,
+          id: target.id,
+        };
+      } finally {
+        paintSponsors = decorate;
+      }
+    });
+    assert.deepEqual(rowPSD.size, rowPSD.expected);
+    assert.deepEqual([...new Set(rowPSD.calls)], [rowPSD.id]);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
