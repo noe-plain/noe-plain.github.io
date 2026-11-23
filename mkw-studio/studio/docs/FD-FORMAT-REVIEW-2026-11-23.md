@@ -14,3 +14,7 @@ Gültige Backup-Ausgaben lassen sich nun in einer separaten, bearbeitbaren FD-Ka
 | Fehlersucher | Rundungsgrenze der Schutzzonen, stale Projektbestätigung, Schutz des Originals und 200-Ausgaben-Grenze. | Gelöst im geprüften Umfang |
 
 Lokal bestanden 223 Modell-/Pakettests und sieben Chromium-Suiten. Volle PSD-Abnahme grosser Altprojekte, weitere repräsentative Altdaten und Entfernung von FD-Backup bleiben in B02 offen. Die Standardgrenzen neu hinzugefügter Designer-Formate, die 200-Ausgaben-/500-Ebenen-Grenzen und das PSD-Exportlimit gelten weiterhin.
+
+## Veröffentlichung
+
+Commit `b942287` bestand den [GitHub-Freigabelauf in Firefox, Chromium und Windows](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45142717386). [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45145410000) lieferte das geprüfte HTML, JavaScript, CSS und Wiki bytegleich aus. Auf der Live-Seite bestanden die Kampagnenprüfung mit dem späteren Format und der MKW-Rundlauf sowie die Konvertierungsprüfung mit grossen und kleinen Originalmassen, PNG und PDF.
