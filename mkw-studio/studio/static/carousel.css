@@ -359,6 +359,11 @@
   top: 50%;
   cursor: ew-resize;
 }
+.carousel-shape-preview {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
 .carousel-marquee {
   position: absolute;
   outline: 1px solid var(--md-sys-color-primary);

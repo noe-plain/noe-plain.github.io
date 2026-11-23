@@ -92,6 +92,16 @@ function carouselPanel() {
     `<label>${label}<select data-prop="${key}">${options(values, o[key])}</select></label>`;
   const section = (title, body) =>
     `<section class="carousel-property-section"><h4>${title}</h4>${body}</section>`;
+  if (
+    !items.length &&
+    carouselUI.tool === "shape" &&
+    carouselUI.slide === null
+  ) {
+    carouselShapeToolPanel(panel);
+    carouselLayerPanel();
+    carouselPresentInspector();
+    return;
+  }
   if (!items.length && carouselUI.slide !== null) {
     carouselSlidePanel(panel);
     carouselLayerPanel();

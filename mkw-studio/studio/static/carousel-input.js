@@ -1,9 +1,7 @@
 "use strict";
 // Designer input: see ARCHITECTURE.md for ownership and load order.
 function carouselOrigin() {
-  return $(
-    MKWSpreadUI.active() ? "#carouselArtwork" : "#carouselCanvas",
-  )?.getBoundingClientRect();
+  return $("#carouselArtwork")?.getBoundingClientRect();
 }
 function carouselPoint(ev) {
   const rect = carouselOrigin();
@@ -47,7 +45,7 @@ function carouselHit(pt) {
   });
 }
 
-function carouselListen(ev, move, finish, cancel = finish) {
+function carouselListen(ev, move, finish, cancel = finish, shape = false) {
   ev.preventDefault();
   let pending = null,
     frame = 0;
@@ -63,7 +61,7 @@ function carouselListen(ev, move, finish, cancel = finish) {
     frame = 0;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
-    window.removeEventListener("pointercancel", onUp);
+    window.removeEventListener("pointercancel", onCancel);
   };
   const onMove = (e) => {
     if (e.pointerId !== ev.pointerId) return;
@@ -80,7 +78,13 @@ function carouselListen(ev, move, finish, cancel = finish) {
     carouselDrawSnap();
     finish(e);
   };
+  const onCancel = (e) => {
+    if (e.pointerId !== ev.pointerId) return;
+    if (shape) carouselUI.drag.cancel();
+    else onUp(e);
+  };
   carouselUI.drag = {
+    shape,
     cancel: () => {
       stop();
       pending = null;
@@ -92,13 +96,14 @@ function carouselListen(ev, move, finish, cancel = finish) {
   };
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", onUp);
-  window.addEventListener("pointercancel", onUp);
+  window.addEventListener("pointercancel", onCancel);
 }
 
 function carouselPointer(ev) {
   if (!p.carousel.n) return;
   if (
     busy ||
+    carouselUI.drag ||
     ev.button !== 0 ||
     ev.target.closest(
       "textarea,button,input,select,.carousel-inline-text,.campaign-card",
@@ -221,14 +226,30 @@ function carouselCreateDrag(ev, type, start) {
     [],
   );
   start = { x: anchor.x, y: anchor.y };
-  const sketch = document.createElement("div");
-  sketch.className = "carousel-marquee";
-  $("#carouselSelectionOverlay").append(sketch);
-  let rect = { x: start.x, y: start.y, w: 1, h: 1 };
+  const project = p,
+    shape = type === "shape" ? carouselVectorDefaults(type) : null,
+    preview = shape ? carouselShapePreview(project) : null,
+    sketch = preview ? null : document.createElement("div");
+  if (sketch) {
+    sketch.className = "carousel-marquee";
+    $("#carouselSelectionOverlay").append(sketch);
+  }
+  const clear = () => {
+    preview?.remove();
+    sketch?.remove();
+  };
+  let rect = { x: start.x, y: start.y, w: 1, h: 1 },
+    moved = false;
+  const drawable = () =>
+    (!shape || moved) &&
+    rect.w * carouselZoom >= 5 &&
+    rect.h * carouselZoom >= 5;
   carouselListen(
     ev,
     (e) => {
+      if (p !== project) return;
       const end = carouselPoint(e);
+      moved ||= Math.hypot(e.clientX - ev.clientX, e.clientY - ev.clientY) >= 5;
       let w = Math.abs(end.x - start.x),
         h = Math.abs(end.y - start.y);
       if (type === "angle") h = w * 2;
@@ -249,6 +270,10 @@ function carouselCreateDrag(ev, type, start) {
       );
       carouselUI.snapLines = [...anchor.guides, ...rect.guides];
       carouselDrawSnap();
+      if (preview) {
+        preview.draw(drawable() ? { type, ...shape, ...rect } : null);
+        return;
+      }
       Object.assign(sketch.style, {
         left: rect.x * carouselZoom + "px",
         top: rect.y * carouselZoom + "px",
@@ -257,17 +282,19 @@ function carouselCreateDrag(ev, type, start) {
       });
     },
     async () => {
-      if (rect.w * carouselZoom < 5 || rect.h * carouselZoom < 5) {
-        sketch.remove();
-        status("Rahmen mit gedrückter Maustaste aufziehen.");
+      clear();
+      if (p !== project || (shape && busy)) return;
+      if (!drawable()) {
+        status("Rahmen durch Ziehen aufziehen.");
         return;
       }
       const inherited =
         p.campaign && type === "text"
           ? await MKWCampaignUI.textChoice(rect)
           : {};
-      if (inherited === null) return;
+      if (p !== project || inherited === null) return;
       const o = carouselObject(type, {
+        ...shape,
         ...inherited,
         x: rect.x,
         y: rect.y,
@@ -280,7 +307,8 @@ function carouselCreateDrag(ev, type, start) {
       if (type === "text") carouselEditText(o);
       else if (type === "image") carouselFile(o.id);
     },
-    () => sketch.remove(),
+    clear,
+    !!shape,
   );
 }
 

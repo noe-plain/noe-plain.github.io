@@ -788,6 +788,33 @@ function carouselSplitPath(o) {
   changed(false);
   carouselPanel();
 }
+function carouselShapeButtons(active) {
+  const choices = [
+    ["rect", "Rechteck"],
+    ["ellipse", "Ellipse"],
+    ["triangle", "Dreieck"],
+    ["polygon", "Vieleck"],
+    ["star", "Stern"],
+  ];
+  return `<div class="vector-shapes" role="group" aria-label="Form auswählen">${choices
+    .map(
+      ([kind, label]) =>
+        `<button data-shape-kind="${kind}" aria-pressed="${active === kind}" title="${label}" aria-label="${label}">${studioIcon(kind)}</button>`,
+    )
+    .join("")}</div>`;
+}
+function carouselShapeToolPanel(panel) {
+  panel.innerHTML = `<section class="carousel-property-section vector-section"><h4>Neue Form</h4>${carouselShapeButtons(carouselUI.shapeKind || "rect")}</section>`;
+  const buttons = panel.querySelectorAll("[data-shape-kind]");
+  for (const button of buttons) {
+    button.onclick = () => {
+      if (carouselUI.drag?.shape) carouselUI.drag.cancel();
+      carouselUI.shapeKind = button.dataset.shapeKind;
+      for (const item of buttons)
+        item.setAttribute("aria-pressed", String(item === button));
+    };
+  }
+}
 function carouselVectorPanel(o) {
   const pick = (key, label, values) =>
       `<label>${label}<select data-vector-key="${key}">${options(values, o[key])}</select></label>`,
@@ -801,20 +828,7 @@ function carouselVectorPanel(o) {
     o.type === "shape"
       ? section(
           "Form",
-          `<button id="vectorShapePoints" >Punkte & Kurven bearbeiten</button><div class="vector-shapes" role="group" aria-label="Form auswählen">${[
-            ["rect", "Rechteck"],
-            ["ellipse", "Ellipse"],
-            ["triangle", "Dreieck"],
-            ["polygon", "Vieleck"],
-            ["star", "Stern"],
-          ]
-            .map(
-              ([kind, name]) =>
-                `<button data-shape-kind="${kind}" aria-pressed="${o.shapeKind === kind}" title="${name}" aria-label="${name}">${studioIcon(kind)}</button>`,
-            )
-            .join(
-              "",
-            )}</div>${o.shapeKind === "rect" ? num("radius", "Eckenradius · px", 0, 5000) : ""}${["polygon", "star"].includes(o.shapeKind) ? num("sides", o.shapeKind === "star" ? "Zacken" : "Seiten", 3, 24) : ""}${o.shapeKind === "star" ? `<label>Innere Grösse <input data-vector-key="innerRatio" type="range" min=".05" max=".95" step=".01" value="${o.innerRatio}"></label>` : ""}`,
+          `<button id="vectorShapePoints" >Punkte & Kurven bearbeiten</button>${carouselShapeButtons(o.shapeKind)}${o.shapeKind === "rect" ? num("radius", "Eckenradius · px", 0, 5000) : ""}${["polygon", "star"].includes(o.shapeKind) ? num("sides", o.shapeKind === "star" ? "Zacken" : "Seiten", 3, 24) : ""}${o.shapeKind === "star" ? `<label>Innere Grösse <input data-vector-key="innerRatio" type="range" min=".05" max=".95" step=".01" value="${o.innerRatio}"></label>` : ""}`,
         )
       : section(
           "Pfad",

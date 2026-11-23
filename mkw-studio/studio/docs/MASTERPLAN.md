@@ -62,6 +62,8 @@ Keine dieser Zeilen behauptet, dass im heutigen Produkt bereits ein neuer P0-Feh
 
 **Nutzerauftrag 20. November:** Das ZIP-Profil behält die Endung `.mkw`. Der normale Editor öffnet Bilddaten bedarfsweise und speichert Projektdateien und die Projektbeigabe im Bild-ZIP standardmässig im ZIP-Profil. Alte JSON-, gzip- und MKWBLK1-Dateien bleiben lesbar. Aus solchen Dateien wird eine neue Arbeitsdatei angelegt. Sie werden durch Autosave nicht verändert.
 
+**Abschluss N01.6, Hauptzweig `01bf63f`:** Der MKW-ZIP-Standardspeicher ist live. [Hauptzweig-Prüfungen](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44743672859) · [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/44743672483). Auf der Live-Seite bestanden ZIP-Speichern/Wiederöffnen sowie Autosave und Wiederherstellung nach unterbrochenem Schreibvorgang. Die verifizierten Laufzeitdateien stimmten bytegenau mit dem Release überein.
+
 #### N01 · Ist-Analyse der vorhandenen Speicherarchitektur
 
 Untersucht am Quellstand `ff867e0`: `project-file.js` liest altes JSON, gzip-JSON und den nativen Blockcontainer. Download-Speichern verwendet derzeit noch gzip-JSON. Verknüpfte native Dateien verwenden bereits `project-blocks.js`: `MKWBLK1` mit binären, SHA-256-adressierten Assets und einem austauschbaren komprimierten Dokumentindex. Unveränderte Assets werden wiederverwendet, reine Layoutänderungen schreiben nicht alle Bildbytes neu. `project-store.js` hält Projekte und deduplizierte Asset-Blobs transaktional in IndexedDB. `file-io.js` besitzt vorbereitete positionsbezogene Schreibpläne, Abbruch und Konfliktschutz; ein Browser kann intern trotzdem eine vollständige temporäre Dateikopie anlegen. Die aktuelle Architektur ist daher nicht pauschal „alles Base64 in JSON“.
@@ -213,7 +215,7 @@ Zentrale neue Defaults **200 px / 50 px / 0,8**, bestehende Werte bleiben erhalt
 
 | Reihenfolge / ID | Priorität | Offene Aufgabe | Abhängigkeit / überprüfbares Ziel |
 | --- | --- | --- | --- |
-| 8 / E01 | P2 | Tatsächliche Formvorschau während des Zeichnens | Gewählte Form, Proportionen, Füllung/Kontur vor Loslassen sichtbar. Escape/Pointer-Abbruch ohne Mutation/Undo-Eintrag; Zoom/Touch prüfen. |
+| 8 / E01 | Lokal geprüft | Tatsächliche Formvorschau während des Zeichnens | Gewählte Form mit Fläche und Kontur vor dem Loslassen. Geometrie, Abbruch, Undo/Redo, Zoom und Tablet-Eingabe geprüft. [Prüfbericht mit sechs Personas](SHAPE-PREVIEW-REVIEW-2026-11-23.md) |
 | 9 / E02 | Erledigt – nochmals prüfen für Abschluss | Winkel mit Farbfüllung am 18. November implementiert | Nachweise D31; echte Photoshop-Handbearbeitung komplexer Effekte bleibt unter F04 offen. |
 | 10 / C01 | P2 | Pipette im Farbpicker | Sichtbare Farben bei korrekten Zoom-/Ausschnittkoordinaten übernehmen, Abbruch sicher; lokale Browseralternative bei fehlender Bildschirm-Pipetten-API. |
 | 11 / C02 | P2 | Farbhilfe mit fünf Farben | Aktive Reihenbilder lokal analysieren, fünf bearbeitbare Felder und passende Vorschläge; gezielte Übernahme ohne automatische Umfärbung. Transparenz, ähnliche Farben und grosse/fehlende Bilder behandeln. |
@@ -293,7 +295,7 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D11 | Absatzgrösse nach vollständiger Markierung/Dreifachklick | Absatz erhält passende Höhe, vorige Absätze unverändert, folgende rücken mit; bei Altdaten vorhandene Regeln nicht heimlich ändern. | [ ] |
 | D12 | Ausrichtung/Blocksatz, Schweizer Silbentrennung, Absatz-/Zeilenwerte, Gross-/Hochstellung und Familienfarben | Gemeinsame Layout-/Inline-/Exporttreue, Auswahlumfang, Copyright ohne Familienkontur; benannte Vorlagen-Absatzformate unter T01 bleiben neue Arbeit. | [ ] |
 | D13 | Winkel/Bildrahmen, Masken, Inhalt-/Rahmentrennung, Drehen, Snapping und sichtbarkeitsbezogene Abdeckungswarnungen | Exportrahmen und echte sichtbare Lücken; neue Defaults W01/Farbfüllung E02 unter D31 separat abgenommen. | [ ] |
-| D14 | Pfad-/Kurven-/Formwerkzeuge, Fortsetzen/Verbinden, Mehrfachpunkte, Raster/Schutzzonen und Ebenen/Ordner/FX | Kurven-/Auswahl-/Undo-Zustände, Masken und reihenbezogene Zugehörigkeit; Formvorschau E01 bleibt separat offen. | [ ] |
+| D14 | Pfad-/Kurven-/Formwerkzeuge, Fortsetzen/Verbinden, Mehrfachpunkte, Raster/Schutzzonen und Ebenen/Ordner/FX | Kurven-/Auswahl-/Undo-Zustände, Masken und reihenbezogene Zugehörigkeit; Formvorschau separat unter E01 geprüft. | [ ] |
 | D15 | Sponsorenleisten und Gruppen, Gewichtung, Reihenfolge, automatische Darstellung, anpassbare Farbe | Heller/dunkler Hintergrund, JPG-Hintergründe, Gruppenbeschriftung und optisch stabile Logogrösse. | [ ] |
 | D16 | Projektbibliothek, Speichern/Öffnen, max. fünf Browserprojekte, Konflikt-/Wiederherstellungsschutz und Asset-Bereinigung | 50 Bilder, gelöschte Inhalte, mehrere Tabs, Quota/Abbruch und kein Download durch Autosave. | [ ] |
 | D17 | Effiziente Projektdateien, Stream-/Kompressionswege und inkrementelles natives Chrome-Speichern | Tatsächlich geschriebene Datenmenge/Zeiten messen; keine Assets neu schreiben, wenn nur Layout geändert wird. | [ ] |

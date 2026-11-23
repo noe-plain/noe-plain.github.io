@@ -547,6 +547,7 @@ function carouselSelect(ids) {
 
 function carouselTool(tool) {
   if (!carouselToolAvailable(tool)) return;
+  if (carouselUI.drag?.shape) carouselUI.drag.cancel();
   if (carouselPathDraft) carouselFinishPath();
   carouselUI.vectorPoints =
     ["curve", "path"].includes(tool) && carouselSelected()[0]?.type === "path";
@@ -692,7 +693,7 @@ function carouselDefault(type, rect = {}) {
   };
 }
 
-function carouselAssignArtboard(o) {
+function carouselAssignArtboard(o, activate = true) {
   if (!p.carousel.pageStructure || o.pageFragment) return;
   const page = MKWCarouselPolicy.sourcePage(
     p.carousel,
@@ -701,7 +702,7 @@ function carouselAssignArtboard(o) {
   if (page) {
     o.pageId = page.id;
     o.artboardScoped = true;
-    carouselRow(o);
+    if (activate) carouselRow(o);
   }
 }
 

@@ -3,6 +3,12 @@
 window.addEventListener(
   "keydown",
   (ev) => {
+    if (ev.key === "Escape" && carouselUI.drag?.shape) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      carouselUI.drag.cancel();
+      return;
+    }
     if (
       !carouselActive() ||
       busy ||
@@ -176,6 +182,7 @@ window.addEventListener("keyup", (ev) => {
 });
 
 window.addEventListener("blur", () => {
+  if (carouselUI.drag?.shape) carouselUI.drag.cancel();
   carouselUI.space = false;
   carouselUI.touches.clear();
   carouselUI.pinch = null;

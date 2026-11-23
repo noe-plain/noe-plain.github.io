@@ -83,7 +83,7 @@ Canvas previews and image downloads share encoded bytes. PDFs use pdf-lib/fontki
 
 ## Interactive performance
 
-Single-post previews paint only visible boards plus a 200 px scroll-ahead margin. Their cache keys include document revision, board geometry, view resolution, edit state and loaded fonts; scrolling schedules newly visible work. Exports always render full resolution independently. Carousel pointer bursts are coalesced per animation frame, with the final queued position flushed before release and discarded on cancellation.
+Single-post previews paint only visible boards plus a 200 px scroll-ahead margin. Their cache keys include document revision, board geometry, view resolution, edit state and loaded fonts; scrolling schedules newly visible work. Exports always render full resolution independently. Carousel pointer bursts are coalesced per animation frame, with the final queued position flushed before release and discarded on cancellation. A shape drag keeps its geometry and paint defaults outside the document. Its viewport-bounded overlay uses the standard vector renderer and artwork clips. Only the newest frame may appear, and only release creates a shape and history entry.
 
 The start screen reads only the last project record, not its image blobs. Full assets are loaded when continuing. Linked-file version checks also read metadata only. Autosave captures a model snapshot with shared immutable asset objects; the persistence boundary compacts it and reuses unchanged asset hashes through weak references. Neither original input duplicates nor undo history are persisted.
 

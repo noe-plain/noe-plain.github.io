@@ -31,6 +31,100 @@ function carouselPaintBounds(o) {
     : carouselVisualPadding(o) + carouselEffectValue(o, "blur") * 3;
   return { x: b.x - pad, y: b.y - pad, w: b.w + 2 * pad, h: b.h + 2 * pad };
 }
+function carouselClipFrames(ctx, frames) {
+  ctx.beginPath();
+  for (const frame of frames) ctx.rect(frame.x, frame.y, frame.w, frame.h);
+  ctx.clip();
+}
+
+// Only the newest completed frame may appear after an asynchronous image fill.
+function carouselShapePreview(project) {
+  const canvas = makeCanvas(1, 1),
+    buffer = makeCanvas(1, 1);
+  canvas.className = "carousel-shape-preview";
+  canvas.setAttribute("aria-hidden", "true");
+  canvas.hidden = true;
+  $("#carouselArtwork").append(canvas);
+  let drawing = false,
+    latest = null;
+  const current = () => canvas.isConnected && project === p;
+  async function draw(shape) {
+    latest = { shape };
+    if (drawing) return;
+    drawing = true;
+    try {
+      while (latest && current()) {
+        const { shape } = latest;
+        latest = null;
+        if (!shape) {
+          canvas.hidden = true;
+          continue;
+        }
+        const c = project.carousel,
+          zoom = carouselZoom;
+        carouselAssignArtboard(shape, false);
+        const bounds = carouselPaintBounds(shape),
+          visible = MKWSpreadUI.visible(),
+          x = Math.floor(Math.max(bounds.x, visible.x) * zoom),
+          y = Math.floor(Math.max(bounds.y, visible.y) * zoom),
+          w =
+            Math.ceil(
+              Math.min(bounds.x + bounds.w, visible.x + visible.w) * zoom,
+            ) - x,
+          h =
+            Math.ceil(
+              Math.min(bounds.y + bounds.h, visible.y + visible.h) * zoom,
+            ) - y;
+        if (w < 1 || h < 1) {
+          canvas.hidden = true;
+          continue;
+        }
+        const density = Math.min(
+          devicePixelRatio || 1,
+          2,
+          Math.sqrt(4000000 / (w * h)),
+        );
+        buffer.width = Math.max(1, Math.ceil(w * density));
+        buffer.height = Math.max(1, Math.ceil(h * density));
+        const ctx = buffer.getContext("2d");
+        ctx.setTransform(
+          density * zoom,
+          0,
+          0,
+          density * zoom,
+          -x * density,
+          -y * density,
+        );
+        if (MKWCarouselPolicy.isFree(c))
+          carouselClipFrames(ctx, MKWCarouselPolicy.frames(c));
+        const frame = MKWCarouselPolicy.contentFrame(c, shape);
+        if (frame) carouselClipFrames(ctx, [frame]);
+        ctx.translate(shape.x, shape.y);
+        await carouselPaintVector(ctx, shape, previewImage, project);
+        if (latest || !current()) continue;
+        canvas.width = buffer.width;
+        canvas.height = buffer.height;
+        canvas.getContext("2d").drawImage(buffer, 0, 0);
+        Object.assign(canvas.style, {
+          left: x + "px",
+          top: y + "px",
+          width: w + "px",
+          height: h + "px",
+        });
+        canvas.hidden = false;
+      }
+    } catch (error) {
+      if (current()) {
+        canvas.hidden = true;
+        status(error, "error");
+      }
+    } finally {
+      drawing = false;
+    }
+  }
+  return { draw, remove: () => canvas.remove() };
+}
+
 async function carouselPaint(
   ctx,
   slide = null,
@@ -63,9 +157,7 @@ async function carouselPaint(
     ctx.clip();
     ctx.translate(-frame.x, -frame.y);
   } else if (MKWCarouselPolicy.isFree(c) && clipArtwork) {
-    ctx.beginPath();
-    for (const frame of frames) ctx.rect(frame.x, frame.y, frame.w, frame.h);
-    ctx.clip();
+    carouselClipFrames(ctx, frames);
   }
   if (!transparent) {
     if (MKWCarouselPolicy.isFree(c))
@@ -102,9 +194,7 @@ async function carouselPaint(
         ctx.restore();
         continue;
       }
-      ctx.beginPath();
-      ctx.rect(frame.x, frame.y, frame.w, frame.h);
-      ctx.clip();
+      carouselClipFrames(ctx, [frame]);
     }
     if (carouselHasEffects(o)) {
       await carouselPaintEffect(ctx, o, scale, loadImage, project);
@@ -272,13 +362,13 @@ function carouselToolUI() {
     builder: "Über Formbereiche ziehen: vereinen · Alt/Option: entfernen",
     curve: "Shift+C · Punkt anklicken: Ecke / Kurve · Ziehen: Kurvengriffe",
     path: "Klicken: Punkte setzen · Ziehen: Kurve · Enter / Doppelklick: fertig · Escape: abbrechen",
-    shape:
-      "Form aufziehen · Shift: gleiche Seiten · Form und Farben rechts einstellen",
+    shape: "Form aufziehen · Shift: gleiche Seiten · Escape: abbrechen",
     zoom: "Klicken: vergrössern · Alt: verkleinern · Pinch oder Alt/Option + Scrollen: Zoom",
   }[carouselUI.tool];
 }
 
 function carouselRender() {
+  if (carouselUI.drag?.shape) carouselUI.drag.cancel();
   const previous = $("#carouselEditor"),
     oldViewport = $("#carouselViewport"),
     retainedView =
