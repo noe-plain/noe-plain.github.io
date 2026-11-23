@@ -103,47 +103,142 @@ const MKWCampaignMigration = (() => {
       (o) => o.pageId === frame.id && o.campaignRole === "logo",
     );
     if (logo) logo.visible = b.elements.logo.visible;
-    const layout = textBlock(b),
-      gradient = textGradientGeometry(b, layout),
-      main = titles(b, frame, layout);
-    if (!b.family?.enabled && gradient.hasText) {
-      const object = base("gradient", frame, {
-        campaignRole: "legacy-gradient",
-        name: "Textkontrast",
-        color: "#000000",
-        endColor: "#000000",
-        startAlpha: 0,
-        endAlpha: 1,
-        opacity: 0.42,
-        blend: "multiply",
-        rotation: 90,
-        gradientStart: { x: 0.5, y: gradient.start / b.h },
-        gradientEnd: {
-          x: 0.5,
-          y: Math.max(gradient.start + 1, gradient.baseline) / b.h,
-        },
-      });
-      q.carousel.objects.push(object);
-    }
+    const layout = textBlock(b);
+    const gradient = contrast(b, frame, layout);
+    const main = titles(b, frame, layout);
+    if (gradient) q.carousel.objects.push(gradient);
     if (main) q.carousel.objects.push(main);
-    const e = layout.copyright;
-    if (e?.visible && e.text)
-      q.carousel.objects.push(
-        base("text", frame, {
-          ...clone(b.elements.copyright),
-          campaignRole: "copyright",
-          name: "Copyright",
-          text: e.text,
-          x: frame.x + e.x,
-          y: frame.y + e.y,
-          w: Math.max(1, e.maxWidth || e.w || e.size),
-          h: Math.max(1, e.h),
-          size: e.size,
-          font: e.role,
-          textAlign: "left",
-          angle: e.angle || 0,
-        }),
-      );
+    const credit = copyright(b, frame, layout);
+    if (credit) q.carousel.objects.push(credit);
   }
-  return Object.freeze({ add, titles });
+  function contrast(b, frame, layout) {
+    if (b.family?.enabled) return null;
+    const gradient = textGradientGeometry(b, layout);
+    if (!gradient.hasText) return null;
+    return base("gradient", frame, {
+      campaignRole: "legacy-gradient",
+      name: "Textkontrast",
+      color: "#000000",
+      endColor: "#000000",
+      startAlpha: 0,
+      endAlpha: 1,
+      opacity: 0.42,
+      blend: "multiply",
+      rotation: 90,
+      gradientStart: { x: 0.5, y: gradient.start / b.h },
+      gradientEnd: {
+        x: 0.5,
+        y: Math.max(gradient.start + 1, gradient.baseline) / b.h,
+      },
+    });
+  }
+  function copyright(b, frame, layout) {
+    const e = layout.copyright;
+    if (!e?.visible || !e.text) return null;
+    return base("text", frame, {
+      ...clone(b.elements.copyright),
+      campaignRole: "copyright",
+      name: "Copyright",
+      text: e.text,
+      x: frame.x + e.x,
+      y: frame.y + e.y,
+      w: Math.max(1, e.maxWidth || e.w || e.size),
+      h: Math.max(1, e.h),
+      size: e.size,
+      font: e.role,
+      textAlign: "left",
+      angle: e.angle || 0,
+    });
+  }
+  function paintText(ctx, object, board, frame) {
+    const title = object.campaignRole === "titles";
+    if (!board || (!title && object.campaignRole !== "copyright")) return false;
+    return paintOriginalLayer(
+      ctx,
+      object,
+      board,
+      frame,
+      title ? titles : copyright,
+    );
+  }
+  function paintContrast(ctx, object, board, frame) {
+    return (
+      !!board &&
+      object.campaignRole === "legacy-gradient" &&
+      paintOriginalLayer(ctx, object, board, frame, contrast)
+    );
+  }
+  const originalLayers = new WeakMap();
+  function paintOriginalLayer(ctx, object, board, frame, createLayer) {
+    const layout = textBlock(board);
+    let expected = originalLayers.get(board);
+    if (expected?.layout !== layout) {
+      expected = { layout, layers: new Map() };
+      originalLayers.set(board, expected);
+    }
+    if (!expected.layers.has(createLayer)) {
+      const local = { ...frame, x: 0, y: 0 };
+      const layer = createLayer(board, local, layout);
+      expected.layers.set(
+        createLayer,
+        layer && MKWCampaignModel.values(layer, local),
+      );
+    }
+    const before = expected.layers.get(createLayer);
+    if (!before) return false;
+    const current = MKWCampaignModel.values(object, frame);
+    const equal = (key) => {
+      if (key === "x" || key === "y")
+        return Math.abs(current[key] - before[key]) < 1e-7;
+      return (
+        key === "name" ||
+        key === "locked" ||
+        current[key] === before[key] ||
+        JSON.stringify(current[key]) === JSON.stringify(before[key])
+      );
+    };
+    if (!Object.keys({ ...before, ...current }).every(equal)) return false;
+    // Unedited layers use the original rasterisation while the native layers
+    // remain the source for editing and take over once their appearance changes.
+    ctx.save();
+    ctx.translate(frame.x, frame.y);
+    const strip = MKWSponsors.layout(board);
+    if (strip) carouselClipFrames(ctx, [{ x: 0, y: 0, ...strip.content }]);
+    if (createLayer === contrast)
+      textGradient(ctx, board, layout, object.opacity);
+    else {
+      const title = createLayer === titles;
+      if (title) carouselClipFrames(ctx, [layout.safe]);
+      drawText(ctx, layout, {
+        family: board.family,
+        ...(title ? { excludeKey: "copyright" } : { includeKey: "copyright" }),
+      });
+    }
+    ctx.restore();
+    return true;
+  }
+  async function paintLogoShadow(ctx, logo, board, frame, project) {
+    const area = MKWSponsors.layout(board)?.content || frame;
+    const bitmap = await carouselLogoImage(logo, project);
+    ctx.save();
+    carouselClipFrames(ctx, [{ x: frame.x, y: frame.y, w: area.w, h: area.h }]);
+    ctx.globalAlpha *= logo.opacity ?? 1;
+    softLogoShadow(
+      ctx,
+      {
+        elements: {
+          logo: { x: logo.x, y: logo.y, size: logo.w, angle: logo.angle },
+        },
+      },
+      bitmap,
+    );
+    ctx.restore();
+  }
+  return Object.freeze({
+    add,
+    titles,
+    paintText,
+    paintContrast,
+    paintLogoShadow,
+  });
 })();

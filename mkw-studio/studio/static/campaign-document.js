@@ -246,9 +246,13 @@ const MKWCampaignDocument = (() => {
           imageAngle: t.angle,
         }),
       );
-      const e = b.elements.logo,
-        lw = e.visible ? e.size : Math.min(600, a.w - a.left - a.right),
-        source = e.visible ? e.source : "white";
+      const e = b.elements.logo;
+      const source = e.visible ? e.source : "white";
+      const logoAsset =
+        legacy && e.visible ? await carouselLogoImage({ source }, q) : logo;
+      if (legacy && e.visible)
+        MKWLayout.constrainLogo(b, logoAsset.width / logoAsset.height);
+      const lw = e.visible ? e.size : Math.min(600, a.w - a.left - a.right);
       q.carousel.objects.push(
         base("logo", a, {
           campaignRole: "logo",
@@ -256,7 +260,7 @@ const MKWCampaignDocument = (() => {
           x: e.visible ? e.x : a.w - a.right - lw,
           y: e.visible ? e.y : a.top,
           w: lw,
-          h: (lw * logo.height) / logo.width,
+          h: (lw * logoAsset.height) / logoAsset.width,
           source,
           angle: e.angle || 0,
         }),

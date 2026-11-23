@@ -1,6 +1,6 @@
 "use strict";
 // Designer render: see ARCHITECTURE.md for ownership and load order.
-function carouselPaintBounds(o) {
+function carouselPaintBounds(o, includeCampaignShadow = false) {
   let b = carouselObjectBounds(o);
   if (o.type === "text") {
     const layout = carouselTextLayout(o),
@@ -26,9 +26,12 @@ function carouselPaintBounds(o) {
         Math.min(...points.map((p) => p.y)),
     };
   }
-  const pad = ["image", "logo"].includes(o.type)
-    ? 0
-    : carouselVisualPadding(o) + carouselEffectValue(o, "blur") * 3;
+  const pad =
+    includeCampaignShadow && o.type === "logo" && o.campaignRole === "logo"
+      ? LOGO_SHADOW_PADDING + 4
+      : ["image", "logo"].includes(o.type)
+        ? 0
+        : carouselVisualPadding(o) + carouselEffectValue(o, "blur") * 3;
   return { x: b.x - pad, y: b.y - pad, w: b.w + 2 * pad, h: b.h + 2 * pad };
 }
 function carouselClipFrames(ctx, frames) {
@@ -170,7 +173,33 @@ async function carouselPaint(
       ctx.fillRect(0, 0, c.w * c.n, c.h);
     }
   }
-  for (const original of objects || c.objects) {
+  const drawing = objects || c.objects;
+  const campaignBoards = project.campaign
+    ? new Map(project.boards.map((board) => [board.campaignPage, board]))
+    : null;
+  const campaignFrames =
+    campaignBoards && new Map(frames.map((frame) => [frame.id, frame]));
+  const campaignFamilyPages =
+    campaignBoards &&
+    new Set(
+      project.campaign.rows
+        .filter((row) => row.family)
+        .flatMap((row) => row.pages),
+    );
+  const shadows = new Map();
+  if (campaignBoards && !transparent)
+    for (const logo of drawing) {
+      if (
+        logo.type !== "logo" ||
+        logo.campaignRole !== "logo" ||
+        !carouselObjectVisible(logo, c)
+      )
+        continue;
+      const board = campaignBoards.get(logo.pageId);
+      if (board?.elements.logo.visible && !campaignFamilyPages.has(logo.pageId))
+        shadows.set(logo.pageId, logo);
+    }
+  for (const original of drawing) {
     const o = project.campaign
       ? MKWCampaignUI.decorate(original, project)
       : original;
@@ -195,6 +224,30 @@ async function carouselPaint(
         continue;
       }
       carouselClipFrames(ctx, [frame]);
+    }
+    if (campaignBoards && (o.type === "text" || o.campaignRole)) {
+      const frame = campaignFrames.get(o.pageId);
+      const board = campaignBoards.get(o.pageId);
+      const shadow = shadows.get(o.pageId);
+      if (frame && shadow && (o.type === "text" || o.type === "logo")) {
+        shadows.delete(o.pageId);
+        await MKWCampaignMigration.paintLogoShadow(
+          ctx,
+          shadow,
+          board,
+          frame,
+          project,
+        );
+      }
+      if (
+        frame &&
+        !!board?.family?.enabled === campaignFamilyPages.has(o.pageId) &&
+        (MKWCampaignMigration.paintText(ctx, original, board, frame) ||
+          MKWCampaignMigration.paintContrast(ctx, original, board, frame))
+      ) {
+        ctx.restore();
+        continue;
+      }
     }
     if (carouselHasEffects(o)) {
       await carouselPaintEffect(ctx, o, scale, loadImage, project);
@@ -593,7 +646,10 @@ function carouselSchedulePaint(canvas, scale, generation) {
   const c = p.carousel,
     objects = canvas._region
       ? c.objects.filter((o) =>
-          MKWCarouselPolicy.intersects(carouselPaintBounds(o), canvas._region),
+          MKWCarouselPolicy.intersects(
+            carouselPaintBounds(o, !!p.campaign),
+            canvas._region,
+          ),
         )
       : null;
   const key = JSON.stringify([

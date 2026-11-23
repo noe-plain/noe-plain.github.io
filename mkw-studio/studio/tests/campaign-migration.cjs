@@ -56,6 +56,8 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       b.elements.title.visible = true;
       b.elements.logo.visible = true;
       b.elements.logo.source = "white";
+      b.elements.copyright.visible = true;
+      b.elements.copyright.text = "Foto: Studio";
       b.angle = MKWPostAngle.defaults(b);
       changed();
       await autosave();
@@ -77,8 +79,11 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
             ),
           ),
         ).join(",");
+      const full = exportContext(makeCanvas(b.w, b.h));
+      await paint(full, b);
       return {
         id: p.projectId,
+        fullHash: await digest(full),
         board: clone(b),
         textHash: await digest(textContext),
         gradientHash: await digest(gradientContext),
@@ -160,14 +165,24 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
             ),
           ),
         ).join(",");
+      const textHash = await digest(tc);
+      const full = exportContext(makeCanvas(frame.w, frame.h));
+      await carouselPaint(full, 0);
+      const fullHash = await digest(full);
+      const edited = { ...main, x: main.x + 42 };
+      tc.clearRect(0, 0, frame.w, frame.h);
+      await carouselPaint(tc, 0, 1, true, null, [edited]);
+      const movedTextHash = await digest(tc);
       const old = await MKWProjectStore.open(id);
       return {
+        fullHash,
+        movedTextHash,
         count: p.carousel.objects.filter(
           (o) => o.type === "text" && o.campaignRole !== "copyright",
         ).length,
         text: main.text,
         sizes: main.textStyles.map((s) => s.size),
-        textHash: await digest(tc),
+        textHash,
         gradientHash: await digest(gc),
         gradientPixels: Array.from(gc.getImageData(100, 0, 1, frame.h).data),
         original: old.project.boards[0].elements.title.text,
@@ -191,13 +206,23 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       gradientDifference,
     );
     assert(
-      gradientDifference <= 1,
-      "Gradient geometry/opacity match with at most one 8-bit rounding level between raster and direct compositing",
+      gradientDifference === 0,
+      "Unedited gradient keeps exact legacy mask compositing",
     );
     assert.equal(
       fidelity.textHash,
       original.textHash,
       "Combined editable title frame preserves original text pixels",
+    );
+    assert.equal(
+      fidelity.fullHash,
+      original.fullHash,
+      "Unedited composition including the logo shadow and credit is pixel-exact",
+    );
+    assert.notEqual(
+      fidelity.movedTextHash,
+      fidelity.textHash,
+      "Moving the editable title changes its rendering",
     );
     assert.equal(fidelity.opacity, 0.42);
     assert.equal(fidelity.blend, "multiply");
