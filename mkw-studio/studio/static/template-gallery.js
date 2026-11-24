@@ -4,6 +4,7 @@ const MKWTemplateGallery = (() => {
     observer,
     generation = 0,
     selectedTemplate = null,
+    imageSlots = [],
     requiredImages = [],
     values = Object.create(null),
     pending = 0,
@@ -203,10 +204,13 @@ const MKWTemplateGallery = (() => {
     }
   }
   function fileField(o, channel, label) {
+    const slot = imageSlots.find(
+      (s) => s.objectId === o.id && s.channel === channel,
+    );
     const required = requiredImages.some(
       (slot) => slot.id === o.id && slot.channel === channel,
     );
-    return `<label class="template-file-field"><span>${label}${required ? ' <small class="template-required">Benötigt</small>' : ""}</span><span class="template-file-button">${studioIcon("image")}<span data-file-name>${esc(values[o.id]?.[channel]?.name || "Bild auswählen")}</span><input type="file" accept="image/*" data-template-upload="${esc(o.id)}" data-channel="${channel}" ${required ? "data-template-required" : ""} aria-label="${esc(label + ": " + o.name)}"></span></label>`;
+    return `<label class="template-file-field"><span>${slot ? `<span class="template-slot-swatch" style="--slot-colour:${slot.colour}" aria-hidden="true"></span>Bildplatz ${slot.number} · ` : ""}${label}${required ? ' <small class="template-required">Benötigt</small>' : ""}</span><span class="template-file-button">${studioIcon("image")}<span data-file-name>${esc(values[o.id]?.[channel]?.name || "Bild auswählen")}</span><input type="file" accept="image/*" data-template-upload="${esc(o.id)}" data-channel="${channel}" ${required ? "data-template-required" : ""} aria-label="${esc((slot ? `Bildplatz ${slot.number} · ` : "") + label + ": " + o.name)}"></span></label>`;
   }
   function layerField(o, t) {
     const slot = t.slots.find((s) => s.objectId === o.id),
@@ -256,6 +260,7 @@ const MKWTemplateGallery = (() => {
         const t = await MKWTemplates.get(id);
         if (current !== generation || !dialog.open) return;
         selectedTemplate = t;
+        imageSlots = MKWTemplateModel.imageSlots(t);
         const card = dialog.querySelector(
           `[data-template-id="${CSS.escape(id)}"]`,
         );
@@ -399,7 +404,24 @@ const MKWTemplateGallery = (() => {
     dialog.setAttribute("aria-labelledby", "templateGalleryTitle");
     dialog.innerHTML = `<div class="dialog-heading"><div><h2 id="templateGalleryTitle">Mit einer Vorlage starten</h2><p>Wähle ein fertiges Design und ersetze seine Inhalte. Danach kannst du alles im Designer anpassen.</p></div><button class="icon-button" id="closeTemplateGallery" aria-label="Vorlagen schliessen">${studioIcon("close")}</button></div><section id="templateChoose"><div class="template-gallery-heading"><h3>1 · Design auswählen</h3><span id="templateResultCount" role="status"></span><div class="template-slider-controls"><button id="templatePrevious" aria-label="Vorherige Vorlagen">${studioIcon("back")}</button><button id="templateNext" aria-label="Weitere Vorlagen">${studioIcon("front")}</button></div></div><div class="template-search-fields"><label>Vorlagen suchen<input type="search" id="templateSearch" placeholder="Name oder Beschreibung"></label><label>Sammlung<select id="templateOrigin"><option value="all">Alle Vorlagen</option><option value="builtin">Mitgeliefert</option><option value="own">Eigene Vorlagen</option></select></label></div><div id="templateCards" class="template-slider" role="group" aria-label="Vorlagen"></div><p id="templateEmpty" role="status" hidden>Keine passende Vorlage. Ändere die Suche oder die Sammlung.</p></section><form id="templateFill" hidden novalidate><div class="template-fill-heading"><button type="button" id="templateChangeChoice">${studioIcon("back")}Andere Vorlage wählen</button><span class="template-step-label">2 · Inhalte einsetzen</span><h3 id="templateFillTitle"></h3><p id="templateFillDescription"></p></div><div class="template-content-fields"><h3>Projekt benennen</h3><div class="setup-project-fields"><label>Projektname<input id="templateProjectName" maxlength="80" required placeholder="Zum Beispiel: Saisonauftakt"></label><label>Kürzel<input id="templateProjectCode" maxlength="24" placeholder="E2"></label></div><p id="templateFillProgress" role="status"></p><label class="template-area-filter">Inhalte anzeigen<select id="templateAreaFilter"><option value="all">Alle Zeichenflächen</option></select></label><div id="templateLayers"></div></div><aside id="templateLivePreview"></aside></form><div class="template-footer"><p id="templateStatus" role="status" aria-live="polite"></p><button id="templateCreate" class="primary" disabled>Im Designer öffnen</button></div>`;
     document.body.append(dialog);
-    livePreview = MKWTemplateFillPreview.attach($("#templateLivePreview"));
+    livePreview = MKWTemplateFillPreview.attach(
+      $("#templateLivePreview"),
+      ({ objectId, channel }) => {
+        if (creating || pending || !selectedTemplate || !dialog.open) return;
+        const field = dialog.querySelector(
+            `[data-template-layer="${CSS.escape(objectId)}"]`,
+          ),
+          input = field?.querySelector(
+            `[data-template-upload][data-channel="${channel}"]`,
+          );
+        if (!input || input.disabled) return;
+        if (field.hidden) {
+          $("#templateAreaFilter").value = "all";
+          filterLayers();
+        }
+        input.click();
+      },
+    );
     $("#closeTemplateGallery").onclick = () => {
       if (!creating) dialog.close();
     };

@@ -1,6 +1,6 @@
 # MKW Studio – verbindlicher Masterplan
 
-Stand: **19. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
+Stand: **24. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
 
 **Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
@@ -190,14 +190,9 @@ Gemeinsame Fläche und Export-Schnitte nutzen bereits das vorhandene Gruppenmode
 
 **Nutzen:** Weniger Typografie-Handarbeit für beide Nutzergruppen, nachvollziehbare Bedienung ohne Gestaltungswissen. **Fertig, wenn:** Format bei Cursor in Absatz 2 den ganzen zweiten Absatz ändert, die Nachbarabsätze unverändert bleiben und weiche Umbrüche, Undo/Redo, Speicherung und Export stimmen.
 
-### 5 · Bildplatzhalter direkt befüllbar machen — P1 / T02
+### 5 · Bildplatzhalter — T02 erledigt am 24. November
 
-- Jeder Bildrahmen erhält eine andere stabile Pastellfarbe, einen verständlichen Namen und eine sichtbare Ersetzen-Aktion.
-- Anklicken öffnet die Bildauswahl; Ersetzen behält Rahmenform, Position und Gestaltung. Dieselbe Aktion ersetzt später ein schon eingefügtes Bild. Tastaturalternative und Abbruch erhalten.
-- Vorschau, Befüllfelder und tatsächlicher Rahmen beziehen sich auf dasselbe Ziel. Vorhandene Hintergrund-/Winkel-Bildverknüpfung bewahren.
-- Platzhalter als leichte Designinformation speichern; keine unnötigen Bilddateien je Farbfeld erzeugen.
-
-**Nutzen:** Einsteigerinnen erkennen direkt, wo ihre Bilder erscheinen; erfahrene Nutzer befüllen schneller. **Fertig, wenn:** Mehrere Plätze eindeutig zuordenbar sind, Ersetzen/Abbrechen/Undo/MKW/Setup funktionieren und keine Information nur durch Farbe vermittelt wird.
+Stabile unterschiedliche Pastellplätze mit Nummern, direkte Bildauswahl/-ersetzung in der Vorschau und bestehende benannte Tastaturfelder. Die ursprüngliche Vorlage und die Rahmengeometrie bleiben erhalten; kein Platzhalterasset im echten Projekt. Status und Abschlussprüfung unter **D33**, [Prüfbericht](TEMPLATE-PLACEHOLDERS-REVIEW-2026-11-24.md).
 
 ### 6 · Gemeinsame Oberfläche im Hintergrund vorbereiten — P1 / L01
 
@@ -318,3 +313,4 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D30 | A01: normale Reihe bleibt eine durchgehende Fläche mit Panorama, Text, Verlauf, Form und Winkel/FX; vorhandenes Gruppenmodell beibehalten | Bewegung pixelgleich, neue Slide erhält Ausschnitte, andere Reihe unverändert, Zoom/MKW. PNG-Schnitte vs. Gesamtreferenz: maximale Kanaldifferenz 20/255, mittlere 0,00294/255; Rastertoleranz ausdrücklich, kein verlustfreies Vektorversprechen. Explizite Altmasken bleiben erhalten. | [x] Chrome/Firefox/Live, siehe Bericht |
 | D31 | W01/E02: zentrale neue Winkel-Defaults 200/50/0,8; Bild/Farbfüllung mit bestehender Deckkraft, Crop beim Zurückwechseln erhalten | Gemeinsame Picker-/Geometrie-/Effektpfade, MKW, Vorlagen ohne erzwungenes Bild, echte PNG/PDF/PSD-Pixel inkl. Transparenz und FD-Adapter. PSD mit Rasterreferenz plus editierbarer Füllung/Maske; keine native Gesamt-FX-Abnahme behauptet. | [x] Chrome/Firefox/Live, siehe Bericht |
 | D32 | MKW-Drop-Feld im Öffnen-Dialog und Drop auf Startkarte; bisheriger Klick-/Tastaturweg bleibt | Alle drei MKW-Leser, beschädigte/mehrere Dateien, ungesicherte Quelle, Busy/Fokus, Themes und Tabletfenster geprüft. [Bericht](PROJECT-DROP-REVIEW-2026-11-19.md). | [x] `742102e`, 123 Chrome-/108 Firefox-Suiten, Pages und Live |
+| D33 | T02: unterschiedliche Pastell-Bildplätze mit Nummer/Ebenenname und direktem Ersetzen in der Vorlagenvorschau; Winkel wählen ihr Quellbild | **Erledigt – nochmals prüfen für Abschluss.** 224 Modelltests, Format/Build und sieben lokale Chromium-Suiten erfolgreich. Native Dateiauswahl/Abbruch, Tastatur, Wischschutz, Masken/Rotation, axe, unveränderte Geometrie und MKW geprüft. [Nachweise](TEMPLATE-PLACEHOLDERS-REVIEW-2026-11-24.md). | [ ] GitHub-/Live-Abschluss nach Bereitstellung |

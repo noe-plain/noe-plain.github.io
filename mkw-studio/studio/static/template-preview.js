@@ -1,37 +1,27 @@
 "use strict";
 const MKWTemplatePreview = (() => {
-  const cache = new Map();
-  let queue = Promise.resolve(),
-    placeholder;
-  function placeholderAsset() {
-    if (placeholder) return placeholder;
-    const c = makeCanvas(600, 600),
+  const cache = new Map(),
+    placeholders = new Map();
+  let queue = Promise.resolve();
+  function placeholderAsset(colour) {
+    if (placeholders.has(colour)) return placeholders.get(colour);
+    const c = makeCanvas(1, 1),
       ctx = c.getContext("2d");
-    ctx.fillStyle = "#c6d3d3";
-    ctx.fillRect(0, 0, 600, 600);
-    ctx.fillStyle = "#94adad";
-    ctx.beginPath();
-    ctx.moveTo(0, 600);
-    ctx.lineTo(220, 230);
-    ctx.lineTo(400, 440);
-    ctx.lineTo(510, 310);
-    ctx.lineTo(600, 430);
-    ctx.lineTo(600, 600);
-    ctx.fill();
-    ctx.fillStyle = "#e9eeee";
-    ctx.beginPath();
-    ctx.arc(420, 145, 55, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = colour;
+    ctx.fillRect(0, 0, 1, 1);
     const data = c.toDataURL();
-    c.width = c.height = 1;
-    return (placeholder = {
-      id: "template-preview",
+    const asset = {
+      id: "template-preview-" + colour.slice(1),
       name: "Bildplatzhalter",
       data,
       original: data,
-      width: 600,
-      height: 600,
-    });
+      width: 1,
+      height: 1,
+    };
+    if (placeholders.size >= 1000)
+      placeholders.delete(placeholders.keys().next().value);
+    placeholders.set(colour, asset);
+    return asset;
   }
   async function paint(
     template,
@@ -39,19 +29,19 @@ const MKWTemplatePreview = (() => {
     slide = 0,
     isCurrent = () => true,
   ) {
-    const asset = placeholderAsset(),
-      values = Object.create(null);
+    const values = Object.create(null);
     for (const o of template.carousel.objects) {
       const value = Object.hasOwn(fields, o.id) ? fields[o.id] : {};
-      values[o.id] = {
-        ...value,
-        image: value.image || asset,
-        stroke: value.stroke || asset,
-      };
+      values[o.id] = { ...value };
     }
+    for (const slot of MKWTemplateModel.imageSlots(template))
+      values[slot.objectId][slot.channel] ||= placeholderAsset(slot.colour);
     const result = MKWTemplateModel.instantiate(template, { values }),
       q = MKWTemplates.documentFor(result),
       c = q.carousel;
+    for (const o of c.objects)
+      if (o.imageId?.startsWith("template-preview-"))
+        Object.assign(o, { scale: 1, panX: 0, panY: 0, imageAngle: 0 });
     const frame = MKWCarouselPolicy.frame(c, slide),
       scale = Math.min(420 / frame.w, 520 / frame.h),
       canvas = makeCanvas(
@@ -95,5 +85,51 @@ const MKWTemplatePreview = (() => {
     while (cache.size > 24) cache.delete(cache.keys().next().value);
     return task;
   }
-  return { render, paint };
+  const hitContext = makeCanvas(1, 1).getContext("2d");
+  function imageAt(template, point) {
+    const c = template.carousel;
+    for (const o of [...c.objects].reverse()) {
+      if (!MKWTemplateModel.visible(o, c) || o.opacity === 0) continue;
+      const clip = MKWCarouselPolicy.contentFrame(c, o);
+      if (
+        clip &&
+        (point.x < clip.x ||
+          point.x > clip.x + clip.w ||
+          point.y < clip.y ||
+          point.y > clip.y + clip.h)
+      )
+        continue;
+      const local = carouselToLocal(o, point);
+      let path;
+      if (o.type === "angle") path = carouselAngleMask(o);
+      else if (carouselIsVector(o)) path = carouselVectorPath(o);
+      else if (["image", "gradient"].includes(o.type))
+        path = carouselImageMask(o);
+      else continue;
+      if (
+        o.strokeMode === "image" &&
+        o.strokeEnabled !== false &&
+        o.strokeWidth > 0
+      ) {
+        carouselVectorStroke(hitContext, o);
+        if (hitContext.isPointInStroke(path, local.x, local.y))
+          return { objectId: o.id, channel: "stroke" };
+      }
+      if (!hitContext.isPointInPath(path, local.x, local.y)) continue;
+      if (
+        MKWTemplateModel.imageLayer(o) &&
+        (!carouselIsVector(o) ||
+          (o.fillEnabled !== false && (o.type === "shape" || o.closed)))
+      )
+        return { objectId: o.id, channel: "image" };
+      if (o.type === "angle" && !MKWAnglePolicy.solid(o)) {
+        const source = template.slots.find(
+          (s) => s.objectId === o.id,
+        )?.sourceId;
+        if (source) return { objectId: source, channel: "image" };
+      }
+    }
+    return null;
+  }
+  return { render, paint, imageAt };
 })();

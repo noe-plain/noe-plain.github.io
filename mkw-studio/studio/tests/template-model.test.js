@@ -191,3 +191,57 @@ test("discarded empty folders do not leave undefined anchors in instantiated des
   const filled = model.instantiate(saved);
   assert.equal(filled.carousel.folders[0].before, null);
 });
+
+test("image placeholders have stable distinct pastel colours and independent named fill/stroke slots", () => {
+  const t = fixture(),
+    before = JSON.stringify(t),
+    slots = model.imageSlots(t);
+  assert.equal(JSON.stringify(t), before);
+  assert.deepEqual(model.imageSlots(t), slots);
+  assert.equal(
+    slots.length,
+    t.carousel.objects.filter(model.imageLayer).length,
+  );
+  assert.equal(new Set(slots.map((s) => s.colour)).size, slots.length);
+  assert(
+    slots.every(
+      (s) => /^#[0-9a-f]{6}$/.test(s.colour) && s.channel === "image",
+    ),
+  );
+  assert(
+    !slots.some(
+      (s) =>
+        t.carousel.objects.find((o) => o.id === s.objectId).type === "angle",
+    ),
+  );
+  const many = {
+    carousel: {
+      objects: Array.from({ length: 500 }, (_, i) => ({
+        id: "image-" + i,
+        type: "shape",
+        fillMode: "image",
+        strokeMode: "image",
+      })),
+    },
+  };
+  const all = model.imageSlots(many);
+  assert.equal(all.length, 1000);
+  assert.equal(new Set(all.map((s) => s.colour)).size, 1000);
+  assert.deepEqual(
+    all
+      .slice(0, 2)
+      .map(({ objectId, channel, number }) => ({ objectId, channel, number })),
+    [
+      { objectId: "image-0", channel: "image", number: 1 },
+      { objectId: "image-0", channel: "stroke", number: 2 },
+    ],
+  );
+  assert(
+    all.every((s) =>
+      s.colour
+        .slice(1)
+        .match(/../g)
+        .every((v) => parseInt(v, 16) >= 150),
+    ),
+  );
+});

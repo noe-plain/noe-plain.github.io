@@ -1,7 +1,7 @@
 "use strict";
 const MKWTemplateFillPreview = (() => {
-  function attach(host) {
-    host.innerHTML = `<div class="template-live-heading"><h3>Vorschau</h3><span id="templatePreviewCount" aria-live="polite"></span></div><div class="template-instagram"><div class="template-instagram-header"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Winterthur"><span>Dein Beitrag</span></div><div class="template-artwork-track" role="group" tabindex="0" aria-label="Slide-Vorschau · nach links oder rechts wischen"></div><div class="template-preview-navigation"><button type="button" data-preview-step="-1" aria-label="Vorherige Slide in der Vorschau">${studioIcon("back")}</button><div class="template-preview-dots" role="group" aria-label="Slide auswählen"></div><button type="button" data-preview-step="1" aria-label="Nächste Slide in der Vorschau">${studioIcon("front")}</button></div></div><p class="template-preview-status" role="status"></p><small>Aktualisiert sich mit deinen Eingaben. Neutrale Bildflächen sind Platzhalter.</small>`;
+  function attach(host, chooseImage = () => {}) {
+    host.innerHTML = `<div class="template-live-heading"><h3>Vorschau</h3><span id="templatePreviewCount" aria-live="polite"></span></div><div class="template-instagram"><div class="template-instagram-header"><img src="mkw-logo-bold-pos.svg" alt="Musikkollegium Winterthur"><span>Dein Beitrag</span></div><div class="template-artwork-track" role="group" tabindex="0" aria-label="Slide-Vorschau · nach links oder rechts wischen"></div><div class="template-preview-navigation"><button type="button" data-preview-step="-1" aria-label="Vorherige Slide in der Vorschau">${studioIcon("back")}</button><div class="template-preview-dots" role="group" aria-label="Slide auswählen"></div><button type="button" data-preview-step="1" aria-label="Nächste Slide in der Vorschau">${studioIcon("front")}</button></div></div><p class="template-preview-status" role="status"></p><small>Klicke auf ein Bild, um es einzusetzen oder zu ersetzen. Die farbigen Plätze gehören zu den benannten Bildfeldern links; diese sind auch per Tastatur bedienbar.</small>`;
     const track = host.querySelector(".template-artwork-track"),
       dots = host.querySelector(".template-preview-dots"),
       status = host.querySelector(".template-preview-status");
@@ -13,7 +13,47 @@ const MKWTemplateFillPreview = (() => {
       timer = null,
       painting = false,
       active = false,
-      highlighted = null;
+      highlighted = null,
+      pointerStart = null;
+    track.addEventListener("pointerdown", (event) => {
+      pointerStart =
+        event.button === 0
+          ? { x: event.clientX, y: event.clientY, scroll: track.scrollLeft }
+          : null;
+    });
+    track.addEventListener("pointercancel", () => {
+      pointerStart = null;
+    });
+    track.onclick = (event) => {
+      const start = pointerStart;
+      pointerStart = null;
+      if (
+        !start ||
+        !active ||
+        !template ||
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8 ||
+        Math.abs(track.scrollLeft - start.scroll) > 8
+      )
+        return;
+      const img = track.children[slide]?.querySelector("img");
+      if (event.target !== img || img.hidden || !img.naturalWidth) return;
+      const r = img.getBoundingClientRect(),
+        scale = Math.min(
+          r.width / img.naturalWidth,
+          r.height / img.naturalHeight,
+        ),
+        width = img.naturalWidth * scale,
+        height = img.naturalHeight * scale,
+        x = event.clientX - r.left - (r.width - width) / 2,
+        y = event.clientY - r.top - (r.height - height) / 2;
+      if (x < 0 || y < 0 || x > width || y > height) return;
+      const frame = MKWCarouselPolicy.frame(template.carousel, slide),
+        slot = MKWTemplatePreview.imageAt(template, {
+          x: frame.x + (x / width) * frame.w,
+          y: frame.y + (y / height) * frame.h,
+        });
+      if (slot) chooseImage(slot);
+    };
     function highlight() {
       for (const mark of track.querySelectorAll(".template-location"))
         mark.remove();
@@ -160,7 +200,7 @@ const MKWTemplateFillPreview = (() => {
       track.innerHTML = Array.from(
         { length: t.carousel.n },
         (_, i) =>
-          `<div class="template-artwork-slide" style="aspect-ratio:${MKWCarouselPolicy.frame(t.carousel, i).w}/${MKWCarouselPolicy.frame(t.carousel, i).h}" role="group" aria-label="${esc(MKWCarouselPolicy.frame(t.carousel, i).name || `Slide ${i + 1}`)}"><img alt="Dein Design · Slide ${i + 1}" hidden><span>Slide ${i + 1}</span></div>`,
+          `<div class="template-artwork-slide" style="aspect-ratio:${MKWCarouselPolicy.frame(t.carousel, i).w}/${MKWCarouselPolicy.frame(t.carousel, i).h}" role="group" aria-label="${esc(MKWCarouselPolicy.frame(t.carousel, i).name || `Slide ${i + 1}`)}"><img alt="Dein Design · Slide ${i + 1}" title="Bild anklicken zum Einsetzen oder Ersetzen" hidden><span>Slide ${i + 1}</span></div>`,
       ).join("");
       dots.innerHTML = Array.from(
         { length: t.carousel.n },
@@ -198,6 +238,7 @@ const MKWTemplateFillPreview = (() => {
       clearTimeout(timer);
       template = null;
       readValues = null;
+      pointerStart = null;
       track.replaceChildren();
       dots.replaceChildren();
       pruneImageCache();

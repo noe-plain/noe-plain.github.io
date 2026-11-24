@@ -57,6 +57,41 @@
     o.type === "image" ||
     (["path", "shape"].includes(o.type) && o.fillMode === "image") ||
     (o.type === "gradient" && o.gradientFillMode === "image");
+  function imageSlots(template) {
+    const used = new Set();
+    return template.carousel.objects.flatMap((o) =>
+      [
+        imageLayer(o) ? "image" : null,
+        o.strokeMode === "image" ? "stroke" : null,
+      ]
+        .filter(Boolean)
+        .map((channel) => {
+          const index = used.size;
+          let attempt = 0,
+            colour;
+          do {
+            const h = ((index * 137.507764 + attempt * 17) % 360) / 30,
+              light = 0.8 + ((index + attempt) % 5) * 0.012,
+              saturation = 0.56 + ((index + attempt) % 3) * 0.06,
+              a = saturation * Math.min(light, 1 - light);
+            colour =
+              "#" +
+              [0, 8, 4]
+                .map((n) => {
+                  const k = (n + h) % 12,
+                    v = light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+                  return Math.round(255 * v)
+                    .toString(16)
+                    .padStart(2, "0");
+                })
+                .join("");
+            attempt++;
+          } while (used.has(colour));
+          used.add(colour);
+          return { objectId: o.id, channel, colour, number: index + 1 };
+        }),
+    );
+  }
   function background(objects, target, carousel) {
     let images = objects.filter(imageLayer);
     if (target && carousel && policy.isFree(carousel)) {
@@ -447,6 +482,7 @@
     return copies;
   }
   const api = {
+    imageSlots,
     remapLinks,
     capture,
     validate,

@@ -382,6 +382,16 @@
   align-items: center;
   justify-content: space-between;
 }
+.template-slot-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: 6px;
+  vertical-align: -3px;
+  border-radius: 4px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--slot-colour);
+}
 #templateGallery .template-live-heading h3 {
   margin: 0;
 }
