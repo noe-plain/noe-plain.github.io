@@ -833,3 +833,47 @@ html[data-theme="dark"] .template-instagram-header img {
 html[data-theme="dark"] .template-instagram-header img {
   filter: invert(1);
 }
+
+.template-text-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.template-text-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+.template-text-controls select {
+  text-overflow: ellipsis;
+}
+.template-text-hint,
+.template-text-actions {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.template-text-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.template-text-actions > span {
+  flex: 1;
+  min-width: 0;
+}
+.template-text-actions .icon-button {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+.template-text-error {
+  color: var(--md-sys-color-error);
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  .template-text-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

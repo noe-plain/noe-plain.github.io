@@ -5,6 +5,7 @@ const MKWTemplateGallery = (() => {
     generation = 0,
     selectedTemplate = null,
     imageSlots = [],
+    textFormats = [],
     requiredImages = [],
     values = Object.create(null),
     pending = 0,
@@ -218,7 +219,7 @@ const MKWTemplateGallery = (() => {
       visible = MKWTemplateModel.visible(o, t.carousel);
     let body = "";
     if (o.type === "text")
-      body = `<label>Text<textarea data-template-text="${esc(o.id)}" aria-label="Text: ${esc(o.name)}" rows="3">${esc(values[o.id]?.text ?? o.text)}</textarea></label>`;
+      body = MKWTemplateTextFields.markup(o, values[o.id], textFormats);
     else if (o.type === "angle")
       body = `<p class="template-linked">${studioIcon("image")}Verwendet das Foto aus <strong>${esc(t.carousel.objects.find((s) => s.id === slot.sourceId)?.name)}</strong></p>`;
     else if (o.type === "logo")
@@ -261,6 +262,7 @@ const MKWTemplateGallery = (() => {
         if (current !== generation || !dialog.open) return;
         selectedTemplate = t;
         imageSlots = MKWTemplateModel.imageSlots(t);
+        textFormats = MKWTemplateTextModel.formats(t);
         const card = dialog.querySelector(
           `[data-template-id="${CSS.escape(id)}"]`,
         );
@@ -295,12 +297,19 @@ const MKWTemplateGallery = (() => {
         for (const input of dialog.querySelectorAll("[data-template-upload]"))
           input.onchange = () =>
             upload(input, input.dataset.templateUpload, input.dataset.channel);
-        for (const input of dialog.querySelectorAll("[data-template-text]"))
-          input.oninput = () => {
-            values[input.dataset.templateText] ??= {};
-            values[input.dataset.templateText].text = input.value;
-            livePreview.changed();
-          };
+        for (const input of dialog.querySelectorAll("[data-template-text]")) {
+          const id = input.dataset.templateText;
+          MKWTemplateTextFields.attach(
+            input.closest(".template-text-field"),
+            objects.get(id),
+            textFormats,
+            () => values[id] || {},
+            (next) => {
+              values[id] = next;
+              livePreview.changed();
+            },
+          );
+        }
         for (const input of dialog.querySelectorAll("[data-template-logo]")) {
           input.value =
             values[input.dataset.templateLogo]?.source || input.value;

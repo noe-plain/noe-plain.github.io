@@ -1,6 +1,6 @@
 # MKW Studio – verbindlicher Masterplan
 
-Stand: **24. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
+Stand: **25. November 2026**. Dies ist die einzige aktive Aufgaben- und Prioritätenliste. Sie vereinigt die lokalen Pläne, die bestätigten Präzisierungen dieses Chats und die Planungsdateien des aktuellen öffentlichen GitHub-Stands. Bisherige Plandateien dienen nur noch als Verweise oder gekennzeichnete historische Nachweise.
 
 **Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
@@ -178,17 +178,11 @@ Nachweis und Grenzen stehen unter **D29** und in [REVIEW-2026-11-18.md](REVIEW-2
 
 Gemeinsame Fläche und Export-Schnitte nutzen bereits das vorhandene Gruppenmodell. Gezielte Abnahme unter **D30**; kein zweites Dokumentmodell eingeführt. Explizite alte Seitenmasken/Fragmentobjekte bleiben unverändert lesbar und werden nicht ungefragt entclippt. Für abweichende Altdateien ist weiterhin ein bewusster Migrationsentscheid nötig.
 
-### 4 · Vorlagentexte mit vorbereiteten Absatzformaten — P1 / T01
+### 4 · Vorlagentexte mit vorbereiteten Absatzformaten — T01-Bedienung umgesetzt am 25. November
 
-**Abhängigkeit:** A01 für mehrseitige Vorlagen; bestehende Text-/Vorlagenmodelle wiederverwenden.
+Die beschrifteten Eingabefelder bieten aus der jeweiligen Vorlage abgeleitete Absatzformate. Cursor im Absatz oder Auswahl mehrerer Absätze bestimmt den Wirkungsbereich. Formatwahl ersetzt dort lokale Zeichenformate; benachbarte Absätze bleiben erhalten. Enter und Shift+Enter, Undo/Redo, Entwürfe und eine explizite vertikale Rahmenposition verwenden dieselbe Projektion für Vorschau und Designer.
 
-- Vorlagen beim Befüllen über beschriftete Inputfelder bearbeiten. Damit wird keine zweite Inhaltseingabe in der Editor-Seitenleiste beauftragt.
-- Vorbereitete passende Absatzformate anbieten: Anwendung auf den gesamten Absatz an der Cursorposition, auch ohne Markierung.
-- Harte Absätze und weiche Zeilenumbrüche unterscheiden. Auswahl über mehrere Absätze, lokale Zeichenabweichungen und spätere Formatänderungen vor der Umsetzung eindeutig entwerfen.
-- Texte auf Bildern unten **im Textrahmen** verankern; horizontale Ausrichtung und Rahmenposition bleiben eigene Eigenschaften.
-- Eingabe/Vorschau/Designer-Übergang zeigen dieselbe Gestaltung. Absatzgrössen folgen der bereits korrigierten Flusslogik statt in vorangehende Absätze hineinzuwachsen.
-
-**Nutzen:** Weniger Typografie-Handarbeit für beide Nutzergruppen, nachvollziehbare Bedienung ohne Gestaltungswissen. **Fertig, wenn:** Format bei Cursor in Absatz 2 den ganzen zweiten Absatz ändert, die Nachbarabsätze unverändert bleiben und weiche Umbrüche, Undo/Redo, Speicherung und Export stimmen.
+**Bestehende Gestaltungen bleiben erhalten:** Mitgelieferte/eigene Vorlagen behalten ihren gespeicherten Anker, bis ausdrücklich „Unten“ gewählt wird. Die noch angekündigten konkreten neuen Bild-/Textvorlagen werden unter **T03** nach ihren tatsächlichen Rahmen unten verankert; dafür liegen die Originale noch nicht vor. Keine automatische Umgestaltung freigegebener Vorlagen. Nachweise/Abschluss unter **D34** und im [Prüfbericht](TEMPLATE-TEXT-REVIEW-2026-11-25.md).
 
 ### 5 · Bildplatzhalter — T02 erledigt am 24. November
 
@@ -292,7 +286,7 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D09 | Direkte Texteingabe, Softbreaks, grosse Auswahlflächen, Absatz-/Zeilensynchronisierung; Inhaltseditor aus Sidebar entfernt | Schreiben ohne Ansichtswechsel/-sprung, Scope richtig, Details unter Hauptfunktionen. Vorlagen-Input T01 ist ein anderer Ablauf. | [ ] |
 | D10 | Rich-/Plain-Copy/Paste, proportionale Textskalierung und numerische Alternative | Native Tasten und Menü, Formatgrenzen, Sperren, Undo/Redo, gemischte Schriftgrössen und MKW. | [ ] |
 | D11 | Absatzgrösse nach vollständiger Markierung/Dreifachklick | Absatz erhält passende Höhe, vorige Absätze unverändert, folgende rücken mit; bei Altdaten vorhandene Regeln nicht heimlich ändern. | [ ] |
-| D12 | Ausrichtung/Blocksatz, Schweizer Silbentrennung, Absatz-/Zeilenwerte, Gross-/Hochstellung und Familienfarben | Gemeinsame Layout-/Inline-/Exporttreue, Auswahlumfang, Copyright ohne Familienkontur; benannte Vorlagen-Absatzformate unter T01 bleiben neue Arbeit. | [ ] |
+| D12 | Ausrichtung/Blocksatz, Schweizer Silbentrennung, Absatz-/Zeilenwerte, Gross-/Hochstellung und Familienfarben | Gemeinsame Layout-/Inline-/Exporttreue, Auswahlumfang, Copyright ohne Familienkontur; Vorlagen-Absatzformate unter D34 separat abgenommen. | [ ] |
 | D13 | Winkel/Bildrahmen, Masken, Inhalt-/Rahmentrennung, Drehen, Snapping und sichtbarkeitsbezogene Abdeckungswarnungen | Exportrahmen und echte sichtbare Lücken; neue Defaults W01/Farbfüllung E02 unter D31 separat abgenommen. | [ ] |
 | D14 | Pfad-/Kurven-/Formwerkzeuge, Fortsetzen/Verbinden, Mehrfachpunkte, Raster/Schutzzonen und Ebenen/Ordner/FX | Kurven-/Auswahl-/Undo-Zustände, Masken und reihenbezogene Zugehörigkeit; Formvorschau separat unter E01 geprüft. | [ ] |
 | D15 | Sponsorenleisten und Gruppen, Gewichtung, Reihenfolge, automatische Darstellung, anpassbare Farbe | Heller/dunkler Hintergrund, JPG-Hintergründe, Gruppenbeschriftung und optisch stabile Logogrösse. | [ ] |
@@ -313,4 +307,5 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D30 | A01: normale Reihe bleibt eine durchgehende Fläche mit Panorama, Text, Verlauf, Form und Winkel/FX; vorhandenes Gruppenmodell beibehalten | Bewegung pixelgleich, neue Slide erhält Ausschnitte, andere Reihe unverändert, Zoom/MKW. PNG-Schnitte vs. Gesamtreferenz: maximale Kanaldifferenz 20/255, mittlere 0,00294/255; Rastertoleranz ausdrücklich, kein verlustfreies Vektorversprechen. Explizite Altmasken bleiben erhalten. | [x] Chrome/Firefox/Live, siehe Bericht |
 | D31 | W01/E02: zentrale neue Winkel-Defaults 200/50/0,8; Bild/Farbfüllung mit bestehender Deckkraft, Crop beim Zurückwechseln erhalten | Gemeinsame Picker-/Geometrie-/Effektpfade, MKW, Vorlagen ohne erzwungenes Bild, echte PNG/PDF/PSD-Pixel inkl. Transparenz und FD-Adapter. PSD mit Rasterreferenz plus editierbarer Füllung/Maske; keine native Gesamt-FX-Abnahme behauptet. | [x] Chrome/Firefox/Live, siehe Bericht |
 | D32 | MKW-Drop-Feld im Öffnen-Dialog und Drop auf Startkarte; bisheriger Klick-/Tastaturweg bleibt | Alle drei MKW-Leser, beschädigte/mehrere Dateien, ungesicherte Quelle, Busy/Fokus, Themes und Tabletfenster geprüft. [Bericht](PROJECT-DROP-REVIEW-2026-11-19.md). | [x] `742102e`, 123 Chrome-/108 Firefox-Suiten, Pages und Live |
-| D33 | T02: unterschiedliche Pastell-Bildplätze mit Nummer/Ebenenname und direktem Ersetzen in der Vorlagenvorschau; Winkel wählen ihr Quellbild | **Erledigt – nochmals prüfen für Abschluss.** 224 Modelltests, Format/Build und sieben lokale Chromium-Suiten erfolgreich. Native Dateiauswahl/Abbruch, Tastatur, Wischschutz, Masken/Rotation, axe, unveränderte Geometrie und MKW geprüft. [Nachweise](TEMPLATE-PLACEHOLDERS-REVIEW-2026-11-24.md). | [ ] GitHub-/Live-Abschluss nach Bereitstellung |
+| D33 | T02: unterschiedliche Pastell-Bildplätze mit Nummer/Ebenenname und direktem Ersetzen in der Vorlagenvorschau; Winkel wählen ihr Quellbild | **Erledigt – nochmals prüfen für Abschluss.** 224 Modelltests, Format/Build und sieben lokale Chromium-Suiten erfolgreich. Native Dateiauswahl/Abbruch, Tastatur, Wischschutz, Masken/Rotation, axe, unveränderte Geometrie und MKW geprüft. [Nachweise](TEMPLATE-PLACEHOLDERS-REVIEW-2026-11-24.md). | [x] [Chromium/Firefox/Windows](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45356450683), Pages und Live erfolgreich |
+| D34 | T01: Vorlagen-Absatzformate am Cursor/über mehrere Absätze, Softbreaks, lokale Text-/Format-/Anker-Historie und explizite untere Rahmenposition | **Erledigt – nochmals prüfen für Abschluss.** 231 Modelltests; Galerie → Eingabe → Designer → MKW und pixelgleiche befüllte Vorschau/Designer geprüft. Bestehende Layouts bleiben erhalten; konkrete Nutzervorlagen weiterhin T03. [Nachweise](TEMPLATE-TEXT-REVIEW-2026-11-25.md). | [ ] Vollständige neue GitHub-/Live-Abnahme nach Bereitstellung |
