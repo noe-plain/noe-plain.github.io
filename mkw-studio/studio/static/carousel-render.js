@@ -254,6 +254,20 @@ async function carouselPaint(
       ctx.restore();
       continue;
     }
+    if (
+      o.type === "logo" &&
+      campaignFrames?.has(o.pageId) &&
+      (await MKWCampaignMigration.paintLogo(
+        ctx,
+        o,
+        campaignBoards.get(o.pageId),
+        campaignFrames.get(o.pageId),
+        project,
+      ))
+    ) {
+      ctx.restore();
+      continue;
+    }
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
     ctx.translate(o.x, o.y);

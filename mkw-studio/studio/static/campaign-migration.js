@@ -217,6 +217,34 @@ const MKWCampaignMigration = (() => {
     ctx.restore();
     return true;
   }
+  async function paintLogo(ctx, logo, board, frame, project) {
+    const original = board?.elements.logo;
+    if (
+      !original?.visible ||
+      logo.campaignRole !== "logo" ||
+      logo.source !== original.source ||
+      (logo.opacity ?? 1) !== 1 ||
+      (logo.blend || "source-over") !== "source-over" ||
+      (logo.angle || 0) !== (original.angle || 0) ||
+      logo.w !== original.size ||
+      Math.abs(logo.x - frame.x - original.x) >= 1e-7 ||
+      Math.abs(logo.y - frame.y - original.y) >= 1e-7
+    )
+      return false;
+    const bitmap = await carouselLogoImage(logo, project);
+    if (Math.abs(logo.h - (logo.w * bitmap.height) / bitmap.width) >= 1e-7)
+      return false;
+
+    // The old editor clips the logo at the safe zone edge, including subpixel edges.
+    ctx.save();
+    ctx.translate(frame.x, frame.y);
+    const strip = MKWSponsors.layout(board);
+    if (strip) carouselClipFrames(ctx, [{ x: 0, y: 0, ...strip.content }]);
+    carouselClipFrames(ctx, [MKWLayout.safeRect(board)]);
+    drawLogo(ctx, board, bitmap);
+    ctx.restore();
+    return true;
+  }
   async function paintLogoShadow(ctx, logo, board, frame, project) {
     const area = MKWSponsors.layout(board)?.content || frame;
     const bitmap = await carouselLogoImage(logo, project);
@@ -239,6 +267,7 @@ const MKWCampaignMigration = (() => {
     titles,
     paintText,
     paintContrast,
+    paintLogo,
     paintLogoShadow,
   });
 })();

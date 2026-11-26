@@ -217,13 +217,43 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         png8: false,
         quality: 95,
       };
-      const hash = async (blob) =>
-        [
-          ...new Uint8Array(
-            await crypto.subtle.digest("SHA-256", await blob.arrayBuffer()),
-          ),
-        ].join(",");
-      const before = await hash((await encodedBoard(p.boards[2], png)).blob);
+      const readPNG = async (b) => {
+        const file = await encodedBoard(b, png);
+        const bitmap = await createImageBitmap(file.blob);
+        const canvas = makeCanvas(bitmap.width, bitmap.height);
+        const ctx = exportContext(canvas);
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        canvas.width = canvas.height = 1;
+        return pixels;
+      };
+      const before = await readPNG(p.boards[2]);
+      const compare = (image) => {
+        if (image.width !== before.width || image.height !== before.height)
+          throw Error("PNG dimensions changed");
+        let changed = 0,
+          max = 0;
+        const box = [before.width, before.height, 0, 0];
+        for (let i = 0; i < before.data.length; i += 4) {
+          const delta = Math.max(
+            Math.abs(before.data[i] - image.data[i]),
+            Math.abs(before.data[i + 1] - image.data[i + 1]),
+            Math.abs(before.data[i + 2] - image.data[i + 2]),
+            Math.abs(before.data[i + 3] - image.data[i + 3]),
+          );
+          if (!delta) continue;
+          changed++;
+          max = Math.max(max, delta);
+          const x = (i / 4) % before.width;
+          const y = Math.floor(i / 4 / before.width);
+          box[0] = Math.min(box[0], x);
+          box[1] = Math.min(box[1], y);
+          box[2] = Math.max(box[2], x);
+          box[3] = Math.max(box[3], y);
+        }
+        return { changed, max, ...(changed && { box }) };
+      };
       const safe = p.boards.map((b) => MKWLayout.safeRect(b));
       const fractionalFormat = {
         w: 600,
@@ -240,7 +270,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       await MKWCampaignUI.convert({ confirmed: true });
       if (!p.campaign) throw Error($("#status").textContent);
       const dimension = p.boards.map((b) => [b.w, b.h]);
-      const after = await hash((await encodedBoard(p.boards[2], png)).blob);
+      const after = compare(await readPNG(p.boards[2]));
       const marginKeys = ["left", "right", "top", "bottom"];
       const exactMargins = () =>
         p.carousel.artboards.every((frame, i) =>
@@ -288,12 +318,11 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       return {
         fractionalMigration,
         fractionalReopened: exactMargins() && exactUsableArea(),
-        reopenedPNGEqual:
-          before === (await hash((await encodedBoard(p.boards[2], png)).blob)),
+        reopenedPNG: compare(await readPNG(p.boards[2])),
         dimension,
         originalDimension: source.project.boards.map((b) => [b.w, b.h]),
         originalUntouched: !source.project.campaign && p.projectId !== sourceId,
-        pngEqual: before === after,
+        png: after,
         pdfSize: pdfDoc.getPage(0).getSize(),
         smallPDF: [small.pdfImage.w, small.pdfImage.h],
         reopened: p.boards.map((b) => [b.w, b.h]),
@@ -313,13 +342,13 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     assert(
       legacy.fractionalMigration &&
         legacy.fractionalReopened &&
-        legacy.reopenedPNGEqual,
+        legacy.reopenedPNG.changed === 0,
       JSON.stringify(legacy),
     );
     assert.deepEqual(legacy.originalDimension, legacy.dimension);
     assert.deepEqual(legacy.reopened, legacy.dimension);
     assert(
-      legacy.originalUntouched && legacy.pngEqual && legacy.editable,
+      legacy.originalUntouched && legacy.png.changed === 0 && legacy.editable,
       JSON.stringify(legacy),
     );
     assert.deepEqual(legacy.pdfSize, { width: 4500, height: 300 });
