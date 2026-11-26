@@ -1,0 +1,255 @@
+{
+  "browser": "158.0.8127.37",
+  "platform": "darwin",
+  "kind": "Local Chrome baseline; synthetic 64px photo; save-data skips subject detection; no before/after optimization claim",
+  "runs": [
+    {
+      "mode": "carousel",
+      "attempt": 1,
+      "startReadyMs": 322,
+      "setupThroughRealCreateMs": 277,
+      "firstWorkspaceIncludingImportMs": 306,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "preview",
+      "switchThroughRealNewProjectMs": 214,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    },
+    {
+      "mode": "carousel",
+      "attempt": 2,
+      "startReadyMs": 222,
+      "setupThroughRealCreateMs": 158,
+      "firstWorkspaceIncludingImportMs": 191,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "preview",
+      "switchThroughRealNewProjectMs": 213,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    },
+    {
+      "mode": "carousel",
+      "attempt": 3,
+      "startReadyMs": 219,
+      "setupThroughRealCreateMs": 159,
+      "firstWorkspaceIncludingImportMs": 191,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "preview",
+      "switchThroughRealNewProjectMs": 213,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    },
+    {
+      "mode": "preview",
+      "attempt": 1,
+      "startReadyMs": 213,
+      "setupThroughRealCreateMs": 124,
+      "firstWorkspaceIncludingImportMs": 208,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "carousel",
+      "switchThroughRealNewProjectMs": 179,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    },
+    {
+      "mode": "preview",
+      "attempt": 2,
+      "startReadyMs": 214,
+      "setupThroughRealCreateMs": 111,
+      "firstWorkspaceIncludingImportMs": 192,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "carousel",
+      "switchThroughRealNewProjectMs": 179,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    },
+    {
+      "mode": "preview",
+      "attempt": 3,
+      "startReadyMs": 157,
+      "setupThroughRealCreateMs": 114,
+      "firstWorkspaceIncludingImportMs": 191,
+      "startResources": [
+        "/static/editor.bundle.css",
+        "/static/vendor/ag-psd.js",
+        "/static/vendor/paper-core.min.js",
+        "/static/editor.bundle.js"
+      ],
+      "entryResources": [],
+      "sharedAtStart": {
+        "toolbar": "function",
+        "workspace": "function",
+        "sidebar": "function",
+        "layers": "function",
+        "icons": "function",
+        "picker": "function",
+        "typography": "object",
+        "campaign": "object"
+      },
+      "editorsAtStart": 0,
+      "helpAtStart": 0,
+      "editors": 1,
+      "workspaces": 1,
+      "sidebars": 1,
+      "helpFrames": 0,
+      "photos": 1,
+      "oppositeMode": "carousel",
+      "switchThroughRealNewProjectMs": 180,
+      "switchResources": [],
+      "switchState": {
+        "sameFunctions": true,
+        "editors": 1,
+        "workspaces": 1,
+        "sidebars": 1,
+        "helpFrames": 0
+      }
+    }
+  ],
+  "runtimeCommit": "2820be620d3ba70453188ecea1bb2494c296e170",
+  "testCorrectionCommit": "b828910"
+}
