@@ -68,3 +68,10 @@ B02 bleibt insgesamt offen. Diese Bereinigung ist kein Ersatz für die noch fehl
 ## Veröffentlichung des Funktionsstands
 
 `f7bedad` ist auf main und über [GitHub Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45836765980) erfolgreich veröffentlicht. HTML, JS/CSS, Icon-Sprite und Wiki-Popup waren SHA256-identisch mit diesem Commit. Auf der Live-Seite bestanden `backup-safe-copy`, `text-frame-controls` und die vereinigte `campaign-conversion-guard`-Prüfung (3/3). Der vollständige [Chromium-/Firefox-/Windows-Lauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45836766693) läuft bei diesem Zwischenstand noch; Windows bestand bereits. Keine abgeschlossene Firefox-Abnahme dieses neuen Stands behauptet.
+
+
+## Abschliessende Auslieferung der Bereinigung
+
+`82dbe79` ist auf main und [Pages 45837503047](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45837503047) erfolgreich. Die automatisch erzeugte Pages-Metadatenzeile nennt noch den vorherigen Commit; die tatsächlich ausgelieferten Dateien wurden deshalb direkt mit `git show 82dbe79` verglichen: HTML, JS, bereinigtes CSS, Icon-Sprite und Wiki-Popup sind bytegleich. Die gemeinsame Text-/Winkel-/Kartenprüfung bestand auf diesem finalen Live-Stand erneut (1/1).
+
+Der [vollständige GitHub-Lauf 45837503600](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45837503600) ist bei diesem Nachtrag noch in Arbeit. Windows ZIP ist erfolgreich, Chromium und Firefox prüfen weiterhin ihre vollständigen Browserlisten. Diese externe Endkontrolle bleibt offen, bis ihr tatsächliches Ergebnis vorliegt. Die bereits durchgeführten lokalen und Live-Prüfungen bleiben oben getrennt dokumentiert.
