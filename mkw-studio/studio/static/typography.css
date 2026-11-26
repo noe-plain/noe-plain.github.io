@@ -150,13 +150,6 @@
   display: block;
 }
 
-.advanced-mode .carousel-text-anchor {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.advanced-mode .carousel-text-anchor button {
-  padding-inline: 5px;
-  gap: 4px;
-}
 .typo-visible {
   flex-direction: row !important;
   align-items: center !important;

@@ -46,3 +46,25 @@ Dies ist eine fachliche Prüfung mit automatisierten Interaktionsnachweisen und 
 - Keine manuelle VoiceOver-/NVDA-, physische Touch-, Photoshop- oder InDesign-Abnahme. Synthetische Dateiprüfungen ersetzen keine weiteren echten Nutzervorlagen oder Nutzerstudien.
 
 Vor dem Push wurden die inzwischen veröffentlichten Teilpixel-/Logo-Korrekturen (`ced0612`, `b27e308`) übernommen. Ihre erweiterten Pixel-/Schutzzonenprüfungen und der Ein-Pixel-Innenbereich bleiben erhalten. Die Revisions-/Projekt-ID-Sicherung während der Vorbereitung und die neuen Bedienungsänderungen ergänzen diesen Stand.
+
+
+## Fortsetzung nach dem Push · belegte Bereinigung
+
+Nach Veröffentlichung des Funktionsstands wurden die fünf verwaisten `.carousel-text-anchor`-Selektoren aus drei Stylesheets entfernt. Die Klasse wird nach der Zusammenlegung der vertikalen Ausrichtung in keiner Quell-Markup-Funktion mehr erzeugt. Der Suchabgleich umfasst auch Tests und Wiki; keine weitere Verwendung ausserhalb der entfernten Regeln. Bestehende gemeinsame Text-/Ebenen-/Backup-Funktionen wurden nicht entfernt.
+
+Entfernt: 539 Quellbytes in 23 Zeilen; das gebündelte CSS sinkt von 314324 auf 313857 Bytes. JavaScript und Source Map bleiben SHA256-identisch zum veröffentlichten Funktionsstand. Das ist eine kleine Wartbarkeitskorrektur, kein behaupteter messbarer Geschwindigkeitsgewinn.
+
+| Persona | Abschliessende Prüfung | Status |
+| --- | --- | --- |
+| Neue Nutzerin | Weiterhin genau eine Stelle für vertikale Textposition. | Erhalten |
+| Erfahrener Nutzer | Auswahl, Mehrfachauswahl, Sperren und Undo/Redo unverändert. | Browsertest bestanden |
+| Senior UX/UI-Designerin | Gemeinsame Formen, Abstände, schmale 300-/450-px-Seitenleisten und hell/dunkel. | Vier betroffene Suiten bestanden |
+| Barrierefreiheitsexperte | 44-px-Ausrichtungsflächen, Namen, Auswahl/Fokus und Tastaturhinweise bleiben bestehen. | Automatisch geprüft; manuelle assistive Technik weiter offen |
+| Entwicklerin & QA-Testerin | Nur nicht mehr erzeugte Selektoren entfernt; JS/Map-Hashes identisch. | 233 Modelltests, Format/Build und vier Browser-Suiten bestanden |
+
+B02 bleibt insgesamt offen. Diese Bereinigung ist kein Ersatz für die noch fehlende vollständige Altdatei-/Editorabnahme.
+
+
+## Veröffentlichung des Funktionsstands
+
+`f7bedad` ist auf main und über [GitHub Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45836765980) erfolgreich veröffentlicht. HTML, JS/CSS, Icon-Sprite und Wiki-Popup waren SHA256-identisch mit diesem Commit. Auf der Live-Seite bestanden `backup-safe-copy`, `text-frame-controls` und die vereinigte `campaign-conversion-guard`-Prüfung (3/3). Der vollständige [Chromium-/Firefox-/Windows-Lauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45836766693) läuft bei diesem Zwischenstand noch; Windows bestand bereits. Keine abgeschlossene Firefox-Abnahme dieses neuen Stands behauptet.

@@ -941,12 +941,6 @@
   overflow: visible;
 }
 
-.carousel-text-anchor [aria-pressed="true"] {
-  background: var(--md-sys-color-primary-outline);
-  border-color: var(--md-sys-color-primary-outline);
-  color: #f1f6ff;
-}
-
 .type-alignment {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

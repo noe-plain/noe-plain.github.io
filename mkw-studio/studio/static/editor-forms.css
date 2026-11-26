@@ -198,16 +198,6 @@ html[data-theme="light"] #carouselProperties {
 #carouselProperties .type-line-picker {
   margin: 14px 0 0;
 }
-#carouselProperties .carousel-text-anchor button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-}
-.carousel-text-anchor svg {
-  width: 19px;
-  height: 19px;
-}
 /* Precise format controls fit the inspector instead of inheriting wide row inputs. */
 .tool-sidebar .post-format-section {
   display: grid;
