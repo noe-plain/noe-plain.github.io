@@ -16,3 +16,7 @@ Die geschützte Umwandlung übernimmt die exakten Ränder in die Kampagnen-Artbo
 Formatierung, reproduzierbarer Build und 231 Modell-/Dateitests geprüft. Die gezielten Chromium-Prüfungen deckten Konvertierung, Familienlayout, Winkel, FD-Formatverknüpfung, PSD und ältere MKW-Speicherung ab. Die lokale «Dichterlos»-ZIP-Arbeitskopie lieferte nach der Umwandlung und Wiederöffnung erneut 18 pixelgleiche PNGs. Die Eingabedatei war danach bytegleich. Die präzisen Teilpixel-Grenzfälle entsprechen synthetischen Prüfdaten.
 
 B02 bleibt offen. Die verfügbare echte FD-Arbeitskopie belegt die reguläre Konvertierung. Für eine repräsentative Abnahme fehlen weiterhin zusätzliche echte Familien-, Winkel- und Sponsorenprojekte. FD-Backup bleibt im Studio.
+
+## Freigabe
+
+Code-Endstand `b27e308` befindet sich auf dem Hauptzweig und ist live. Der vollständige [Freigabelauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45784151535) bestand mit Chromium, Firefox und Windows. Firefox hatte im ersten Lauf eine Abweichung am Testmotiv gezeigt. Nach der Korrektur der Logo-Beschneidung prüften beide Browser die dekodierten PNG-Pixel exakt. Der [GitHub-Pages-Lauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45786787490) war erfolgreich. HTML, JavaScript und CSS stimmten bytegenau mit dem Build überein. Auf der Live-Seite bestanden die Konvertierungsprüfung und der PSD-Reihenexport.
