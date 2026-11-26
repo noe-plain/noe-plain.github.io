@@ -99,6 +99,8 @@ const MKWCampaignMigration = (() => {
     return object;
   }
   function add(q, b, frame) {
+    const target = q.boards.find((board) => board.campaignPage === frame.id);
+    if (target) target.campaignLegacyTexts = true;
     // append() supplies a visible logo for new campaigns. Imported legacy
     // documents keep their deliberate visibility instead of revealing it.
     const logo = q.carousel.objects.find(
@@ -112,6 +114,60 @@ const MKWCampaignMigration = (() => {
     if (main) q.carousel.objects.push(main);
     const credit = copyright(b, frame, layout);
     if (credit) q.carousel.objects.push(credit);
+  }
+  const recoveredRole = (key) =>
+    key === "copyright" ? "copyright" : "legacy-" + key;
+  function hiddenTexts(q, pageId) {
+    if (!q.campaign) return [];
+    const board = q.boards.find((b) => b.campaignPage === pageId),
+      objects = q.carousel?.objects.filter((o) => o.pageId === pageId) || [];
+    if (
+      !board ||
+      !(
+        board.campaignLegacyTexts ||
+        objects.some((o) =>
+          ["titles", "legacy-gradient"].includes(o.campaignRole),
+        )
+      )
+    )
+      return [];
+    return MKWLayout.keys.filter((key) => {
+      const e = board.elements[key];
+      return (
+        e.text?.trim() &&
+        (!e.visible || (key !== "copyright" && e.enabled === false)) &&
+        !objects.some((o) => o.campaignRole === recoveredRole(key))
+      );
+    });
+  }
+  function recoverText(q, frame, key) {
+    if (!hiddenTexts(q, frame.id).includes(key)) return null;
+    const source = q.boards.find((b) => b.campaignPage === frame.id),
+      board = {
+        ...clone(source),
+        w: frame.w,
+        h: frame.h,
+        safe: Object.fromEntries(
+          ["top", "bottom", "left", "right"].map((side) => [side, frame[side]]),
+        ),
+      };
+    board.elements[key].visible = true;
+    board.elements[key].enabled = true;
+    const layout = textBlock(board),
+      object =
+        key === "copyright"
+          ? copyright(board, frame, layout)
+          : titles(board, frame, {
+              ...layout,
+              mainRecords: layout.mainRecords.filter(
+                (record) => record.key === key,
+              ),
+            });
+    if (!object) return null;
+    object.campaignRole = recoveredRole(key);
+    object.campaignLocal = true;
+    object.name = elementNames[key] + " · Altdatei";
+    return object;
   }
   function contrast(b, frame, layout) {
     if (b.family?.enabled) return null;
@@ -267,6 +323,8 @@ const MKWCampaignMigration = (() => {
   return Object.freeze({
     add,
     titles,
+    hiddenTexts,
+    recoverText,
     paintText,
     paintContrast,
     paintLogo,

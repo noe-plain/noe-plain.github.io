@@ -71,7 +71,8 @@ const MKWCampaignUI = (() => {
     const row = rowFor(o.pageId, project);
     if (!row?.family) return o;
     const legacyFamily =
-        o.campaignRole === "titles"
+        o.campaignRole === "titles" ||
+        /^legacy-(date|title|subtitle)$/.test(o.campaignRole)
           ? project.boards.find((b) => b.campaignPage === o.pageId)?.family
           : null,
       signature = JSON.stringify([o, legacyFamily?.offset]),
@@ -376,7 +377,7 @@ const MKWCampaignUI = (() => {
       target = link?.targets.find((t) => t.id === o.id),
       section = document.createElement("section");
     section.className = "campaign-link-info";
-    section.innerHTML = `<strong>${!link ? "Nur diese Ausgabe" : target ? (target.overrides.length ? "Einzeln angepasst" : "Mit Formatvorlage verbunden") : "Formatvorlage"}</strong><p>${!link ? "Zusätzliche Bilder werden nicht übernommen." : target ? "Text, Position und Gestaltung können getrennt angepasst werden." : "Änderungen werden auf gleiche Formate übernommen."}</p>${target ? '<button id="campaignRelink">Alle Eigenschaften der Formatvorlage übernehmen</button>' : ""}`;
+    section.innerHTML = `<strong>${!link ? "Nur diese Ausgabe" : target ? (target.overrides.length ? "Einzeln angepasst" : "Mit Formatvorlage verbunden") : "Formatvorlage"}</strong><p>${!link ? "Diese Ebene bleibt unabhängig von den anderen Ausgaben." : target ? "Text, Position und Gestaltung können getrennt angepasst werden." : "Änderungen werden auf gleiche Formate übernommen."}</p>${target ? '<button id="campaignRelink">Alle Eigenschaften der Formatvorlage übernehmen</button>' : ""}`;
     if (items.length === 1) {
       const label = document.createElement("label");
       label.textContent = "Drehung (°)";

@@ -5,6 +5,48 @@
   color: var(--md-sys-color-on-secondary-container);
   margin-bottom: 16px;
 }
+.campaign-legacy-texts {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: var(--studio-shape-medium);
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  font-size: 12px;
+  line-height: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.campaign-legacy-texts summary {
+  min-height: 44px;
+  align-content: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+.campaign-legacy-texts p {
+  margin-block: 8px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.campaign-legacy-texts ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 16px;
+}
+.campaign-legacy-texts .campaign-legacy-preview {
+  max-height: 36px;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+.campaign-legacy-texts button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  white-space: normal;
+}
 .campaign-link-info p {
   font-size: 12px;
   line-height: 18px;

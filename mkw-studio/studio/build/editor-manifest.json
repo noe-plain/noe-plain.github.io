@@ -130,6 +130,7 @@
     "static/campaign-text-choice.js",
     "static/campaign-card-ui.js",
     "static/campaign-ui.js",
+    "static/campaign-legacy-text-ui.js",
     "static/review-comments.js",
     "static/start.js",
     "static/workspace-scroll.js"

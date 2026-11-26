@@ -598,6 +598,7 @@ async function restore(q, { beforeCommit } = {}) {
   }
   for (const l of q.logos) await image(l.data);
   beforeCommit?.();
+  clearExportCache();
   p = q;
   pruneImageCache();
   pruneCarouselEffects();

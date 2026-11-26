@@ -58,6 +58,8 @@
         textBox(b.textBox);
         if (
           bids.has(b.id) ||
+          (b.campaignLegacyTexts !== undefined &&
+            typeof b.campaignLegacyTexts !== "boolean") ||
           typeof b.id !== "string" ||
           !ids.has(b.imageId) ||
           !policy.validLegacySize(b.w, b.h) ||

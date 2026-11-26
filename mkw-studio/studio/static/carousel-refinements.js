@@ -359,6 +359,7 @@ function carouselLayerPanel() {
   carouselLayerActions(root);
   carouselFolderActions(root);
   carouselBindFolderDropTargets(root);
+  MKWCampaignLegacyTextUI.mount(root);
 }
 function carouselRefinementsPanel(panel, items) {
   const o = items.at(-1),

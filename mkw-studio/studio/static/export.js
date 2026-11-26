@@ -12,10 +12,12 @@ let exportOptions = {
   previewTimer;
 const exportCache = new Map();
 let exportCacheBytes = 0,
+  exportCacheEpoch = 0,
   reviewIndex = 0,
   reviewURL,
   reviewGeneration = 0;
 function clearExportCache() {
+  exportCacheEpoch++;
   for (const entry of exportCache.values()) URL.revokeObjectURL(entry.url);
   exportCache.clear();
   exportCacheBytes = 0;
@@ -28,7 +30,14 @@ function exportBytes(n) {
       : `${(n / 1048576).toFixed(1)} MB`;
 }
 function exportKey(b, settings) {
-  return JSON.stringify([revision, b, settings, MKWTextHyphen.version]);
+  return JSON.stringify([
+    exportCacheEpoch,
+    p.projectId,
+    revision,
+    b,
+    settings,
+    MKWTextHyphen.version,
+  ]);
 }
 function exportSettings() {
   return {
