@@ -163,15 +163,16 @@ const MKWCampaignDocument = (() => {
   }
   function checkBoards(boards, legacy = false) {
     if (boards.length > 200) throw Error("Maximal 200 Ausgaben pro Kampagne.");
+    const margin = legacy ? (value) => value : Math.round;
     const formats = boards.map((b) => {
       const safe = MKWLayout.safeRect({ ...b, sponsors: undefined });
       return {
         w: b.w,
         h: b.h,
-        top: Math.round(safe.top),
-        bottom: Math.round(safe.bottom),
-        left: Math.round(safe.left),
-        right: Math.round(safe.right),
+        top: margin(safe.top),
+        bottom: margin(safe.bottom),
+        left: margin(safe.left),
+        right: margin(safe.right),
       };
     });
     const invalid = formats.flatMap((f, i) =>

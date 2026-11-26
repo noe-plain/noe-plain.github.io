@@ -17,11 +17,12 @@
   const validLegacySize = (w, h) =>
     validSize(w, h, 16, 10000) && w * h <= 40000000;
   function validFormat(c, legacy = false) {
+    const validMargin = legacy ? Number.isFinite : Number.isInteger;
     return (
       !!c &&
       (legacy ? validLegacySize(c.w, c.h) : validSize(c.w, c.h, 240, 4000)) &&
       [c.top, c.bottom, c.left, c.right].every(
-        (n) => Number.isInteger(n) && n >= 0,
+        (n) => validMargin(n) && n >= 0,
       ) &&
       c.top + c.bottom < c.h &&
       c.left + c.right < c.w
@@ -240,8 +241,9 @@
     return {
       x: a.x + a.left,
       y: a.y + a.top,
-      w: a.w - a.left - a.right,
-      h: a.h - a.top - a.bottom,
+      // The legacy text layout has the same one-pixel floor.
+      w: Math.max(1, a.w - a.left - a.right),
+      h: Math.max(1, a.h - a.top - a.bottom),
     };
   }
   function formatPlan(c, value) {

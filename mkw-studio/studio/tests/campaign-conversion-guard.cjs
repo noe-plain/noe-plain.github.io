@@ -43,6 +43,9 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       await MKWProjects.autosave({ writeFile: false });
       const state = () =>
         JSON.stringify({ p, revision, history, future, selected });
+      // Model a damaged in-memory draft without replacing the intact saved source.
+      p.boards[1].safe.right = 2000.5;
+      p.boards[2].safe.bottom = 119.55;
       const before = state(),
         records = (await MKWProjectStore.list()).length;
       const version = (await MKWProjectStore.open(p.projectId)).version;
@@ -58,6 +61,8 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         throw Error(
           "Unsupported formats must not request conversion confirmation",
         );
+      p.boards[1].safe.right = 2000.2;
+      p.boards[2].safe.bottom = 119.05;
       const portable = MKWProjectAssets.hydrate(
         await MKWProjectFile.decode(await MKWProjectFile.encode(snapshot())),
       );
@@ -177,6 +182,33 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
           element.visible = false;
         return board;
       });
+      original.boards[0].safe = {
+        left: 3999.6,
+        right: 2000.2,
+        top: 0,
+        bottom: 0,
+      };
+      original.boards[1].safe = {
+        left: 0,
+        right: 0,
+        top: 119.55,
+        bottom: 119.05,
+      };
+      original.boards[2].safe = {
+        left: 120.5,
+        right: 90.25,
+        top: 35.4,
+        bottom: 80.55,
+      };
+      Object.assign(original.boards[2].elements.title, {
+        visible: true,
+        text: "Konzert mit genauer Schutzzone",
+        size: 68,
+      });
+      Object.assign(original.boards[2].elements.logo, {
+        visible: true,
+        size: 500,
+      });
       await MKWProjects.startDocument(original);
       const sourceId = p.projectId;
       const png = {
@@ -192,10 +224,38 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
           ),
         ].join(",");
       const before = await hash((await encodedBoard(p.boards[2], png)).blob);
+      const safe = p.boards.map((b) => MKWLayout.safeRect(b));
+      const fractionalFormat = {
+        w: 600,
+        h: 500,
+        top: 30.25,
+        bottom: 50,
+        left: 20,
+        right: 30,
+      };
+      if (MKWCarouselPolicy.validFormat(fractionalFormat))
+        throw Error(
+          "Designer unexpectedly accepts fractional values for new formats",
+        );
       await MKWCampaignUI.convert({ confirmed: true });
       if (!p.campaign) throw Error($("#status").textContent);
       const dimension = p.boards.map((b) => [b.w, b.h]);
       const after = await hash((await encodedBoard(p.boards[2], png)).blob);
+      const marginKeys = ["left", "right", "top", "bottom"];
+      const exactMargins = () =>
+        p.carousel.artboards.every((frame, i) =>
+          marginKeys.every((key) => frame[key] === safe[i][key]),
+        );
+      const exactUsableArea = () =>
+        p.carousel.artboards.every((frame, i) => {
+          const area = MKWCarouselPolicy.safeRect(p.carousel, i);
+          return (
+            Math.abs(area.x - frame.x - safe[i].x) < 1e-8 &&
+            Math.abs(area.y - frame.y - safe[i].y) < 1e-8 &&
+            area.w === safe[i].w &&
+            area.h === safe[i].h
+          );
+        });
       const pdf = await encodedBoard(p.boards[2], {
         format: "pdf",
         pdf: carouselPDFPreset("original"),
@@ -217,6 +277,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       if (editable?.pageId !== large.id)
         throw Error("Text belongs to the wrong legacy board");
       const source = await MKWProjectStore.open(sourceId);
+      const fractionalMigration = exactMargins() && exactUsableArea();
       const packet = await MKWProjectFile.encodeZip(snapshot());
       const reopened = MKWProjectAssets.hydrate(
         await MKWProjectFile.decode(packet),
@@ -225,6 +286,10 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       validateCarousel(reopened);
       await MKWProjects.startDocument(reopened);
       return {
+        fractionalMigration,
+        fractionalReopened: exactMargins() && exactUsableArea(),
+        reopenedPNGEqual:
+          before === (await hash((await encodedBoard(p.boards[2], png)).blob)),
         dimension,
         originalDimension: source.project.boards.map((b) => [b.w, b.h]),
         originalUntouched: !source.project.campaign && p.projectId !== sourceId,
@@ -245,6 +310,12 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       [240, 239],
       [6000, 400],
     ]);
+    assert(
+      legacy.fractionalMigration &&
+        legacy.fractionalReopened &&
+        legacy.reopenedPNGEqual,
+      JSON.stringify(legacy),
+    );
     assert.deepEqual(legacy.originalDimension, legacy.dimension);
     assert.deepEqual(legacy.reopened, legacy.dimension);
     assert(
@@ -269,7 +340,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       ) + "\n",
     );
     console.log(
-      "PASS invalid-safezone preflight, original-size migration and export, unchanged original/history/store, full MKW dimensions, stale project/revision confirmation guards, count limit and unused-image conversion",
+      "PASS invalid-safezone preflight, exact fractional safezones, original-size migration and export, unchanged original/history/store, full MKW dimensions, stale project/revision confirmation guards, count limit and unused-image conversion",
     );
   } finally {
     await browser.close();
