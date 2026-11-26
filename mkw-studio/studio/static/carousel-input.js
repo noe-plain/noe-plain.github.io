@@ -252,8 +252,7 @@ function carouselCreateDrag(ev, type, start) {
       moved ||= Math.hypot(e.clientX - ev.clientX, e.clientY - ev.clientY) >= 5;
       let w = Math.abs(end.x - start.x),
         h = Math.abs(end.y - start.y);
-      if (type === "angle") h = w * 2;
-      else if (e.shiftKey) w = h = Math.max(w, h);
+      if (e.shiftKey) w = h = Math.max(w, h);
       rect = {
         x: end.x < start.x ? start.x - w : start.x,
         y: end.y < start.y ? start.y - h : start.y,
@@ -264,10 +263,17 @@ function carouselCreateDrag(ev, type, start) {
         rect,
         (end.y < start.y ? "n" : "s") + (end.x < start.x ? "w" : "e"),
         e.ctrlKey || e.metaKey,
-        type === "angle" || e.shiftKey,
+        e.shiftKey,
         false,
         [],
       );
+      if (type === "angle") {
+        rect.direction = MKWAnglePolicy.drawingDirection(rect.w, rect.h);
+        sketch.textContent =
+          rect.direction === "down" ? "Spitze unten" : "Spitze links";
+        sketch.classList.add("carousel-angle-draft");
+        sketch.setAttribute("aria-hidden", "true");
+      }
       carouselUI.snapLines = [...anchor.guides, ...rect.guides];
       carouselDrawSnap();
       if (preview) {
@@ -296,6 +302,7 @@ function carouselCreateDrag(ev, type, start) {
       const o = carouselObject(type, {
         ...shape,
         ...inherited,
+        ...(type === "angle" ? { direction: rect.direction } : {}),
         x: rect.x,
         y: rect.y,
         w: rect.w,
@@ -308,7 +315,7 @@ function carouselCreateDrag(ev, type, start) {
       else if (type === "image") carouselFile(o.id);
     },
     clear,
-    !!shape,
+    !!shape || type === "angle",
   );
 }
 

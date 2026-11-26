@@ -110,3 +110,14 @@ test("nearest artboard keeps placement near the visible area when the pointer is
   assert.equal(policy.nearest(q, { x: 1250, y: 1500, w: 10, h: 10 }), 1);
   assert.equal(policy.nearest(q, { x: -100, y: 0, w: 1, h: 1 }), 0);
 });
+
+test("campaign compatibility keeps fractional legacy safe zones while new Designer formats remain integer-only", () => {
+  const f = { ...format, top: 119.55, bottom: 119.05, left: 0.125, right: 23.875, w: 240, h: 239 };
+  assert.equal(policy.validFormat(f, true), true);
+  assert.equal(policy.validFormat(f), false);
+  const q = { ...f, layout: "free", n: 1, objects: [], artboards: [{...f, id:"fractional", name:"Altformat", x:0, y:0}] };
+  assert.equal(policy.validBoards(q,true),true);
+  assert.equal(policy.validBoards(q),false);
+  for (const patch of [{top:Infinity},{left:NaN},{right:-0.1},{bottom:120},{w:240.5},{h:10001},{top:"12.5"}])
+    assert.equal(policy.validFormat({...f,...patch},true),false);
+});

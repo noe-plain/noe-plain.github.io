@@ -29,8 +29,9 @@ function carouselJustificationHint(
   return `<details class="typo-details justification-settings" ${hidden ? "hidden" : ""}><summary>Blocksatz · Satzwerte</summary><label class="justification-hyphen"><input type="checkbox" ${attribute} ${enabled ? "checked" : ""}>Automatische Silbentrennung</label><p>Deutsch (Schweiz) · reformierte Rechtschreibung 2006</p><table><thead><tr><th></th><th>Min.</th><th>Optimal</th><th>Max.</th></tr></thead><tbody><tr><th>Wortabstand</th><td>80 %</td><td>100 %</td><td>120 %</td></tr><tr><th>Zeichenabstand</th><td>−2 %</td><td>0 %</td><td>+2 %</td></tr><tr><th>Glyphenbreite</th><td>98 %</td><td>100 %</td><td>102 %</td></tr></tbody></table><p>Letzte Absatzzeile linksbündig. Bei zu schmalen Zeilen werden die Grenzen eingehalten; ein Hinweis zeigt unvollständig ausgeglichene Zeilen.</p></details>`;
 }
 function carouselTextFramePanel(o) {
-  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4>${MKWTextResize.markup()}<div class="type-control-heading">Vertikale Position</div><div class="carousel-fields carousel-text-anchor" role="group" aria-label="Vertikale Textausrichtung"><button data-text-anchor="top" aria-pressed="${!o.textAnchor || o.textAnchor === "top"}">${studioIcon("up")}Oben</button><button data-text-anchor="center" aria-pressed="${o.textAnchor === "center"}">Mitte</button><button data-text-anchor="bottom" aria-pressed="${o.textAnchor === "bottom"}">${studioIcon("down")}Unten</button></div></section>`;
+  return `<section class="carousel-property-section"><h4>Text im Rahmen</h4>${MKWTextResize.markup()}</section>`;
 }
+
 function carouselBindTextAlignment(o, panel) {
   const hyphen = panel.querySelector("[data-text-hyphenate]");
   if (hyphen) {

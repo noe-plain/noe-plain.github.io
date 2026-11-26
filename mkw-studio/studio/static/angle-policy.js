@@ -13,6 +13,8 @@
     glowColor: "#ffffff",
     glowAlpha: 0.8,
   });
+  const drawingDirection = (w, h) =>
+    Math.abs(w) > Math.abs(h) ? "down" : "left";
   const solid = (o) => o?.angleFillMode === "solid";
   const fill = (o) => ({
     kind: solid(o) ? "solid" : "image",
@@ -41,6 +43,7 @@
     accepts,
     choices,
     defaults,
+    drawingDirection,
     solid,
     fill,
     paintFields,

@@ -626,7 +626,16 @@ const MKWCampaignUI = (() => {
   async function convert({ confirmed = false } = {}) {
     if (busy || p.carousel || p.campaign) return;
     const source = p,
-      sourceRevision = revision;
+      sourceRevision = revision,
+      sourceId = p.projectId;
+    const current = () =>
+      p === source && revision === sourceRevision && p.projectId === sourceId;
+    const ensureCurrent = () => {
+      if (!current())
+        throw Error(
+          "Das Ausgangsprojekt wurde während der Vorbereitung geändert oder gewechselt. Bitte die Umwandlung erneut starten.",
+        );
+    };
     try {
       if (!source.boards.length)
         throw Error("Füge zuerst ein Bild mit mindestens einer Ausgabe hinzu.");
@@ -644,7 +653,7 @@ const MKWCampaignUI = (() => {
         confirm: "Kopie umwandeln",
       }));
     if (!accepted) return;
-    if (p !== source || revision !== sourceRevision || busy) {
+    if (!current() || busy) {
       status(
         "Die Umwandlung wurde verworfen, weil das Projekt inzwischen gewechselt oder geändert wurde. Bitte erneut starten.",
       );
@@ -655,6 +664,9 @@ const MKWCampaignUI = (() => {
         ...original,
         projectId: uid(),
         campaign: newState(),
+        images: original.images.map((im) => ({ ...im })),
+        logos: original.logos.map((logo) => ({ ...logo })),
+        fonts: original.fonts.map((font) => ({ ...font })),
         boards: [],
         carousel: undefined,
       };
@@ -669,7 +681,7 @@ const MKWCampaignUI = (() => {
           .map((b) => clone(b));
         await append(q, im, boards, { legacy: true });
         for (const b of boards) {
-          if (p !== source) return;
+          ensureCurrent();
           const a = q.carousel.artboards.find((a) => a.id === b.campaignPage);
           MKWCampaignMigration.add(q, b, a);
           if (b.angle?.enabled) {
@@ -682,11 +694,11 @@ const MKWCampaignUI = (() => {
       MKWCampaignModel.reconcile(q, uid);
       validate(q);
       validateCarousel(q);
-      if (p !== source) return;
+      ensureCurrent();
       await MKWProjects.autosave({ writeFile: false });
-      if (p !== source) return;
+      ensureCurrent();
       carouselUI.slide = 0;
-      await MKWProjects.startDocument(q);
+      await MKWProjects.startDocument(q, { beforeCommit: ensureCurrent });
       if ($("#saveDialog").open) $("#saveDialog").close();
       fit();
       status(
@@ -699,7 +711,7 @@ const MKWCampaignUI = (() => {
         "error",
       );
     } finally {
-      busy = false;
+      if (p === source || p === q) busy = false;
       finishLoading();
     }
   }

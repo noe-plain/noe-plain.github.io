@@ -638,6 +638,7 @@ function carouselDefault(type, rect = {}) {
       );
   return {
     ...carouselVectorDefaults(type),
+    ...(type === "text" ? { opticalAlign: true } : {}),
     id: uid(),
     type,
     name: {

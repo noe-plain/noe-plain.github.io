@@ -151,7 +151,12 @@ const MKWUIControls = (function () {
           .filter(Boolean);
         button.setAttribute("aria-describedby", [...ids, tooltip.id].join(" "));
       },
-      immediate ? 0 : 500,
+      immediate
+        ? 0
+        : Math.max(
+            500,
+            Math.min(2000, Number(button.dataset.tooltipDelay) || 500),
+          ),
     );
   }
   document.addEventListener(

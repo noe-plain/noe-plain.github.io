@@ -53,6 +53,7 @@ const MKWCampaignTextChoice = (() => {
           );
           if (!source) return finish(null);
           const result = clone(source);
+          result.opticalAlign ??= false;
           for (const key of [
             "id",
             "pageId",

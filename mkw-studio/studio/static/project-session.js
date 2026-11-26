@@ -694,15 +694,16 @@ const MKWProjects = (() => {
               : "Automatische Sicherung im Browser. Lokale Dateien können hier nur heruntergeladen werden.";
     };
   }
-  async function startDocument(document) {
+  async function startDocument(document, { beforeCommit } = {}) {
     validate(document);
     validateCarousel(document);
     const wasBusy = busy;
     busy = true;
     try {
       if (savedRevision < revision) await autosave();
+      beforeCommit?.();
       zipCache = undefined;
-      await restore(document);
+      await restore(document, { beforeCommit });
       notice("");
       revision = 1;
       savedRevision = 0;

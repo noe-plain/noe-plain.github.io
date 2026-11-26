@@ -54,6 +54,8 @@ const MKWCampaignMigration = (() => {
         style.size ??= record.size;
         style.lineHeight ??= source.lineHeight ?? 1;
         style.align ??= source.textAlign || source.align || "left";
+        if (source.opticalAlign !== undefined)
+          style.opticalAlign ??= source.opticalAlign;
         if (local === 0)
           style.spaceBefore = Math.max(0, (style.spaceBefore || 0) + gap);
         object.textStyles[paragraph++] = style;

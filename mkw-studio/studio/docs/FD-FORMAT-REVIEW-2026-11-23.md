@@ -18,3 +18,6 @@ Lokal bestanden 223 Modell-/Pakettests und sieben Chromium-Suiten. Volle PSD-Abn
 ## Veröffentlichung
 
 Commit `b942287` bestand den [GitHub-Freigabelauf in Firefox, Chromium und Windows](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45142717386). [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45145410000) lieferte das geprüfte HTML, JavaScript, CSS und Wiki bytegleich aus. Auf der Live-Seite bestanden die Kampagnenprüfung mit dem späteren Format und der MKW-Rundlauf sowie die Konvertierungsprüfung mit grossen und kleinen Originalmassen, PNG und PDF.
+
+
+**Fortschreibung 26. November:** Die oben historisch beschriebene Rundungsgrenze wurde im nächsten B02-Teilschritt beseitigt. Gültige Bruchteil-Schutzzonen werden exakt übernommen, ohne den positiven Innenbereich wegzurunden. Nachweise und weiterhin offene Ablösungskriterien: [sichere Kopien](FD-SAFE-COPY-REVIEW-2026-11-26.md).

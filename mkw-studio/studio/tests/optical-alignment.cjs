@@ -25,6 +25,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         w: 400,
         h: 670,
         text: "HARMONIE\nSALON\nMusik beginnt\nWinterthur",
+        opticalAlign: false,
         size: 65,
         color: "#111111",
         textStyles: [{ size: 65 }, { size: 120 }, { size: 74 }, { size: 100 }],

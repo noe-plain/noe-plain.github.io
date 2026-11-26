@@ -587,3 +587,13 @@ html[data-density="compact"]
     height: 48px;
   }
 }
+
+.carousel-angle-draft {
+  padding: 8px;
+  box-sizing: border-box;
+  color: var(--md-sys-color-on-surface);
+  background: color-mix(in srgb, var(--md-sys-color-surface) 75%, transparent);
+  font:
+    500 12px/16px system-ui,
+    sans-serif;
+}

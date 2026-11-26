@@ -15,7 +15,7 @@ const { launch, artifact } = require('./browser.cjs');
     await page.locator('#carouselCanvas').waitFor();
     const id = await page.evaluate(() => {
       p.carousel.objects = [];
-      carouselObject('text', { x: 150, y: 300, w: 650, h: 500, size: 54, color: '#172238', text: 'Ein kurzer Titel\nEin längerer Absatz mit mehreren Worten, der automatisch umbricht.' });
+      carouselObject('text', { x: 150, y: 300, w: 650, h: 500, size: 54, color: '#172238', opticalAlign: false, text: 'Ein kurzer Titel\nEin längerer Absatz mit mehreren Worten, der automatisch umbricht.' });
       return carouselSelection;
     });
     const object = () => page.evaluate(id => clone(p.carousel.objects.find(o => o.id === id)), id);

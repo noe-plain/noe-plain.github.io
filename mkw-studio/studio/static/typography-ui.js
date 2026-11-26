@@ -113,7 +113,18 @@ const MKWTypography = (() => {
       )
       .join(
         "",
-      )}</div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-size-auto>Schriftgrösse zurücksetzen</button><button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div class="typo-control-group" data-typo-page="paragraph"><h4>Absatz &amp; Abstände</h4><p class="typo-paragraph-scope" data-typo-paragraph-scope></p><div class="type-control-heading"><span>Ausrichtung der Auswahl</span><button data-typo-align-auto>Vom Textfeld</button></div>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}${carouselJustificationHint(true, "data-typo-hyphenate")}<label class="typo-optical-align" title="Sichtbare Buchstabenkanten links, rechts oder mittig ausrichten; bewusste Einzüge bleiben erhalten."><input type="checkbox" data-typo-optical><span>Optischer Randausgleich</span></label><div class="typo-grid">${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<label data-line-spacing>Zeilenabstand (px)<span class="type-unit"><input data-lines-leading aria-label="Zeilenabstand in Pixeln" type="number" min="1" max="3000" step="any"><span>px</span></span></label></div><button data-typo-leading-auto>Automatischen Zeilenabstand verwenden</button><div class="typo-grid">${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
+      )}</div><details class="typo-details"><summary>Weitere Zeichenoptionen</summary>${field("baselineShift", "Grundlinienversatz", "px", -5000, 5000)}<button data-typo-size-auto>Schriftgrösse zurücksetzen</button><button data-typo-reset>Zeichenformatierung zurücksetzen</button></details></div><div class="typo-control-group" data-typo-page="paragraph"><h4>Absatz &amp; Abstände</h4><p class="typo-paragraph-scope" data-typo-paragraph-scope></p><div class="type-control-heading"><span>Ausrichtung der Auswahl</span><button data-typo-align-auto>Vom Textfeld</button></div>${carouselTextAlignButtons("left", "data-typo-align", "Absatzausrichtung")}<div class="type-alignment type-vertical-alignment" data-typo-anchor-row role="group" aria-label="Vertikale Position im gesamten Textfeld">${[
+      ["top", "alignTop", "Oben im Textfeld"],
+      ["center", "alignMiddle", "Vertikal mittig im Textfeld"],
+      ["bottom", "alignBottom", "Unten im Textfeld"],
+    ]
+      .map(
+        ([value, icon, label]) =>
+          `<button type="button" data-text-anchor="${value}" aria-label="${label}" title="${label}" aria-pressed="false">${studioIcon(icon)}</button>`,
+      )
+      .join(
+        "",
+      )}</div>${carouselJustificationHint(true, "data-typo-hyphenate")}<label class="typo-optical-align" title="Sichtbare Buchstabenkanten links, rechts oder mittig ausrichten; bewusste Einzüge bleiben erhalten."><input type="checkbox" data-typo-optical><span>Optischer Randausgleich</span></label><div class="typo-grid">${field("lineHeight", "Zeilenabstand", "%", 20, 500)}<label data-line-spacing>Zeilenabstand (px)<span class="type-unit"><input data-lines-leading aria-label="Zeilenabstand in Pixeln" type="number" min="1" max="3000" step="any"><span>px</span></span></label></div><button data-typo-leading-auto>Automatischen Zeilenabstand verwenden</button><div class="typo-grid">${field("spaceBefore", "Abstand davor", "px", 0, 5000)}${field("spaceAfter", "Abstand danach", "px", 0, 5000)}</div><div data-typo-extra></div></div></section>`;
   }
   function values(key) {
     return current.targets.flatMap((o) => {
@@ -274,6 +285,15 @@ const MKWTypography = (() => {
           "left",
       ),
     );
+    host.querySelector("[data-typo-anchor-row]").hidden = !!current.post;
+    const anchor = common(targets.map((target) => target.textAnchor || "top"));
+    for (const button of host.querySelectorAll("[data-text-anchor]")) {
+      button.disabled = locked;
+      button.setAttribute(
+        "aria-pressed",
+        String(anchor === button.dataset.textAnchor),
+      );
+    }
     host.querySelector(".justification-settings").hidden = align !== "justify";
     const optical = host.querySelector("[data-typo-optical]"),
       opticalValue = common(
@@ -287,6 +307,10 @@ const MKWTypography = (() => {
     optical.checked = opticalValue === true;
     optical.indeterminate = opticalValue === null;
     optical.disabled = locked || !paragraphEnabled || align === "justify";
+    optical.closest("label").title =
+      align === "justify"
+        ? "Blocksatz verwendet derzeit seine eigene Satzregelung; der optische Randausgleich ist dort nicht verfügbar."
+        : "Sichtbare Buchstabenkanten links, rechts oder mittig ausrichten; bewusste Einzüge bleiben erhalten.";
     host.querySelector("[data-typo-align-auto]").disabled =
       locked ||
       !paragraphEnabled ||
@@ -472,6 +496,21 @@ const MKWTypography = (() => {
       extra.append(...advanced);
       host.append(extra);
     }
+    for (const button of host.querySelectorAll("[data-text-anchor]"))
+      button.onclick = () => {
+        if (current.post || current.locked) return;
+        const value = button.dataset.textAnchor;
+        if (
+          current.targets.every(
+            (target) => (target.textAnchor || "top") === value,
+          )
+        )
+          return;
+        checkpoint();
+        for (const target of current.targets) target.textAnchor = value;
+        current.commit({ kind: "frame", values: { textAnchor: value } });
+        sync();
+      };
     host.querySelector(".paragraph-scope").hidden = current.targets.length > 1;
     const lineScope = host.querySelector("[data-line-scope]");
     lineScope.hidden = current.targets.length > 1;

@@ -544,7 +544,7 @@ const validate = MKWProjectValidation.create({
   customFont: (font) => studioIsCustomFont(font),
   sponsors: (q) => MKWSponsors.validate(q),
 });
-async function restore(q) {
+async function restore(q, { beforeCommit } = {}) {
   MKWProjectAssets.hydrate(q);
   q.projectId ??= uid();
   validate(q);
@@ -597,6 +597,7 @@ async function restore(q) {
     if (!MKWProjectAssets.deferred(im.data)) await image(im.data);
   }
   for (const l of q.logos) await image(l.data);
+  beforeCommit?.();
   p = q;
   pruneImageCache();
   pruneCarouselEffects();

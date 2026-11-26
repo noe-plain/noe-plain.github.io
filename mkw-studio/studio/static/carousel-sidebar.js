@@ -347,20 +347,6 @@ function carouselPanel() {
               carouselRefreshTextStyles(o);
           };
     }
-    panel.querySelectorAll("[data-text-anchor]").forEach(
-      (btn) =>
-        (btn.onclick = () => {
-          if (
-            carouselObjectLocked(o) ||
-            o.textAnchor === btn.dataset.textAnchor
-          )
-            return;
-          checkpoint();
-          o.textAnchor = btn.dataset.textAnchor;
-          changed(false);
-          carouselPanel();
-        }),
-    );
     if ($("#carouselGradientEdit"))
       $("#carouselGradientEdit").onclick = () => carouselTool("gradient");
     if ($("#carouselContentEdit")) {

@@ -783,3 +783,18 @@
 .typography-inspector .typo-optical-align:has(input:disabled) {
   color: var(--md-sys-color-on-surface-variant);
 }
+
+.typography-inspector .type-vertical-alignment {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 8px;
+}
+.type-vertical-alignment[hidden] {
+  display: none !important;
+}
+
+:is(#carouselProperties, #stepPanel)
+  .typography-inspector
+  .type-alignment
+  button {
+  min-height: 44px;
+}
