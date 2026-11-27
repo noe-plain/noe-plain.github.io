@@ -179,13 +179,6 @@ async function carouselPaint(
     : null;
   const campaignFrames =
     campaignBoards && new Map(frames.map((frame) => [frame.id, frame]));
-  const campaignFamilyPages =
-    campaignBoards &&
-    new Set(
-      project.campaign.rows
-        .filter((row) => row.family)
-        .flatMap((row) => row.pages),
-    );
   const shadows = new Map();
   if (campaignBoards && !transparent)
     for (const logo of drawing) {
@@ -196,12 +189,16 @@ async function carouselPaint(
       )
         continue;
       const board = campaignBoards.get(logo.pageId);
-      if (board?.elements.logo.visible && !campaignFamilyPages.has(logo.pageId))
+      if (board?.elements.logo.visible && !board.family?.enabled)
         shadows.set(logo.pageId, logo);
     }
   for (const original of drawing) {
     const o = project.campaign
-      ? MKWCampaignUI.decorate(original, project)
+      ? MKWCampaignUI.decorate(
+          original,
+          project,
+          campaignBoards.get(original.pageId),
+        )
       : original;
     if (!isCurrent()) break;
     if (!carouselObjectVisible(o, c) || o.id === editingId) continue;
@@ -241,7 +238,6 @@ async function carouselPaint(
       }
       if (
         frame &&
-        !!board?.family?.enabled === campaignFamilyPages.has(o.pageId) &&
         (MKWCampaignMigration.paintText(ctx, original, board, frame) ||
           MKWCampaignMigration.paintContrast(ctx, original, board, frame))
       ) {

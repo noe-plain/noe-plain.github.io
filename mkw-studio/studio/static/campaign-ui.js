@@ -66,14 +66,16 @@ const MKWCampaignUI = (() => {
       status("Änderung nicht übernommen: " + error.message);
     }
   }
-  function decorate(o, project = p) {
+  function decorate(o, project = p, board) {
     if (!project.campaign || o.type !== "text") return o;
-    const row = rowFor(o.pageId, project);
-    if (!row?.family) return o;
+    const family = (
+      board ?? project.boards.find((b) => b.campaignPage === o.pageId)
+    )?.family;
+    if (!family?.enabled) return o;
     const legacyFamily =
         o.campaignRole === "titles" ||
         /^legacy-(date|title|subtitle)$/.test(o.campaignRole)
-          ? project.boards.find((b) => b.campaignPage === o.pageId)?.family
+          ? family
           : null,
       signature = JSON.stringify([o, legacyFamily?.offset]),
       cached = decorated.get(o);
@@ -98,37 +100,35 @@ const MKWCampaignUI = (() => {
     decorated.set(o, { signature, value: next });
     return next;
   }
-  function adoptOptions(row) {
+  function adoptOption(row, key) {
     const c = p.carousel;
     for (const id of row.pages) {
-      const a = c.artboards.find((a) => a.id === id),
-        b = p.boards.find((b) => b.campaignPage === id),
-        bg = c.objects.find(
-          (o) => o.pageId === id && o.campaignRole === "background",
-        );
-      a.bg = row.family ? row.background || "#f4efdf" : b.bg;
-      b.family = {
-        ...MKWFamily.defaults(),
-        enabled: !!row.family,
-        background: row.background || "#f4efdf",
-      };
-      if (row.angle)
-        b.angle = MKWPostAngle.defaults(b, {
-          direction: row.direction || "left",
-        });
-      else delete b.angle;
+      const a = c.artboards.find((a) => a.id === id);
+      const b = p.boards.find((b) => b.campaignPage === id);
+      if (key === "family" || key === "background") {
+        if (key === "background" && !b.family?.enabled) continue;
+        if (!b.family) {
+          b.family = MKWFamily.defaults();
+          if (row.background) b.family.background = row.background;
+        }
+        if (key === "family") b.family.enabled = row.family;
+        else b.family.background = row.background;
+        a.bg = b.family.enabled ? b.family.background : b.bg;
+        continue;
+      }
       const old = c.objects.find(
         (o) => o.pageId === id && o.campaignRole === "angle",
       );
+      if (key === "direction" && !old) continue;
       if (row.angle) {
+        b.angle ??= MKWPostAngle.defaults(b);
+        b.angle.direction = row.direction || "left";
         if (!old) {
-          const geometry = MKWPostAngle.geometry({
-            ...b,
-            angle: MKWPostAngle.defaults(b, {
-              direction: row.direction || "left",
-            }),
-          });
-          const g = geometry.o;
+          b.angle.enabled = true;
+          const bg = c.objects.find(
+            (o) => o.pageId === id && o.campaignRole === "background",
+          );
+          const g = MKWPostAngle.geometry(b).o;
           const o = base("angle", a, {
             ...g,
             x: a.x + g.x,
@@ -143,7 +143,10 @@ const MKWCampaignUI = (() => {
           });
           c.objects.push(o);
         } else old.direction = row.direction || "left";
-      } else if (old) c.objects = c.objects.filter((o) => o !== old);
+      } else {
+        delete b.angle;
+        if (old) c.objects = c.objects.filter((o) => o !== old);
+      }
     }
   }
   function cards(root) {
@@ -161,12 +164,14 @@ const MKWCampaignUI = (() => {
     const c = p.carousel,
       signature = JSON.stringify([
         p.campaign.rows,
+        p.boards.map((b) => !!b.family?.enabled),
         p.images.map((i) => [i.id, i.name]),
         c.artboards.map((a) => [a.id, a.x, a.y]),
         carouselZoom,
       ]);
     if (host.dataset.signature === signature) return;
     host.dataset.signature = signature;
+    const boardsByPage = new Map(p.boards.map((b) => [b.campaignPage, b]));
     releaseCards();
     host.innerHTML = p.campaign.rows
       .map((row, i) => {
@@ -177,11 +182,16 @@ const MKWCampaignUI = (() => {
             (o) => o.id === l.source && row.pages.includes(o.pageId),
           ),
         );
-        const sponsors = p.boards.find(
-          (b) => b.campaignPage === a.id,
-        )?.sponsors;
+        const sponsors = boardsByPage.get(a.id)?.sponsors;
+        const familyPage = row.pages.find(
+          (id) => boardsByPage.get(id)?.family?.enabled,
+        );
         return MKWCampaignCardUI.markup({
-          row,
+          row: {
+            ...row,
+            family: !!familyPage,
+            background: boardsByPage.get(familyPage)?.family.background,
+          },
           index: i,
           im,
           frame: a,
@@ -194,9 +204,7 @@ const MKWCampaignUI = (() => {
           sponsors,
           open: openOptions.has(im.id),
           count: p.campaign.rows.length,
-          copyright:
-            p.boards.find((b) => b.campaignPage === a.id)?.elements.copyright
-              .text || "",
+          copyright: boardsByPage.get(a.id)?.elements.copyright.text || "",
         });
       })
       .join("");
@@ -207,6 +215,12 @@ const MKWCampaignUI = (() => {
       MKWCampaignCardUI.bind(card, (open) =>
         open ? openOptions.add(row.imageId) : openOptions.delete(row.imageId),
       );
+      const family = card.querySelector("[data-campaign-family]");
+      const familyCount = row.pages.filter(
+        (id) => boardsByPage.get(id)?.family?.enabled,
+      ).length;
+      family.indeterminate = familyCount > 0 && familyCount < row.pages.length;
+      family.checked = familyCount === row.pages.length;
       card.querySelector("[data-campaign-sponsors]").onchange = (e) =>
         change(() => {
           for (const page of row.pages) {
@@ -261,7 +275,7 @@ const MKWCampaignUI = (() => {
                 );
                 live[key] =
                   input.type === "checkbox" ? input.checked : input.value;
-                adoptOptions(live);
+                adoptOption(live, key);
               },
               key !== "background" || !began,
               key !== "background",

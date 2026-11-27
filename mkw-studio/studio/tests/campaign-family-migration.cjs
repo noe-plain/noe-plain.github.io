@@ -60,7 +60,150 @@ const {launch,waitForProjectReady,artifact}=require('./browser.cjs');
     });
     assert(files.pngExact&&files.psdMax<=1&&files.pdfMax===0&&files.cacheUpdated,JSON.stringify(files));
     assert.equal(files.offset,7);assert(files.titleReference&&files.editableText>=1&&files.references>=1,JSON.stringify(files));
-    fs.writeFileSync(artifact('campaign-family-migration.json'),JSON.stringify({results,files},null,2)+'\n');
+    const mixed = await page.evaluate(async () => {
+      const image = p.images[0];
+      const legacy = fresh();
+      legacy.images = [image];
+      legacy.meta.title = "Familiengestaltung nur im ersten Format";
+      legacy.boards = [
+        [600, 750],
+        [600, 600],
+      ].map(([w, h], index) => {
+        const b = basicBoard(image, w, h);
+        for (const element of Object.values(b.elements))
+          element.visible = false;
+        Object.assign(b.elements.title, {
+          visible: true,
+          text: "Bunte Musik",
+          size: 64,
+        });
+        Object.assign(b.elements.copyright, {
+          visible: true,
+          text: "Foto Studio",
+          color: "#cc0000",
+        });
+        Object.assign(b.elements.logo, { visible: true, size: 180 });
+        if (index === 0)
+          b.family = {
+            ...MKWFamily.defaults(),
+            enabled: true,
+            offset: 5,
+            background: "#dbebdd",
+          };
+        return b;
+      });
+      window.familyPixelReport = async (b) => {
+        const entry = await encodedBoard(b, {
+          format: "png",
+          png8: false,
+          transparent: false,
+          quality: 95,
+        });
+        const bitmap = await createImageBitmap(entry.blob);
+        const canvas = makeCanvas(b.w, b.h);
+        const ctx = exportContext(canvas);
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const pixels = ctx.getImageData(0, 0, b.w, b.h).data;
+        canvas.width = canvas.height = 1;
+        return [
+          ...new Uint8Array(await crypto.subtle.digest("SHA-256", pixels)),
+        ].join(",");
+      };
+      await MKWProjects.startDocument(legacy);
+      const sourceId = p.projectId;
+      const before = await Promise.all(p.boards.map(window.familyPixelReport));
+      await MKWCampaignUI.convert({ confirmed: true });
+      if (!p.campaign) throw Error($("#status").textContent);
+      const after = await Promise.all(p.boards.map(window.familyPixelReport));
+      const zip = await MKWProjectFile.encodeZip(snapshot());
+      const reopened = MKWProjectAssets.hydrate(
+        await MKWProjectFile.decode(zip),
+      );
+      validate(reopened);
+      validateCarousel(reopened);
+      await MKWProjects.startDocument(reopened);
+      const revived = await Promise.all(p.boards.map(window.familyPixelReport));
+      window.familyStates = () =>
+        p.boards.map((b) => [
+          !!b.family?.enabled,
+          b.family?.offset ?? 0,
+          b.family?.background ?? null,
+        ]);
+      return {
+        exact: [before[0] === after[0], before[1] === after[1]],
+        reopenExact: [before[0] === revived[0], before[1] === revived[1]],
+        sourceSeparate:
+          sourceId !== p.projectId &&
+          !(await MKWProjectStore.open(sourceId)).project.campaign,
+        states: window.familyStates(),
+        familyOffsets: p.boards.map((b) => {
+          const title = p.carousel.objects.find(
+            (o) => o.pageId === b.campaignPage && o.campaignRole === "titles",
+          );
+          return MKWCampaignUI.decorate(title).familyOffset ?? null;
+        }),
+      };
+    });
+    assert.deepEqual(mixed.exact, [true, true]);
+    assert.deepEqual(mixed.reopenExact, [true, true]);
+    assert(mixed.sourceSeparate);
+    assert.deepEqual(mixed.states, [
+      [true, 5, "#dbebdd"],
+      [false, 0, null],
+    ]);
+    assert.deepEqual(mixed.familyOffsets, [5, null]);
+    const options = page.locator(".campaign-card details");
+    await options.locator("summary").click();
+    const familyToggle = options.locator("[data-campaign-family]");
+    assert(await familyToggle.evaluate((input) => input.indeterminate));
+    await options.locator("[data-campaign-background]").fill("#d9eee6");
+    assert.deepEqual(await page.evaluate(() => window.familyStates()), [
+      [true, 5, "#d9eee6"],
+      [false, 0, null],
+    ]);
+    await page.evaluate(() => undo());
+    assert(await familyToggle.evaluate((input) => input.indeterminate));
+    await options.locator("[data-campaign-angle]").check();
+    assert(await familyToggle.evaluate((input) => input.indeterminate));
+    assert.deepEqual(
+      await page.evaluate(() => window.familyStates()),
+      mixed.states,
+    );
+    const beforeToggle = await page.evaluate(() =>
+      p.carousel.objects.filter((o) => o.type === "angle").map((o) => o.id),
+    );
+    assert.equal(beforeToggle.length, 2);
+    await familyToggle.focus();
+    await familyToggle.press("Space");
+    assert(await familyToggle.isChecked());
+    assert.deepEqual(await page.evaluate(() => window.familyStates()), [
+      [true, 5, "#dbebdd"],
+      [true, 0, "#dbebdd"],
+    ]);
+    assert.deepEqual(
+      await page.evaluate(() =>
+        p.carousel.objects.filter((o) => o.type === "angle").map((o) => o.id),
+      ),
+      beforeToggle,
+    );
+    await page.evaluate(() => undo());
+    assert(await familyToggle.evaluate((input) => input.indeterminate));
+    assert.deepEqual(
+      await page.evaluate(() => window.familyStates()),
+      mixed.states,
+    );
+    await page.screenshot({ path: artifact("campaign-mixed-family-light.png") });
+    await page.setViewportSize({ width: 1000, height: 900 });
+    await page.evaluate(() => studioSetTheme("dark"));
+    await familyToggle.scrollIntoViewIfNeeded();
+    assert(await familyToggle.evaluate((input) => input.indeterminate));
+    assert(await options.evaluate((menu) => menu.scrollWidth <= menu.clientWidth + 1));
+    await page.screenshot({ path: artifact("campaign-mixed-family-dark.png") });
+    console.log(
+      "PASS mixed family options stay per output across real conversion, PNG, MKW, angle controls and keyboard Undo",
+    );
+    fs.writeFileSync(artifact('campaign-family-migration.json'),JSON.stringify({results,files,mixed},null,2)+'\n');
     console.log('PASS eight legacy family colour offsets, outline order, copyright kerning, unchanged raw model, cache invalidation, MKW and actual PNG/PDF/PSD with raster references and editable text');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

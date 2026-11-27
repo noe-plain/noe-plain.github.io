@@ -266,7 +266,10 @@ const MKWCampaignDocument = (() => {
           angle: e.angle || 0,
         }),
       );
-      if (row.family || b.family?.enabled) row.family = true;
+      if (b.family?.enabled && !row.family) {
+        row.family = true;
+        row.background = b.family.background;
+      }
       if (b.angle?.enabled) {
         const geometry = MKWPostAngle.geometry(
             b,

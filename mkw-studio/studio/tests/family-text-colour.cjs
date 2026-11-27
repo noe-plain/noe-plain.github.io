@@ -203,7 +203,11 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
           o.characterStyles = [];
           o.color = "#126789";
           if (p.carousel) p.campaign.rows[0].family = true;
-          else board().family = { enabled: true, background: "#ffffff" };
+          board().family = {
+            ...MKWFamily.defaults(),
+            enabled: true,
+            background: "#ffffff",
+          };
           changed();
           MKWTypography.track(o, 0, o.text.length);
         });
