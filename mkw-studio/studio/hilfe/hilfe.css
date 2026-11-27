@@ -454,3 +454,128 @@ html[data-theme="dark"] header img {
     color: black;
   }
 }
+
+/* Inline diagrams load only with this handbook. */
+.wiki-figure {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 20px;
+  background: var(--md-sys-color-surface-container);
+  break-inside: avoid;
+}
+.wiki-figure > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  overflow: visible;
+}
+.wiki-figure svg text {
+  fill: var(--md-sys-color-on-surface);
+  font:
+    14px Replica,
+    sans-serif;
+}
+.wiki-figure svg .diagram-title {
+  font-size: 18px;
+}
+.diagram-paper {
+  fill: var(--md-sys-color-surface);
+  stroke: var(--md-sys-color-outline);
+  stroke-width: 1.5;
+}
+.diagram-wash {
+  fill: var(--md-sys-color-secondary-container);
+}
+.diagram-accent,
+.diagram-marker circle {
+  fill: var(--md-sys-color-primary);
+}
+.wiki-figure svg .diagram-on-accent,
+.wiki-figure .diagram-marker text {
+  fill: var(--md-sys-color-on-primary);
+}
+.diagram-line,
+.diagram-divider {
+  fill: none;
+  stroke: var(--md-sys-color-on-surface-variant);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.diagram-divider {
+  stroke-width: 1;
+}
+.diagram-dashed {
+  fill: none;
+  stroke: var(--md-sys-color-primary);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.diagram-guide {
+  fill: none;
+  stroke: var(--md-sys-color-primary);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+.diagram-ink {
+  fill: var(--md-sys-color-on-surface);
+}
+.diagram-round {
+  fill: none;
+  stroke: var(--md-sys-color-on-surface);
+  stroke-width: 8;
+}
+.wiki-figure figcaption {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.wiki-visual-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+.wiki-visual-steps li {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface);
+  font:
+    14px/1.5 Replica,
+    sans-serif;
+}
+.wiki-visual-steps li svg {
+  width: 100%;
+  max-height: 92px;
+}
+.wiki-visual-steps li span {
+  color: var(--md-sys-color-on-surface-variant);
+}
+@media (max-width: 640px) {
+  .wiki-figure {
+    padding: 12px;
+    border-radius: 16px;
+  }
+  .wiki-visual-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .wiki-figure figcaption {
+    font-size: 14px;
+  }
+}
+@media print {
+  .wiki-figure {
+    background: #fff;
+    border-color: #888;
+  }
+}

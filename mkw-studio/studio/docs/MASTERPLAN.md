@@ -4,26 +4,36 @@ Stand: **27. November 2026**. Dies ist die einzige aktive Aufgaben- und Priorit�
 
 **Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
-## Aktueller Auftrag · 27. November · ausdrückliche Reihenfolge
+## Auftrag vom 27. November · Abschluss und neue Planung
 
-Die fünf Produktperspektiven (Neue Nutzerin, erfahrener Nutzer, UX/UI, Barrierefreiheit, Entwicklung/QA) bestimmen die Abnahme jeder Etappe. Bestehende Designs, Schriftzuordnungen und Dateisicherheit bleiben erhalten. Dieser Auftrag hat während seiner Umsetzung Vorrang vor der bisherigen offenen Reihenfolge.
+U39–U43 wurden in der ausdrücklich verlangten Reihenfolge bearbeitet und separat gepusht; die Abnahmen und der Vermerk **«Erledigt – nochmals prüfen für Abschluss»** stehen unten unter D39–D42. Der erste Font-Push wird auf Wunsch nicht beobachtet. Neue nachgewiesene Fehler bleiben P0; die bisherige offene Reihenfolge bleibt nach diesem Auftrag bestehen.
 
-| ID | Schritt | Abnahme | Status |
-| --- | --- | --- | --- |
-| U39 | Replica LL Regular, Bold, Light einbinden | Neue Standardtexte/UI Regular, Titel/Hervorhebung Bold, Light nur manuell. Alte Replica-LL-Rollen bleiben Bold. Alle Schnitte laden, MKW/Export erhalten die Schriften. Separater Push, ausdrücklich nicht beobachten. | Erledigt – nochmals prüfen für Abschluss |
-| U40 | FD-Bildkarte: Übertitel/Titel/Untertitel und Logo-Geometrie | Erste Bildkarte, erstes Format: drei beschriftete Felder → ein nativer Textrahmen. 70/120/55 px, Regular/Bold/Regular. Verknüpfung und individuelle Eigenschaftsänderungen erhalten. Logo-Geometrie trotz Farbvarianten übernehmen, lokale Anpassung möglich. | Erledigt – nochmals prüfen für Abschluss |
-| U41 | Instagram-Ansicht Shift+I | Referenz 1080×1920 und 1080×1080 inklusive Werbe-CTA; nur Ansicht, niemals Export. Kein universelles geräteunabhängiges Pixelversprechen. Mit U40 kurz prüfen und pushen. | Erledigt – nochmals prüfen für Abschluss |
-| U42 | Exportfenster und Vorschau vereinfachen; JPG+ | Material 3, Auswahl/Einstellungen/Vorschau ohne doppelte Bedienwege; klare Reihendateinamen. Echter JPEG-XL-Export unter JPG+, Hover «JPEG-XL», Endung .jxl. Normales JPG erhalten. Codec nur bei Bedarf laden, Abbruch/Fehler prüfen. Eigener geprüfter Push. | Erledigt – nochmals prüfen für Abschluss |
-| U43 | Speichernpanel vereinfachen | Wenig Prosa, eindeutiger Speicherort/Dateiname/Status, Dateikonflikte und Firefox-Ausweichweg erhalten. Tastatur, Abbruch, MKW-Rundlauf prüfen. Eigener Push. | offen |
-
-### Ergänzungen für spätere Umsetzung
+### Neue vorgemerkte Aufgaben · nach Personas priorisiert
 
 | ID | Aufgabe | Priorität / Abnahme | Status |
 | --- | --- | --- | --- |
-| U44 | Sponsorenleisten-UI in FD und Designer | P3. Kante wählbar, auch transparenter Balken, Logos schwarz/weiss; bestehenden Export und optische Gewichtung erhalten. | geplant |
 | U45 | Format zu offenem Projekt hinzufügen | P2. Gleiche verständliche Formatauswahl wie beim Start; bestehende individuelle Designs bleiben erhalten. | geplant |
+| U48 | Wiki visuell und strukturell überarbeiten | P2, Grundlage für U47/U49. Aufgabenorientierte Kapitel statt einer langen entwicklernahen Funktionsliste. Kurzstart, konkrete Schritte, HTML-Karten, SVG-Aufbauzeichnungen und zugehörige Textalternative. Bestehende Suchbegriffe/Anker weiterführen; FD/Designer, Bild vs. Ausschnitt, Absatz/Zeile, Fläche/Kontur, Ebenen, Seiten/Reihen, Speichern/Export und Fehler systematisch erklären. Vier erste Grafiken sind unter D42 bereits ergänzt; dies ist noch keine vollständige Wiki-Überarbeitung. | geplant, erste Grafiken vorhanden |
+| U49 | Eigenes Bézier-Lernspiel direkt im Wiki | P2, nach gemeinsamer Lektionenstruktur U48. Interaktives Nachzeichnen als Lernprinzip nach [The Bézier Game](https://bezier.method.ac/); native lokale Implementierung ohne externen Iframe, kopierte Marken/Grafiken oder vorausgesetzte Internetverbindung. Eigene Lernformen, dieselben Modell-/Griffregeln wie im Designer. Details und Abnahme unten. | geplant, nicht implementiert |
+| U47 | Erklärungen ins Wiki, kurze Gestaltungseinführung | P2, abhängig von U48. Oberflächenprosa systematisch reduzieren; Labels, zugängliche Namen, Status-, Sicherheits- und Fehlermeldungen erhalten. Jede entfernte notwendige Erklärung im Wiki auffindbar; Crashkurs Bildausschnitt, Hierarchie, Abstände, Kontrast, Export. | geplant |
 | U46 | Weitere Verlaufsarten | P2. Radial mit verschiebbarem Zentrum, Winkel, Punkte und Grid; gemeinsames Modell/Picker/Renderer/Export statt paralleler Implementierungen. | geplant |
-| U47 | Erklärungen ins Wiki, kurze Gestaltungseinführung | P2. Oberflächenprosa systematisch reduzieren; Labels, zugängliche Namen, Status-, Sicherheits- und Fehlermeldungen erhalten. Jede entfernte notwendige Erklärung im Wiki auffindbar; Crashkurs Bildausschnitt, Hierarchie, Abstände, Kontrast, Export. | geplant |
+| U44 | Sponsorenleisten-UI in FD und Designer | P3. Kante wählbar, auch transparenter Balken, Logos schwarz/weiss; bestehenden Export und optische Gewichtung erhalten. | geplant |
+
+#### U48 · Visuelles Handbuch mit HTML und SVG
+
+- **Neue Nutzerin:** Einstieg nach Ziel («Foto gestalten», «Text ändern», «Datei sichern», «Bilder veröffentlichen»), pro Aufgabe zuerst eine klare Darstellung, dann wenige ausführbare Schritte. Begriffe an den Abbildungen erklären; keine Kenntnis der alten Oberfläche voraussetzen.
+- **Erfahrener Nutzer:** Durchsuchbare Nachschlagebereiche, Direktlinks, Kurzbefehle, typische Fehler und verknüpfte Eigenschaften. Kurze Anleitung zuerst, vertiefende Sonderfälle danach.
+- **UX/UI:** Gemeinsames Raster, lesbare native HTML-Beschriftungen, konsistente SVG-Symbole/Legenden, Material-3-Theme-Tokens. Dichte Diagramme auf schmalen Fenstern in mehrere verständliche Schritte aufteilen; keine unlesbar verkleinerte Bildschirmkopie.
+- **Barrierefreiheit:** Jede Grafik mit Titel/Beschreibung und vollständiger Textalternative; Information zusätzlich über Beschriftung/Form, nicht nur Farbe. Tastatur, 200-%-Zoom, Hell/Dunkel/Farbkonzepte und reduzierte Bewegung prüfen. Keine automatisch laufenden Demonstrationen.
+- **Entwicklung/QA:** Semantische HTML-/SVG-Bausteine und ein gemeinsames Handbuch-Stylesheet, keine Bildgenerierung oder neue UI-Bibliothek. Wiki und Übungen erst beim Öffnen laden. Verweise auf aktuelle echte Bedienelemente prüfen. Akzeptanz: zentrale Arbeitsabläufe ohne Entwicklerhilfe nachschlagbar, keine defekten Anker oder horizontalen Seitenüberläufe; automatische Prüfungen plus ausdrücklich ausstehende echte Nutzer-/Screenreader-Abnahme dokumentieren.
+
+#### U49 · Pfade und Kurven spielerisch erlernen
+
+1. **Lektionen:** Punkte durch Klick setzen → Kurven durch Ziehen formen → Griffe und Kurvenenergie verstehen → Shift-Winkeleinrastung und getrennte Grifflängen bei verknüpfter Richtung → offene Enden fortsetzen, zwei Pfade verbinden, Form am Anfangspunkt schliessen. Kurven- und Pfadwerkzeug ausdrücklich unterscheiden.
+2. **Echte Interaktion:** Zielkontur als SVG, eigener Pfad darüber, sichtbare Anker/Griffe und ein direktes Ergebnis. Übung neu beginnen, Schritt zurück/vor, Hinweise und überspringen; kein Zeitdruck. Abweichung als verständliche Rückmeldung und nicht nur als abstrakte Punktzahl. Punktbudget optional, freies Üben immer möglich.
+3. **Bediengleichheit:** Vor Umsetzung die aktuellen Studio-Tastenregeln abgleichen. Die Referenz nennt unter anderem Shift und Option; das Studio darf nicht unbemerkt fremde Kurzbefehle übernehmen. Klick-/Menü- und numerische Alternativen für Griffaktionen, sinnvolle Fokusreihenfolge und kleine sichtbare Griffe mit grossen Trefferflächen. Maus, Tastatur sowie soweit realistisch Touch/Stift berücksichtigen; technische Grenzen konkret nennen.
+4. **Architektur:** Reine vorhandene Bézier-/Pfadmodelle wiederverwenden, getrenntes flüchtiges Übungsmodell ohne Projektvariable, Medien oder Autosave. Keine Vorschau darf dafür das aktive Dokument austauschen. Ein lokales, verzögert geladenes Übungsmodul; SVG-Aktualisierung pro Animationsframe bündeln, Geometrie-/Trefferprüfungen begrenzen.
+5. **Abnahme:** Eigene Testformen mit reproduzierbaren Toleranzen, vollständige Lektion mit Maus und Tastatur, korrekte Modifier/Undo/Abbruch/Neustart, Projekt unverändert, kein Spielcode vor Öffnen der Übung. Firefox/Chromium, schmale Fenster, Themes, reduzierte Bewegung und Screenreader-Ansagen prüfen. Tatsächlich funktionsfähiges Lernspiel, keine statische Demo. Die derzeit vier statischen Wiki-Grafiken zählen nicht als Umsetzung dieses Spiels.
 
 ## 1. Grundlage, Quellen und Status
 
@@ -344,3 +354,5 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D40 | FD-Kartenfelder, unabhängige Logo-Farbe und Instagram-Referenz | **Erledigt – nochmals prüfen für Abschluss.** 236 Modelltests; Chromium: fd-card-texts, campaign-cards, campaign-preview, text-soft-breaks bestanden. Eingabefokus beim Projektwechsel abgesichert, Kartenüberlappung korrigiert, Screenshot kontrolliert. .mkw-Rundlauf und gleicher PNG-Export mit Ansichtshilfe geprüft. Instagram-UI ist ausdrücklich eine skalierte Werbe-Referenz, keine universelle Pixelgarantie. | [x] |
 
 | D41 | Exportfenster mit integrierter Vorschau, lesbare Reihennamen und echter JPG+-Ausgabe | **Erledigt – nochmals prüfen für Abschluss.** 237 Modelltests; sieben betroffene Chromium-Suiten bestanden. Echter JXL-Header, verlustfreie Pixel, ZIP ohne MKW, normales JPG, Abbruch, unveränderte Farbausgaben, Kommentare und responsive Hell-/Dunkelansichten geprüft. Codec lokal/versioniert, Worker nur bei Bedarf; JXL-Limit 16 MP benannt. Instagram-Schutzzone auf Nutzerwunsch bei Footer-Ansichtsoptionen. [Fünf Personas und Grenzen](REPLICA-FD-EXPORT-REVIEW-2026-11-27.md). | [x] |
+
+| D42 | U43: klares Speichernpanel; bildzentrierte Exportvorschau, Meldungen, Reihennamen und Schriftkanten; vier Wiki-Grafiken | **Erledigt – nochmals prüfen für Abschluss.** Dateiname/Ziel/Browserstatus zuerst, Projektangaben aufklappbar; native Sicherung, Speichern unter, Firefox-Download und Konfliktschutz bleiben erhalten. Vorschau nutzt links die volle Fläche, Kommentare rechts aufklappbar, direkte Auswahl neben Umschaltung, Einpassen/Originalpixel. Reihennamen jetzt `Projekt_R02_4x5_S01.ext`, ohne Artboardnamen. Gerade Stämme inklusive Harriet-Serifen ausgerichtet; erlaubte Rundungen/Serifen allein warnen nicht. GitHub-Zoom-Fehler am 390-px-Fenster lokal behoben. Erste vier HTML/SVG-Grafiken sind eingebaut, die vollständige Wiki-Neustrukturierung und das Bézier-Spiel bleiben U48/U49. [Prüfungen, fünf Personas und Grenzen](REPLICA-FD-EXPORT-REVIEW-2026-11-27.md). | [x] |

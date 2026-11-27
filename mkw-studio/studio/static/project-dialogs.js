@@ -131,76 +131,74 @@ const MKWProjectDialogs = (() => {
       save = $("#saveProject"),
       saveAs = $("#saveProjectAs"),
       psd = $("#savePSD"),
-      status = $("#psdStatus"),
       psdHint = dialog.lastElementChild,
-      body = document.createElement("div"),
+      status = $("#psdStatus");
+    dialog.classList.add("project-task-dialog", "save-focused-dialog");
+    $("#closeSave").setAttribute("aria-label", "Speicherdialog schliessen");
+    const body = document.createElement("div"),
       grid = document.createElement("div"),
       main = document.createElement("div"),
-      target = document.createElement("section"),
-      actions = document.createElement("div"),
+      file = document.createElement("section"),
+      metadata = document.createElement("details"),
+      summary = document.createElement("summary"),
       alternative = document.createElement("aside"),
-      footer = document.createElement("div");
-    dialog.classList.add("project-task-dialog");
-    const title = heading.querySelector("h2"),
-      titleGroup = document.createElement("div");
-    titleGroup.append(title);
-    titleGroup.insertAdjacentHTML(
-      "beforeend",
-      "<p>Sichere dein Projekt zum Weiterarbeiten oder Weitergeben.</p>",
-    );
-    heading.prepend(titleGroup);
-    $("#closeSave").setAttribute("aria-label", "Speicherdialog schliessen");
+      footer = document.createElement("div"),
+      actions = document.createElement("div"),
+      statusArea = document.createElement("div");
     body.className = "project-dialog-body";
     grid.className = "project-dialog-grid";
     main.className = "save-dialog-main";
-    target.className = "save-file-naming";
-    target.setAttribute("aria-labelledby", "saveFileTitle");
-    target.innerHTML = '<h3 id="saveFileTitle">Projektdatei · MKW</h3>';
-    target.append(nameField);
+    file.className = "save-file-naming";
+    file.setAttribute("aria-labelledby", "saveFileTitle");
+    file.innerHTML = `<div class="save-file-heading">${studioIcon("save")}<h3 id="saveFileTitle">MKW-Projekt</h3><span id="saveBrowserState" role="status"></span></div>`;
     const preview = document.createElement("output");
     preview.id = "saveFilePreview";
-    preview.setAttribute("aria-label", "Dateiname der neuen MKW-Datei");
-    preview.setAttribute("aria-live", "off");
-    preview.setAttribute("for", "saveName projectCode projectName saveDate");
     preview.className = "save-file-preview";
-    const previewLabel = document.createElement("p");
-    previewLabel.className = "save-preview-label";
-    previewLabel.textContent = "Datei beim Speichern unter …";
-    previewLabel.append(preview);
-    target.append(previewLabel, $("#saveLocationHint"), $("#saveAsHint"));
-    save.setAttribute("aria-describedby", "saveLocationHint");
-    naming.querySelector("h3").textContent = "Projektangaben";
-    $("#saveDate").placeholder = "z. B. 151126";
-    actions.className = "save-primary-actions";
-    actions.setAttribute("role", "group");
-    actions.setAttribute("aria-label", "MKW-Projekt sichern");
-    save.classList.add("primary");
-    actions.append(saveAs, save);
-    main.append(naming, target);
+    preview.setAttribute("aria-label", "Dateiname der neuen MKW-Datei");
+    preview.setAttribute("for", "saveName projectCode projectName saveDate");
+    const destination = document.createElement("div");
+    destination.className = "save-destination";
+    destination.append($("#saveLocationHint"));
+    $("#saveAsHint").classList.add("sr-only");
+    file.append(
+      nameField,
+      preview,
+      destination,
+      $("#saveDateHint"),
+      $("#saveAsHint"),
+    );
+    metadata.className = "save-project-details";
+    summary.textContent = "Projektangaben";
+    naming.querySelector("h3").remove();
+    metadata.append(summary, naming);
+    if ($("#saveDateFormats")) $("#saveDateFormats").classList.add("sr-only");
+    main.append(file, metadata);
     alternative.className = "save-alternatives";
     alternative.setAttribute("aria-labelledby", "saveAlternativesTitle");
     alternative.innerHTML =
-      '<h3 id="saveAlternativesTitle">Weitere Möglichkeiten</h3>';
-    psdHint.textContent =
-      "Photoshop benötigt dieselben Schriften. Spezialfälle enthalten eine genaue Rasterdarstellung und zusätzliche Ebenen zum Bearbeiten. MKW zum Weiterarbeiten im Studio behalten.";
+      '<h3 id="saveAlternativesTitle">Weitere Formate</h3>';
     const psdScope = document.createElement("label");
     psdScope.id = "psdRowScopeLabel";
     psdScope.hidden = true;
     psdScope.innerHTML =
       'PSD-Auswahl<select id="psdRowScope"><option value="all">Gesamtes Projekt</option><option value="row">Aktive Reihe</option></select>';
-    alternative.append(psdScope, psd, psdHint);
+    psdHint.textContent = "MKW zum Weiterarbeiten im Studio behalten.";
     const exportCard = document.createElement("section");
     exportCard.className = "save-export-entry";
-    exportCard.innerHTML = `<h3>Fertige Bilder teilen</h3><p>JPG, PNG, WebP und beim Designer auch PDF findest du im Export.</p><button type="button" id="saveOpenExport">${studioIcon("export")}<span>Zum Export</span></button>`;
-    alternative.append(exportCard);
+    exportCard.innerHTML = `<button type="button" id="saveOpenExport">${studioIcon("export")}<span>Bilder & PDF exportieren</span></button>`;
+    alternative.append(psdScope, psd, psdHint, exportCard);
     grid.append(main, alternative);
     body.append(grid);
     footer.className = "save-dialog-footer";
-    const statusArea = document.createElement("div");
     statusArea.className = "project-dialog-status";
     statusArea.append(status);
+    actions.className = "save-primary-actions";
+    actions.setAttribute("role", "group");
+    actions.setAttribute("aria-label", "MKW-Projekt sichern");
+    save.classList.add("primary");
+    actions.append(saveAs, save);
     footer.append(statusArea, actions);
-    heading.after(body, footer);
+    dialog.replaceChildren(heading, body, footer);
     $("#saveOpenExport").onclick = () => {
       dialog.close();
       $(p.carousel ? "#carouselExport" : "#export").click();
@@ -211,18 +209,38 @@ const MKWProjectDialogs = (() => {
     for (const id of ["saveName", "projectCode", "projectName", "saveDate"])
       $("#" + id).addEventListener("input", update);
     $("#save").addEventListener("click", () => {
-      saveAs.hidden = !MKWProjects.fileLink();
-      previewLabel.firstChild.textContent = MKWProjects.fileLink()
-        ? "Neue Datei beim Speichern unter …"
-        : "So heisst deine Datei";
+      const link = MKWProjects.fileLink();
+      $("#saveOpenExport span").textContent = p.carousel
+        ? "Bilder & PDF exportieren"
+        : "Bilder exportieren";
+      saveAs.hidden = !link;
+      nameField.firstChild.textContent = link
+        ? "Name für neue Kopie / PSD"
+        : "Dateiname";
+      $("#saveBrowserState").textContent =
+        savedRevision >= revision
+          ? "Browser: gesichert"
+          : "Browser: Sicherung ausstehend";
+      $("#saveLocationHint").textContent = link?.stamp?.zip
+        ? link.handle.name +
+          (studioPreferences.autoSaveFile
+            ? " · Auto-Speichern an"
+            : " · Auto-Speichern aus")
+        : link
+          ? link.handle.name + " · neues MKW-Format als Kopie speichern"
+          : window.showSaveFilePicker
+            ? "Ordner beim Speichern wählen"
+            : "Download · Speicherort gemäss Browser-Einstellung";
       psdScope.hidden = !p.carousel?.pageStructure;
       psdScope.querySelector("select").value = "all";
       const row = p.carousel?.pageStructure ? carouselRow() : null;
       psdScope.querySelector('[value="row"]').textContent = row
         ? `Diese Reihe: ${row.info.name}`
         : "Aktive Reihe";
+      metadata.open = !!MKWDateFields.message($("#saveDate").value);
       update();
       body.scrollTop = 0;
+      $("#saveName").focus({ preventScroll: true });
     });
   }
   setupSave();

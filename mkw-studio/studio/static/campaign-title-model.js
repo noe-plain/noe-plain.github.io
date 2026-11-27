@@ -21,7 +21,7 @@
     const result = new Map(),
       legacy = fields.flatMap(({ key }) => {
         const value = board?.elements?.[key];
-        return value?.text && value.visible
+        return value?.text && value.visible && value.enabled !== false
           ? value.text.split("\n").map(() => key)
           : [];
       });

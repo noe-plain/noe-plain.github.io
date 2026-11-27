@@ -42,7 +42,12 @@ const MKWExportPanel = (() => {
   filenamePreview.setAttribute("aria-label", "Beispiel-Dateiname");
   namingSummary.append(namingHeading);
   naming.append(namingSummary, filenamePreview, fields);
-  scroll.replaceChildren(settings, naming);
+  const comments = document.createElement("details");
+  comments.id = "exportCommentPanel";
+  comments.className = "export-settings-card";
+  comments.hidden = true;
+  comments.innerHTML = "<summary>Bildkommentar</summary>";
+  scroll.replaceChildren(settings, comments, naming);
   preset.firstChild.textContent = "Voreinstellung";
   summary.className = "export-footer-summary";
   summary.append($("#exportTotal"), $("#exportStatus"));
@@ -64,7 +69,16 @@ const MKWExportPanel = (() => {
   choose.setAttribute("aria-label", "Exportauswahl anzeigen");
   reviewButton.textContent = "Vorschau";
   views.append(choose, reviewButton);
-  dialog.querySelector(".export-selection").after(views);
+  const viewbar = document.createElement("div");
+  viewbar.className = "export-viewbar";
+  viewbar.append(views);
+  dialog.querySelector(".export-selection").after(viewbar);
+  const messages = document.createElement("details");
+  messages.className = "export-messages";
+  messages.id = "exportMessages";
+  messages.innerHTML = `<summary aria-label="Meldungen">${studioIcon("info")}<span class="export-message-label">Meldungen</span><span id="exportMessageCount"></span></summary><div id="exportMessageList" role="list"></div>`;
+  $("#closeExport").before(messages);
+
   reviewDialog.querySelector(".dialog-heading").hidden = true;
   dialog.querySelector(".export-images").append(reviewDialog);
   const cancel = document.createElement("button");
@@ -78,7 +92,11 @@ const MKWExportPanel = (() => {
   };
   actions.prepend(cancel);
   dialog.addEventListener("cancel", (event) => {
-    if (busy) {
+    if (messages.open) {
+      event.preventDefault();
+      messages.open = false;
+      messages.querySelector("summary").focus();
+    } else if (busy) {
       event.preventDefault();
       if (!cancel.hidden) cancel.click();
     } else if (reviewDialog.open) {
@@ -91,7 +109,15 @@ const MKWExportPanel = (() => {
   dialog.addEventListener(
     "keydown",
     (event) => {
-      if (event.key !== "Escape" || !reviewDialog.open || busy) return;
+      if (event.key !== "Escape" || busy) return;
+      if (messages.open) {
+        event.preventDefault();
+        event.stopPropagation();
+        messages.open = false;
+        messages.querySelector("summary").focus();
+        return;
+      }
+      if (!reviewDialog.open) return;
       event.preventDefault();
       event.stopPropagation();
       if (window.MKWReviewCommentsUI?.editing())
@@ -101,17 +127,101 @@ const MKWExportPanel = (() => {
     true,
   );
   function review(open) {
+    comments.hidden = !open;
+    dialog.querySelector(".export-images").classList.toggle("is-preview", open);
+    const tools = $("#reviewImageTools");
+    if (tools) tools.hidden = !open;
+    $("#selectAllExports").parentElement.hidden = open;
+    dialog.querySelector(".export-selection h3").textContent = open
+      ? "Exportvorschau"
+      : p.carousel && !p.campaign
+        ? "Slides auswählen"
+        : "Bilder auswählen";
     $("#exportNames").hidden = open;
+    const current = $(".review-current-actions");
+    if (current) current.hidden = !open;
     choose.setAttribute("aria-pressed", String(!open));
     reviewButton.setAttribute("aria-pressed", String(open));
     if (!open && reviewDialog.open) reviewDialog.close();
   }
+  const imageTools = document.createElement("div");
+  imageTools.id = "reviewImageTools";
+  imageTools.setAttribute("role", "group");
+  imageTools.setAttribute("aria-label", "Vorschau vergrössern");
+  imageTools.hidden = true;
+  imageTools.innerHTML = `<button type="button" class="icon-button" id="reviewFit" aria-label="Vorschau einpassen" title="Vorschau einpassen" aria-pressed="true">${studioIcon("fit")}</button><button type="button" class="icon-button" id="reviewPixels" aria-label="Originalpixel prüfen" title="Originalpixel prüfen" aria-pressed="false">${studioIcon("zoom")}</button>`;
+  viewbar.append(imageTools);
+  for (const [id, actual] of [
+    ["reviewFit", false],
+    ["reviewPixels", true],
+  ])
+    $("#" + id).onclick = () => {
+      $(".review-stage").classList.toggle("review-original-pixels", actual);
+      $("#reviewFit").setAttribute("aria-pressed", String(!actual));
+      $("#reviewPixels").setAttribute("aria-pressed", String(actual));
+      $(".review-stage").scrollTop = $(".review-stage").scrollLeft = 0;
+    };
   function filename(value) {
     filenamePreview.textContent = value;
     filenamePreview.title = value;
   }
+  function refreshMessages() {
+    const items = studioWarningItems.map((item) => ({
+        ...item,
+        actionable: true,
+      })),
+      system = studioSystemMessages();
+    $("#exportMessageCount").textContent = items.length
+      ? `· ${items.length} ${items.length === 1 ? "Hinweis" : "Hinweise"}`
+      : system.some((item) => item.level === "error")
+        ? "· Fehler"
+        : "";
+    $("#exportMessages summary").setAttribute(
+      "aria-label",
+      "Meldungen " + $("#exportMessageCount").textContent,
+    );
+    const messages = $("#exportMessageList");
+    messages.replaceChildren();
+    for (const item of [...items, ...system]) {
+      const row = document.createElement("div"),
+        title = document.createElement("strong"),
+        value = document.createElement("span");
+      row.setAttribute("role", "listitem");
+      title.textContent =
+        item.title || (item.level === "error" ? "Fehler" : "Projektstatus");
+      value.textContent = item.message;
+      row.append(title, value);
+      if (item.actionable) {
+        const button = document.createElement("button"),
+          projectId = p.projectId;
+        button.type = "button";
+        button.className = "icon-button";
+        button.innerHTML = studioIcon("select");
+        button.setAttribute("aria-label", `Im Design anzeigen: ${item.title}`);
+        button.onclick = () => {
+          if (p.projectId !== projectId) return;
+          $("#closeExport").click();
+          setTimeout(() => {
+            if (p.projectId === projectId) studioFocusWarning(item);
+          }, 0);
+        };
+        row.append(button);
+      }
+      messages.append(row);
+    }
+    if (!messages.children.length) {
+      const empty = document.createElement("div");
+      empty.setAttribute("role", "listitem");
+      empty.textContent = "Keine aktuellen Meldungen.";
+      messages.append(empty);
+    }
+  }
+  messages.addEventListener("toggle", () => {
+    if (messages.open) refreshMessages();
+  });
   function sync() {
     const designer = !!p.carousel && !p.campaign;
+    refreshMessages();
     $("#exportIncludeProject").checked = exportOptions.includeProject !== false;
     projectFile.hidden = exportOptions.format === "pdf";
     $("#zip").textContent =
@@ -146,9 +256,11 @@ const MKWExportPanel = (() => {
       dialog.querySelector(".export-selection h3").after(label);
     }
 
-    dialog.querySelector(".export-selection h3").textContent = designer
-      ? "Slides auswählen"
-      : "Bilder auswählen";
+    dialog.querySelector(".export-selection h3").textContent = reviewDialog.open
+      ? "Exportvorschau"
+      : designer
+        ? "Slides auswählen"
+        : "Bilder auswählen";
     dialog
       .querySelector(".export-images")
       .setAttribute(

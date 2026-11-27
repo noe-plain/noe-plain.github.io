@@ -773,7 +773,7 @@ function openReview(boardId) {
     actions.className = "review-current-actions";
     actions.innerHTML =
       '<label><input id="reviewCurrentExport" type="checkbox"><span>Dieses Bild exportieren</span></label><span id="reviewSelectedCount" role="status"></span>';
-    document.querySelector(".review-stage").before(actions);
+    document.querySelector(".export-viewbar").append(actions);
     $("#reviewCurrentExport").onchange = (e) =>
       exportSetSelection(
         p.boards

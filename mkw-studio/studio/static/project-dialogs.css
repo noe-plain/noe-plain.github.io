@@ -540,3 +540,105 @@
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
+
+#saveDialog.save-focused-dialog .project-dialog-grid {
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+}
+#saveDialog .save-file-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+#saveDialog .save-file-heading h3 {
+  margin: 0;
+}
+#saveBrowserState {
+  margin-left: auto;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+}
+#saveDialog .save-file-preview {
+  margin-block: 12px 20px;
+  font-size: 13px;
+}
+#saveDialog .save-destination {
+  padding: 16px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+#saveDialog .save-destination p {
+  margin: 0;
+  color: inherit;
+}
+#saveDialog .save-project-details {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+  min-width: 0;
+}
+#saveDialog .save-project-details summary {
+  min-height: 56px;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+#saveDialog .save-project-details .save-project-naming {
+  padding-top: 12px;
+  background: transparent;
+}
+#saveDialog #saveDateHint {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+}
+#saveDialog #saveDateHint:empty {
+  display: none;
+}
+#saveDialog .save-alternatives .save-choice {
+  min-height: 72px;
+  padding: 16px 12px;
+  gap: 12px;
+}
+#saveDialog .save-export-entry {
+  border: 0;
+  padding: 0;
+  margin-top: 20px;
+}
+#saveDialog #saveOpenExport {
+  width: 100%;
+  justify-content: flex-start;
+  min-height: 48px;
+  padding: 12px;
+  border-radius: 12px;
+}
+#saveDialog .save-alternatives small {
+  font-size: 12px;
+  line-height: 18px;
+}
+@media (max-width: 760px) {
+  #saveDialog.save-focused-dialog .project-dialog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  #saveDialog .save-file-heading {
+    margin-bottom: 16px;
+  }
+}
+
+#saveDialog .save-alternatives {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+#saveDialog .save-alternatives > :is(h3, small, button, section) {
+  margin: 0;
+}
+#saveDialog .save-alternatives > button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 12px;
+}

@@ -89,12 +89,12 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       assert(r.optical);
       for (const row of r.rows) {
         if (align === "left")
-          assert(Math.abs(row.min - 100) <= 2, JSON.stringify(row));
+          assert(Math.abs(row.min + (row.ink.overhangLeft || 0) - 100) <= 2, JSON.stringify(row));
         if (align === "right")
-          assert(Math.abs(row.max - 499) <= 2, JSON.stringify(row));
+          assert(Math.abs(row.max - (row.ink.overhangRight || 0) - 499) <= 2, JSON.stringify(row));
         if (align === "center")
           assert(
-            Math.abs((row.min + row.max) / 2 - 299.5) <= 2,
+            Math.abs((row.min + (row.ink.overhangLeft || 0) + row.max - (row.ink.overhangRight || 0)) / 2 - 299.5) <= 2,
             JSON.stringify(row),
           );
       }

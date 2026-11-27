@@ -148,6 +148,15 @@ function carouselWarning(o) {
       bounds.y + bounds.h > safe.y + safe.h)
   )
     return "Text liegt ausserhalb der empfohlenen Safezone.";
+  if (
+    carouselTextLayout(o).lines.some(
+      (line) =>
+        line.ink &&
+        (line.x + line.ink.left + line.ink.overhangLeft < -1 ||
+          line.x + line.ink.right - line.ink.overhangRight > o.w + 1),
+    )
+  )
+    return "Text ragt mit seiner geraden Satzkante über den Textrahmen hinaus.";
   if (carouselTextHeight(o) > o.h + 1)
     return "Text passt nicht vollständig in den Textrahmen.";
   return carouselTextLayout(o).lines.some((line) => line.justification?.limited)

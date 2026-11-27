@@ -803,3 +803,17 @@ header .header-action-group .icon-button:hover {
     background: Highlight;
   }
 }
+
+/* View toggles may scroll in narrow windows; zoom stays fixed and reachable. */
+footer .footer-view-controls {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+footer .footer-view-controls::-webkit-scrollbar {
+  display: none;
+}
+footer .footer-view-controls button {
+  flex: none;
+}

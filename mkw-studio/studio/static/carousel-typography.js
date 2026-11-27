@@ -88,6 +88,94 @@ function carouselTypeRuns(o, raw, start, size, ctx) {
   if (previousSpacing !== undefined) ctx.letterSpacing = previousSpacing;
   return { runs, width: x };
 }
+const carouselOpticalGlyphs = new WeakMap();
+function carouselOpticalOverhang(run, side) {
+  const characters = Array.from(run.text.trim()),
+    character = side === "left" ? characters[0] : characters.at(-1);
+  if (!character) return 0;
+  let cache = carouselOpticalGlyphs.get(fontStatus);
+  if (!cache) carouselOpticalGlyphs.set(fontStatus, (cache = new Map()));
+  const key = JSON.stringify([run.font, character, side]);
+  let fraction = cache.get(key);
+  if (fraction === undefined) {
+    const unit = 192,
+      canvas = makeCanvas(unit * 3, unit * 3),
+      context = canvas.getContext("2d", { willReadFrequently: true });
+    try {
+      context.font = `${unit}px ${fontFamily(run.font)}`;
+      context.textBaseline = "alphabetic";
+      const metrics = context.measureText(character),
+        glyphWidth =
+          metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+      if (
+        /^[.,:;!?\u2018\u2019\u201c\u201d\u00ab\u00bb"'\-–—]$/u.test(character)
+      )
+        fraction = Math.min(0.25, (glyphWidth / unit) * 0.45);
+      else if (
+        (side === "left"
+          ? /^[CGOQSaceoqs0235689]$/u
+          : /^[BCDGOPQSabcdeopqs0235689]$/u
+        ).test(character)
+      )
+        fraction = 0.025;
+      else if (/^[AVWXYavwxy]$/u.test(character)) fraction = 0.035;
+      else {
+        context.fillText(character, unit, unit * 2);
+        const pixels = context.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+          ).data,
+          top = Math.max(
+            0,
+            Math.floor(unit * 2 - metrics.actualBoundingBoxAscent),
+          ),
+          bottom = Math.min(
+            canvas.height,
+            Math.ceil(unit * 2 + metrics.actualBoundingBoxDescent),
+          ),
+          inset = Math.floor((bottom - top) * 0.12),
+          edges = [];
+        for (let y = top + inset; y < bottom - inset; y++) {
+          const first = Math.max(
+              0,
+              Math.floor(unit - metrics.actualBoundingBoxLeft - 2),
+            ),
+            last = Math.min(
+              canvas.width - 1,
+              Math.ceil(unit + metrics.actualBoundingBoxRight + 2),
+            );
+          for (
+            let x = side === "left" ? first : last;
+            side === "left" ? x <= last : x >= first;
+            x += side === "left" ? 1 : -1
+          ) {
+            if (pixels[(y * canvas.width + x) * 4 + 3] > 64) {
+              edges.push(x - unit);
+              break;
+            }
+          }
+        }
+        edges.sort((a, b) => a - b);
+        const stem = edges[Math.floor(edges.length / 2)],
+          delta =
+            side === "left"
+              ? stem + metrics.actualBoundingBoxLeft
+              : metrics.actualBoundingBoxRight - stem - 1;
+        fraction =
+          Number.isFinite(delta) && delta > 1.25 && delta < unit * 0.16
+            ? delta / unit
+            : 0;
+      }
+    } finally {
+      canvas.width = canvas.height = 1;
+    }
+    if (cache.size >= 256) cache.delete(cache.keys().next().value);
+    cache.set(key, fraction);
+  }
+  return fraction * run.size * (run.glyphScale ?? 1);
+}
 // Visible glyph bounds, measured once with the cached text layout. Advances
 // remain unchanged, preserving wrapping, selection and intentional indentation.
 function carouselTextInk(runs, ctx, family = false) {
@@ -119,7 +207,16 @@ function carouselTextInk(runs, ctx, family = false) {
     );
   }
   ctx.restore();
-  return found ? { left, right, indent } : null;
+  const visible = runs.filter((run) => run.text.trim());
+  return found
+    ? {
+        left,
+        right,
+        indent,
+        overhangLeft: carouselOpticalOverhang(visible[0], "left"),
+        overhangRight: carouselOpticalOverhang(visible.at(-1), "right"),
+      }
+    : null;
 }
 function carouselPaintTextRun(ctx, run, x, y, color, family = false) {
   const horizontal = run.glyphScale ?? 1;

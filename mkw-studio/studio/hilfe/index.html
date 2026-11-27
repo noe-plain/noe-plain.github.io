@@ -13,7 +13,7 @@
       href="../static/ui-theme-tokens.css?v=b86a421a3a48"
     />
     <link rel="stylesheet" href="../static/ui-theme.css?v=b86a421a3a48" />
-    <link rel="stylesheet" href="hilfe.css?v=1207b3f797a4" />
+    <link rel="stylesheet" href="hilfe.css?v=cf3181285ead" />
     <script src="hilfe.js?v=097f3e57514e" defer></script>
   </head>
   <body>
@@ -89,13 +89,23 @@
         <p id="helpResults" role="status" aria-live="polite" hidden></p>
         <section id="schnellstart">
           <h2>Deinen ersten Post erstellen</h2>
+          <figure class="wiki-figure" id="grafik-ablauf">
+            <ol class="wiki-visual-steps">
+              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="15" y="9" width="66" height="60" rx="8"/><circle class="diagram-accent" cx="61" cy="27" r="8"/><path class="diagram-accent" d="M21 61 42 37 56 50 64 42 76 61Z"/></svg><strong>1 · Foto</strong><span>Importieren</span></li>
+              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="15" y="9" width="66" height="60" rx="8"/><path class="diagram-line" d="M26 25H67M26 36H60M26 53H67"/><rect class="diagram-dashed" x="22" y="18" width="52" height="41"/></svg><strong>2 · Gestalten</strong><span>Text, Ausschnitt, Logo</span></li>
+              <li><svg viewBox="0 0 96 80" aria-hidden="true"><path class="diagram-paper" d="M25 8H58L73 23V70H25Z"/><path class="diagram-line" d="M58 8V24H73M35 43L45 53 64 32"/></svg><strong>3 · MKW sichern</strong><span>Bearbeitbares Projekt</span></li>
+              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="17" y="11" width="62" height="58" rx="8"/><path class="diagram-line" d="M48 21V50M35 38 48 51 61 38M29 60H67"/></svg><strong>4 · Exportieren</strong><span>Fertige Bilder / PDF</span></li>
+            </ol>
+            <figcaption>Speichern und Export sind zwei verschiedene Ergebnisse: MKW zum Weiterarbeiten, JPG oder PDF zum Veröffentlichen.</figcaption>
+          </figure>
+
           <h3>Welchen Modus soll ich wählen?</h3>
           <ul>
             <li>
               <strong>FD-Kampagnen:</strong> Du möchtest aus einem oder mehreren
               Fotos fertige Sujets erstellen. Für jedes Foto entstehen
               automatisch die ausgewählten Formate, zum Beispiel Story und
-              Quadrat. Text und MKW-Logo haben bereits ihren vorgesehenen Platz.
+              Quadrat. Das Foto füllt den Rahmen. In der ersten Bildkarte ergänzt du Übertitel, Titel und Untertitel; das Logo kannst du auf der Fläche anpassen.
             </li>
             <li>
               <strong>Designer:</strong> Du möchtest mehrere Seiten gestalten,
@@ -209,6 +219,16 @@
         <section id="einzelposts">
           <h2>FD-Kampagnen gestalten</h2>
           <h3 id="fd-vorschau">FD-Kampagnen: der neue Bearbeitungsablauf</h3>
+          <figure class="wiki-figure" id="grafik-verknuepfung">
+            <svg viewBox="0 0 680 320" role="img" aria-labelledby="linkBildTitel linkBildBeschreibung">
+              <title id="linkBildTitel">Ein gemeinsamer Text, zwei individuelle Positionen</title><desc id="linkBildBeschreibung">Zwei gleich grosse Hochformate zeigen Sommermusik. Der Textinhalt ist verbunden. Im zweiten Bild wurde nur die Position nach oben verschoben.</desc>
+              <g transform="translate(35 20)"><rect class="diagram-paper" width="210" height="250" rx="12"/><path class="diagram-wash" d="M0 150 70 80 140 140 210 100V250H0Z"/><text x="16" y="32">Bild 1 · Vorlage</text><rect class="diagram-dashed" x="12" y="180" width="186" height="45"/><text class="diagram-title" x="22" y="209">Sommermusik</text></g>
+              <g transform="translate(435 20)"><rect class="diagram-paper" width="210" height="250" rx="12"/><path class="diagram-wash" d="M0 190 100 95 210 170V250H0Z"/><text x="16" y="32">Bild 2</text><rect class="diagram-dashed" x="12" y="100" width="186" height="45"/><text class="diagram-title" x="22" y="129">Sommermusik</text></g>
+              <path class="diagram-line" d="M265 145H415M400 136 415 145 400 154"/><text x="340" y="120" text-anchor="middle">Text verbunden</text><text x="340" y="183" text-anchor="middle">Position individuell</text><text x="340" y="304" text-anchor="middle">Gleiche Formate · geänderte Eigenschaft bleibt eigenständig</text>
+            </svg>
+            <figcaption>Verschiebst du den Titel nur bei Bild 2, bleibt dort seine Position individuell. Änderst du danach den gemeinsamen Text bei Bild 1, aktualisiert sich der Inhalt trotzdem in beiden Ausgaben.</figcaption>
+          </figure>
+
           <ol><li>Wähle auf der Startseite <strong>FD-Kampagnen</strong>. Gib Namen und Kürzel ein und wähle deine Formate mit Schutzzonen.</li><li>Importiere deine Fotos. Jedes Bild erhält eine Reihe mit allen gewählten Formaten. Die Formate stehen oberhalb der Zeichenflächen; links findest du Bildvorschau und Bildaktionen.</li><li>Gestalte das oberste Sujet je Auflösung. Sujets mit gleicher Breite und Höhe übernehmen sein Design, unabhängig von der Position des Formats in der Reihe. Wenn du Bildreihen verschiebst, führt das neue oberste Sujet die gemeinsame Gestaltung weiter.</li><li>Du kannst jede Ausgabe einzeln anpassen. Nur die geänderte Eigenschaft wird unabhängig: Eine eigene Position behält weiterhin den gemeinsamen Text. Ein eigener Text kann weiterhin der gemeinsamen Position folgen. Im Eigenschaftenbereich siehst du, ob ein Element verbunden oder einzeln angepasst ist.</li><li>Zusätzliche Bilder bleiben auf ihrer Ausgabe. Der erste Verlauf der Formatvorlage wird übernommen und liegt zunächst unter den Texten. Über die Ebenen kannst du die Reihenfolge ändern.</li><li>Ziehe auf einem weiteren Format ein Textfeld auf: Die Auswahl erscheint direkt im aufgezogenen Feld. Links wählst du <strong>Neuen Text schreiben</strong>, rechts kannst du einen vorhandenen Text mit seiner Formatierung übernehmen. Mit Escape oder einem Klick ausserhalb brichst du ab. Die Formatierung des neuen Formats ist anschliessend unabhängig anpassbar.</li></ol>
           <p>Die Bildkarte zeigt dein Foto gross als Vorschau. Ein Klick darauf zeigt die Bildreihe. Darunter findest du kompakte Symbolbuttons für <strong>Bild ersetzen</strong> und <strong>Format hinzufügen</strong>. Lasse die Maus kurz auf einem Symbol ruhen, um seine Beschriftung zu sehen. Bei Tastaturfokus erscheint der Hinweis direkt. Reihenfolge und Entfernen findest du ebenfalls bei den Bildaktionen. Über die <strong>drei Punkte</strong> erreichst du Bildwinkel, Familienkonzert, Sponsorenleiste und die Aktionen für die Bildreihe. Die Bildkarte bleibt unabhängig vom Zoom lesbar und ist an der oberen Kante des Artworks ausgerichtet. Bei stark verkleinerten Ansichten wird sie kompakt; ihre Aktionen und der Bildnachweis bleiben über die drei Punkte erreichbar. Die Karte selbst hat keine eigene Scrollfläche. Bildnachweis / Copyright steht zunächst wie bisher am Bildrand, ist aber eine eigene verschiebbare und drehbare Textebene.</p>
           <p>FD-Kampagnen unterstützt einzelne Ausgabeformate von 240–4000 px, bis zu 200 Ausgaben und 500 Ebenen pro Kampagne. Viele Ausgaben teilen sich die Originalbilder. Wie viele grosse Fotos gleichzeitig flüssig bearbeitet werden können, hängt zusätzlich von Browser und Arbeitsspeicher ab.</p>
@@ -217,7 +237,7 @@
           <h3>Familienkonzert-Farben für einzelne Texte</h3><p>Markiere die gewünschten Zeichen oder wähle Absätze/Zeilen. Öffne unter <strong>Textfarbe</strong> den Farbwähler und wähle <strong>Familienkonzert</strong>. Nur diese Auswahl erhält bunte Buchstaben mit 2-px-Kontur. Ein zweiter Klick auf <strong>Familienkonzert</strong> schaltet die Farbfolge wieder aus und zeigt die bisherige Textfarbe. Der Button zeigt aktiv, inaktiv oder teilweise aktiv an. Du kannst auch eine normale Textfarbe wählen. Der Quelltext bleibt erhalten. Die Funktion steht in Designer, FD-Kampagnen und bisherigem FD-Modus bereit; Copyright ist ausgenommen.</p>
           <p>Die Werkzeuge zeigen nur Icons; ihre Namen erscheinen als Hinweis beim Darüberfahren oder Fokussieren. Die überlappenden Farbfelder in der Werkzeugleiste bearbeiten Fläche und Kontur des gewählten Elements. Die vordere Fläche ist aktiv. Am fokussierten Farbfeld wählt Pfeil links die Fläche, Pfeil rechts die Kontur; Eingabe öffnet den Farbwähler. Je nach Element kann eine Kontur nicht verfügbar sein.</p>
           <p><strong>Meldungen im Footer:</strong> Ganz links in der rechten Footer-Gruppe bleibt der Meldungsbutton immer sichtbar. Neutral bedeutet keine aktuellen Warnungen oder Fehler, Blau eine Projektinformation, Gelb einen Hinweis und Rot einen Fehler. Ein Klick öffnet Details und die bisherigen Sprünge zum betroffenen Element. Auch Speicherfehler erscheinen dort; Hinweise können geschlossen und später wieder angesehen werden. Escape schliesst die Details. Das Öffnen der Meldungen ändert dein Layout nicht.</p>
-          <h3>Exportvorschau</h3><p>Mit den festen Pfeilbuttons wechselst du zwischen den Bildern. Die Checkbox <strong>Dieses Bild exportieren</strong> nimmt das gezeigte Bild in die Auswahl auf oder entfernt es. Über <strong>Auswahl</strong> wechselst du zur Übersicht zurück. Die Vorschau bleibt im Exportfenster; die Einstellungen rechts bleiben erreichbar.</p>
+          <h3>Exportvorschau</h3><p>Mit den festen Pfeilbuttons wechselst du zwischen den Bildern. Die Checkbox <strong>Dieses Bild exportieren</strong> nimmt das gezeigte Bild in die Auswahl auf oder entfernt es. Über <strong>Auswahl</strong> wechselst du zur Übersicht zurück. Die Vorschau bleibt im Exportfenster. «Dieses Bild exportieren» steht neben der Umschaltung. Das Bild nutzt die gesamte linke Fläche; «Bildkommentar» ist rechts aufklappbar. Mit «Originalpixel prüfen» vergrösserst du zur Qualitätskontrolle, mit «Vorschau einpassen» kehrst du zur Gesamtansicht zurück. «Meldungen» oben zeigt Hinweise und Fehler; über «Im Design anzeigen» wechselst du zum betroffenen Objekt.</p>
           <p>In der Vorschau kannst du einen <strong>Bildkommentar</strong> hinzufügen, bearbeiten oder entfernen. Bis zu 1000 Zeichen bleiben als interne Notiz im Projekt; <strong>Speichern</strong> übernimmt sie, <strong>Abbrechen</strong> verwirft die Eingabe. Escape bricht zunächst die Bearbeitung ab. In FD-Kampagnen gilt die Notiz für alle Formate desselben Bildes, im Designer für die jeweilige Slide. Auf der Fläche öffnet der kleine Button <strong>Kommentar</strong> unter dem Bild die Notiz. Sie bleibt in MKW und der Projektdatei im Bild-ZIP erhalten, erscheint aber nie im PNG-, PDF- oder PSD-Motiv.</p>
           <p class="note">Die folgenden detaillierten Anleitungen zu festen Textarten und der bisherigen Formatvorlage betreffen <strong>FD-Kampagnen (Backup)</strong>.</p>
 
@@ -788,8 +808,18 @@
             den ursprünglichen Text neu einzugeben.
           </p>
           <p><strong>Vertikale Textposition:</strong> Direkt unter <strong>Ausrichtung der Auswahl</strong> findest du eine eigene Reihe mit drei Symbolen für oben, mittig und unten. Sie positionieren den Inhalt im gesamten Textfeld; die Rahmenposition bleibt erhalten. Bei mehreren ausgewählten Textfeldern gilt die Wahl für alle. Gesperrte Felder werden nicht verändert. Rückgängig stellt die vorige Position wieder her.</p>
-          <p><strong>Optisch bündige Textkanten:</strong> Neue Textfelder in Designer und FD-Kampagnen richten sichtbare Buchstabenkanten standardmässig optisch aus. Unter <strong>Absatz &amp; Abstände → Optischer Randausgleich</strong> kannst du dies pro Absatz ausschalten oder bei bestehenden Texten einschalten. Sie gilt für die gewählten Absätze und deren Links-, Rechts- oder Mittelachse. Gewollte Einzüge bleiben erhalten. Bestehende Texte und Vorlagen verschieben sich erst nach deiner Auswahl. Blocksatz verwendet seine eigene Abstandsregelung. Im PSD bleibt bei optisch ausgeglichenem Text eine genaue Rasterdarstellung mit zusätzlichem bearbeitbarem Text erhalten.</p>
-          <h3>Bildwinkel positionieren und drehen</h3>
+          <p><strong>Optisch bündige Textkanten:</strong> Neue Textfelder in Designer und FD-Kampagnen richten ihre Satzkante standardmässig optisch aus: Gerade Buchstabenstämme beginnen am Textrahmen. Rundungen, schräge Kanten, Satzzeichen und ausladende Serifen dürfen kontrolliert darüber hinausragen. Die Überhänge allein lösen keine Schutzzonenwarnung aus; ein verschobener Textrahmen oder tatsächlich überlaufender Text wird weiterhin gemeldet. Die Schriftform wird aus der geladenen Schrift gemessen; es handelt sich um die eigene optische Satzlogik des Studios. Unter <strong>Absatz &amp; Abstände → Optischer Randausgleich</strong> kannst du dies pro Absatz ausschalten oder bei bestehenden Texten einschalten. Sie gilt für die gewählten Absätze und deren Links-, Rechts- oder Mittelachse. Gewollte Einzüge bleiben erhalten. Bei ausgeschaltetem Randausgleich bleiben bisherige Positionen unverändert. Ist der Randausgleich eingeschaltet, gilt die aktuelle optische Satzlogik. Blocksatz verwendet seine eigene Abstandsregelung. Im PSD bleibt bei optisch ausgeglichenem Text eine genaue Rasterdarstellung mit zusätzlichem bearbeitbarem Text erhalten.</p>
+
+          <figure class="wiki-figure" id="grafik-randausgleich">
+            <svg viewBox="0 0 660 160" role="img" aria-labelledby="optBildTitel optBildBeschreibung">
+              <title id="optBildTitel">Gerade Kante, Rundung und Serife am Textrahmen</title><desc id="optBildBeschreibung">Drei schematische Buchstaben stehen an einer gestrichelten Rahmenkante. Beim E beginnt der Stamm exakt an der Linie. Die Rundung des O und die schmalen Serifen des zweiten E reichen etwas links über die Linie hinaus.</desc>
+              <g transform="translate(80 30)"><path class="diagram-guide" d="M0-12V75"/><path class="diagram-ink" d="M0 0H42V8H10V27H35V35H10V57H42V65H0Z"/><text x="22" y="103" text-anchor="middle">Gerader Stamm</text></g>
+              <g transform="translate(300 30)"><path class="diagram-guide" d="M0-12V75"/><ellipse class="diagram-round" cx="22" cy="32" rx="26" ry="33"/><text x="22" y="103" text-anchor="middle">Rundung</text></g>
+              <g transform="translate(520 30)"><path class="diagram-guide" d="M0-12V75"/><path class="diagram-ink" d="M-7 0H43V13H39L36 6H9V28H31V22H35V40H31V34H9V59H36L40 51H44V65H-7V61H0V4H-7Z"/><text x="22" y="103" text-anchor="middle">Serife</text></g>
+            </svg>
+            <figcaption>Schematisch: Die gestrichelte Linie ist die Textrahmenkante. Der gerade Stamm beginnt dort; Rundungen und Serifen dürfen optisch darüber hinausragen. Ein solcher Überhang allein ist keine Warnung.</figcaption>
+          </figure>
+<h3>Bildwinkel positionieren und drehen</h3>
           <p>Unter <strong>Inhalt → Bilddrehung</strong> drehst du das Bild innerhalb seines Rahmens oder Winkels. Die Rahmenrichtung bleibt dabei erhalten. <strong>Rahmen füllen</strong> zentriert und skaliert das Bild passend, ohne diese Bilddrehung zurückzusetzen.</p>
           <p>Unter <strong>Füllung</strong> kannst du zwischen einem Bild und einer Farbfläche wechseln und Farbe sowie Deckkraft einstellen. Der bisherige Bildausschnitt bleibt beim Wechsel zur Farbe erhalten. Neue Winkel starten mit 200 px Schenkelbreite, 50 px Schein und 0,8 Intensität; bestehende Winkel und Vorlagen behalten ihre gespeicherten Werte.</p>
           <ol>
@@ -1188,7 +1218,20 @@
             PDF-Seiten zum Veröffentlichen. Für ein abgeschlossenes Projekt ist
             es sinnvoll, beides zu behalten.
           </p>
-          <h3>So exportierst du</h3>
+
+          <figure class="wiki-figure" id="grafik-exportvorschau">
+            <svg viewBox="0 0 760 360" role="img" aria-labelledby="exportBildTitel exportBildBeschreibung">
+              <title id="exportBildTitel">Aufbau der Exportvorschau</title><desc id="exportBildBeschreibung">Die grosse Bildansicht liegt links. Rechts stehen Format und Qualität, darunter Kommentare und Dateinamen. Oben gibt es Meldungen, unten eine feste Bildnavigation und den Download.</desc>
+              <rect class="diagram-paper" x="8" y="8" width="744" height="344" rx="20"/><path class="diagram-divider" d="M8 52H752M8 304H752M525 52V304"/>
+              <text class="diagram-title" x="28" y="36">Exportieren</text><text x="638" y="36">Meldungen</text>
+              <rect class="diagram-wash" x="28" y="66" width="475" height="204" rx="10"/><rect class="diagram-paper" x="180" y="76" width="170" height="183"/><circle class="diagram-accent" cx="302" cy="112" r="18"/><path class="diagram-wash" d="M180 218 238 150 285 197 310 170 350 215V259H180Z"/>
+              <text x="543" y="86">Format &amp; Qualität</text><path class="diagram-line" d="M547 115H712"/><circle class="diagram-accent" cx="661" cy="115" r="7"/><rect class="diagram-wash" x="542" y="152" width="190" height="46" rx="10"/><text x="558" y="181">Bildkommentar</text><text x="558" y="236">Dateinamen</text>
+              <text x="46" y="291">←</text><text x="266" y="291" text-anchor="middle">1 / 3</text><text x="480" y="291">→</text><text x="28" y="334">Auswahl · Fortschritt</text><rect class="diagram-accent" x="593" y="313" width="139" height="30" rx="15"/><text class="diagram-on-accent" x="662" y="334" text-anchor="middle">Herunterladen</text>
+              <g class="diagram-marker"><circle cx="155" cy="157" r="14"/><text x="155" y="162" text-anchor="middle">1</text><circle cx="730" cy="79" r="14"/><text x="730" y="84" text-anchor="middle">2</text><circle cx="730" cy="175" r="14"/><text x="730" y="180" text-anchor="middle">3</text></g>
+            </svg>
+            <figcaption><strong>1</strong> Bild beurteilen und bei Bedarf die Originalpixel prüfen. <strong>2</strong> Format und Qualität einstellen. <strong>3</strong> Kommentare bei Bedarf aufklappen. Die feste Navigation und der Download bleiben erreichbar.</figcaption>
+          </figure>
+<h3>So exportierst du</h3>
           <ol>
             <li>
               Prüfe die Warnungen links neben <strong>Export</strong>. Ein Klick
@@ -1282,7 +1325,7 @@
             </li>
             <li>Prüfe die Vorschau und lade das PDF herunter.</li>
           </ol>
-          <h3>Reihen und Projektbeigabe</h3><p>Beim Designer enthält jeder Dateiname den Projektnamen, den Reihennamen, das Format und feste Nummern wie <code>R02_S01</code>. Diese Nummern ändern sich nicht, wenn nur einzelne Slides ausgewählt werden. Unter <strong>Dateinamen</strong> kannst du die Projektangaben anpassen. Die erste Bildnummer betrifft FD-Ausgaben, nicht die festen Reihennummern.</p><p><strong>MKW-Projekt im ZIP</strong> fügt wie bisher das vollständige bearbeitbare Projekt bei – auch mit nicht ausgewählten Bildern. Schalte die Option aus, wenn du nur fertige Bilder weitergeben möchtest: Das spart Zeit und Platz. Bei direktem Ordnerexport wird keine Projektdatei beigefügt. <strong>Abbrechen</strong> stoppt den Bildexport; bereits in einen Ordner geschriebene Dateien bleiben dort erhalten. In der Vorschau gehören Schliessen, Auswahl und Kommentare zum selben Dialog.</p>
+          <h3>Reihen und Projektbeigabe</h3><p>Beim Designer enthält jeder Dateiname den Projektnamen, die Reihe, das Format und die Slide-Nummer, zum Beispiel <code>Projekt_R02_4x5_S01.jpg</code>. Diese Nummern ändern sich nicht, wenn nur einzelne Slides ausgewählt werden. Unter <strong>Dateinamen</strong> kannst du die Projektangaben anpassen. Ein zusätzlicher Artboardname wird nicht in den Dateinamen geschrieben. Die erste Bildnummer betrifft FD-Ausgaben, nicht die festen Reihennummern.</p><p><strong>MKW-Projekt im ZIP</strong> fügt wie bisher das vollständige bearbeitbare Projekt bei – auch mit nicht ausgewählten Bildern. Schalte die Option aus, wenn du nur fertige Bilder weitergeben möchtest: Das spart Zeit und Platz. Bei direktem Ordnerexport wird keine Projektdatei beigefügt. <strong>Abbrechen</strong> stoppt den Bildexport; bereits in einen Ordner geschriebene Dateien bleiben dort erhalten. In der Vorschau gehören Schliessen, Auswahl und Kommentare zum selben Dialog.</p>
           <h3>Farbtreue</h3><p>Das Studio arbeitet für Bildschirm- und Social-Media-Ausgaben in <strong>sRGB</strong>. PDF und PSD enthalten das zugehörige Farbprofil. PNG ohne Farbreduktion und verlustfreie PDF erhalten die gerenderten RGB-Werte; JPG und WebP verwenden verlustbehaftete Komprimierung, PNG-8 reduziert die Farbpalette. Nutze PNG beziehungsweise die verlustfreie PDF, wenn exakte Farbwerte besonders wichtig sind. Farbraumgrenzen, Bildschirmeinstellungen und andere Programme können die Darstellung beeinflussen; dies ist kein CMYK-Druckproof.</p>
           <h3>Das Exportfenster im Überblick</h3>
           <p>Links wählst du Bilder oder Slides aus und prüfst ihre Vorschauen.
@@ -1476,6 +1519,7 @@
           <p>Übertitel, Titel und Untertitel schreiben im ersten Format in ein gemeinsames Textfeld. Neue Absätze starten mit 70 px Regular, 120 px Bold und 55 px Regular. Klicke nach der Eingabe aus dem Feld, um sie zu übernehmen. Zeilenumbrüche innerhalb eines Kartenfelds bleiben weiche Umbrüche. Auf der Fläche bearbeitete Absatzgrössen und Formatierungen bleiben erhalten. Gleiche Formate anderer Bilder folgen dem ersten Bild; individuelle Eigenschaften bleiben unabhängig.</p>
           <h3>Instagram-Vorschau</h3>
           <p>Mit <strong>Shift+I</strong> oder dem Vorschau-Symbol bei den Ansichtsoptionen im Footer schaltest du eine Referenz für das ausgewählte 9:16-Reel oder den quadratischen 1:1-Feedpost ein. Beim Reel zeigt die gestrichelte Fläche die <a href="https://www.facebook.com/business/ads-guide/update/video/instagram-reels/outcome-sales">von Meta empfohlenen Werbe-Schutzzonen</a>: oben 14 %, unten 35 %, seitlich je 6 %. Im Feed liegen Profil, Werbeaktion und Interaktionen ausserhalb des quadratischen Bilds. Die Darstellung skaliert von 1080 × 1920 bzw. 1080 × 1080 px. Geräte, App-Version, Beschreibung und Werbeformat verändern die echte Instagram-Oberfläche; dies ist keine geräteunabhängig pixelgenaue Zusage. Die Referenz verändert keine Schutzzonen, wird nicht gespeichert und erscheint nie im Export.</p>
+          <h3>Das Speichernfenster</h3><p>Der Dateiname und der tatsächlich verwendete Speicherweg stehen oben. «Browser: gesichert» bestätigt nur die Browsersicherung, nicht das Schreiben einer lokalen Datei. Unter «Projektangaben» kannst du Kürzel, Projektname und freiwilliges Datum ändern. Bei einer verknüpften MKW-Datei aktualisiert die Hauptaktion diese Datei. Ein geänderter Name im Feld «Name für neue Kopie / PSD» betrifft «Speichern unter» und PSD, nicht den Namen der bereits verknüpften Datei. Firefox bietet einen Download an; dessen Speicherort wird vom Browser bestimmt. Photoshop und der Bildexport stehen getrennt rechts. Fehlermeldungen und ein abgebrochener Speicherdialog lassen das Projekt offen.</p>
           <h3>Replica LL: Regular, Bold und Light</h3>
           <p>Regular ist die Grundschrift für neue Texte und die Oberfläche.
             Bold dient für Titel und Hervorhebungen. Light steht zur manuellen

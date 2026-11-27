@@ -172,6 +172,7 @@ const { launch, artifact } = require("./browser.cjs");
       "UI states and invalid preference drafts preserve document/history/export pixels",
     );
     await page.locator("#save").click();
+    await page.locator(".save-project-details").evaluate(el => el.open = true);
     await page.locator("#saveDate").fill("");
     await page.locator("#saveDate").press("Tab");
     assert.notEqual(

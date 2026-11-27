@@ -37,6 +37,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     const imageId = await page.evaluate(() => p.campaign.rows[0].imageId);
     await page.locator("#carouselExport").click();
     await page.locator("#reviewExport").click();
+    await page.locator("#exportCommentPanel").evaluate(el => el.open = true);
     await page.locator("#reviewCommentEdit").click();
     await page.locator("#reviewCommentInput").fill("Für alle Formate");
     await page.locator("#reviewCommentSave").click();
@@ -134,6 +135,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       .catch(() => 0);
     await page.evaluate(() => openExport());
     await page.locator("#reviewExport").click();
+    await page.locator("#exportCommentPanel").evaluate(el => el.open = true);
     assert.equal(
       await page.locator("#reviewCommentText").innerText(),
       "Für alle Formate",

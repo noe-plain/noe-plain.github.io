@@ -260,6 +260,7 @@ const assert = require("node:assert/strict");
     await page.locator("#toolsToggle").click();
     await page.locator("#save").click();
     assert(await page.locator("#savePSD").isVisible());
+    await page.locator(".save-project-details").evaluate(el => el.open = true);
     await page.locator("#projectName").fill("Benannt beim Speichern");
     await page.locator("#projectCode").fill("NEU");
     assert((await page.locator("#saveName").inputValue()).includes("NEU"));

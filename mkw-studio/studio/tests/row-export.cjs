@@ -143,7 +143,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
       ).toString(),
     );
     assert.equal(result.names.filter((n) => n.endsWith(".png")).length, 1);
-    assert(result.names.some((n) => n.includes("_R02_S01.png")));
+    assert(result.names.some((n) => /_R02_[0-9]+x[0-9]+_S01\.png$/.test(n)));
     assert(
       result.names.every(
         (n) => !n.startsWith("/") && !n.split("/").includes(".."),

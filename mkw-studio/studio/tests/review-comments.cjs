@@ -61,6 +61,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     });
     await page.locator("#carouselExport").click();
     await page.locator("#reviewExport").click();
+    await page.locator("#exportCommentPanel").evaluate(el => el.open = true);
     await page.locator("#reviewImage").waitFor({ state: "visible" });
     await page.locator("#reviewCommentEdit").click();
     await page.evaluate(() => {
@@ -161,6 +162,7 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
     await page.locator("[data-comment-board]").first().waitFor();
     await page.locator("#carouselExport").click();
     await page.locator("#reviewExport").click();
+    await page.locator("#exportCommentPanel").evaluate(el => el.open = true);
     await page.locator("#reviewCommentRemove").click();
     assert.equal(
       await page.locator("#reviewCommentText").innerText(),

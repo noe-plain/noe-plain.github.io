@@ -273,7 +273,7 @@ const assert = require("node:assert/strict");
     );
     assert.equal(
       await page.locator("#reviewExport").textContent(),
-      "Exportvorschau öffnen",
+      "Vorschau",
     );
     await page.locator("#closeExport").click();
     // Removal GC retains shared assets referenced by another project.

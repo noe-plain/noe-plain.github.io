@@ -161,10 +161,15 @@ function carouselTextLayout(o, ctx = carouselMeasureContext) {
           : null,
         x = ink
           ? alignment.value === "right"
-            ? o.w - ink.right
+            ? o.w - ink.right + ink.overhangRight
             : alignment.value === "center"
-              ? (o.w - ink.left - ink.right) / 2
-              : ink.indent - ink.left
+              ? (o.w -
+                  ink.left -
+                  ink.right -
+                  ink.overhangLeft +
+                  ink.overhangRight) /
+                2
+              : ink.indent - ink.left - ink.overhangLeft
           : alignment.factor
             ? (o.w - width) * alignment.factor
             : 0;

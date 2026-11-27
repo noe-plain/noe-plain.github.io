@@ -75,6 +75,7 @@ const { launch, artifact } = require("./browser.cjs");
         await page.locator("#date").getAttribute("aria-describedby"),
         /dateFormats/,
       );
+      await page.locator("#exportFields").evaluate(el => el.closest("details").open = true);
       for (const value of [
         "151126",
         "15.11.2026",
@@ -188,7 +189,8 @@ const { launch, artifact } = require("./browser.cjs");
       await page.locator("#save").click();
       assert.equal(await page.locator("#saveDate").inputValue(), "151126");
       assert.match(await page.locator("#saveName").inputValue(), /^261115_E2_/);
-      await page.locator("#saveDate").fill("31.04.2026");
+      await page.locator(".save-project-details").evaluate(el => el.open = true);
+    await page.locator("#saveDate").fill("31.04.2026");
       assert.equal(
         await page.locator("#saveDate").getAttribute("aria-invalid"),
         "true",

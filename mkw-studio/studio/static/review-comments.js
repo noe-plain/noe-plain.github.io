@@ -21,7 +21,7 @@ window.MKWReviewCommentsUI = (() => {
     host.className = "review-comment";
     host.setAttribute("aria-label", "Interner Bildkommentar");
     host.innerHTML = `<div class="review-comment-heading"><h3>Bildkommentar</h3><span id="reviewCommentScope"></span></div><div id="reviewCommentRead"><p id="reviewCommentText"></p><div class="review-comment-actions"><button id="reviewCommentEdit" type="button">Kommentar hinzufügen</button><button id="reviewCommentRemove" type="button">Entfernen</button></div></div><form id="reviewCommentForm" hidden><label for="reviewCommentInput">Interne Notiz</label><textarea id="reviewCommentInput" rows="3" maxlength="${model.maxLength}" aria-describedby="reviewCommentHint reviewCommentCount reviewCommentError"></textarea><div class="review-comment-meta"><span id="reviewCommentHint">Reiner Text – erscheint nicht im Bildexport.</span><span id="reviewCommentCount"></span></div><p id="reviewCommentError" role="alert"></p><div class="review-comment-actions"><button id="reviewCommentSave" class="primary" type="submit">Speichern</button><button id="reviewCommentCancel" type="button">Abbrechen</button></div><p class="review-comment-hint">Zum nächsten Bild nach Speichern oder Abbrechen wechseln.</p></form><p id="reviewCommentStatus" role="status"></p>`;
-    $("#reviewDialog .review-controls").after(host);
+    $("#exportCommentPanel").append(host);
     $("#reviewCommentEdit").onclick = () => {
       base = model.read(p, current);
       draftProject = p.projectId;
