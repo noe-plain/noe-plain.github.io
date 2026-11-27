@@ -132,7 +132,12 @@
       overrides: [],
     });
   }
-  function reconcile(q, makeId, inheritPages = new Set()) {
+  function reconcile(
+    q,
+    makeId,
+    inheritPages = new Set(),
+    { preserveMissingRoles = false } = {},
+  ) {
     const c = q.carousel,
       s = q.campaign;
     if (!c || !s) return;
@@ -207,6 +212,11 @@
                 o.campaignRole === source.campaignRole &&
                 !followers.has(o.id),
             );
+          if (!o && preserveMissingRoles && source.campaignRole) {
+            // A missing role is part of the original layout, just like a deleted follower.
+            l.targets.push({ page, id: null, last: {}, overrides: [] });
+            continue;
+          }
           if (!o) {
             if (c.objects.length >= 500)
               throw Error(

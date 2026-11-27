@@ -706,7 +706,9 @@ const MKWCampaignUI = (() => {
           }
         }
       }
-      MKWCampaignModel.reconcile(q, uid);
+      MKWCampaignModel.reconcile(q, uid, undefined, {
+        preserveMissingRoles: true,
+      });
       validate(q);
       validateCarousel(q);
       ensureCurrent();

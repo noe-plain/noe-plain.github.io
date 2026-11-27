@@ -250,3 +250,39 @@ test("after reordering, the top subject leads its own format and other local ove
   assert.equal(q.carousel.objects.find((o) => o.id === "t").text, "Hallo");
   assert(m.valid(JSON.parse(JSON.stringify(q))));
 });
+
+test("legacy conversion preserves intentionally absent layers in existing outputs", () => {
+  const q = fixture();
+  const title = q.carousel.objects[0];
+  title.campaignRole = "titles";
+  const gradient = {
+    ...title,
+    id: "g",
+    type: "gradient",
+    campaignRole: "legacy-gradient",
+  };
+  q.carousel.objects.push(gradient);
+  q.carousel.objects.push({ ...title, id: "c-t", pageId: "c", text: "Lokal" });
+  m.reconcile(q, id, undefined, { preserveMissingRoles: true });
+  assert(m.valid(q));
+  const link = q.campaign.links.find((candidate) => candidate.source === "g");
+  assert.equal(link.targets.find((target) => target.page === "c").id, null);
+  assert.equal(
+    q.carousel.objects.find((object) => object.id === "c-t").text,
+    "Lokal",
+  );
+  m.reconcile(q, id);
+  assert(
+    !q.carousel.objects.some(
+      (object) => object.pageId === "c" && object.type === "gradient",
+    ),
+  );
+  q.carousel.artboards.push({ id: "e", w: 1080, h: 1920, x: 1000, y: 4600 });
+  q.campaign.rows[1].pages.push("e");
+  m.reconcile(q, id, new Set(["e"]));
+  assert(
+    q.carousel.objects.some(
+      (object) => object.pageId === "e" && object.type === "gradient",
+    ),
+  );
+});
