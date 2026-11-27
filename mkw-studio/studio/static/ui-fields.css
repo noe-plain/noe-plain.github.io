@@ -194,3 +194,48 @@
 #toolsSidebar .tool-section > label > .studio-field-feedback {
   flex-shrink: 0;
 }
+
+.studio-floating-field {
+  position: relative;
+  display: block !important;
+  min-width: 0;
+}
+.studio-floating-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  max-height: 144px;
+  resize: vertical;
+  padding: 16px 12px 8px;
+  font: inherit;
+}
+.studio-floating-field > span {
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  max-width: calc(100% - 24px);
+  padding-inline: 4px;
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface-variant);
+  transform-origin: left center;
+  transition:
+    transform var(--studio-motion-short) var(--studio-ease-effects),
+    top var(--studio-motion-short) var(--studio-ease-effects);
+}
+.studio-floating-field:has(textarea:focus) > span,
+.studio-floating-field:has(textarea:not(:placeholder-shown)) > span {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+}
+.studio-floating-field:has(textarea:focus) > span {
+  color: var(--md-sys-color-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-floating-field > span {
+    transition: none;
+  }
+}

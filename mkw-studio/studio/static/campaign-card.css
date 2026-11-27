@@ -276,3 +276,13 @@
 .campaign-card-popover .icon-button {
   border-radius: var(--studio-shape-small);
 }
+
+.campaign-title-fields {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding-block: 4px;
+}
+.campaign-card-popover .studio-floating-field > span {
+  background: var(--md-sys-color-surface-container-high);
+}

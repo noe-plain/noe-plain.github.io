@@ -207,3 +207,102 @@
   overflow-wrap: anywhere;
   min-width: 0;
 }
+
+#instagramPreviewOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+#instagramPreviewOverlay[hidden] {
+  display: none;
+}
+.instagram-reference {
+  position: absolute;
+  transform-origin: top left;
+  color: #fff;
+  font:
+    36px/1.4 "MKW UI",
+    sans-serif;
+}
+.instagram-reference span {
+  float: right;
+}
+.instagram-ad-zone {
+  position: absolute;
+  inset: 14% 6% 35%;
+  border: 3px dashed #fff;
+  box-shadow: 0 0 0 4000px #0004;
+  clip-path: inset(-270px -65px -673px);
+}
+.instagram-reel-top {
+  position: absolute;
+  top: 115px;
+  left: 48px;
+  right: 48px;
+  font-size: 56px;
+  font-weight: 700;
+}
+.instagram-reel-actions {
+  position: absolute;
+  right: 36px;
+  bottom: 365px;
+  font-size: 76px;
+  line-height: 1.8;
+  text-align: center;
+  text-shadow: 0 2px 12px #0009;
+}
+.instagram-reel-caption {
+  position: absolute;
+  left: 48px;
+  right: 160px;
+  bottom: 100px;
+  text-shadow: 0 2px 12px #0009;
+}
+.instagram-reference p {
+  margin: 20px 0;
+}
+.instagram-cta {
+  background: #fff;
+  color: #111;
+  padding: 24px 28px;
+  border-radius: 12px;
+  text-shadow: none;
+}
+.instagram-feed-top,
+.instagram-feed-bottom {
+  position: absolute;
+  background: #fff;
+  color: #111;
+  left: 0;
+  width: 1080px;
+  padding: 28px 40px;
+}
+.instagram-feed-top {
+  bottom: 100%;
+  min-height: 120px;
+}
+.instagram-feed-bottom {
+  top: 100%;
+}
+.instagram-feed-bottom .instagram-cta {
+  background: #1674df;
+  color: #fff;
+  border-radius: 0;
+  margin: -28px -40px 0;
+}
+.instagram-reference-label {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  float: none !important;
+  background: #111c;
+  color: #fff;
+  font-size: 24px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+#instagramPreview[aria-pressed="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}

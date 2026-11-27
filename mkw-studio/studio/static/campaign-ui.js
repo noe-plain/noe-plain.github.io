@@ -168,6 +168,14 @@ const MKWCampaignUI = (() => {
         p.images.map((i) => [i.id, i.name]),
         c.artboards.map((a) => [a.id, a.x, a.y]),
         carouselZoom,
+        c.objects
+          .filter(
+            (o) =>
+              o.type === "text" &&
+              o.campaignRole === "titles" &&
+              o.pageId === p.campaign.rows[0]?.pages[0],
+          )
+          .map((o) => [o.id, o.text, o.textStyles]),
       ]);
     if (host.dataset.signature === signature) return;
     host.dataset.signature = signature;
@@ -204,10 +212,20 @@ const MKWCampaignUI = (() => {
           sponsors,
           open: openOptions.has(im.id),
           count: p.campaign.rows.length,
+          titles: MKWCampaignTitles.read(
+            c.objects.find(
+              (o) =>
+                o.type === "text" &&
+                o.campaignRole === "titles" &&
+                o.pageId === a.id,
+            ),
+            boardsByPage.get(a.id),
+          ),
           copyright: boardsByPage.get(a.id)?.elements.copyright.text || "",
         });
       })
       .join("");
+    const cardProject = p;
     host.querySelectorAll("[data-campaign-row]").forEach((card) => {
       const row = p.campaign.rows.find(
         (r) => r.imageId === card.dataset.campaignRow,
@@ -283,6 +301,50 @@ const MKWCampaignUI = (() => {
             began = true;
           };
       }
+      for (const field of card.querySelectorAll("[data-campaign-title]"))
+        field.onchange = () => {
+          if (p !== cardProject || !field.isConnected || busy) return;
+          if (!MKWFields.validate(field)) return;
+          const page = row.pages[0];
+          change(() => {
+            const frame = p.carousel.artboards.find((a) => a.id === page),
+              b = p.boards.find((b) => b.campaignPage === page);
+            let object = p.carousel.objects.find(
+              (o) =>
+                o.type === "text" &&
+                o.pageId === page &&
+                o.campaignRole === "titles",
+            );
+            if (object && carouselObjectLocked(object))
+              throw Error(
+                "Die Textebene ist gesperrt. Entsperre sie zuerst in den Ebenen.",
+              );
+            if (!object) {
+              if (!field.value) return;
+              object = base("text", frame, {
+                name: "Konzerttexte",
+                campaignRole: "titles",
+                x: frame.x + frame.left,
+                y: frame.y + frame.top,
+                w: frame.w - frame.left - frame.right,
+                h: frame.h - frame.top - frame.bottom,
+                textAnchor: "bottom",
+                font: "Replica LL Regular",
+                opticalAlign: true,
+              });
+              p.carousel.objects.push(object);
+            }
+            Object.assign(
+              object,
+              MKWCampaignTitles.update(
+                object,
+                field.dataset.campaignTitle,
+                field.value,
+                b,
+              ),
+            );
+          });
+        };
       card.querySelector("[data-campaign-copyright]").onchange = (e) =>
         change(() => {
           for (const page of row.pages) {

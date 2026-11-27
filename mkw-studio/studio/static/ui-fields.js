@@ -205,7 +205,23 @@ const MKWFields = (() => {
     },
     true,
   );
+  function floating(label, value, attributes = "") {
+    const escape = (value) =>
+      String(value).replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char],
+      );
+    return `<label class="studio-floating-field"><textarea placeholder=" " rows="1" ${attributes}>${escape(value)}</textarea><span>${escape(label)}</span></label>`;
+  }
   return Object.freeze({
+    floating,
     error,
     clear,
     validate,

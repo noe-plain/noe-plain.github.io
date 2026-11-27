@@ -6,6 +6,7 @@
     value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   const maxLength = 100000;
   const paragraphKeys = [
+    "fdRole",
     "align",
     "opticalAlign",
     "size",

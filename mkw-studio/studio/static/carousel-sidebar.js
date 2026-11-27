@@ -235,7 +235,8 @@ function carouselPanel() {
           checkpoint();
           carouselUI.propertyUndo = true;
         }
-        const oldRatio = o.h / o.w;
+        const oldRatio = o.h / o.w,
+          oldSource = o.source;
         if (o.type === "text" && input.dataset.prop === "text") {
           o.textStyles = carouselTextStylesForInput(o, value);
           o.characterStyles = carouselCharacterStylesForInput(o, value);
@@ -256,12 +257,28 @@ function carouselPanel() {
           else if (input.dataset.prop === "h")
             o.w = MKWAnglePolicy.horizontal(o.direction) ? o.h / 2 : o.h * 2;
         }
-        if (o.type === "logo" && input.dataset.prop === "source")
+        if (
+          o.type === "logo" &&
+          input.dataset.prop === "source" &&
+          !(
+            ["black", "white"].includes(oldSource) &&
+            ["black", "white"].includes(o.source)
+          )
+        ) {
+          const project = p,
+            source = o.source;
           carouselLogoImage(o).then((im) => {
+            if (
+              p !== project ||
+              o.source !== source ||
+              !p.carousel.objects.includes(o)
+            )
+              return;
             o.h = (o.w * im.height) / im.width;
             changed(false);
             carouselPanel();
           });
+        }
         if (o.type === "logo") {
           if (input.dataset.prop === "w") o.h = o.w * oldRatio;
           if (input.dataset.prop === "h") o.w = o.h / oldRatio;

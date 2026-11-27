@@ -927,6 +927,7 @@ function carouselRefresh() {
   );
   const selectedPhoto = carouselSelected();
   if (selectedPhoto.length === 1) carouselUpdateWarning(selectedPhoto[0]);
+  MKWInstagramPreview.render();
   carouselDrawSelection();
   carouselVectorOverlay();
   carouselCurvatureOverlay();

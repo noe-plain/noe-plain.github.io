@@ -128,9 +128,11 @@
     "static/campaign-document.js",
     "static/campaign-migration.js",
     "static/campaign-text-choice.js",
+    "static/campaign-title-model.js",
     "static/campaign-card-ui.js",
     "static/campaign-ui.js",
     "static/campaign-legacy-text-ui.js",
+    "static/instagram-preview.js",
     "static/review-comments.js",
     "static/start.js",
     "static/workspace-scroll.js"

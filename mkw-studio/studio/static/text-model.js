@@ -262,6 +262,8 @@
       for (const s of o.textStyles)
         if (s) {
           if (
+            (s.fdRole !== undefined &&
+              !["date", "title", "subtitle"].includes(s.fdRole)) ||
             (s.opticalAlign !== undefined &&
               typeof s.opticalAlign !== "boolean") ||
             (s.align !== undefined &&
