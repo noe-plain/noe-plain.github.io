@@ -372,7 +372,11 @@ function carouselPDFUI() {
   ))
     el.hidden = !p.carousel;
   $("#folder").hidden = pdf || !window.showDirectoryPicker;
-  $("#zip").textContent = pdf ? "PDF herunterladen" : "ZIP mit Projektdatei";
+  $("#zip").textContent = pdf
+    ? "PDF herunterladen"
+    : exportOptions.includeProject === false
+      ? "ZIP herunterladen"
+      : "ZIP mit Projektdatei";
   $("#qualityField").hidden = pdf || exportOptions.format === "png";
   $("#transparencyField").hidden = pdf || exportOptions.format === "jpg";
   if (!pdf) return;

@@ -1,0 +1,8 @@
+JPEG XL encoder/decoder from @jsquash/jxl 1.3.0, unmodified generated single-threaded JS and WASM.
+https://github.com/jamsinclair/jSquash/tree/main/packages/jxl
+https://registry.npmjs.org/@jsquash/jxl/-/jxl-1.3.0.tgz
+npm package SHA-512: IVOPTneyOd9eBAuow+FnCYIP6wkIc7CjrCDnZGiqAPyJ63vMVxv3zoWiucGiZVh6u9vi/l40AkcS9QwkoVSAqA==
+JS wrappers/codec build: Google Squoosh / Jamie Sinclair, Apache-2.0 (LICENSE-jsquash).
+JPEG XL reference library: libjxl, BSD-3-Clause (LICENSE-libjxl).
+https://github.com/libjxl/libjxl
+The Studio worker adapter is first-party source, outside this vendor directory.

@@ -18,6 +18,7 @@ let exportCacheBytes = 0,
   reviewGeneration = 0;
 function clearExportCache() {
   exportCacheEpoch++;
+  MKWJXL.cancel();
   for (const entry of exportCache.values()) URL.revokeObjectURL(entry.url);
   exportCache.clear();
   exportCacheBytes = 0;
@@ -40,8 +41,9 @@ function exportKey(b, settings) {
   ]);
 }
 function exportSettings() {
+  const { includeProject, ...settings } = exportOptions;
   return {
-    ...exportOptions,
+    ...settings,
     transparent: exportOptions.format !== "jpg" && exportOptions.transparent,
   };
 }
@@ -105,34 +107,73 @@ function exportSRGBProfile() {
       throw error;
     }));
 }
+const exportEncodings = new Map();
 async function encodedBoard(b, settings) {
+  const key = exportKey(b, settings);
+  if (exportEncodings.has(key)) return exportEncodings.get(key);
+  const work = encodeBoardFile(b, settings);
+  exportEncodings.set(key, work);
+  try {
+    return await work;
+  } finally {
+    if (exportEncodings.get(key) === work) exportEncodings.delete(key);
+  }
+}
+async function encodeBoardFile(b, settings) {
   if (settings.format === "pdf") return carouselEncodePDFPage(b, settings);
   const key = exportKey(b, settings);
   if (exportCache.has(key)) return exportCache.get(key);
   await document.fonts.ready;
   const c = makeCanvas(b.w, b.h);
-  const mime = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" }[
-    settings.format
-  ];
+  const mime = {
+    jpg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    jxl: "image/jxl",
+  }[settings.format];
   let blob,
+    previewBlob,
     hasTransparency = false;
   try {
     await paint(exportContext(c), b, 1, {
       transparent: settings.transparent,
     });
-    blob =
-      settings.format === "png" && settings.png8
-        ? await encodePNG8(c, settings.colours)
-        : await new Promise((resolve, reject) =>
-            c.toBlob(
-              (blob) =>
-                blob
-                  ? resolve(blob)
-                  : reject(Error("Bild konnte nicht exportiert werden.")),
-              mime,
-              settings.quality / 100,
-            ),
-          );
+    if (settings.format === "jxl") {
+      const encoded = await MKWJXL.encode(c, settings.quality),
+        ctx = c.getContext("2d");
+      blob = new Blob([encoded.buffer], { type: "image/jxl" });
+      ctx.putImageData(
+        new ImageData(
+          new Uint8ClampedArray(encoded.preview),
+          c.width,
+          c.height,
+        ),
+        0,
+        0,
+      );
+      previewBlob = await new Promise((resolve, reject) =>
+        c.toBlob(
+          (b) =>
+            b
+              ? resolve(b)
+              : reject(Error("JPG+-Vorschau konnte nicht erstellt werden.")),
+          "image/png",
+        ),
+      );
+    } else
+      blob =
+        settings.format === "png" && settings.png8
+          ? await encodePNG8(c, settings.colours)
+          : await new Promise((resolve, reject) =>
+              c.toBlob(
+                (blob) =>
+                  blob
+                    ? resolve(blob)
+                    : reject(Error("Bild konnte nicht exportiert werden.")),
+                mime,
+                settings.quality / 100,
+              ),
+            );
     if (settings.transparent) {
       const pixels = c
         .getContext("2d")
@@ -149,9 +190,19 @@ async function encodedBoard(b, settings) {
   if (blob.type !== mime)
     throw Error("Dieses Bildformat wird von deinem Browser nicht unterstützt.");
   if (exportCache.has(key)) return exportCache.get(key);
-  const entry = { blob, url: URL.createObjectURL(blob), hasTransparency };
+  const cacheBytes = blob.size + (previewBlob?.size || 0);
+  const entry = {
+    blob,
+    previewBlob,
+    cacheBytes,
+    url: URL.createObjectURL(previewBlob || blob),
+    hasTransparency,
+  };
   // Bound memory while keeping recent preview files ready for download.
-  while (exportCacheBytes + blob.size > 128 * 1024 * 1024 && exportCache.size) {
+  while (
+    exportCacheBytes + cacheBytes > 128 * 1024 * 1024 &&
+    exportCache.size
+  ) {
     const oldest = exportCache.keys().next().value,
       old = exportCache.get(oldest);
     exportCacheBytes -= old.cacheBytes ?? old.blob.size;
@@ -159,7 +210,7 @@ async function encodedBoard(b, settings) {
     exportCache.delete(oldest);
   }
   exportCache.set(key, entry);
-  exportCacheBytes += blob.size;
+  exportCacheBytes += cacheBytes;
   return entry;
 }
 async function openExport() {
@@ -184,7 +235,7 @@ async function openExport() {
     ...exportSessions.get(p.projectId),
   };
   if (
-    !["jpg", "png", "webp", ...(p.carousel ? ["pdf"] : [])].includes(
+    !["jpg", "jxl", "png", "webp", ...(p.carousel ? ["pdf"] : [])].includes(
       exportOptions.format,
     )
   )
@@ -240,6 +291,7 @@ async function openExport() {
   };
   setExportProgress(0, 1, "Bereit zum Exportieren");
   $("#exportProgress").classList.remove("is-running");
+  MKWExportPanel.review(false);
   $("#exportDialog").showModal();
   syncExportSettings();
   updateExportNames();
@@ -264,7 +316,9 @@ function syncExportSettings() {
   $("#qualityValue").textContent = exportOptions.quality + " %";
   $("#exportFormatHint").textContent = jpg
     ? "JPG · deckender Hintergrund · sRGB"
-    : "Transparenz entfernt die Zeichenflächenfarbe. Fotos werden dadurch nicht freigestellt.";
+    : exportOptions.format === "jxl"
+      ? "JPEG-XL · .jxl · für Instagram normales JPG verwenden"
+      : "Transparenz entfernt die Zeichenflächenfarbe. Fotos werden dadurch nicht freigestellt.";
   $("#start")
     ?.closest("label")
     .toggleAttribute("hidden", exportOptions.format === "pdf");
@@ -301,6 +355,7 @@ function selectExports(checked) {
 $("#selectAllExports").onclick = () => selectExports(true);
 $("#deselectAllExports").onclick = () => selectExports(false);
 function scheduleExportPreviews() {
+  MKWJXL.cancel();
   exportGeneration++;
   clearTimeout(previewTimer);
   const generation = exportGeneration;
@@ -310,7 +365,10 @@ function scheduleExportPreviews() {
     delete el.dataset.exportError;
   });
   $("#exportTotal").textContent = "Dateigrössen werden berechnet …";
-  previewTimer = setTimeout(() => refreshExportPreviews(generation), 220);
+  previewTimer = setTimeout(() => {
+    refreshExportPreviews(generation);
+    if ($("#reviewDialog").open) showReview();
+  }, 220);
 }
 async function refreshExportPreviews(generation) {
   const finishLoading = MKWUIControls.loading("#exportTotal");
@@ -326,6 +384,18 @@ async function refreshExportPreviews(generation) {
       if (generation !== exportGeneration || !$("#exportDialog").open) return;
       const cell = cells.get(b.id);
       if (!cell) continue;
+      if (settings.format === "jxl") {
+        const root = $("#exportNames").getBoundingClientRect(),
+          rect = cell.getBoundingClientRect();
+        if (
+          !root.height ||
+          rect.bottom < root.top ||
+          rect.top > root.bottom ||
+          rect.right < root.left ||
+          rect.left > root.right
+        )
+          continue;
+      }
       try {
         const entry = await encodedBoard(clone(b), settings);
         if (generation !== exportGeneration) return;
@@ -364,7 +434,7 @@ function updateExportTotal() {
       else total += +bytes;
     }
   $("#exportTotal").textContent =
-    `Auswahl: ca. ${exportBytes(total)}${missing ? " · weitere Grössen werden berechnet" : ""}${failed ? ` · ${failed} Vorschau${failed === 1 ? "" : "en"} nicht verfügbar` : ""}`;
+    `Auswahl: ca. ${exportBytes(total)}${missing ? " · weitere Dateigrössen offen" : ""}${failed ? ` · ${failed} Vorschau${failed === 1 ? "" : "en"} nicht verfügbar` : ""}`;
 }
 function updateExportNames() {
   $("#exportSelectionCount").textContent =
@@ -374,8 +444,13 @@ function updateExportNames() {
   const bs = orderedBoards().filter((b) => b.checked);
   const dateError = MKWDateFields.message(p.meta.date);
   MKWDateFields.validate($("#date"));
+  if (dateError) $("#exportFields").closest("details").open = true;
   try {
     if (dateError) throw Error(dateError);
+    if (exportOptions.format === "jxl" && bs.some((b) => b.w * b.h > 16000000))
+      throw Error(
+        "JPG+ unterstützt bis zu 16 Megapixel pro Bild. Wähle für grössere Ausgaben JPG oder PNG.",
+      );
     if (exportOptions.format === "pdf") {
       if (!bs.every((board) => carouselValidatePDF(exportOptions.pdf, board)))
         throw Error("Bitte PDF-Seitengrösse und Einstellungen prüfen.");
@@ -395,10 +470,7 @@ function updateExportNames() {
           p.carousel,
           bs[i].carouselSlide,
         );
-        return name.replace(
-          /(\.[^.]+)$/,
-          `_R${String(info.row + 1).padStart(2, "0")}_S${String(info.local + 1).padStart(2, "0")}$1`,
-        );
+        return MKWExportNames.row(p.meta, bs[i], info, exportOptions.format);
       });
     if (!bs.length) throw Error("Wähle mindestens ein Sujet.");
   } catch (e) {
@@ -423,6 +495,7 @@ function updateExportNames() {
       `${bs.length} Sujets bereit.${!String(p.meta.date || "").trim() ? " Hinweis: Kein Datum angegeben; die Dateinamen enthalten kein Datum." : ""}`,
     !!error,
   );
+  MKWExportPanel.filename(names[0] || "—");
   $("#zip").disabled = $("#folder").disabled = !!error;
   $("#reviewExport").disabled = !bs.length;
 }
@@ -434,23 +507,30 @@ function setExportProgress(done, total, text) {
   $("#progressPercent").textContent = percent + " %";
   $("#progressText").textContent = text;
 }
+let exportAbort = false;
 async function runExport(mode) {
   if (exportOptions.format === "pdf") return carouselRunPDF();
   if (busy || !exportPlan.length) return;
   busy = true;
+  exportAbort = false;
+  $("#cancelImageExport").hidden = false;
+  MKWJXL.cancel();
   const finishLoading = MKWUIControls.loading("#progressText");
   exportGeneration++;
   clearTimeout(previewTimer);
   window.MKWFooterFeedback?.report("", "info", "export");
   const plan = clone(exportPlan),
     settings = exportSettings(),
-    projectSnapshot = mode === "zip" ? snapshot() : null,
+    projectSnapshot =
+      mode === "zip" && exportOptions.includeProject !== false
+        ? snapshot()
+        : null,
     disabled = new Map();
   $("#exportDialog")
     .querySelectorAll("input,select,button")
     .forEach((el) => {
       disabled.set(el, el.disabled);
-      el.disabled = true;
+      el.disabled = el.id !== "cancelImageExport";
     });
   const failures = [],
     items = [];
@@ -469,18 +549,22 @@ async function runExport(mode) {
       folder = await window.showDirectoryPicker({ mode: "readwrite" });
     setExportProgress(
       0,
-      plan.length + (mode === "zip" ? 1 : 0),
+      plan.length + (projectSnapshot ? 1 : 0),
       "Bilder werden vorbereitet …",
     );
     for (const [i, x] of plan.entries()) {
+      if (exportAbort)
+        throw new DOMException("Export abgebrochen.", "AbortError");
       setExportProgress(
         i,
-        plan.length + (mode === "zip" ? 1 : 0),
+        plan.length + (projectSnapshot ? 1 : 0),
         `${i + 1} / ${plan.length} · ${x.name}`,
       );
       await new Promise((resolve) => setTimeout(resolve, 20));
       try {
         const { blob } = await encodedBoard(x.board, settings);
+        if (exportAbort)
+          throw new DOMException("Export abgebrochen.", "AbortError");
         if (mode === "folder") {
           try {
             await folder.getFileHandle(x.name);
@@ -503,19 +587,23 @@ async function runExport(mode) {
             bytes: new Uint8Array(await blob.arrayBuffer()),
           });
       } catch (e) {
+        if (e.name === "AbortError") throw e;
         failures.push(`${x.name}: ${e.message}`);
       }
       setExportProgress(
         i + 1,
-        plan.length + (mode === "zip" ? 1 : 0),
+        plan.length + (projectSnapshot ? 1 : 0),
         `${i + 1} / ${plan.length} verarbeitet`,
       );
     }
+    if (exportAbort)
+      throw new DOMException("Export abgebrochen.", "AbortError");
     if (mode === "zip" && items.length) {
-      items.push({
-        name: "Projekt/" + MKW.projectName(projectSnapshot.meta) + ".mkw",
-        bytes: new Uint8Array(await projectFile.arrayBuffer()),
-      });
+      if (projectFile)
+        items.push({
+          name: "Projekt/" + MKW.projectName(projectSnapshot.meta) + ".mkw",
+          bytes: new Uint8Array(await projectFile.arrayBuffer()),
+        });
       setExportProgress(
         plan.length,
         plan.length + 1,
@@ -530,7 +618,7 @@ async function runExport(mode) {
     const successes = plan.length - failures.length;
     MKWFields.notice(
       $("#exportStatus"),
-      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${mode === "zip" && successes ? " Vollständiges MKW-Projekt enthalten." : ""}${failures.length ? " " + failures.join(" · ") : ""}`,
+      `${successes} von ${plan.length} Dateien ${mode === "zip" ? "als ZIP an den Browser übergeben" : "gespeichert"}.${projectSnapshot && successes ? " Vollständiges MKW-Projekt enthalten." : ""}${failures.length ? " " + failures.join(" · ") : ""}`,
       failures.length > 0,
     );
     setExportProgress(
@@ -557,6 +645,7 @@ async function runExport(mode) {
     $("#exportProgress").classList.remove("is-running");
   } finally {
     finishLoading();
+    $("#cancelImageExport").hidden = true;
     busy = false;
     for (const [el, value] of disabled) el.disabled = value;
     updateExportTotal();
@@ -576,8 +665,24 @@ $("#closeExport").onclick = () => {
 $("#exportDialog").addEventListener("close", () => {
   exportGeneration++;
   clearTimeout(previewTimer);
+  MKWJXL.cancel();
+  if ($("#reviewDialog").open) $("#reviewDialog").close();
+  MKWExportPanel.review(false);
 });
 $("#folder").hidden = !window.showDirectoryPicker;
+let exportScrollTimer;
+$("#exportNames").addEventListener(
+  "scroll",
+  () => {
+    if (busy || exportOptions.format !== "jxl") return;
+    clearTimeout(exportScrollTimer);
+    exportScrollTimer = setTimeout(
+      () => refreshExportPreviews(exportGeneration),
+      120,
+    );
+  },
+  { passive: true },
+);
 function exportSetSelection(ids) {
   if (busy) return;
   const selected = new Set(ids),
@@ -678,7 +783,8 @@ function openReview(boardId) {
           .map((b) => b.id),
       );
   }
-  $("#reviewDialog").showModal();
+  MKWExportPanel.review(true);
+  $("#reviewDialog").show();
   showReview();
 }
 $("#reviewExport").onclick = () => openReview();
@@ -690,7 +796,11 @@ $("#reviewNext").onclick = () => {
   reviewIndex++;
   showReview();
 };
-$("#closeReview").onclick = () => $("#reviewDialog").close();
+$("#closeReview").onclick = () => {
+  $("#reviewDialog").close();
+  MKWExportPanel.review(false);
+  $("#closeReview").focus();
+};
 $("#reviewDialog").addEventListener("keydown", (ev) => {
   if (
     ev.target.closest("input,textarea,select,[contenteditable=true]") ||
@@ -707,5 +817,6 @@ $("#reviewDialog").addEventListener("close", () => {
   reviewGeneration++;
   URL.revokeObjectURL(reviewURL);
   reviewURL = null;
+  MKWExportPanel.review(false);
   $("#reviewImage").removeAttribute("src");
 });

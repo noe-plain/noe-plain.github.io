@@ -80,6 +80,8 @@ let studioSidebarOpen = !matchMedia("(max-width:760px)").matches,
 let studioCommandbarFrame = 0,
   studioPostGuides = true;
 function studioSyncFooter() {
+  const instagram = $("#instagramPreview");
+  if (instagram) instagram.hidden = !p.carousel;
   studioMountNoticeButtons();
   const carousel = !!p.carousel;
   if (!carousel) $("#footerCurvature")?.setAttribute("hidden", "");

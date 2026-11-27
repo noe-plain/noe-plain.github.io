@@ -132,6 +132,7 @@ const { launch, artifact } = require("./browser.cjs");
         path: artifact(`export-panel-${mode}-mobile.png`),
       });
       await page.setViewportSize({ width: 1500, height: 1050 });
+      await page.locator("#exportFields").evaluate(el => el.closest("details").open = true);
       await page.locator("#deselectAllExports").click();
       assert(await page.locator("#zip").isDisabled());
       assert.match(

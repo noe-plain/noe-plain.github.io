@@ -18,11 +18,12 @@ const MKWInstagramPreview = (() => {
       button.id = "instagramPreview";
       button.className = "icon-button";
       button.type = "button";
-      button.setAttribute("aria-label", "Instagram-Vorschau");
-      button.title = "Instagram-Vorschau (Shift+I)";
+      button.setAttribute("aria-label", "Instagram-Schutzzone");
+      button.setAttribute("aria-keyshortcuts", "Shift+I");
+      button.title = "Instagram-Schutzzone (Shift+I)";
       button.innerHTML = studioIcon("visible");
       button.onclick = toggle;
-      $(".carousel-statusbar").prepend(button);
+      $("#footerGuides").after(button);
     }
     button.setAttribute("aria-pressed", String(enabled));
     if (!overlay) {

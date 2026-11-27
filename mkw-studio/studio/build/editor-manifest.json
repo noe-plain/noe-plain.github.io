@@ -46,6 +46,8 @@
     "static/project-formats.js",
     "static/subject-model.js",
     "static/subject.js",
+    "static/jxl-export.js",
+    "static/export-name-model.js",
     "static/export.js",
     "static/psd.js",
     "static/bezier.js",

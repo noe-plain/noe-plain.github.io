@@ -13,7 +13,7 @@ const MKWExportPanel = (() => {
     namingHeading = scroll.querySelector(".export-naming-heading"),
     fields = $("#exportFields"),
     settings = document.createElement("section"),
-    naming = document.createElement("section"),
+    naming = document.createElement("details"),
     summary = document.createElement("div"),
     progress = $("#exportProgress"),
     actions = footer.querySelector(".export-download-buttons");
@@ -22,9 +22,26 @@ const MKWExportPanel = (() => {
   formatHeading.id = "exportSettingsTitle";
   formatHeading.textContent = "Dateiformat & Qualität";
   settings.append(formatHeading, buttons, format, preset, options, pdf, hint);
+  const projectFile = document.createElement("label");
+  projectFile.className = "export-project-option";
+  projectFile.innerHTML =
+    '<input type="checkbox" id="exportIncludeProject" checked><span>MKW-Projekt im ZIP</span>';
+  settings.append(projectFile);
+  projectFile.querySelector("input").onchange = (e) => {
+    exportOptions.includeProject = e.target.checked;
+    exportSessions.set(p.projectId, clone(exportOptions));
+    $("#zip").textContent = e.target.checked
+      ? "ZIP mit Projektdatei"
+      : "ZIP herunterladen";
+  };
   naming.setAttribute("aria-labelledby", "exportNamingTitle");
   namingHeading.id = "exportNamingTitle";
-  naming.append(namingHeading, fields);
+  const namingSummary = document.createElement("summary"),
+    filenamePreview = document.createElement("output");
+  filenamePreview.id = "exportFilenamePreview";
+  filenamePreview.setAttribute("aria-label", "Beispiel-Dateiname");
+  namingSummary.append(namingHeading);
+  naming.append(namingSummary, filenamePreview, fields);
   scroll.replaceChildren(settings, naming);
   preset.firstChild.textContent = "Voreinstellung";
   summary.className = "export-footer-summary";
@@ -34,10 +51,75 @@ const MKWExportPanel = (() => {
   dialog.append(footer);
   $("#exportDialogTitle").textContent = "Exportieren";
   $("#closeExport").setAttribute("aria-label", "Exportfenster schliessen");
-  dialog.querySelector(".dialog-heading p").textContent =
-    "Bilder auswählen, Einstellungen prüfen und herunterladen.";
+  dialog.querySelector(".dialog-heading p").textContent = "";
+  dialog.querySelector(".dialog-heading p").hidden = true;
+  const views = document.createElement("div"),
+    choose = $("#closeReview"),
+    reviewDialog = $("#reviewDialog"),
+    reviewButton = $("#reviewExport");
+  views.className = "export-view-switch";
+  views.setAttribute("role", "group");
+  views.setAttribute("aria-label", "Exportansicht");
+  choose.textContent = "Auswahl";
+  choose.setAttribute("aria-label", "Exportauswahl anzeigen");
+  reviewButton.textContent = "Vorschau";
+  views.append(choose, reviewButton);
+  dialog.querySelector(".export-selection").after(views);
+  reviewDialog.querySelector(".dialog-heading").hidden = true;
+  dialog.querySelector(".export-images").append(reviewDialog);
+  const cancel = document.createElement("button");
+  cancel.id = "cancelImageExport";
+  cancel.type = "button";
+  cancel.textContent = "Abbrechen";
+  cancel.hidden = true;
+  cancel.onclick = () => {
+    exportAbort = true;
+    MKWJXL.cancel();
+  };
+  actions.prepend(cancel);
+  dialog.addEventListener("cancel", (event) => {
+    if (busy) {
+      event.preventDefault();
+      if (!cancel.hidden) cancel.click();
+    } else if (reviewDialog.open) {
+      event.preventDefault();
+      if (window.MKWReviewCommentsUI?.editing())
+        $("#reviewCommentCancel").click();
+      else $("#closeReview").click();
+    }
+  });
+  dialog.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Escape" || !reviewDialog.open || busy) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (window.MKWReviewCommentsUI?.editing())
+        $("#reviewCommentCancel").click();
+      else $("#closeReview").click();
+    },
+    true,
+  );
+  function review(open) {
+    $("#exportNames").hidden = open;
+    choose.setAttribute("aria-pressed", String(!open));
+    reviewButton.setAttribute("aria-pressed", String(open));
+    if (!open && reviewDialog.open) reviewDialog.close();
+  }
+  function filename(value) {
+    filenamePreview.textContent = value;
+    filenamePreview.title = value;
+  }
   function sync() {
     const designer = !!p.carousel && !p.campaign;
+    $("#exportIncludeProject").checked = exportOptions.includeProject !== false;
+    projectFile.hidden = exportOptions.format === "pdf";
+    $("#zip").textContent =
+      exportOptions.format === "pdf"
+        ? "PDF herunterladen"
+        : exportOptions.includeProject === false
+          ? "ZIP herunterladen"
+          : "ZIP mit Projektdatei";
     document.querySelector("#exportRowScopeLabel")?.remove();
     if (p.carousel?.pageStructure && !p.campaign) {
       const label = document.createElement("label"),
@@ -106,5 +188,5 @@ const MKWExportPanel = (() => {
       )
       .join("");
   }
-  return { sync, selection };
+  return { sync, selection, review, filename };
 })();

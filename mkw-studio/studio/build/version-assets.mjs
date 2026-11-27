@@ -105,6 +105,18 @@ const workerHash = createHash("sha256")
 if (subjectSource !== subjectVersioned)
   await writeFile(subjectFile, subjectVersioned);
 
+const jxlWorkerHash = createHash("sha256")
+    .update(await readFile(new URL("static/jxl-worker.js", root)))
+    .digest("hex")
+    .slice(0, 12),
+  jxlClientFile = new URL("static/jxl-export.js", root),
+  jxlClient = await readFile(jxlClientFile, "utf8"),
+  nextJxlClient = jxlClient.replace(
+    /const workerURL = "[^"]+";/,
+    `const workerURL = "static/jxl-worker.js?v=${jxlWorkerHash}";`,
+  );
+if (jxlClient !== nextJxlClient) await writeFile(jxlClientFile, nextJxlClient);
+
 // Version the lazily loaded handbook independently from the editor's startup assets.
 const helpIndex = new URL("hilfe/index.html", root),
   helpSource = await readFile(helpIndex, "utf8"),

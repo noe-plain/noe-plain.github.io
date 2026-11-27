@@ -760,3 +760,147 @@ html.studio-theme-changing #exportDialog .export-card {
   width: 48px;
   height: 48px;
 }
+
+/* Shared export surface: selection and review occupy the same pane. */
+#exportDialog .export-view-switch {
+  display: flex;
+  gap: 0;
+  flex: none;
+  align-self: flex-start;
+}
+#exportDialog .export-view-switch button {
+  min-height: 44px;
+  padding: 10px 24px;
+  border-radius: 0;
+}
+#exportDialog .export-view-switch button:first-child {
+  border-radius: 999px 0 0 999px;
+}
+#exportDialog .export-view-switch button:last-child {
+  border-radius: 0 999px 999px 0;
+  margin-left: -1px;
+}
+#exportDialog .export-view-switch [aria-pressed="true"] {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+#exportNames[hidden] {
+  display: none;
+}
+#exportDialog #reviewDialog {
+  position: static;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  min-height: 0;
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: auto;
+}
+#exportDialog #reviewDialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#exportDialog #reviewDialog > .dialog-heading {
+  display: none;
+}
+#exportDialog .review-stage {
+  flex: 1;
+  height: auto;
+  min-height: 140px;
+  background: var(--md-sys-color-surface-container-low);
+  padding: 12px;
+}
+#exportDialog .review-controls {
+  flex: none;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  padding: 0;
+  gap: 12px;
+}
+#exportDialog #reviewPosition {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+#exportDialog .review-current-actions {
+  flex: none;
+}
+#exportDialog .review-comment {
+  flex: none;
+  margin: 0;
+}
+#exportDialog .export-settings-card {
+  min-width: 0;
+}
+#exportDialog details.export-settings-card summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#exportDialog details.export-settings-card summary::after {
+  content: "⌄";
+  margin-left: auto;
+}
+#exportDialog details.export-settings-card[open] summary::after {
+  transform: rotate(180deg);
+}
+#exportDialog details.export-settings-card summary h3 {
+  margin: 0 !important;
+}
+#exportDialog #exportFilenamePreview {
+  display: block;
+  margin-block: 8px 12px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+#exportDialog .export-options {
+  border: 0;
+  padding-bottom: 0;
+}
+#exportDialog .export-row h4 {
+  margin: 0;
+}
+#exportDialog .export-row {
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  #exportDialog .export-images {
+    gap: 8px;
+  }
+  #exportDialog .export-view-switch button {
+    min-height: 40px;
+    padding-block: 8px;
+  }
+  #exportDialog .review-stage {
+    min-height: 100px;
+  }
+  #exportDialog #reviewDialog {
+    overflow: auto;
+  }
+}
+
+#exportDialog .export-settings-card .export-options label.check,
+#exportDialog .export-project-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 14px;
+  margin: 0;
+}
+#exportDialog .export-project-option[hidden] {
+  display: none;
+}
