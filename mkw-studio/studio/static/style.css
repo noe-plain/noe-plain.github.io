@@ -1895,9 +1895,16 @@ dialog small {
 /* Bundled MKW brand fonts, independent of fonts stored in individual projects. */
 @font-face {
   font-family: "MKW UI";
+  src: url("fonts/ReplicaLL-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MKW UI";
   src: url("fonts/ReplicaLL-Bold.otf") format("opentype");
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 700;
   font-display: swap;
 }
 @font-face {

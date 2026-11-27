@@ -4,6 +4,27 @@ Stand: **27. November 2026**. Dies ist die einzige aktive Aufgaben- und Priorit�
 
 **Historischer Konsolidierungsauftrag vom 17. November:** nur planen. **Ausdrücklicher Umsetzungsauftrag vom 18. November:** Bildkommentare abschliessen, Winkel-Plan umsetzen und bei verfügbarem Guthaben die durchgehenden Artboards prüfen/herstellen. Die tatsächlichen Ergebnisse stehen unter D29–D31; offene Aufgaben bleiben davon getrennt.
 
+## Aktueller Auftrag · 27. November · ausdrückliche Reihenfolge
+
+Die fünf Produktperspektiven (Neue Nutzerin, erfahrener Nutzer, UX/UI, Barrierefreiheit, Entwicklung/QA) bestimmen die Abnahme jeder Etappe. Bestehende Designs, Schriftzuordnungen und Dateisicherheit bleiben erhalten. Dieser Auftrag hat während seiner Umsetzung Vorrang vor der bisherigen offenen Reihenfolge.
+
+| ID | Schritt | Abnahme | Status |
+| --- | --- | --- | --- |
+| U39 | Replica LL Regular, Bold, Light einbinden | Neue Standardtexte/UI Regular, Titel/Hervorhebung Bold, Light nur manuell. Alte Replica-LL-Rollen bleiben Bold. Alle Schnitte laden, MKW/Export erhalten die Schriften. Separater Push, ausdrücklich nicht beobachten. | Erledigt – nochmals prüfen für Abschluss |
+| U40 | FD-Bildkarte: Übertitel/Titel/Untertitel und Logo-Geometrie | Erste Bildkarte, erstes Format: drei beschriftete Felder → ein nativer Textrahmen. 70/120/55 px, Regular/Bold/Regular. Verknüpfung und individuelle Eigenschaftsänderungen erhalten. Logo-Geometrie trotz Farbvarianten übernehmen, lokale Anpassung möglich. | offen |
+| U41 | Instagram-Ansicht Shift+I | Referenz 1080×1920 und 1080×1080 inklusive Werbe-CTA; nur Ansicht, niemals Export. Kein universelles geräteunabhängiges Pixelversprechen. Mit U40 kurz prüfen und pushen. | offen |
+| U42 | Exportfenster und Vorschau vereinfachen; JPG+ | Material 3, Auswahl/Einstellungen/Vorschau ohne doppelte Bedienwege; klare Reihendateinamen. Echter JPEG-XL-Export unter JPG+, Hover «JPEG-XL», Endung .jxl. Normales JPG erhalten. Codec nur bei Bedarf laden, Abbruch/Fehler prüfen. Eigener geprüfter Push. | offen |
+| U43 | Speichernpanel vereinfachen | Wenig Prosa, eindeutiger Speicherort/Dateiname/Status, Dateikonflikte und Firefox-Ausweichweg erhalten. Tastatur, Abbruch, MKW-Rundlauf prüfen. Eigener Push. | offen |
+
+### Ergänzungen für spätere Umsetzung
+
+| ID | Aufgabe | Priorität / Abnahme | Status |
+| --- | --- | --- | --- |
+| U44 | Sponsorenleisten-UI in FD und Designer | P3. Kante wählbar, auch transparenter Balken, Logos schwarz/weiss; bestehenden Export und optische Gewichtung erhalten. | geplant |
+| U45 | Format zu offenem Projekt hinzufügen | P2. Gleiche verständliche Formatauswahl wie beim Start; bestehende individuelle Designs bleiben erhalten. | geplant |
+| U46 | Weitere Verlaufsarten | P2. Radial mit verschiebbarem Zentrum, Winkel, Punkte und Grid; gemeinsames Modell/Picker/Renderer/Export statt paralleler Implementierungen. | geplant |
+| U47 | Erklärungen ins Wiki, kurze Gestaltungseinführung | P2. Oberflächenprosa systematisch reduzieren; Labels, zugängliche Namen, Status-, Sicherheits- und Fehlermeldungen erhalten. Jede entfernte notwendige Erklärung im Wiki auffindbar; Crashkurs Bildausschnitt, Hierarchie, Abstände, Kontrast, Export. | geplant |
+
 ## 1. Grundlage, Quellen und Status
 
 - Umsetzung am 18. November auf sauberem `origin/main` **ec79fe59b8b0291137dfea81f596bd7447dc365a** begonnen; öffentliche offene Issues beim erneuten Abruf leer. Eigene getrennte Arbeitskopie verwendet. Aktuelle Code-/CI-/Live-Nachweise: [REVIEW-2026-11-18.md](REVIEW-2026-11-18.md).
@@ -317,3 +338,5 @@ Alle folgenden Einträge haben genau diesen Status. Ein noch leeres Abschlusskä
 | D36 | B02-Teilkorrektur: exakte Bruchteil-Schutzzonen und Schutz gegen Änderungen während der Kopienvorbereitung; gemeinsame vertikale Textausrichtung, optischer Standard für neue Textfelder, kompakte Karten-Icons und automatische Winkelrichtung beim Aufziehen | **Erledigt – nochmals prüfen für Abschluss.** Gezielte Browser-/Datei-/Pixelprüfungen bestanden; bestehende Designs bleiben erhalten. B02 selbst bleibt offen. [Fünf Personas und Prüfnachweis](FD-SAFE-COPY-REVIEW-2026-11-26.md). | [x] Pages, Live und vollständiger [Chromium-/Firefox-/Windows-Lauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45837503600) erfolgreich |
 | D37 | Nach D36 fünf verwaiste Regeln der alten doppelten Rahmenausrichtung aus drei Stylesheets entfernt | **Erledigt – nochmals prüfen für Abschluss.** Keine aktive Markup-Verwendung, JS/Source Map identisch; 539 Quellbytes und 467 gebündelte CSS-Bytes weniger, kein gemessener Geschwindigkeitsgewinn behauptet. 233 Modelltests und vier UI-Suiten bestanden. [Nachweise und fünf Personas](FD-SAFE-COPY-REVIEW-2026-11-26.md). | [x] [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45837503047), Live und vollständiger GitHub-Lauf 45837503600 erfolgreich |
 | D38 | B02: ausgeblendete Texte auf Wunsch als native, unabhängige Ebenen übernehmen; Export-Cache beim Wiederöffnen eindeutig dem Dokumentstand zuordnen | **Erledigt – nochmals prüfen für Abschluss.** Original/Pixel/Rich-Text/Undo/Datei/Limit/Tastatur und schmale Hell-/Dunkelansicht geprüft. B02 bleibt insgesamt offen. [Fünf Personas und Grenzen](FD-HIDDEN-TEXT-REVIEW-2026-11-26.md). | [x] [Firefox/Chromium/Windows/Gate](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45844746554), [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45844746153) und Live erfolgreich (`d39ca33`) |
+
+| D39 | Replica LL Regular/Bold/Light, neue Regular-Standards und lesbare Schriftrollen | **Erledigt – nochmals prüfen für Abschluss.** 233 Modelltests; Chromium: user-fonts, inline-fidelity, campaign-hidden-texts (3/3). Visuelle Schrift-Einstellungen kontrolliert. Vorhandene Bold-Rolle, Alttexte und PDF/PSD-Zuordnung erhalten. Erster Push gemäss Auftrag nicht beobachtet; lokale Firefox-Ausführung wegen bekannter Startprobleme nicht behauptet. | [x] |

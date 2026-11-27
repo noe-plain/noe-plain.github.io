@@ -617,3 +617,21 @@
   border-radius: 0;
   background: transparent;
 }
+
+.settings-brand-fonts dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.settings-brand-fonts dl > div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+}
+.settings-brand-fonts dt {
+  font-weight: 700;
+}
+.settings-brand-fonts dd {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+}

@@ -123,7 +123,16 @@ function studioSettingsUI() {
         `<label>${label}<span class="settings-size-value"><input type="number" data-default-text-size="${key}" aria-label="Standard-Schriftgrösse ${label}" min="1" max="5000" step="any" value="${studioPreferences.textSizes[key]}"><span>px</span></span></label>`,
     )
     .join("")}</div>`;
-  panels.fonts.prepend(textSizes, leading);
+  const brandFonts = document.createElement("section");
+  brandFonts.className = "settings-brand-fonts";
+  brandFonts.innerHTML = `<h3>Replica LL</h3><dl>${[
+    ["Regular", "Standard · Übertitel & Untertitel"],
+    ["Bold", "Hervorhebungen · Titel"],
+    ["Light", "Manuell auswählbar"],
+  ]
+    .map(([name, usage]) => `<div><dt>${name}</dt><dd>${usage}</dd></div>`)
+    .join("")}</dl>`;
+  panels.fonts.prepend(brandFonts, textSizes, leading);
   for (const input of textSizes.querySelectorAll("input"))
     input.onchange = () => {
       if (!MKWFields.validate(input, true)) return;

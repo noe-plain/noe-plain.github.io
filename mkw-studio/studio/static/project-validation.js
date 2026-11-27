@@ -98,6 +98,8 @@
                 "Arial",
                 "Georgia",
                 "Replica LL",
+                "Replica LL Regular",
+                "Replica LL Light",
                 "Harriet",
                 "Harriet Regular",
                 "Harriet Italic",
@@ -113,6 +115,8 @@
               !/^#[0-9a-f]{6}$/i.test(e.color) ||
               (![
                 "Replica LL",
+                "Replica LL Regular",
+                "Replica LL Light",
                 "Harriet",
                 "Harriet Regular",
                 "Harriet Italic",
@@ -128,6 +132,8 @@
         if (
           (![
             "Replica LL",
+            "Replica LL Regular",
+            "Replica LL Light",
             "Harriet",
             "Harriet Regular",
             "Harriet Italic",

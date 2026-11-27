@@ -178,7 +178,7 @@ function pruneImageCache() {
       imageCacheSizes.delete(key);
     }
 }
-function item(text, x, y, size, role = "Replica LL") {
+function item(text, x, y, size, role = "Replica LL Regular") {
   return {
     text,
     x,
@@ -226,6 +226,7 @@ function basicBoard(im, w = 1080, h = 1080, metadata = p.meta) {
           64,
           h - 240,
           studioPreferences.textSizes.title,
+          "Replica LL",
         ),
         enabled: true,
         visible: true,
@@ -614,6 +615,8 @@ async function loadFonts() {
   await studioMergeUserFonts();
   for (const [role, name] of [
     ["Replica LL", "ReplicaLL-Bold.otf"],
+    ["Replica LL Regular", "ReplicaLL-Regular.otf"],
+    ["Replica LL Light", "ReplicaLL-Light.otf"],
     ["Harriet Regular", "Harrietv2Text-Regular.otf"],
     ["Harriet", "HarrietText-Bold.otf"],
     ["Harriet Italic", "HarrietText-BoldItalic.otf"],

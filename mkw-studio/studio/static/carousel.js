@@ -670,7 +670,7 @@ function carouselDefault(type, rect = {}) {
     textAlign: "left",
     lineHeight: (studioPreferences.lineHeight || 95) / 100,
     size: 70,
-    font: "Replica LL",
+    font: "Replica LL Regular",
     color: "#ffffff",
     startAlpha: 1,
     endColor: "#000000",

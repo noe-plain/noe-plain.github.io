@@ -1,6 +1,8 @@
 "use strict";
 const studioBrandFonts = [
-  ["Replica LL", "Replica LL"],
+  ["Replica LL Regular", "Replica LL Regular · Standard"],
+  ["Replica LL", "Replica LL Bold · Hervorhebung"],
+  ["Replica LL Light", "Replica LL Light"],
   ["Harriet Regular", "Harriet Regular"],
   ["Harriet", "Harriet Bold"],
   ["Harriet Italic", "Harriet Bold Italic"],
