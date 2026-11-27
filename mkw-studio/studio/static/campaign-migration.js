@@ -275,6 +275,70 @@ const MKWCampaignMigration = (() => {
     ctx.restore();
     return true;
   }
+  async function paintPhoto(
+    ctx,
+    object,
+    board,
+    frame,
+    scale,
+    loadImage,
+    project,
+  ) {
+    const angle = object.campaignRole === "angle";
+    if (
+      !board?.campaignLegacyTexts ||
+      (angle
+        ? object.type !== "angle"
+        : object.campaignRole !== "background" || object.type !== "image") ||
+      object.imageId !== board.imageId ||
+      object.framePoints ||
+      (object.angle || 0) !== 0 ||
+      (object.blend || "source-over") !== "source-over"
+    )
+      return false;
+    const photo = project.images.find((asset) => asset.id === object.imageId);
+    const area = MKWSponsors.layout(board)?.content;
+    if (
+      !photo ||
+      (angle && (!board.angle?.enabled || MKWAnglePolicy.solid(object)))
+    )
+      return false;
+    const geometry = angle
+      ? MKWPostAngle.geometry(board, area || board).o
+      : { x: 0, y: 0, w: board.w, h: board.h };
+    if (
+      object.w !== geometry.w ||
+      object.h !== geometry.h ||
+      Math.abs(object.x - frame.x - geometry.x) >= 1e-7 ||
+      Math.abs(object.y - frame.y - geometry.y) >= 1e-7 ||
+      (object.opacity ?? 1) !== (angle ? (board.angle.opacity ?? 1) : 1) ||
+      (angle &&
+        ["direction", "thickness", "glow", "glowColor", "glowAlpha"].some(
+          (key) => object[key] !== geometry[key],
+        ))
+    )
+      return false;
+    const transform = MKWPhotoTransform.fromLegacy(
+      geometry,
+      photo,
+      angle ? board.angle.image : board.image,
+    );
+    if (
+      !Object.keys(transform).every(
+        (key) => (object[key] ?? 0) === transform[key],
+      )
+    )
+      return false;
+    const bitmap = await loadImage(photo.data, project);
+    ctx.save();
+    ctx.translate(frame.x, frame.y);
+    if (area) carouselClipFrames(ctx, [{ x: 0, y: 0, ...area }]);
+    if (angle)
+      drawLegacyAnglePhoto(ctx, bitmap, photo, board.angle, geometry, scale);
+    else drawLegacyPhoto(ctx, bitmap, photo, board.image);
+    ctx.restore();
+    return true;
+  }
   async function paintLogo(ctx, logo, board, frame, project) {
     const original = board?.elements.logo;
     if (
@@ -327,6 +391,7 @@ const MKWCampaignMigration = (() => {
     recoverText,
     paintText,
     paintContrast,
+    paintPhoto,
     paintLogo,
     paintLogoShadow,
   });

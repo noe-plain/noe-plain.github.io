@@ -264,6 +264,22 @@ async function carouselPaint(
       ctx.restore();
       continue;
     }
+    if (
+      (o.campaignRole === "background" || o.campaignRole === "angle") &&
+      campaignFrames?.has(o.pageId) &&
+      (await MKWCampaignMigration.paintPhoto(
+        ctx,
+        o,
+        campaignBoards.get(o.pageId),
+        campaignFrames.get(o.pageId),
+        scale,
+        loadImage,
+        project,
+      ))
+    ) {
+      ctx.restore();
+      continue;
+    }
     ctx.globalAlpha = o.opacity ?? 1;
     ctx.globalCompositeOperation = o.blend || "source-over";
     ctx.translate(o.x, o.y);
@@ -310,7 +326,7 @@ async function carouselPaint(
     }
     ctx.restore();
   }
-  if (project.campaign)
+  if (project.campaign && isCurrent())
     await MKWCampaignUI.paintDecorations(ctx, project, slide);
   ctx.restore();
 }
@@ -648,17 +664,19 @@ function carouselFit() {
 
 let carouselPaintBuffer = null,
   carouselPaintPending = null,
-  carouselPaintRunning = false,
+  carouselPaintRunning = null,
   carouselPaintFrame = 0;
 
 const carouselPaintStates = new WeakMap();
-function carouselSchedulePaint(canvas, scale, generation) {
+function carouselSchedulePaint(canvas, view, immediate = false) {
+  canvas._requestedView = view;
   const c = p.carousel,
-    objects = canvas._region
+    { region, scale } = view,
+    objects = region
       ? c.objects.filter((o) =>
           MKWCarouselPolicy.intersects(
             carouselPaintBounds(o, !!p.campaign),
-            canvas._region,
+            region,
           ),
         )
       : null;
@@ -668,41 +686,72 @@ function carouselSchedulePaint(canvas, scale, generation) {
       p.carousel.n,
       p.carousel.bg,
       p.carousel.artboards,
-      p.campaign ? c.objects : objects || c.objects,
+      objects || c.objects,
       c.folders,
       c.layout,
       c.pageStructure?.groups,
-      p.campaign ? p.boards.map((b) => b.sponsors) : null,
-      canvas._region,
-      scale,
+      p.campaign ? p.boards.map((b) => [b.sponsors, b.family]) : null,
+      view,
       carouselUI.editing?.composing ? carouselUI.editing.id : null,
       MKWTextHyphen.version,
       fontStatus,
     ]),
-    sources = [...p.images, ...p.logos].map((a) => a.data),
-    old = carouselPaintStates.get(canvas);
+    sources = [...p.images, ...p.logos].map((a) => a.data);
+  const matches = (paint) =>
+    paint?.key === key &&
+    paint.project === p &&
+    sources.length === paint.sources.length &&
+    sources.every((src, i) => src === paint.sources[i]);
+  const requested = carouselPaintPending || carouselPaintRunning;
   if (
-    old?.key === key &&
-    old.project === p &&
-    old.fonts === fontStatus &&
-    sources.length === old.sources.length &&
-    sources.every((src, i) => src === old.sources[i])
+    requested?.canvas === canvas &&
+    requested.generation === carouselDraw &&
+    matches(requested)
   )
     return;
+  if (matches(carouselPaintStates.get(canvas))) {
+    if (requested) {
+      carouselDraw++;
+      carouselPaintPending = null;
+    }
+    return;
+  }
   carouselPaintPending = {
     canvas,
     objects,
-    scale,
-    region: canvas._region,
-    generation,
+    view,
+    generation: ++carouselDraw,
     key,
     sources,
-    fonts: fontStatus,
     project: p,
     editingId: carouselUI.editing?.composing ? carouselUI.editing.id : null,
   };
-  if (!carouselPaintRunning && !carouselPaintFrame)
+  if (carouselPaintRunning) return;
+  if (immediate) {
+    cancelAnimationFrame(carouselPaintFrame);
+    void carouselRunPaint();
+  } else if (!carouselPaintFrame) {
     carouselPaintFrame = requestAnimationFrame(carouselRunPaint);
+  }
+}
+
+// Keep the previous raster at its document coordinates until its replacement
+// is ready. Changing a canvas size or origin earlier clears or misplaces it.
+function carouselPublishPaint(canvas, view, buffer) {
+  const { region, zoom, width, height, rasterWidth, rasterHeight } = view;
+  if (canvas.width !== rasterWidth) canvas.width = rasterWidth;
+  if (canvas.height !== rasterHeight) canvas.height = rasterHeight;
+  canvas._region = region;
+  Object.assign(canvas.style, {
+    position: region ? "absolute" : "",
+    left: region ? region.x * zoom + "px" : "",
+    top: region ? region.y * zoom + "px" : "",
+    width: width + "px",
+    height: height + "px",
+  });
+  const out = canvas.getContext("2d");
+  out.clearRect(0, 0, canvas.width, canvas.height);
+  out.drawImage(buffer, 0, 0);
 }
 
 async function carouselRunPaint() {
@@ -710,11 +759,12 @@ async function carouselRunPaint() {
   if (carouselPaintRunning || !carouselPaintPending) return;
   const job = carouselPaintPending;
   carouselPaintPending = null;
-  carouselPaintRunning = true;
+  carouselPaintRunning = job;
+  const { region, scale, rasterWidth, rasterHeight } = job.view;
   let loadingTimer = 0,
     finishLoading = () => {},
     loadingNode = null;
-  if (job.region)
+  if (region)
     loadingTimer = setTimeout(() => {
       if (!job.canvas.isConnected || job.project !== p) return;
       loadingNode = document.querySelector("#spreadLoading");
@@ -735,20 +785,19 @@ async function carouselRunPaint() {
       job.canvas.isConnected;
     if (!current()) return;
     carouselPaintBuffer ??= makeCanvas(1, 1);
-    if (carouselPaintBuffer.width !== job.canvas.width)
-      carouselPaintBuffer.width = job.canvas.width;
-    if (carouselPaintBuffer.height !== job.canvas.height)
-      carouselPaintBuffer.height = job.canvas.height;
+    if (carouselPaintBuffer.width !== rasterWidth)
+      carouselPaintBuffer.width = rasterWidth;
+    if (carouselPaintBuffer.height !== rasterHeight)
+      carouselPaintBuffer.height = rasterHeight;
     const ctx = carouselPaintBuffer.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, carouselPaintBuffer.width, carouselPaintBuffer.height);
-    if (job.region)
-      ctx.translate(-job.region.x * job.scale, -job.region.y * job.scale);
+    if (region) ctx.translate(-region.x * scale, -region.y * scale);
     job.canvas.setAttribute("aria-busy", "true");
     await carouselPaint(
       ctx,
       null,
-      job.scale,
+      scale,
       false,
       job.editingId,
       job.objects,
@@ -756,13 +805,10 @@ async function carouselRunPaint() {
       previewImage,
     );
     if (current()) {
-      const out = job.canvas.getContext("2d");
-      out.clearRect(0, 0, job.canvas.width, job.canvas.height);
-      out.drawImage(carouselPaintBuffer, 0, 0);
+      carouselPublishPaint(job.canvas, job.view, carouselPaintBuffer);
       carouselPaintStates.set(job.canvas, {
         key: job.key,
         project: job.project,
-        fonts: job.fonts,
         sources: job.sources,
       });
     }
@@ -773,7 +819,7 @@ async function carouselRunPaint() {
     finishLoading();
     if (loadingNode) loadingNode.hidden = true;
     job.canvas.removeAttribute("aria-busy");
-    carouselPaintRunning = false;
+    carouselPaintRunning = null;
     if (carouselPaintPending && !carouselPaintFrame)
       carouselPaintFrame = requestAnimationFrame(carouselRunPaint);
   }
@@ -805,8 +851,7 @@ function carouselRefresh() {
       16000 / extent.h,
       Math.sqrt(24000000 / (extent.w * extent.h)),
     ),
-    canvas = $("#carouselCanvas"),
-    generation = ++carouselDraw;
+    canvas = $("#carouselCanvas");
   c.zoom = s;
   const width = extent.w * s,
     height = extent.h * s;
@@ -814,45 +859,37 @@ function carouselRefresh() {
   $("#carouselArtwork").style.height = height + "px";
   const viewport = $("#carouselViewport");
   carouselPasteboardSpace(viewport, width, height);
-  let drawScale = rasterScale;
   const regional =
     structured ||
     p.images.some((asset) => MKWProjectAssets.deferred(asset.data));
+  let view = {
+    region: null,
+    zoom: s,
+    scale: rasterScale,
+    width,
+    height,
+    rasterWidth: Math.max(1, Math.ceil(extent.w * rasterScale)),
+    rasterHeight: Math.max(1, Math.ceil(extent.h * rasterScale)),
+  };
   if (regional) {
     const v = MKWSpreadUI.visible(),
-      x = Math.max(0, Math.floor(v.x)),
-      y = Math.max(0, Math.floor(v.y)),
-      w = Math.max(1, Math.min(extent.w - x, Math.ceil(v.w))),
-      h = Math.max(1, Math.min(extent.h - y, Math.ceil(v.h)));
-    canvas._region = { x, y, w, h };
-    drawScale = Math.min(
-      s * Math.min(2, devicePixelRatio || 1),
-      Math.sqrt(4000000 / (w * h)),
-    );
-    const rw = Math.max(1, Math.ceil(w * drawScale)),
-      rh = Math.max(1, Math.ceil(h * drawScale));
-    if (canvas.width !== rw) canvas.width = rw;
-    if (canvas.height !== rh) canvas.height = rh;
-    Object.assign(canvas.style, {
-      position: "absolute",
-      left: x * s + "px",
-      top: y * s + "px",
-      width: w * s + "px",
-      height: h * s + "px",
-    });
-  } else {
-    canvas._region = null;
-    if (canvas.width !== Math.ceil(extent.w * rasterScale))
-      canvas.width = Math.ceil(extent.w * rasterScale);
-    if (canvas.height !== Math.ceil(extent.h * rasterScale))
-      canvas.height = Math.ceil(extent.h * rasterScale);
-    Object.assign(canvas.style, {
-      position: "",
-      left: "",
-      top: "",
-      width: width + "px",
-      height: height + "px",
-    });
+      x = Math.max(0, Math.min(extent.w, Math.floor(v.x))),
+      y = Math.max(0, Math.min(extent.h, Math.floor(v.y))),
+      w = Math.max(1, Math.min(extent.w - x, Math.ceil(v.x + v.w) - x)),
+      h = Math.max(1, Math.min(extent.h - y, Math.ceil(v.y + v.h) - y)),
+      scale = Math.min(
+        s * Math.min(2, devicePixelRatio || 1),
+        Math.sqrt(4000000 / (w * h)),
+      );
+    view = {
+      region: { x, y, w, h },
+      zoom: s,
+      scale,
+      width: w * s,
+      height: h * s,
+      rasterWidth: Math.max(1, Math.ceil(w * scale)),
+      rasterHeight: Math.max(1, Math.ceil(h * scale)),
+    };
   }
   carouselScheduleOutside();
   const zoomField = $("#carouselZoom"),
@@ -863,7 +900,7 @@ function carouselRefresh() {
   zoomField.max = Math.ceil(
     MKWZoom.percent(carouselMaxZoom(), studioZoomReference(true)),
   );
-  carouselSchedulePaint(canvas, drawScale, generation);
+  carouselSchedulePaint(canvas, view);
   $("#carouselGuides").hidden = !carouselUI.guides;
   const gridStyle = MKWDesignerGrid.style(c),
     guideView = structured ? MKWSpreadUI.visible() : null,
@@ -939,6 +976,18 @@ function carouselRefresh() {
     const o = c.objects.find((o) => o.id === carouselUI.editing.id);
     if (o) carouselPositionText(carouselUI.editing.el, o);
   }
+}
+
+function carouselRefreshMove() {
+  const canvas = $("#carouselCanvas");
+  if (!canvas?._requestedView) return carouselRefresh();
+  carouselUpdateOutsideCandidates();
+  carouselScheduleOutside();
+  carouselDrawSelection();
+  carouselVectorOverlay();
+  carouselCurvatureOverlay();
+  carouselDrawSnap();
+  carouselSchedulePaint(canvas, canvas._requestedView, true);
 }
 
 function carouselDrawSelection() {

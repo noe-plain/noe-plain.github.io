@@ -1,20 +1,22 @@
 "use strict";
 // Only wholly off-artwork objects appear on the pasteboard. Export painting is unchanged.
 function carouselOutsideObjects(c = p.carousel) {
+  const frames = MKWCarouselPolicy.frames(c);
   return c.objects.filter((object) => {
     if (!carouselObjectVisible(object)) return false;
     const b = carouselObjectBounds(object);
-    return !MKWCarouselPolicy.frames(c).some((frame) =>
-      MKWCarouselPolicy.intersects(b, frame),
-    );
+    return !frames.some((frame) => MKWCarouselPolicy.intersects(b, frame));
   });
 }
 let carouselOutsideCandidates = null;
-function carouselPasteboardSpace(viewport, width, height) {
+function carouselUpdateOutsideCandidates() {
   carouselOutsideCandidates = {
     document: p.carousel,
     objects: carouselOutsideObjects(),
   };
+}
+function carouselPasteboardSpace(viewport, width, height) {
+  carouselUpdateOutsideCandidates();
   const pasteboard = $("#carouselPasteboard"),
     artwork = $("#carouselArtwork"),
     old = pasteboard.space,
@@ -67,11 +69,10 @@ function carouselScheduleOutside() {
     carouselOutsideGeneration++;
     return;
   }
-  canvas.hidden = false;
-  canvas.style.left = viewport.scrollLeft + "px";
-  canvas.style.top = viewport.scrollTop + "px";
-  canvas.style.width = viewport.clientWidth + "px";
-  canvas.style.height = viewport.clientHeight + "px";
+  const left = viewport.scrollLeft,
+    top = viewport.scrollTop;
+  const cssWidth = viewport.clientWidth,
+    cssHeight = viewport.clientHeight;
   const ratio = Math.min(
       2,
       devicePixelRatio || 1,
@@ -80,9 +81,9 @@ function carouselScheduleOutside() {
     width = Math.max(1, Math.round(viewport.clientWidth * ratio)),
     height = Math.max(1, Math.round(viewport.clientHeight * ratio)),
     origin = carouselOrigin(),
-    rect = canvas.getBoundingClientRect(),
-    dx = origin.left - rect.left,
-    dy = origin.top - rect.top,
+    rect = viewport.getBoundingClientRect(),
+    dx = origin.left - rect.left - viewport.clientLeft,
+    dy = origin.top - rect.top - viewport.clientTop,
     objects = candidates.filter((object) => {
       const b = carouselObjectBounds(object),
         pad =
@@ -128,6 +129,10 @@ function carouselScheduleOutside() {
     width,
     height,
     ratio,
+    left,
+    top,
+    cssWidth,
+    cssHeight,
     dx,
     dy,
     objects,
@@ -187,6 +192,13 @@ async function carouselPaintOutside() {
       job.canvas.height = job.height;
       job.canvas.getContext("2d").drawImage(buffer, 0, 0);
     }
+    Object.assign(job.canvas.style, {
+      left: job.left + "px",
+      top: job.top + "px",
+      width: job.cssWidth + "px",
+      height: job.cssHeight + "px",
+    });
+    job.canvas.hidden = job.canvas.paintEmpty;
     job.canvas.paintKey = job.key;
     job.canvas.paintProject = job.project;
     job.canvas.paintSources = job.sources;

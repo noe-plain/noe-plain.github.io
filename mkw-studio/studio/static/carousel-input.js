@@ -48,12 +48,14 @@ function carouselHit(pt) {
 function carouselListen(ev, move, finish, cancel = finish, shape = false) {
   ev.preventDefault();
   let pending = null,
+    last = ev,
     frame = 0;
   const flush = () => {
     frame = 0;
     if (!pending) return;
     const event = pending;
     pending = null;
+    last = event;
     move(event);
   };
   const stop = () => {
@@ -71,7 +73,13 @@ function carouselListen(ev, move, finish, cancel = finish, shape = false) {
   const onUp = (e) => {
     if (e.pointerId !== ev.pointerId) return;
     stop();
-    // A quick release can precede the next frame: never lose the final position.
+    // A release may carry a newer position than the last coalesced move.
+    const position = pending || last;
+    if (
+      e.type === "pointerup" &&
+      (e.clientX !== position.clientX || e.clientY !== position.clientY)
+    )
+      pending = e;
     flush();
     carouselUI.drag = null;
     carouselUI.snapLines = [];
@@ -604,7 +612,7 @@ function carouselMove(ev) {
           o.y = original[i].y + snap.y - bounds.y;
         });
       }
-      carouselRefresh();
+      carouselRefreshMove();
       carouselCoordinates(objects);
     },
     () => {

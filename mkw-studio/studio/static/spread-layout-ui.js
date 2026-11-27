@@ -1242,12 +1242,15 @@ const MKWSpreadUI = (() => {
     window.addEventListener("blur", cancel);
   }
   function scroll() {
-    if (!document.querySelector("#carouselCanvas")?._region || repaintFrame)
+    if (
+      !document.querySelector("#carouselCanvas")?._requestedView?.region ||
+      repaintFrame
+    )
       return;
     repaintFrame = requestAnimationFrame(() => {
       repaintFrame = 0;
       const canvas = document.querySelector("#carouselCanvas"),
-        region = canvas?._region,
+        region = canvas?._requestedView?.region,
         viewport = document.querySelector("#carouselViewport");
       if (!canvas || !viewport) return;
       if (region) {

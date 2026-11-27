@@ -340,6 +340,23 @@ function drawLogo(ctx, b, logo, opts = {}) {
   ctx.drawImage(logo, off, 0, w, h);
   ctx.restore();
 }
+function drawLegacyPhoto(ctx, bitmap, photo, transform) {
+  ctx.save();
+  ctx.translate(transform.x, transform.y);
+  ctx.rotate((transform.angle * Math.PI) / 180);
+  ctx.scale(
+    transform.scale * transform.flipX,
+    transform.scale * transform.flipY,
+  );
+  ctx.drawImage(
+    bitmap,
+    -photo.width / 2,
+    -photo.height / 2,
+    photo.width,
+    photo.height,
+  );
+  ctx.restore();
+}
 async function paint(ctx, b, s = 1, opts = {}) {
   if (
     b.carouselSlide === undefined &&
@@ -365,21 +382,9 @@ async function paint(ctx, b, s = 1, opts = {}) {
     ctx.fillRect(0, 0, b.w, b.h);
   }
   if (!opts.only || opts.only === "image") {
-    const photo = asset(b),
-      im = await (opts.preview ? previewImage : image)(photo.data),
-      t = b.image;
-    ctx.save();
-    ctx.translate(t.x, t.y);
-    ctx.rotate((t.angle * Math.PI) / 180);
-    ctx.scale(t.scale * t.flipX, t.scale * t.flipY);
-    ctx.drawImage(
-      im,
-      -photo.width / 2,
-      -photo.height / 2,
-      photo.width,
-      photo.height,
-    );
-    ctx.restore();
+    const photo = asset(b);
+    const bitmap = await (opts.preview ? previewImage : image)(photo.data);
+    drawLegacyPhoto(ctx, bitmap, photo, b.image);
   }
   await MKWPostAngleEditor.paint(ctx, b, s, opts);
   if (

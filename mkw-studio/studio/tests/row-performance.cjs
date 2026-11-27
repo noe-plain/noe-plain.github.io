@@ -201,6 +201,58 @@ const { launch, waitForProjectReady, artifact } = require("./browser.cjs");
         "Folder visibility must invalidate the viewport",
       );
     }
+    const scroll = await page.evaluate(async () => {
+      const viewport = $("#carouselViewport"),
+        canvas = $("#carouselCanvas");
+      await carouselWaitForPaint();
+      const before = {
+        top: canvas.style.top,
+        rect: JSON.stringify(canvas._region),
+        pixel: Array.from(
+          canvas.getContext("2d").getImageData(100, 100, 1, 1).data,
+        ),
+      };
+      const normal = carouselPaint;
+      let started, release;
+      const active = new Promise((resolve) => (started = resolve));
+      const hold = new Promise((resolve) => (release = resolve));
+      carouselPaint = async (...args) => {
+        started();
+        await hold;
+        return normal(...args);
+      };
+      try {
+        viewport.scrollTop += 420;
+        await active;
+        const during = {
+          top: canvas.style.top,
+          rect: JSON.stringify(canvas._region),
+          pixel: Array.from(
+            canvas.getContext("2d").getImageData(100, 100, 1, 1).data,
+          ),
+        };
+        const generation = carouselDraw;
+        carouselSchedulePaint(canvas, canvas._requestedView);
+        const reused = generation === carouselDraw;
+        release();
+        await carouselWaitForPaint();
+        return { before, during, reused, after: canvas.style.top };
+      } finally {
+        release();
+        carouselPaint = normal;
+      }
+    });
+    assert.deepEqual(
+      scroll.during,
+      scroll.before,
+      "Pending scroll paint must retain the old raster and its origin",
+    );
+    assert(scroll.reused, "Identical refresh must keep the in-progress paint");
+    assert.notEqual(
+      scroll.after,
+      scroll.before.top,
+      "Completed scroll paint publishes the new origin",
+    );
     assert.deepEqual(errors, []);
     console.log(
       "PASS 1/3/10 rows, up to 200 slides/401 objects/50 synthetic 640×480 images, bounded viewport, coalesced movement and correct folder/cache invalidation",

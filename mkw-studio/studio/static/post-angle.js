@@ -1,4 +1,14 @@
 "use strict";
+function drawLegacyAnglePhoto(ctx, bitmap, photo, angle, geometry, scale) {
+  ctx.save();
+  ctx.globalAlpha *= angle.opacity ?? 1;
+  ctx.translate(geometry.x, geometry.y);
+  carouselClipPhoto(ctx, geometry, scale);
+  ctx.translate(-geometry.x, -geometry.y);
+  drawLegacyPhoto(ctx, bitmap, photo, angle.image);
+  ctx.restore();
+}
+
 const MKWPostAngleEditor = (() => {
   const postAngleContent = { board: null };
   const postAngleArea = (b) => MKWSponsors.layout(b)?.content || b;
@@ -82,26 +92,10 @@ const MKWPostAngleEditor = (() => {
       ctx.restore();
       return;
     }
-    const { o } = MKWPostAngle.geometry(b, postAngleArea(b)),
-      photo = asset(b),
-      im = await (opts.preview ? previewImage : image)(photo.data),
-      t = b.angle.image;
-    ctx.save();
-    ctx.globalAlpha *= b.angle.opacity ?? 1;
-    ctx.translate(o.x, o.y);
-    carouselClipPhoto(ctx, o, scale);
-    ctx.translate(-o.x, -o.y);
-    ctx.translate(t.x, t.y);
-    ctx.rotate((t.angle * Math.PI) / 180);
-    ctx.scale(t.scale * t.flipX, t.scale * t.flipY);
-    ctx.drawImage(
-      im,
-      -photo.width / 2,
-      -photo.height / 2,
-      photo.width,
-      photo.height,
-    );
-    ctx.restore();
+    const { o } = MKWPostAngle.geometry(b, postAngleArea(b));
+    const photo = asset(b);
+    const bitmap = await (opts.preview ? previewImage : image)(photo.data);
+    drawLegacyAnglePhoto(ctx, bitmap, photo, b.angle, o, scale);
   }
   function postAnglePanel(b, panel) {
     const a = b.angle,
