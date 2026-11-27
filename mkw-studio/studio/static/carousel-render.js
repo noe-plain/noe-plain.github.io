@@ -737,11 +737,7 @@ function carouselSchedulePaint(canvas, view, immediate = false) {
 
 // Keep the previous raster at its document coordinates until its replacement
 // is ready. Changing a canvas size or origin earlier clears or misplaces it.
-function carouselPublishPaint(canvas, view, buffer) {
-  const { region, zoom, width, height, rasterWidth, rasterHeight } = view;
-  if (canvas.width !== rasterWidth) canvas.width = rasterWidth;
-  if (canvas.height !== rasterHeight) canvas.height = rasterHeight;
-  canvas._region = region;
+function carouselPlaceCanvas(canvas, { region, zoom, width, height }) {
   Object.assign(canvas.style, {
     position: region ? "absolute" : "",
     left: region ? region.x * zoom + "px" : "",
@@ -749,6 +745,15 @@ function carouselPublishPaint(canvas, view, buffer) {
     width: width + "px",
     height: height + "px",
   });
+}
+
+function carouselPublishPaint(canvas, view, buffer) {
+  const { region, zoom, rasterWidth, rasterHeight } = view;
+  if (canvas.width !== rasterWidth) canvas.width = rasterWidth;
+  if (canvas.height !== rasterHeight) canvas.height = rasterHeight;
+  canvas._region = region;
+  canvas._displayZoom = zoom;
+  carouselPlaceCanvas(canvas, view);
   const out = canvas.getContext("2d");
   out.clearRect(0, 0, canvas.width, canvas.height);
   out.drawImage(buffer, 0, 0);
@@ -900,6 +905,18 @@ function carouselRefresh() {
   zoomField.max = Math.ceil(
     MKWZoom.percent(carouselMaxZoom(), studioZoomReference(true)),
   );
+  // Zoom can reproject the previous bitmap without changing its document origin.
+  if (!view.region && !canvas._region) carouselPlaceCanvas(canvas, view);
+  else if (canvas._region && canvas._displayZoom !== s) {
+    const region = canvas._region;
+    carouselPlaceCanvas(canvas, {
+      region,
+      zoom: s,
+      width: region.w * s,
+      height: region.h * s,
+    });
+    canvas._displayZoom = s;
+  }
   carouselSchedulePaint(canvas, view);
   $("#carouselGuides").hidden = !carouselUI.guides;
   const gridStyle = MKWDesignerGrid.style(c),
