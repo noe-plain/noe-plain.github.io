@@ -14,3 +14,10 @@ Kampagnen verwenden für Text, Hintergrund und Logoschatten die gespeicherten Ei
 | Destruktiver Fehlersucher | Original bleibt getrennt. Änderung und Undo stellen den gemischten Zustand wieder her. Der Wechsel der Familiengestaltung lässt bestehende Winkelobjekte bestehen. | Gelöst für diesen Fall |
 
 Der Testfall verwendet eigene synthetische Daten. Die acht bereits geprüften Palettenversätze sowie die PNG-, PDF-, PSD-, Winkel- und Alttext-Regressionsfälle decken zusätzliche vorhandene Funktionen ab. Die vollständige B02-Abnahme benötigt weiterhin weitere echte Familien-, Winkel- und Sponsorenprojekte. FD-Backup bleibt verfügbar.
+
+
+## Freigabe
+
+Lokal bestanden 233 Modell-/Dateitests und acht gezielte Chromium-Suiten. Der neue Test erkannte den Fehler im zuvor ausgelieferten Build an der regulären Ausgabe. Beide Ausgaben waren mit dem korrigierten Build pixelgleich. Die Steuerung wurde im hellen Desktopfenster sowie in einem schmaleren dunklen Fenster geprüft.
+
+Code-Endstand `08dfc2c` ist live. [GitHub-Freigabelauf](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45960341794) mit Chromium, Firefox, Windows und Studio-Gate sowie [Pages](https://github.com/noe-plain/noe-plain.github.io/actions/runs/45962262004) bestanden. HTML, JavaScript und CSS der Live-Seite waren bytegleich mit dem Release. Die zweite Prüfung auf der Live-Seite bestätigte Familienumwandlung/-export sowie die Kampagnenbedienung (2/2 Suiten).
