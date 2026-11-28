@@ -160,7 +160,7 @@ const { launch, artifact } = require("./browser.cjs");
     await page.locator("#help").click();
     const help = page.frameLocator("#studioHelpFrame");
     await help.locator("#helpSearch").waitFor();
-    assert.equal(await help.locator("main section").count(), 8);
+    assert.equal(await help.locator("main section").count(), 10);
     for (const theme of ["light", "dark"]) {
       await page.evaluate((theme) => studioSetTheme(theme), theme);
       const colours = await help.locator("html").evaluate((el) => ({
@@ -231,7 +231,10 @@ const { launch, artifact } = require("./browser.cjs");
           .locator("#helpSearch")
           .evaluate((el) => document.activeElement === el),
       );
-      assert.equal(await help.locator("main section:not([hidden])").count(), 8);
+      assert.equal(
+        await help.locator("main section:not([hidden])").count(),
+        10,
+      );
       await help.locator("#helpSearch").fill("keinpassendeskapitel123");
       assert.match(
         await help.locator("#helpResults").textContent(),

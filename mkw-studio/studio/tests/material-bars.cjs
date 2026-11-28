@@ -98,7 +98,12 @@ const { launch, artifact } = require("./browser.cjs");
       assert((await page.locator("#saveName").boundingBox()).height >= 56);
       assert(!(await page.locator("#saveProjectAs").isVisible()));
       assert((await page.locator("#saveProject").boundingBox()).height >= 56);
-      assert.equal(await page.locator("#saveProject").evaluate(el => !!el.closest(".save-dialog-footer")), true);
+      assert.equal(
+        await page
+          .locator("#saveProject")
+          .evaluate((el) => !!el.closest(".save-dialog-footer")),
+        true,
+      );
       await checkContrast("#saveProject strong");
       await checkContrast("#savePSD small");
       await page.screenshot({
@@ -144,9 +149,13 @@ const { launch, artifact } = require("./browser.cjs");
           (e) => e.dataset.bytes,
         ),
       );
-      assert.equal(
-        await page.locator(".export-format-buttons button:visible").count(),
-        3,
+      assert.deepEqual(
+        await page
+          .locator(".export-format-buttons button:visible")
+          .evaluateAll((buttons) =>
+            buttons.map((button) => button.dataset.exportFormat),
+          ),
+        ["jpg", "jxl", "png", "webp"],
       );
       assert((await page.locator("#exportPreset").boundingBox()).height >= 56);
       await checkContrast(".export-name");
@@ -160,7 +169,11 @@ const { launch, artifact } = require("./browser.cjs");
         const layout = await page.locator("#exportDialog").evaluate((el) => {
           const r = el.getBoundingClientRect(),
             b = el.querySelector("#zip").getBoundingClientRect(),
-            s = el.querySelector(matchMedia("(max-width: 760px)").matches ? ".export-layout" : ".export-settings-scroll");
+            s = el.querySelector(
+              matchMedia("(max-width: 760px)").matches
+                ? ".export-layout"
+                : ".export-settings-scroll",
+            );
           return {
             overflow: el.scrollWidth > el.clientWidth + 1,
             visible:
@@ -174,7 +187,10 @@ const { launch, artifact } = require("./browser.cjs");
           `${width}: export has no horizontal overflow`,
         );
         assert(layout.visible, `${width}: download stays visible`);
-        assert(layout.scroll, "Settings keep a reachable scroll container at this breakpoint");
+        assert(
+          layout.scroll,
+          "Settings keep a reachable scroll container at this breakpoint",
+        );
       }
       await page.locator("#deselectAllExports").click();
       assert(await page.locator("#zip").isDisabled());

@@ -66,7 +66,7 @@ const MKWExportPanel = (() => {
   views.setAttribute("role", "group");
   views.setAttribute("aria-label", "Exportansicht");
   choose.textContent = "Auswahl";
-  choose.setAttribute("aria-label", "Exportauswahl anzeigen");
+  choose.setAttribute("aria-label", "Auswahl anzeigen");
   reviewButton.textContent = "Vorschau";
   views.append(choose, reviewButton);
   const viewbar = document.createElement("div");

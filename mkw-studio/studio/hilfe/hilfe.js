@@ -13,6 +13,11 @@ const search = document.getElementById("helpSearch"),
   text = new Map(
     sections.map((section) => [section.id, normalize(section.textContent)]),
   );
+const references = [...document.querySelectorAll("main details")],
+  referenceText = new Map(
+    references.map((element) => [element, normalize(element.textContent)]),
+  ),
+  referenceState = new Map();
 search.hidden = false;
 document.getElementById("searchHint").hidden = false;
 search.addEventListener("input", () => {
@@ -26,6 +31,19 @@ search.addEventListener("input", () => {
     if (!section.hidden) count++;
     chapterLinks.get(section.id).hidden = section.hidden;
   }
+  // Search also reveals matching instructions inside the legacy reference.
+  for (const reference of references) {
+    if (words.length) {
+      if (!referenceState.has(reference))
+        referenceState.set(reference, reference.open);
+      reference.open = words.every((word) =>
+        referenceText.get(reference).includes(word),
+      );
+    } else if (referenceState.has(reference)) {
+      reference.open = referenceState.get(reference);
+      referenceState.delete(reference);
+    }
+  }
   results.hidden = !words.length;
   results.textContent = count
     ? `${count} ${count === 1 ? "passendes Kapitel" : "passende Kapitel"}`
@@ -36,14 +54,22 @@ clear.addEventListener("click", () => {
   search.dispatchEvent(new Event("input"));
   search.focus({ preventScroll: true });
 });
-function markSection(hash = location.hash) {
+function markSection(hash = location.hash || "#schnellstart") {
   const target = document.getElementById(hash.slice(1)),
     section = target?.closest("main section");
-  if (section?.hidden) {
+  const wasHidden = section?.hidden;
+  if (wasHidden) {
     search.value = "";
     search.dispatchEvent(new Event("input"));
-    target.scrollIntoView();
   }
+  let reference = target?.closest("details"),
+    expanded = false;
+  while (reference) {
+    expanded ||= !reference.open;
+    reference.open = true;
+    reference = reference.parentElement.closest("details");
+  }
+  if (target && (wasHidden || expanded)) target.scrollIntoView();
   for (const link of links) {
     if (link.hash === "#" + section?.id)
       link.setAttribute("aria-current", "location");

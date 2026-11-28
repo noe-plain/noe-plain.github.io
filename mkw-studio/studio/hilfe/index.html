@@ -13,8 +13,8 @@
       href="../static/ui-theme-tokens.css?v=b86a421a3a48"
     />
     <link rel="stylesheet" href="../static/ui-theme.css?v=b86a421a3a48" />
-    <link rel="stylesheet" href="hilfe.css?v=cf3181285ead" />
-    <script src="hilfe.js?v=097f3e57514e" defer></script>
+    <link rel="stylesheet" href="hilfe.css?v=0aa20d88327c" />
+    <script src="hilfe.js?v=ef14ce86486e" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#helpContent">Zum Inhalt springen</a>
@@ -62,8 +62,10 @@
         </p>
         <nav aria-label="Themen">
           <a href="#schnellstart">Erste Schritte</a
+          ><a href="#grundlagen">Gestalten ohne Vorwissen</a
           ><a href="#einzelposts">FD-Kampagnen gestalten</a
           ><a href="#carousels">Im Designer gestalten</a
+          ><a href="#texte">Texte schreiben &amp; gestalten</a
           ><a href="#speichern">Speichern & übergeben</a
           ><a href="#export">Vorschau & Export</a
           ><a href="#einstellungen">Einstellungen</a
@@ -74,16 +76,23 @@
       <main id="helpContent" tabindex="-1">
         <div class="intro">
           <p class="eyebrow">MKW STUDIO · HANDBUCH</p>
-          <h1>Dein Post.<br />Schritt für Schritt.</h1>
+          <h1>Dein erstes Design.<br />Wir gehen es gemeinsam an.</h1>
           <p>
-            Hier findest du die passenden Schritte für deine Aufgabe – auch wenn
-            du das Studio zum ersten Mal benutzt. Wähle ein Thema aus der
-            Übersicht oder suche nach einem Begriff, zum Beispiel „Text“, „Logo“
-            oder „Speichern“.
+            Du brauchst weder Gestaltungswissen noch Erfahrung mit dem Studio.
+            Beginne mit <a href="#schnellstart">deinem ersten Post</a>. Wenn du
+            noch unsicher bist, was ein gutes Design ausmacht, hilft dir
+            <a href="#grundlagen">der kurze Gestaltungskurs</a>.
           </p>
           <p>
-            Die Hilfe bleibt über deiner Arbeit geöffnet. Mit Escape oder dem
-            Schliessen-Symbol kehrst du zu deinem Projekt zurück.
+            <strong>Gestaltungstipp</strong> erklärt dir, wie Bilder und Texte
+            gut zusammenwirken. <strong>Im Studio</strong> zeigt dir die
+            passenden Handgriffe. Zum Nachschlagen wählst du links ein Thema
+            oder suchst nach einem Wort.
+          </p>
+          <p>
+            Die Hilfe liegt über deinem Projekt. Mit Escape oder dem
+            Schliessen-Symbol kehrst du zu deiner Arbeit zurück; dein Projekt
+            bleibt geöffnet.
           </p>
         </div>
         <p id="helpResults" role="status" aria-live="polite" hidden></p>
@@ -91,21 +100,87 @@
           <h2>Deinen ersten Post erstellen</h2>
           <figure class="wiki-figure" id="grafik-ablauf">
             <ol class="wiki-visual-steps">
-              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="15" y="9" width="66" height="60" rx="8"/><circle class="diagram-accent" cx="61" cy="27" r="8"/><path class="diagram-accent" d="M21 61 42 37 56 50 64 42 76 61Z"/></svg><strong>1 · Foto</strong><span>Importieren</span></li>
-              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="15" y="9" width="66" height="60" rx="8"/><path class="diagram-line" d="M26 25H67M26 36H60M26 53H67"/><rect class="diagram-dashed" x="22" y="18" width="52" height="41"/></svg><strong>2 · Gestalten</strong><span>Text, Ausschnitt, Logo</span></li>
-              <li><svg viewBox="0 0 96 80" aria-hidden="true"><path class="diagram-paper" d="M25 8H58L73 23V70H25Z"/><path class="diagram-line" d="M58 8V24H73M35 43L45 53 64 32"/></svg><strong>3 · MKW sichern</strong><span>Bearbeitbares Projekt</span></li>
-              <li><svg viewBox="0 0 96 80" aria-hidden="true"><rect class="diagram-paper" x="17" y="11" width="62" height="58" rx="8"/><path class="diagram-line" d="M48 21V50M35 38 48 51 61 38M29 60H67"/></svg><strong>4 · Exportieren</strong><span>Fertige Bilder / PDF</span></li>
+              <li>
+                <svg viewBox="0 0 96 80" aria-hidden="true">
+                  <rect
+                    class="diagram-paper"
+                    x="15"
+                    y="9"
+                    width="66"
+                    height="60"
+                    rx="8"
+                  />
+                  <circle class="diagram-accent" cx="61" cy="27" r="8" />
+                  <path
+                    class="diagram-accent"
+                    d="M21 61 42 37 56 50 64 42 76 61Z"
+                  /></svg
+                ><strong>1 · Foto</strong><span>Importieren</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 96 80" aria-hidden="true">
+                  <rect
+                    class="diagram-paper"
+                    x="15"
+                    y="9"
+                    width="66"
+                    height="60"
+                    rx="8"
+                  />
+                  <path class="diagram-line" d="M26 25H67M26 36H60M26 53H67" />
+                  <rect
+                    class="diagram-dashed"
+                    x="22"
+                    y="18"
+                    width="52"
+                    height="41"
+                  /></svg
+                ><strong>2 · Gestalten</strong
+                ><span>Text, Ausschnitt, Logo</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 96 80" aria-hidden="true">
+                  <path class="diagram-paper" d="M25 8H58L73 23V70H25Z" />
+                  <path
+                    class="diagram-line"
+                    d="M58 8V24H73M35 43L45 53 64 32"
+                  /></svg
+                ><strong>3 · MKW sichern</strong
+                ><span>Bearbeitbares Projekt</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 96 80" aria-hidden="true">
+                  <rect
+                    class="diagram-paper"
+                    x="17"
+                    y="11"
+                    width="62"
+                    height="58"
+                    rx="8"
+                  />
+                  <path
+                    class="diagram-line"
+                    d="M48 21V50M35 38 48 51 61 38M29 60H67"
+                  /></svg
+                ><strong>4 · Exportieren</strong
+                ><span>Fertige Bilder / PDF</span>
+              </li>
             </ol>
-            <figcaption>Speichern und Export sind zwei verschiedene Ergebnisse: MKW zum Weiterarbeiten, JPG oder PDF zum Veröffentlichen.</figcaption>
+            <figcaption>
+              Speichern und Export sind zwei verschiedene Ergebnisse: MKW zum
+              Weiterarbeiten, JPG oder PDF zum Veröffentlichen.
+            </figcaption>
           </figure>
 
           <h3>Welchen Modus soll ich wählen?</h3>
           <ul>
             <li>
               <strong>FD-Kampagnen:</strong> Du möchtest aus einem oder mehreren
-              Fotos fertige Sujets erstellen. Für jedes Foto entstehen
+              Fotos fertige Motive erstellen. Für jedes Foto entstehen
               automatisch die ausgewählten Formate, zum Beispiel Story und
-              Quadrat. Das Foto füllt den Rahmen. In der ersten Bildkarte ergänzt du Übertitel, Titel und Untertitel; das Logo kannst du auf der Fläche anpassen.
+              Quadrat. Das Foto füllt den Rahmen. In der ersten Bildkarte
+              ergänzt du Übertitel, Titel und Untertitel; das Logo kannst du auf
+              der Fläche anpassen.
             </li>
             <li>
               <strong>Designer:</strong> Du möchtest mehrere Seiten gestalten,
@@ -115,31 +190,99 @@
               eine einzelne frei gestaltete Slide ist möglich.
             </li>
           </ul>
-          <h3>So beginnst du</h3>
+          <h3>Übung: Ein Konzertfoto als fertigen Post gestalten</h3>
+          <p>
+            Du brauchst ein Foto und einen kurzen Konzerttitel. Wir beginnen mit
+            <strong>FD-Kampagnen</strong>: Das Studio legt dein Foto bereits
+            passend in die gewählten Formate.
+          </p>
+          <ol class="wiki-lesson">
+            <li>
+              <strong>Projekt anlegen.</strong> Öffne
+              <strong>FD-Kampagnen</strong> auf der Startseite. Gib einen
+              Projektnamen ein. Für diese Übung wählst du nur
+              <strong>Quadrat (1:1)</strong>; entferne das Häkchen bei Story.
+              Klicke auf <strong>Projekt erstellen</strong>.
+            </li>
+            <li>
+              <strong>Foto einsetzen.</strong> Wähle dein Foto über die
+              Bildauswahl oder ziehe es in das Studio. Die Bildkarte steht
+              links, das fertige Format daneben. Wähle auf der Fläche das Foto
+              und <strong>Bildinhalt bearbeiten</strong>, falls Gesicht oder
+              Motiv abgeschnitten sind. Verschiebe den Bildinhalt, bis der
+              Ausschnitt passt; das Ausgabeformat bleibt gleich.
+            </li>
+            <li>
+              <strong>Titel eingeben.</strong> Schreibe in der ersten Bildkarte
+              bei <strong>Titel</strong> zum Beispiel «Konzert». Klicke danach
+              ausserhalb des Felds. Bei wenig Platz findest du die Felder unter
+              den <strong>drei Punkten</strong> der Karte. Übertitel und
+              Untertitel darfst du leer lassen.
+            </li>
+            <li>
+              <strong>Lesbarkeit prüfen.</strong> Ist der Titel gut sichtbar?
+              Verschiebe ihn mit
+              <strong>Auswählen &amp; verschieben</strong> auf eine ruhigere
+              Bildstelle. Mit
+              <a href="#text-direkt-bearbeiten">Auf der Fläche</a> kannst du die
+              Wörter ändern; rechts änderst du ihre Gestaltung. Prüfe auch das
+              Logo auf der Fläche: Wähle es aus, um Grösse und Position
+              anzupassen.
+            </li>
+            <li>
+              <strong>Zum Weiterarbeiten sichern.</strong> Öffne
+              <strong>Speichern</strong> oben in der Kopfzeile und speichere
+              eine <strong>MKW-Datei</strong> auf deinem Computer. Eine
+              Browsersicherung ersetzt diese Datei nicht.
+              <a href="#speichern">Mehr zum Speicherweg</a>.
+            </li>
+            <li>
+              <strong>Fertiges Bild herunterladen.</strong> Öffne
+              <strong>Export</strong>, wähle <strong>JPG</strong> und prüfe dein
+              Bild unter <strong>Vorschau</strong>. Es muss mit
+              <strong>Dieses Bild exportieren</strong> ausgewählt sein. Starte
+              den Download. Bei einer ZIP-Datei entpackst du sie, um dein JPG zu
+              verwenden.
+            </li>
+          </ol>
+          <p class="wiki-check">
+            <strong>Geschafft, wenn:</strong> Du hast eine MKW-Datei zum
+            Weiterarbeiten und ein JPG zum Veröffentlichen. Öffne beide noch
+            einmal: Stimmen Foto, Titel und Logo? Falls nicht, ändere die
+            MKW-Datei und exportiere erneut.
+          </p>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Beginne mit einem Foto und einem
+            Titel. Zusätzliche Effekte sind erst sinnvoll, wenn die Aussage
+            bereits ohne sie verständlich ist.
+          </p>
+          <h3>Weitere Formate und Projekte einrichten</h3>
           <ol>
             <li>
               Wähle auf der Startseite <strong>FD-Kampagnen</strong> oder
-              <strong>Designer</strong>. Der passende Modus ist bereits vorausgewählt. Gib einen Projektnamen ein. Das
-              Kürzel kannst du für die Dateinamen ergänzen.
+              <strong>Designer</strong>. Der passende Modus ist bereits
+              vorausgewählt. Gib einen Projektnamen ein. Das Kürzel kannst du
+              für die Dateinamen ergänzen.
             </li>
             <li>
               Wähle deine Formate. Bei FD-Kampagnen sind Story (9:16) und
               Quadrat (1:1) vorausgewählt. Bei nicht ausgewählten Formaten
               siehst du Breite und Höhe. Mit dem Häkchen nimmst du ein Format
-              ins Projekt auf. Über <strong>Schutzzonen</strong> öffnest du seine
-              Randabstände in der Vorschau rechts (auf kleinen Bildschirmen darunter).
-              Diese Aktion verändert die Formatauswahl nicht. Beim Designer gibst du
-              Breite, Höhe und die Anzahl von
+              ins Projekt auf. Über <strong>Schutzzonen</strong> öffnest du
+              seine Randabstände in der Vorschau rechts (auf kleinen
+              Bildschirmen darunter). Diese Aktion verändert die Formatauswahl
+              nicht. Beim Designer gibst du Breite, Höhe und die Anzahl von
               <strong>1 bis 20 Slides</strong> an.
             </li>
             <li>
               Prüfe die Schutzzonen. Das sind die Abstände zwischen wichtigen
               Inhalten und dem Rand. So bleiben Texte und Logos gut sichtbar.
-              Klicke unten auf <strong>Projekt erstellen</strong>. Eigene Formate
-              kannst du direkt unter der Formatliste hinzufügen und wieder entfernen.
-              Wenn du zwischen FD-Kampagnen, Designer und den Vorlagen wechselst,
-              bleiben deine Eingaben während der Einrichtung erhalten. Mit
-              <strong>Abbrechen</strong> kehrst du ohne Änderungen zurück.
+              Klicke unten auf <strong>Projekt erstellen</strong>. Eigene
+              Formate kannst du direkt unter der Formatliste hinzufügen und
+              wieder entfernen. Wenn du zwischen FD-Kampagnen, Designer und den
+              Vorlagen wechselst, bleiben deine Eingaben während der Einrichtung
+              erhalten. Mit <strong>Abbrechen</strong> kehrst du ohne Änderungen
+              zurück.
             </li>
             <li>
               Füge deine Bilder ein. Bei FD-Kampagnen wählst du Bilder aus oder
@@ -161,17 +304,17 @@
           </ol>
           <p>
             Ziehe genau eine <strong>.mkw-Datei</strong> auf die Startkarte
-            <strong>Projekt öffnen</strong> oder in das Ablagefeld im Öffnen-Dialog.
-            Alternativ öffnest du dort per Klick, Enter oder Leertaste die Dateiauswahl.
-            Unterstützte ältere MKW-Dateien werden wie bisher geprüft und geöffnet;
-            beschädigte oder mehrere Dateien ersetzen dein aktuelles Projekt nicht.
-            Noch ungesicherte Änderungen werden vor dem Wechsel im Browser gesichert.
-            Die abgelegte Datei wird nicht automatisch überschrieben.
-            Im Dialog stehen ausserdem die Projekte aus diesem Browser mit Name,
-            Modus und letztem Speicherzeitpunkt. Klicke auf
-            einen Eintrag zum Öffnen. Der Papierkorb daneben entfernt nur die
-            Browsersicherung; das gerade geöffnete Projekt ist vor diesem
-            Löschen geschützt.
+            <strong>Projekt öffnen</strong> oder in das Ablagefeld im
+            Öffnen-Dialog. Alternativ öffnest du dort per Klick, Enter oder
+            Leertaste die Dateiauswahl. Unterstützte ältere MKW-Dateien werden
+            wie bisher geprüft und geöffnet; beschädigte oder mehrere Dateien
+            ersetzen dein aktuelles Projekt nicht. Noch ungesicherte Änderungen
+            werden vor dem Wechsel im Browser gesichert. Die abgelegte Datei
+            wird nicht automatisch überschrieben. Im Dialog stehen ausserdem die
+            Projekte aus diesem Browser mit Name, Modus und letztem
+            Speicherzeitpunkt. Klicke auf einen Eintrag zum Öffnen. Der
+            Papierkorb daneben entfernt nur die Browsersicherung; das gerade
+            geöffnete Projekt ist vor diesem Löschen geschützt.
           </p>
           <h3>Was sehe ich auf der Arbeitsfläche?</h3>
           <p>
@@ -181,17 +324,38 @@
             <strong>Bildausschnitt</strong> ist der sichtbare Teil eines Fotos
             gemeint.
           </p>
-          <p><strong>Breite der Seitenleiste:</strong> Ziehe den senkrechten Griff neben der Seitenleiste nach links oder rechts. In beiden Editoren sind 300–450 px möglich. Header und Arbeitsfläche passen sich gemeinsam an. Mit Tab erreichst du den Griff; Pfeil links verbreitert, Pfeil rechts verkleinert, Umschalt macht grössere Schritte. Pos1 und Ende wählen die Grenzen. Doppelklick oder 0 stellt 300 px wieder her, Escape bricht das Ziehen ab. Auf kleinen Fenstern bleibt die Leiste innerhalb des Bildschirms. Breite und Höhenaufteilung sind Werkzeugeinstellungen und werden auch im MKW-Setup gespeichert.</p>
+          <p>
+            <strong>Breite der Seitenleiste:</strong> Ziehe den senkrechten
+            Griff neben der Seitenleiste nach links oder rechts. In beiden
+            Editoren sind 300–450 px möglich. Header und Arbeitsfläche passen
+            sich gemeinsam an. Mit Tab erreichst du den Griff; Pfeil links
+            verbreitert, Pfeil rechts verkleinert, Umschalt macht grössere
+            Schritte. Pos1 und Ende wählen die Grenzen. Doppelklick oder 0
+            stellt 300 px wieder her, Escape bricht das Ziehen ab. Auf kleinen
+            Fenstern bleibt die Leiste innerhalb des Bildschirms. Breite und
+            Höhenaufteilung sind Werkzeugeinstellungen und werden auch im
+            MKW-Setup gespeichert.
+          </p>
           <p>
             In der Werkzeugleiste wählst du, was du bearbeiten möchtest. Rechts
             findest du die Eigenschaften zum ausgewählten Element. Oben stehen
-            Name und Kontext deiner Auswahl. Die Buttons <strong>Inhalt</strong>,
-            <strong>Design</strong> und <strong>Position</strong> springen zu den
-            entsprechenden Abschnitten. Es werden keine Einstellungen versteckt.
-            Im Designer stehen die Kontext-Einstellungen oben und die Ebenenliste darunter. Beide Bereiche lassen sich unabhängig scrollen. Ziehe den Griff dazwischen nach oben oder unten, um mehr Platz zu verteilen. Anfangs ist das Verhältnis <strong>70:30</strong>; deine Aufteilung wird als Werkzeugeinstellung gemerkt und im MKW-Setup mitgespeichert. Mit Tab erreichst du den Griff und verstellst ihn mit den Pfeiltasten; Shift macht grössere Schritte. Doppelklick oder Taste <strong>0</strong> am fokussierten Griff setzt 70:30 zurück. Escape bricht das Ziehen ab. Der Button <strong>Ebenen</strong> führt direkt zur Ebenenliste. Mit
-            <strong>Bildinhalt bearbeiten</strong> öffnest du den Ausschnitt auch
-            ohne Doppelklick. Bei FD-Texten zeigt der Kopf, ob du die Textvorlage oder
-            eine eigene Anpassung bearbeitest. Über
+            Name und Kontext deiner Auswahl. Die Buttons
+            <strong>Inhalt</strong>, <strong>Design</strong> und
+            <strong>Position</strong> springen zu den entsprechenden
+            Abschnitten. Es werden keine Einstellungen versteckt. Im Designer
+            stehen die Kontext-Einstellungen oben und die Ebenenliste darunter.
+            Beide Bereiche lassen sich unabhängig scrollen. Ziehe den Griff
+            dazwischen nach oben oder unten, um mehr Platz zu verteilen. Anfangs
+            ist das Verhältnis <strong>70:30</strong>; deine Aufteilung wird als
+            Werkzeugeinstellung gemerkt und im MKW-Setup mitgespeichert. Mit Tab
+            erreichst du den Griff und verstellst ihn mit den Pfeiltasten; Shift
+            macht grössere Schritte. Doppelklick oder Taste
+            <strong>0</strong> am fokussierten Griff setzt 70:30 zurück. Escape
+            bricht das Ziehen ab. Der Button <strong>Ebenen</strong> führt
+            direkt zur Ebenenliste. Mit
+            <strong>Bildinhalt bearbeiten</strong> öffnest du den Ausschnitt
+            auch ohne Doppelklick. Bei FD-Texten zeigt der Kopf, ob du die
+            Textvorlage oder eine eigene Anpassung bearbeitest. Über
             <strong>Eigenschaften ein-/ausblenden</strong> unten öffnest oder
             schliesst du diese Seitenleiste. Die globalen
             <strong>Einstellungen</strong> erreichst du über das Zahnrad oben.
@@ -202,9 +366,9 @@
           <p>
             Die Werkzeuge liegen in einer schwebenden Pille. Der separate
             <strong>Export</strong>-Button rechts daneben öffnet Vorschau und
-            Exporteinstellungen. Alle Werkzeuge stehen ohne zusätzlichen Modusschalter bereit. Wenn der Platz knapp
-            wird, erscheinen nur die Symbole. Mit der Maus über einem Symbol
-            siehst du seinen Namen.
+            Exporteinstellungen. Alle Werkzeuge stehen ohne zusätzlichen
+            Modusschalter bereit. Wenn der Platz knapp wird, erscheinen nur die
+            Symbole. Mit der Maus über einem Symbol siehst du seinen Namen.
           </p>
           <p>
             Oben sind die Aktionen in drei Gruppen geordnet: Rückgängig und
@@ -213,370 +377,863 @@
             Ein- oder Ausblenden der Seitenleiste erreichbar.
           </p>
           <p class="note">
-            Wähle zuerst, was du bearbeiten möchtest. Rechts erscheinen die passenden Eigenschaften. Freie Formen, Pfade und die vollständigen Textwerkzeuge sind direkt verfügbar.
+            Wähle zuerst, was du bearbeiten möchtest. Rechts erscheinen die
+            passenden Eigenschaften. Freie Formen, Pfade und die vollständigen
+            Textwerkzeuge sind direkt verfügbar.
+          </p>
+        </section>
+        <section id="grundlagen">
+          <h2>Gestalten ohne Vorwissen</h2>
+          <p>
+            Ein gutes Konzertmotiv beantwortet zuerst:
+            <strong>Was findet statt?</strong> Danach: Was muss ich noch wissen?
+            Du musst dafür keine Effekte beherrschen. Die folgenden
+            Gestaltungstipps sind praktische Empfehlungen, keine starren Regeln.
+          </p>
+          <h3>1 · Ein Titel führt den Blick</h3>
+          <p>
+            Der <strong>Übertitel</strong> ordnet ein, zum Beispiel
+            «Konzertreihe». Der <strong>Titel</strong> nennt die Hauptaussage,
+            zum Beispiel «Konzert». Der <strong>Untertitel</strong> ergänzt
+            etwas, etwa «Mit dem Orchester». Du brauchst nicht alle drei. Was
+            für die Entscheidung am wichtigsten ist, sollte zuerst auffallen.
+          </p>
+          <figure class="wiki-figure" id="grafik-hierarchie">
+            <div class="wiki-example wiki-type-example">
+              <span class="wiki-role-label">Übertitel · ordnet ein</span>
+              <p class="wiki-demo-overline">Konzertreihe</p>
+              <span class="wiki-role-label">Titel · führt den Blick</span>
+              <p class="wiki-demo-title">Sommerkonzert</p>
+              <span class="wiki-role-label">Untertitel · ergänzt</span>
+              <p class="wiki-demo-subtitle">Mit dem Orchester</p>
+            </div>
+            <figcaption>
+              Die Unterschiede in Grösse und Schriftschnitt schaffen eine
+              Leserichtung. Im Beispiel ist der Titel deutlich grösser und
+              kräftiger, die Zusatzinformation ruhiger.
+            </figcaption>
+          </figure>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Lies dein Motiv kurz aus etwas
+            Abstand. Erkennst du den Konzerttitel zuerst? Falls mehrere Texte um
+            Aufmerksamkeit kämpfen, verkleinere die Zusatzinformationen, statt
+            alles fett zu machen.
+          </p>
+          <p>
+            <strong>Im Studio:</strong> Die erste FD-Bildkarte bietet passende
+            Startwerte: Übertitel 70 px Replica Regular, Titel 120 px Replica
+            Bold, Untertitel 55 px Replica Regular. Das sind Ausgangswerte für
+            das erste Format, keine Vorschrift für jedes Motiv.
+            <a href="#advanced-typografie"
+              >So änderst du einen einzelnen Absatz</a
+            >.
+          </p>
+          <h3>2 · Der Text braucht einen ruhigen Hintergrund</h3>
+          <p>
+            <strong>Kontrast</strong> ist der sichtbare Unterschied zwischen
+            Text und Hintergrund. Helle Schrift auf einer hellen Bildstelle
+            verschwindet schnell. Ein dunklerer Bildbereich oder ein dunkler
+            Verlauf unter weisser Schrift kann helfen.
+          </p>
+          <figure class="wiki-figure" id="grafik-kontrast">
+            <div class="wiki-diagram-grid">
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 240 160"
+                  role="img"
+                  aria-labelledby="contrastBeforeTitle contrastBeforeDesc"
+                >
+                  <title id="contrastBeforeTitle">Unruhiger Hintergrund</title>
+                  <desc id="contrastBeforeDesc">
+                    Viele kleine Formen liegen direkt hinter den symbolischen
+                    Textzeilen und konkurrieren mit ihnen.
+                  </desc>
+                  <rect
+                    class="diagram-paper"
+                    x="4"
+                    y="4"
+                    width="232"
+                    height="152"
+                    rx="8"
+                  />
+                  <path
+                    class="diagram-wash"
+                    d="M4 25 55 55 90 5 140 85 180 20 236 60V156H4Z"
+                  />
+                  <path
+                    class="diagram-line"
+                    d="M20 55H90M110 40H210M22 105H216M20 122H150"
+                  />
+                  <circle
+                    class="diagram-accent"
+                    cx="175"
+                    cy="105"
+                    r="22"
+                  /></svg
+                ><strong>Zu viel Konkurrenz</strong
+                ><span>Bilddetails und Text liegen übereinander.</span>
+              </div>
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 240 160"
+                  role="img"
+                  aria-labelledby="contrastAfterTitle contrastAfterDesc"
+                >
+                  <title id="contrastAfterTitle">Ruhiger Textbereich</title>
+                  <desc id="contrastAfterDesc">
+                    Das Bildmotiv liegt oben. Eine geschlossene Fläche unten
+                    trennt die beiden hellen Textzeilen deutlich vom
+                    Hintergrund.
+                  </desc>
+                  <rect
+                    class="diagram-paper"
+                    x="4"
+                    y="4"
+                    width="232"
+                    height="152"
+                    rx="8"
+                  />
+                  <path
+                    class="diagram-wash"
+                    d="M4 25 55 55 90 5 140 85 180 20 236 60V156H4Z"
+                  />
+                  <rect
+                    class="diagram-accent"
+                    x="4"
+                    y="86"
+                    width="232"
+                    height="70"
+                    rx="8"
+                  />
+                  <path
+                    class="diagram-on-accent-stroke"
+                    d="M22 108H210M22 129H145"
+                  /></svg
+                ><strong>Klarer Textbereich</strong
+                ><span>Eine ruhige Fläche trennt den Text vom Foto.</span>
+              </div>
+            </div>
+            <figcaption>
+              Schematisch: Beurteile den Text zusammen mit dem Foto, nicht nur
+              die Schriftfarbe. Ein Verlauf kann die Bilddetails unter dem Text
+              abschwächen und das übrige Foto sichtbar lassen.
+            </figcaption>
+          </figure>
+          <p>
+            <strong>Im Studio:</strong> Wähle <strong>Verlauf</strong>, ziehe
+            ihn auf und ordne ihn in <strong>Ebenen</strong> zwischen Foto und
+            Text an. Passe Farbe und Deckkraft an.
+            <a href="#grafik-ebenen">So funktioniert die Reihenfolge</a>.
+          </p>
+          <h3>3 · Gleiche Kanten und bewusste Abstände schaffen Ordnung</h3>
+          <p>
+            Richte zusammengehörige Texte an derselben Kante aus. Zwischen Titel
+            und Untertitel darf weniger Platz sein als zwischen dem Textblock
+            und einem unabhängigen Logo. <strong>Weissraum</strong> bedeutet
+            freie Fläche; sie darf jede Farbe haben.
+          </p>
+          <figure class="wiki-figure" id="grafik-abstaende">
+            <svg
+              viewBox="0 0 420 240"
+              role="img"
+              aria-labelledby="spacingTitle spacingDesc"
+            >
+              <title id="spacingTitle">
+                Gemeinsame linke Kante und zwei Abstandsgruppen
+              </title>
+              <desc id="spacingDesc">
+                Drei Textzeilen beginnen an einer gemeinsamen gestrichelten
+                Kante. Ein kurzer Abstand verbindet die Zeilen; ein grösserer
+                Abstand trennt sie vom Logo darunter.
+              </desc>
+              <rect
+                class="diagram-paper"
+                x="55"
+                y="12"
+                width="310"
+                height="215"
+                rx="10"
+              />
+              <path class="diagram-guide" d="M85 30V210" />
+              <path class="diagram-line" d="M85 49H230M85 74H310M85 96H265" />
+              <rect
+                class="diagram-wash"
+                x="85"
+                y="113"
+                width="250"
+                height="48"
+                rx="4"
+              />
+              <rect
+                class="diagram-accent"
+                x="85"
+                y="180"
+                width="90"
+                height="24"
+                rx="3"
+              />
+            </svg>
+            <figcaption>
+              Die gemeinsame linke Kante verbindet den Text. Die freie Fläche
+              darunter trennt den Textblock vom Logo. Auf einem Foto zählt auch
+              ruhige Bildfläche als Abstand.
+            </figcaption>
+          </figure>
+          <p>
+            <strong>Im Studio:</strong> Ziehe Objekte mit
+            <strong>Auswählen &amp; verschieben</strong>. Schalte
+            <strong>Schutzzonen</strong> und <strong>Einrasten</strong> unten
+            ein. Die Linien helfen beim Ausrichten, sie werden nicht exportiert.
+          </p>
+          <h3>4 · Format, Ausschnitt und Schutzzone unterscheiden</h3>
+          <dl class="wiki-glossary">
+            <dt>Schriftschnitt</dt>
+            <dd>
+              Eine Variante derselben Schrift: Regular ist normal, Bold kräftig,
+              Light dünn. Verwende Bold gezielt für wichtige Wörter. Die
+              Schriftgrösse ist davon unabhängig.
+            </dd>
+            <dt>Absatzformat</dt>
+            <dd>
+              Gespeicherte Gestaltung für einen ganzen Absatz, zum Beispiel ein
+              Titelstil. Bei Vorlagentexten gilt es für den Absatz, in dem dein
+              Schreibcursor steht.
+            </dd>
+            <dt>Format / Auflösung</dt>
+            <dd>
+              Breite und Höhe des fertigen Bilds in Pixeln, etwa 1080 × 1080.
+              1:1 ist quadratisch; 9:16 ist hoch. Pixel sind die kleinen
+              Bildpunkte einer digitalen Datei.
+            </dd>
+            <dt>Slide / Reihe</dt>
+            <dd>
+              Eine Slide ist ein einzelnes Bild zum Weiterwischen. Im Designer
+              bilden aneinanderliegende Slides eine Reihe. Ein Objekt darf über
+              mehrere Slides reichen; du gestaltest die Reihe zusammenhängend.
+            </dd>
+            <dt>Zeichenfläche / Artboard</dt>
+            <dd>
+              Die Fläche, auf der du gestaltest. Im Designer kann eine Reihe aus
+              mehreren aneinanderliegenden Slides bestehen. Erst beim Export
+              wird sie in Einzelbilder geschnitten.
+            </dd>
+            <dt>Bildausschnitt</dt>
+            <dd>
+              Der Teil des Fotos, den der Rahmen zeigt. Das Foto wird dabei
+              nicht aus der MKW-Datei weggeschnitten.
+              <a href="#grafik-bildausschnitt"
+                >Rahmen und Bildinhalt im Vergleich</a
+              >.
+            </dd>
+            <dt>Schutzzone</dt>
+            <dd>
+              Ein Randabstand für wichtige Inhalte. Sie ist eine
+              Gestaltungshilfe, keine Garantie gegen jede App-Überlagerung. Lass
+              Titel, Gesichter und Logos möglichst darin.
+            </dd>
+            <dt>Fläche / Kontur</dt>
+            <dd>
+              Fläche ist die Farbe innerhalb einer Form, Kontur ihre Randlinie.
+              Im Farbwähler zeigen die überlappenden Felder, welche davon du
+              änderst.
+            </dd>
+            <dt>Deckkraft</dt>
+            <dd>
+              Bei 100 % ist ein Element vollständig sichtbar, bei 0 %
+              unsichtbar. Dazwischen scheint der Hintergrund durch.
+            </dd>
+          </dl>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Prüfe ein Motiv auch klein. Unten
+            verändert <strong>Zoom</strong> nur deine Arbeitsansicht, nicht die
+            Exportgrösse. Die Instagram-Ansicht ist eine zusätzliche Referenz
+            mit möglichen Überlagerungen; sie ist nicht Teil des exportierten
+            Motivs.
+          </p>
+          <h3>5 · Vor dem Veröffentlichen kurz prüfen</h3>
+          <ul class="wiki-checklist">
+            <li>
+              Kann ich den Titel sofort lesen und ist er richtig geschrieben?
+            </li>
+            <li>Sind wichtige Gesichter und das Logo vollständig zu sehen?</li>
+            <li>Haben Texte genug Abstand zum Rand und zueinander?</li>
+            <li>
+              Habe ich jedes Format und alle Meldungen in der Exportvorschau
+              geprüft?
+            </li>
+            <li>
+              Habe ich die bearbeitbare MKW-Datei zusätzlich zum fertigen Bild
+              gesichert?
+            </li>
+          </ul>
+          <p>
+            Jetzt ausprobieren:
+            <a href="#schnellstart">Ersten Post erstellen</a> oder
+            <a href="#vorlagen">mit einer Vorlage beginnen</a>.
           </p>
         </section>
         <section id="einzelposts">
           <h2>FD-Kampagnen gestalten</h2>
-          <h3 id="fd-vorschau">FD-Kampagnen: der neue Bearbeitungsablauf</h3>
+          <h3 id="fd-vorschau">Vom Foto zu mehreren fertigen Formaten</h3>
+          <h3>Die drei Textfelder auf der ersten Bildkarte</h3>
+          <p>
+            Übertitel, Titel und Untertitel schreiben im ersten Format in ein
+            gemeinsames Textfeld. Neue Absätze starten mit 70 px Regular, 120 px
+            Bold und 55 px Regular. Klicke nach der Eingabe aus dem Feld, um sie
+            zu übernehmen. Zeilenumbrüche innerhalb eines Kartenfelds bleiben
+            weiche Umbrüche. Auf der Fläche bearbeitete Absatzgrössen und
+            Formatierungen bleiben erhalten. Gleiche Formate anderer Bilder
+            folgen dem ersten Bild; individuelle Eigenschaften bleiben
+            unabhängig.
+          </p>
+
           <figure class="wiki-figure" id="grafik-verknuepfung">
-            <svg viewBox="0 0 680 320" role="img" aria-labelledby="linkBildTitel linkBildBeschreibung">
-              <title id="linkBildTitel">Ein gemeinsamer Text, zwei individuelle Positionen</title><desc id="linkBildBeschreibung">Zwei gleich grosse Hochformate zeigen Sommermusik. Der Textinhalt ist verbunden. Im zweiten Bild wurde nur die Position nach oben verschoben.</desc>
-              <g transform="translate(35 20)"><rect class="diagram-paper" width="210" height="250" rx="12"/><path class="diagram-wash" d="M0 150 70 80 140 140 210 100V250H0Z"/><text x="16" y="32">Bild 1 · Vorlage</text><rect class="diagram-dashed" x="12" y="180" width="186" height="45"/><text class="diagram-title" x="22" y="209">Sommermusik</text></g>
-              <g transform="translate(435 20)"><rect class="diagram-paper" width="210" height="250" rx="12"/><path class="diagram-wash" d="M0 190 100 95 210 170V250H0Z"/><text x="16" y="32">Bild 2</text><rect class="diagram-dashed" x="12" y="100" width="186" height="45"/><text class="diagram-title" x="22" y="129">Sommermusik</text></g>
-              <path class="diagram-line" d="M265 145H415M400 136 415 145 400 154"/><text x="340" y="120" text-anchor="middle">Text verbunden</text><text x="340" y="183" text-anchor="middle">Position individuell</text><text x="340" y="304" text-anchor="middle">Gleiche Formate · geänderte Eigenschaft bleibt eigenständig</text>
+            <svg
+              viewBox="0 0 680 320"
+              role="img"
+              aria-labelledby="linkBildTitel linkBildBeschreibung"
+            >
+              <title id="linkBildTitel">
+                Ein gemeinsamer Text, zwei individuelle Positionen
+              </title>
+              <desc id="linkBildBeschreibung">
+                Zwei gleich grosse Hochformate zeigen Sommermusik. Der
+                Textinhalt ist verbunden. Im zweiten Bild wurde nur die Position
+                nach oben verschoben.
+              </desc>
+              <g transform="translate(35 20)">
+                <rect class="diagram-paper" width="210" height="250" rx="12" />
+                <path
+                  class="diagram-wash"
+                  d="M0 150 70 80 140 140 210 100V250H0Z"
+                />
+                <text x="16" y="32">Bild 1 · Vorlage</text>
+                <rect
+                  class="diagram-dashed"
+                  x="12"
+                  y="180"
+                  width="186"
+                  height="45"
+                />
+                <text class="diagram-title" x="22" y="209">Sommermusik</text>
+              </g>
+              <g transform="translate(435 20)">
+                <rect class="diagram-paper" width="210" height="250" rx="12" />
+                <path class="diagram-wash" d="M0 190 100 95 210 170V250H0Z" />
+                <text x="16" y="32">Bild 2</text>
+                <rect
+                  class="diagram-dashed"
+                  x="12"
+                  y="100"
+                  width="186"
+                  height="45"
+                />
+                <text class="diagram-title" x="22" y="129">Sommermusik</text>
+              </g>
+              <path
+                class="diagram-line"
+                d="M265 145H415M400 136 415 145 400 154"
+              />
+              <text x="340" y="120" text-anchor="middle">Text verbunden</text>
+              <text x="340" y="183" text-anchor="middle">
+                Position individuell
+              </text>
+              <text x="340" y="304" text-anchor="middle">
+                Gleiche Formate · geänderte Eigenschaft bleibt eigenständig
+              </text>
             </svg>
-            <figcaption>Verschiebst du den Titel nur bei Bild 2, bleibt dort seine Position individuell. Änderst du danach den gemeinsamen Text bei Bild 1, aktualisiert sich der Inhalt trotzdem in beiden Ausgaben.</figcaption>
+            <figcaption>
+              Verschiebst du den Titel nur bei Bild 2, bleibt dort seine
+              Position individuell. Änderst du danach den gemeinsamen Text bei
+              Bild 1, aktualisiert sich der Inhalt trotzdem in beiden Ausgaben.
+            </figcaption>
           </figure>
 
-          <ol><li>Wähle auf der Startseite <strong>FD-Kampagnen</strong>. Gib Namen und Kürzel ein und wähle deine Formate mit Schutzzonen.</li><li>Importiere deine Fotos. Jedes Bild erhält eine Reihe mit allen gewählten Formaten. Die Formate stehen oberhalb der Zeichenflächen; links findest du Bildvorschau und Bildaktionen.</li><li>Gestalte das oberste Sujet je Auflösung. Sujets mit gleicher Breite und Höhe übernehmen sein Design, unabhängig von der Position des Formats in der Reihe. Wenn du Bildreihen verschiebst, führt das neue oberste Sujet die gemeinsame Gestaltung weiter.</li><li>Du kannst jede Ausgabe einzeln anpassen. Nur die geänderte Eigenschaft wird unabhängig: Eine eigene Position behält weiterhin den gemeinsamen Text. Ein eigener Text kann weiterhin der gemeinsamen Position folgen. Im Eigenschaftenbereich siehst du, ob ein Element verbunden oder einzeln angepasst ist.</li><li>Zusätzliche Bilder bleiben auf ihrer Ausgabe. Der erste Verlauf der Formatvorlage wird übernommen und liegt zunächst unter den Texten. Über die Ebenen kannst du die Reihenfolge ändern.</li><li>Ziehe auf einem weiteren Format ein Textfeld auf: Die Auswahl erscheint direkt im aufgezogenen Feld. Links wählst du <strong>Neuen Text schreiben</strong>, rechts kannst du einen vorhandenen Text mit seiner Formatierung übernehmen. Mit Escape oder einem Klick ausserhalb brichst du ab. Die Formatierung des neuen Formats ist anschliessend unabhängig anpassbar.</li></ol>
-          <p>Die Bildkarte zeigt dein Foto gross als Vorschau. Ein Klick darauf zeigt die Bildreihe. Darunter findest du kompakte Symbolbuttons für <strong>Bild ersetzen</strong> und <strong>Format hinzufügen</strong>. Lasse die Maus kurz auf einem Symbol ruhen, um seine Beschriftung zu sehen. Bei Tastaturfokus erscheint der Hinweis direkt. Reihenfolge und Entfernen findest du ebenfalls bei den Bildaktionen. Über die <strong>drei Punkte</strong> erreichst du Bildwinkel, Familienkonzert, Sponsorenleiste und die Aktionen für die Bildreihe. Die Bildkarte bleibt unabhängig vom Zoom lesbar und ist an der oberen Kante des Artworks ausgerichtet. Bei stark verkleinerten Ansichten wird sie kompakt; ihre Aktionen und der Bildnachweis bleiben über die drei Punkte erreichbar. Die Karte selbst hat keine eigene Scrollfläche. Bildnachweis / Copyright steht zunächst wie bisher am Bildrand, ist aber eine eigene verschiebbare und drehbare Textebene.</p>
-          <p>FD-Kampagnen unterstützt einzelne Ausgabeformate von 240–4000 px, bis zu 200 Ausgaben und 500 Ebenen pro Kampagne. Viele Ausgaben teilen sich die Originalbilder. Wie viele grosse Fotos gleichzeitig flüssig bearbeitet werden können, hängt zusätzlich von Browser und Arbeitsspeicher ab.</p>
-          <h3>Alte Kampagne weiterverwenden</h3><p>Der bisherige Ablauf ist auf der Startseite über den Link <strong>FD-Kampagnen (Backup)</strong> links neben <strong>Hilfe &amp; How-to</strong> erreichbar. Alte MKW-Dateien öffnen sich dort wie bisher. Im Fenster <strong>Projekt öffnen</strong> findest du bei alten Kampagnen unter dem Papierkorb den Button <strong>In FD-Kampagnen umwandeln</strong>. Alternativ gibt es dieselbe Aktion im Speicherdialog. Nach deiner Bestätigung erstellt das Studio eine neue Projektkopie. Über-, Konzert- und Untertitel werden in einem gemeinsamen Textfeld mit bisherigen Grössen und Formatierungen zusammengeführt; der bisherige Textverlauf wird übernommen. Das Copyright bleibt eine eigene bewegliche Ebene. Die Originaldatei bleibt erhalten. Vergleiche das Ergebnis vor dem Export. Bei nicht unterstützten Formaten oder Safezones nennt das Studio die betroffenen Ausgaben vor der Umwandlung. Es verkleinert oder überspringt nichts. Du kannst das Original im bisherigen Editor weiterbearbeiten und als MKW speichern. Schutzzonen mit Nachkommastellen werden exakt übernommen. Wird das Ausgangsprojekt während der Bestätigung oder der Vorbereitung geändert oder gewechselt, wird die Übernahme abgebrochen. Dein aktueller Stand bleibt erhalten; starte die Umwandlung erneut. Der bisherige Editor bleibt verfügbar, bis alle Altdatei-Fälle sicher übernommen werden können.</p>
-          <h3>Ausgeblendete Texte aus einer Altdatei übernehmen</h3><p>Wähle die gewünschte Ausgabe auf der Arbeitsfläche. Wenn die umgewandelte Kampagne ausgeblendete Texte enthält, findest du im Ebenenbereich <strong>Ausgeblendete Texte</strong>. Klappe den Bereich auf und wähle beim gewünschten Text <strong>Als Textebene hinzufügen</strong>. Der Text wird mit seiner gespeicherten Formatierung als eigene Ebene eingefügt. Du kannst ihn danach auf der Fläche bearbeiten, verschieben, drehen oder ausblenden. Die Übernahme gilt nur für diese Ausgabe; vorhandene Ebenen und das Originalprojekt bleiben erhalten. Mit <strong>Rückgängig</strong> lässt sich das Einfügen zurücknehmen. Wenn eine ältere Kopie diesen Bereich nicht zeigt, öffne das ursprüngliche Backup-Projekt und wandle es erneut um. Bei 500 Ebenen muss zuerst eine Ebene entfernt werden. Kann eine alte Formatierung nicht übernommen werden, bleibt der gespeicherte Ausgangstext erhalten.</p>
-          <h3>Familienkonzert-Farben für einzelne Texte</h3><p>Markiere die gewünschten Zeichen oder wähle Absätze/Zeilen. Öffne unter <strong>Textfarbe</strong> den Farbwähler und wähle <strong>Familienkonzert</strong>. Nur diese Auswahl erhält bunte Buchstaben mit 2-px-Kontur. Ein zweiter Klick auf <strong>Familienkonzert</strong> schaltet die Farbfolge wieder aus und zeigt die bisherige Textfarbe. Der Button zeigt aktiv, inaktiv oder teilweise aktiv an. Du kannst auch eine normale Textfarbe wählen. Der Quelltext bleibt erhalten. Die Funktion steht in Designer, FD-Kampagnen und bisherigem FD-Modus bereit; Copyright ist ausgenommen.</p>
-          <p>Die Werkzeuge zeigen nur Icons; ihre Namen erscheinen als Hinweis beim Darüberfahren oder Fokussieren. Die überlappenden Farbfelder in der Werkzeugleiste bearbeiten Fläche und Kontur des gewählten Elements. Die vordere Fläche ist aktiv. Am fokussierten Farbfeld wählt Pfeil links die Fläche, Pfeil rechts die Kontur; Eingabe öffnet den Farbwähler. Je nach Element kann eine Kontur nicht verfügbar sein.</p>
-          <p><strong>Meldungen im Footer:</strong> Ganz links in der rechten Footer-Gruppe bleibt der Meldungsbutton immer sichtbar. Neutral bedeutet keine aktuellen Warnungen oder Fehler, Blau eine Projektinformation, Gelb einen Hinweis und Rot einen Fehler. Ein Klick öffnet Details und die bisherigen Sprünge zum betroffenen Element. Auch Speicherfehler erscheinen dort; Hinweise können geschlossen und später wieder angesehen werden. Escape schliesst die Details. Das Öffnen der Meldungen ändert dein Layout nicht.</p>
-          <h3>Exportvorschau</h3><p>Mit den festen Pfeilbuttons wechselst du zwischen den Bildern. Die Checkbox <strong>Dieses Bild exportieren</strong> nimmt das gezeigte Bild in die Auswahl auf oder entfernt es. Über <strong>Auswahl</strong> wechselst du zur Übersicht zurück. Die Vorschau bleibt im Exportfenster. «Dieses Bild exportieren» steht neben der Umschaltung. Das Bild nutzt die gesamte linke Fläche; «Bildkommentar» ist rechts aufklappbar. Mit «Originalpixel prüfen» vergrösserst du zur Qualitätskontrolle, mit «Vorschau einpassen» kehrst du zur Gesamtansicht zurück. «Meldungen» oben zeigt Hinweise und Fehler; über «Im Design anzeigen» wechselst du zum betroffenen Objekt.</p>
-          <p>In der Vorschau kannst du einen <strong>Bildkommentar</strong> hinzufügen, bearbeiten oder entfernen. Bis zu 1000 Zeichen bleiben als interne Notiz im Projekt; <strong>Speichern</strong> übernimmt sie, <strong>Abbrechen</strong> verwirft die Eingabe. Escape bricht zunächst die Bearbeitung ab. In FD-Kampagnen gilt die Notiz für alle Formate desselben Bildes, im Designer für die jeweilige Slide. Auf der Fläche öffnet der kleine Button <strong>Kommentar</strong> unter dem Bild die Notiz. Sie bleibt in MKW und der Projektdatei im Bild-ZIP erhalten, erscheint aber nie im PNG-, PDF- oder PSD-Motiv.</p>
-          <p class="note">Die folgenden detaillierten Anleitungen zu festen Textarten und der bisherigen Formatvorlage betreffen <strong>FD-Kampagnen (Backup)</strong>.</p>
-
-          <h3>Weitere Bilder oder Formate hinzufügen</h3>
-          <p>
-            Jedes Foto hat eine eigene Reihe. Links steht seine Bildkarte,
-            rechts liegen die ausgewählten Formate. Über
-            <strong>Weitere Bilder hinzufügen</strong> am Ende der Reihen
-            ergänzt du Fotos. Über <strong>Format hinzufügen</strong> in einer
-            Bildkarte ergänzt du eine Zeichenfläche und kannst deren Grösse und
-            Schutzzonen einstellen.
-          </p>
-          <p>
-            In der Bildkarte findest du unter der Vorschau den Dateinamen und
-            die Bildinformationen. Über <strong>Bild ersetzen</strong> tauschst
-            du das Foto aus. Mit den Pfeilen verschiebst du die Reihe nach oben
-            oder unten; der Papierkorb entfernt das Bild. Wenn du nur den
-            Bildinhalt ändern möchtest, verwende <strong>Bild ersetzen</strong>.
-          </p>
-          <p>
-            Unter <strong>Copyright</strong> trägst du die Bildbeschreibung und
-            den Namen ein. Öffne darunter <strong>Optionen</strong>, um Texte,
-            Winkel, Familienkonzert oder Sponsorenleiste auszuwählen. Die
-            farbigen Zeilen und Häkchen zeigen, was aktiv ist. Die Anzahl steht
-            bereits im geschlossenen Feld. Mit Tab erreichst du die Optionen,
-            mit der Leertaste öffnest du sie oder änderst ein Kästchen, mit
-            Escape schliesst du sie wieder. Die Karte selbst bleibt immer
-            geöffnet.
-          </p>
-          <h3>Was übernimmt das erste Bild für die anderen?</h3>
-          <p>
-            Die erste Bildkarte trägt den Hinweis
-            <strong>Textvorlage für weitere Bilder</strong>. Richte dort zuerst
-            die gemeinsamen Texte und Textoptionen ein. Weitere Bilder folgen,
-            solange du die betreffende Einstellung dort noch nicht selbst
-            angepasst hast.
-          </p>
-          <ul>
-            <li>
-              <strong>Gleicher Text, anderes Foto:</strong> Ändere den Text am
-              ersten Bild.
-            </li>
-            <li>
-              <strong>Abweichender Text für ein einzelnes Foto:</strong> Wähle
-              dieses Bild und ändere dort den Text. Mit
-              <strong>Text vom ersten Bild übernehmen</strong> kehrst du zur
-              Vorlage zurück.
-            </li>
-            <li>
-              <strong>Schriftgrösse:</strong> Eine Änderung am ersten Bild wird
-              auf andere Bilder mit demselben Text und demselben Format
-              übertragen. Das Quadrat verändert dadurch nicht die Schriftgrösse
-              deiner Story.
-            </li>
-            <li>
-              <strong>Winkel:</strong> Diesen aktivierst und bearbeitest du
-              immer für jedes Foto einzeln.
-            </li>
-          </ul>
-          <h3>Texte einblenden und schreiben</h3>
           <ol>
             <li>
-              Öffne in der Bildkarte <strong>Optionen</strong>. Aktiviere unter
-              Textoptionen die gewünschten Felder: Übertitel, Konzerttitel und
-              Untertitel.
+              Wähle auf der Startseite <strong>FD-Kampagnen</strong>. Gib Namen
+              und Kürzel ein und wähle deine Formate mit Schutzzonen.
             </li>
             <li>
-              Wähle das Werkzeug <strong>Text</strong> oder klicke direkt auf
-              einen vorhandenen Text. Bei einem noch leeren Textfeld wählst du
-              im Textmodus zuerst die Zeichenfläche aus.
+              Importiere deine Fotos. Jedes Bild erhält eine Reihe mit allen
+              gewählten Formaten. Die Formate stehen oberhalb der
+              Zeichenflächen; links findest du Bildvorschau und Bildaktionen.
             </li>
             <li>
-              Wähle rechts das gewünschte Textfeld und schreibe deinen Text. Du
-              kannst auch direkt auf der Zeichenfläche schreiben.
+              Gestalte das oberste Motiv je Auflösung. Motive mit gleicher
+              Breite und Höhe übernehmen sein Design, unabhängig von der
+              Position des Formats in der Reihe. Wenn du Bildreihen verschiebst,
+              führt das neue oberste Motiv die gemeinsame Gestaltung weiter.
             </li>
             <li>
-              Passe bei Bedarf Schriftgrösse, Ausrichtung oder Farbe an.
-              <strong>Übertitel in Grossbuchstaben</strong> ist voreingestellt
-              und lässt sich ausschalten. Dein eingegebener Text bleibt dabei
-              erhalten.
-            </li>
-          </ol>
-          <h3 id="textstapel">Abstände zwischen den Titeln ändern</h3>
-          <ol>
-            <li>
-              Wähle das Textwerkzeug. Unter
-              <strong>Abstände im Textstapel</strong> stehen die Abstände
-              zwischen den sichtbaren Titeln.
+              Du kannst jede Ausgabe einzeln anpassen. Nur die geänderte
+              Eigenschaft wird unabhängig: Eine eigene Position behält weiterhin
+              den gemeinsamen Text. Ein eigener Text kann weiterhin der
+              gemeinsamen Position folgen. Im Eigenschaftenbereich siehst du, ob
+              ein Element verbunden oder einzeln angepasst ist.
             </li>
             <li>
-              Gib einen Wert in Pixeln ein oder ziehe den kleinen Zahlengriff
-              links zwischen den Titeln: nach oben für mehr Abstand, nach unten
-              für weniger. Ein Doppelklick auf den Griff öffnet die
-              Zahleneingabe.
+              Zusätzliche Bilder bleiben auf ihrer Ausgabe. Der erste Verlauf
+              der Formatvorlage wird übernommen und liegt zunächst unter den
+              Texten. Über die Ebenen kannst du die Reihenfolge ändern.
             </li>
             <li>
-              Mit <strong>Standard</strong> stellst du den ursprünglichen
-              Abstand wieder her. Der gewohnte Verschiebegriff bewegt weiterhin
-              den gesamten Textblock.
+              Ziehe auf einem weiteren Format ein Textfeld auf: Die Auswahl
+              erscheint direkt im aufgezogenen Feld. Links wählst du
+              <strong>Neuen Text schreiben</strong>, rechts kannst du einen
+              vorhandenen Text mit seiner Formatierung übernehmen. Mit Escape
+              oder einem Klick ausserhalb brichst du ab. Die Formatierung des
+              neuen Formats ist anschliessend unabhängig anpassbar.
             </li>
           </ol>
           <p>
-            Am ersten Bild geänderte Abstände folgen auch andere Bilder mit
-            denselben beteiligten Texten. Bei späteren Bildern bleiben deine
-            Änderungen individuell. Das Copyright gehört nicht zum Textstapel.
-          </p>
-          <h3>Automatischer Ausschnitt beim Import</h3>
-          <p>
-            Bei FD-Kampagnen sucht das Tool beim Import nach Gesichtern. Es
-            setzt das deutlichste Gesicht horizontal in die Mitte und die Augen
-            auf das obere Drittel der gesamten Zeichenfläche. Falls dafür ein
-            freier Bildrand entstehen würde, wird die nächstmögliche Position
-            verwendet. Ohne erkanntes Gesicht hilft weiterhin die
-            Personenerkennung beim Ausschnitt. Du kannst das Ergebnis danach
-            selbst verändern.
-          </p>
-          <p>
-            Bei langsamer Verbindung oder aktiviertem Datensparmodus wird die
-            Erkennung übersprungen. Falls dein Browser die
-            Verbindungsgeschwindigkeit nicht meldet, etwa Firefox, wartet das
-            Tool höchstens 4,5 Sekunden auf den ersten Erkennungsversuch. Danach
-            werden die weiteren Bilder dieses Imports ohne Erkennung
-            vorbereitet. Der mittige Ausschnitt, die Formate und das MKW-Logo
-            stehen trotzdem bereit. Prüfe die Ausschnitte vor dem Export. Deine
-            Fotos bleiben auf deinem Computer.
-          </p>
-          <h3>Das Foto zuschneiden, ohne es zu verändern</h3>
-          <ol>
-            <li>
-              Klicke auf den Bildhintergrund oder wähle
-              <strong>Bildausschnitt</strong>.
-            </li>
-            <li>
-              Ziehe das Foto an die gewünschte Stelle und vergrössere es mit den
-              Eckgriffen. <strong>Fläche füllen</strong> verhindert freie
-              Ränder; <strong>Ganzes Bild</strong> zeigt das vollständige Foto
-              und kann dabei freie Flächen lassen.
-            </li>
-            <li>
-              Zum Spiegeln verwende <strong>Horizontal</strong> oder
-              <strong>Vertikal</strong>. Mit
-              <strong>Bildausschnitt zurücksetzen</strong> beginnst du erneut.
-            </li>
-          </ol>
-          <p>
-            Die Originaldatei bleibt erhalten. Ein roter Rand weist auf
-            unbedeckte Stellen hin, ein gelber auf eine möglicherweise zu
-            niedrige Auflösung. Diese Markierungen werden nicht exportiert.
-          </p>
-          <h3>Schutzzonen später ändern</h3>
-          <p>
-            Öffne an der gewünschten Zeichenfläche das Menü mit den drei Punkten
-            und wähle <strong>Format anpassen</strong>. Dort kannst du die
-            Schutzabstände oben, unten, links und rechts ändern. Die Vorschau
-            zeigt die verbleibende Fläche für Text und Logo. Beim Einrichten
-            sind links und rechts bei Standardformaten jeweils 100 px
-            vorgesehen.
-          </p>
-          <h3>Das MKW-Logo oder ein eigenes Logo wählen</h3>
-          <ol>
-            <li>
-              Klicke auf das Logo oder wähle <strong>Logo</strong> in der
-              Werkzeugleiste.
-            </li>
-            <li>
-              Wähle das schwarze oder weisse MKW-Logo. Über
-              <strong>Logo hinzufügen</strong> kannst du ein eigenes Logo laden.
-            </li>
-            <li>
-              Wenn alle Bilder dieselbe Auswahl erhalten sollen, klicke auf
-              <strong>Logo auf alle Bilder übertragen</strong>.
-            </li>
-          </ol>
-          <p>
-            Eigene Logos lassen sich über das Entfernen-Symbol wieder löschen.
-            Die beiden mitgelieferten MKW-Logos bleiben zur Auswahl verfügbar.
-          </p>
-          <h3>Copyright ergänzen</h3>
-          <p>
-            Schreibe in der Bildkarte ins Feld <strong>Copyright</strong>, zum
-            Beispiel „Probe im Stadthaus © Noé Plain“. Die Bildbeschreibung
-            darf vor dem ©-Zeichen stehen. Der Text erscheint gedreht am
-            rechten Bildrand; seine Länge verändert den Verlauf hinter den
-            Titeln nicht.
-          </p>
-          <h3>Familienkonzert gestalten</h3>
-          <ol>
-            <li>
-              Aktiviere unter <strong>Optionen → Familienkonzert</strong> das
-              Familienkonzert-Design.
-            </li>
-            <li>
-              Füge deine Illustration ein. Wähle unter
-              <strong>Bildausschnitt → Hintergrund</strong> die
-              Zeichenflächenfarbe.
-            </li>
-            <li>
-              Ergänze die Texte wie bei einem normalen Post. Die Titel erhalten
-              bunte Buchstaben mit einer Kontur. Über
-              <strong>Farbreihenfolge wechseln</strong> im Textwerkzeug änderst
-              du die Farbabfolge.
-            </li>
-          </ol>
-          <p>
-            Das Copyright bleibt schwarz oder weiss und erhält keine Kontur.
-          </p>
-          <h3>Einen Bildwinkel hinzufügen</h3>
-          <ol>
-            <li>
-              Aktiviere unter <strong>Optionen</strong> das Kästchen neben
-              <strong>Winkel</strong>. Wähle im danebenstehenden Menü Oben,
-              Links oder Unten.
-            </li>
-            <li>
-              Ziehe den sichtbaren Winkel an seine Position. Bei Oben und Unten
-              bleibt er waagrecht zentriert und bewegt sich nach oben oder
-              unten. Bei Links bleibt er senkrecht zentriert und bewegt sich
-              seitlich.
-            </li>
-            <li>
-              Ein <strong>Doppelklick</strong> öffnet den Bildinhalt: Ziehen
-              verschiebt das Foto im Winkel, die Eckgriffe verändern seine
-              Grösse. Mit Escape oder dem Button <strong>Winkel</strong> rechts
-              kehrst du zum Winkelrahmen zurück.
-            </li>
-          </ol>
-          <p>
-            Der Winkel zeigt dasselbe Foto wie der Hintergrund mit einem eigenen
-            Ausschnitt. Du kannst ihn spiegeln sowie Schenkelbreite und Schein
-            ändern. <strong>Winkel vollständig füllen</strong> behebt freie
-            Stellen. Neue Bilder starten ohne Winkel; weitere Formate desselben
-            Bildes übernehmen seine Aktivierung und Richtung.
-          </p>
-          <h3>Sponsorlogos einrichten und anzeigen</h3>
-          <ol>
-            <li>
-              Öffne <strong>Einstellungen → Sponsoren</strong>. Lege eine Gruppe
-              an, gib ihr einen Namen, zum Beispiel „Hauptpartnerin“, und füge
-              ihre Logos hinzu. Weitere Gruppen sind möglich.
-            </li>
-            <li>
-              Ziehe die Logos innerhalb einer Gruppe in die gewünschte
-              Reihenfolge oder in eine andere Gruppe.
-            </li>
-            <li>
-              Aktiviere in der Bildkarte unter
-              <strong>Optionen → Sponsorenleiste</strong> die Leiste.
-            </li>
-            <li>
-              Klicke auf den Balken oder wähle das Werkzeug
-              <strong>Sponsoren</strong>. Rechts wählst du die Gruppen,
-              Balkenfarbe und Mindesthöhe aus.
-            </li>
-            <li>
-              Prüfe das Ergebnis. Ein Klick auf ein Sponsorlogo öffnet dessen
-              Darstellung und manuelle Grössenanpassung.
-            </li>
-          </ol>
-          <p>
-            Im Hochformat liegt die Leiste unten, im Quadrat und Querformat
-            rechts gedreht. Als Ausgangspunkt sind 180 px Höhe bei 1080 px
-            Grundformat vorgesehen. Bei mehreren Gruppenzeilen kann mehr Platz
-            nötig sein. Das übrige Design erhält entsprechend weniger Fläche;
-            oberhalb einer unteren Sponsorleiste bleiben mindestens 100 px
-            Schutzabstand.
+            Die Bildkarte zeigt dein Foto gross als Vorschau. Ein Klick darauf
+            zeigt die Bildreihe. Darunter findest du kompakte Symbolbuttons für
+            <strong>Bild ersetzen</strong> und
+            <strong>Format hinzufügen</strong>. Lasse die Maus kurz auf einem
+            Symbol ruhen, um seine Beschriftung zu sehen. Bei Tastaturfokus
+            erscheint der Hinweis direkt. Reihenfolge und Entfernen findest du
+            ebenfalls bei den Bildaktionen. Über die
+            <strong>drei Punkte</strong> erreichst du Bildwinkel,
+            Familienkonzert, Sponsorenleiste und die Aktionen für die Bildreihe.
+            Die Bildkarte bleibt unabhängig vom Zoom lesbar und ist an der
+            oberen Kante des Artworks ausgerichtet. Bei stark verkleinerten
+            Ansichten wird sie kompakt; ihre Aktionen und der Bildnachweis
+            bleiben über die drei Punkte erreichbar. Die Karte selbst hat keine
+            eigene Scrollfläche. Bildnachweis / Copyright steht zunächst wie
+            bisher am Bildrand, ist aber eine eigene verschiebbare und drehbare
+            Textebene.
           </p>
           <p>
-            <strong>Automatisch</strong> ist die empfohlene Logodarstellung. Sie
-            verwendet auf hellen Balken Multiplizieren und auf dunklen Negativ
-            multiplizieren (Screen). Die Logogrössen und Abstände bleiben beim
-            Farbwechsel gleich. Vorhandene Graustufen bleiben erhalten. Falls
-            ein älteres Logo noch einen rechteckigen Hintergrund zeigt, klicke
-            es an und verwende
-            <strong>Hintergrund prüfen &amp; entfernen</strong>. Mit
-            <strong>Originalfarben</strong> zeigst du die unveränderten Farben.
+            FD-Kampagnen unterstützt einzelne Ausgabeformate von 240–4000 px,
+            bis zu 200 Ausgaben und 500 Ebenen pro Kampagne. Viele Ausgaben
+            teilen sich die Originalbilder. Wie viele grosse Fotos gleichzeitig
+            flüssig bearbeitet werden können, hängt zusätzlich von Browser und
+            Arbeitsspeicher ab.
+          </p>
+          <h3>Alte Kampagne weiterverwenden</h3>
+          <p>
+            Der bisherige Ablauf ist auf der Startseite über den Link
+            <strong>FD-Kampagnen (Backup)</strong> links neben
+            <strong>Hilfe &amp; How-to</strong> erreichbar. Alte MKW-Dateien
+            öffnen sich dort wie bisher. Im Fenster
+            <strong>Projekt öffnen</strong> findest du bei alten Kampagnen unter
+            dem Papierkorb den Button
+            <strong>In FD-Kampagnen umwandeln</strong>. Alternativ gibt es
+            dieselbe Aktion im Speicherdialog. Nach deiner Bestätigung erstellt
+            das Studio eine neue Projektkopie. Über-, Konzert- und Untertitel
+            werden in einem gemeinsamen Textfeld mit bisherigen Grössen und
+            Formatierungen zusammengeführt; der bisherige Textverlauf wird
+            übernommen. Das Copyright bleibt eine eigene bewegliche Ebene. Die
+            Originaldatei bleibt erhalten. Vergleiche das Ergebnis vor dem
+            Export. Bei nicht unterstützten Formaten oder Safezones nennt das
+            Studio die betroffenen Ausgaben vor der Umwandlung. Es verkleinert
+            oder überspringt nichts. Du kannst das Original im bisherigen Editor
+            weiterbearbeiten und als MKW speichern. Schutzzonen mit
+            Nachkommastellen werden exakt übernommen. Wird das Ausgangsprojekt
+            während der Bestätigung oder der Vorbereitung geändert oder
+            gewechselt, wird die Übernahme abgebrochen. Dein aktueller Stand
+            bleibt erhalten; starte die Umwandlung erneut. Der bisherige Editor
+            bleibt verfügbar, bis alle Altdatei-Fälle sicher übernommen werden
+            können.
+          </p>
+          <h3>Ausgeblendete Texte aus einer Altdatei übernehmen</h3>
+          <p>
+            Wähle die gewünschte Ausgabe auf der Arbeitsfläche. Wenn die
+            umgewandelte Kampagne ausgeblendete Texte enthält, findest du im
+            Ebenenbereich <strong>Ausgeblendete Texte</strong>. Klappe den
+            Bereich auf und wähle beim gewünschten Text
+            <strong>Als Textebene hinzufügen</strong>. Der Text wird mit seiner
+            gespeicherten Formatierung als eigene Ebene eingefügt. Du kannst ihn
+            danach auf der Fläche bearbeiten, verschieben, drehen oder
+            ausblenden. Die Übernahme gilt nur für diese Ausgabe; vorhandene
+            Ebenen und das Originalprojekt bleiben erhalten. Mit
+            <strong>Rückgängig</strong> lässt sich das Einfügen zurücknehmen.
+            Wenn eine ältere Kopie diesen Bereich nicht zeigt, öffne das
+            ursprüngliche Backup-Projekt und wandle es erneut um. Bei 500 Ebenen
+            muss zuerst eine Ebene entfernt werden. Kann eine alte Formatierung
+            nicht übernommen werden, bleibt der gespeicherte Ausgangstext
+            erhalten.
           </p>
           <p>
-            Die Sponsorgruppen in den Einstellungen sind deine Vorlagen. Löschen
-            dort entfernt die Vorlage, nicht bereits im Projekt verwendete
-            Logos. Zum Entfernen einer Gruppe aus einem Bild verwende den
-            Sponsorbereich dieses Bildes. Ausblenden behält die Gruppe für
-            später.
+            <strong>Im Studio:</strong> Du kannst Text direkt auf der Fläche
+            bearbeiten und rechts formatieren.
+            <a href="#texte">Zur gemeinsamen Textanleitung</a>. Das Copyright
+            aus der Bildkarte erscheint als eigene Ebene; du kannst es auf der
+            Fläche verschieben und drehen. Der Bildwinkel verwendet das Foto der
+            jeweiligen Ausgabe. Er wird pro Bild eingestellt. Sponsoren
+            verwaltest du unter <strong>Einstellungen → Sponsoren</strong> und
+            fügst sie über die Bildoptionen hinzu.
           </p>
-          <h3 id="text-direkt-bearbeiten">Text eingeben und direkt gestalten</h3>
-          <ol>
-            <li>Wähle einen Text auf der Fläche oder das Werkzeug <strong>Text</strong>. Im bisherigen Modus <strong>FD-Kampagnen (Backup)</strong> wählst du unter <strong>Text auswählen</strong> den Über-, Konzert- oder Untertitel beziehungsweise das Copyright.</li>
-            <li>Doppelklicke auf den Text im Artwork oder wähle <strong>Auf der Fläche</strong>. Schreibe direkt an der Stelle, an der der Text im fertigen Bild steht. In FD-Kampagnen folgen die verknüpften Texte dem ersten Bild; die Anzeige oben erklärt den Änderungsumfang.</li>
-            <li>Mit <strong>Auf der Fläche</strong> bearbeitest du den Text direkt im Design. Ein Doppelklick bleibt ebenfalls möglich. Mit <strong>Fertig</strong> oder Escape beendest du diese Bearbeitung. Deine Eingabe bleibt erhalten.</li>
-            <li>Ist der Text ausgeblendet, aktiviere <strong>Auf dem Bild anzeigen</strong>, bevor du ihn auf der Fläche bearbeitest. Eine gesperrte Designer-Ebene muss zuerst entsperrt werden.</li>
-          </ol>
-          <p>Bei einem eigenen Text in <strong>FD-Kampagnen (Backup)</strong> erscheint sofort <strong>Text vom ersten Bild übernehmen</strong>. Damit stellst du die Textverknüpfung wieder her. Änderungen an der Schriftgrösse auf dem ersten Bild folgen weiterhin nur auf dasselbe Format.</p>
-          <h3>Zeilenumbrüche und Textauswahl</h3>
-          <p><strong>Enter</strong> beginnt einen neuen Absatz. <strong>Shift + Enter</strong> setzt eine neue Zeile innerhalb desselben Absatzes; dessen Formatierung und Absatzabstände bleiben zusammengehörig. Die Seitenleiste dient der Formatierung; den Inhalt bearbeitest du direkt auf der Fläche.</p>
-          <p>Markierst du Text auf der Fläche, werden die betroffenen Absätze und Zeilen in der Seitenleiste automatisch angezeigt. Du kannst eine Auswahl auch im freien Bereich rechts neben einem Zeilenende beginnen und nach oben ziehen. Häufige Texteinstellungen stehen zuerst, einklappbare Zusatzoptionen darunter.</p>
-          <h3 id="advanced-typografie">Einzelne Wörter, Absätze oder Zeilen gestalten</h3>
-          <p>Wähle ein Textfeld. Die gleichen Textwerkzeuge stehen in allen Arbeitsbereichen bereit. Den Inhalt bearbeitest du auf der Fläche; rechts legst du die Formatierung fest.</p>
-          <ol>
-            <li><strong>Ein Wort oder einzelne Zeichen:</strong> Markiere die Zeichen direkt im Text. Unter <strong>Schrift &amp; Farbe</strong> änderst du Schrift, Grösse, Farbe, Grossbuchstaben, Unterstreichen oder Hochstellen wie bei x². Die Markierung hat Vorrang vor der Absatzauswahl.</li>
-            <li><strong>Einen oder mehrere Absätze:</strong> Ein Dreifachklick im Text markiert einen Absatz. Änderst du die Grösse eines vollständig markierten Absatzes, erhält er die passende Absatzhöhe: Er wächst nach unten und nachfolgende Absätze rücken mit.  Wähle die Kästchen unter <strong>Einzelne Absätze &amp; Zeilen → Absätze</strong>. Mit Umschalt wählst du einen Bereich; <strong>Alle</strong> wählt sämtliche Absätze. Falls noch Text markiert ist, wähle zuerst <strong>Absatz-/Zeilenauswahl verwenden</strong>.</li>
-            <li><strong>Absatzgrösse und Ausrichtung:</strong> Die <strong>Schriftgrösse</strong> unter <strong>Schrift &amp; Farbe</strong> gilt für deine Auswahl. Unter <strong>Absatz &amp; Abstände</strong> stellst du Ausrichtung, Zeilenabstand sowie Abstand davor und danach ein. Bei einer Markierung mitten in einem Absatz sind die gemeinsamen Absatzoptionen gesperrt; wähle dafür den Absatz über sein Kästchen aus.</li>
-            <li><strong>Einzelne Zeilen:</strong> Die Zeilenliste zeigt die Zeilen der gewählten Absätze. Wähle ihre Kästchen, um zum Beispiel Schriftgrössen oder den Zeilenabstand in Pixeln gemeinsam anzupassen. <strong>Automatischen Zeilenabstand verwenden</strong> setzt den Abstand dieser Auswahl zurück.</li>
-          </ol>
-          <p>Die Auswahl wird beim Markieren auf der Fläche automatisch in der Seitenleiste angezeigt. Die Anzeige darüber erklärt, ob ganze Absätze, Zeilen oder bestimmte Zeichen geändert werden. Neue Eingaben übernehmen die Formatierung ihrer Einfügestelle.</p>
-          <p><strong>Laufweite</strong> ist der zusätzliche Abstand zwischen Buchstaben. <strong>Zeilenabstand</strong> bestimmt den Abstand aufeinanderfolgender Zeilen; 95 % entspricht 0,95-mal der Schriftgrösse. Unter den immer sichtbaren Hauptoptionen findest du die einklappbaren Zusatzoptionen, einschliesslich <strong>Weitere Zeichenoptionen</strong> und dem Zurücksetzen der Zeichenformatierung.</p>
-          <p>Bereits abweichende Schriftgrössen bleiben erhalten, wenn du andere Absätze änderst. Die Deckkraft betrifft das ganze Textfeld. In FD-Kampagnen folgen Änderungen auf dem ersten Bild den gleichen Formaten; eine individuelle Position trennt den Textinhalt nicht von der Vorlage. Im Backup-Modus gilt die dort beschriebene Übernahme der festen Textarten.</p>
-          <h3>Text kopieren und einfügen</h3>
-          <p>Markiere Text direkt auf der Fläche. <strong>⌘/Strg+C</strong> kopiert ihn mit unterstützter Formatierung; <strong>⌘/Strg+V</strong> fügt ihn ein. Mit <strong>⌘/Strg+Umschalt+V</strong> fügst du nur den Inhalt ein. Dieser übernimmt die Formatierung an der Einfügestelle. Absätze und weiche Zeilenumbrüche bleiben erhalten.</p>
-          <p>Neben <strong>Auf der Fläche / Fertig</strong> öffnet das Drei-Punkte-Menü die Aktionen <strong>Mit Formatierung kopieren</strong>, <strong>Nur Text kopieren</strong> sowie beide Einfügevarianten. Dein Browser kann dafür Zugriff auf die Zwischenablage verlangen. Wird dieser nicht erlaubt, nutze die genannten Tastenkombinationen direkt auf der Fläche. Nicht verfügbare Quellschriften werden durch die Schrift des Zieltexts ersetzt. Es werden keine Schriften automatisch installiert oder mitkopiert.</p>
-          <h3>Rahmen ändern oder Text skalieren</h3>
-          <p>In Designer und FD-Kampagnen findest du unter <strong>Text im Rahmen → Grösse ändern</strong> zwei Varianten. <strong>Rahmen ändern</strong> passt Breite und Höhe an; die Schriftgrösse bleibt gleich und der Text kann neu umbrechen. Bei <strong>Text skalieren</strong> vergrössern die Eckgriffe Rahmen, Zeichen- und Absatzgrössen sowie feste Abstände proportional. Seitengriffe ändern weiterhin den Rahmen. <strong>Umschalt + Ziehen</strong> skaliert ebenfalls den Text.</p>
-          <p>Alternativ gibst du einen Prozentwert ein und wählst <strong>Anwenden</strong>, zum Beispiel 150 % für die eineinhalbfache Grösse. Rückgängig stellt den vorherigen Stand wieder her. Farbe, Schriftfamilie, prozentualer Zeilenabstand und Laufweite bleiben erhalten. Im Backup-Modus verwendest du weiterhin die Schriftgrössen der festen Textarten.</p>
-          <h3 id="blocksatz">Text links und rechts bündig setzen</h3>
-          <ol>
-            <li>
-              Wähle den Text und unter <strong>Einzelne Absätze &amp; Zeilen</strong> die gewünschten Absätze oder <strong>Alle</strong>. Nutze den Bereich <strong>Absatz &amp; Abstände</strong>.
-            </li>
-            <li>
-              Wähle <strong>Blocksatz</strong>. Die Zeilen werden links und
-              rechts an den Rahmen angepasst; die letzte Zeile bleibt
-              linksbündig.
-            </li>
-            <li>
-              Lass <strong>Automatische Silbentrennung</strong> eingeschaltet,
-              wenn lange Wörter umgebrochen werden sollen. Sie verwendet Deutsch
-              (Schweiz), reformierte Rechtschreibung 2006. Ausschalten ist pro
-              Textfeld beziehungsweise ausgewähltem Absatz möglich.
-            </li>
-          </ol>
+          <h3>Familienkonzert-Farben für einzelne Texte</h3>
           <p>
-            Die Trennstriche erscheinen nur an einem Zeilenumbruch. Dein
-            eingegebener Text bleibt erhalten. Erscheint eine Warnung zum
-            Blocksatz, versuche einen breiteren Rahmen, eine kleinere Schrift
-            oder einen kürzeren Text.
+            Markiere die gewünschten Zeichen oder wähle Absätze/Zeilen. Öffne
+            unter <strong>Textfarbe</strong> den Farbwähler und wähle
+            <strong>Familienkonzert</strong>. Nur diese Auswahl erhält bunte
+            Buchstaben mit 2-px-Kontur. Ein zweiter Klick auf
+            <strong>Familienkonzert</strong> schaltet die Farbfolge wieder aus
+            und zeigt die bisherige Textfarbe. Der Button zeigt aktiv, inaktiv
+            oder teilweise aktiv an. Du kannst auch eine normale Textfarbe
+            wählen. Der Quelltext bleibt erhalten. Die Funktion steht in
+            Designer, FD-Kampagnen und bisherigem FD-Modus bereit; Copyright ist
+            ausgenommen.
           </p>
           <p>
-            Unter <strong>Blocksatz · Satzwerte</strong> kannst du die festen
-            Grenzen nachsehen: Wortabstand 80–120 %, Zeichenabstand −2 bis +2 %,
-            Zeichenbreite 98–102 %. Die Normalwerte sind 100 %, 0 % und 100 %.
+            Die Werkzeuge zeigen nur Icons; ihre Namen erscheinen als Hinweis
+            beim Darüberfahren oder Fokussieren. Die überlappenden Farbfelder in
+            der Werkzeugleiste bearbeiten Fläche und Kontur des gewählten
+            Elements. Die vordere Fläche ist aktiv. Am fokussierten Farbfeld
+            wählt Pfeil links die Fläche, Pfeil rechts die Kontur; Eingabe
+            öffnet den Farbwähler. Je nach Element kann eine Kontur nicht
+            verfügbar sein.
           </p>
+          <p>
+            <strong>Meldungen unten in der Ansichtsleiste:</strong> Ganz links
+            in der rechten Footer-Gruppe bleibt der Meldungsbutton immer
+            sichtbar. Neutral bedeutet keine aktuellen Warnungen oder Fehler,
+            Blau eine Projektinformation, Gelb einen Hinweis und Rot einen
+            Fehler. Ein Klick öffnet Details und die bisherigen Sprünge zum
+            betroffenen Element. Auch Speicherfehler erscheinen dort; Hinweise
+            können geschlossen und später wieder angesehen werden. Escape
+            schliesst die Details. Das Öffnen der Meldungen ändert dein Layout
+            nicht.
+          </p>
+          <h3>Exportvorschau</h3>
+          <p>
+            Mit den festen Pfeilbuttons wechselst du zwischen den Bildern. Die
+            Checkbox <strong>Dieses Bild exportieren</strong> nimmt das gezeigte
+            Bild in die Auswahl auf oder entfernt es. Über
+            <strong>Auswahl</strong> wechselst du zur Übersicht zurück. Die
+            Vorschau bleibt im Exportfenster. «Dieses Bild exportieren» steht
+            neben der Umschaltung. Das Bild nutzt die gesamte linke Fläche;
+            «Bildkommentar» ist rechts aufklappbar. Mit «Originalpixel prüfen»
+            vergrösserst du zur Qualitätskontrolle, mit «Vorschau einpassen»
+            kehrst du zur Gesamtansicht zurück. «Meldungen» oben zeigt Hinweise
+            und Fehler; über «Im Design anzeigen» wechselst du zum betroffenen
+            Objekt.
+          </p>
+          <p>
+            In der Vorschau kannst du einen
+            <strong>Bildkommentar</strong> hinzufügen, bearbeiten oder
+            entfernen. Bis zu 1000 Zeichen bleiben als interne Notiz im Projekt;
+            <strong>Speichern</strong> übernimmt sie,
+            <strong>Abbrechen</strong> verwirft die Eingabe. Escape bricht
+            zunächst die Bearbeitung ab. In FD-Kampagnen gilt die Notiz für alle
+            Formate desselben Bildes, im Designer für die jeweilige Slide. Auf
+            der Fläche öffnet der kleine Button <strong>Kommentar</strong> unter
+            dem Bild die Notiz. Sie bleibt in MKW und der Projektdatei im
+            Bild-ZIP erhalten, erscheint aber nie im PNG-, PDF- oder PSD-Motiv.
+          </p>
+          <h3>Weitere Bilder und Formate</h3>
+          <p>
+            <strong>Weitere Bilder hinzufügen</strong> ergänzt Fotos am Ende
+            deiner Kampagne. Über <strong>Format hinzufügen</strong> in einer
+            Bildkarte ergänzt du ein Ausgabeformat. Gestalte jedes
+            unterschiedliche Format einmal; gleiche Formate anderer Bilder
+            folgen der Vorlage.
+          </p>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Ein Hochformat und ein Quadrat
+            brauchen oft unterschiedliche Textpositionen. Prüfe jedes Format
+            einzeln, statt die Schrift einfach kleiner zu machen.
+          </p>
+          <details class="wiki-reference" id="fd-backup-anleitung">
+            <summary>
+              Bisherige FD-Kampagnen (Backup): alte Textoptionen und Karten
+            </summary>
+            <p>
+              Dieser Abschnitt gilt ausschliesslich für den über den Backup-Link
+              geöffneten Editor. Im aktuellen FD-Modus schreibst du Text über
+              die ersten Kartenfelder oder direkt auf der Fläche. Die folgenden
+              festen Textarten und Optionen gehören zum bisherigen Ablauf.
+              <a href="#fd-vorschau">Zur aktuellen FD-Anleitung</a>.
+            </p>
+            <h3>Weitere Bilder oder Formate hinzufügen</h3>
+            <p>
+              Jedes Foto hat eine eigene Reihe. Links steht seine Bildkarte,
+              rechts liegen die ausgewählten Formate. Über
+              <strong>Weitere Bilder hinzufügen</strong> am Ende der Reihen
+              ergänzt du Fotos. Über <strong>Format hinzufügen</strong> in einer
+              Bildkarte ergänzt du eine Zeichenfläche und kannst deren Grösse
+              und Schutzzonen einstellen.
+            </p>
+            <p>
+              In der Bildkarte findest du unter der Vorschau den Dateinamen und
+              die Bildinformationen. Über
+              <strong>Bild ersetzen</strong> tauschst du das Foto aus. Mit den
+              Pfeilen verschiebst du die Reihe nach oben oder unten; der
+              Papierkorb entfernt das Bild. Wenn du nur den Bildinhalt ändern
+              möchtest, verwende <strong>Bild ersetzen</strong>.
+            </p>
+            <p>
+              Unter <strong>Copyright</strong> trägst du die Bildbeschreibung
+              und den Namen ein. Öffne darunter <strong>Optionen</strong>, um
+              Texte, Winkel, Familienkonzert oder Sponsorenleiste auszuwählen.
+              Die farbigen Zeilen und Häkchen zeigen, was aktiv ist. Die Anzahl
+              steht bereits im geschlossenen Feld. Mit Tab erreichst du die
+              Optionen, mit der Leertaste öffnest du sie oder änderst ein
+              Kästchen, mit Escape schliesst du sie wieder. Die Karte selbst
+              bleibt immer geöffnet.
+            </p>
+            <h3>Was übernimmt das erste Bild für die anderen?</h3>
+            <p>
+              Die erste Bildkarte trägt den Hinweis
+              <strong>Textvorlage für weitere Bilder</strong>. Richte dort
+              zuerst die gemeinsamen Texte und Textoptionen ein. Weitere Bilder
+              folgen, solange du die betreffende Einstellung dort noch nicht
+              selbst angepasst hast.
+            </p>
+            <ul>
+              <li>
+                <strong>Gleicher Text, anderes Foto:</strong> Ändere den Text am
+                ersten Bild.
+              </li>
+              <li>
+                <strong>Abweichender Text für ein einzelnes Foto:</strong> Wähle
+                dieses Bild und ändere dort den Text. Mit
+                <strong>Text vom ersten Bild übernehmen</strong> kehrst du zur
+                Vorlage zurück.
+              </li>
+              <li>
+                <strong>Schriftgrösse:</strong> Eine Änderung am ersten Bild
+                wird auf andere Bilder mit demselben Text und demselben Format
+                übertragen. Das Quadrat verändert dadurch nicht die
+                Schriftgrösse deiner Story.
+              </li>
+              <li>
+                <strong>Winkel:</strong> Diesen aktivierst und bearbeitest du
+                immer für jedes Foto einzeln.
+              </li>
+            </ul>
+            <h3>Texte einblenden und schreiben</h3>
+            <ol>
+              <li>
+                Öffne in der Bildkarte <strong>Optionen</strong>. Aktiviere
+                unter Textoptionen die gewünschten Felder: Übertitel,
+                Konzerttitel und Untertitel.
+              </li>
+              <li>
+                Wähle das Werkzeug <strong>Text</strong> oder klicke direkt auf
+                einen vorhandenen Text. Bei einem noch leeren Textfeld wählst du
+                im Textmodus zuerst die Zeichenfläche aus.
+              </li>
+              <li>
+                Wähle rechts das gewünschte Textfeld und schreibe deinen Text.
+                Du kannst auch direkt auf der Zeichenfläche schreiben.
+              </li>
+              <li>
+                Passe bei Bedarf Schriftgrösse, Ausrichtung oder Farbe an.
+                <strong>Übertitel in Grossbuchstaben</strong> ist voreingestellt
+                und lässt sich ausschalten. Dein eingegebener Text bleibt dabei
+                erhalten.
+              </li>
+            </ol>
+            <h3 id="textstapel">Abstände zwischen den Titeln ändern</h3>
+            <ol>
+              <li>
+                Wähle das Textwerkzeug. Unter
+                <strong>Abstände im Textstapel</strong> stehen die Abstände
+                zwischen den sichtbaren Titeln.
+              </li>
+              <li>
+                Gib einen Wert in Pixeln ein oder ziehe den kleinen Zahlengriff
+                links zwischen den Titeln: nach oben für mehr Abstand, nach
+                unten für weniger. Ein Doppelklick auf den Griff öffnet die
+                Zahleneingabe.
+              </li>
+              <li>
+                Mit <strong>Standard</strong> stellst du den ursprünglichen
+                Abstand wieder her. Der gewohnte Verschiebegriff bewegt
+                weiterhin den gesamten Textblock.
+              </li>
+            </ol>
+            <p>
+              Am ersten Bild geänderte Abstände folgen auch andere Bilder mit
+              denselben beteiligten Texten. Bei späteren Bildern bleiben deine
+              Änderungen individuell. Das Copyright gehört nicht zum Textstapel.
+            </p>
+            <h3>Automatischer Ausschnitt beim Import</h3>
+            <p>
+              Bei FD-Kampagnen sucht das Tool beim Import nach Gesichtern. Es
+              setzt das deutlichste Gesicht horizontal in die Mitte und die
+              Augen auf das obere Drittel der gesamten Zeichenfläche. Falls
+              dafür ein freier Bildrand entstehen würde, wird die nächstmögliche
+              Position verwendet. Ohne erkanntes Gesicht hilft weiterhin die
+              Personenerkennung beim Ausschnitt. Du kannst das Ergebnis danach
+              selbst verändern.
+            </p>
+            <p>
+              Bei langsamer Verbindung oder aktiviertem Datensparmodus wird die
+              Erkennung übersprungen. Falls dein Browser die
+              Verbindungsgeschwindigkeit nicht meldet, etwa Firefox, wartet das
+              Tool höchstens 4,5 Sekunden auf den ersten Erkennungsversuch.
+              Danach werden die weiteren Bilder dieses Imports ohne Erkennung
+              vorbereitet. Der mittige Ausschnitt, die Formate und das MKW-Logo
+              stehen trotzdem bereit. Prüfe die Ausschnitte vor dem Export.
+              Deine Fotos bleiben auf deinem Computer.
+            </p>
+            <h3>Das Foto zuschneiden, ohne es zu verändern</h3>
+            <ol>
+              <li>
+                Klicke auf den Bildhintergrund oder wähle
+                <strong>Bildausschnitt</strong>.
+              </li>
+              <li>
+                Ziehe das Foto an die gewünschte Stelle und vergrössere es mit
+                den Eckgriffen. <strong>Fläche füllen</strong> verhindert freie
+                Ränder; <strong>Ganzes Bild</strong> zeigt das vollständige Foto
+                und kann dabei freie Flächen lassen.
+              </li>
+              <li>
+                Zum Spiegeln verwende <strong>Horizontal</strong> oder
+                <strong>Vertikal</strong>. Mit
+                <strong>Bildausschnitt zurücksetzen</strong> beginnst du erneut.
+              </li>
+            </ol>
+            <p>
+              Die Originaldatei bleibt erhalten. Ein roter Rand weist auf
+              unbedeckte Stellen hin, ein gelber auf eine möglicherweise zu
+              niedrige Auflösung. Diese Markierungen werden nicht exportiert.
+            </p>
+            <h3>Schutzzonen später ändern</h3>
+            <p>
+              Öffne an der gewünschten Zeichenfläche das Menü mit den drei
+              Punkten und wähle <strong>Format anpassen</strong>. Dort kannst du
+              die Schutzabstände oben, unten, links und rechts ändern. Die
+              Vorschau zeigt die verbleibende Fläche für Text und Logo. Beim
+              Einrichten sind links und rechts bei Standardformaten jeweils 100
+              px vorgesehen.
+            </p>
+            <h3>Das MKW-Logo oder ein eigenes Logo wählen</h3>
+            <ol>
+              <li>
+                Klicke auf das Logo oder wähle <strong>Logo</strong> in der
+                Werkzeugleiste.
+              </li>
+              <li>
+                Wähle das schwarze oder weisse MKW-Logo. Über
+                <strong>Logo hinzufügen</strong> kannst du ein eigenes Logo
+                laden.
+              </li>
+              <li>
+                Wenn alle Bilder dieselbe Auswahl erhalten sollen, klicke auf
+                <strong>Logo auf alle Bilder übertragen</strong>.
+              </li>
+            </ol>
+            <p>
+              Eigene Logos lassen sich über das Entfernen-Symbol wieder löschen.
+              Die beiden mitgelieferten MKW-Logos bleiben zur Auswahl verfügbar.
+            </p>
+            <h3>Copyright ergänzen</h3>
+            <p>
+              Schreibe in der Bildkarte ins Feld <strong>Copyright</strong>, zum
+              Beispiel „Probe im Stadthaus © Noé Plain“. Die Bildbeschreibung
+              darf vor dem ©-Zeichen stehen. Der Text erscheint gedreht am
+              rechten Bildrand; seine Länge verändert den Verlauf hinter den
+              Titeln nicht.
+            </p>
+            <h3>Familienkonzert gestalten</h3>
+            <ol>
+              <li>
+                Aktiviere unter <strong>Optionen → Familienkonzert</strong> das
+                Familienkonzert-Design.
+              </li>
+              <li>
+                Füge deine Illustration ein. Wähle unter
+                <strong>Bildausschnitt → Hintergrund</strong> die
+                Zeichenflächenfarbe.
+              </li>
+              <li>
+                Ergänze die Texte wie bei einem normalen Post. Die Titel
+                erhalten bunte Buchstaben mit einer Kontur. Über
+                <strong>Farbreihenfolge wechseln</strong> im Textwerkzeug
+                änderst du die Farbabfolge.
+              </li>
+            </ol>
+            <p>
+              Das Copyright bleibt schwarz oder weiss und erhält keine Kontur.
+            </p>
+            <h3>Einen Bildwinkel hinzufügen</h3>
+            <ol>
+              <li>
+                Aktiviere unter <strong>Optionen</strong> das Kästchen neben
+                <strong>Winkel</strong>. Wähle im danebenstehenden Menü Oben,
+                Links oder Unten.
+              </li>
+              <li>
+                Ziehe den sichtbaren Winkel an seine Position. Bei Oben und
+                Unten bleibt er waagrecht zentriert und bewegt sich nach oben
+                oder unten. Bei Links bleibt er senkrecht zentriert und bewegt
+                sich seitlich.
+              </li>
+              <li>
+                Ein <strong>Doppelklick</strong> öffnet den Bildinhalt: Ziehen
+                verschiebt das Foto im Winkel, die Eckgriffe verändern seine
+                Grösse. Mit Escape oder dem Button
+                <strong>Winkel</strong> rechts kehrst du zum Winkelrahmen
+                zurück.
+              </li>
+            </ol>
+            <p>
+              Der Winkel zeigt dasselbe Foto wie der Hintergrund mit einem
+              eigenen Ausschnitt. Du kannst ihn spiegeln sowie Schenkelbreite
+              und Schein ändern.
+              <strong>Winkel vollständig füllen</strong> behebt freie Stellen.
+              Neue Bilder starten ohne Winkel; weitere Formate desselben Bildes
+              übernehmen seine Aktivierung und Richtung.
+            </p>
+            <h3>Sponsorlogos einrichten und anzeigen</h3>
+            <ol>
+              <li>
+                Öffne <strong>Einstellungen → Sponsoren</strong>. Lege eine
+                Gruppe an, gib ihr einen Namen, zum Beispiel „Hauptpartnerin“,
+                und füge ihre Logos hinzu. Weitere Gruppen sind möglich.
+              </li>
+              <li>
+                Ziehe die Logos innerhalb einer Gruppe in die gewünschte
+                Reihenfolge oder in eine andere Gruppe.
+              </li>
+              <li>
+                Aktiviere in der Bildkarte unter
+                <strong>Optionen → Sponsorenleiste</strong> die Leiste.
+              </li>
+              <li>
+                Klicke auf den Balken oder wähle das Werkzeug
+                <strong>Sponsoren</strong>. Rechts wählst du die Gruppen,
+                Balkenfarbe und Mindesthöhe aus.
+              </li>
+              <li>
+                Prüfe das Ergebnis. Ein Klick auf ein Sponsorlogo öffnet dessen
+                Darstellung und manuelle Grössenanpassung.
+              </li>
+            </ol>
+            <p>
+              Im Hochformat liegt die Leiste unten, im Quadrat und Querformat
+              rechts gedreht. Als Ausgangspunkt sind 180 px Höhe bei 1080 px
+              Grundformat vorgesehen. Bei mehreren Gruppenzeilen kann mehr Platz
+              nötig sein. Das übrige Design erhält entsprechend weniger Fläche;
+              oberhalb einer unteren Sponsorleiste bleiben mindestens 100 px
+              Schutzabstand.
+            </p>
+            <p>
+              <strong>Automatisch</strong> ist die empfohlene Logodarstellung.
+              Sie verwendet auf hellen Balken Multiplizieren und auf dunklen
+              Negativ multiplizieren (Screen). Die Logogrössen und Abstände
+              bleiben beim Farbwechsel gleich. Vorhandene Graustufen bleiben
+              erhalten. Falls ein älteres Logo noch einen rechteckigen
+              Hintergrund zeigt, klicke es an und verwende
+              <strong>Hintergrund prüfen &amp; entfernen</strong>. Mit
+              <strong>Originalfarben</strong> zeigst du die unveränderten
+              Farben.
+            </p>
+            <p>
+              Die Sponsorgruppen in den Einstellungen sind deine Vorlagen.
+              Löschen dort entfernt die Vorlage, nicht bereits im Projekt
+              verwendete Logos. Zum Entfernen einer Gruppe aus einem Bild
+              verwende den Sponsorbereich dieses Bildes. Ausblenden behält die
+              Gruppe für später.
+            </p>
+          </details>
         </section>
         <section id="carousels">
           <h2>Im Designer gestalten</h2>
@@ -594,7 +1251,12 @@
               erhalten.
             </li>
             <li>
-              Suche nach einem Namen oder wähle unter <strong>Sammlung</strong> zwischen allen, mitgelieferten und eigenen Vorlagen. Scrolle durch die Karten und wähle ein Design. Die Karten zeigen die erste Zeichenfläche mit pastellfarbenen Bildplatzhaltern. Danach öffnet sich die Ansicht zum Einsetzen deiner Inhalte.
+              Suche nach einem Namen oder wähle unter
+              <strong>Sammlung</strong> zwischen allen, mitgelieferten und
+              eigenen Vorlagen. Scrolle durch die Karten und wähle ein Design.
+              Die Karten zeigen die erste Zeichenfläche mit pastellfarbenen
+              Bildplatzhaltern. Danach öffnet sich die Ansicht zum Einsetzen
+              deiner Inhalte.
             </li>
             <li>
               Gib einen Projektnamen und bei Bedarf ein Kürzel ein. Unter
@@ -629,19 +1291,57 @@
             Pfeilen, Punkten oder durch seitliches Wischen wechselst du zwischen
             den Slides. Bilder und Texte werden laufend aktualisiert. Wenn du
             ein Inhaltsfeld anklickst, zeigt die Vorschau die dazugehörige
-            Zeichenfläche. Ein farbig umrandeter Bereich zeigt die Position des Feldes; dieser Hinweis wird nicht exportiert. Unter <strong>Inhalte anzeigen</strong> kannst du die Felder auf eine Zeichenfläche begrenzen. Deine Eingaben bleiben dabei erhalten. Noch nicht befüllte Bildfelder haben jeweils eine eigene Pastellfarbe. Dieselbe Farbe und die Bildplatznummer findest du beim zugehörigen Bildfeld. Klicke direkt auf ein Bild in der Vorschau, um es einzusetzen oder erneut zu ersetzen. Ein Klick auf einen bildgefüllten Winkel wählt dessen zugeordnetes Hintergrundbild. Alternativ bedienst du die benannten Bildfelder mit Tab und Enter. Abbrechen behält das bisherige Bild. Auf schmalen Bildschirmen steht die Vorschau über den
-            Inhaltsfeldern. Du kannst auch mit Tab einen Punkt oder Pfeil
-            auswählen und mit der Leertaste zur entsprechenden Slide wechseln.
-            <strong>Im Designer öffnen</strong> bleibt am unteren Fensterrand
-            erreichbar. Fehlt noch ein Bild, werden die betreffenden Bildfelder
-            markiert. Setze dort ein Bild ein und klicke erneut auf den Button.
-            Über <strong>Andere Vorlage wählen</strong> kehrst du zur Auswahl zurück. Wechselst du innerhalb des geöffneten Fensters die Vorlage, bleiben deine Eingaben für die Rückkehr erhalten. Schliesst du das Fenster,
+            Zeichenfläche. Ein farbig umrandeter Bereich zeigt die Position des
+            Feldes; dieser Hinweis wird nicht exportiert. Unter
+            <strong>Inhalte anzeigen</strong> kannst du die Felder auf eine
+            Zeichenfläche begrenzen. Deine Eingaben bleiben dabei erhalten. Noch
+            nicht befüllte Bildfelder haben jeweils eine eigene Pastellfarbe.
+            Dieselbe Farbe und die Bildplatznummer findest du beim zugehörigen
+            Bildfeld. Klicke direkt auf ein Bild in der Vorschau, um es
+            einzusetzen oder erneut zu ersetzen. Ein Klick auf einen
+            bildgefüllten Winkel wählt dessen zugeordnetes Hintergrundbild.
+            Alternativ bedienst du die benannten Bildfelder mit Tab und Enter.
+            Abbrechen behält das bisherige Bild. Auf schmalen Bildschirmen steht
+            die Vorschau über den Inhaltsfeldern. Du kannst auch mit Tab einen
+            Punkt oder Pfeil auswählen und mit der Leertaste zur entsprechenden
+            Slide wechseln. <strong>Im Designer öffnen</strong> bleibt am
+            unteren Fensterrand erreichbar. Fehlt noch ein Bild, werden die
+            betreffenden Bildfelder markiert. Setze dort ein Bild ein und klicke
+            erneut auf den Button. Über
+            <strong>Andere Vorlage wählen</strong> kehrst du zur Auswahl zurück.
+            Wechselst du innerhalb des geöffneten Fensters die Vorlage, bleiben
+            deine Eingaben für die Rückkehr erhalten. Schliesst du das Fenster,
             werden diese noch nicht als Projekt gespeicherten Eingaben
             verworfen.
           </p>
           <h3>Texte mit Absatzformaten anpassen</h3>
-          <p>Schreibe in die beschrifteten Textfelder. Mit <strong>Enter</strong> beginnst du einen neuen Absatz, mit <strong>Shift+Enter</strong> eine neue Zeile innerhalb desselben Absatzes. Unter <strong>Absatzformat</strong> findest du die bereits in der Vorlage verwendeten Gestaltungen, jeweils mit Ebenenname und Beispieltext. Setze den Cursor in den gewünschten Absatz und wähle ein Format. Es gilt für den ganzen Absatz; eine Markierung ist nicht nötig. Markierst du mehrere Absätze, werden diese gemeinsam formatiert. Die Anzeige unter dem Feld nennt die betroffenen Absätze. Lokale Zeichenformatierungen in diesen Absätzen werden dabei durch das gewählte Format ersetzt. Die übrigen Absätze bleiben erhalten.</p>
-          <p>Unter <strong>Text im Rahmen</strong> wählst du <strong>Oben</strong>, <strong>Mitte</strong> oder <strong>Unten</strong>, zum Beispiel für eine Bildbeschriftung am unteren Rahmenrand. Die Vorschau zeigt die spätere Position. Die mitgelieferten und deine bisherigen Vorlagen behalten zunächst ihre gespeicherte Position. Mit den Pfeilen <strong>Rückgängig</strong> und <strong>Wiederholen</strong> oder <strong>Cmd/Ctrl+Z</strong> und <strong>Cmd/Ctrl+Shift+Z</strong> korrigierst du Text-, Format- und Positionsänderungen im jeweiligen Textfeld. Erst <strong>Im Designer öffnen</strong> erstellt daraus dein Projekt.</p>
+          <p>
+            Schreibe in die beschrifteten Textfelder. Mit
+            <strong>Enter</strong> beginnst du einen neuen Absatz, mit
+            <strong>Shift+Enter</strong> eine neue Zeile innerhalb desselben
+            Absatzes. Unter <strong>Absatzformat</strong> findest du die bereits
+            in der Vorlage verwendeten Gestaltungen, jeweils mit Ebenenname und
+            Beispieltext. Setze den Cursor in den gewünschten Absatz und wähle
+            ein Format. Es gilt für den ganzen Absatz; eine Markierung ist nicht
+            nötig. Markierst du mehrere Absätze, werden diese gemeinsam
+            formatiert. Die Anzeige unter dem Feld nennt die betroffenen
+            Absätze. Lokale Zeichenformatierungen in diesen Absätzen werden
+            dabei durch das gewählte Format ersetzt. Die übrigen Absätze bleiben
+            erhalten.
+          </p>
+          <p>
+            Unter <strong>Text im Rahmen</strong> wählst du
+            <strong>Oben</strong>, <strong>Mitte</strong> oder
+            <strong>Unten</strong>, zum Beispiel für eine Bildbeschriftung am
+            unteren Rahmenrand. Die Vorschau zeigt die spätere Position. Die
+            mitgelieferten und deine bisherigen Vorlagen behalten zunächst ihre
+            gespeicherte Position. Mit den Pfeilen
+            <strong>Rückgängig</strong> und <strong>Wiederholen</strong> oder
+            <strong>Cmd/Ctrl+Z</strong> und
+            <strong>Cmd/Ctrl+Shift+Z</strong> korrigierst du Text-, Format- und
+            Positionsänderungen im jeweiligen Textfeld. Erst
+            <strong>Im Designer öffnen</strong> erstellt daraus dein Projekt.
+          </p>
           <h3>Ein eigenes Design als Vorlage speichern</h3>
           <ol>
             <li>
@@ -682,10 +1382,41 @@
             <strong>Bild platzieren / ersetzen</strong> wählst, bekommt er ein
             unabhängiges Bild. Ein Doppelklick passt seinen Ausschnitt an.
           </p>
-          <h3 id="freie-zeichenflaechen">Unabhängige Artboards statt verbundener Slides</h3>
-          <p>Wähle beim Einrichten <strong>Unabhängige Artboards</strong>, wenn du mehrere Designs getrennt voneinander gestalten möchtest. Ein Artboard ist eine einzelne Seite oder ein zusammenhängender Bogen mit mehreren Seiten. Unter <strong>Startformat</strong> kannst du 4:5, 9:16, 1:1 oder 3:4 wählen. Breite, Höhe und Schutzzonen bleiben einzeln einstellbar; ein Formatwechsel setzt deine Schutzzonen nicht zurück. Neue Artboards stehen untereinander mit 240 px Abstand. Bestehende Positionen bleiben beim Öffnen erhalten. Den Abstand kannst du unter <strong>Seiten &amp; Artboards → Weitere Optionen</strong> ändern. Für einen durchgehenden Social-Media-Beitrag wählst du <strong>Zusammenhängende Slides</strong>.</p>
-          <p>Klicke auf einen Seitentitel oder eine Miniatur, um ihre Eigenschaften zu öffnen. Unter <strong>Format dieser Seite</strong> änderst du Breite und Höhe. Position, Schutzzonen und Hintergrund stehen in der zugehörigen Detailansicht. Änderungen am Format skalieren deine Elemente nicht automatisch. Mehrseitige Bögen lassen sich über <strong>Artboard bearbeiten …</strong> gemeinsam anpassen.</p>
-          <p>Ältere Dateien mit freien Zeichenflächen behalten zunächst ihre bisherige Anordnung und Bedienung. Mit <strong>Seitenverwaltung aktivieren</strong> wechselst du zur neuen Übersicht. Prüfe die Anordnung danach; Rückgängig stellt die vorherige Struktur wieder her. Jedes Bild bzw. jede PDF-Seite behält im Export sein eigenes Format. PSD-Slices markieren die Seiten, keine nativen Photoshop-Artboards.</p>
+          <h3 id="freie-zeichenflaechen">
+            Unabhängige Artboards statt verbundener Slides
+          </h3>
+          <p>
+            Wähle beim Einrichten <strong>Unabhängige Artboards</strong>, wenn
+            du mehrere Designs getrennt voneinander gestalten möchtest. Ein
+            Artboard ist eine einzelne Seite oder ein zusammenhängender Bogen
+            mit mehreren Seiten. Unter <strong>Startformat</strong> kannst du
+            4:5, 9:16, 1:1 oder 3:4 wählen. Breite, Höhe und Schutzzonen bleiben
+            einzeln einstellbar; ein Formatwechsel setzt deine Schutzzonen nicht
+            zurück. Neue Artboards stehen untereinander mit 240 px Abstand.
+            Bestehende Positionen bleiben beim Öffnen erhalten. Den Abstand
+            kannst du unter
+            <strong>Seiten &amp; Artboards → Weitere Optionen</strong> ändern.
+            Für einen durchgehenden Social-Media-Beitrag wählst du
+            <strong>Zusammenhängende Slides</strong>.
+          </p>
+          <p>
+            Klicke auf einen Seitentitel oder eine Miniatur, um ihre
+            Eigenschaften zu öffnen. Unter
+            <strong>Format dieser Seite</strong> änderst du Breite und Höhe.
+            Position, Schutzzonen und Hintergrund stehen in der zugehörigen
+            Detailansicht. Änderungen am Format skalieren deine Elemente nicht
+            automatisch. Mehrseitige Bögen lassen sich über
+            <strong>Artboard bearbeiten …</strong> gemeinsam anpassen.
+          </p>
+          <p>
+            Ältere Dateien mit freien Zeichenflächen behalten zunächst ihre
+            bisherige Anordnung und Bedienung. Mit
+            <strong>Seitenverwaltung aktivieren</strong> wechselst du zur neuen
+            Übersicht. Prüfe die Anordnung danach; Rückgängig stellt die
+            vorherige Struktur wieder her. Jedes Bild bzw. jede PDF-Seite behält
+            im Export sein eigenes Format. PSD-Slices markieren die Seiten,
+            keine nativen Photoshop-Artboards.
+          </p>
           <h3>Slides hinzufügen, entfernen oder umsortieren</h3>
           <p>
             Klicke über einer Zeichenfläche auf
@@ -715,22 +1446,136 @@
             eine versehentliche Änderung zurücknehmen.
           </p>
           <h3 id="seiten-boegen">Seiten &amp; Artboards verwalten</h3>
-          <p><strong>Seiten verschieben:</strong> Ziehe eine Miniatur in das gewünschte Artboard. Am linken oder rechten Rand einer Miniatur fügst du davor oder danach ein; in der Mitte oder auf dem Artboard-Titel hängst du sie an. Alternativ öffnest du per Rechtsklick die Seitenaktionen und wählst <strong>In Artboard verschieben …</strong>. Der Dialog zeigt verfügbare Ziele und die neue Seitenanzahl. Ein Bild über mehrere Slides bleibt beim Verschieben ganz und folgt seiner ersten Seite. Bereits früher ausdrücklich getrennte Seitenausschnitte bleiben erhalten. <strong>Rückgängig</strong> stellt die vorherige Anordnung wieder her.</p>
-          <p>Klicke auf einen Seitentitel über der Gestaltung. Direkt unter dem Format findest du <strong>Seiten &amp; Artboards</strong>. Bei neuen unabhängigen Artboards ist die Verwaltung bereits aktiv. In älteren Projekten wählst du zuerst <strong>Seitenverwaltung aktivieren</strong>. Bis dahin bleibt deren Anordnung unverändert.</p>
+          <p>
+            <strong>Seiten verschieben:</strong> Ziehe eine Miniatur in das
+            gewünschte Artboard. Am linken oder rechten Rand einer Miniatur
+            fügst du davor oder danach ein; in der Mitte oder auf dem
+            Artboard-Titel hängst du sie an. Alternativ öffnest du per
+            Rechtsklick die Seitenaktionen und wählst
+            <strong>In Artboard verschieben …</strong>. Der Dialog zeigt
+            verfügbare Ziele und die neue Seitenanzahl. Ein Bild über mehrere
+            Slides bleibt beim Verschieben ganz und folgt seiner ersten Seite.
+            Bereits früher ausdrücklich getrennte Seitenausschnitte bleiben
+            erhalten. <strong>Rückgängig</strong> stellt die vorherige Anordnung
+            wieder her.
+          </p>
+          <p>
+            Klicke auf einen Seitentitel über der Gestaltung. Direkt unter dem
+            Format findest du <strong>Seiten &amp; Artboards</strong>. Bei neuen
+            unabhängigen Artboards ist die Verwaltung bereits aktiv. In älteren
+            Projekten wählst du zuerst
+            <strong>Seitenverwaltung aktivieren</strong>. Bis dahin bleibt deren
+            Anordnung unverändert.
+          </p>
           <ol>
-            <li><strong>Einzelseiten</strong> stehen mit Abstand. Beim Wechsel zu <strong>Druckbögen (2–20 Seiten)</strong> bleibt dein vorhandenes Design unverändert: Seiten werden dabei nicht automatisch auseinandergezogen, neu sortiert oder in Zweiergruppen zerlegt. Ein durchgehender Slidepost bleibt beim Aktivieren der Seitenverwaltung zusammen. Nutze <strong>Zusammenfügen</strong> und <strong>Trennen</strong>, um die Struktur bewusst zu ändern. Mit <strong>Automatisches Nachrücken</strong> entstehen zunächst Zweiergruppen. Ohne diese Option stellst du die Gruppen selbst zusammen. Falzlinien sind nur Hilfen im Studio und werden nicht exportiert.</li>
-            <li>Jedes Artboard hat eine Überschrift und Miniaturen seines tatsächlichen Inhalts. Klicke auf den Pfeil, um es ein- oder auszuklappen. Die Miniaturen behalten ihre Seitenverhältnisse. Ein Klick wählt die Seite und zeigt sie mittig auf der Arbeitsfläche. Bei kleinem Zoom steht der Seitentitel neben dem Artwork, damit die Zwischenräume frei bleiben. Sehr kleine Seiten wählst du bequem über die Miniaturübersicht.</li>
-            <li>Mit Umschalt wählst du mehrere Seiten, mit Cmd auf dem Mac oder Ctrl unter Windows einzelne weitere. <strong>Zusammenfügen</strong> verbindet sie; <strong>Trennen</strong> löst den Bogen in einzelne Artboards.</li>
-            <li><strong>Artboard bearbeiten …</strong> stellt für diesen Bogen die Zahl von 1–20 Seiten, seine Position und auf Wunsch ein gemeinsames Format mit vier Schutzzonen ein. Weniger Seiten trennt die überzähligen Seiten ab; es löscht sie nicht. Abbrechen übernimmt nichts.</li>
-            <li><strong>Neues Artboard</strong> fügt eine unabhängige Seite hinzu, ohne vorhandene Artboards neu anzuordnen. Über das <strong>Plus am jeweiligen Artboard</strong> – auf der Arbeitsfläche oder in seiner Überschrift – ergänzt du eine Seite in genau diesem Bogen. Bestehende Inhalte und andere Artboards behalten ihre Positionen. Bei Platzmangel erhältst du einen Hinweis; es wird nichts überdeckt. Im Drei-Punkte-Menü eines Artboards kannst du es umbenennen, duplizieren, löschen oder eine Seite hinzufügen. Ein Doppelklick auf seinen Namen öffnet ebenfalls das Umbenennen.</li>
-            <li>Ziehe eine Seite vor oder hinter eine Miniatur, um die Reihenfolge zu ändern. Ablegen in deren Mitte oder auf einer Artboard-Überschrift fügt sie in dieses Artboard ein. Beim Ziehen zeigt eine Einfügelinie oder Andockfläche das Ziel; ein Text nennt die geplante Aktion. Halte Alt/Option beim Ziehen, um eine Kopie abzulegen. Zum Löschen erscheint während des Ziehens eine Ablagefläche; danach entscheidest du, ob Inhalte erhalten bleiben sollen. Abbrechen verändert das Dokument nicht.</li>
-            <li>Alle Seitenaktionen findest du auch mit Rechtsklick oder unter <strong>Weitere Aktionen</strong>. <strong>In Artboard verschieben …</strong> ist die Alternative zum Ziehen. Dort findest du ausserdem Duplizieren, Löschen, Umbenennen sowie Nach vorne und Nach hinten. Ein Doppelklick auf eine Seitenminiatur öffnet ihren Namen.</li>
-            <li>Der Titel über dem Artwork verschiebt den ganzen Bogen. Cmd/Ctrl + Umschalt beim Ziehen löst nur diese Seite heraus. Unter <strong>Weitere Optionen</strong> änderst du die erste Seitennummer, Leserichtung, Bogenabstand und Anschnitt-Hilfe.</li>
+            <li>
+              <strong>Einzelseiten</strong> stehen mit Abstand. Beim Wechsel zu
+              <strong>Druckbögen (2–20 Seiten)</strong> bleibt dein vorhandenes
+              Design unverändert: Seiten werden dabei nicht automatisch
+              auseinandergezogen, neu sortiert oder in Zweiergruppen zerlegt.
+              Ein durchgehender Slidepost bleibt beim Aktivieren der
+              Seitenverwaltung zusammen. Nutze
+              <strong>Zusammenfügen</strong> und <strong>Trennen</strong>, um
+              die Struktur bewusst zu ändern. Mit
+              <strong>Automatisches Nachrücken</strong> entstehen zunächst
+              Zweiergruppen. Ohne diese Option stellst du die Gruppen selbst
+              zusammen. Falzlinien sind nur Hilfen im Studio und werden nicht
+              exportiert.
+            </li>
+            <li>
+              Jedes Artboard hat eine Überschrift und Miniaturen seines
+              tatsächlichen Inhalts. Klicke auf den Pfeil, um es ein- oder
+              auszuklappen. Die Miniaturen behalten ihre Seitenverhältnisse. Ein
+              Klick wählt die Seite und zeigt sie mittig auf der Arbeitsfläche.
+              Bei kleinem Zoom steht der Seitentitel neben dem Artwork, damit
+              die Zwischenräume frei bleiben. Sehr kleine Seiten wählst du
+              bequem über die Miniaturübersicht.
+            </li>
+            <li>
+              Mit Umschalt wählst du mehrere Seiten, mit Cmd auf dem Mac oder
+              Ctrl unter Windows einzelne weitere.
+              <strong>Zusammenfügen</strong> verbindet sie;
+              <strong>Trennen</strong> löst den Bogen in einzelne Artboards.
+            </li>
+            <li>
+              <strong>Artboard bearbeiten …</strong> stellt für diesen Bogen die
+              Zahl von 1–20 Seiten, seine Position und auf Wunsch ein
+              gemeinsames Format mit vier Schutzzonen ein. Weniger Seiten trennt
+              die überzähligen Seiten ab; es löscht sie nicht. Abbrechen
+              übernimmt nichts.
+            </li>
+            <li>
+              <strong>Neues Artboard</strong> fügt eine unabhängige Seite hinzu,
+              ohne vorhandene Artboards neu anzuordnen. Über das
+              <strong>Plus am jeweiligen Artboard</strong> – auf der
+              Arbeitsfläche oder in seiner Überschrift – ergänzt du eine Seite
+              in genau diesem Bogen. Bestehende Inhalte und andere Artboards
+              behalten ihre Positionen. Bei Platzmangel erhältst du einen
+              Hinweis; es wird nichts überdeckt. Im Drei-Punkte-Menü eines
+              Artboards kannst du es umbenennen, duplizieren, löschen oder eine
+              Seite hinzufügen. Ein Doppelklick auf seinen Namen öffnet
+              ebenfalls das Umbenennen.
+            </li>
+            <li>
+              Ziehe eine Seite vor oder hinter eine Miniatur, um die Reihenfolge
+              zu ändern. Ablegen in deren Mitte oder auf einer
+              Artboard-Überschrift fügt sie in dieses Artboard ein. Beim Ziehen
+              zeigt eine Einfügelinie oder Andockfläche das Ziel; ein Text nennt
+              die geplante Aktion. Halte Alt/Option beim Ziehen, um eine Kopie
+              abzulegen. Zum Löschen erscheint während des Ziehens eine
+              Ablagefläche; danach entscheidest du, ob Inhalte erhalten bleiben
+              sollen. Abbrechen verändert das Dokument nicht.
+            </li>
+            <li>
+              Alle Seitenaktionen findest du auch mit Rechtsklick oder unter
+              <strong>Weitere Aktionen</strong>.
+              <strong>In Artboard verschieben …</strong> ist die Alternative zum
+              Ziehen. Dort findest du ausserdem Duplizieren, Löschen, Umbenennen
+              sowie Nach vorne und Nach hinten. Ein Doppelklick auf eine
+              Seitenminiatur öffnet ihren Namen.
+            </li>
+            <li>
+              Der Titel über dem Artwork verschiebt den ganzen Bogen. Cmd/Ctrl +
+              Umschalt beim Ziehen löst nur diese Seite heraus. Unter
+              <strong>Weitere Optionen</strong> änderst du die erste
+              Seitennummer, Leserichtung, Bogenabstand und Anschnitt-Hilfe.
+            </li>
           </ol>
-          <p><strong>Ohne Maus:</strong> Tab führt in die Übersicht. Pfeile, Pos1 und Ende navigieren; Umschalt erweitert die Auswahl. Pfeil links/rechts klappt ein Artboard ein bzw. auf. Leertaste beginnt das Verschieben, die Pfeile wählen die Zielposition, Eingabe bestätigt und Escape bricht ab. Cmd/Ctrl + A wählt alle Seiten. F2 benennt die Auswahl um. Cmd/Ctrl + Alt + N fügt einen neuen Druckbogen hinzu.</p>
-          <p><strong>Mehrere Seiten formatieren:</strong> Wähle die Seiten und dann ein Format unter <strong>Auswahl gemeinsam formatieren</strong>. <strong>Eigene Grösse</strong> bietet Breite, Höhe und alle vier Schutzzonen. Erst <strong>Übernehmen</strong> ändert das Dokument; Elementgrössen bleiben unverändert.</p>
-          <p><strong>Übergreifende Inhalte:</strong> Beim Auseinanderbewegen bleiben die sichtbaren Teile auf ihren Seiten erhalten. Das Studio erstellt bei Bedarf unabhängig bearbeitbare Seitenausschnitte, die dieselbe Bilddatei verwenden. Es werden keine doppelten Bilddaten gespeichert. Rückgängig stellt das ursprüngliche gemeinsame Element wieder her.</p>
-          <p>Die Seitenverwaltung unterstützt bis zu <strong>200 Seiten mit insgesamt 500 Ebenen</strong> und höchstens <strong>20 Seiten pro Artboard</strong>. Bild- und PDF-Ausgabe exportieren einzelne Seiten. Anschnitt ist eine Anzeigehilfe, keine Druck-PDF mit Schnittmarken oder CMYK. Für PSD bleiben die gesonderten Pixelgrenzen bestehen; Seitenausschnitte erscheinen dort als benannte Rasterebenen. Die bearbeitbare Quelle bleibt in deiner MKW-Datei erhalten. Sehr grosse Bilder können unabhängig von der Seitenzahl den verfügbaren Arbeitsspeicher begrenzen.</p>
+          <p>
+            <strong>Ohne Maus:</strong> Tab führt in die Übersicht. Pfeile, Pos1
+            und Ende navigieren; Umschalt erweitert die Auswahl. Pfeil
+            links/rechts klappt ein Artboard ein bzw. auf. Leertaste beginnt das
+            Verschieben, die Pfeile wählen die Zielposition, Eingabe bestätigt
+            und Escape bricht ab. Cmd/Ctrl + A wählt alle Seiten. F2 benennt die
+            Auswahl um. Cmd/Ctrl + Alt + N fügt einen neuen Druckbogen hinzu.
+          </p>
+          <p>
+            <strong>Mehrere Seiten formatieren:</strong> Wähle die Seiten und
+            dann ein Format unter
+            <strong>Auswahl gemeinsam formatieren</strong>.
+            <strong>Eigene Grösse</strong> bietet Breite, Höhe und alle vier
+            Schutzzonen. Erst <strong>Übernehmen</strong> ändert das Dokument;
+            Elementgrössen bleiben unverändert.
+          </p>
+          <p>
+            <strong>Übergreifende Inhalte:</strong> Beim Auseinanderbewegen
+            bleiben die sichtbaren Teile auf ihren Seiten erhalten. Das Studio
+            erstellt bei Bedarf unabhängig bearbeitbare Seitenausschnitte, die
+            dieselbe Bilddatei verwenden. Es werden keine doppelten Bilddaten
+            gespeichert. Rückgängig stellt das ursprüngliche gemeinsame Element
+            wieder her.
+          </p>
+          <p>
+            Die Seitenverwaltung unterstützt bis zu
+            <strong>200 Seiten mit insgesamt 500 Ebenen</strong> und höchstens
+            <strong>20 Seiten pro Artboard</strong>. Bild- und PDF-Ausgabe
+            exportieren einzelne Seiten. Anschnitt ist eine Anzeigehilfe, keine
+            Druck-PDF mit Schnittmarken oder CMYK. Für PSD bleiben die
+            gesonderten Pixelgrenzen bestehen; Seitenausschnitte erscheinen dort
+            als benannte Rasterebenen. Die bearbeitbare Quelle bleibt in deiner
+            MKW-Datei erhalten. Sehr grosse Bilder können unabhängig von der
+            Seitenzahl den verfügbaren Arbeitsspeicher begrenzen.
+          </p>
           <h3>Auf der grossen Arbeitsfläche navigieren</h3>
           <p>
             Scrolle nach links und rechts, um weitere Slides zu erreichen. Halte
@@ -749,6 +1594,103 @@
             Exportauflösung bleibt unverändert.
           </p>
           <h3>Ein Bild platzieren und zuschneiden</h3>
+          <figure class="wiki-figure" id="grafik-bildausschnitt">
+            <div class="wiki-diagram-grid">
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 260 190"
+                  role="img"
+                  aria-labelledby="cropFrameTitle cropFrameDesc"
+                >
+                  <title id="cropFrameTitle">Rahmen verschieben</title>
+                  <desc id="cropFrameDesc">
+                    Zwei versetzte quadratische Rahmen zeigen, dass sich die
+                    Position des sichtbaren Bildbereichs auf der Zeichenfläche
+                    ändert.
+                  </desc>
+                  <rect
+                    class="diagram-paper"
+                    x="4"
+                    y="4"
+                    width="252"
+                    height="182"
+                    rx="8"
+                  />
+                  <rect
+                    class="diagram-dashed"
+                    x="30"
+                    y="25"
+                    width="100"
+                    height="100"
+                  />
+                  <rect
+                    class="diagram-wash"
+                    x="105"
+                    y="65"
+                    width="100"
+                    height="100"
+                  />
+                  <path
+                    class="diagram-line"
+                    d="M75 65 155 105M140 105H155V90"
+                  /></svg
+                ><strong>Rahmen bewegen</strong
+                ><span>Der Bildplatz auf dem Design verschiebt sich.</span>
+              </div>
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 260 190"
+                  role="img"
+                  aria-labelledby="cropImageTitle cropImageDesc"
+                >
+                  <title id="cropImageTitle">Bildinhalt verschieben</title>
+                  <desc id="cropImageDesc">
+                    Ein unveränderter Rahmen enthält ein Motiv, das nach rechts
+                    verschoben wird. Die Aussengrenze des Bildplatzes bleibt
+                    gleich.
+                  </desc>
+                  <rect
+                    class="diagram-paper"
+                    x="4"
+                    y="4"
+                    width="252"
+                    height="182"
+                    rx="8"
+                  />
+                  <rect
+                    class="diagram-wash"
+                    x="60"
+                    y="30"
+                    width="140"
+                    height="130"
+                  />
+                  <circle class="diagram-dashed" cx="95" cy="75" r="23" />
+                  <circle class="diagram-accent" cx="160" cy="75" r="23" />
+                  <path
+                    class="diagram-line"
+                    d="M85 125H175M163 116 175 125 163 134"
+                  /></svg
+                ><strong>Inhalt bewegen</strong
+                ><span
+                  >Der Rahmen bleibt. Du suchst den passenden
+                  Fotoausschnitt.</span
+                >
+              </div>
+            </div>
+            <figcaption>
+              Wähle zuerst das Bild. Mit
+              <strong>Auswählen &amp; verschieben</strong> bewegst du den
+              Rahmen. Mit <strong>Bildinhalt bearbeiten</strong> oder
+              Doppelklick passt du das Foto im Rahmen an. Eine Meldung
+              erscheint, wenn innerhalb der Ausgabe eine Lücke bleibt.
+            </figcaption>
+          </figure>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Schneide wichtige Köpfe nicht
+            zufällig am Bildrand ab. Wenn das Motiv bei vollem Rahmen nicht
+            passt, wähle einen anderen Ausschnitt oder ein anderes Foto.
+          </p>
+
           <ol>
             <li>
               Wähle <strong>Bildrahmen</strong> und ziehe ein Rechteck auf.
@@ -791,14 +1733,24 @@
           <ol>
             <li>Wähle <strong>Text</strong> und ziehe ein Textfeld auf.</li>
             <li>
-              Schreibe direkt auf der Fläche. Über <strong>Auf der Fläche</strong> kannst du auch ein leeres Textfeld bearbeiten.
-              Enter beginnt einen neuen Absatz.
+              Schreibe direkt auf der Fläche. Über
+              <strong>Auf der Fläche</strong> kannst du auch ein leeres Textfeld
+              bearbeiten. Enter beginnt einen neuen Absatz.
             </li>
             <li>
-              Stelle rechts Schrift, Grösse und Ausrichtung ein. <strong>Einzelne Absätze &amp; Zeilen</strong> ist direkt sichtbar. Wähle dort einen oder mehrere Absätze, ändere unter <strong>Schrift &amp; Farbe</strong> die gemeinsame Grösse und unter <strong>Absatz &amp; Abstände</strong> die Ausrichtung. In der Zeilenliste kannst du einzelne Abstände anpassen. <strong>Automatischen Zeilenabstand verwenden</strong> setzt die gewählten Zeilen zurück.
+              Stelle rechts Schrift, Grösse und Ausrichtung ein.
+              <strong>Einzelne Absätze &amp; Zeilen</strong> ist direkt
+              sichtbar. Wähle dort einen oder mehrere Absätze, ändere unter
+              <strong>Schrift &amp; Farbe</strong> die gemeinsame Grösse und
+              unter <strong>Absatz &amp; Abstände</strong> die Ausrichtung. In
+              der Zeilenliste kannst du einzelne Abstände anpassen.
+              <strong>Automatischen Zeilenabstand verwenden</strong> setzt die
+              gewählten Zeilen zurück.
             </li>
             <li>
-              Wähle unter <strong>Text im Rahmen</strong>, ob der Text oben, mittig oder unten im Rahmen stehen soll. Das funktioniert in beiden Modi.
+              Unter <strong>Ausrichtung der Auswahl</strong> wählst du in der
+              zweiten Symbolreihe, ob der Text oben, mittig oder unten im Rahmen
+              stehen soll. Das funktioniert in beiden Modi.
             </li>
           </ol>
           <p>
@@ -807,24 +1759,109 @@
             Grossbuchstaben und Hochstellen lassen sich wieder ausschalten, ohne
             den ursprünglichen Text neu einzugeben.
           </p>
-          <p><strong>Vertikale Textposition:</strong> Direkt unter <strong>Ausrichtung der Auswahl</strong> findest du eine eigene Reihe mit drei Symbolen für oben, mittig und unten. Sie positionieren den Inhalt im gesamten Textfeld; die Rahmenposition bleibt erhalten. Bei mehreren ausgewählten Textfeldern gilt die Wahl für alle. Gesperrte Felder werden nicht verändert. Rückgängig stellt die vorige Position wieder her.</p>
-          <p><strong>Optisch bündige Textkanten:</strong> Neue Textfelder in Designer und FD-Kampagnen richten ihre Satzkante standardmässig optisch aus: Gerade Buchstabenstämme beginnen am Textrahmen. Rundungen, schräge Kanten, Satzzeichen und ausladende Serifen dürfen kontrolliert darüber hinausragen. Die Überhänge allein lösen keine Schutzzonenwarnung aus; ein verschobener Textrahmen oder tatsächlich überlaufender Text wird weiterhin gemeldet. Die Schriftform wird aus der geladenen Schrift gemessen; es handelt sich um die eigene optische Satzlogik des Studios. Unter <strong>Absatz &amp; Abstände → Optischer Randausgleich</strong> kannst du dies pro Absatz ausschalten oder bei bestehenden Texten einschalten. Sie gilt für die gewählten Absätze und deren Links-, Rechts- oder Mittelachse. Gewollte Einzüge bleiben erhalten. Bei ausgeschaltetem Randausgleich bleiben bisherige Positionen unverändert. Ist der Randausgleich eingeschaltet, gilt die aktuelle optische Satzlogik. Blocksatz verwendet seine eigene Abstandsregelung. Im PSD bleibt bei optisch ausgeglichenem Text eine genaue Rasterdarstellung mit zusätzlichem bearbeitbarem Text erhalten.</p>
+          <p>
+            <strong>Vertikale Textposition:</strong> Direkt unter
+            <strong>Ausrichtung der Auswahl</strong> findest du eine eigene
+            Reihe mit drei Symbolen für oben, mittig und unten. Sie
+            positionieren den Inhalt im gesamten Textfeld; die Rahmenposition
+            bleibt erhalten. Bei mehreren ausgewählten Textfeldern gilt die Wahl
+            für alle. Gesperrte Felder werden nicht verändert. Rückgängig stellt
+            die vorige Position wieder her.
+          </p>
+          <p>
+            <strong>Optisch bündige Textkanten:</strong> Neue Textfelder in
+            Designer und FD-Kampagnen richten ihre Satzkante standardmässig
+            optisch aus: Gerade Buchstabenstämme beginnen am Textrahmen.
+            Rundungen, schräge Kanten, Satzzeichen und ausladende Serifen dürfen
+            kontrolliert darüber hinausragen. Die Überhänge allein lösen keine
+            Schutzzonenwarnung aus; ein verschobener Textrahmen oder tatsächlich
+            überlaufender Text wird weiterhin gemeldet. Die Schriftform wird aus
+            der geladenen Schrift gemessen; es handelt sich um die eigene
+            optische Satzlogik des Studios. Unter
+            <strong>Absatz &amp; Abstände → Optischer Randausgleich</strong>
+            kannst du dies pro Absatz ausschalten oder bei bestehenden Texten
+            einschalten. Sie gilt für die gewählten Absätze und deren Links-,
+            Rechts- oder Mittelachse. Gewollte Einzüge bleiben erhalten. Bei
+            ausgeschaltetem Randausgleich bleiben bisherige Positionen
+            unverändert. Ist der Randausgleich eingeschaltet, gilt die aktuelle
+            optische Satzlogik. Blocksatz verwendet seine eigene
+            Abstandsregelung. Im PSD bleibt bei optisch ausgeglichenem Text eine
+            genaue Rasterdarstellung mit zusätzlichem bearbeitbarem Text
+            erhalten.
+          </p>
 
           <figure class="wiki-figure" id="grafik-randausgleich">
-            <svg viewBox="0 0 660 160" role="img" aria-labelledby="optBildTitel optBildBeschreibung">
-              <title id="optBildTitel">Gerade Kante, Rundung und Serife am Textrahmen</title><desc id="optBildBeschreibung">Drei schematische Buchstaben stehen an einer gestrichelten Rahmenkante. Beim E beginnt der Stamm exakt an der Linie. Die Rundung des O und die schmalen Serifen des zweiten E reichen etwas links über die Linie hinaus.</desc>
-              <g transform="translate(80 30)"><path class="diagram-guide" d="M0-12V75"/><path class="diagram-ink" d="M0 0H42V8H10V27H35V35H10V57H42V65H0Z"/><text x="22" y="103" text-anchor="middle">Gerader Stamm</text></g>
-              <g transform="translate(300 30)"><path class="diagram-guide" d="M0-12V75"/><ellipse class="diagram-round" cx="22" cy="32" rx="26" ry="33"/><text x="22" y="103" text-anchor="middle">Rundung</text></g>
-              <g transform="translate(520 30)"><path class="diagram-guide" d="M0-12V75"/><path class="diagram-ink" d="M-7 0H43V13H39L36 6H9V28H31V22H35V40H31V34H9V59H36L40 51H44V65H-7V61H0V4H-7Z"/><text x="22" y="103" text-anchor="middle">Serife</text></g>
+            <svg
+              viewBox="0 0 660 160"
+              role="img"
+              aria-labelledby="optBildTitel optBildBeschreibung"
+            >
+              <title id="optBildTitel">
+                Gerade Kante, Rundung und Serife am Textrahmen
+              </title>
+              <desc id="optBildBeschreibung">
+                Drei schematische Buchstaben stehen an einer gestrichelten
+                Rahmenkante. Beim E beginnt der Stamm exakt an der Linie. Die
+                Rundung des O und die schmalen Serifen des zweiten E reichen
+                etwas links über die Linie hinaus.
+              </desc>
+              <g transform="translate(80 30)">
+                <path class="diagram-guide" d="M0-12V75" />
+                <path
+                  class="diagram-ink"
+                  d="M0 0H42V8H10V27H35V35H10V57H42V65H0Z"
+                />
+                <text x="22" y="103" text-anchor="middle">Gerader Stamm</text>
+              </g>
+              <g transform="translate(300 30)">
+                <path class="diagram-guide" d="M0-12V75" />
+                <ellipse
+                  class="diagram-round"
+                  cx="22"
+                  cy="32"
+                  rx="26"
+                  ry="33"
+                />
+                <text x="22" y="103" text-anchor="middle">Rundung</text>
+              </g>
+              <g transform="translate(520 30)">
+                <path class="diagram-guide" d="M0-12V75" />
+                <path
+                  class="diagram-ink"
+                  d="M-7 0H43V13H39L36 6H9V28H31V22H35V40H31V34H9V59H36L40 51H44V65H-7V61H0V4H-7Z"
+                />
+                <text x="22" y="103" text-anchor="middle">Serife</text>
+              </g>
             </svg>
-            <figcaption>Schematisch: Die gestrichelte Linie ist die Textrahmenkante. Der gerade Stamm beginnt dort; Rundungen und Serifen dürfen optisch darüber hinausragen. Ein solcher Überhang allein ist keine Warnung.</figcaption>
+            <figcaption>
+              Schematisch: Die gestrichelte Linie ist die Textrahmenkante. Der
+              gerade Stamm beginnt dort; Rundungen und Serifen dürfen optisch
+              darüber hinausragen. Ein solcher Überhang allein ist keine
+              Warnung.
+            </figcaption>
           </figure>
-<h3>Bildwinkel positionieren und drehen</h3>
-          <p>Unter <strong>Inhalt → Bilddrehung</strong> drehst du das Bild innerhalb seines Rahmens oder Winkels. Die Rahmenrichtung bleibt dabei erhalten. <strong>Rahmen füllen</strong> zentriert und skaliert das Bild passend, ohne diese Bilddrehung zurückzusetzen.</p>
-          <p>Unter <strong>Füllung</strong> kannst du zwischen einem Bild und einer Farbfläche wechseln und Farbe sowie Deckkraft einstellen. Der bisherige Bildausschnitt bleibt beim Wechsel zur Farbe erhalten. Neue Winkel starten mit 200 px Schenkelbreite, 50 px Schein und 0,8 Intensität; bestehende Winkel und Vorlagen behalten ihre gespeicherten Werte.</p>
+          <h3>Bildwinkel positionieren und drehen</h3>
+          <p>
+            Unter <strong>Inhalt → Bilddrehung</strong> drehst du das Bild
+            innerhalb seines Rahmens oder Winkels. Die Rahmenrichtung bleibt
+            dabei erhalten. <strong>Rahmen füllen</strong> zentriert und
+            skaliert das Bild passend, ohne diese Bilddrehung zurückzusetzen.
+          </p>
+          <p>
+            Unter <strong>Füllung</strong> kannst du zwischen einem Bild und
+            einer Farbfläche wechseln und Farbe sowie Deckkraft einstellen. Der
+            bisherige Bildausschnitt bleibt beim Wechsel zur Farbe erhalten.
+            Neue Winkel starten mit 200 px Schenkelbreite, 50 px Schein und 0,8
+            Intensität; bestehende Winkel und Vorlagen behalten ihre
+            gespeicherten Werte.
+          </p>
           <ol>
             <li>
-              Wähle <strong>Bildwinkel</strong> und ziehe seinen Rahmen auf. Ein breiter Rahmen erhält die Spitze unten, ein hoher oder quadratischer Rahmen die Spitze links. Schon beim Ziehen erscheint ein Hinweis zur erkannten Richtung. Füge über <strong>Bild platzieren / ersetzen</strong> das Foto ein.
+              Wähle <strong>Bildwinkel</strong> und ziehe seinen Rahmen auf. Ein
+              breiter Rahmen erhält die Spitze unten, ein hoher oder
+              quadratischer Rahmen die Spitze links. Schon beim Ziehen erscheint
+              ein Hinweis zur erkannten Richtung. Füge über
+              <strong>Bild platzieren / ersetzen</strong> das Foto ein.
             </li>
             <li>
               Wähle rechts die Richtung. Ziehe den Winkel frei an die gewünschte
@@ -912,11 +1949,38 @@
             innerhalb der Fläche. Ziehe sie, um den sichtbaren Ausschnitt zu
             verschieben; die Griffe enden vor den abgerundeten Ecken. Per Tab
             kannst du einen Griff anwählen und mit den Pfeiltasten, Bild auf/ab
-            oder Pos1/Ende bedienen. Zum
-            Verschieben kannst du auch das Handwerkzeug verwenden; Zoom und
-            Einpassen findest du unten rechts.
+            oder Pos1/Ende bedienen. Zum Verschieben kannst du auch das
+            Handwerkzeug verwenden; Zoom und Einpassen findest du unten rechts.
           </p>
           <h3>Ebenen und Ordner verwenden</h3>
+          <figure class="wiki-figure" id="grafik-ebenen">
+            <ol class="wiki-layer-stack">
+              <li>
+                <strong>Oben · Text</strong
+                ><span>Bleibt vor Verlauf und Foto sichtbar.</span>
+              </li>
+              <li>
+                <strong>Mitte · Verlauf</strong
+                ><span>Liegt hinter dem Text und beruhigt das Foto.</span>
+              </li>
+              <li>
+                <strong>Unten · Foto</strong><span>Füllt den Hintergrund.</span>
+              </li>
+            </ol>
+            <figcaption>
+              Stelle dir Ebenen wie transparente Folien übereinander vor. Was
+              oben liegt, kann untere Inhalte verdecken. Ein Ordner fasst
+              mehrere Ebenen zusammen.
+            </figcaption>
+          </figure>
+          <p>
+            <strong>Im Studio:</strong> Wähle eine Ebene, um das passende Objekt
+            auf der Fläche zu finden. Das Auge blendet sie aus; das Schloss
+            schützt vor unbeabsichtigten Änderungen. Ausblenden ist kein
+            Löschen. Über die Reihenfolge bestimmst du, was vor oder hinter
+            etwas liegt.
+          </p>
+
           <p>
             Das Menü mit den drei Punkten an einer Ebene enthält zum Beispiel
             <strong>Umbenennen</strong>, <strong>Duplizieren</strong> und
@@ -977,8 +2041,56 @@
             Beschnittsrahmens bleibt scharf.
           </p>
           <h3>Mit Pfaden und Formen zeichnen</h3>
+          <figure class="wiki-figure" id="grafik-kurvengriffe">
+            <svg
+              viewBox="0 0 420 220"
+              role="img"
+              aria-labelledby="curveTitle curveDesc"
+            >
+              <title id="curveTitle">Ein Kurvenpunkt mit zwei Griffen</title>
+              <desc id="curveDesc">
+                Eine Kurve verläuft durch einen quadratischen Punkt. Eine gerade
+                Hilfslinie verbindet den Punkt mit zwei runden Griffen. Der
+                Punkt bestimmt den Ort, die Griffe bestimmen Richtung und Stärke
+                der Rundung.
+              </desc>
+              <path
+                class="diagram-line"
+                d="M30 180C80 180 110 130 210 110S330 40 390 40"
+              />
+              <path class="diagram-guide" d="M110 130 310 90" />
+              <circle class="diagram-paper" cx="110" cy="130" r="8" />
+              <circle class="diagram-paper" cx="310" cy="90" r="8" />
+              <rect
+                class="diagram-accent"
+                x="203"
+                y="103"
+                width="14"
+                height="14"
+              />
+              <text x="85" y="200" text-anchor="middle">Griff</text>
+              <text x="210" y="80" text-anchor="middle">Punkt</text>
+              <text x="335" y="28" text-anchor="middle">Griff</text>
+            </svg>
+            <figcaption>
+              Der quadratische Punkt liegt auf der Linie. Die runden Griffe sind
+              Hilfen: Ihre Richtung und Länge verändern den Bogen. Hilfslinien
+              und Griffe erscheinen nicht im Export.
+            </figcaption>
+          </figure>
           <p>
-            Wähle das Pfad-, Kurven- oder Formwerkzeug direkt in der Werkzeugleiste. Mit der Maus über einem Symbol siehst du seinen Namen. Ein zusätzlicher Modusschalter ist nicht nötig.
+            <strong>Zum Üben:</strong> Wähle <strong>Pfad zeichnen</strong>.
+            Klicke einmal für den ersten Punkt. Klicke an einer zweiten Stelle
+            und ziehe bei gedrückter Maustaste: Eine Kurve entsteht. Beende die
+            offene Linie mit Enter. Wähle <strong>Kurven bearbeiten</strong> und
+            verändere einen Griff. Mit <strong>Rückgängig</strong> kannst du den
+            Versuch zurücknehmen.
+          </p>
+
+          <p>
+            Wähle das Pfad-, Kurven- oder Formwerkzeug direkt in der
+            Werkzeugleiste. Mit der Maus über einem Symbol siehst du seinen
+            Namen. Ein zusätzlicher Modusschalter ist nicht nötig.
           </p>
           <ul>
             <li>
@@ -1033,6 +2145,250 @@
             dem Raster zeigt bei ausgewählten Pfaden zusätzliche Linien, mit
             denen du unruhige Kurven leichter erkennst. Das ist nur eine
             Ansichtshilfe und erscheint nicht im Export.
+          </p>
+        </section>
+        <section id="texte">
+          <h2>Texte schreiben und gestalten</h2>
+          <p>
+            Diese Werkzeuge funktionieren in
+            <strong>FD-Kampagnen und Designer</strong> gleich. Du schreibst auf
+            der Fläche und formatierst rechts. Die drei Kartenfelder in
+            FD-Kampagnen sind ein schneller Einstieg; danach kannst du denselben
+            Text frei weiterbearbeiten.
+          </p>
+          <h3 id="text-direkt-bearbeiten">
+            Text eingeben und direkt gestalten
+          </h3>
+          <ol>
+            <li>
+              Klicke auf ein vorhandenes Textfeld. Für neuen Text wählst du das
+              Werkzeug <strong>Text</strong> und ziehst einen Rahmen auf. Im
+              Backup-Editor wählst du stattdessen zuerst die feste Textart unter
+              <strong>Text auswählen</strong>.
+            </li>
+            <li>
+              Doppelklicke auf den Text im Artwork oder wähle
+              <strong>Auf der Fläche</strong>. Schreibe direkt an der Stelle, an
+              der der Text im fertigen Bild steht. In FD-Kampagnen folgen die
+              verknüpften Texte dem ersten Bild; die Anzeige oben erklärt den
+              Änderungsumfang.
+            </li>
+            <li>
+              Markiere die Wörter, die du ändern möchtest, oder setze den
+              Schreibcursor an die gewünschte Stelle. Mit
+              <strong>Fertig</strong> oder Escape beendest du die Texteingabe.
+              Deine Eingabe bleibt erhalten; Escape ist hier kein Rückgängig.
+            </li>
+            <li>
+              Ist der Text ausgeblendet, aktiviere
+              <strong>Auf dem Bild anzeigen</strong>, bevor du ihn auf der
+              Fläche bearbeitest. Eine gesperrte Designer-Ebene muss zuerst
+              entsperrt werden.
+            </li>
+          </ol>
+          <p>
+            Bei einem eigenen Text in
+            <strong>FD-Kampagnen (Backup)</strong> erscheint sofort
+            <strong>Text vom ersten Bild übernehmen</strong>. Damit stellst du
+            die Textverknüpfung wieder her. Änderungen an der Schriftgrösse auf
+            dem ersten Bild folgen weiterhin nur auf dasselbe Format.
+          </p>
+          <h3>Absatz oder neue Zeile: Was ist der Unterschied?</h3>
+          <p>
+            Ein <strong>Textfeld</strong> ist der ganze Rahmen. Darin können
+            mehrere <strong>Absätze</strong> stehen: zum Beispiel Übertitel,
+            Titel und Untertitel. Ein Absatz kann über mehrere
+            <strong>Zeilen</strong> laufen. Er bleibt ein Absatz, solange du
+            nicht Enter drückst.
+          </p>
+          <figure class="wiki-figure" id="grafik-absatz">
+            <div class="wiki-diagram-grid">
+              <div class="wiki-example">
+                <strong>Enter · neuer Absatz</strong>
+                <p class="wiki-sample">Sommerkonzert</p>
+                <p class="wiki-sample">Mit dem Orchester</p>
+                <span
+                  >Beide Absätze können eigene Grössen und Abstände haben.</span
+                >
+              </div>
+              <div class="wiki-example">
+                <strong>Shift + Enter · neue Zeile</strong>
+                <p class="wiki-sample">Sommerkonzert<br />mit dem Orchester</p>
+                <span>Beide Zeilen gehören zum selben Absatz.</span>
+              </div>
+            </div>
+            <figcaption>
+              Für einen langen Titel mit gleichem Stil verwende Shift + Enter.
+              Für Titel und Untertitel mit unterschiedlichen Stilen verwende
+              Enter.
+            </figcaption>
+          </figure>
+          <h3>Text auswählen</h3>
+          <p>
+            <strong>Enter</strong> beginnt einen neuen Absatz.
+            <strong>Shift + Enter</strong> setzt eine neue Zeile innerhalb
+            desselben Absatzes; dessen Formatierung und Absatzabstände bleiben
+            zusammengehörig. Die Seitenleiste dient der Formatierung; den Inhalt
+            bearbeitest du direkt auf der Fläche.
+          </p>
+          <p>
+            Markierst du Text auf der Fläche, werden die betroffenen Absätze und
+            Zeilen in der Seitenleiste automatisch angezeigt. Du kannst eine
+            Auswahl auch im freien Bereich rechts neben einem Zeilenende
+            beginnen und nach oben ziehen. Häufige Texteinstellungen stehen
+            zuerst, einklappbare Zusatzoptionen darunter.
+          </p>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Wähle zuerst den Umfang deiner
+            Änderung: einzelne Buchstaben, einen Absatz oder das ganze Feld.
+            Prüfe die Auswahl rechts, bevor du eine Schriftgrösse änderst. Sonst
+            wird schnell mehr verändert als beabsichtigt.
+          </p>
+          <h3 id="advanced-typografie">
+            Einzelne Wörter, Absätze oder Zeilen gestalten
+          </h3>
+          <p>
+            Wähle ein Textfeld. Die gleichen Textwerkzeuge stehen in allen
+            Arbeitsbereichen bereit. Den Inhalt bearbeitest du auf der Fläche;
+            rechts legst du die Formatierung fest.
+          </p>
+          <ol>
+            <li>
+              <strong>Ein Wort oder einzelne Zeichen:</strong> Markiere die
+              Zeichen direkt im Text. Unter
+              <strong>Schrift &amp; Farbe</strong> änderst du Schrift, Grösse,
+              Farbe, Grossbuchstaben, Unterstreichen oder Hochstellen wie bei
+              x². Die Markierung hat Vorrang vor der Absatzauswahl.
+            </li>
+            <li>
+              <strong>Einen oder mehrere Absätze:</strong> Ein Dreifachklick im
+              Text markiert einen Absatz. Änderst du die Grösse eines
+              vollständig markierten Absatzes, erhält er die passende
+              Absatzhöhe: Er wächst nach unten und nachfolgende Absätze rücken
+              mit. Wähle die Kästchen unter
+              <strong>Einzelne Absätze &amp; Zeilen → Absätze</strong>. Mit
+              Umschalt wählst du einen Bereich; <strong>Alle</strong> wählt
+              sämtliche Absätze. Falls noch Text markiert ist, wähle zuerst
+              <strong>Absatz-/Zeilenauswahl verwenden</strong>.
+            </li>
+            <li>
+              <strong>Absatzgrösse und Ausrichtung:</strong> Die
+              <strong>Schriftgrösse</strong> unter
+              <strong>Schrift &amp; Farbe</strong> gilt für deine Auswahl. Unter
+              <strong>Absatz &amp; Abstände</strong> stellst du Ausrichtung,
+              Zeilenabstand sowie Abstand davor und danach ein. Bei einer
+              Markierung mitten in einem Absatz sind die gemeinsamen
+              Absatzoptionen gesperrt; wähle dafür den Absatz über sein Kästchen
+              aus.
+            </li>
+            <li>
+              <strong>Einzelne Zeilen:</strong> Die Zeilenliste zeigt die Zeilen
+              der gewählten Absätze. Wähle ihre Kästchen, um zum Beispiel
+              Schriftgrössen oder den Zeilenabstand in Pixeln gemeinsam
+              anzupassen.
+              <strong>Automatischen Zeilenabstand verwenden</strong> setzt den
+              Abstand dieser Auswahl zurück.
+            </li>
+          </ol>
+          <p>
+            Die Auswahl wird beim Markieren auf der Fläche automatisch in der
+            Seitenleiste angezeigt. Die Anzeige darüber erklärt, ob ganze
+            Absätze, Zeilen oder bestimmte Zeichen geändert werden. Neue
+            Eingaben übernehmen die Formatierung ihrer Einfügestelle.
+          </p>
+          <p>
+            <strong>Laufweite</strong> ist der zusätzliche Abstand zwischen
+            Buchstaben. <strong>Zeilenabstand</strong> bestimmt den Abstand
+            aufeinanderfolgender Zeilen; 95 % entspricht 0,95-mal der
+            Schriftgrösse. Unter den immer sichtbaren Hauptoptionen findest du
+            die einklappbaren Zusatzoptionen, einschliesslich
+            <strong>Weitere Zeichenoptionen</strong> und dem Zurücksetzen der
+            Zeichenformatierung.
+          </p>
+          <p>
+            Bereits abweichende Schriftgrössen bleiben erhalten, wenn du andere
+            Absätze änderst. Die Deckkraft betrifft das ganze Textfeld. In
+            FD-Kampagnen folgen Änderungen auf dem ersten Bild den gleichen
+            Formaten; eine individuelle Position trennt den Textinhalt nicht von
+            der Vorlage. Im Backup-Modus gilt die dort beschriebene Übernahme
+            der festen Textarten.
+          </p>
+          <h3>Text kopieren und einfügen</h3>
+          <p>
+            Markiere Text direkt auf der Fläche.
+            <strong>⌘/Strg+C</strong> kopiert ihn mit unterstützter
+            Formatierung; <strong>⌘/Strg+V</strong> fügt ihn ein. Mit
+            <strong>⌘/Strg+Umschalt+V</strong> fügst du nur den Inhalt ein.
+            Dieser übernimmt die Formatierung an der Einfügestelle. Absätze und
+            weiche Zeilenumbrüche bleiben erhalten.
+          </p>
+          <p>
+            Neben <strong>Auf der Fläche / Fertig</strong> öffnet das
+            Drei-Punkte-Menü die Aktionen
+            <strong>Mit Formatierung kopieren</strong>,
+            <strong>Nur Text kopieren</strong> sowie beide Einfügevarianten.
+            Dein Browser kann dafür Zugriff auf die Zwischenablage verlangen.
+            Wird dieser nicht erlaubt, nutze die genannten Tastenkombinationen
+            direkt auf der Fläche. Nicht verfügbare Quellschriften werden durch
+            die Schrift des Zieltexts ersetzt. Es werden keine Schriften
+            automatisch installiert oder mitkopiert.
+          </p>
+          <h3>Rahmen ändern oder Text skalieren</h3>
+          <p>
+            In Designer und FD-Kampagnen findest du unter
+            <strong>Text im Rahmen → Grösse ändern</strong> zwei Varianten.
+            <strong>Rahmen ändern</strong> passt Breite und Höhe an; die
+            Schriftgrösse bleibt gleich und der Text kann neu umbrechen. Bei
+            <strong>Text skalieren</strong> vergrössern die Eckgriffe Rahmen,
+            Zeichen- und Absatzgrössen sowie feste Abstände proportional.
+            Seitengriffe ändern weiterhin den Rahmen.
+            <strong>Umschalt + Ziehen</strong> skaliert ebenfalls den Text.
+          </p>
+          <p>
+            Alternativ gibst du einen Prozentwert ein und wählst
+            <strong>Anwenden</strong>, zum Beispiel 150 % für die
+            eineinhalbfache Grösse. Rückgängig stellt den vorherigen Stand
+            wieder her. Farbe, Schriftfamilie, prozentualer Zeilenabstand und
+            Laufweite bleiben erhalten. Im Backup-Modus verwendest du weiterhin
+            die Schriftgrössen der festen Textarten.
+          </p>
+          <h3 id="blocksatz">Text links und rechts bündig setzen</h3>
+          <ol>
+            <li>
+              Wähle den Text und unter
+              <strong>Einzelne Absätze &amp; Zeilen</strong> die gewünschten
+              Absätze oder <strong>Alle</strong>. Nutze den Bereich
+              <strong>Absatz &amp; Abstände</strong>.
+            </li>
+            <li>
+              Wähle <strong>Blocksatz</strong>. Die Zeilen werden links und
+              rechts an den Rahmen angepasst; die letzte Zeile bleibt
+              linksbündig.
+            </li>
+            <li>
+              Lass <strong>Automatische Silbentrennung</strong> eingeschaltet,
+              wenn lange Wörter umgebrochen werden sollen. Sie verwendet Deutsch
+              (Schweiz), reformierte Rechtschreibung 2006. Ausschalten ist pro
+              Textfeld beziehungsweise ausgewähltem Absatz möglich.
+            </li>
+          </ol>
+          <p>
+            Die Trennstriche erscheinen nur an einem Zeilenumbruch. Dein
+            eingegebener Text bleibt erhalten. Erscheint eine Warnung zum
+            Blocksatz, versuche einen breiteren Rahmen, eine kleinere Schrift
+            oder einen kürzeren Text.
+          </p>
+          <p>
+            Unter <strong>Blocksatz · Satzwerte</strong> kannst du die festen
+            Grenzen nachsehen: Wortabstand 80–120 %, Zeichenabstand −2 bis +2 %,
+            Zeichenbreite 98–102 %. Die Normalwerte sind 100 %, 0 % und 100 %.
+          </p>
+          <p class="wiki-check">
+            <strong>Prüfe dein Ergebnis:</strong> Beende die Texteingabe. Lies
+            den Text in der Exportvorschau: Fehlt eine Zeile, läuft etwas aus
+            dem Rahmen, oder ist der Titel zu klein? Korrigiere zuerst Rahmen
+            oder Schriftgrösse.
+            <a href="#fragen">Hilfe bei unerwarteten Ergebnissen</a>.
           </p>
         </section>
         <section id="speichern">
@@ -1092,11 +2448,13 @@
               unten sichtbar, auch wenn du durch die Angaben scrollst.
             </li>
             <li>
-              In Chrome wählst du beim ersten Mal <strong>Speichern unter …</strong>
-              und bestimmst Ordner und Dateiname. Bei einer verknüpften Datei
-              wählst du <strong>MKW-Datei aktualisieren</strong>; daneben bleibt
-              <strong>Speichern unter …</strong> für eine andere Datei erreichbar.
-              In Firefox wählst du <strong>MKW-Datei herunterladen</strong>.
+              In Chrome wählst du beim ersten Mal
+              <strong>Speichern unter …</strong> und bestimmst Ordner und
+              Dateiname. Bei einer verknüpften Datei wählst du
+              <strong>MKW-Datei aktualisieren</strong>; daneben bleibt
+              <strong>Speichern unter …</strong> für eine andere Datei
+              erreichbar. In Firefox wählst du
+              <strong>MKW-Datei herunterladen</strong>.
             </li>
             <li>
               Warte auf die Bestätigung. Bewahre die Datei an einem Ort auf, den
@@ -1163,10 +2521,11 @@
             <strong>Projekt öffnen</strong> zeigt zwei Quellen: Unter
             <strong>Zuletzt in diesem Browser</strong> findest du deine
             automatischen Sicherungen mit Name, Modus und Zeitpunkt. Das gerade
-            bearbeitete Projekt ist mit <strong>Aktuell geöffnet</strong>
-            gekennzeichnet; seine Browsersicherung kannst du hier nicht löschen.
-            Unter <strong>Auf deinem Computer → MKW-Datei öffnen</strong> wählst
-            du eine Datei von deinem Gerät. Auf schmalen Fenstern steht diese
+            bearbeitete Projekt ist mit
+            <strong>Aktuell geöffnet</strong> gekennzeichnet; seine
+            Browsersicherung kannst du hier nicht löschen. Unter
+            <strong>Auf deinem Computer → MKW-Datei öffnen</strong> wählst du
+            eine Datei von deinem Gerät. Auf schmalen Fenstern steht diese
             Dateiauswahl über den Browserprojekten.
           </p>
           <p>
@@ -1174,13 +2533,14 @@
             <strong>Erneut laden</strong>. Das Öffnen einer MKW-Datei bleibt
             weiterhin möglich. Während ein Projekt geladen oder eine Datei
             gespeichert wird, zeigt das Studio den aktuellen Schritt an. Nach
-            dem Abbrechen der Speicherortauswahl kannst du im Dialog weitermachen.
+            dem Abbrechen der Speicherortauswahl kannst du im Dialog
+            weitermachen.
           </p>
           <ol>
             <li>
-              Wähle auf der Startseite <strong>Projekt öffnen</strong>.
-              Deine letzte Arbeit steht in der Browserliste ganz oben. Dort findest du auch
-              die anderen bis zu fünf Browsersicherungen.
+              Wähle auf der Startseite <strong>Projekt öffnen</strong>. Deine
+              letzte Arbeit steht in der Browserliste ganz oben. Dort findest du
+              auch die anderen bis zu fünf Browsersicherungen.
             </li>
             <li>
               Für eine Datei auf dem Computer:
@@ -1220,18 +2580,101 @@
           </p>
 
           <figure class="wiki-figure" id="grafik-exportvorschau">
-            <svg viewBox="0 0 760 360" role="img" aria-labelledby="exportBildTitel exportBildBeschreibung">
-              <title id="exportBildTitel">Aufbau der Exportvorschau</title><desc id="exportBildBeschreibung">Die grosse Bildansicht liegt links. Rechts stehen Format und Qualität, darunter Kommentare und Dateinamen. Oben gibt es Meldungen, unten eine feste Bildnavigation und den Download.</desc>
-              <rect class="diagram-paper" x="8" y="8" width="744" height="344" rx="20"/><path class="diagram-divider" d="M8 52H752M8 304H752M525 52V304"/>
-              <text class="diagram-title" x="28" y="36">Exportieren</text><text x="638" y="36">Meldungen</text>
-              <rect class="diagram-wash" x="28" y="66" width="475" height="204" rx="10"/><rect class="diagram-paper" x="180" y="76" width="170" height="183"/><circle class="diagram-accent" cx="302" cy="112" r="18"/><path class="diagram-wash" d="M180 218 238 150 285 197 310 170 350 215V259H180Z"/>
-              <text x="543" y="86">Format &amp; Qualität</text><path class="diagram-line" d="M547 115H712"/><circle class="diagram-accent" cx="661" cy="115" r="7"/><rect class="diagram-wash" x="542" y="152" width="190" height="46" rx="10"/><text x="558" y="181">Bildkommentar</text><text x="558" y="236">Dateinamen</text>
-              <text x="46" y="291">←</text><text x="266" y="291" text-anchor="middle">1 / 3</text><text x="480" y="291">→</text><text x="28" y="334">Auswahl · Fortschritt</text><rect class="diagram-accent" x="593" y="313" width="139" height="30" rx="15"/><text class="diagram-on-accent" x="662" y="334" text-anchor="middle">Herunterladen</text>
-              <g class="diagram-marker"><circle cx="155" cy="157" r="14"/><text x="155" y="162" text-anchor="middle">1</text><circle cx="730" cy="79" r="14"/><text x="730" y="84" text-anchor="middle">2</text><circle cx="730" cy="175" r="14"/><text x="730" y="180" text-anchor="middle">3</text></g>
+            <svg
+              viewBox="0 0 760 360"
+              role="img"
+              aria-labelledby="exportBildTitel exportBildBeschreibung"
+            >
+              <title id="exportBildTitel">Aufbau der Exportvorschau</title>
+              <desc id="exportBildBeschreibung">
+                Die grosse Bildansicht liegt links. Rechts stehen Format und
+                Qualität, darunter Kommentare und Dateinamen. Oben gibt es
+                Meldungen, unten eine feste Bildnavigation und den Download.
+              </desc>
+              <rect
+                class="diagram-paper"
+                x="8"
+                y="8"
+                width="744"
+                height="344"
+                rx="20"
+              />
+              <path
+                class="diagram-divider"
+                d="M8 52H752M8 304H752M525 52V304"
+              />
+              <text class="diagram-title" x="28" y="36">Exportieren</text>
+              <text x="638" y="36">Meldungen</text>
+              <rect
+                class="diagram-wash"
+                x="28"
+                y="66"
+                width="475"
+                height="204"
+                rx="10"
+              />
+              <rect
+                class="diagram-paper"
+                x="180"
+                y="76"
+                width="170"
+                height="183"
+              />
+              <circle class="diagram-accent" cx="302" cy="112" r="18" />
+              <path
+                class="diagram-wash"
+                d="M180 218 238 150 285 197 310 170 350 215V259H180Z"
+              />
+              <text x="543" y="86">Format &amp; Qualität</text>
+              <path class="diagram-line" d="M547 115H712" />
+              <circle class="diagram-accent" cx="661" cy="115" r="7" />
+              <rect
+                class="diagram-wash"
+                x="542"
+                y="152"
+                width="190"
+                height="46"
+                rx="10"
+              />
+              <text x="558" y="181">Bildkommentar</text>
+              <text x="558" y="236">Dateinamen</text>
+              <text x="46" y="291">←</text>
+              <text x="266" y="291" text-anchor="middle">1 / 3</text>
+              <text x="480" y="291">→</text>
+              <text x="28" y="334">Auswahl · Fortschritt</text>
+              <rect
+                class="diagram-accent"
+                x="593"
+                y="313"
+                width="139"
+                height="30"
+                rx="15"
+              />
+              <text
+                class="diagram-on-accent"
+                x="662"
+                y="334"
+                text-anchor="middle"
+              >
+                Herunterladen
+              </text>
+              <g class="diagram-marker">
+                <circle cx="155" cy="157" r="14" />
+                <text x="155" y="162" text-anchor="middle">1</text>
+                <circle cx="730" cy="79" r="14" />
+                <text x="730" y="84" text-anchor="middle">2</text>
+                <circle cx="730" cy="175" r="14" />
+                <text x="730" y="180" text-anchor="middle">3</text>
+              </g>
             </svg>
-            <figcaption><strong>1</strong> Bild beurteilen und bei Bedarf die Originalpixel prüfen. <strong>2</strong> Format und Qualität einstellen. <strong>3</strong> Kommentare bei Bedarf aufklappen. Die feste Navigation und der Download bleiben erreichbar.</figcaption>
+            <figcaption>
+              <strong>1</strong> Bild beurteilen und bei Bedarf die
+              Originalpixel prüfen. <strong>2</strong> Format und Qualität
+              einstellen. <strong>3</strong> Kommentare bei Bedarf aufklappen.
+              Die feste Navigation und der Download bleiben erreichbar.
+            </figcaption>
           </figure>
-<h3>So exportierst du</h3>
+          <h3>So exportierst du</h3>
           <ol>
             <li>
               Prüfe die Warnungen links neben <strong>Export</strong>. Ein Klick
@@ -1249,8 +2692,8 @@
               erhalten, auch wenn du den Export erneut öffnest.
             </li>
             <li>
-              Öffne <strong>Vorschau</strong>. Prüfe Ausschnitt,
-              Text, Logos und alle Slides.
+              Öffne <strong>Vorschau</strong>. Prüfe Ausschnitt, Text, Logos und
+              alle Slides.
             </li>
             <li>
               Lade die Dateien herunter.
@@ -1279,8 +2722,17 @@
           <ul>
             <li>
               <strong>JPG:</strong> Gut für Fotos mit deckendem Hintergrund.
-            </li><li><strong>JPG+:</strong> Echter JPEG-XL-Export mit der Endung <code>.jxl</code>. Der Hover-Hinweis nennt «JPEG-XL». Bei 100 % werden die gerenderten Bilddaten verlustfrei codiert, darunter platzsparend mit Qualitätsverlust. Die Vorschau zeigt die wieder decodierte Datei. Bis 16 Megapixel pro Bild; grössere Formate können weiterhin als JPG oder PNG exportiert werden. Nicht alle Programme oder sozialen Netzwerke öffnen JPEG-XL; für Instagram normales JPG verwenden.
-              Mehr Qualität bedeutet meist eine grössere Datei.
+            </li>
+            <li>
+              <strong>JPG+:</strong> Echter JPEG-XL-Export mit der Endung
+              <code>.jxl</code>. Der Hover-Hinweis nennt «JPEG-XL». Bei 100 %
+              werden die gerenderten Bilddaten verlustfrei codiert, darunter
+              platzsparend mit Qualitätsverlust. Die Vorschau zeigt die wieder
+              decodierte Datei. Bis 16 Megapixel pro Bild; grössere Formate
+              können weiterhin als JPG oder PNG exportiert werden. Nicht alle
+              Programme oder sozialen Netzwerke öffnen JPEG-XL; für Instagram
+              normales JPG verwenden. Mehr Qualität bedeutet meist eine grössere
+              Datei.
             </li>
             <li>
               <strong>PNG:</strong> Gut, wenn du Transparenz oder verlustfreie
@@ -1325,15 +2777,49 @@
             </li>
             <li>Prüfe die Vorschau und lade das PDF herunter.</li>
           </ol>
-          <h3>Reihen und Projektbeigabe</h3><p>Beim Designer enthält jeder Dateiname den Projektnamen, die Reihe, das Format und die Slide-Nummer, zum Beispiel <code>Projekt_R02_4x5_S01.jpg</code>. Diese Nummern ändern sich nicht, wenn nur einzelne Slides ausgewählt werden. Unter <strong>Dateinamen</strong> kannst du die Projektangaben anpassen. Ein zusätzlicher Artboardname wird nicht in den Dateinamen geschrieben. Die erste Bildnummer betrifft FD-Ausgaben, nicht die festen Reihennummern.</p><p><strong>MKW-Projekt im ZIP</strong> fügt wie bisher das vollständige bearbeitbare Projekt bei – auch mit nicht ausgewählten Bildern. Schalte die Option aus, wenn du nur fertige Bilder weitergeben möchtest: Das spart Zeit und Platz. Bei direktem Ordnerexport wird keine Projektdatei beigefügt. <strong>Abbrechen</strong> stoppt den Bildexport; bereits in einen Ordner geschriebene Dateien bleiben dort erhalten. In der Vorschau gehören Schliessen, Auswahl und Kommentare zum selben Dialog.</p>
-          <h3>Farbtreue</h3><p>Das Studio arbeitet für Bildschirm- und Social-Media-Ausgaben in <strong>sRGB</strong>. PDF und PSD enthalten das zugehörige Farbprofil. PNG ohne Farbreduktion und verlustfreie PDF erhalten die gerenderten RGB-Werte; JPG und WebP verwenden verlustbehaftete Komprimierung, PNG-8 reduziert die Farbpalette. Nutze PNG beziehungsweise die verlustfreie PDF, wenn exakte Farbwerte besonders wichtig sind. Farbraumgrenzen, Bildschirmeinstellungen und andere Programme können die Darstellung beeinflussen; dies ist kein CMYK-Druckproof.</p>
+          <h3>Reihen und Projektbeigabe</h3>
+          <p>
+            Beim Designer enthält jeder Dateiname den Projektnamen, die Reihe,
+            das Format und die Slide-Nummer, zum Beispiel
+            <code>Projekt_R02_4x5_S01.jpg</code>. Diese Nummern ändern sich
+            nicht, wenn nur einzelne Slides ausgewählt werden. Unter
+            <strong>Dateinamen</strong> kannst du die Projektangaben anpassen.
+            Ein zusätzlicher Artboardname wird nicht in den Dateinamen
+            geschrieben. Die erste Bildnummer betrifft FD-Ausgaben, nicht die
+            festen Reihennummern.
+          </p>
+          <p>
+            <strong>MKW-Projekt im ZIP</strong> fügt wie bisher das vollständige
+            bearbeitbare Projekt bei – auch mit nicht ausgewählten Bildern.
+            Schalte die Option aus, wenn du nur fertige Bilder weitergeben
+            möchtest: Das spart Zeit und Platz. Bei direktem Ordnerexport wird
+            keine Projektdatei beigefügt. <strong>Abbrechen</strong> stoppt den
+            Bildexport; bereits in einen Ordner geschriebene Dateien bleiben
+            dort erhalten. In der Vorschau gehören Schliessen, Auswahl und
+            Kommentare zum selben Dialog.
+          </p>
+          <h3>Farbtreue</h3>
+          <p>
+            Das Studio arbeitet für Bildschirm- und Social-Media-Ausgaben in
+            <strong>sRGB</strong>. PDF und PSD enthalten das zugehörige
+            Farbprofil. PNG ohne Farbreduktion und verlustfreie PDF erhalten die
+            gerenderten RGB-Werte; JPG und WebP verwenden verlustbehaftete
+            Komprimierung, PNG-8 reduziert die Farbpalette. Nutze PNG
+            beziehungsweise die verlustfreie PDF, wenn exakte Farbwerte
+            besonders wichtig sind. Farbraumgrenzen, Bildschirmeinstellungen und
+            andere Programme können die Darstellung beeinflussen; dies ist kein
+            CMYK-Druckproof.
+          </p>
           <h3>Das Exportfenster im Überblick</h3>
-          <p>Links wählst du Bilder oder Slides aus und prüfst ihre Vorschauen.
+          <p>
+            Links wählst du Bilder oder Slides aus und prüfst ihre Vorschauen.
             Rechts stehen <strong>Dateiformat &amp; Qualität</strong> und
-            <strong>Dateinamen</strong>. Über <strong>Voreinstellung</strong>
-            rufst du eine passende Kombination auf; alle Werte bleiben änderbar.
-            Unten bleiben die Auswahlgrösse, Rückmeldungen, Fortschritt und
-            Downloadaktion sichtbar, auch wenn du die Einstellungen scrollst.</p>
+            <strong>Dateinamen</strong>. Über
+            <strong>Voreinstellung</strong> rufst du eine passende Kombination
+            auf; alle Werte bleiben änderbar. Unten bleiben die Auswahlgrösse,
+            Rückmeldungen, Fortschritt und Downloadaktion sichtbar, auch wenn du
+            die Einstellungen scrollst.
+          </p>
           <h3>Eine Photoshop-Datei erstellen</h3>
           <p>
             PSD findest du im <strong>Speichern-Dialog</strong> unter
@@ -1351,29 +2837,41 @@
             Gruppentitel und eine bearbeitbare Balkenfarbe.
           </p>
           <ol>
-            <li><strong>Text ändern:</strong> Wähle die Textebene und das
+            <li>
+              <strong>Text ändern:</strong> Wähle die Textebene und das
               Textwerkzeug. Zusammenhängender Text lässt sich in einem Feld
-              bearbeiten. Photoshop benötigt dieselben Schriften wie das Studio.</li>
-            <li><strong>Bild austauschen:</strong> Öffne über die Smartobjekt-Miniatur
-              den Bildinhalt oder verwende in Photoshop „Inhalt ersetzen“.
-              Die Ebenenmaske bestimmt weiterhin den sichtbaren Rahmen.</li>
-            <li><strong>Spezialdarstellungen:</strong> Bei Blocksatz, komplexer
+              bearbeiten. Photoshop benötigt dieselben Schriften wie das Studio.
+            </li>
+            <li>
+              <strong>Bild austauschen:</strong> Öffne über die
+              Smartobjekt-Miniatur den Bildinhalt oder verwende in Photoshop
+              „Inhalt ersetzen“. Die Ebenenmaske bestimmt weiterhin den
+              sichtbaren Rahmen.
+            </li>
+            <li>
+              <strong>Spezialdarstellungen:</strong> Bei Blocksatz, komplexer
               Typografie, Verläufen oder Effekten kann eine Gruppe die sichtbare
               <strong>Darstellung · gerastert</strong> und eine ausgeblendete
-              Ebene <strong>Bearbeiten · …</strong> enthalten. Blende die Darstellung
-              aus und die Bearbeitungsebene ein, wenn du diese verändern möchtest.
-              So wird der Inhalt nicht doppelt angezeigt. Vorbereitete Smartfilter
-              und Verlaufsfüllungen können in Photoshop anders aussehen.</li>
-            <li><strong>Sponsorlogo:</strong> „Darstellung · Tonwerte“ erhält den
-              vorbereiteten Look. Die ausgeblendete Ebene „Original · Farbe“ enthält
-              die ursprüngliche Bildquelle. Verwende jeweils eine der beiden Ebenen.</li>
+              Ebene <strong>Bearbeiten · …</strong> enthalten. Blende die
+              Darstellung aus und die Bearbeitungsebene ein, wenn du diese
+              verändern möchtest. So wird der Inhalt nicht doppelt angezeigt.
+              Vorbereitete Smartfilter und Verlaufsfüllungen können in Photoshop
+              anders aussehen.
+            </li>
+            <li>
+              <strong>Sponsorlogo:</strong> „Darstellung · Tonwerte“ erhält den
+              vorbereiteten Look. Die ausgeblendete Ebene „Original · Farbe“
+              enthält die ursprüngliche Bildquelle. Verwende jeweils eine der
+              beiden Ebenen.
+            </li>
           </ol>
           <p>
-            Photoshop kann beim Öffnen eine Aktualisierung von Textebenen verlangen.
-            Seine Textberechnung und automatische Silbentrennung können vom Studio
-            abweichen; prüfe danach Textstart, Umbrüche und Abstände. Fehlende
-            Schriften werden durch eine PSD nicht automatisch installiert.
-            Behalte immer auch die MKW-Datei zum Weiterarbeiten im Studio.
+            Photoshop kann beim Öffnen eine Aktualisierung von Textebenen
+            verlangen. Seine Textberechnung und automatische Silbentrennung
+            können vom Studio abweichen; prüfe danach Textstart, Umbrüche und
+            Abstände. Fehlende Schriften werden durch eine PSD nicht automatisch
+            installiert. Behalte immer auch die MKW-Datei zum Weiterarbeiten im
+            Studio.
           </p>
         </section>
         <section id="einstellungen">
@@ -1385,38 +2883,44 @@
             Bildschirmen stehen die Kategorien als seitlich scrollbare Leiste
             über dem Inhalt; ihre Namen bleiben sichtbar. Das Fenster ist gleich
             gross wie das Wiki. Änderungen werden sofort übernommen. Mit
-            <strong>Fertig</strong> oder dem Kreuz schliesst du die Einstellungen.
+            <strong>Fertig</strong> oder dem Kreuz schliesst du die
+            Einstellungen.
           </p>
           <h3>Eine Einstellung schnell finden</h3>
           <p>
             Gib oben in <strong>Einstellung suchen …</strong> einen Begriff ein,
-            zum Beispiel „Schrift“, „Einrasten“, „Hintergrund“ oder „Verknüpfen“.
-            Die Suche zeigt dir passende Einstellungen mit ihrem Bereich. Klicke
-            auf einen Treffer, um direkt dorthin zu gelangen. Mit Enter öffnest
-            du den ersten Treffer. Escape oder das Kreuz im Suchfeld leert die
-            Suche; danach kannst du wieder die Kategorien verwenden.
+            zum Beispiel „Schrift“, „Einrasten“, „Hintergrund“ oder
+            „Verknüpfen“. Die Suche zeigt dir passende Einstellungen mit ihrem
+            Bereich. Klicke auf einen Treffer, um direkt dorthin zu gelangen.
+            Mit Enter öffnest du den ersten Treffer. Escape oder das Kreuz im
+            Suchfeld leert die Suche; danach kannst du wieder die Kategorien
+            verwenden.
           </p>
           <p>
             <strong>Darstellung</strong> enthält das Aussehen des Studios,
-            <strong>Bedienung</strong> die zusätzlichen Werkzeuge und die
-            Grösse der Bedienelemente. Unter <strong>Raster &amp; Hilfslinien</strong>
-            richtest du die Ansichtshilfen ein. Schriften, Sponsoren und Vorlagen
-            haben je einen eigenen Bereich. Unter <strong>Speichern &amp; Export</strong>
+            <strong>Bedienung</strong> die zusätzlichen Werkzeuge und die Grösse
+            der Bedienelemente. Unter
+            <strong>Raster &amp; Hilfslinien</strong> richtest du die
+            Ansichtshilfen ein. Schriften, Sponsoren und Vorlagen haben je einen
+            eigenen Bereich. Unter <strong>Speichern &amp; Export</strong>
             findest du die automatische Dateiaktualisierung, Exportvorgaben und
             das MKW-Setup zum Weitergeben deiner Einstellungen.
           </p>
           <p>
             Neue Schriftgrössen und andere Startwerte ändern bereits gestaltete
-            Elemente nicht. Falls dein Browser Einstellungen nicht speichern kann,
-            erscheint unten eine Fehlermeldung. Exportiere dann ein MKW-Setup,
-            damit du deine Einstellungen später wieder übernehmen kannst.
+            Elemente nicht. Falls dein Browser Einstellungen nicht speichern
+            kann, erscheint unten eine Fehlermeldung. Exportiere dann ein
+            MKW-Setup, damit du deine Einstellungen später wieder übernehmen
+            kannst.
           </p>
           <h3>Startseite und eigenes Hintergrundbild</h3>
-          <p>Die gleichwertigen Startkarten <strong>FD-Kampagnen</strong> und
+          <p>
+            Die gleichwertigen Startkarten <strong>FD-Kampagnen</strong> und
             <strong>Designer</strong> führen direkt zur passenden Einrichtung.
-            <strong>Mit Vorlage starten</strong> öffnet die Designvorlagen.
-            Über <strong>Projekt öffnen</strong> erreichst du MKW-Dateien und
-            deine letzten fünf Browserprojekte. Die neueste Sicherung steht ganz oben.</p>
+            <strong>Mit Vorlage starten</strong> öffnet die Designvorlagen. Über
+            <strong>Projekt öffnen</strong> erreichst du MKW-Dateien und deine
+            letzten fünf Browserprojekte. Die neueste Sicherung steht ganz oben.
+          </p>
           <p>
             Auch auf der Startseite öffnest du das
             <strong>Zahnrad oben rechts</strong>, bevor du ein Projekt
@@ -1427,9 +2931,10 @@
             automatisch für die Bildschirmansicht. Mit
             <strong>Ersetzen</strong> wählst du ein anderes Bild;
             <strong>Entfernen</strong> stellt den farbigen Standardhintergrund
-            wieder her. Texte und Schaltflächen liegen auf einer deckenden Fläche,
-            damit sie auch bei unruhigen Fotos lesbar bleiben. Das Startbild wird nur für dein Studio verwendet und
-            erscheint nie in deinen Projekten oder Exporten.
+            wieder her. Texte und Schaltflächen liegen auf einer deckenden
+            Fläche, damit sie auch bei unruhigen Fotos lesbar bleiben. Das
+            Startbild wird nur für dein Studio verwendet und erscheint nie in
+            deinen Projekten oder Exporten.
           </p>
           <p>
             Die Montagefläche verwendet in beiden Editoren denselben hellen oder
@@ -1461,12 +2966,12 @@
               Hauptfarbe. <strong>Komplementär</strong> ergänzt eine Gegenfarbe.
               <strong>Harmonisch</strong> verwendet benachbarte Farbtöne.
               <strong>Lebendig</strong> bildet einen Dreiklang; der Hilfebereich
-              im Header erhält dabei den dritten Akzent. Alle Varianten werden
-              automatisch aus deiner Hauptfarbe abgeleitet. Warn- und
-              Fehlerfarben bleiben erhalten. Bei einer grauen Hauptfarbe dienen
-              MKW-Töne als Grundlage für die zusätzlichen Farbakzente. Das
-              Farbkonzept wird in diesem Browser und beim Export einer
-              MKW-Setup-Datei gespeichert. Unter
+              oben in der Kopfzeile erhält dabei den dritten Akzent. Alle
+              Varianten werden automatisch aus deiner Hauptfarbe abgeleitet.
+              Warn- und Fehlerfarben bleiben erhalten. Bei einer grauen
+              Hauptfarbe dienen MKW-Töne als Grundlage für die zusätzlichen
+              Farbakzente. Das Farbkonzept wird in diesem Browser und beim
+              Export einer MKW-Setup-Datei gespeichert. Unter
               <strong>Bedienung → Grösse der Bedienelemente</strong> wählst du
               <strong>Komfortabel</strong> für grössere Eingabefelder oder
               <strong>Kompakt</strong>, um mehr Eigenschaften gleichzeitig zu
@@ -1476,7 +2981,8 @@
               diese neuen Animationen.
             </li>
             <li>
-              <strong>Bedienung:</strong> Stelle die Grösse der Bedienelemente passend für Maus oder Touch ein. Alle Werkzeuge bleiben verfügbar.
+              <strong>Bedienung:</strong> Stelle die Grösse der Bedienelemente
+              passend für Maus oder Touch ein. Alle Werkzeuge bleiben verfügbar.
             </li>
             <li>
               <strong>Hilfslinien &amp; Einrasten:</strong> Farben für Raster,
@@ -1485,20 +2991,20 @@
               ein kleinerer erlaubt genaueres freies Platzieren.
             </li>
             <li>
-              <strong>Designer-Raster:</strong> Unter Raster &amp; Hilfslinien kannst du 1–24
-              Spalten und Reihen sowie den Abstand dazwischen (Stege in Pixeln)
-              einstellen. Standard sind sechs Spalten, sechs Reihen und keine
-              Stege. Das Raster liegt innerhalb der Schutzzone jeder Slide.
-              Rahmen und Pfadpunkte können an beiden Stegkanten einrasten. Bei
-              sehr engen Schutzzonen werden zu breite Stege automatisch
-              verkleinert. Die Rastereinstellungen bleiben in deinem Studio und
-              werden auch in einer MKW-Setup-Datei gesichert; sie verändern
-              keine Elemente und erscheinen nicht im Export.
+              <strong>Designer-Raster:</strong> Unter Raster &amp; Hilfslinien
+              kannst du 1–24 Spalten und Reihen sowie den Abstand dazwischen
+              (Stege in Pixeln) einstellen. Standard sind sechs Spalten, sechs
+              Reihen und keine Stege. Das Raster liegt innerhalb der Schutzzone
+              jeder Slide. Rahmen und Pfadpunkte können an beiden Stegkanten
+              einrasten. Bei sehr engen Schutzzonen werden zu breite Stege
+              automatisch verkleinert. Die Rastereinstellungen bleiben in deinem
+              Studio und werden auch in einer MKW-Setup-Datei gesichert; sie
+              verändern keine Elemente und erscheinen nicht im Export.
             </li>
             <li>
-              <strong>Speichern &amp; Export:</strong> Wähle das Format, das beim Öffnen des
-              Exports vorausgewählt sein soll. Im Export kannst du es jederzeit
-              ändern.
+              <strong>Speichern &amp; Export:</strong> Wähle das Format, das
+              beim Öffnen des Exports vorausgewählt sein soll. Im Export kannst
+              du es jederzeit ändern.
             </li>
             <li>
               <strong>Schriften:</strong> Lege Standardgrössen für Übertitel,
@@ -1515,17 +3021,45 @@
               Projekt.
             </li>
           </ul>
-          <h3>Die drei Textfelder auf der ersten Bildkarte</h3>
-          <p>Übertitel, Titel und Untertitel schreiben im ersten Format in ein gemeinsames Textfeld. Neue Absätze starten mit 70 px Regular, 120 px Bold und 55 px Regular. Klicke nach der Eingabe aus dem Feld, um sie zu übernehmen. Zeilenumbrüche innerhalb eines Kartenfelds bleiben weiche Umbrüche. Auf der Fläche bearbeitete Absatzgrössen und Formatierungen bleiben erhalten. Gleiche Formate anderer Bilder folgen dem ersten Bild; individuelle Eigenschaften bleiben unabhängig.</p>
           <h3>Instagram-Vorschau</h3>
-          <p>Mit <strong>Shift+I</strong> oder dem Vorschau-Symbol bei den Ansichtsoptionen im Footer schaltest du eine Referenz für das ausgewählte 9:16-Reel oder den quadratischen 1:1-Feedpost ein. Beim Reel zeigt die gestrichelte Fläche die <a href="https://www.facebook.com/business/ads-guide/update/video/instagram-reels/outcome-sales">von Meta empfohlenen Werbe-Schutzzonen</a>: oben 14 %, unten 35 %, seitlich je 6 %. Im Feed liegen Profil, Werbeaktion und Interaktionen ausserhalb des quadratischen Bilds. Die Darstellung skaliert von 1080 × 1920 bzw. 1080 × 1080 px. Geräte, App-Version, Beschreibung und Werbeformat verändern die echte Instagram-Oberfläche; dies ist keine geräteunabhängig pixelgenaue Zusage. Die Referenz verändert keine Schutzzonen, wird nicht gespeichert und erscheint nie im Export.</p>
-          <h3>Das Speichernfenster</h3><p>Der Dateiname und der tatsächlich verwendete Speicherweg stehen oben. «Browser: gesichert» bestätigt nur die Browsersicherung, nicht das Schreiben einer lokalen Datei. Unter «Projektangaben» kannst du Kürzel, Projektname und freiwilliges Datum ändern. Bei einer verknüpften MKW-Datei aktualisiert die Hauptaktion diese Datei. Ein geänderter Name im Feld «Name für neue Kopie / PSD» betrifft «Speichern unter» und PSD, nicht den Namen der bereits verknüpften Datei. Firefox bietet einen Download an; dessen Speicherort wird vom Browser bestimmt. Photoshop und der Bildexport stehen getrennt rechts. Fehlermeldungen und ein abgebrochener Speicherdialog lassen das Projekt offen.</p>
+          <p>
+            Mit <strong>Shift+I</strong> oder dem Vorschau-Symbol bei den
+            Ansichtsoptionen unten in der Ansichtsleiste schaltest du eine
+            Referenz für das ausgewählte 9:16-Reel oder den quadratischen
+            1:1-Feedpost ein. Beim Reel zeigt die gestrichelte Fläche die
+            <a
+              href="https://www.facebook.com/business/ads-guide/update/video/instagram-reels/outcome-sales"
+              >von Meta empfohlenen Werbe-Schutzzonen</a
+            >: oben 14 %, unten 35 %, seitlich je 6 %. Im Feed liegen Profil,
+            Werbeaktion und Interaktionen ausserhalb des quadratischen Bilds.
+            Die Darstellung skaliert von 1080 × 1920 bzw. 1080 × 1080 px.
+            Geräte, App-Version, Beschreibung und Werbeformat verändern die
+            echte Instagram-Oberfläche; dies ist keine geräteunabhängig
+            pixelgenaue Zusage. Die Referenz verändert keine Schutzzonen, wird
+            nicht gespeichert und erscheint nie im Export.
+          </p>
+          <h3>Das Speichernfenster</h3>
+          <p>
+            Der Dateiname und der tatsächlich verwendete Speicherweg stehen
+            oben. «Browser: gesichert» bestätigt nur die Browsersicherung, nicht
+            das Schreiben einer lokalen Datei. Unter «Projektangaben» kannst du
+            Kürzel, Projektname und freiwilliges Datum ändern. Bei einer
+            verknüpften MKW-Datei aktualisiert die Hauptaktion diese Datei. Ein
+            geänderter Name im Feld «Name für neue Kopie / PSD» betrifft
+            «Speichern unter» und PSD, nicht den Namen der bereits verknüpften
+            Datei. Firefox bietet einen Download an; dessen Speicherort wird vom
+            Browser bestimmt. Photoshop und der Bildexport stehen getrennt
+            rechts. Fehlermeldungen und ein abgebrochener Speicherdialog lassen
+            das Projekt offen.
+          </p>
           <h3>Replica LL: Regular, Bold und Light</h3>
-          <p>Regular ist die Grundschrift für neue Texte und die Oberfläche.
-            Bold dient für Titel und Hervorhebungen. Light steht zur manuellen
+          <p>
+            Regular ist die Grundschrift für neue Texte und die Oberfläche. Bold
+            dient für Titel und Hervorhebungen. Light steht zur manuellen
             Auswahl bereit und wird nicht automatisch verwendet. Bereits
-            gespeicherte Gestaltungen behalten ihre bisherige Schrift.
-            Die frühere Auswahl «Replica LL» entspricht weiterhin Bold.</p>
+            gespeicherte Gestaltungen behalten ihre bisherige Schrift. Die
+            frühere Auswahl «Replica LL» entspricht weiterhin Bold.
+          </p>
           <h3>Eine eigene Schrift hinzufügen oder entfernen</h3>
           <ol>
             <li>
@@ -1711,10 +3245,14 @@
           </p>
           <h3>Ein Text ändert sich auf mehreren Bildern. Warum?</h3>
           <p>
-            Das erste Bild ist die Textvorlage. Ändere für eine Ausnahme den
-            Text direkt am betreffenden späteren Bild. Schriftgrössen werden vom
-            ersten Bild nur auf andere Bilder mit demselben Format und Text
-            übertragen.
+            In FD-Kampagnen führt das erste Bild die Gestaltung für alle Bilder
+            mit demselben Format. Ändere für eine Ausnahme nur die gewünschte
+            Eigenschaft am späteren Bild: Eine eigene Position behält weiterhin
+            den gemeinsamen Text, ein eigener Text kann weiterhin der
+            gemeinsamen Position folgen. Andere Formate werden unabhängig
+            gestaltet. Im Designer sind Texte grundsätzlich eigenständige
+            Objekte.
+            <a href="#grafik-verknuepfung">Beispiel zur Verknüpfung</a>.
           </p>
           <h3>
             Ich klicke auf ein leeres Textfeld und lande beim Bildausschnitt.

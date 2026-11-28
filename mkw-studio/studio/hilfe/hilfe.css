@@ -579,3 +579,138 @@ html[data-theme="dark"] header img {
     border-color: #888;
   }
 }
+
+/* Native learning blocks stay readable when the handbook is narrow or enlarged. */
+.wiki-diagram-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.wiki-example {
+  min-width: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface);
+}
+.wiki-example > strong,
+.wiki-example > span {
+  display: block;
+}
+.wiki-example > span {
+  margin-top: 8px;
+}
+.wiki-example svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+}
+.wiki-role-label {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+}
+.wiki-type-example p {
+  margin: 4px 0 20px;
+  overflow-wrap: anywhere;
+}
+.wiki-type-example p:last-child {
+  margin-bottom: 0;
+}
+.wiki-demo-overline,
+.wiki-demo-subtitle {
+  font-size: 20px;
+  line-height: 1.4;
+}
+.wiki-demo-title {
+  font:
+    36px/1.2 Replica,
+    Arial,
+    sans-serif;
+}
+.wiki-sample {
+  padding: 12px;
+  border-inline-start: 3px solid var(--md-sys-color-primary);
+}
+.wiki-tip,
+.wiki-check {
+  padding: 16px;
+  border-inline-start: 4px solid var(--md-sys-color-primary);
+  border-radius: 0 12px 12px 0;
+  background: var(--md-sys-color-surface-container-low);
+}
+.wiki-glossary {
+  display: grid;
+  gap: 8px;
+}
+.wiki-glossary dt {
+  font-family: Replica, Arial, sans-serif;
+  margin-top: 12px;
+}
+.wiki-glossary dd {
+  margin: 0;
+}
+.wiki-layer-stack {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wiki-layer-stack li {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 16px;
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-inline-start: 4px solid var(--md-sys-color-primary);
+  border-radius: 12px;
+}
+.wiki-reference {
+  padding: 0 16px;
+  margin-top: 24px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 16px;
+}
+.wiki-reference > summary {
+  cursor: pointer;
+  padding: 16px 0;
+  min-height: 48px;
+  font-family: Replica, Arial, sans-serif;
+}
+.wiki-reference > summary:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.diagram-on-accent-stroke {
+  fill: none;
+  stroke: var(--md-sys-color-on-primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+@media (max-width: 640px) {
+  .wiki-diagram-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wiki-demo-title {
+    font-size: 28px;
+  }
+  .wiki-example {
+    padding: 12px;
+  }
+}
+@media print {
+  .wiki-reference > :not(summary) {
+    display: block !important;
+  }
+}
+@font-face {
+  font-family: ReplicaRegular;
+  src: url("../static/fonts/ReplicaLL-Regular.otf") format("opentype");
+  font-display: swap;
+}
+.wiki-demo-overline,
+.wiki-demo-subtitle {
+  font-family: ReplicaRegular, Arial, sans-serif;
+}
