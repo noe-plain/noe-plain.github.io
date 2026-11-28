@@ -18,7 +18,7 @@ const assert = require("node:assert/strict"),
     await page.locator("#help").click();
     const help = page.frameLocator("#studioHelpFrame");
     await help.locator("#helpSearch").waitFor();
-    assert.equal(await help.locator("figure.wiki-figure").count(), 11);
+    assert.equal(await help.locator("figure.wiki-figure").count(), 13);
     for (const theme of ["light", "dark"]) {
       await page.evaluate((t) => studioSetTheme(t), theme);
       for (const id of [
@@ -33,6 +33,8 @@ const assert = require("node:assert/strict"),
         "grafik-bildausschnitt",
         "grafik-ebenen",
         "grafik-kurvengriffe",
+        "grafik-grifftypen",
+        "grafik-pfad-schliessen",
       ]) {
         const fig = help.locator("#" + id);
         await fig.scrollIntoViewIfNeeded();
@@ -71,7 +73,7 @@ const assert = require("node:assert/strict"),
     assert.deepEqual(violations, []);
     await page.keyboard.press("Escape");
     console.log(
-      "PASS eleven inline HTML/SVG handbook figures, meaningful names/captions, light/dark screenshots, narrow layout, axe and lazy help loading without external image assets",
+      "PASS thirteen inline HTML/SVG handbook figures, meaningful names/captions, light/dark screenshots, narrow layout, axe and lazy help loading without external image assets",
     );
   } finally {
     await browser.close();

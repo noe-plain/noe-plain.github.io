@@ -1,32 +1,6 @@
 "use strict";
 function carouselCurvatureSamples(a, b, count = 20) {
-  const p = a.out || a,
-    q = b.in || b,
-    curved = !!(a.out || b.in),
-    result = [];
-  if (!curved) return result;
-  for (let i = 0; i <= count; i++) {
-    const t = Math.max(1e-5, Math.min(1 - 1e-5, i / count)),
-      u = 1 - t,
-      point = carouselBezierPoint(a, b, t),
-      dx =
-        3 *
-        (u * u * (p.x - a.x) + 2 * u * t * (q.x - p.x) + t * t * (b.x - q.x)),
-      dy =
-        3 *
-        (u * u * (p.y - a.y) + 2 * u * t * (q.y - p.y) + t * t * (b.y - q.y)),
-      ddx = 6 * (u * (q.x - 2 * p.x + a.x) + t * (b.x - 2 * q.x + p.x)),
-      ddy = 6 * (u * (q.y - 2 * p.y + a.y) + t * (b.y - 2 * q.y + p.y)),
-      speed = Math.hypot(dx, dy);
-    if (speed < 1e-6) continue;
-    result.push({
-      ...point,
-      nx: -dy / speed,
-      ny: dx / speed,
-      k: (dx * ddy - dy * ddx) / speed ** 3,
-    });
-  }
-  return result;
+  return MKWPath.curvatureSamples(a, b, count);
 }
 function carouselCurvatureOverlay() {
   let button = $("#footerCurvature");

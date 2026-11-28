@@ -1098,3 +1098,23 @@ html.studio-theme-changing #exportDialog .export-card {
 #exportDialog .export-images.is-preview {
   gap: 12px;
 }
+
+/* In preview, spend vertical space on the artwork rather than empty tracks. */
+#exportDialog .export-images.is-preview {
+  padding-block: 16px;
+  gap: 8px;
+}
+#exportDialog .export-images.is-preview #reviewDialog[open] {
+  gap: 8px;
+}
+#exportDialog .export-images.is-preview .review-stage {
+  padding: 8px;
+}
+#exportDialog .export-images.is-preview .review-controls {
+  height: 56px;
+  min-height: 56px;
+  padding-block: 4px;
+}
+#exportDialog .export-images.is-preview #reviewPosition {
+  max-height: 40px;
+}

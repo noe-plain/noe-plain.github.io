@@ -51,28 +51,7 @@ function carouselStartPointEditing(o) {
   carouselRefresh();
 }
 function carouselBezierPoint(a, b, t) {
-  const curved = a.out || b.in,
-    p =
-      a.out ||
-      (curved ? a : { x: a.x + (b.x - a.x) / 3, y: a.y + (b.y - a.y) / 3 });
-  const q =
-      b.in ||
-      (curved
-        ? b
-        : { x: a.x + (2 * (b.x - a.x)) / 3, y: a.y + (2 * (b.y - a.y)) / 3 }),
-    u = 1 - t;
-  return {
-    x:
-      u * u * u * a.x +
-      3 * u * u * t * p.x +
-      3 * u * t * t * q.x +
-      t * t * t * b.x,
-    y:
-      u * u * u * a.y +
-      3 * u * u * t * p.y +
-      3 * u * t * t * q.y +
-      t * t * t * b.y,
-  };
+  return MKWPath.pointAt(a, b, t);
 }
 function carouselNearestSegment(o, pt) {
   let best = null;
@@ -200,28 +179,7 @@ function carouselLinkedHandle(
   base = node,
   createOpposite = true,
 ) {
-  let dx = position.x - node.x,
-    dy = position.y - node.y,
-    length = Math.hypot(dx, dy);
-  if (event.shiftKey) {
-    const angle =
-      (Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) * Math.PI) / 4;
-    dx = Math.cos(angle) * length;
-    dy = Math.sin(angle) * length;
-  }
-  node[key] = { x: node.x + dx, y: node.y + dy };
-  const other = key === "in" ? "out" : "in";
-  if (event.altKey || (!createOpposite && !base[other])) return;
-  const otherLength =
-    event.ctrlKey && base[other]
-      ? Math.hypot(base[other].x - base.x, base[other].y - base.y)
-      : length;
-  if (length > 0.00001)
-    node[other] = {
-      x: node.x - (dx / length) * otherLength,
-      y: node.y - (dy / length) * otherLength,
-    };
-  else if (!event.ctrlKey) node[other] = { x: node.x, y: node.y };
+  MKWPath.linkedHandle(node, key, position, event, base, createOpposite);
 }
 function carouselClosePathPointer(ev) {
   const draft = carouselPathDraft;

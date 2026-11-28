@@ -714,3 +714,225 @@ html[data-theme="dark"] header img {
 .wiki-demo-subtitle {
   font-family: ReplicaRegular, Arial, sans-serif;
 }
+/* Image examples deliberately retain their photographic colours in either UI theme. */
+.wiki-photo-sky {
+  fill: #a5b7c4;
+}
+.wiki-photo-scene {
+  fill: #617767;
+}
+.wiki-photo-light {
+  fill: #d7d1b0;
+}
+.wiki-photo-type {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.wiki-three-examples {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.bezier-launcher button,
+.bezier-game button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-surface);
+  font:
+    14px/20px Replica,
+    Arial,
+    sans-serif;
+  cursor: pointer;
+}
+.bezier-launcher button:hover,
+.bezier-game button:hover {
+  background: var(--md-sys-color-surface-container-high);
+}
+.bezier-game button[aria-pressed="true"] {
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+}
+.bezier-game .bezier-primary {
+  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-primary);
+  border-color: transparent;
+}
+.bezier-game button:disabled {
+  cursor: default;
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container);
+  opacity: 0.6;
+}
+.bezier-game {
+  margin-top: 16px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-low);
+}
+.bezier-game h3 {
+  margin-block: 20px 8px;
+}
+.bezier-heading,
+.bezier-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 12px;
+}
+.bezier-game label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+}
+.bezier-game label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.bezier-game select,
+.bezier-game input[type="number"] {
+  min-height: 44px;
+  padding: 10px 12px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 8px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font:
+    14px/20px ReplicaRegular,
+    Arial,
+    sans-serif;
+}
+.bezier-game input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--md-sys-color-primary);
+}
+.bezier-game :is(select, input):focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+.bezier-point-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 12px;
+}
+.bezier-controls > label {
+  flex: 1 1 150px;
+}
+.bezier-controls > label:has(input[type="checkbox"]) {
+  flex: 0 1 auto;
+}
+.bezier-stage {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5/3;
+  background: var(--md-sys-color-surface);
+  border-radius: 12px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  touch-action: none;
+  user-select: none;
+}
+.bezier-target {
+  fill: none;
+  stroke: var(--md-sys-color-on-surface-variant);
+  stroke-width: 3;
+  stroke-dasharray: 8 8;
+}
+.bezier-target-node {
+  fill: var(--md-sys-color-surface);
+  stroke: var(--md-sys-color-on-surface-variant);
+  stroke-width: 2;
+}
+.bezier-line {
+  fill: none;
+  stroke: var(--md-sys-color-primary);
+  stroke-width: 3;
+}
+.bezier-guide {
+  fill: none;
+  stroke: var(--md-sys-color-primary);
+  stroke-width: 1.5;
+}
+.bezier-node,
+.bezier-handle {
+  fill: var(--md-sys-color-surface);
+  stroke: var(--md-sys-color-primary);
+  stroke-width: 2;
+}
+.bezier-node.is-selected {
+  fill: var(--md-sys-color-primary);
+}
+.bezier-hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+.bezier-stage [data-hit]:focus {
+  outline: none;
+}
+.bezier-stage [data-hit]:focus :is(.bezier-node, .bezier-handle) {
+  stroke: var(--md-sys-color-on-surface);
+  stroke-width: 5;
+}
+.bezier-stage text {
+  font:
+    16px Replica,
+    sans-serif;
+  fill: var(--md-sys-color-on-surface);
+}
+.bezier-feedback {
+  padding: 12px;
+  border-inline-start: 3px solid var(--md-sys-color-primary);
+  background: var(--md-sys-color-surface);
+  border-radius: 0 8px 8px 0;
+}
+#bezierLoadProgress {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--md-sys-color-primary);
+}
+@media (max-width: 640px) {
+  .wiki-three-examples {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bezier-game {
+    padding: 12px;
+  }
+  .bezier-controls button {
+    flex: 1 1 130px;
+  }
+  .bezier-heading label {
+    width: 100%;
+  }
+}
+.bezier-game .bezier-primary:hover {
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 2px 6px #0002;
+}
+.bezier-comb {
+  fill: none;
+  stroke: var(--md-sys-color-on-surface-variant);
+  stroke-width: 1.25;
+}
+@media (prefers-reduced-motion: reduce) {
+  #bezierLoadProgress {
+    display: none;
+  }
+}
+/* Leave room for the task and actions inside the handbook dialog. */
+.bezier-stage {
+  max-width: 600px;
+  margin-inline: auto;
+}

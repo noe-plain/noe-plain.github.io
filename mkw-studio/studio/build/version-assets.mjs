@@ -117,6 +117,25 @@ const jxlWorkerHash = createHash("sha256")
   );
 if (jxlClient !== nextJxlClient) await writeFile(jxlClientFile, nextJxlClient);
 
+// The optional practice shares pure path rules, not the editor or project state.
+const bezierFiles = [
+    "static/path-model.js",
+    "hilfe/bezier-model.js",
+    "hilfe/bezier-game.js",
+  ],
+  bezierHash = createHash("sha256");
+for (const name of bezierFiles)
+  bezierHash.update(await readFile(new URL(name, root)));
+const bezierVersion = bezierHash.digest("hex").slice(0, 12),
+  handbookScriptFile = new URL("hilfe/hilfe.js", root),
+  handbookScript = await readFile(handbookScriptFile, "utf8"),
+  nextHandbookScript = handbookScript.replace(
+    /const bezierResources = \[[\s\S]*?\];/,
+    `const bezierResources = [\n  "../static/path-model.js?v=${bezierVersion}",\n  "bezier-model.js?v=${bezierVersion}",\n  "bezier-game.js?v=${bezierVersion}",\n];`,
+  );
+if (handbookScript !== nextHandbookScript)
+  await writeFile(handbookScriptFile, nextHandbookScript);
+
 // Version the lazily loaded handbook independently from the editor's startup assets.
 const helpIndex = new URL("hilfe/index.html", root),
   helpSource = await readFile(helpIndex, "utf8"),

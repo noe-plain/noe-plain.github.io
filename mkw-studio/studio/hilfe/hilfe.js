@@ -90,3 +90,69 @@ document.addEventListener("click", (event) => {
 });
 window.addEventListener("hashchange", () => markSection());
 markSection();
+
+const bezierResources = [
+  "../static/path-model.js?v=89e214c51293",
+  "bezier-model.js?v=89e214c51293",
+  "bezier-game.js?v=89e214c51293",
+];
+const startBezier = document.getElementById("startBezier"),
+  closeBezier = document.getElementById("closeBezier"),
+  bezierHost = document.getElementById("bezierHost"),
+  bezierStatus = document.getElementById("bezierLoadStatus");
+let bezierLoaded = false,
+  bezierSession = null;
+function loadBezierScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => {
+      script.remove();
+      reject(
+        Error(
+          "Die Übung konnte nicht geladen werden. Prüfe die Verbindung und versuche es erneut.",
+        ),
+      );
+    };
+    document.head.append(script);
+  });
+}
+if (startBezier) {
+  startBezier.hidden = false;
+  startBezier.addEventListener("click", async () => {
+    startBezier.disabled = true;
+    document.getElementById("bezierLoadProgress").hidden = false;
+    bezierStatus.textContent = "Übung wird geladen …";
+    bezierHost.setAttribute("aria-busy", "true");
+    try {
+      if (!bezierLoaded) {
+        for (const resource of bezierResources)
+          await loadBezierScript(resource);
+        bezierLoaded = true;
+      }
+      bezierHost.hidden = false;
+      bezierSession = MKWBezierLesson.mount(bezierHost);
+      closeBezier.hidden = false;
+      startBezier.hidden = true;
+      bezierStatus.textContent = "";
+      bezierHost.querySelector("select").focus({ preventScroll: true });
+    } catch (error) {
+      bezierStatus.textContent = error.message;
+    } finally {
+      document.getElementById("bezierLoadProgress").hidden = true;
+      startBezier.disabled = false;
+      bezierHost.setAttribute("aria-busy", "false");
+    }
+  });
+  closeBezier.addEventListener("click", () => {
+    bezierSession?.close();
+    bezierSession = null;
+    bezierHost.hidden = true;
+    closeBezier.hidden = true;
+    startBezier.hidden = false;
+    bezierStatus.textContent =
+      "Übung beendet. Dein Studio-Projekt bleibt unverändert.";
+    startBezier.focus({ preventScroll: true });
+  });
+}

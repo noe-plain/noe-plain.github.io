@@ -112,7 +112,7 @@ function studioSettingsUI() {
     '<h3>Zeilenabstand im Designer</h3><p id="settingsLeadingHint">95 % entspricht dem üblichen Zeilenabstand. Gilt für neue Textfelder.</p><label>Standard-Zeilenhöhe<span class="settings-leading-value"><input id="defaultLineHeight" type="number" min="20" max="300" step="any" aria-label="Standard-Zeilenhöhe in Prozent" aria-describedby="settingsLeadingHint"><span>%</span></span></label>';
   const textSizes = document.createElement("section");
   textSizes.className = "settings-text-sizes";
-  textSizes.innerHTML = `<h3>Schriftgrössen für FD-Kampagnen</h3><p>Startwerte für neue Texte. Bereits gestaltete Texte bleiben erhalten.</p><div class="settings-size-grid">${[
+  textSizes.innerHTML = `<h3>Textgrössen · FD-Backup &amp; Copyright</h3><p>Bestehende Gestaltungen bleiben unverändert.</p><div class="settings-size-grid">${[
     ["date", "Übertitel"],
     ["title", "Konzerttitel"],
     ["subtitle", "Untertitel"],

@@ -13,8 +13,8 @@
       href="../static/ui-theme-tokens.css?v=b86a421a3a48"
     />
     <link rel="stylesheet" href="../static/ui-theme.css?v=b86a421a3a48" />
-    <link rel="stylesheet" href="hilfe.css?v=0aa20d88327c" />
-    <script src="hilfe.js?v=ef14ce86486e" defer></script>
+    <link rel="stylesheet" href="hilfe.css?v=5a78fb47130c" />
+    <script src="hilfe.js?v=a93eae241719" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#helpContent">Zum Inhalt springen</a>
@@ -443,13 +443,13 @@
                   role="img"
                   aria-labelledby="contrastBeforeTitle contrastBeforeDesc"
                 >
-                  <title id="contrastBeforeTitle">Unruhiger Hintergrund</title>
+                  <title id="contrastBeforeTitle">Foto ohne Abdunklung</title>
                   <desc id="contrastBeforeDesc">
-                    Viele kleine Formen liegen direkt hinter den symbolischen
-                    Textzeilen und konkurrieren mit ihnen.
+                    Helle Textzeilen liegen auf einem Foto mit hellen und
+                    dunklen Bildstellen. Bilddetails konkurrieren mit dem Text.
                   </desc>
                   <rect
-                    class="diagram-paper"
+                    class="wiki-photo-sky"
                     x="4"
                     y="4"
                     width="232"
@@ -457,21 +457,19 @@
                     rx="8"
                   />
                   <path
-                    class="diagram-wash"
-                    d="M4 25 55 55 90 5 140 85 180 20 236 60V156H4Z"
+                    class="wiki-photo-scene"
+                    d="M4 80 55 40 90 95 140 25 180 95 236 60V156H4Z"
                   />
+                  <circle class="wiki-photo-light" cx="175" cy="110" r="22" />
                   <path
-                    class="diagram-line"
-                    d="M20 55H90M110 40H210M22 105H216M20 122H150"
-                  />
-                  <circle
-                    class="diagram-accent"
-                    cx="175"
-                    cy="105"
-                    r="22"
+                    class="wiki-photo-type"
+                    d="M22 109H210M22 132H145"
                   /></svg
-                ><strong>Zu viel Konkurrenz</strong
-                ><span>Bilddetails und Text liegen übereinander.</span>
+                ><strong>Ohne Verlauf</strong
+                ><span
+                  >Helle Bildstellen können mit weisser Schrift
+                  konkurrieren.</span
+                >
               </div>
               <div class="wiki-example">
                 <svg
@@ -479,14 +477,28 @@
                   role="img"
                   aria-labelledby="contrastAfterTitle contrastAfterDesc"
                 >
-                  <title id="contrastAfterTitle">Ruhiger Textbereich</title>
+                  <title id="contrastAfterTitle">
+                    Dasselbe Foto mit dunklem Verlauf
+                  </title>
                   <desc id="contrastAfterDesc">
-                    Das Bildmotiv liegt oben. Eine geschlossene Fläche unten
-                    trennt die beiden hellen Textzeilen deutlich vom
-                    Hintergrund.
+                    Ein Verlauf wird nach unten dunkler. Das Foto bleibt oben
+                    sichtbar; der Text hebt sich im unteren Bereich besser ab.
                   </desc>
+                  <defs>
+                    <linearGradient
+                      id="wikiKontrastVerlauf"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0" stop-color="#000" stop-opacity="0" />
+                      <stop offset=".4" stop-color="#000" stop-opacity=".05" />
+                      <stop offset="1" stop-color="#000" stop-opacity=".9" />
+                    </linearGradient>
+                  </defs>
                   <rect
-                    class="diagram-paper"
+                    class="wiki-photo-sky"
                     x="4"
                     y="4"
                     width="232"
@@ -494,35 +506,49 @@
                     rx="8"
                   />
                   <path
-                    class="diagram-wash"
-                    d="M4 25 55 55 90 5 140 85 180 20 236 60V156H4Z"
+                    class="wiki-photo-scene"
+                    d="M4 80 55 40 90 95 140 25 180 95 236 60V156H4Z"
                   />
+                  <circle class="wiki-photo-light" cx="175" cy="110" r="22" />
                   <rect
-                    class="diagram-accent"
                     x="4"
-                    y="86"
+                    y="4"
                     width="232"
-                    height="70"
+                    height="152"
                     rx="8"
+                    fill="url(#wikiKontrastVerlauf)"
                   />
                   <path
-                    class="diagram-on-accent-stroke"
-                    d="M22 108H210M22 129H145"
+                    class="wiki-photo-type"
+                    d="M22 109H210M22 132H145"
                   /></svg
-                ><strong>Klarer Textbereich</strong
-                ><span>Eine ruhige Fläche trennt den Text vom Foto.</span>
+                ><strong>Mit abdunkelndem Verlauf</strong
+                ><span
+                  >Der Textbereich wird dunkler, das Bild bleibt
+                  erkennbar.</span
+                >
               </div>
             </div>
             <figcaption>
-              Schematisch: Beurteile den Text zusammen mit dem Foto, nicht nur
-              die Schriftfarbe. Ein Verlauf kann die Bilddetails unter dem Text
-              abschwächen und das übrige Foto sichtbar lassen.
+              Wir verwenden Verläufe zum Abdunkeln unserer Bilder. Lege den
+              dunkleren Teil hinter den hellen Text und lasse den Verlauf zum
+              übrigen Foto weich auslaufen. Prüfe jede Textzeile: Ein Verlauf
+              garantiert nicht auf jedem Foto ausreichenden Kontrast.
             </figcaption>
           </figure>
+          <p class="wiki-tip">
+            <strong>Gestaltungstipp:</strong> Eine feste dunkle Fläche bietet
+            gleichmässigeren Kontrast, verdeckt das Foto aber stärker. Für
+            unsere Bildmotive ist der abdunkelnde Verlauf der Ausgangspunkt.
+            Passe seine Position und Deckkraft an das jeweilige Foto an.
+          </p>
           <p>
             <strong>Im Studio:</strong> Wähle <strong>Verlauf</strong>, ziehe
             ihn auf und ordne ihn in <strong>Ebenen</strong> zwischen Foto und
-            Text an. Passe Farbe und Deckkraft an.
+            Text an. Wähle Schwarz für den dunklen Bereich und lasse die
+            Deckkraft zum anderen Ende auf 0 % auslaufen. Im Zahlenfeld
+            <strong>Transparenz</strong> entspricht das 100 %. Prüfe das
+            Ergebnis in der Exportvorschau.
             <a href="#grafik-ebenen">So funktioniert die Reihenfolge</a>.
           </p>
           <h3>3 · Gleiche Kanten und bewusste Abstände schaffen Ordnung</h3>
@@ -2040,6 +2066,213 @@
             Bei Fotos wird der Bildinhalt weichgezeichnet, die Kante des
             Beschnittsrahmens bleibt scharf.
           </p>
+          <h3 id="bezier-lernen">Pfade und Kurven spielerisch lernen</h3>
+          <p>
+            Eine <strong>Bézier-Kurve</strong> ist eine Linie, deren Biegung du
+            mit Punkten und Griffen steuerst. Die kurzen Übungen führen dich von
+            einer Ecke zu einer verbundenen, geschlossenen Form. Kein Zeitdruck:
+            Hinweise, Schritt zurück und freies Üben sind immer möglich.
+          </p>
+          <div class="bezier-launcher">
+            <button
+              type="button"
+              id="startBezier"
+              aria-controls="bezierHost"
+              hidden
+            >
+              Kurven-Lernspiel starten</button
+            ><button type="button" id="closeBezier" hidden>
+              Übung schliessen</button
+            ><progress
+              id="bezierLoadProgress"
+              aria-label="Kurven-Lernspiel wird geladen"
+              hidden
+            ></progress>
+            <p id="bezierLoadStatus" role="status" aria-live="polite"></p>
+          </div>
+          <div
+            id="bezierHost"
+            class="bezier-game"
+            role="region"
+            aria-label="Kurven-Lernspiel"
+            hidden
+          ></div>
+          <noscript
+            ><p>
+              Für die interaktive Übung brauchst du JavaScript. Die folgenden
+              Bilder und die Anleitung zum Üben im Studio funktionieren auch
+              ohne JavaScript.
+            </p></noscript
+          >
+          <p>
+            Das Lernspiel ist eine separate Übungsfläche. Es ändert dein Projekt
+            nicht und speichert keine Übungen. Die Griffregeln entsprechen dem
+            Studio; die reduzierte Übungsoberfläche ersetzt nicht alle Werkzeuge
+            des Designers.
+          </p>
+          <figure class="wiki-figure" id="grafik-grifftypen">
+            <div class="wiki-diagram-grid wiki-three-examples">
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 190 145"
+                  role="img"
+                  aria-labelledby="cornerTipTitle cornerTipDesc"
+                >
+                  <title id="cornerTipTitle">Eckpunkt</title>
+                  <desc id="cornerTipDesc">
+                    Zwei gerade Linien treffen in einem Eckpunkt ohne Griffe
+                    zusammen.
+                  </desc>
+                  <path class="diagram-line" d="M20 110 95 35 170 110" />
+                  <rect
+                    class="diagram-accent"
+                    x="89"
+                    y="29"
+                    width="12"
+                    height="12"
+                  /></svg
+                ><strong>Ecke</strong
+                ><span
+                  >Klicken setzt einen Punkt. Ohne Griffe kann die Richtung dort
+                  scharf wechseln.</span
+                >
+              </div>
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 190 145"
+                  role="img"
+                  aria-labelledby="smoothTipTitle smoothTipDesc"
+                >
+                  <title id="smoothTipTitle">Verbundene Griffe</title>
+                  <desc id="smoothTipDesc">
+                    Zwei gegenüberliegende Griffe bilden eine gemeinsame Gerade.
+                    Die Linie läuft weich durch den Punkt.
+                  </desc>
+                  <path
+                    class="diagram-line"
+                    d="M15 120C35 120 55 105 95 75S150 25 175 25"
+                  />
+                  <path class="diagram-guide" d="M55 105 135 45" />
+                  <circle class="diagram-paper" cx="55" cy="105" r="6" />
+                  <circle class="diagram-paper" cx="135" cy="45" r="6" />
+                  <rect
+                    class="diagram-accent"
+                    x="89"
+                    y="69"
+                    width="12"
+                    height="12"
+                  /></svg
+                ><strong>Richtung verbunden</strong
+                ><span
+                  >Eine gemeinsame Griffachse ermöglicht einen glatten Übergang.
+                  Unterschiedliche Längen verändern die Stärke auf jeder
+                  Seite.</span
+                >
+              </div>
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 190 145"
+                  role="img"
+                  aria-labelledby="freeTipTitle freeTipDesc"
+                >
+                  <title id="freeTipTitle">Unabhängige Griffe</title>
+                  <desc id="freeTipDesc">
+                    Zwei Griffe zeigen in unterschiedliche Richtungen. Die Kurve
+                    hat am Punkt einen bewussten Knick.
+                  </desc>
+                  <path
+                    class="diagram-line"
+                    d="M15 120C35 120 55 105 95 75C140 105 150 40 175 25"
+                  />
+                  <path class="diagram-guide" d="M55 105 95 75 140 105" />
+                  <circle class="diagram-paper" cx="55" cy="105" r="6" />
+                  <circle class="diagram-paper" cx="140" cy="105" r="6" />
+                  <rect
+                    class="diagram-accent"
+                    x="89"
+                    y="69"
+                    width="12"
+                    height="12"
+                  /></svg
+                ><strong>Griffe frei</strong
+                ><span
+                  >Alt/Option beim Ziehen löst die Richtung. So kannst du einen
+                  bewussten Knick mit gebogenen Seiten gestalten.</span
+                >
+              </div>
+            </div>
+            <figcaption>
+              Shift hilft bei 45°-Richtungen. Control hält die Länge des
+              gegenüberliegenden Griffs fest, während seine Richtung gekoppelt
+              bleibt. Alt/Option löst auch diese Richtung. Im Lernspiel gibt es
+              dafür zusätzlich sichtbare Auswahlfelder.
+            </figcaption>
+          </figure>
+          <figure class="wiki-figure" id="grafik-pfad-schliessen">
+            <div class="wiki-diagram-grid">
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 220 165"
+                  role="img"
+                  aria-labelledby="openTipTitle openTipDesc"
+                >
+                  <title id="openTipTitle">Offene Linie</title>
+                  <desc id="openTipDesc">
+                    Die Raute hat eine offene Seite. Anfang und Ende sind
+                    getrennte Punkte.
+                  </desc>
+                  <path class="diagram-line" d="M110 20 195 80 110 145 25 80" />
+                  <rect
+                    class="diagram-accent"
+                    x="104"
+                    y="14"
+                    width="12"
+                    height="12"
+                  />
+                  <circle class="diagram-paper" cx="25" cy="80" r="7" /></svg
+                ><strong>Offen beenden</strong
+                ><span
+                  >Enter beendet die Linie. Anfang und Ende bleiben getrennt; du
+                  kannst später weiterzeichnen.</span
+                >
+              </div>
+              <div class="wiki-example">
+                <svg
+                  viewBox="0 0 220 165"
+                  role="img"
+                  aria-labelledby="closedTipTitle closedTipDesc"
+                >
+                  <title id="closedTipTitle">Geschlossene Form</title>
+                  <desc id="closedTipDesc">
+                    Die letzte Seite führt zum ersten Punkt zurück und schliesst
+                    die Raute vollständig.
+                  </desc>
+                  <path
+                    class="diagram-line"
+                    d="M110 20 195 80 110 145 25 80Z"
+                  />
+                  <circle class="diagram-guide" cx="110" cy="20" r="14" />
+                  <rect
+                    class="diagram-accent"
+                    x="104"
+                    y="14"
+                    width="12"
+                    height="12"
+                  /></svg
+                ><strong>Geschlossen</strong
+                ><span
+                  >Klicke ausdrücklich auf den ersten Punkt. Nur nahe herangehen
+                  oder einrasten schliesst die Form nicht.</span
+                >
+              </div>
+            </div>
+            <figcaption>
+              Eine gefüllte offene Linie kann optisch bereits geschlossen
+              wirken. Entscheidend ist, ob die Endpunkte tatsächlich verbunden
+              sind. Das Lernspiel prüft deshalb auch die Verbindung und den
+              offenen beziehungsweise geschlossenen Zustand.
+            </figcaption>
+          </figure>
           <h3>Mit Pfaden und Formen zeichnen</h3>
           <figure class="wiki-figure" id="grafik-kurvengriffe">
             <svg
@@ -2823,18 +3056,21 @@
           <h3>Eine Photoshop-Datei erstellen</h3>
           <p>
             PSD findest du im <strong>Speichern-Dialog</strong> unter
-            <strong>Photoshop-Datei · PSD</strong>. Beim Designer sind die
-            Slides als Slices enthalten. Ein Slice markiert den Bereich einer
-            einzelnen Slide innerhalb der grossen Gestaltung.
+            <strong>Photoshop-Datei · PSD</strong>. Im Designer und im aktuellen
+            FD-Modus sind die Ausgabeflächen als Slices enthalten. Ein Slice
+            markiert den Bereich einer einzelnen Slide innerhalb der grossen
+            Gestaltung.
           </p>
           <p>
             Im Designer bleiben Texte als zusammenhängende Textfelder erhalten.
             Fotos, Winkelbilder und Logos sind als eingebettete
             <strong>Smartobjekte</strong> enthalten. Das sind austauschbare
             Bildinhalte. Der Beschnitt liegt bei Fotos und Winkeln als separate
-            Maske darüber. Bei FD-Kampagnen bleiben die Formate eigene
-            Photoshop-Zeichenflächen; Sponsorleisten enthalten einzelne Logos,
-            Gruppentitel und eine bearbeitbare Balkenfarbe.
+            Maske darüber. Eigene Photoshop-Zeichenflächen für die Formate
+            betreffen den bisherigen FD-Backup-Export; im aktuellen FD-Modus
+            wird der Designer-Exportweg mit zusammenhängender Gestaltung und
+            Slices verwendet. Der genaue Ebenenaufbau hängt vom Element und
+            seinen Effekten ab.
           </p>
           <ol>
             <li>
@@ -3007,9 +3243,11 @@
               du es jederzeit ändern.
             </li>
             <li>
-              <strong>Schriften:</strong> Lege Standardgrössen für Übertitel,
-              Konzerttitel, Untertitel und Copyright neuer FD-Kampagnen fest.
-              Die Zeilenhöhe in Prozent gilt für neue Designer-Texte.
+              <strong>Schriften:</strong> Die Standardgrössen betreffen die
+              festen FD-Textarten und den Bildnachweis. Die drei Kartenfelder im
+              aktuellen FD-Modus haben eigene Startwerte: 70, 120 und 55 px. Du
+              änderst ihre Grösse anschliessend am jeweiligen Absatz auf der
+              Fläche. Die Zeilenhöhe in Prozent gilt für neue Designer-Texte.
             </li>
             <li>
               <strong>Sponsoren:</strong> Verwalte Gruppen und Logos und wähle
@@ -3258,21 +3496,24 @@
             Ich klicke auf ein leeres Textfeld und lande beim Bildausschnitt.
           </h3>
           <p>
-            Wähle zuerst das Werkzeug <strong>Text</strong> und dann die
-            gewünschte Zeichenfläche. Der erste Klick wählt die Fläche, damit du
-            rechts oder direkt auf der Fläche schreiben kannst. Ein weiterer
-            Klick auf den Bildhintergrund kann zum Ausschnitt wechseln.
+            Wähle das leere Textfeld in der <strong>Ebenenliste</strong>, damit
+            nicht das Foto dahinter ausgewählt wird. Öffne danach
+            <strong>Auf der Fläche</strong> und schreibe direkt im Rahmen. Prüfe
+            bei Bedarf, ob die Textebene ausgeblendet oder gesperrt ist. Rechts
+            formatierst du den Text; den Inhalt gibst du in den aktuellen Modi
+            auf der Fläche ein.
           </p>
           <h3>Was bedeutet die Warnung bei einem Bild?</h3>
           <p>
             <strong>Nicht vollständig abgedeckt:</strong> Das Foto lässt eine
-            freie Stelle. Wähle in den FD-Kampagnen
-            <strong>Fläche füllen</strong>, beim Designer
-            <strong>Rahmen füllen</strong> und prüfe den Ausschnitt.
+            freie Stelle. Wähle im aktuellen FD-Modus und im Designer
+            <strong>Rahmen füllen</strong> und prüfe den Ausschnitt. Im
+            bisherigen FD-Backup heisst die Aktion
+            <strong>Fläche füllen</strong>.
             <strong>Niedrige Auflösung:</strong> Das Foto wird stark
             vergrössert. Verwende wenn möglich eine grössere Datei oder
-            vergrössere den Ausschnitt weniger. Warnränder und Hilfslinien
-            erscheinen nicht im Export.
+            verringere die Vergrösserung des Bildinhalts. Warnränder und
+            Hilfslinien erscheinen nicht im Export.
           </p>
           <h3>Der Text ist zu lang oder reicht über eine Slide.</h3>
           <p>

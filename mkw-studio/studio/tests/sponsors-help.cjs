@@ -38,7 +38,7 @@ const { launch, artifact } = require("./browser.cjs");
       1,
       "Wiki opens inside the current Studio window",
     );
-    assert.equal(await help.locator("main section").count(), 8);
+    assert.equal(await help.locator("main section").count(), 10);
     assert(await help.locator("body>header").isHidden());
     await help.locator("#helpSearch").fill("Firefox");
     assert(await help.locator("#speichern").isVisible());
@@ -50,15 +50,15 @@ const { launch, artifact } = require("./browser.cjs");
     );
     await help.locator("#helpSearch").fill("Rahmenpunkte");
     assert(await help.locator("#einzelposts").isHidden());
-    await help.locator('a[href="#advanced-typografie"]').click();
+    await help.locator('#carousels a[href="#advanced-typografie"]').click();
     assert(await help.locator("#advanced-typografie").isVisible());
     assert.equal(await help.locator("#helpSearch").inputValue(), "");
     assert.equal(
       await help.locator('nav [aria-current="location"]').getAttribute("href"),
-      "#einzelposts",
+      "#texte",
     );
     await help.locator("#helpSearch").fill("Rahmenpunkte");
-    await help.locator('a[href="#advanced-typografie"]').click();
+    await help.locator('#carousels a[href="#advanced-typografie"]').click();
     assert(await help.locator("#advanced-typografie").isVisible());
     assert.equal(await help.locator("#helpSearch").inputValue(), "");
     await help.locator("#helpSearch").fill("");
@@ -479,7 +479,12 @@ const { launch, artifact } = require("./browser.cjs");
       syncOverlays(true);
     });
     await require("./browser.cjs").fillCanvasText(page, "Aus nächster Nähe");
-    assert.equal(await page.locator("[data-typo-toggle=uppercase]").getAttribute("aria-pressed"),"true");
+    assert.equal(
+      await page
+        .locator("[data-typo-toggle=uppercase]")
+        .getAttribute("aria-pressed"),
+      "true",
+    );
     assert.equal(
       await page.evaluate(() => board().elements.date.text),
       "Aus nächster Nähe",
@@ -490,7 +495,8 @@ const { launch, artifact } = require("./browser.cjs");
       ),
       "AUS NÄCHSTER NÄHE",
     );
-    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    if (await page.locator("[data-typo-all]").isVisible())
+      await page.locator("[data-typo-all]").click();
     await page.locator("[data-typo-toggle=uppercase]").click();
     assert.equal(
       await page.evaluate(
@@ -498,7 +504,8 @@ const { launch, artifact } = require("./browser.cjs");
       ),
       "Aus nächster Nähe",
     );
-    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    if (await page.locator("[data-typo-all]").isVisible())
+      await page.locator("[data-typo-all]").click();
     await page.locator("[data-typo-toggle=uppercase]").click();
     await page.evaluate(() => {
       const b = board(),
@@ -510,7 +517,8 @@ const { launch, artifact } = require("./browser.cjs");
       el.dispatchEvent(new Event("input", { bubbles: true }));
       el.blur();
     });
-    if(await page.locator("[data-typo-all]").isVisible()) await page.locator("[data-typo-all]").click();
+    if (await page.locator("[data-typo-all]").isVisible())
+      await page.locator("[data-typo-all]").click();
     await page.locator("[data-typo-toggle=uppercase]").click();
     assert.equal(
       await page.evaluate(() => board().elements.date.text),
